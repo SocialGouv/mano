@@ -1,0 +1,54 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Helvetica, Arial, sans-serif;
+  background-color: #f2f7fd;
+}
+
+ul {
+  list-style: inside;
+  position: 0;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main {
+  flex: 1;
+  height: 100%;
+  flex-direction: column;
+  display: flex;
+  height: 100%;
+  overflow-y: auto;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+
+table tr {
+  cursor: pointer;
+}
+a {
+  text-decoration: none;
+}
+
+.image-input {
+  height: 100px;
+  min-width: 150px;
+  background: #f3f3f3 url("./assets/image.svg") center no-repeat;
+  background-size: 50%;
+  border: 2px solid #eee;
+  margin-top: 10px;
+  cursor: pointer;
+}

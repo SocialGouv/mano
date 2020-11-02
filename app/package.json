@@ -1,0 +1,61 @@
+{
+  "name": "Mano",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "android": "react-native run-android",
+    "ios": "react-native run-ios",
+    "start": "react-native start --reset-cache",
+    "test": "jest --watch",
+    "lint": "eslint .",
+    "android-clean-start": "npm run clean:android && react-native run-android",
+    "postinstall": "pod install --project-directory=ios/ && npx jetify",
+    "clean:android": "cd android && ./gradlew clean && cd ../ && adb uninstall com.mano",
+    "build:android": "cd android && ./gradlew clean && ./gradlew bundleRelease && cd ../",
+    "build:android-apk": "npm run build:android && npm run from-aab-to-apk",
+    "from-aab-to-apk": "cd android && bundletool build-apks --bundle=./app/build/outputs/bundle/release/app-release.aab --output=./app/build/outputs/bundle/release/app.apks --ks=./app/debug.keystore --ks-pass=pass:android --ks-key-alias=androiddebugkey --key-pass=pass:android --mode=universal && cd ./app/build/outputs/bundle/release && mv app.apks app.zip && unzip app.zip && cd ../../../../../../",
+    "deploy:android": "./upload.sh",
+    "build-and-deploy:android": "npm run build:android-apk && ./upload.sh"
+  },
+  "dependencies": {
+    "@react-native-community/async-storage": "^1.12.0",
+    "@react-native-community/datetimepicker": "^3.0.1",
+    "@react-native-community/masked-view": "^0.1.10",
+    "@react-native-community/netinfo": "^5.9.6",
+    "@react-native-community/picker": "^1.6.5",
+    "@react-navigation/bottom-tabs": "^5.7.2",
+    "@react-navigation/native": "^5.7.1",
+    "@react-navigation/stack": "^5.7.1",
+    "@sentry/react-native": "^1.7.1",
+    "jsonwebtoken": "^8.5.1",
+    "libphonenumber-js": "^1.7.57",
+    "prop-types": "^15.7.2",
+    "react": "16.13.1",
+    "react-native": "0.63.1",
+    "react-native-bootsplash": "^2.2.5",
+    "react-native-country-picker-modal": "^2.0.0",
+    "react-native-gesture-handler": "^1.7.0",
+    "react-native-keychain": "^6.1.1",
+    "react-native-reanimated": "^1.10.0",
+    "react-native-safe-area-context": "^3.1.1",
+    "react-native-screens": "^2.9.0",
+    "react-native-svg": "^12.1.0",
+    "styled-components": "^5.1.1"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.10.5",
+    "@babel/runtime": "^7.10.5",
+    "@react-native-community/eslint-config": "^2.0.0",
+    "babel-jest": "^26.1.0",
+    "eslint": "^7.5.0",
+    "jest": "^26.1.0",
+    "metro-react-native-babel-preset": "^0.61.0",
+    "react-test-renderer": "16.13.1"
+  },
+  "jest": {
+    "preset": "react-native",
+    "forceCoverageMatch": [
+      "**/*.test.js"
+    ]
+  }
+}

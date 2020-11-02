@@ -1,0 +1,9 @@
+.env
+.env.staging
+.env.development
+.env.production
+
+node_modules/
+.DS_Store
+
+.scripts
