@@ -29,6 +29,8 @@ jobs:
 
       - name: Yarn cache setup
         uses: c-hive/gha-yarn-cache@v2
+        with:
+          directory: website
 
       - name: Install dependencies
         working-directory: website
