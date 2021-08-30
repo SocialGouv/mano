@@ -29,6 +29,11 @@
     "generate:dev": "kosko generate  --env dev",
     "generate:preprod": "kosko generate  --env preprod",
     "generate:prod": "kosko generate  --env prod",
+    "github": "DOTENV_CONFIG_PATH=./environments/.github-actions.env kosko generate --require dotenv/config",
+    "github-prod": "DOTENV_CONFIG_PATH=./environments/.github-actions-prod.env kosko generate --require dotenv/config",
+    "github:dev": "yarn --silent github --env dev",
+    "github:preprod": "yarn --silent github --env preprod",
+    "github:prod": "yarn --silent github-prod --env prod",
     "test": "jest"
   }
 }
