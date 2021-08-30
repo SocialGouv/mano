@@ -1,0 +1,27 @@
+@import url("./font-poppins.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply font-poppins;
+  }
+
+  button {
+    @apply focus:outline-none;
+  }
+
+  .flex-center {
+    @apply flex items-center justify-center;
+  }
+
+  .list-card {
+    @apply p-6 text-gray-600 list-disc list-inside rounded-lg bg-gray-50;
+  }
+}

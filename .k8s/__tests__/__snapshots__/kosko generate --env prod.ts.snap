@@ -1,0 +1,691 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`kosko generate --prod 1`] = `
+"---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    app: api
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  namespace: mano
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: mano-branch-42
+        app.gitlab.com/env.name: mano-branch-dev2
+      labels:
+        app: api
+        application: mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    spec:
+      containers:
+        - image: harbor.fabrique.social.gouv.fr/mano/mano-api:1.2.3
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: api
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            failureThreshold: 15
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          envFrom:
+            - secretRef:
+                name: azure-pg-user
+      imagePullSecrets:
+        - name: regcred
+      initContainers:
+        - env:
+            - name: WAIT_FOR_RETRIES
+              value: '24'
+          envFrom:
+            - secretRef:
+                name: azure-pg-user
+          image: ghcr.io/socialgouv/docker/wait-for-postgres:6.0.1
+          imagePullPolicy: Always
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 20m
+              memory: 32Mi
+            requests:
+              cpu: 5m
+              memory: 16Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  namespace: mano
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  selector:
+    app: api
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: 'true'
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    app: api
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  namespace: mano
+spec:
+  rules:
+    - host: mano.dev2.fabrique.social.gouv.fr
+      http:
+        paths:
+          - backend:
+              serviceName: api
+              servicePort: 80
+            path: /
+  tls:
+    - hosts:
+        - mano.dev2.fabrique.social.gouv.fr
+      secretName: api-crt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    app: dashboard
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: dashboard
+  namespace: mano
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: mano-branch-42
+        app.gitlab.com/env.name: mano-branch-dev2
+      labels:
+        app: dashboard
+        application: mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    spec:
+      containers:
+        - image: harbor.fabrique.social.gouv.fr/mano/mano-dashboard:1.2.3
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: dashboard
+          ports:
+            - containerPort: 80
+              name: http
+          readinessProbe:
+            failureThreshold: 15
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dashboard
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: dashboard
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  namespace: mano
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: dashboard
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: 'true'
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    app: dashboard
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: dashboard
+  namespace: mano
+spec:
+  rules:
+    - host: dashboard-mano.dev2.fabrique.social.gouv.fr
+      http:
+        paths:
+          - backend:
+              serviceName: dashboard
+              servicePort: 80
+            path: /
+  tls:
+    - hosts:
+        - dashboard-mano.dev2.fabrique.social.gouv.fr
+      secretName: dashboard-crt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    app: metabase
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: metabase
+  namespace: mano
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: metabase
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: mano-branch-42
+        app.gitlab.com/env.name: mano-branch-dev2
+      labels:
+        app: metabase
+        application: mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    spec:
+      containers:
+        - image: metabase/metabase:v0.37.4
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: metabase
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            failureThreshold: 15
+            httpGet:
+              path: /api/health
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 1024Mi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /api/health
+              port: http
+            periodSeconds: 10
+            initialDelaySeconds: 240
+            successThreshold: 1
+            timeoutSeconds: 10
+          envFrom:
+            - secretRef:
+                name: metabase-db-user
+            - configMapRef:
+                name: metabase-configmap
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  name: metabase-db-user
+  namespace: mano
+  labels:
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+spec:
+  encryptedData:
+    MB_DB_CONNECTION_URI: >-
+      AgAzyBTOcvPc6KVLVo+htqRVg+drrU1kom1remKacZcjinaiUhItYx3BELV0tZe82H7RVNsb9xa+F9hDx4P5FkcfVMMcxklCIXFZJrX7HafYiybZp8zw70I8Z1x6vNdwW9qkDxyNLK6k0P0S3UDZtSuh6kMiBG3mRAZANklTL8SAS8uU5h57q5aNt57edX/4yP/nej6zlOAZhffJmafdYBeVoW00IRyDXYidIAfWDO/p0QxpkcCfBMShlsOV1TwfZr6yIAnrMRt+vyiYuY3fO1dO51e8UBdT254ANZctzD+ODqHqagZ2Axk3np6A09mXIimhRiIzrZbDCoPYT72TLHBkgpLrDKHqsgLTNbesYosQHrvv4XqY/H3/gKzQt+fuesvHVhX4nwJJXESxxPlbuy5wE+TcQcZhdIlokUHqvHAKTUR7VXd9jlUS9TY/cqPAauBurzm1k4vM55r2MMPCB3H5ZXOBvWhvYkgo+uOqt3zfnF63tkUbA4C8SWqxFaCXZa1JZMtRl4APf1dyUBuvvMXeC36bjtGOWYQuVTIj3JUh0o4N4EIt2aapSOxD5q74UvMbTWCZEf8BhR0YxZeAyElk3485The5fqBkKcF8p3Nod1xyZNTtb7FyLFIV2i9C7GVe+ICz348cXLi7DHAz7/3DUUCvfkSoOjbqMh1KgsabP1v871Ko0OAd53L5N8aUnjGhA2qSHYiC01AbvefarzjyM4ZGCRd9+qPFlBJ5bOCZIVprrQ2GGmoTbYSznNKldbfFBhWQlCTWJky8XfWgNieal+jJzcFMbllB6NiipSY+qHXnXHXNXZXCBrT3seK6ImAqSU8QrgGQyJ6V4iwISj7pH5ucVoaspZdHRp6N5rRsO0eOjH03ZgBqu1tG3dIfvGyXTSiMx3qJhZZcE+BfeA==
+    MB_ENCRYPTION_SECRET_KEY: >-
+      AgCoPqZyamRvrGe4r5bIjsKYkSjNP+9Cg22H6zYuah5HzFOTy5iOts9gh6tfMbS5zmtXFw/cmGHvBkCXJxxu8KBCF5tZzwX4ofAEb/aymkUDR7aQ0weV3o03C425/FwqYiukJqgvyRBxoOOVHMi2+0h4cjMbrSqCNXGl5o1X6ah/GarqwRIuRXK0J6ko82L64jyXhE9GaLKG88cgbvYLYZOHMpP0vaZ3r111ZVBXA4z0PHFuKrhafhFGBmbDTnYKdSkNTEFJgwwuKk1kk8ZYzhyKrDEbQz7jVUZ+WJmGsWbLsv5HkGlpg0232RWEW4A/MSPMfZ8xI9eGo6J4SMgCxoh+JsZd1RV9EXKpEvUKEc1JnP1KundYda3MB6xI/wXEogqnFslfZ+6EjIqbZKlNOPtwqpavUhJ4E9PAc9JJUstjfwh3vA0IGDVh3+HLchfZhY+f0RFBf/25A5+TnXr04dWx8WfZU+F+kq3NrxCX+igs6ElB1QeA4S4YHK9WXaLRbev6rWtP09fsTnMdUHkfONu0cKZsGQLnLQ2+kn9T2UCuOnGNHw9dA1BxTCr05cR8EhJERlLYYEm1+yDz649iSj/+tj7deNqC/kExYPCdYNJ8eKKBk7wyilys/hgIrqLqK0pLHeuasoTAInZJBg17fgDhRhM0YN0H/CZtj4XWJJb45+n8lsDnkAHzT4vQ84NipUHaNF86RADRhH8WcMlx92XFQCPpGu9ftGt4+Xjt8syq3dCpvP1eJfVX
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: mano-branch-42
+        app.gitlab.com/env.name: mano-branch-dev2
+      name: metabase-db-user
+      labels:
+        application: mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    type: Opaque
+---
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: metabase-configmap
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  namespace: mano
+data:
+  MB_DB_TYPE: postgres
+  MB_ADMIN_EMAIL: admin@fabrique.social.gouv.fr
+  MB_ANON_TRACKING_ENABLED: 'false'
+  MB_APPLICATION_LOGO_URL: https://socialgouv.github.io/support/_media/marianne.jpeg
+  MB_APPLICATION_NAME: metabase-mano
+  MB_EMAIL_FROM_ADDRESS: admin@fabrique.social.gouv.fr
+  MB_ENABLE_EMBEDDING: 'true'
+  MB_ENABLE_PUBLIC_SHARING: 'true'
+  MB_SITE_LOCALE: fr
+  MB_SITE_NAME: Fabrique des ministères sociaux
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: metabase
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: metabase
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  namespace: mano
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  selector:
+    app: metabase
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: 'true'
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    app: metabase
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: metabase
+  namespace: mano
+spec:
+  rules:
+    - host: metabase-mano.dev2.fabrique.social.gouv.fr
+      http:
+        paths:
+          - backend:
+              serviceName: metabase
+              servicePort: 80
+            path: /
+  tls:
+    - hosts:
+        - metabase-mano.dev2.fabrique.social.gouv.fr
+      secretName: metabase-crt
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  name: azure-pg-user
+  namespace: mano
+  labels:
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+spec:
+  encryptedData:
+    DATABASE_URL: >-
+      AgBhJofjyCeZXQErnLQqEdpn+a9wVV0/o1SelGGyAfFRDi/U6zAGz7TK1AOAMycFaESw3Ayp1i3FmJk7ToSC2U7mv54g/W3BLY3HMWE7c3AHNqMZK05O0YcaO31qh938t0DUmYlFyuqfJ50CDVF4i7BiAv+jiVkhsvr90ZGOJEo9KnrmMJaDRPL0IJD1k+s1UDlbJNjoT6Gmt+uqSEEXdBptKwhhKZrRKUE7RG+76/jtGZxIZLeKM01xlE/dJSRvCmM8mlrtrO1iqUPZpKWw2IHK+FG8VG2ztIvZVk/Y0IRhNGgI31Uimwy1K9HlMm6GabCnXDzjEXEz+6BdX2s7/jxc2tINn+wCdfSgIqy6t2kV3856S7QBp+cSbeq+rQt51nmpSscslpGut+dPwQhFcl8/H0rpCvPw2iuprg2Gsmw+V0/mKfac+zaULww2FRIu5CeuhSdn+7zswx+fseKuRRMXG+xyfCw8aJ5Dmtg3EwfdWuA2I5TAKJl95YZ/yWU+t+R4Quhq2g5/4DlYT3c3WUBrlAa8kqc97t5IjhUifjtvnQQZ8QkSsZcfQEpr3zi+vRe3CDLPqCsuxMEApvJGePXk6dAJZIdA1kUJx7SwpJeSaJNePFaUNBmv2eSUx2nrNH2vKaen50FCZSE4AV06mzaAGYbCPJGu6RBBNomVbxRA9mNBcdxFYQ+9k/T5x/IYO9ueQnQ7wr76jruOVSYiH/fPOjtwbjz1RAOwfH+UAg9b/4Tq4CRkEHlT/BcDsAOFI8K4K1fL1CN3OG1THrF6wqz8a+32qP6fofYnVZuzz9ZhJa04KWMKJa5afBMuu53V+EJ2939rWrfhdzPCenyDy2j8Bay948fr4pb8FV98kDXy38vZoI2ThTFon3o+Q8lfPEGfUA15umqldfkmSi3vK75JO62cvyvS
+    DB_URI: >-
+      AgBLtSjT4dgIHdJooDe/PgEv3f5sziHw0cHlFvWsbTO/Q0IhQ3LZ+d5cyd7G662CAbIFsZyBwyYBedkLQzPfTcueRrvAH4O0X8Sso5OevWLfOMWu2f2G09zlUxzX6pX6pH6bOLjSWC0XSxJrwzPLmSnOYTes1c6YRL3tCzE0JrxTXLIFvYWAAErA3U2sFdIjIJA/40KIPMZ6vFscJg9ZqMZR6lmO/eYxlSCpSKuF6P2kiM+8YZVQLfrYp1FBzyD9WJUs4oLvA+aUn+R1hbyiB6kbY7ekYAcda7fPPmQJER04klX/mfRumaMT5ITvRk8xr7SbjwduirtHlrS+xnC3yQMamFDABBZwulKrpjzM+cC4oXwZF9cPR6sYXFKGUdJnau2vmZZSz8RVUOsRBMkGasohOlsoyGVjW2+IwDN8CuhsWCJgiLu9xEtsYv52gf7LTFupHFhEG0+35S93VBI/OGzbxgcSK2CfVFM8m7r5nS81PmBZIuF6gmBIaS1VQMwhFhNJvlgB8rUS1eEO6ZLeni8XX7ILy8HvfzGMpgaGK/up2yXBTmR4C66bKShjNDp34MGmwLnbHXKziPakrg7L7AvAdpxqSt7EVh73ZszlLTWNZkWeydfpGcj6lPsp+gXD8EAnYeFzE1aRog6wA9S0yxSKgPUWAzAvIx4XAiqhqcKRO6fdU6pJc7TBN4LrNwTx06SXZSM/eARRz4974JHr3v7ulxrRfFAWrgBr92wLdHUPoCygzblXo+K5U79y3MdMByh4ES6oYEI4Ld2Xs946FfCnP+ioE6USU0NSVgCIhxgYgAOuNeqFxwaHgcbfwmi7H9+cvX1zgXQR69CfwLhc892j0hTT1PKirgg1UMAAyJbhRXVOtZSNYeP6OaNWq/yNsJPY1qU6ep3197bvVsVMP1Sc/NgK9btL
+    HASURA_GRAPHQL_DATABASE_URL: >-
+      AgBRujiKy8JPqLwpB0ZL9ZwCq/6nhPlQarMJlz9pXBHUM3c559tfFGVNPsCLehLhIQkQZQv1V1JdlcgP9vEd72YLf4LMdpmItOXSV7mnOB/bicwQDRbay1QFiGYg4BdZ2xF7gM4ikd2wP4gX90cRuhjUxpP2W+mmvT81WpisQhOdtvwv0StoihXAEBp3Bo17m4enRV7OnnBFlEAZ5/wjED5I0R/05uimjiLEHwTmf/pY7QfoTJmxSWF4AmCl8qJRLS5pJndykzL6Si1+eNaRg8jLV3RpCAshmgJ8TaaU2ax6JMm04F6O24/na/t9tMm8rDXGEE5CFv2XDoAJdkrkkgl9HvQ542ttIYKAPxjYZ9AeCu5sDhU9BJVpCPczTeLKKfDJxXRhauLaUi/w1qWXXnQrBopOuF1enrk+HrPr7xBKJn09JD4KXacVyc+9EPiAXn9ACPHKYPD1x7Y+n1P/0e/eAIjeaO1Fd/xAN2DQgG5QbGiKHF1PpqsIWJhHx5N4Uzvvhruqdzgbgn3i/yFICa2C34gEByUjGZRc8l/cxvTBSS91TXpw8TriQknZxgmzpFBN10q7ghoRHjVWODdY6vIwKEEh0FZjdSjqqNLIoxzTJ7h75656D1zkMr/sN12zujcqK0KoA+AWMySH/TflqE+XTvEcSce1vIZD18wE7K3ae8fy4GDsTsPk4nsiLLCfumDvnz0t/B3h0MmpfZahwNKYkzVjVVHR6yM051NvQAixMlhJd315ObW06l38Dfou6eCMK48n+U3K6S9nwvMoR6r6KrZuNNPzwTvnRKQX+ZCyIRmmKLFRoEqgdiC2Kl2bxE93O3ZaAuCXdTB8y6wJDqYZSFOB+1bLA5JJGYQDIWnP5HPWxYUctlpYNooVo029cFY1if93OenZH76fh5LP4AlBmDClVImj
+    PGDATABASE: >-
+      AgBEk7MoSk/1Ss6T/OZCm6emy0QFdPUDm8x5rCHNlxLTOJy9jd0rW6qgty6LxkzYKFfh2YT2TQrc7bGB/cLnRZ9mQ47nEFDFbcDY9YIxNNghXA9tg0ket+JkK99A48p5YPNhFI068cMOzWehWItYy0EE+MT2BR6mD0TF8j2g99gTcWQ4KWYrXqxThTFFY56+IpWRfgDwK+ssWl3Fndf9IyJ/f4/knKi3fiVAaueKjKBV3rxFkDmYpPSan0ODydhe9Rw4HteiTfbwYsXTDZYbpz8RTWAlFpNW9XhiqEnF6oxhr/+3QZ63AtQ72oRc77APnyHyBqNHJimJGLDADryhQ1/pZc9iSE26s17bczaMtaKr/K7qoRNhsu2JS73em++YlB8UHbQQjDVsEIf3jmKWjdb3K+mhsouZozSTnXRjLaN9+ruiDDFqLefcEMvCV1BzDPqZ5bzN2GphYO6IvOl20PUeip4GL1mqLxOq7uXJx3WgBv4gIR+gP+hCSRLiamLR0d9m2nYTcyWWfA5i1yvfXV4+OaDFCayP65TedHrVOz5wPMcNZ0RDWQl2p4mQrtavYE4iWF9rjdLuq0+EBD6nK74VYuLZQ8UjhGBxJWquU65pT95QJTdYlM7AXRF+3xHT8e2S5A8YCnHfxqjakbHtJdN1QYufEeZRmNU4ISGsvJDyDp9V72Zrv7ReduMYcomE7wHZfRmV
+    PGHOST: >-
+      AgA8YVGPL6nMPLzv4eju8bVgIzpXMGI+0SVU0NkWBBP3+6SYa5PcT4nomFHXbtBN5KqdKkAB2l51DtW5BZ6fFQLS+EPOVpjO0o/xs36p7RP0RniJFkP1gjIPzKq0holJiqsG+QhFxB5IlEdXusmQqkkxS4a9VSrdhK9JUT7Pw/nXFbwpfolhpehtDR6WaZPduRr53Fd1tNxYnxg0Sj/oi6ZfW+kuGX62uRkkBM8fTjIm9H85Mcy2nasDvc8e0SeXrlzjfQgfRHyj+gh4IkTs7eXkv88nYpK7uYUEGSkTYYGDeH/GGo6aJYRMiDn21Ho9vqZuIORyj3I0N8DpZ6nerKX1YsmNZvliQ3uPG2uOUcnvNqTp4AAJT7tuAyI2/eKblxvXNmaqCIp/6aAivZrZB6gdoECFv7XigcID69hytfZF6W4imt3I4LoH5ZTCeXk78DcrU+SchsC8aJPXYQbrZ0syI/TCfsqK7wjPXi+C3ehdUU9/Sdrc9k7B1puwVaMp9DpsB4DCgl3AQH1suOStglw99R8eOTytKqupDeCFJdY0iG5+4cRPEIPOk9agn14ScGPCD55GfsLEmK1VlcmwWf4VUYiNtHkToYQKgh2eQqoxhiklIazxeIHdsk/kMqV972d30uc+/UVRxXJroWSzbBmXTA0yROzYUlAnqHL0jSX67qtrCIxN8RcwxbfYSYdBkUSRJUQxRsAYZ4v6YeDWU8qU4/cwqVlscUWjRLgGPdFLQj0bjXyclZk8pkw=
+    PGPASSWORD: >-
+      AgBT+r+zm4+ZCj2a8msZwF9cA8AXbYVryCUxs+thwMFQ6I2JAIjegbhROzTILss6eiLbK8mCNLEVVx7iclZTZuhXfu7EIfLFV3A/XnhykY+9Rauf/mlPWiTSz089MJROQMCJ1geiRYrTB6kKe8QjCV/PGjYLN6anTsgHZGb/c0Tz9Nb2ZNfbnLUjDrnG0lmc7HU1fBIF+rNLhwsBVlzAIWmGMKYBdzkn4VPYv9Nf3bC7AjRuZXfI8E87aTVVcR4Uh1d+hdFSPP68jm1Tc/bE1JdZRPdUzlficyCypd2iwqlCV2WJp/L5dotvEUIrvOhrO8SRU/XZsyzbWKTTTAZ0ZcK504xnqqE7V4+hTVJ3IJ65u+EzNJ59jgoFKvJLTclwoTqFyo8b3SgDenTQNoOH97fG3i6CuszxhRFsPNUhZWzwR/HmvcH2kdljGp+mvwWUZt8LD2ifRr4MjxY5k2Wo6F/lvfcrMLI+MA8fmmbswPxjOp4L+opp54oV/9osVAd7DGqihQaxv1MSL9FEMKrN+uPj7bhG8E7k91Meny6iin38JLy9VnG5G5hv/5buTL89xlDfBDSPOwHBy+ckbSHxAGq1qUFB5syyv0hf1jiwjhpLMqW1xQ4I8nMGwc4YgIidcGoD0L6IE/0lqKn67RJylXrv3w1ppD+ZIw/vZqM9L7RJc5NJsoapWlpwmpnw6hgbP6/KEbyCwfGzy0QuIkwVcHNFqqX+XUGIlb3/sS6j7dVPmFD4MstJzEA=
+    PGRST_DB_URI: >-
+      AgCLSDueWKFO86Wp7PL73StCHqrAChy0gwiVFLwTIQA7hxoRGBqaa42IXUHuitUhSA0fzFRPnMEsyztpy6baCnQuWeUm0DflmcVGyZY3yLv9uVMQe0BYtTtAZNZPSf2lyisN1yWZczB/8gSxiFPeOna+F8dIts0jPavz1leEmLtUoQByYskYUJQpj1XyKllXzaMHpaEXYMnq28N0dtbO10vjZgPGCaSlHnD9NXaOm3KbYXSUufYMnQn0xy8WmpNYmclUtoW2RluyLOSRsDC34KZgj2zhyVmsVk8LOkMGqixhDhacTRijBwv45uCloA5SozA3PYz6K3nhSxEmVfSq1AhaUeOIg9X1Ai4kJnZSiqWTiA7lekkxnWsrg3KtlV1mK7sFSoeGEfTvknlI1NO9pHYMI9/QWuXD5CJVIhBDRTm7FzHi9/CGnJYojTobIGl0bza9Sj0MFExoSs8CXakVGDXYC4rFTgTqGuaa1kxqOrYQhe68cHMEWphEjU929uwL0Hc6j3d6umKNnX02WWGeh7SIvUqScJBVqBnBPNw9t12KPAsEfF2ZXPmH/XsQHjDvNouUvUsqzlrbscS/Rw+zlt7YZGkelAFVOBEuCkodRbC5vRqEQ+u+bZ2RF7Y7Dhj8IsJaeNYzl60bXP8gCxpxtdKOLPLRgOlO+lFwaZ9e6ilfCuuRFT0k5MI0GqqhN9ijul0+k1pjF6IfpSNieJhluU6OBmNsmcMY+i3zsrYOzKO04irOMhTsVKCW2G5DWaY+uE0bsDzrEVWcCKCLAF2BD048SeSrQVT7g2ORG4PkpjD9qOBEyFAg92glrhXdgtzDr5VbTZp2ZMT5Q5jm21HFPgUf/xT3CPyxccuiAOe8ewmMNrv96WKtHf5G7hDJoX7ioK7lw8RKJHICaGafq/brNu9fjdurZQoJ
+    PGSSLMODE: >-
+      AgBQXna4B+d/d5KKPBpVwHXgz7jIfQ0BOK/fLcwCH6whfu8x9wg7Dh7ztIRc05DNE2K3DqgcJatxLT49T8YI760NIyUn6j9cnVWYDO1RthhNmNxvMa0lTcZDjJwSfx2jRqrMuzHO2IA5JOQqv/HWeNrv2r6oq+Rb0mQUOsmbKXLEk6eNgnTBIesvj1RxJTZcclq4wHLbkh4YLyDDdChel2Q+3SAM0shBTF/43Q6P4EUGSgX4fadPuRgKI8wKqZ2wzeglVaKYzTnmVlxyewS5u2SNlpHa2LQN/pj8db//bz/eXtywc7NIouJlivg8VtmYHq8UPUW6ozKLbTYd4C+J0DtZ+qv3zw59wJIqU7/DlUcrgmyx1/hLmcOgcRy/ThgnRxeZ9c97RUziS1SvDfU/PhJMNqO6Zm27MC0XM4aYBLGp6MUnafUY9iA4dY8VDlHeCP4mBF+SCiHaTLUuKBNztFK6RN5bzEYo1vZ2H6DduOWr/0S+rqU293Gkhg5NHupLDWXdeKkf4Ybn2n275SfGiEesTNgWFJAe7/Qgkja381Fi2y+aGCy/iCyGN+IUO+uAuciIaNYU5woHuHcebzhDni3N6JFES4epFmrVbj996wI7xY9YCgxvyCtT5Y1fVFVZ09+4LJMEcXJjko6IJxb+kicvtF5js+qJ6Ta4j7x/7qIjlk8uXKcHSvH0kYfuNTZmNKjEFDNtdM/Q
+    PGUSER: >-
+      AgBuLCWtMBBbZCaxZA55pVzCPXMLSf8huLJlDxaDgNGIh2FB/FjS3MNQTSyz6oBRPR+smLsbx1I3FuvdUnmwQa4+ehSBoEiLGWEam0zjE0z6Ht22+iXGRr9PKpntOWb4vFUPYqW/UvjqL0CuLCZkOEYCHRLXSZIWArY9r+HbQRB5jvCnuBNhdEa32i75amxWAmUZc9Me7F6bNOrCZQzZ5wEysUXmAV/+VWzDsp6nFV7b51IZ1SyAz0xRg2d2yyTVFVSux08XNeXvVWPE7CvftBpOD16Rzzgfwhbd6xbJbco6sff28uHLxG5gHt3Iaku6+kU3VC4ZlZljbwpDOmlRK1pVjed2ijUTLScK9YpbxkkX1X1fgtqFpTC1z0QUQgbyc8MIY2r6Ll6fOzjLYwTCp6X78B3YWnso2h2RsJcxpzY5xLRh1Yn4USAMNUkm5b0bKN/6FXr7a73Jq0I4pPXg4s6bKUUPYMjqiE/sWwXERKiA+gVRFf2628cCGRmiCxqPusrx2e+bLW/SVyV8hMailcagRzIALr40xiF0kZ0MIrrVX2iiad6rTVfdOIxauSWjSn4AEY96PKPh5BXSjIQskfzrorIHabDk9h3wMGj4LewWoPPK3MKAdfmk+4RJpLbRVKISnevU57sVkFyFOXPuaTxqN5cMq92XxDqhdmZISVlZnmvR0MA9TFtp6/giaeEqCXRDK/5is957bx/m40D55T0r1W8ivK4USFWG6EfJ9f5GJeuVVLK2fz05RnnxptWGoQ==
+  template:
+    metadata:
+      annotations:
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: mano-branch-42
+        app.gitlab.com/env.name: mano-branch-dev2
+      name: azure-pg-user
+      labels:
+        application: mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    type: Opaque
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    app: www
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+    component: nginx
+  name: www
+  namespace: mano
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: www
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: mano-branch-42
+        app.gitlab.com/env.name: mano-branch-dev2
+      labels:
+        app: www
+        application: mano
+        owner: mano
+        team: mano
+        cert: wildcard
+        component: nginx
+    spec:
+      containers:
+        - image: harbor.fabrique.social.gouv.fr/mano/mano-www:1.2.3
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: www
+          ports:
+            - containerPort: 80
+              name: http
+          readinessProbe:
+            failureThreshold: 15
+            httpGet:
+              path: /index.html
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 5m
+              memory: 32Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /index.html
+              port: http
+            periodSeconds: 5
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: www
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: www
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  namespace: mano
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: www
+  type: ClusterIP
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/tls-acme: 'true'
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: mano-branch-42
+    app.gitlab.com/env.name: mano-branch-dev2
+  labels:
+    app: www
+    application: mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: www
+  namespace: mano
+spec:
+  rules:
+    - host: mano-app.dev2.fabrique.social.gouv.fr
+      http:
+        paths:
+          - backend:
+              serviceName: www
+              servicePort: 80
+            path: /
+  tls:
+    - hosts:
+        - mano-app.dev2.fabrique.social.gouv.fr
+      secretName: www-crt
+"
+`;
