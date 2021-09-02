@@ -1,3 +1,10 @@
+# [1.1.0-alpha.3](https://github.com/SocialGouv/mano/compare/v1.1.0-alpha.2...v1.1.0-alpha.3) (2021-09-02)
+
+
+### Bug Fixes
+
+* bump version ([304b705](https://github.com/SocialGouv/mano/commit/304b7055dc03eedf5d0e5ba92d667f028c213285))
+
 # [1.1.0-alpha.2](https://github.com/SocialGouv/mano/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2021-09-02)
 
 
