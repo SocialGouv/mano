@@ -12,39 +12,6 @@ concurrency:
   group: ${{ github.ref }}
 
 jobs:
-  ##############################################################################
-  ## BUILD WEBSITE.
-  ##############################################################################
-  build-website:
-    name: Build website
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Node setup
-        uses: actions/setup-node@v2
-        with:
-          node-version: "14"
-
-      - name: Yarn cache setup
-        uses: c-hive/gha-yarn-cache@v2
-        with:
-          directory: website
-
-      - name: Install dependencies
-        working-directory: website
-        run: yarn --frozen-lockfile
-
-      - name: Build website
-        working-directory: website
-        run: yarn build-static
-
-      - name: Archive website build
-        uses: actions/upload-artifact@v2
-        with:
-          name: website-export
-          path: website/out
 
   ##############################################################################
   ## BUILD AND REGISTER WEBSITE IMAGE
@@ -52,7 +19,6 @@ jobs:
   register-website:
     name: Register website
     runs-on: ubuntu-latest
-    needs: build-website
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
@@ -60,12 +26,6 @@ jobs:
       - name: Get project name
         run: |
           echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
-
-      - name: Download website build
-        uses: actions/download-artifact@v2
-        with:
-          name: website-export
-          path: website/out
 
       - name: Create image labels and tags
         id: docker_meta
