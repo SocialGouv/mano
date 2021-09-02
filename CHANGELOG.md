@@ -1,0 +1,13 @@
+# 1.0.0 (2021-09-02)
+
+
+### Bug Fixes
+
+* **ci:** remove useless url ([30c5993](https://github.com/SocialGouv/mano/commit/30c5993707ad1226d81e3c3700451f1a638728da))
+* missing releaserc ([e44d777](https://github.com/SocialGouv/mano/commit/e44d77763d8111d20a9c8d6d98207e9c8978bb35))
+* **ci:** branches ([0c00e06](https://github.com/SocialGouv/mano/commit/0c00e06d4684a3ac85d6d31b386917aa095485d5))
+
+
+### Features
+
+* add semantic release ([82ad799](https://github.com/SocialGouv/mano/commit/82ad799e36fda1ff2a9cd930eb06b0112697cda1))
