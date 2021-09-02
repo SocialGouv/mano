@@ -157,7 +157,7 @@ jobs:
   ##############################################################################
   ## DEPLOY WEBSITE TO PREPRODUCTION
   ##############################################################################
-  deploy-website-preproduction:
+  deploy-preproduction:
     name: Deploy application
     runs-on: ubuntu-latest
     needs: [register-website, manifests-preproduction]
