@@ -1,0 +1,11 @@
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - "@semantic-release/changelog"
+  - - "@semantic-release/git"
+    - assets:
+        - CHANGELOG.md
+        - README.md
+      message: "chore(release): version ${nextRelease.version}\n\n${nextRelease.notes}"
+  - "@semantic-release/github"
+repositoryUrl: https://gitlab.factory.social.gouv.fr/SocialGouv/mano.git
