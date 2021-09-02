@@ -92,7 +92,7 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ secrets.SOCIALGROOVYBOT_NAME }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Image build and register
@@ -100,6 +100,8 @@ jobs:
         with:
           context: .
           push: "true"
+          cache-from: "type=gha"
+          cache-to: "type=gha,mode=max"
           file: website/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           tags: "${{ steps.docker_meta.outputs.tags }}"
@@ -129,13 +131,13 @@ jobs:
         run: yarn --cwd .k8s install --frozen-lockfile --prefer-offline
 
       - name: Generate preproduction manifests
-        run: yarn --cwd .k8s --silent generate:preprod > manifests.yml
+        run: yarn --cwd .k8s --silent generate --env preprod > manifests-preprod.yml
         env:
           SOCIALGOUV_PREPRODUCTION: true
           SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
 
       - name: Generate preproduction namespace
-        run: yarn --cwd .k8s --silent generate:preprod _namespace > namespace.yml
+        run: yarn --cwd .k8s --silent generate --env preprod _namespace > namespace-preprod.yml
         env:
           SOCIALGOUV_PREPRODUCTION: true
           SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
@@ -143,14 +145,14 @@ jobs:
       - name: Archive preproduction manifests
         uses: actions/upload-artifact@v2
         with:
-          name: manifests.yml
-          path: manifests.yml
+          name: manifests-preprod.yml
+          path: manifests-preprod.yml
 
       - name: Archive preproduction namespace
         uses: actions/upload-artifact@v2
         with:
-          name: namespace.yml
-          path: namespace.yml
+          name: namespace-preprod.yml
+          path: namespace-preprod.yml
 
   ##############################################################################
   ## DEPLOY WEBSITE TO PREPRODUCTION
@@ -167,21 +169,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get project and namespace names
+      - name: Get project name
         run: |
           cat ".github/preproduction.env" >> $GITHUB_ENV
           echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
-          echo "namespace=${GITHUB_REPOSITORY#*/}-preprod" >> $GITHUB_ENV
 
       - name: Download k8s manifests
         uses: actions/download-artifact@v2
         with:
-          name: manifests.yml
+          name: manifests-preprod.yml
 
       - name: Download k8s namespace
         uses: actions/download-artifact@v2
         with:
-          name: namespace.yml
+          name: namespace-preprod.yml
 
       - name: Install Kapp
         uses: vmware-tanzu/carvel-setup-action@v1
@@ -196,10 +197,10 @@ jobs:
           echo ${{ secrets.SOCIALGOUV_KUBE_CONFIG_DEV }} | base64 -d > ~/.kube/config
 
       - name: Create preproduction namespace
-        run: kubectl create -f namespace.yml || true
+        run: kubectl create -f namespace-preprod.yml || true
 
       - name: Deploy application
-        run: kapp --dangerous-override-ownership-of-existing-resources -y deploy -a ${{ env.project }} --namespace ${{ env.namespace }} -f manifests.yml
+        run: kapp --dangerous-override-ownership-of-existing-resources -y deploy -a ${{ env.project }} --namespace mano-preprod -f manifests-preprod.yml
 
   ##############################################################################
   ## GENERATE PROD KUBERNETES MANIFESTS
@@ -226,7 +227,7 @@ jobs:
         run: yarn --cwd .k8s install --frozen-lockfile --prefer-offline
 
       - name: Generate production manifests
-        run: yarn --cwd .k8s --silent generate:prod > manifests-production.yml
+        run: yarn --cwd .k8s --silent generate --env prod > manifests-production.yml
         env:
           SOCIALGOUV_PRODUCTION: true
           SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
@@ -246,17 +247,16 @@ jobs:
     needs: manifests-production
     environment:
       name: production
-      url: https://${{ env.namespace }}.${{ env.SOCIALGOUV_BASE_DOMAIN }}
+      url: https://mano-app.${{ env.SOCIALGOUV_BASE_DOMAIN }}
     steps:
   
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    - name: Get project and namespace names
+    - name: Get project name
       run: |
         cat ".github/production.env" >> $GITHUB_ENV
         echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
-        echo "namespace=fake-${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
     - name: Download production manifests
       uses: actions/download-artifact@v2
