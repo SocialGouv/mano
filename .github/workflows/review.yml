@@ -93,28 +93,20 @@ jobs:
         uses: docker/login-action@v1
         with:
           registry: ghcr.io
-          username: ${{ secrets.SOCIALGROOVYBOT_NAME }}
+          username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Set buildx cache up
-        uses: "actions/cache@v2"
-        with:
-          key: "${{ runner.os }}-buildx-website-${{ hashFiles('website/Dockerfile') }}"
-          path: /tmp/.buildx-website-cache
-          restore-keys: |
-            ${{ runner.os }}-buildx-website
 
       - name: Image build and register
         uses: docker/build-push-action@v2
         with:
           context: .
           push: "true"
+          cache-from: "type=gha"
+          cache-to: "type=gha,mode=max"
           file: website/Dockerfile
           builder: ${{ steps.buildx.outputs.name }}
           tags: "${{ steps.docker_meta.outputs.tags }}"
           labels: "${{ steps.docker_meta.outputs.labels }}"
-          cache-to: "type=local,dest=/tmp/.buildx-website-cache"
-          cache-from: "type=local,src=/tmp/.buildx-website-cache"
 
   ##############################################################################
   ## GENERATE KUBERNETES MANIFESTS
@@ -139,12 +131,12 @@ jobs:
         run: yarn --cwd .k8s install --frozen-lockfile --prefer-offline
 
       - name: Generate k8s manifests
-        run: yarn --cwd .k8s --silent generate:dev > manifests.yml
+        run: yarn --cwd .k8s --silent generate --env dev > manifests.yml
         env:
           SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
 
       - name: Generate k8s namespace
-        run: yarn --cwd .k8s --silent generate:dev _namespace > namespace.yml
+        run: yarn --cwd .k8s --silent generate --env dev _namespace > namespace.yml
         env:
           SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
 
@@ -197,7 +189,6 @@ jobs:
         run: |
           cat ".github/review.env" >> $GITHUB_ENV
           echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
-          # echo "namespace=${GITHUB_REPOSITORY#*/}-${GITHUB_REF##*/}" >> $GITHUB_ENV
           echo "namespace=${NAMESPACE}" >> $GITHUB_ENV
         env:
           NAMESPACE: ${{ steps.namespace.outputs.result }}
