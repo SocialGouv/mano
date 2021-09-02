@@ -1,3 +1,10 @@
+# [1.1.0-alpha.2](https://github.com/SocialGouv/mano/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2021-09-02)
+
+
+### Bug Fixes
+
+* **ci:** rename job to deploy-preproduction ([647a280](https://github.com/SocialGouv/mano/commit/647a2808b1eae073dbced3adc35cd9ebb01c118b))
+
 # [1.1.0-alpha.1](https://github.com/SocialGouv/mano/compare/v1.0.0...v1.1.0-alpha.1) (2021-09-02)
 
 
