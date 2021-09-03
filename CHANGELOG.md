@@ -1,3 +1,24 @@
+# [1.1.0-alpha.3](https://github.com/SocialGouv/mano/compare/v1.1.0-alpha.2...v1.1.0-alpha.3) (2021-09-02)
+
+
+### Bug Fixes
+
+* bump version ([304b705](https://github.com/SocialGouv/mano/commit/304b7055dc03eedf5d0e5ba92d667f028c213285))
+
+# [1.1.0-alpha.2](https://github.com/SocialGouv/mano/compare/v1.1.0-alpha.1...v1.1.0-alpha.2) (2021-09-02)
+
+
+### Bug Fixes
+
+* **ci:** rename job to deploy-preproduction ([647a280](https://github.com/SocialGouv/mano/commit/647a2808b1eae073dbced3adc35cd9ebb01c118b))
+
+# [1.1.0-alpha.1](https://github.com/SocialGouv/mano/compare/v1.0.0...v1.1.0-alpha.1) (2021-09-02)
+
+
+### Features
+
+* **ci:** add prod and pre-prod deployment ([#3](https://github.com/SocialGouv/mano/issues/3)) ([2eaf32e](https://github.com/SocialGouv/mano/commit/2eaf32e4b6a8574a4412eb191c02aa2f6ede8a5d))
+
 # 1.0.0 (2021-09-02)
 
 
