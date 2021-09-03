@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+    <link rel="shortcut icon" href="/favicon.png" />
+    <title>Mano - Admin</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        display: block;
+        margin: auto;
+        width: 60vw;
+        height: 100vh;
+        padding-top: 100px;
+        padding-top: 50px;
+      }
+
+      a {
+        color: black;
+      }
+
+      .browser-link {
+        display: flex;
+        margin-top: 15px;
+        padding: 5px 0;
+        align-items: center;
+        border: 1px solid #ddd;
+        color: black;
+        text-decoration: none;
+      }
+
+      .browser-image {
+        display: block;
+        flex-shrink: 0;
+        flex-grow: 0;
+        margin-right: 15px;
+        height: 60px;
+        width: 60px;
+        background-size: contain;
+        background-position: center center;
+        background-repeat: no-repeat;
+      }
+    </style>
+  </head>
+
+  <body>
+    <p>
+      Internet Explorer n'est
+      <a
+        href="https://blogs.windows.com/windowsexperience/2021/05/19/the-future-of-internet-explorer-on-windows-10-is-in-microsoft-edge/"
+        target="_blank"
+        rel="noreferrer"
+        >plus supporté par Microsoft</a
+      >
+      et Mano aura des difficultés à fonctionner correctement sur votre navigateur.
+      <br />
+      Heureusement, beaucoup d'autres sont à votre disposition !
+    </p>
+    <br />
+    <br />
+    <div id="browsers"></div>
+    <script type="text/javascript">
+      const browsers = [
+        {
+          name: 'Brave',
+          description:
+            'Créé par le fondateur de Firefox, Brave tente de repenser notre usage du Web et la monétisation des contenus. Le top de la sécurité, de la rapidité, et du futur.',
+          link: 'https://brave.com',
+          logo: 'https://file.wiki/wp-content/uploads/thumbs_dir/Brave-Browser-owrl1tbgaull69o81uytqmamoifhwtbnt8g7rasovm.jpg',
+        },
+        {
+          name: 'Firefox',
+          description:
+            'Logiciel libre, open Source et indépendant, édité par une fondation et non une entreprise, très en pointe sur le non tracking des utilisateurs',
+          link: 'https://www.mozilla.org/fr/firefox/new/',
+          logo: 'https://3u26hb1g25wn1xwo8g186fnd-wpengine.netdna-ssl.com/files/2019/10/Fx-Browser-icon-fullColor.svg',
+          objectFit: 'initial',
+        },
+        {
+          name: 'Opera',
+          description:
+            "Basé sur le projet open source Chromium, Opera parvient à innover et à se démarquer de Chrome et des autres navigateurs en proposant notamment un VPN gratuit et illimité. Il est aujourd'hui stable, performant, simple d'emploi, riche en fonctionnalités et en options de personnalisation.",
+          link: 'https://www.opera.com',
+          logo: 'https://1000logos.net/wp-content/uploads/2020/08/Opera-Logo-1024x640.png',
+        },
+        {
+          name: 'Vivaldi',
+          description:
+            'Vivaldi offre non seulement un niveau de personnalisation supérieur à tous les autres navigateurs, mais également des fonctionnalités vraiment originales et très pratiques au quotidien',
+          link: 'https://vivaldi.com',
+          logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e4/Vivaldi_web_browser_logo.svg/128px-Vivaldi_web_browser_logo.svg.png',
+        },
+        {
+          name: 'Netscape',
+          description: "La base, l'origine. Mais tout aussi compatible qu'Internet Explorer...",
+          link: 'https://netscape.fr.malavida.com/#gref',
+          logo: 'https://imag.malavida.com/mvimgbig/download-s/netscape-220-0.jpg',
+        },
+      ];
+
+      (function () {
+        document.getElementById('browsers').innerHTML = browsers
+          .map(
+            (b) =>
+              "<a class='browser-link' href='" +
+              b.link +
+              "' target='_blank' rel='noreferrer'><div class='browser-image' title='Logo " +
+              b.name +
+              "' style='background-image: url(" +
+              b.logo +
+              ")'></div><span><b>" +
+              b.name +
+              ': </b>' +
+              b.description +
+              '</span></a>'
+          )
+          .join('');
+      })();
+    </script>
+  </body>
+</html>

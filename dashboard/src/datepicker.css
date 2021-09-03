@@ -1,0 +1,7 @@
+.date-picker-container {
+  box-sizing: border-box;
+}
+.date-picker-container * {
+  box-sizing: border-box;
+  font-weight: 400;
+}

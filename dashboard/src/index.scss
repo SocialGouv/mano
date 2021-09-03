@@ -1,0 +1,185 @@
+@import url('./assets/Lato/font-face.css');
+
+@font-face {
+  font-family: 'password';
+  src: url('./assets/password.woff');
+}
+
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Lato, serif;
+  background-color: #f7f9fa;
+  color: #1d2021;
+}
+
+ul {
+  list-style: inside;
+  position: 0;
+  margin: 0;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.main {
+  flex: 1;
+  height: 100%;
+  flex-direction: column;
+  display: flex;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.main-container {
+  display: flex;
+  height: 100%;
+}
+
+.main-content {
+  height: 100%;
+  padding: 0 68px;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+}
+table {
+  background-color: white;
+  padding: 24px !important;
+}
+table tr {
+  cursor: pointer;
+}
+a {
+  text-decoration: none;
+}
+
+hr {
+  margin-top: 1vw;
+  margin-bottom: 1vw;
+}
+
+.image-input {
+  height: 100px;
+  min-width: 150px;
+  background: #f3f3f3 url('./assets/image.svg') center no-repeat;
+  background-size: 50%;
+  border: 2px solid #eee;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.time-range {
+  background-color: white;
+  border-radius: 5px;
+  border-color: lightgray;
+  border-style: solid;
+  border-width: 1px;
+  padding: 4.5px 4px;
+}
+
+.time-range {
+  border: none !important;
+  width: 100%;
+}
+
+.time-range .react-daterange-picker__wrapper {
+  border: none !important;
+}
+
+.time-range .react-daterange-picker__clear-button {
+  border-radius: 100px;
+  border: none;
+  padding: 2px;
+  width: 14px;
+  height: 14px;
+  background-color: #cbd3d6;
+}
+
+.time-range .react-daterange-picker__clear-button__icon {
+  width: 10px;
+  height: 10px;
+  color: white;
+  stroke: white;
+}
+
+@media print {
+  .noprint {
+    display: none !important;
+  }
+  .main,
+  .main-container {
+    height: auto;
+  }
+
+  .main-content {
+    height: auto;
+    margin-left: 0 !important;
+    max-width: 100%;
+    padding: 0 !important;
+  }
+  .report-container {
+    padding: 0 !important;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .report-container > .printonly > div {
+    border-radius: 16px;
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+    border: 1px solid #ddd;
+  }
+
+  .print-title {
+    position: fixed;
+    top: 0;
+    font-size: 14px;
+    font-weight: 400;
+    font-style: italic;
+    margin-bottom: 30px;
+    opacity: 0.5;
+  }
+
+  hr {
+    page-break-before: auto;
+    display: none;
+  }
+  @page {
+    margin: 1cm;
+    margin-top: 50px;
+  }
+}
+@media screen {
+  .printonly {
+    display: none;
+  }
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-box-shadow: 0 0 0 30px #49c3a666 inset !important;
+}
+$theme-colors: (
+  'primary': #49c3a6,
+);
+
+.rrt-success {
+  background-color: #49c3a6 !important;
+}
+
+@import '~bootstrap/scss/bootstrap.scss';
