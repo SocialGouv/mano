@@ -1,10 +1,10 @@
 # Mano
 
-Code source de [Mano](https://www.snu.gouv.fr/), organisé en plusieurs services : 
- - [Application mobile](https://github.com/SocialGouv/mano/tree/master/app)
- - [Interface de gestion](https://github.com/SocialGouv/mano/tree/master/dashboard)
- - [API](https://github.com/SocialGouv/mano/tree/master/api) 
- - [Site](https://github.com/SocialGouv/mano/tree/master/website) 
+Code source de [Mano](https://mano-app.fabrique.social.gouv.fr/), organisé en plusieurs services : 
+ - [Application mobile](https://github.com/SocialGouv/mano/tree/main/app)
+ - [Interface de gestion](https://github.com/SocialGouv/mano/tree/main/dashboard)
+ - [API](https://github.com/SocialGouv/mano/tree/main/api) 
+ - [Site](https://github.com/SocialGouv/mano/tree/main/website) 
 
 Il est conseillé de lire le fichier `README.md` de chacun de ces services.
 
