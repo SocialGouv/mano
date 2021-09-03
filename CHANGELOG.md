@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/SocialGouv/mano/compare/v1.1.0...v1.2.0) (2021-09-03)
+
+
+### Features
+
+* add dashboard ([#7](https://github.com/SocialGouv/mano/issues/7)) ([988fd16](https://github.com/SocialGouv/mano/commit/988fd16d08945984c8b19834d32f71e84e237f96))
+
 # [1.1.0](https://github.com/SocialGouv/mano/compare/v1.0.0...v1.1.0) (2021-09-03)
 
 
