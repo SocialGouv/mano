@@ -1,3 +1,10 @@
+# [1.4.0-alpha.1](https://github.com/SocialGouv/mano/compare/v1.3.0...v1.4.0-alpha.1) (2021-09-10)
+
+
+### Features
+
+* **ci:** deploy to prod ([#10](https://github.com/SocialGouv/mano/issues/10)) ([3ac41bc](https://github.com/SocialGouv/mano/commit/3ac41bc719e507e319b87e88825ec80430759151))
+
 # [1.3.0](https://github.com/SocialGouv/mano/compare/v1.2.0...v1.3.0) (2021-09-10)
 
 
