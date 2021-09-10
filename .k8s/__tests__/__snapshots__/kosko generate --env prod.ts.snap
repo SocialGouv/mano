@@ -2,6 +2,27 @@
 
 exports[`kosko generate --prod 1`] = `
 "---
+apiVersion: v1
+kind: Namespace
+metadata:
+  annotations:
+    socialgouv/creator: autodevops
+    field.cattle.io/creatorId: gitlab
+    field.cattle.io/projectId: ''
+    git/branch: v1.2.3
+    git/remote: >-
+      https://gitlab-ci-token:[MASKED]@gitlab.factory.social.gouv.fr/SocialGouv/mano.git
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: prod
+    app.gitlab.com/env.name: prod
+  labels:
+    azure-pg-admin-user: mano
+    application: mano
+    component: mano
+    owner: mano
+    team: mano
+  name: mano
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

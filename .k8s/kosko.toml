@@ -1,2 +1,11 @@
+[environments.dev]
 components = ["*"]
+require = ["ts-node/register"]
+
+[environments.prod]
+components = ["www", "_namespace"]
+require = ["ts-node/register"]
+
+[environments.preprod]
+components = ["www", "_namespace"]
 require = ["ts-node/register"]
