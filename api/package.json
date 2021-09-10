@@ -1,0 +1,41 @@
+{
+  "name": "api_mano",
+  "version": "2.3.21",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development nodemon ./src/index.js",
+    "test": "NODE_ENV=test nodemon ./src/index.js",
+    "start": "NODE_ENV=production node ./src/index.js",
+    "initdb": "node ./src/db/scriptInit.js"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "prettier": {
+    "printWidth": 150
+  },
+  "dependencies": {
+    "@sentry/node": "^5.30.0",
+    "@sentry/tracing": "^6.7.2",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "helmet": "^3.21.1",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "node-fetch": "^2.6.1",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "password-validator": "^5.1.0",
+    "pg": "^8.5.1",
+    "pg-hstore": "^2.3.3",
+    "sequelize": "^6.3.5"
+  },
+  "devDependencies": {
+    "@types/jsonwebtoken": "^8.5.0",
+    "cross-env": "^7.0.2",
+    "nodemon": "^1.19.4"
+  }
+}
