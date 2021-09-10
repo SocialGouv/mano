@@ -1,9 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Col, Container, Input, Nav, NavItem, NavLink, Row, TabContent, TabPane, Button as LinkButton } from 'reactstrap';
+import { Col, Container, Input, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label, Button as LinkButton } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
+import { Formik } from 'formik';
 
 import { toFrenchDate } from '../../utils';
 import DateBloc from '../../components/DateBloc';
@@ -508,56 +509,56 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
 };
 
 const Description = ({ report }) => {
-  const [description, setDescription] = useState(report.description || '');
-  const [editable, setEditable] = useState(false);
-  const [saving, setSaving] = useState(false);
   const { updateReport } = useContext(ReportsContext);
 
-  useEffect(() => {
-    setDescription(report.description || '');
-  }, [report.description]);
-
-  const onSave = async () => {
-    const reportUpdate = {
-      ...report,
-      description,
-    };
-    setSaving(true);
-    const res = await updateReport(reportUpdate);
-    setSaving(false);
-    if (res.ok) {
-      toastr.success('Mis à jour !');
-    }
-  };
-
-  if (editable) {
-    return (
-      <DescriptionBox description={description}>
-        <Title>Description</Title>
-        <Input className="noprint" type="textarea" name="text" value={description} onChange={(v) => setDescription(v.target.value)} />
-        <ButtonCustom className="noprint" loading={saving} color="primary" onClick={onSave} style={{ marginTop: '10px' }} title="Sauvegarder" />
-        <ButtonCustom
-          className="noprint"
-          loading={saving}
-          color="secondary"
-          onClick={() => setEditable(false)}
-          style={{ marginTop: '10px' }}
-          title="Annuler"
-        />
-      </DescriptionBox>
-    );
-  }
-
   return (
-    <DescriptionBox description={description} onClick={() => setEditable(true)}>
-      <Title>
-        Description
-        <LinkButton color="link" style={{ marginLeft: 30 }}>
-          Modifier
-        </LinkButton>
-      </Title>
-      <p dangerouslySetInnerHTML={{ __html: description.split('\n').join('<br />') || 'Pas de description' }} />
-    </DescriptionBox>
+    <>
+      <DescriptionBox className="noprint" report={report}>
+        <Formik
+          className="noprint"
+          initialValues={report}
+          onSubmit={async (body) => {
+            const reportUpdate = {
+              ...report,
+              ...body,
+            };
+            const res = await updateReport(reportUpdate);
+            if (res.ok) {
+              toastr.success('Mis à jour !');
+            }
+          }}>
+          {({ values, handleChange, handleSubmit, isSubmitting }) => (
+            <Row>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Description</Label>
+                  <Input name="description" type="textarea" value={values.description} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Collaboration</Label>
+                  <Input name="collaboration" type="text" value={values.collaboration} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+              </Col>
+            </Row>
+          )}
+        </Formik>
+      </DescriptionBox>
+      <DescriptionBox className="printonly" report={report}>
+        {!!report?.collaboration && (
+          <>
+            <Title>Collaboration</Title>
+            <p dangerouslySetInnerHTML={{ __html: report?.collaboration?.split('\n').join('<br />') || 'Pas de description' }} />
+          </>
+        )}
+        <Title>Description</Title>
+        <p dangerouslySetInnerHTML={{ __html: report?.description.split('\n').join('<br />') || 'Pas de description' }} />
+      </DescriptionBox>
+    </>
   );
 };
 
@@ -606,7 +607,7 @@ const DescriptionBox = styled(StyledBox)`
     margin-bottom: 40px;
   }
   @media print {
-    ${(props) => props.description.length < 1 && 'display: none !important;'}
+    ${(props) => props.report?.description?.length < 1 && props.report?.collaboration?.length < 1 && 'display: none !important;'}
     margin-bottom: 40px;
     page-break-inside: avoid;
   }

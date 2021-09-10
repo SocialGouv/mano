@@ -109,7 +109,7 @@ export const ReportsProvider = ({ children }) => {
 
 export default ReportsContext;
 
-const encryptedFields = ['description', 'services', 'passages', 'team', 'date'];
+const encryptedFields = ['description', 'services', 'passages', 'team', 'date', 'collaboration'];
 
 export const prepareReportForEncryption = (report) => {
   const decrypted = {};

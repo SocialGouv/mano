@@ -17,7 +17,15 @@ const ButtonCustom = ({
   ...rest
 }) => {
   return (
-    <ButtonWrapper onClick={onClick} color={color} style={style} width={width} disabled={loading || disabled} type={type} {...rest}>
+    <ButtonWrapper
+      className="noprint"
+      onClick={onClick}
+      color={color}
+      style={style}
+      width={width}
+      disabled={loading || disabled}
+      type={type}
+      {...rest}>
       <SpinnerContainer visibility={!loading ? 'hidden' : 'visible'}>
         <Spinner color={'white'} size={'sm'} style={{ borderWidth: '0.1em' }} />
       </SpinnerContainer>
