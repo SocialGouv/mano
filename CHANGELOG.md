@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/SocialGouv/mano/compare/v1.4.0...v1.4.1) (2021-09-10)
+
+
+### Bug Fixes
+
+* add another maraud in report ([#12](https://github.com/SocialGouv/mano/issues/12)) ([c543440](https://github.com/SocialGouv/mano/commit/c54344013a89ffe8b8cde0387773941b9f0aefe3))
+
 # [1.4.0](https://github.com/SocialGouv/mano/compare/v1.3.0...v1.4.0) (2021-09-10)
 
 
