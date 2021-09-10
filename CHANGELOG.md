@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/SocialGouv/mano/compare/v1.2.0...v1.3.0) (2021-09-10)
+
+
+### Features
+
+* **ci:** add component dashboard only for dev env ([#9](https://github.com/SocialGouv/mano/issues/9)) ([36af8db](https://github.com/SocialGouv/mano/commit/36af8db09179341ade62e230cbba204a89469538))
+
 # [1.2.0](https://github.com/SocialGouv/mano/compare/v1.1.0...v1.2.0) (2021-09-03)
 
 
