@@ -3,9 +3,9 @@ components = ["*"]
 require = ["ts-node/register"]
 
 [environments.prod]
-components = ["www", "_namespace"]
+components = ["www", "_namespace", "dashboard"]
 require = ["ts-node/register"]
 
 [environments.preprod]
-components = ["www", "_namespace"]
+components = ["www", "_namespace", "dashboard"]
 require = ["ts-node/register"]
