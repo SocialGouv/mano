@@ -6,12 +6,12 @@ WORKDIR /app
 
 RUN chown node:node /app
 
-COPY package.json .
-COPY yarn.lock .
+COPY dashboard/package.json .
+COPY dashboard/yarn.lock .
 
 RUN yarn --frozen-lockfile
 
-COPY . .
+COPY dashboard/. .
 
 ENV NODE_ENV=production
 
