@@ -34,6 +34,147 @@ metadata:
     app.gitlab.com/env: preprod-dev42
     app.gitlab.com/env.name: preprod-dev42
   labels:
+    app: dashboard
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: dashboard
+  namespace: mano-186-preprod-dev2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dashboard
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: preprod-dev42
+        app.gitlab.com/env.name: preprod-dev42
+      labels:
+        app: dashboard
+        application: v1-2-3-mano
+        component: v1-2-3-mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    spec:
+      containers:
+        - image: ghcr.io/socialgouv/mano/dashboard:sha-undefined
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: dashboard
+          ports:
+            - containerPort: 80
+              name: http
+          readinessProbe:
+            failureThreshold: 15
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 200m
+              memory: 128Mi
+            requests:
+              cpu: 10m
+              memory: 64Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+      imagePullSecrets:
+        - name: regcred
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: dashboard
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: dashboard
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  namespace: mano-186-preprod-dev2
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 80
+  selector:
+    app: dashboard
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  labels:
+    app: dashboard
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: dashboard
+  namespace: mano-186-preprod-dev2
+spec:
+  rules:
+    - host: dashboard-preprod-mano.dev42.fabrique.social.gouv.fr
+      http:
+        paths:
+          - backend:
+              service:
+                name: dashboard
+                port:
+                  name: http
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - dashboard-preprod-mano.dev42.fabrique.social.gouv.fr
+      secretName: wildcard-crt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  labels:
     app: www
     application: v1-2-3-mano
     component: nginx
