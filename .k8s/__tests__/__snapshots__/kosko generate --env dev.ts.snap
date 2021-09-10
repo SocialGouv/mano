@@ -35,6 +35,184 @@ metadata:
     app.gitlab.com/env: master-dev42
     app.gitlab.com/env.name: master-dev42
   labels:
+    app: api
+    application: master-dev42-mano
+    component: master-dev42-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  namespace: mano-186-master-dev2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: master-dev42
+        app.gitlab.com/env.name: master-dev42
+      labels:
+        app: api
+        application: master-dev42-mano
+        component: master-dev42-mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    spec:
+      containers:
+        - image: ghcr.io/socialgouv/mano/api:sha-undefined
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: api
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            failureThreshold: 15
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          envFrom:
+            - secretRef:
+                name: azure-pg-user-master
+      imagePullSecrets:
+        - name: regcred
+      initContainers:
+        - env:
+            - name: WAIT_FOR_RETRIES
+              value: '24'
+          envFrom:
+            - secretRef:
+                name: azure-pg-user-master
+          image: ghcr.io/socialgouv/docker/wait-for-postgres:6.43.1
+          imagePullPolicy: Always
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 20m
+              memory: 32Mi
+            requests:
+              cpu: 5m
+              memory: 16Mi
+        - args:
+            - initdb
+          command:
+            - yarn
+          image: ghcr.io/socialgouv/mano/api:sha-undefined
+          imagePullPolicy: Always
+          name: init
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          envFrom:
+            - secretRef:
+                name: azure-pg-user-0123456
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api
+    application: master-dev42-mano
+    component: master-dev42-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: master-dev42
+    app.gitlab.com/env.name: master-dev42
+  namespace: mano-186-master-dev2
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  selector:
+    app: api
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: master-dev42
+    app.gitlab.com/env.name: master-dev42
+  labels:
+    app: api
+    application: master-dev42-mano
+    component: master-dev42-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  namespace: mano-186-master-dev2
+spec:
+  rules:
+    - host: master-dev42-mano.dev42.fabrique.social.gouv.fr
+      http:
+        paths:
+          - backend:
+              service:
+                name: api
+                port:
+                  name: http
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - master-dev42-mano.dev42.fabrique.social.gouv.fr
+      secretName: wildcard-crt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: master-dev42
+    app.gitlab.com/env.name: master-dev42
+  labels:
     app: dashboard
     application: master-dev42-mano
     component: master-dev42-mano
@@ -165,6 +343,94 @@ spec:
     - hosts:
         - dashboard-master-dev42-mano.dev42.fabrique.social.gouv.fr
       secretName: wildcard-crt
+---
+apiVersion: batch/v1
+kind: Job
+spec:
+  backoffLimit: 5
+  template:
+    spec:
+      containers:
+        - command:
+            - create-db-user
+          env:
+            - name: NEW_DB_NAME
+              value: autodevops_master
+            - name: NEW_USER
+              value: user_master
+            - name: NEW_PASSWORD
+              value: password_master
+            - name: NEW_DB_EXTENSIONS
+              value: hstore pgcrypto citext uuid-ossp
+          envFrom:
+            - secretRef:
+                name: azure-pg-admin-user
+          image: ghcr.io/socialgouv/docker/azure-db:6.43.1
+          imagePullPolicy: IfNotPresent
+          name: create-db-user
+          resources:
+            limits:
+              cpu: 300m
+              memory: 256Mi
+            requests:
+              cpu: 100m
+              memory: 64Mi
+      restartPolicy: Never
+    metadata:
+      annotations:
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: master-dev42
+        app.gitlab.com/env.name: master-dev42
+      labels:
+        application: master-dev42-mano
+        component: master-dev42-mano
+        owner: mano
+        team: mano
+        cert: wildcard
+  ttlSecondsAfterFinished: 86400
+metadata:
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: master-dev42
+    app.gitlab.com/env.name: master-dev42
+  labels:
+    application: master-dev42-mano
+    component: master-dev42-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: create-db-job-master
+  namespace: mano-186-master-dev2
+---
+apiVersion: v1
+kind: Secret
+stringData:
+  DATABASE_URL: >-
+    postgresql://user_master%40manodevserver.postgres.database.azure.com:password_master@manodevserver.postgres.database.azure.com/autodevops_master?sslmode=require
+  DB_URI: >-
+    postgresql://user_master%40manodevserver.postgres.database.azure.com:password_master@manodevserver.postgres.database.azure.com/autodevops_master?sslmode=require
+  HASURA_GRAPHQL_DATABASE_URL: >-
+    postgresql://user_master%40manodevserver.postgres.database.azure.com:password_master@manodevserver.postgres.database.azure.com/autodevops_master?sslmode=require
+  PGDATABASE: autodevops_master
+  PGHOST: manodevserver.postgres.database.azure.com
+  PGPASSWORD: password_master
+  PGRST_DB_URI: >-
+    postgresql://user_master%40manodevserver.postgres.database.azure.com:password_master@manodevserver.postgres.database.azure.com/autodevops_master?sslmode=require
+  PGSSLMODE: require
+  PGUSER: user_master@manodevserver.postgres.database.azure.com
+metadata:
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: master-dev42
+    app.gitlab.com/env.name: master-dev42
+  labels:
+    application: master-dev42-mano
+    component: master-dev42-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: azure-pg-user-master
+  namespace: mano-186-master-dev2
 ---
 apiVersion: apps/v1
 kind: Deployment
