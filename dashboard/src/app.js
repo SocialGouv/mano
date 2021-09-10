@@ -26,6 +26,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import AuthContext from './contexts/auth';
 import API from './services/api';
 import Reception from './scenes/reception';
+import Charte from './scenes/auth/charte';
 
 registerLocale('fr', fr);
 
@@ -46,6 +47,7 @@ const App = () => {
         <Router>
           <Switch>
             <Route path="/auth" component={Auth} />
+            <RestrictedRoute path="/charte" component={Charte} />
             <RestrictedRoute path="/account" component={Account} />
             <RestrictedRoute path="/user" component={User} />
             <RestrictedRoute path="/person" component={Person} />
@@ -69,6 +71,7 @@ const App = () => {
 
 const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
   const { user } = useContext(AuthContext);
+  if (!!user && !user?.termsAccepted) return <Route {...rest} path="/auth" component={Charte} />;
   return (
     <>
       {user && <Drawer />}

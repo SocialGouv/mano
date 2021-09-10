@@ -27,7 +27,16 @@ const prepareItemForSearch = (item) => {
   return itemClean;
 };
 
-export const filterBySearch = (search) => (item) => {
-  const stringifiedItem = JSON.stringify(prepareItemForSearch(item));
-  return stringifiedItem.toLocaleLowerCase().includes(search.toLocaleLowerCase());
+export const filterBySearch = (search, items = []) => {
+  search = search.toLocaleLowerCase();
+  const firstItems = items.filter((item) => item?.name?.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
+  const firstItemsIds = firstItems.map((item) => item._id);
+  const lastItems = items
+    .filter((item) => !firstItemsIds.includes(item._id))
+    .filter((item) => {
+      const stringifiedItem = JSON.stringify(prepareItemForSearch(item));
+      return stringifiedItem.toLocaleLowerCase().includes(search.toLocaleLowerCase());
+    });
+
+  return [...firstItems, ...lastItems];
 };

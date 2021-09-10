@@ -1,13 +1,16 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { capture } from '../services/sentry';
+import TerritoryObservationsContext from './territoryObservations';
 
 const TerritoryContext = React.createContext();
 
 export const TerritoriesProvider = ({ children }) => {
-  const [state, setState] = useState({ territories: [], key: 0 });
+  const { territoryObservations, deleteTerritoryObs } = useContext(TerritoryObservationsContext);
 
-  const setTerritories = (territories) => setState(({ key }) => ({ territories, key: key + 1, loading: false }));
+  const [state, setState] = useState({ territories: [], territoryKey: 0 });
+
+  const setTerritories = (territories) => setState(({ territoryKey }) => ({ territories, territoryKey: territoryKey + 1, loading: false }));
 
   const refreshTerritories = async (setProgress, initialLoad) => {
     setState((state) => ({ ...state, loading: true }));
@@ -43,11 +46,14 @@ export const TerritoriesProvider = ({ children }) => {
   const deleteTerritory = async (id) => {
     const res = await API.delete({ path: `/territory/${id}` });
     if (res.ok) {
-      setState(({ territories, key, ...s }) => ({
+      setState(({ territories, territoryKey, ...s }) => ({
         ...s,
-        key: key + 1,
+        territoryKey: territoryKey + 1,
         territories: territories.filter((t) => t._id !== id),
       }));
+      for (let obs of territoryObservations.filter((o) => o.territory === id)) {
+        await deleteTerritoryObs(obs._id);
+      }
     }
     return res;
   };
@@ -57,9 +63,9 @@ export const TerritoriesProvider = ({ children }) => {
       const res = await API.post({ path: '/territory', body: prepareTerritoryForEncryption(territory) });
 
       if (res.ok) {
-        setState(({ territories, key, ...s }) => ({
+        setState(({ territories, territoryKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          territoryKey: territoryKey + 1,
           territories: [res.decryptedData, ...territories],
         }));
       }
@@ -77,9 +83,9 @@ export const TerritoriesProvider = ({ children }) => {
         body: prepareTerritoryForEncryption(territory),
       });
       if (res.ok) {
-        setState(({ territories, key, ...s }) => ({
+        setState(({ territories, territoryKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          territoryKey: territoryKey + 1,
           territories: territories.map((a) => {
             if (a._id === territory._id) return res.decryptedData;
             return a;

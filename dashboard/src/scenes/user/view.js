@@ -52,12 +52,12 @@ const View = () => {
             try {
               body.organisation = auth.organisation._id;
               const res = await API.put({ path: `/user/${id}`, body });
-              actions.setSubmitting(false);
-              if (!res.ok) return;
+              if (!res.ok) return actions.setSubmitting(false);
               if (auth.user._id === id) {
                 const { data } = await API.get({ path: `/user/${id}` });
                 setAuth({ user: data });
               }
+              actions.setSubmitting(false);
               toastr.success('Mis à jour !');
             } catch (errorUpdatingUser) {
               console.log('error in updating user', errorUpdatingUser);

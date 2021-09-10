@@ -6,7 +6,6 @@ import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { version } from '../../../package.json';
-
 import API from '../../services/api';
 import AuthContext from '../../contexts/auth';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -21,6 +20,14 @@ const SignIn = () => {
   const [showSelectTeam, setShowSelectTeam] = useState(false);
   const [showEncryption, setShowEncryption] = useState(false);
 
+  const onSigninValidated = ({ organisation }) => {
+    if (!!organisation?.receptionEnabled) {
+      history.push('/reception');
+    } else {
+      history.push('/');
+    }
+  };
+
   if (showSelectTeam) {
     return (
       <AuthWrapper>
@@ -33,7 +40,7 @@ const SignIn = () => {
               onClick={() => {
                 setCurrentTeam(team);
                 refresh({ initialLoad: true, showFullScreen: true });
-                history.push('/');
+                onSigninValidated(user);
               }}
             />
           ))}
@@ -78,7 +85,7 @@ const SignIn = () => {
               history.push('/organisation');
             } else if (user.teams.length <= 1) {
               setCurrentTeam(user.teams[0]);
-              history.push('/');
+              onSigninValidated(user);
               refresh({ initialLoad: true, showFullScreen: true });
             } else if (!teams.length) {
               history.push('/team');

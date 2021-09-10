@@ -26,13 +26,13 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('calendarDate', currentDate.toISOString().split('T')[0]);
-    history.push({ pathname: location.pathname, search: searchParams.toString() });
+    history.replace({ pathname: location.pathname, search: searchParams.toString() });
   }, [currentDate]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('calendarTab', activeTab);
-    history.push({ pathname: location.pathname, search: searchParams.toString() });
+    history.replace({ pathname: location.pathname, search: searchParams.toString() });
   }, [activeTab]);
 
   const renderActionsTable = (actions, date) => (

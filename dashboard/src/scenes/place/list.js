@@ -21,7 +21,7 @@ import RefreshContext from '../../contexts/refresh';
 import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
 
 const filterPlaces = (places, { page, limit, search }) => {
-  if (search?.length) places = places.filter(filterBySearch(search));
+  if (search?.length) places = filterBySearch(search, places);
 
   const data = places.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
   return { data, total: places.length };

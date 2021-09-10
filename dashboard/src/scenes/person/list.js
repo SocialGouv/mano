@@ -20,12 +20,14 @@ import PaginationContext from '../../contexts/pagination';
 import Filters, { filterData } from '../../components/Filters';
 import { filterBySearch } from '../search/utils';
 import { displayBirthDate } from '../../services/date';
-import SelectorsContext from '../../contexts/selectors';
+import { PersonsSelectorsContext } from '../../contexts/selectors';
 import CreatePerson from './CreatePerson';
 
 const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) persons = filterData(persons, filters);
-  if (search?.length) persons = persons.filter(filterBySearch(search));
+  if (search?.length) {
+    persons = filterBySearch(search, persons);
+  }
   if (!!alertness) persons = persons.filter((p) => !!p.alertness);
   if (filterTeams.length) {
     persons = persons.filter((p) => {
@@ -42,7 +44,7 @@ const getData = (persons = [], { page, limit, search, filterTeams, filters, aler
 const List = () => {
   const [filters, setFilters] = useState([]);
 
-  const { personsFullPopulated } = useContext(SelectorsContext);
+  const { personsFullPopulated } = useContext(PersonsSelectorsContext);
   const { organisation, teams } = useContext(AuthContext);
   const history = useHistory();
 

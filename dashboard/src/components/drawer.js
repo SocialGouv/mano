@@ -11,6 +11,7 @@ import API from '../services/api';
 
 import legal from '../assets/legal.pdf';
 import privacy from '../assets/privacy.pdf';
+import charte from '../assets/charte.pdf';
 import AuthContext from '../contexts/auth';
 
 const Drawer = () => {
@@ -156,6 +157,9 @@ const Drawer = () => {
                 rel="noreferrer"
                 href="https://framaforms.org/nouveau-questionnaire-de-satisfaction-de-mano-1627635427">
                 Donner mon avis sur Mano
+              </DropdownItem>
+              <DropdownItem tag="a" href={charte} target="_blank" rel="noreferrer">
+                Charte des Utilisateurs
               </DropdownItem>
               <DropdownItem tag="a" href={legal} target="_blank" rel="noreferrer">
                 Mentions Légales

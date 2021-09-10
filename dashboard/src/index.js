@@ -11,48 +11,20 @@ import './datepicker.css';
 import './index.scss';
 import 'moment/min/locales.min';
 import App from './app';
-import { AuthProvider } from './contexts/auth';
-import { PersonsProvider } from './contexts/persons';
-import { ActionsProvider } from './contexts/actions';
-import { CommentsProvider } from './contexts/comments';
-import { TerritoryObservationsProvider } from './contexts/territoryObservations';
-import { TerritoriesProvider } from './contexts/territory';
-import { PlacesProvider } from './contexts/places';
 import './services/sentry';
 import './services/api-interface-with-dashboard';
-import { ReportsProvider } from './contexts/reports';
-import { RefreshProvider } from './contexts/refresh';
-import { SelectorsProvider } from './contexts/selectors';
-import { RelsPersonPlaceProvider } from './contexts/relPersonPlace';
+import RootContextsProvider, { FullPopulatedSelectorsProvider } from './contexts/rootProvider';
 
 const store = createStore(combineReducers({ toastr }));
 
 ReactDOM.render(
   <Provider store={store}>
-    <AuthProvider>
-      <CommentsProvider>
-        <ActionsProvider>
-          <PersonsProvider>
-            <TerritoryObservationsProvider>
-              <TerritoriesProvider>
-                <PlacesProvider>
-                  <RelsPersonPlaceProvider>
-                    <ReportsProvider>
-                      <RefreshProvider>
-                        <SelectorsProvider>
-                          <App />
-                          <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-                        </SelectorsProvider>
-                      </RefreshProvider>
-                    </ReportsProvider>
-                  </RelsPersonPlaceProvider>
-                </PlacesProvider>
-              </TerritoriesProvider>
-            </TerritoryObservationsProvider>
-          </PersonsProvider>
-        </ActionsProvider>
-      </CommentsProvider>
-    </AuthProvider>
+    <RootContextsProvider>
+      <FullPopulatedSelectorsProvider>
+        <App />
+        <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
+      </FullPopulatedSelectorsProvider>
+    </RootContextsProvider>
   </Provider>,
   document.getElementById('root')
 );

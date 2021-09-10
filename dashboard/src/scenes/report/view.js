@@ -29,7 +29,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Card from '../../components/Card';
 import CreateObservation from '../../components/CreateObservation';
 
-const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Observations'];
+const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
 const View = () => {
   const { id } = useParams();
@@ -93,6 +93,7 @@ const View = () => {
       <ActionCreatedAt date={report.date} />
       <ActionCompletedAt date={report.date} status={CANCEL} />
       <CommentCreatedAt date={report.date} />
+      <CommentCreatedAt date={report.date} forPassages />
       <TerritoryObservationsCreatedAt date={report.date} />
     </div>
   );
@@ -111,7 +112,7 @@ const View = () => {
                 onClick={() => {
                   const searchParams = new URLSearchParams(location.search);
                   searchParams.set('tab', index);
-                  history.push({ pathname: location.pathname, search: searchParams.toString() });
+                  history.replace({ pathname: location.pathname, search: searchParams.toString() });
                   setActiveTab(index);
                 }}>
                 {tabCaption}
@@ -139,7 +140,10 @@ const View = () => {
           <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
         </TabPane>
         <TabPane tabId={5}>
-          <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Observations (${total})`)} />
+          <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} forPassages />
+        </TabPane>
+        <TabPane tabId={6}>
+          <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
         </TabPane>
       </TabContent>
     </div>
@@ -336,7 +340,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
+const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) => {
   const history = useHistory();
 
   const { comments } = useContext(CommentsContext);
@@ -347,7 +351,11 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const data = comments
     .filter((c) => c.team === currentTeam._id)
     .filter((c) => c.createdAt.slice(0, 10) === date.slice(0, 10))
-    .filter((c) => c.comment !== 'Passage enregistré')
+    .filter((c) => {
+      const commentIsPassage = c.comment.includes('Passage enregistré');
+      if (forPassages) return commentIsPassage;
+      return !commentIsPassage;
+    })
     .map((comment) => {
       const commentPopulated = { ...comment };
       if (comment.person) {
@@ -373,7 +381,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
       <StyledBox>
         <Table
           className="Table"
-          title={`Commentaires ajoutés le ${toFrenchDate(date)}`}
+          title={`${forPassages ? 'Passages non-anonymes' : 'Commentaires'} ajoutés le ${toFrenchDate(date)}`}
           data={data}
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {

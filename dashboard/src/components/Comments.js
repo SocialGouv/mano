@@ -17,19 +17,27 @@ import Loading from './loading';
 import { Formik } from 'formik';
 import AuthContext from '../contexts/auth';
 
-const Comments = ({ personId = '', actionId = '' }) => {
+const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
 
   const commentsContext = useContext(CommentsContext);
 
-  const comments = commentsContext.comments.filter((c) => {
-    if (!!personId) return c.person === personId;
-    if (!!actionId) return c.action === actionId;
-    return false;
-  });
+  const comments = commentsContext.comments
+    .filter((c) => {
+      if (!!personId) return c.person === personId;
+      if (!!actionId) return c.action === actionId;
+      return false;
+    })
+    .filter((c) => {
+      const commentIsPassage = c?.comment?.includes('Passage enregistré');
+      if (forPassages) return commentIsPassage;
+      return !commentIsPassage;
+    });
 
-  if (!comments) return null;
+  useEffect(() => {
+    if (!!onUpdateResults) onUpdateResults(comments.length);
+  }, [comments.length]);
 
   const deleteData = async (id) => {
     const confirm = window.confirm('Êtes-vous sûr ?');
@@ -69,7 +77,7 @@ const Comments = ({ personId = '', actionId = '' }) => {
     <React.Fragment>
       <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
         <Col md={4}>
-          <Title>Commentaires</Title>
+          <Title>{!forPassages ? 'Commentaires' : 'Passages'}</Title>
         </Col>
       </Row>
       <Box>
@@ -77,7 +85,7 @@ const Comments = ({ personId = '', actionId = '' }) => {
           <Loading />
         ) : (
           <>
-            <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment />
+            <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment forPassages={forPassages} />
             {comments.map((comment) => {
               return (
                 <StyledComment key={comment._id}>
@@ -112,12 +120,13 @@ const Comments = ({ personId = '', actionId = '' }) => {
         value={comments.find((c) => c._id === editingId)}
         onSubmit={updateData}
         onCancel={() => setEditing(null)}
+        forPassages={forPassages}
       />
     </React.Fragment>
   );
 };
 
-const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment }) => {
+const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment, forPassages }) => {
   const { user } = useContext(AuthContext);
   const [open, setOpen] = useState(false);
 
@@ -132,7 +141,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
 
   return (
     <>
-      {!!newComment && <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />}
+      {!!newComment && !forPassages && <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />}
       <Modal isOpen={!!open} toggle={onCancelRequest} size="lg">
         <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créér un' : 'Éditer le'} commentaire</ModalHeader>
         <ModalBody>
@@ -141,7 +150,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
             onSubmit={async (body, actions) => {
               if (!body.user && !newComment) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.createdAt && !newComment) return toastr.error('Erreur!', 'La date est obligatoire');
-              if (!body.comment) return toastr.error('Erreur!', 'Le commentaire suivie est obligatoire');
+              if (!body.comment) return toastr.error('Erreur!', 'Le commentaire est obligatoire');
               await onSubmit({ ...value, ...body });
               actions.setSubmitting(false);
             }}>

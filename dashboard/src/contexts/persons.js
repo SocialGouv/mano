@@ -3,18 +3,22 @@ import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { mergeNewUpdatedData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
+import ActionsContext from './actions';
 import CommentsContext from './comments';
+import RelsPersonPlaceContext from './relPersonPlace';
 
 const PersonsContext = React.createContext();
 
 export const PersonsProvider = ({ children }) => {
-  const { addComment } = useContext(CommentsContext);
+  const { addComment, deleteComment, comments } = useContext(CommentsContext);
+  const { actions, deleteAction } = useContext(ActionsContext);
+  const { relsPersonPlace, deleteRelation } = useContext(RelsPersonPlaceContext);
 
-  const [state, setState] = useState({ key: 0, persons: [], encrypted: [], loading: false, lastRefresh: undefined });
+  const [state, setState] = useState({ personKey: 0, persons: [], encrypted: [], loading: false, lastRefresh: undefined });
 
   const setPersons = (persons, encrypted) => {
     persons = persons.sort(sortPersons);
-    setState(({ key }) => ({ persons, encrypted, key: key + 1, loading: false, lastRefresh: Date.now() }));
+    setState(({ personKey }) => ({ persons, encrypted, personKey: personKey + 1, loading: false, lastRefresh: Date.now() }));
   };
 
   const refreshPersons = async (setProgress, initialLoad) => {
@@ -44,11 +48,20 @@ export const PersonsProvider = ({ children }) => {
   const deletePerson = async (id) => {
     const res = await API.delete({ path: `/person/${id}` });
     if (res.ok) {
-      setState(({ persons, key, ...s }) => ({
+      setState(({ persons, personKey, ...s }) => ({
         ...s,
-        key: key + 1,
+        personKey: personKey + 1,
         persons: persons.filter((p) => p._id !== id),
       }));
+      for (const action of actions.filter((a) => a.person === id)) {
+        await deleteAction(action._id);
+      }
+      for (let comment of comments.filter((c) => c.person === id)) {
+        await deleteComment(comment._id);
+      }
+      for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === id)) {
+        await deleteRelation(relPersonPlace._id);
+      }
     }
     return res;
   };
@@ -59,9 +72,9 @@ export const PersonsProvider = ({ children }) => {
       if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
       const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
       if (response.ok) {
-        setState(({ persons, encrypted, key, ...s }) => ({
+        setState(({ persons, encrypted, personKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          personKey: personKey + 1,
           persons: [response.decryptedData, ...persons].sort(sortPersons),
           encrypted: [response.data, ...encrypted],
         }));
@@ -81,9 +94,9 @@ export const PersonsProvider = ({ children }) => {
       });
       if (response.ok) {
         const newPerson = response.decryptedData;
-        setState(({ persons, encrypted, key, ...s }) => ({
+        setState(({ persons, encrypted, personKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          personKey: personKey + 1,
           persons: persons.map((p) => {
             if (p._id === person._id) return newPerson;
             return p;

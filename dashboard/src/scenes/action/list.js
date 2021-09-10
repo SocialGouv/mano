@@ -19,13 +19,13 @@ import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
 import SelectTeam from '../../components/SelectTeam';
 import { filterBySearch } from '../search/utils';
-import SelectorsContext from '../../contexts/selectors';
+import { ActionsSelectorsContext } from '../../contexts/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 
 const filterActions = (actions, { page, limit, status, currentTeam, search }) => {
   if (status) actions = actions.filter((a) => a.status === status);
-  if (search?.length) actions = actions.filter(filterBySearch(search));
+  if (search?.length) actions = filterBySearch(search, actions);
   actions = actions.filter((a) => a.team === currentTeam._id);
   return actions;
 };
@@ -38,7 +38,7 @@ const paginateActions = (actions, { page, limit }) => {
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
-  const { actionsFullPopulated } = useContext(SelectorsContext);
+  const { actionsFullPopulated } = useContext(ActionsSelectorsContext);
   const { user, teams, currentTeam, setCurrentTeam } = useContext(AuthContext);
 
   const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
@@ -50,7 +50,7 @@ const List = () => {
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('showAs', showAs);
-    history.push({ pathname: location.pathname, search: searchParams.toString() });
+    history.replace({ pathname: location.pathname, search: searchParams.toString() });
   }, [showAs]);
 
   const limit = 20;

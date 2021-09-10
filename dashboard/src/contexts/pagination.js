@@ -22,7 +22,7 @@ export const PaginationProvider = ({ children }) => {
     if (!!window && changeParams) {
       const searchParams = new URLSearchParams(location.search);
       searchParams.set('page', page);
-      history.push({ pathname: location.pathname, search: searchParams.toString() });
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
       // returns the existing query string: '?type=fiction&author=fahid'
     }
     setState((oldState) => ({ ...oldState, page }));
@@ -31,7 +31,7 @@ export const PaginationProvider = ({ children }) => {
     if (!!window) {
       const searchParams = new URLSearchParams(location.search);
       searchParams.set('search', search);
-      history.push({ pathname: location.pathname, search: searchParams.toString() });
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
       // returns the existing query string: '?type=fiction&author=fahid'
     }
     setState((oldState) => ({ ...oldState, search, page: 0 }));

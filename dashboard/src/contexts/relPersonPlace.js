@@ -5,12 +5,12 @@ import { capture } from '../services/sentry';
 const RelsPersonPlaceContext = React.createContext();
 
 export const RelsPersonPlaceProvider = ({ children }) => {
-  const [state, setState] = useState({ relsPersonPlace: [], key: 0 });
+  const [state, setState] = useState({ relsPersonPlace: [], relsKey: 0 });
 
   const setRelsPersonPlace = (relsPersonPlace) =>
-    setState(({ key }) => ({
+    setState(({ relsKey }) => ({
       relsPersonPlace,
-      key: key + 1,
+      relsKey: relsKey + 1,
       loading: false,
     }));
 
@@ -25,13 +25,11 @@ export const RelsPersonPlaceProvider = ({ children }) => {
   };
 
   const deleteRelation = async (id) => {
-    const res = await API.delete({
-      path: `/relPersonPlace/${id}`,
-    });
+    const res = await API.delete({ path: `/relPersonPlace/${id}` });
     if (res.ok) {
-      setState(({ relsPersonPlace, key, ...s }) => ({
+      setState(({ relsPersonPlace, relsKey, ...s }) => ({
         ...s,
-        key: key + 1,
+        relsKey: relsKey + 1,
         relsPersonPlace: relsPersonPlace.filter((rel) => rel._id !== id),
       }));
     }
@@ -42,8 +40,8 @@ export const RelsPersonPlaceProvider = ({ children }) => {
     try {
       const res = await API.post({ path: '/relPersonPlace', body: prepareRelPersonPlaceForEncryption(place) });
       if (res.ok) {
-        setState(({ relsPersonPlace, key }) => ({
-          key: key + 1,
+        setState(({ relsPersonPlace, relsKey }) => ({
+          relsKey: relsKey + 1,
           relsPersonPlace: [res.decryptedData, ...relsPersonPlace],
         }));
       }

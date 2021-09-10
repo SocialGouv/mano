@@ -2,7 +2,11 @@
 import React, { useContext, useState } from 'react';
 import { Col, Button as LinkButton, Container, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
+import styled from 'styled-components';
+import { toastr } from 'react-redux-toastr';
+import { Formik } from 'formik';
 
+import { filterBySearch } from '../search/utils';
 import Header from '../../components/header';
 import Page from '../../components/pagination';
 import { toFrenchDate } from '../../utils';
@@ -10,29 +14,22 @@ import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import styled from 'styled-components';
-import { toastr } from 'react-redux-toastr';
-import { Formik } from 'formik';
 import AuthContext from '../../contexts/auth';
 import TerritoryContext, { territoryTypes } from '../../contexts/territory';
 import PaginationContext from '../../contexts/pagination';
 import RefreshContext from '../../contexts/refresh';
 import SelectCustom from '../../components/SelectCustom';
-import SelectorsContext from '../../contexts/selectors';
+import { TerritoriesSelectorsContext } from '../../contexts/selectors';
 
 const filterTerritories = (territories, { page, limit, search }) => {
-  if (search?.length)
-    territories = territories
-      .map(JSON.stringify)
-      .filter((p) => p.toLocaleLowerCase().includes(search.toLocaleLowerCase()))
-      .map(JSON.parse);
+  if (search?.length) territories = filterBySearch(search, territories);
 
   const data = territories.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
   return { data, total: territories.length };
 };
 
 const List = () => {
-  const { territoriesFullPopulated } = useContext(SelectorsContext);
+  const { territoriesFullPopulated } = useContext(TerritoriesSelectorsContext);
   const { organisation } = useContext(AuthContext);
   const history = useHistory();
 

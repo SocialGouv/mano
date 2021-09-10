@@ -49,7 +49,7 @@ const View = () => {
     if (!search) return 'Pas de recherche, pas de résultat !';
     return (
       <>
-        <Nav tabs style={{ marginBottom: 20 }}>
+        <Nav tabs fill style={{ marginBottom: 20 }}>
           {tabsContents.map((tabCaption, index) => (
             <NavItem key={index} style={{ cursor: 'pointer' }}>
               <NavLink
@@ -58,7 +58,7 @@ const View = () => {
                 onClick={() => {
                   const searchParams = new URLSearchParams(location.search);
                   searchParams.set('tab', initTabs[index].toLowerCase());
-                  history.push({ pathname: location.pathname, search: searchParams.toString() });
+                  history.replace({ pathname: location.pathname, search: searchParams.toString() });
                   setActiveTab(index);
                 }}>
                 {tabCaption}
@@ -109,13 +109,13 @@ const Actions = ({ search, onUpdateResults }) => {
   const { persons } = useContext(PersonsContext);
   const { currentTeam } = useContext(AuthContext);
 
-  const data = actions
-    ?.filter((a) => a.team === currentTeam._id)
-    .filter(filterBySearch(search))
-    .map((action) => ({
-      ...action,
-      person: persons.find((p) => p._id === action?.person),
-    }));
+  const data = filterBySearch(
+    search,
+    actions?.filter((a) => a.team === currentTeam._id)
+  ).map((action) => ({
+    ...action,
+    person: persons.find((p) => p._id === action?.person),
+  }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -172,7 +172,7 @@ const Persons = ({ search, onUpdateResults }) => {
   const { persons } = useContext(PersonsContext);
   const { teams } = useContext(AuthContext);
 
-  const data = persons?.filter(filterBySearch(search));
+  const data = filterBySearch(search, persons);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -224,23 +224,23 @@ const Comments = ({ search, onUpdateResults }) => {
   const { actions } = useContext(ActionsContext);
   const { currentTeam } = useContext(AuthContext);
 
-  const data = comments
-    .filter((c) => c.team === currentTeam._id)
-    .filter(filterBySearch(search))
-    .map((comment) => {
-      const commentPopulated = { ...comment };
-      if (comment.person) {
-        commentPopulated.person = persons.find((p) => p._id === comment?.person);
-        commentPopulated.type = 'person';
-      }
-      if (comment.action) {
-        const action = actions.find((p) => p._id === comment?.action);
-        commentPopulated.action = action;
-        commentPopulated.person = persons.find((p) => p._id === action?.person);
-        commentPopulated.type = 'action';
-      }
-      return commentPopulated;
-    });
+  const data = filterBySearch(
+    search,
+    comments?.filter((c) => c.team === currentTeam._id)
+  ).map((comment) => {
+    const commentPopulated = { ...comment };
+    if (comment.person) {
+      commentPopulated.person = persons.find((p) => p._id === comment?.person);
+      commentPopulated.type = 'person';
+    }
+    if (comment.action) {
+      const action = actions.find((p) => p._id === comment?.action);
+      commentPopulated.action = action;
+      commentPopulated.person = persons.find((p) => p._id === action?.person);
+      commentPopulated.type = 'action';
+    }
+    return commentPopulated;
+  });
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -331,7 +331,7 @@ const Territories = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const { territories } = useContext(TerritoryContext);
 
-  const data = territories.filter(filterBySearch(search));
+  const data = filterBySearch(search, territories);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -369,7 +369,7 @@ const Places = ({ search, onUpdateResults }) => {
   const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
   const { persons } = useContext(PersonsContext);
 
-  const data = places.filter(filterBySearch(search));
+  const data = filterBySearch(search, places);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -419,13 +419,13 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
   const { territoryObservations } = useContext(TerritoryObservationsContext);
   const { territories } = useContext(TerritoryContext);
 
-  const data = territoryObservations
-    .filter((o) => o.team === currentTeam._id)
-    .filter(filterBySearch(search))
-    .map((obs) => ({
-      ...obs,
-      territory: territories.find((t) => t._id === obs.territory),
-    }));
+  const data = filterBySearch(
+    search,
+    territoryObservations?.filter((o) => o.team === currentTeam._id)
+  ).map((obs) => ({
+    ...obs,
+    territory: territories.find((t) => t._id === obs.territory),
+  }));
 
   useEffect(() => {
     onUpdateResults(data.length);

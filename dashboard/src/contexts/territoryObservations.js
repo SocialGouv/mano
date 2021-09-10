@@ -5,12 +5,12 @@ import { capture } from '../services/sentry';
 const TerritoryObservationsContext = React.createContext();
 
 export const TerritoryObservationsProvider = ({ children }) => {
-  const [state, setState] = useState({ territoryObservations: [], key: 0, loading: true });
+  const [state, setState] = useState({ territoryObservations: [], obsKey: 0, loading: true });
 
   const setTerritoryObs = (territoryObservations) => {
-    setState(({ key }) => ({
+    setState(({ obsKey }) => ({
       territoryObservations,
-      key: key + 1,
+      obsKey: obsKey + 1,
       loading: false,
     }));
   };
@@ -35,9 +35,9 @@ export const TerritoryObservationsProvider = ({ children }) => {
   const deleteTerritoryObs = async (id) => {
     const res = await API.delete({ path: `/territory-observation/${id}` });
     if (res.ok) {
-      setState(({ territoryObservations, key, ...s }) => ({
+      setState(({ territoryObservations, obsKey, ...s }) => ({
         ...s,
-        key: key + 1,
+        obsKey: obsKey + 1,
         territoryObservations: territoryObservations.filter((p) => p._id !== id),
       }));
     }
@@ -48,9 +48,9 @@ export const TerritoryObservationsProvider = ({ children }) => {
     try {
       const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(obs) });
       if (res.ok) {
-        setState(({ territoryObservations, key, ...s }) => ({
+        setState(({ territoryObservations, obsKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          obsKey: obsKey + 1,
           territoryObservations: [res.decryptedData, ...territoryObservations],
         }));
       }
@@ -65,9 +65,9 @@ export const TerritoryObservationsProvider = ({ children }) => {
     try {
       const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(obs) });
       if (res.ok) {
-        setState(({ territoryObservations, key, ...s }) => ({
+        setState(({ territoryObservations, obsKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          obsKey: obsKey + 1,
           territoryObservations: territoryObservations.map((a) => {
             if (a._id === obs._id) return res.decryptedData;
             return a;

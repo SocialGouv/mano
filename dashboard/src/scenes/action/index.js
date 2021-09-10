@@ -1,9 +1,9 @@
-import React from "react";
-import { Switch, Route } from "react-router-dom";
-import { PaginationProvider } from "../../contexts/pagination";
+import React from 'react';
+import { Switch, Route } from 'react-router-dom';
+import { PaginationProvider } from '../../contexts/pagination';
 
-import List from "./list";
-import View from "./view";
+import List from './list';
+import View from './view';
 
 const Router = () => {
   return (

@@ -1,8 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext } from 'react';
-import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
+import React, { useContext, useEffect, useState } from 'react';
+import { Container, FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink } from 'reactstrap';
 
-import { useParams, useHistory } from 'react-router-dom';
+import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
@@ -13,7 +13,6 @@ import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import BackButton from '../../components/backButton';
 import CreateAction from '../action/CreateAction';
-import Box from '../../components/Box';
 import Comments from '../../components/Comments';
 import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
@@ -38,24 +37,25 @@ import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
 import { toFrenchDate } from '../../utils';
+import AuthContext from '../../contexts/auth';
+
+const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
 
 const View = () => {
   const { id } = useParams();
+  const location = useLocation();
   const history = useHistory();
-  const { persons, updatePerson, deletePerson } = useContext(PersonsContext);
+  const { persons } = useContext(PersonsContext);
+  const { organisation } = useContext(AuthContext);
+  const [tabsContents, setTabsContents] = useState(initTabs);
+  const searchParams = new URLSearchParams(location.search);
+  const [activeTab, setActiveTab] = useState(
+    searchParams.get('tab') ? initTabs.findIndex((value) => value.toLowerCase() === searchParams.get('tab')) : 0
+  );
+
+  const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
 
   const person = persons.find((p) => p._id === id) || {};
-
-  const deleteData = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const res = await deletePerson(id);
-      if (res?.ok) {
-        toastr.success('Suppression réussie');
-        history.goBack();
-      }
-    }
-  };
 
   return (
     <StyledContainer style={{ padding: '40px 0' }}>
@@ -64,221 +64,282 @@ const View = () => {
         {`Dossier de ${person?.name}`}
         <UserName id={person.user} wrapper={(name) => ` (créée par ${name})`} />
       </Title>
-      <Box>
-        <Formik
-          initialValues={person}
-          onSubmit={async (body) => {
-            if (!body.createdAt) body.createdAt = person.createdAt;
-            body.entityKey = person.entityKey;
-            const res = await updatePerson(body);
-            if (res.ok) {
-              toastr.success('Mis à jour !');
-            }
-          }}>
-          {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
-            return (
-              <React.Fragment>
-                <Title>Résumé</Title>
-                <Row>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Nom prénom ou Pseudonyme</Label>
-                      <Input name="name" value={values.name || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Autres pseudos</Label>
-                      <Input name="otherNames" value={values.otherNames || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <Label>Genre</Label>
-                    <SelectAsInput options={genderOptions} name="gender" value={values.gender || ''} onChange={handleChange} />
-                  </Col>
-
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Date de naissance</Label>
-                      <div>
-                        <DatePicker
-                          locale="fr"
-                          className="form-control"
-                          selected={values.birthdate ? new Date(values.birthdate) : null}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
-                          dateFormat="dd/MM/yyyy"
-                        />
-                      </div>
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>En rue depuis le</Label>
-                      <div>
-                        <DatePicker
-                          locale="fr"
-                          className="form-control"
-                          selected={values.wanderingAt ? new Date(values.wanderingAt) : null}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
-                          dateFormat="dd/MM/yyyy"
-                        />
-                      </div>
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Suivi(e) depuis le / Créé le</Label>
-                      <div>
-                        <DatePicker
-                          locale="fr"
-                          className="form-control"
-                          selected={values.createdAt ? new Date(values.createdAt) : null}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
-                          dateFormat="dd/MM/yyyy"
-                        />
-                      </div>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Équipe(s) en charge</Label>
-                      <div>
-                        <SelectTeamMultiple
-                          onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
-                          value={values.assignedTeams}
-                          colored
-                        />
-                      </div>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Personne très vulnérable</Label>
-                      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                        <span>Personne très vulnérable, ou ayant besoin d'une attention particulière</span>
-                        <Input type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
-                      </div>
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label>Téléphone</Label>
-                      <Input name="phone" value={values.phone || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label>Description</Label>
-                      <Input type="textarea" rows={5} name="description" value={values.description || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <hr />
-                <Title>Dossier social</Title>
-                <Row>
-                  <Col md={4}>
-                    <Label>Situation personnelle</Label>
-                    <SelectAsInput
-                      options={personalSituationOptions}
-                      name="personalSituation"
-                      value={values.personalSituation || ''}
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Structure de suivi social</Label>
-                      <Input name="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Avec animaux</Label>
-                      <SelectAsInput options={yesNoOptions} name="hasAnimal" value={values.hasAnimal || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Hébergement</Label>
-                      <SelectAsInput options={yesNoOptions} name="address" value={values.address || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-
-                  <AddressDetails values={values} onChange={handleChange} />
-
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Nationalité</Label>
-                      <SelectAsInput
-                        options={nationalitySituationOptions}
-                        name="nationalitySituation"
-                        value={values.nationalitySituation || ''}
-                        onChange={handleChange}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Emploi</Label>
-                      <SelectAsInput options={employmentOptions} name="employment" value={values.employment || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-
-                  <Col md={4}>
-                    <Ressources value={values.resources} onChange={handleChange} />
-                  </Col>
-
-                  <Col md={4}>
-                    <Reasons value={values.reasons} onChange={handleChange} />
-                  </Col>
-                </Row>
-                <hr />
-                <Title>Dossier médical</Title>
-                <Row>
-                  <Col md={4}>
-                    <Label>Couverture médicale</Label>
-                    <SelectAsInput
-                      options={healthInsuranceOptions}
-                      name="healthInsurance"
-                      value={values.healthInsurance || ''}
-                      onChange={handleChange}
-                    />
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label>Structure de suivi médical</Label>
-                      <Input name="structureMedical" value={values.structureMedical} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <Vunerabilities value={values.vulnerabilities} onChange={handleChange} />
-                  </Col>
-                  <Col md={4}>
-                    <Consommations value={values.consumptions} onChange={handleChange} />
-                  </Col>
-                </Row>
-                <hr />
-
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
-                  <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
-                </div>
-              </React.Fragment>
-            );
-          }}
-        </Formik>
-      </Box>
-      <Actions person={person} />
-      <Comments personId={person?._id} />
-      <Places personId={person?._id} />
+      <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }}>
+        {tabsContents.map((tabCaption, index) => {
+          if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
+          return (
+            <NavItem key={index} style={{ cursor: 'pointer' }}>
+              <NavLink
+                key={index}
+                className={`${activeTab === index && 'active'}`}
+                onClick={() => {
+                  const searchParams = new URLSearchParams(location.search);
+                  searchParams.set('tab', initTabs[index].toLowerCase());
+                  history.replace({ pathname: location.pathname, search: searchParams.toString() });
+                  setActiveTab(index);
+                }}>
+                {tabCaption}
+              </NavLink>
+            </NavItem>
+          );
+        })}
+      </Nav>
+      <TabContent activeTab={activeTab}>
+        <TabPane tabId={0}>
+          <Summary person={person} />
+        </TabPane>
+        <TabPane tabId={1}>
+          <Actions person={person} onUpdateResults={(total) => updateTabContent(1, `Actions (${total})`)} />
+        </TabPane>
+        <TabPane tabId={2}>
+          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(2, `Commentaires (${total})`)} />
+        </TabPane>
+        <TabPane tabId={3}>
+          <Comments personId={person?._id} forPassages onUpdateResults={(total) => updateTabContent(3, `Passages (${total})`)} />
+        </TabPane>
+        <TabPane tabId={4}>
+          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Lieux (${total})`)} />
+        </TabPane>
+      </TabContent>
     </StyledContainer>
   );
 };
 
-const Actions = ({ person }) => {
+const Summary = ({ person }) => {
+  const history = useHistory();
+  const { updatePerson, deletePerson } = useContext(PersonsContext);
+
+  const deleteData = async () => {
+    const confirm = window.confirm('Êtes-vous sûr ?');
+    if (confirm) {
+      const res = await deletePerson(person._id);
+      if (res?.ok) {
+        toastr.success('Suppression réussie');
+        history.goBack();
+      }
+    }
+  };
+
+  return (
+    <>
+      <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
+        <Col md={4}>
+          <Title>Résumé</Title>
+        </Col>
+      </Row>
+      <Formik
+        initialValues={person}
+        onSubmit={async (body) => {
+          if (!body.createdAt) body.createdAt = person.createdAt;
+          body.entityKey = person.entityKey;
+          const res = await updatePerson(body);
+          if (res.ok) {
+            toastr.success('Mis à jour !');
+          }
+        }}>
+        {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
+          return (
+            <React.Fragment>
+              <Row>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Nom prénom ou Pseudonyme</Label>
+                    <Input name="name" value={values.name || ''} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Autres pseudos</Label>
+                    <Input name="otherNames" value={values.otherNames || ''} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <Label>Genre</Label>
+                  <SelectAsInput options={genderOptions} name="gender" value={values.gender || ''} onChange={handleChange} />
+                </Col>
+
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Date de naissance</Label>
+                    <div>
+                      <DatePicker
+                        locale="fr"
+                        className="form-control"
+                        selected={values.birthdate ? new Date(values.birthdate) : null}
+                        onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
+                        dateFormat="dd/MM/yyyy"
+                      />
+                    </div>
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>En rue depuis le</Label>
+                    <div>
+                      <DatePicker
+                        locale="fr"
+                        className="form-control"
+                        selected={values.wanderingAt ? new Date(values.wanderingAt) : null}
+                        onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
+                        dateFormat="dd/MM/yyyy"
+                      />
+                    </div>
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Suivi(e) depuis le / Créé le</Label>
+                    <div>
+                      <DatePicker
+                        locale="fr"
+                        className="form-control"
+                        selected={values.createdAt ? new Date(values.createdAt) : null}
+                        onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                        dateFormat="dd/MM/yyyy"
+                      />
+                    </div>
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label>Équipe(s) en charge</Label>
+                    <div>
+                      <SelectTeamMultiple
+                        onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
+                        value={values.assignedTeams}
+                        colored
+                      />
+                    </div>
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label>Personne très vulnérable</Label>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                      <span>Personne très vulnérable, ou ayant besoin d'une attention particulière</span>
+                      <Input type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
+                    </div>
+                  </FormGroup>
+                </Col>
+                <Col md={12}>
+                  <FormGroup>
+                    <Label>Téléphone</Label>
+                    <Input name="phone" value={values.phone || ''} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={12}>
+                  <FormGroup>
+                    <Label>Description</Label>
+                    <Input type="textarea" rows={5} name="description" value={values.description || ''} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+              </Row>
+              <hr />
+              <Title>Dossier social</Title>
+              <Row>
+                <Col md={4}>
+                  <Label>Situation personnelle</Label>
+                  <SelectAsInput
+                    options={personalSituationOptions}
+                    name="personalSituation"
+                    value={values.personalSituation || ''}
+                    onChange={handleChange}
+                  />
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Structure de suivi social</Label>
+                    <Input name="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Avec animaux</Label>
+                    <SelectAsInput options={yesNoOptions} name="hasAnimal" value={values.hasAnimal || ''} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Hébergement</Label>
+                    <SelectAsInput options={yesNoOptions} name="address" value={values.address || ''} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+
+                <AddressDetails values={values} onChange={handleChange} />
+
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Nationalité</Label>
+                    <SelectAsInput
+                      options={nationalitySituationOptions}
+                      name="nationalitySituation"
+                      value={values.nationalitySituation || ''}
+                      onChange={handleChange}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Emploi</Label>
+                    <SelectAsInput options={employmentOptions} name="employment" value={values.employment || ''} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+
+                <Col md={4}>
+                  <Ressources value={values.resources} onChange={handleChange} />
+                </Col>
+
+                <Col md={4}>
+                  <Reasons value={values.reasons} onChange={handleChange} />
+                </Col>
+              </Row>
+              <hr />
+              <Title>Dossier médical</Title>
+              <Row>
+                <Col md={4}>
+                  <Label>Couverture médicale</Label>
+                  <SelectAsInput
+                    options={healthInsuranceOptions}
+                    name="healthInsurance"
+                    value={values.healthInsurance || ''}
+                    onChange={handleChange}
+                  />
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Structure de suivi médical</Label>
+                    <Input name="structureMedical" value={values.structureMedical} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <Vunerabilities value={values.vulnerabilities} onChange={handleChange} />
+                </Col>
+                <Col md={4}>
+                  <Consommations value={values.consumptions} onChange={handleChange} />
+                </Col>
+              </Row>
+              <hr />
+
+              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
+                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+              </div>
+            </React.Fragment>
+          );
+        }}
+      </Formik>
+    </>
+  );
+};
+
+const Actions = ({ person, onUpdateResults }) => {
   const { actions } = useContext(ActionsContext);
 
   const data = actions.filter((a) => a.person === person._id);
+
+  useEffect(() => {
+    onUpdateResults(data.length);
+  }, [data.length]);
 
   const history = useHistory();
 

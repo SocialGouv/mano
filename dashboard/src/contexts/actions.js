@@ -8,10 +8,10 @@ import CommentsContext from './comments';
 const ActionsContext = React.createContext({});
 
 export const ActionsProvider = ({ children }) => {
-  const { addComment } = useContext(CommentsContext);
+  const { addComment, deleteComment, comments } = useContext(CommentsContext);
   const { user } = useContext(AuthContext);
 
-  const [state, setState] = useState({ key: 0, actions: [], encrypted: [], loading: false });
+  const [state, setState] = useState({ actionKey: 0, actions: [], encrypted: [], loading: false });
 
   const refreshActions = async (setProgress) => {
     setState((state) => ({ ...state, loading: true }));
@@ -20,8 +20,8 @@ export const ActionsProvider = ({ children }) => {
       capture('error getting actions', { extra: { response } });
       return setState((state) => ({ ...state, loading: false }));
     }
-    setState(({ key }) => ({
-      key: key + 1,
+    setState(({ actionKey }) => ({
+      actionKey: actionKey + 1,
       actions: response.decryptedData,
       encrypted: response.data,
       loading: false,
@@ -32,12 +32,15 @@ export const ActionsProvider = ({ children }) => {
   const deleteAction = async (id) => {
     const res = await API.delete({ path: `/action/${id}` });
     if (res.ok) {
-      setState(({ key, actions, encrypted, ...s }) => ({
+      setState(({ actionKey, actions, encrypted, ...s }) => ({
         ...s,
-        key: key + 1,
+        actionKey: actionKey + 1,
         actions: actions.filter((a) => a._id !== id),
         encrypted: encrypted.filter((a) => a._id !== id),
       }));
+      for (let comment of comments.filter((c) => c.action === id)) {
+        await deleteComment(comment._id);
+      }
     }
     return res;
   };
@@ -46,9 +49,9 @@ export const ActionsProvider = ({ children }) => {
     try {
       const response = await API.post({ path: '/action', body: prepareActionForEncryption(action) });
       if (response.ok) {
-        setState(({ actions, encrypted, key, ...s }) => ({
+        setState(({ actions, encrypted, actionKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          actionKey: actionKey + 1,
           actions: [response.decryptedData, ...actions],
           encrypted: [response.data, ...encrypted],
         }));
@@ -77,9 +80,9 @@ export const ActionsProvider = ({ children }) => {
         body: prepareActionForEncryption(action),
       });
       if (response.ok) {
-        setState(({ actions, encrypted, key, ...s }) => ({
+        setState(({ actions, encrypted, actionKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          actionKey: actionKey + 1,
           actions: actions.map((a) => {
             if (a._id === response.decryptedData._id) return response.decryptedData;
             return a;

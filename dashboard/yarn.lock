@@ -5830,6 +5830,14 @@ file-loader@6.1.1:
     loader-utils "^2.0.0"
     schema-utils "^3.0.0"
 
+file-loader@^6.0.0:
+  version "6.2.0"
+  resolved "https://registry.yarnpkg.com/file-loader/-/file-loader-6.2.0.tgz#baef7cf8e1840df325e4390b4484879480eebe4d"
+  integrity sha512-qo3glqyTa61Ytg4u73GultjHGjdRyig3tG6lPtyX/jOEJvHif9uB0/OCI2Kif6ctF3caQTW2G5gym21oAsI4pw==
+  dependencies:
+    loader-utils "^2.0.0"
+    schema-utils "^3.0.0"
+
 file-uri-to-path@1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/file-uri-to-path/-/file-uri-to-path-1.0.0.tgz#553a7b8446ff6f684359c445f1e37a05dacc33dd"
@@ -8199,6 +8207,11 @@ magic-string@^0.25.0, magic-string@^0.25.7:
   dependencies:
     sourcemap-codec "^1.4.4"
 
+make-cancellable-promise@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/make-cancellable-promise/-/make-cancellable-promise-1.0.0.tgz#826214115b0827ca7a45ba204df7c31546243870"
+  integrity sha512-+YO6Grg2uy/z8Mv3uV90OP6yAUHIF43YGgEFbejmBrK9VWFsVO6DvzFMcopXr9wCNg3/QIltIKiSCROC7zFB2g==
+
 make-dir@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/make-dir/-/make-dir-2.1.0.tgz#5f0310e18b8be898cc07009295a30ae41e91e6f5"
@@ -8313,6 +8326,11 @@ merge-descriptors@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/merge-descriptors/-/merge-descriptors-1.0.1.tgz#b00aaa556dd8b44568150ec9d1b953f3f90cbb61"
   integrity sha1-sAqqVW3YtEVoFQ7J0blT8/kMu2E=
+
+merge-refs@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/merge-refs/-/merge-refs-1.0.0.tgz#388348bce22e623782c6df9d3c4fc55888276120"
+  integrity sha512-WZ4S5wqD9FCR9hxkLgvcHJCBxzXzy3VVE6p8W2OzxRzB+hLRlcadGE2bW9xp2KSzk10rvp4y+pwwKO6JQVguMg==
 
 merge-stream@^2.0.0:
   version "2.0.0"
@@ -9301,6 +9319,11 @@ pbkdf2@^3.0.3:
     ripemd160 "^2.0.1"
     safe-buffer "^5.0.1"
     sha.js "^2.4.8"
+
+pdfjs-dist@2.6.347:
+  version "2.6.347"
+  resolved "https://registry.yarnpkg.com/pdfjs-dist/-/pdfjs-dist-2.6.347.tgz#f257ed66e83be900cd0fd28524a2187fb9e25cd5"
+  integrity sha512-QC+h7hG2su9v/nU1wEI3SnpPIrqJODL7GTDFvR74ANKGq1AFJW16PH8VWnhpiTi9YcLSFV9xLeWSgq+ckHLdVQ==
 
 performance-now@^0.2.0:
   version "0.2.0"
@@ -10532,6 +10555,20 @@ react-outside-click-handler@^1.2.4, react-outside-click-handler@^1.3.0:
     document.contains "^1.0.1"
     object.values "^1.1.0"
     prop-types "^15.7.2"
+
+react-pdf@^5.3.2:
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/react-pdf/-/react-pdf-5.3.2.tgz#517109d2a32ea7450dea49f7e5cc8e10bd2cfc4b"
+  integrity sha512-gT2xeUAUJem5UWNZYIQSPJAlPDbc3mIIhEgGK8P/qo1B68WIE4R4v3tNFYM9e5nqlKnGZG4Cd68SetlmnPejwA==
+  dependencies:
+    "@babel/runtime" "^7.0.0"
+    file-loader "^6.0.0"
+    make-cancellable-promise "^1.0.0"
+    make-event-props "^1.1.0"
+    merge-class-names "^1.1.1"
+    merge-refs "^1.0.0"
+    pdfjs-dist "2.6.347"
+    prop-types "^15.6.2"
 
 react-popper@^1.3.6, react-popper@^1.3.8:
   version "1.3.11"

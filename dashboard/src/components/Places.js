@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, FormGroup, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { Formik } from 'formik';
@@ -15,7 +15,7 @@ import Table from './table';
 import { toFrenchDate } from '../utils';
 import SelectCustom from './SelectCustom';
 
-const Places = ({ personId = '' }) => {
+const Places = ({ personId = '', onUpdateResults }) => {
   const history = useHistory();
 
   const { places } = useContext(PlacesContext);
@@ -25,7 +25,9 @@ const Places = ({ personId = '' }) => {
     .filter((relation) => relation.person === personId)
     .map((relation) => ({ ...relation, place: places.find((p) => p._id === relation.place) }));
 
-  if (!data) return null;
+  useEffect(() => {
+    if (!!onUpdateResults) onUpdateResults(data.length);
+  }, [data.length]);
 
   return (
     <React.Fragment>

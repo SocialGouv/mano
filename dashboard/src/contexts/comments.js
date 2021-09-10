@@ -10,13 +10,13 @@ const CommentsContext = React.createContext();
 export const CommentsProvider = ({ children }) => {
   const { currentTeam, organisation, user } = useContext(AuthContext);
 
-  const [state, setState] = useState({ key: 0, comments: [], encrypted: [], loading: false, lastRefresh: undefined });
+  const [state, setState] = useState({ commentKey: 0, comments: [], encrypted: [], loading: false, lastRefresh: undefined });
 
   const setComments = (newComments, encrypted) =>
-    setState(({ key }) => ({
+    setState(({ commentKey }) => ({
       comments: newComments,
       encrypted,
-      key: key + 1,
+      commentKey: commentKey + 1,
       loading: false,
       lastRefresh: Date.now(),
     }));
@@ -52,9 +52,9 @@ export const CommentsProvider = ({ children }) => {
   const deleteComment = async (id) => {
     const res = await API.delete({ path: `/comment/${id}` });
     if (res.ok) {
-      setState(({ comments, key, ...s }) => ({
+      setState(({ comments, commentKey, ...s }) => ({
         ...s,
-        key: key + 1,
+        commentKey: commentKey + 1,
         comments: comments.filter((p) => p._id !== id),
       }));
     }
@@ -68,9 +68,9 @@ export const CommentsProvider = ({ children }) => {
       if (!body.organisation) body.organisation = organisation._id;
       const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
       if (response.ok) {
-        setState(({ comments, encrypted, key, s }) => ({
+        setState(({ comments, encrypted, commentKey, s }) => ({
           ...s,
-          key: key + 1,
+          commentKey: commentKey + 1,
           comments: [response.decryptedData, ...comments],
           encrypted: [response.data, ...encrypted],
         }));
@@ -88,9 +88,9 @@ export const CommentsProvider = ({ children }) => {
         body: prepareCommentForEncryption(comment),
       });
       if (response.ok) {
-        setState(({ comments, key, encrypted, ...s }) => ({
+        setState(({ comments, commentKey, encrypted, ...s }) => ({
           ...s,
-          key: key + 1,
+          commentKey: commentKey + 1,
           comments: comments.map((c) => {
             if (c._id === comment._id) return response.decryptedData;
             return c;

@@ -6,10 +6,10 @@ import CommentsContext from './comments';
 const ReportsContext = React.createContext();
 
 export const ReportsProvider = ({ children }) => {
-  const [state, setState] = useState({ reports: [], key: 0, loading: true });
+  const [state, setState] = useState({ reports: [], reportsKey: 0, loading: true });
   const { addComment } = useContext(CommentsContext);
 
-  const setReports = (reports) => setState(({ key }) => ({ reports, key: key + 1, loading: false }));
+  const setReports = (reports) => setState(({ reportsKey }) => ({ reports, reportsKey: reportsKey + 1, loading: false }));
 
   const refreshReports = async () => {
     setState((state) => ({ ...state, loading: true }));
@@ -24,9 +24,9 @@ export const ReportsProvider = ({ children }) => {
   const deleteReport = async (id) => {
     const res = await API.delete({ path: `/report/${id}` });
     if (res.ok) {
-      setState(({ key, reports, ...s }) => ({
+      setState(({ reportsKey, reports, ...s }) => ({
         ...s,
-        key: key + 1,
+        reportsKey: reportsKey + 1,
         reports: reports.filter((p) => p._id !== id),
       }));
     }
@@ -37,9 +37,9 @@ export const ReportsProvider = ({ children }) => {
     try {
       const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(report) });
       if (res.ok) {
-        setState(({ reports, key, ...s }) => ({
+        setState(({ reports, reportsKey, ...s }) => ({
           ...s,
-          key: key + 1,
+          reportsKey: reportsKey + 1,
           reports: reports.map((a) => {
             if (a._id === report._id) return res.decryptedData;
             return a;
@@ -57,9 +57,9 @@ export const ReportsProvider = ({ children }) => {
     try {
       const res = await API.post({ path: '/report', body: { team, date } });
       if (!res.ok) return res;
-      setState(({ reports, key, ...s }) => ({
+      setState(({ reports, reportsKey, ...s }) => ({
         ...s,
-        key: key + 1,
+        reportsKey: reportsKey + 1,
         reports: [res.decryptedData, ...reports],
       }));
       return res;
@@ -73,7 +73,7 @@ export const ReportsProvider = ({ children }) => {
     const incrementPassages = persons.length || 1;
     const reportUpdate = {
       ...report,
-      passages: newValue || (report.passages || 0) + incrementPassages,
+      passages: newValue === null ? (report.passages || 0) + incrementPassages : newValue,
     };
     const res = await updateReport(reportUpdate);
     if (res.ok) {
