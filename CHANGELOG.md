@@ -1,3 +1,10 @@
+# [1.5.0](https://github.com/SocialGouv/mano/compare/v1.4.1...v1.5.0) (2021-09-10)
+
+
+### Features
+
+* add api ([#14](https://github.com/SocialGouv/mano/issues/14)) ([b951367](https://github.com/SocialGouv/mano/commit/b951367bb07e330ebc73dfa8d2dbc7c0132ffd03))
+
 ## [1.4.1](https://github.com/SocialGouv/mano/compare/v1.4.0...v1.4.1) (2021-09-10)
 
 
