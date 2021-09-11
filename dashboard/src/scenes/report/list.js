@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { Container, Collapse } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { toastr } from 'react-redux-toastr';
 
 import Header from '../../components/header';
 
@@ -42,7 +41,6 @@ const HitMonth = ({ date, reports, team, debug }) => {
 
     const res = await addReport(date, team._id);
     if (!res.ok) return;
-    toastr.success('Report created !');
     history.push(`/report/${res.data._id}`);
   };
 
