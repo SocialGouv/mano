@@ -3,6 +3,7 @@ import { ok } from "assert";
 
 import { Deployment } from "kubernetes-models/apps/v1/Deployment";
 
+import environments from "@socialgouv/kosko-charts/environments"
 import { create } from "@socialgouv/kosko-charts/components/app";
 import { addInitContainerCommand } from "@socialgouv/kosko-charts/utils";
 
@@ -43,6 +44,7 @@ export default async () => {
   if (env.env === "dev") {
     const deployment = getDeployment(manifests);
     ok(deployment);
+    const ciEnv = environments(process.env)
 
     addInitContainerCommand(deployment, {
       command: ["yarn"],
@@ -50,7 +52,7 @@ export default async () => {
       envFrom: [
         {
           secretRef: {
-            name: `azure-pg-user-${process.env.CI_COMMIT_SHORT_SHA}`,
+            name: `azure-pg-user-${ciEnv.branchSlug}`,
           },
         },
       ],
