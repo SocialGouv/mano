@@ -76,7 +76,7 @@ const Reception = () => {
     setPassages((p) => p + (selectedPersons.length || 1));
     await incrementPassage(todaysReport, {
       persons: selectedPersons,
-      onSuccess: () => onSelectPerson([]),
+      // onSuccess: () => onSelectPerson([]),
     });
     setAddingPassage(false);
   };
@@ -140,6 +140,7 @@ const Reception = () => {
               color="link"
               title="Ajouter un passage anonyme"
               padding="0px"
+              disabled={addingPassage}
             />
             <ButtonCustom
               onClick={async () => {
@@ -152,6 +153,7 @@ const Reception = () => {
               color="link"
               title="Retirer un passage"
               padding="0px"
+              disabled={addingPassage}
             />
           </Card>
         </Col>

@@ -47,7 +47,7 @@ const View = () => {
           onSubmit={async (body) => {
             try {
               const response = await API.put({ path: `/team/${team._id}`, body });
-              if (response.ok) toastr.success('Mis à jour !');
+              if (response.ok) toastr.success('Mise à jour !');
             } catch (errorUpdatingTeam) {
               console.log('error in updating team', errorUpdatingTeam);
               toastr.error('Erreur!', errorUpdatingTeam.message);
@@ -60,6 +60,16 @@ const View = () => {
                   <FormGroup>
                     <Label>Nom</Label>
                     <Input name="name" value={values.name} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={6} />
+                <Col md={12}>
+                  <FormGroup>
+                    <Label>Maraude de nuit</Label>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                      <span>Maraude de nuit</span>
+                      <Input type="checkbox" name="nightSession" checked={values.nightSession} onChange={handleChange} />
+                    </div>
                   </FormGroup>
                 </Col>
               </Row>

@@ -41,6 +41,7 @@ const List = () => {
           { title: 'Nom', dataKey: 'name' },
           { title: 'Créée le', dataKey: 'createdAt', render: (i) => toFrenchDate(i.createdAt) },
           { title: 'Organisation', dataKey: 'Organisation', render: (i) => i.Organisation.name || '' },
+          { title: 'Maraude de nuit', dataKey: 'nightSession', render: (i) => (i.nightSession ? '🌒' : '☀️') },
         ]}
       />
     </Container>
