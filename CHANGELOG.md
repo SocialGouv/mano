@@ -1,3 +1,10 @@
+## [1.5.1](https://github.com/SocialGouv/mano/compare/v1.5.0...v1.5.1) (2021-09-11)
+
+
+### Bug Fixes
+
+* can view report ([98794f2](https://github.com/SocialGouv/mano/commit/98794f2d958bfcd947630ed57c67bbecdffe3905))
+
 # [1.5.0](https://github.com/SocialGouv/mano/compare/v1.4.1...v1.5.0) (2021-09-10)
 
 
