@@ -1,0 +1,40 @@
+{
+  "testRunner": "jest",
+  "runnerConfig": "e2e/config.json",
+  "apps": {
+    "ios.dev": {
+      "type": "ios.app",
+      "binaryPath": "ios/build/Build/Products/Debug-iphonesimulator/mano.app",
+      "build": "set -o pipefail && xcodebuild -workspace ios/mano.xcworkspace -configuration Debug -scheme mano.test -destination name=\"iPhone 12 Pro\" -derivedDataPath ios/build -quiet",
+      "bundleId": "org.reactjs.native.example.mano"
+    },
+    "android": {
+      "type": "android.apk",
+      "binaryPath": "SPECIFY_PATH_TO_YOUR_APP_BINARY"
+    }
+  },
+  "devices": {
+    "simulator": {
+      "type": "ios.simulator",
+      "device": {
+        "type": "iPhone 12 Pro"
+      }
+    },
+    "emulator": {
+      "type": "android.emulator",
+      "device": {
+        "avdName": "Pixel_3a_API_30_x86"
+      }
+    }
+  },
+  "configurations": {
+    "ios": {
+      "device": "simulator",
+      "app": "ios.dev"
+    },
+    "android": {
+      "device": "emulator",
+      "app": "android"
+    }
+  }
+}
