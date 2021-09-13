@@ -370,6 +370,50 @@ spec:
         - dashboard-preprod-mano.dev42.fabrique.social.gouv.fr
       secretName: wildcard-crt
 ---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    sealedsecrets.bitnami.com/cluster-wide: 'true'
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  name: azure-pg-user
+  namespace: mano-186-preprod-dev2
+  labels:
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+spec:
+  encryptedData:
+    PGDATABASE: >-
+      AgAmuGxlRoFKIqa63kwGfAaI9PnqZ21Ryc7TXcPBDAhb9edT0y/fuIcnHQTspnppBMMF3Ct0bbzW/XnqCGg3pCRFLn8Y+2r79mosFJ3xbtvRhS++QgQJ8KgwO4LnHkJ0wTWswsXPns2Jf1AQdcfagR3k+MuI5x5c6vz2lhwVgJVy1VePD42yrER+QsZZ0GlHFeDfXTRe1wqOMab5EqjMWKO6WBYWEBf9eB2Qb8frFRP/2+1tp1MqS4IVHeAMkcOA6gvd1ZWRjSe6ta3o+lxpNgpf3EC6Rg85PJRhRewNTheqCDXAvVxmiYQLfNsR3lUHWD4JWZWYtEyEWV6LCUf/yPYN+Hte+fApMdlo3/DtwXv+ibz7L+BZkPudKo7AsSK4/eMB0HwNOU8ZUIEaq77bbV9KkFm9MKQOqiGeVvK5+zDI2ABelGE7njyCOAbst9+LF+cU2ve7JT1JCdadRW66pNxNjZbyCb7M54ijxpHvL7ua3IPmtpf1qwvSc/Fjcv3bqMZzYDXGHQr2rTwYAcW7dhfAj2scJBfhAaXN+dqksKyNzv6ke+0gsEtDOL/VVwKgRJ9FORHI5A1FVaulIOCEabf5k9vrxxXuyq/7wsr4MEgJ4dysR6psBXRFXmEHEtAxQaeHMKB/HifB8qvnIuDxVCpBF6DVgq1HDLMjEiks4JowQKDcvclklHRAZzOMsexeCRP4j+EO
+    PGHOST: >-
+      AgDJTHONsLWvzUCqQ4Kb+8aHKTh9+ts2W/Lt6+djf99lhhoqJ3ZLgCfei3seTgherXA0vocA14odv9GAee2zQyh2jfdzhEkFwxOUv/IcVNnaTMLN2vLrth37+7KkHXAfPWR20z+ZF7RDT/V9+GSVc6mx8xMBi1T2ufKdDAwPhDeZDiCcvYUNvbwiYVF6lyP9J1T8ynNxetTnXUh38rLYk6y9MLaVJzpWAc205oN0c1krqbXds5Pesqj2rJx8l6ZFUJti9wBHoxVP1pc6sj9MYWl4PvqA1G/I4WEJv6hll0qWcI955NFqU+cgYpgXtfOaSmPksJiW+v0DqbLJfs9YVb6+gm2A3Jwb0CO/bd0Ua8ivXIjpJ8XDiniUaksjaVkGrU0V5RxF0tJwR8DAg3VLTato4VT7QbiZNU79PG7gqHa7dMo0WCfgBnZIF7hnUcQuEtwz8OyJmddL/2A/IcEHGxJVyR1tn7btNn1IpOC5LjJ2R1eguXvRWf/9yG+OTfGs9M3/C4NO7eCz7Jp1Qi+P8P+/Ztjwl+azWTGk5f/0p371cOElAWWcmyq+RHN+w75TANehrxZpb8Ob2yMb6xJ4exj22fDzy1kJ2wJJMNXkW6CxLTpMf1QmqKu1g0wexh7DadDy4o1iLmPvRvkIv1v65rVt4aEeahJ1k2t5dfZ8X2fwYvZwhJacUx5edvAJAeXfR5xcX7Q8HWngb2FqJJQhPVnByH1tCKBDOIjEez3zaO2caBJD1t4kRUoxsuw=
+    PGPASSWORD: >-
+      AgAUf9IT9qI1YCAlE8rDmUxbHG7ji9HsdHnzIiTbQInOGD83in0qsvN2OdPpjBZ2iILWrp/fKVL8F35CmJ5CzikiXLa0B+5iyC41LTWuPf5NLpAdnFca4hOXa1WuUYmJZuZ+Ga7FydVLSoNUNrld5vupMVrQXH3SAL0jgr7adegrESeFVBbtSp/L+11D7VA3hPzxufZg8gzFW+OvJVFvCC7Qm3dRh3yHUZvZ/0v+2NFqPTlVEnR2faUVZPLR67LyGm0cZxUx7VwlkiH56LhFQCFVO5yw5G3vNtfroYpRPY7eM8uk/H9KGntlYuzUlA1milSIAKZzEIYsJFu0o15AGY8gzEidAbuTR46gQEchgJFCseZszRE2omU3RR7GoYTklS8kOUIAVIYolnjw0IaY5X+Iz21tjOfU3bjskbITAsE0YMHLkUBpALwL8adJ4esuTsy0DzInzffyUhqGTcPxQoqOzbNR2AO2SVokxtBerlmPS3kfCLOuffXrktmN74FHtNr4vgDl7pY4T8NNR91fTJJd92V/6Yvgvj4VIIiFy2nzGmojcRz7kwbmVTn3KQwd/5OW8nm1u3sGqgPzhROiAkb+uJjt5itoJp6HqfvuddDbew/oo+jWk6ZN1v+FSQjp8zwwqf69UzWxlNv2EgiqlzgVUJAKgd+QFNqcSiZ1UJa/aV1oIqySWaHGy7TLrsY7cG1RKzZDF+xhSrUDJxBY0/RN/N9uTTisdugimMEI8mm5L1zSdsp5u20=
+    PGSSLMODE: >-
+      AgBCQtodNlnpNQXEuIVzYFfQzGd6GVBtZTRyzTi/4MktkVZfWkumpZi66qnQi84wRAL/svOVXTV5xjzAaDenbJaYyK9dzBR959i5kkxxs0wEsuhem5xOw7Hhc2sXBY4KldGBhwJlBNuR0k8106Dc/030hP+wz6EI1Dx8dbi9SGAyIYUyVEEzA7us04l2q6oYtFniQzLZAieI9OEL7L4+OlmZFKhBBPej8M2+y6bpWA3TXLpd7uK44+P4RtLWwMmD/3WdUq1d71duLFMLpsBC2XENxVIoMrhit0hQBEw+W41KofJGRomBxWOAt4lB9TibQxSwzfzGURHbLhAhVIFgZqGj7yk9Ut7TurYSyy9w0Pi4zM5ob2XLi/ejWrzQeLqnuMA6BLVqJfoEFRdrBotHBRiar4tmcJFfXqFP1zwMS9D1fQzRaXP3eWPJZxSbL6R7UwWOFCHE/CsdoJuLeIBh5T3dn/O+21ekeiI+2O0Cmj0f2OPI/6RzQ2cawKSa0soC7EMhzxBWtv6bDnVrh8lfn3yp58ILi4moYugkS0kgjA6V4celHhR/+GTmf5Dt+4sZHKPOc1wqJnCi7TsFKqN5/yzFa8nxjf9vgMIDmlnSf98prRlBLXNa+1mM0WfJiOm+XQsdPoCFdCVvdG2+K2YgRpSxe8Ku0Vk9w03RgndMNFl0loIzq4Gqsi6vytrfVNKFRrF/emnrr7nl
+    PGUSER: >-
+      AgCi0iSJ30puRWllfl3ORhGDOo9H+EFGymKa7MTr6AnG+KChUv21+Fron65Mb+4vL7Jshca8oRoUDpSG2MWpRt+TZl6WRDLHKtqXmK65tERcZyxIMMBBeridoxIeJf30LHdfnHB16SXgS9eNVT6JvcZlQLjBB7wvrLeqMmpHA6dss6rx3cP+tC7rCLXD3Yhl1IadesrRfXCHVkHKEhyNpUTXVn3E1IfoQTiZVFKCcyG9oxf81zJCPpafy6SZtXsSOGL3QO8so5MOW0xXK7XwGv3ZHQTC22t7Lx4ds1hKrtDoVI3fbHLOxLdYtBA4CeqrfD6X0ygWH0VF+ogDqimBXxeVWOAxt3zw5yzkx3/aHB5Oo9XMwCmgcaqBWb9oLlX2VDFrHE92kWe8r6GuFcABQOw89DbQWbAN53qs+s/bH2QjEpEU2K8eB4wvEf6xfd04UenGNX7dZlFUyEHYnYJKrAnxrF7i/q3odl/8w9732fXvoG8Pd83gBut3nZheLXCwzlSxZcc4nGYmro0HXIysziW5kLQQe392JFFpk51B55rm7iKaxfcQl2eeYbQuU9DA6IML6ZpF7GU5g8lKjIeripExIcEI++EArMlxyuscuAn/qEvtDyJxvaKq9kBuxUrKU6e/azZQdz+fRRySDqrQD87MtoVJbO/vEiE99dmk8odLItW6Z2l/ZxRPW0TS33exJVCWFro5crhUflPoZbol1Uu+TZzq7yu6ko/WUCQQQRZ65Iqf9LHtnkwEAo9EqT58qw==
+  template:
+    metadata:
+      annotations:
+        sealedsecrets.bitnami.com/cluster-wide: 'true'
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: preprod-dev42
+        app.gitlab.com/env.name: preprod-dev42
+      name: azure-pg-user
+      labels:
+        application: v1-2-3-mano
+        component: v1-2-3-mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    type: Opaque
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:

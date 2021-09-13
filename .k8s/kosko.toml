@@ -1,11 +1,7 @@
-[environments.dev]
-components = ["*"]
+# dont include jobs on deploys
+components = ["!jobs", "*"]
 require = ["ts-node/register"]
 
+# dont include underscores-prefix components
 [environments.prod]
-components = ["www", "_namespace", "dashboard", "api"]
-require = ["ts-node/register"]
-
-[environments.preprod]
-components = ["www", "_namespace", "dashboard", "api"]
-require = ["ts-node/register"]
+components = ["!_*"]
