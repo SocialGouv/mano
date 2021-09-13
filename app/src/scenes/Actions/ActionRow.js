@@ -1,0 +1,116 @@
+import React from 'react';
+import styled from 'styled-components';
+import ButtonRight from '../../components/ButtonRight';
+import RowContainer from '../../components/RowContainer';
+import { MyText } from '../../components/MyText';
+import colors from '../../utils/colors';
+import TeamsTags from '../../components/TeamsTags';
+import withContext from '../../contexts/withContext';
+import PersonsContext from '../../contexts/persons';
+import { DONE } from '../../contexts/actions';
+
+const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName, context }) => {
+  const name = action?.name;
+  const status = action?.status;
+  const withTime = action?.withTime;
+  const pseudo = action?.personName || action?.person ? context.persons?.find((p) => p._id === action.person)?.name : null;
+  const dueAt = action?.dueAt ? new Date(action?.dueAt) : null;
+
+  return (
+    <RowContainer onPress={onActionPress}>
+      <DateContainer>
+        {Boolean(dueAt) && (
+          <>
+            <Day>{dueAt.getLocaleWeekDay('fr')}</Day>
+            <DateNumber heavy>{dueAt.getLocaleDay('fr')}</DateNumber>
+            <Month>{dueAt.getLocaleMonth('fr')}</Month>
+            {new Date().getFullYear() !== dueAt.getFullYear() && <Month>{dueAt.getFullYear()}</Month>}
+            {Boolean(withTime) && <Time>{dueAt.getLocalePureTime('fr')}</Time>}
+          </>
+        )}
+      </DateContainer>
+      <CaptionsContainer>
+        <Name bold>{name}</Name>
+        {!!withTeamName && <TeamsTags teams={[action.team]} />}
+        {showStatus ? (
+          <StatusContainer onPress={onPseudoPress}>
+            <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>
+          </StatusContainer>
+        ) : pseudo ? (
+          <PseudoContainer onPress={onPseudoPress}>
+            <Pseudo>Pour {pseudo}</Pseudo>
+          </PseudoContainer>
+        ) : null}
+      </CaptionsContainer>
+      <ButtonRight onPress={onActionPress} caption=">" />
+    </RowContainer>
+  );
+};
+
+const CaptionsContainer = styled.View`
+  margin-horizontal: 15px;
+  flex-grow: 1;
+  flex-shrink: 1;
+`;
+
+const Name = styled(MyText)`
+  font-weight: bold;
+  font-size: 17px;
+`;
+
+const StatusContainer = styled.View`
+  margin-top: 15px;
+  align-self: flex-start;
+`;
+
+const Status = styled(MyText)`
+  /* text-decoration: underline; */
+  flex-grow: 0;
+  align-self: flex-start;
+  color: ${(props) => props.color};
+`;
+
+const PseudoContainer = styled.TouchableOpacity`
+  margin-top: 15px;
+  align-self: flex-start;
+`;
+
+const Pseudo = styled(MyText)`
+  /* text-decoration: underline; */
+  flex-grow: 0;
+  align-self: flex-start;
+  color: ${colors.app.color};
+`;
+
+const DateContainer = styled.View`
+  flex-shrink: 0;
+  flex-basis: 70px;
+`;
+
+const DateText = styled(MyText)`
+  font-size: 12px;
+  font-style: italic;
+  text-align: center;
+  text-transform: uppercase;
+`;
+
+const Day = styled(DateText)`
+  color: ${colors.app.color};
+`;
+
+const Time = styled(DateText)`
+  margin-top: 10px;
+`;
+
+const Month = styled(DateText)`
+  color: ${colors.app.secondary};
+`;
+
+const DateNumber = styled(MyText)`
+  font-size: 20px;
+  font-style: italic;
+  text-align: center;
+  margin-vertical: 5px;
+`;
+
+export default withContext(PersonsContext)(ActionRow);
