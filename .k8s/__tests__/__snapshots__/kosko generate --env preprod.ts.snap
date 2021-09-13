@@ -34,6 +34,211 @@ metadata:
     app.gitlab.com/env: preprod-dev42
     app.gitlab.com/env.name: preprod-dev42
   labels:
+    app: api
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  namespace: mano-186-preprod-dev2
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: preprod-dev42
+        app.gitlab.com/env.name: preprod-dev42
+      labels:
+        app: api
+        application: v1-2-3-mano
+        component: v1-2-3-mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    spec:
+      containers:
+        - image: ghcr.io/socialgouv/mano/api:sha-undefined
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: api
+          ports:
+            - containerPort: 3000
+              name: http
+          readinessProbe:
+            failureThreshold: 15
+            httpGet:
+              path: /healthz
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 512Mi
+            requests:
+              cpu: 100m
+              memory: 128Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /healthz
+              port: http
+            periodSeconds: 5
+          envFrom:
+            - secretRef:
+                name: azure-pg-user
+            - secretRef:
+                name: api
+      imagePullSecrets:
+        - name: regcred
+      initContainers:
+        - env:
+            - name: WAIT_FOR_RETRIES
+              value: '24'
+          envFrom:
+            - secretRef:
+                name: azure-pg-user
+          image: ghcr.io/socialgouv/docker/wait-for-postgres:6.43.1
+          imagePullPolicy: Always
+          name: wait-for-postgres
+          resources:
+            limits:
+              cpu: 20m
+              memory: 32Mi
+            requests:
+              cpu: 5m
+              memory: 16Mi
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  name: api
+  namespace: mano-186-preprod-dev2
+  labels:
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+spec:
+  encryptedData:
+    X_TIPIMAIL_APIUSER: >-
+      AgBVs+HJnZoyliAsiJo6vF43mbTC6/4nI+/25WIZLH3Z9N2GaqzgCK9frniVfYrfINdqKoXaiqgdw+PocyPhPVMOw9AHWveTkfZ34lOXsa37EIqePrj90kEnhPP9LxO/pI98Bj9/df7wi7hLJY0wFm/ys6VG6In1LTBWsaGdIHyUVBRuuQmHCgUG3s9hKLqAKNfGfcFMOGFwNQMcZZ8wK2ZJhunlkjohJExyzR1v7KYLkbFTUrnvCHVLEwJ/MQQruYCcYfL8DxbuPL+hie/A8a9ELB8BmdFVdxjBXmAZ4iHRY5b9jqRBrMzUVc0oHE03k1qjDNrlRTxV4AcAL5AduKWjwpz4iCEY5tqOKMapq/8sHRnKUYzZnFJdD76AFObL1MSzoTvy2JOjKQ5/4o4TK3LxQ5V7qFLZTKv5ipTicwhIwdgUYtda+l+Z8gdoCQl5COgpppgfw/EOF4Pd/WGvlK2B7GI5EpzpozDL+5ASlvROO48iRgHTSfPfxAVxw+7QNJhP4GSts1ODPC+XLa3LJ37Knca/sC3/cIZKi0uXSwQlBNPIZ4vMfS4dRRjchfcDUoVxv7pkhBsZ6OM8qqBVG2yjChf2uW7DzvOnzDr/kB3q/xznHCL5XOISfE7M7ua4QgWFFwu+QM0seMJAZH/wzhmBhjnzZYSktnc5KZ3TgIiHuNiTo81CP00Rf1afcP5EuMtSHnAiBpalX/ANP5Jw7KHtdJ8uhiRwfjrSLJxi/eJCwQ==
+    X_TIPIMAIL_APIKEY: >-
+      AgAODYMp5mGFfXDRKEVr48Mp5J1tDSh/iBYK/INwGcPyesG4zpnSIi74PCbj7LB4+A9LotaFfin5Rl4RPcmww8aEPa/plKs+1qc0EWJ3uMtifMf4rPbLhsbzbdIxiC+/cA+WA378tuM8eb7B5y1Xram3Kf4P/S20P0Dc3bSb/vO2Zv/xVZwFwmo96j+a8DNbSUtN17F7tbbJwQbHS7z16kTH3ZwVusG+N2rG93E4TrjyARtDS8qIz9pX2wr+zp9PIsDSAXZbauV6PaSbKkGUAyt6YLaCvnKXZffZxcPMhzy9XBwWw5oKeCadwVa9W7OVbah7QAKyzR2KFptcU/QAVIYiDZuFCNQL7llD0MJTPgpPFbUyyXc4x76eFuCErq9t+acTQ86jJyMNjkR8EROtxPGwpTbqEeLB0VH7e5RixvJgoamyQQCcSQHKtv7zI72yYUtba57+eQiWGWb+MJ1h9/ZXm0zw3XUEgqbzcBWBnrr308I6KXiUgLDRFsN4TtS8ecfmJewwxK/JBrQvx8LDRS6+UPqQlrqo2hwG40LVd1U0hGnCbA/6r+3Jj5g9wCWPUEBkslmjOjgOxcwVDwct9uu/PrRsAazoBDRcvbO4AEsQW+rcoxTRZYncW00dKvCmoTD+fqKstWWrA2wSi3RG1w20jIU/cPf32rE3LGWQwrIYNEfgEkANp/vbtk7BlMKR5oUfahDo9VAMhEDOismUBsj5q/8MApPWUhncre3VzweAMg==
+    SECRET: >-
+      AgBXhk1jaMUTyQVnpPF7ljm8FtEq4yKjG47LmCl48gQ8Kq/V6RLoH1XFTirSGfzyo/WD18wd8+CyxlYGVIEjRSOEHzdF0cFxOZDoqbj8fmYTgcoIJ+eUflbJjdMk12rDtHDUHKk2tLWGPB3/sB9oG5Ztp+eMCUB5OOCx8k9CcA3b6JkdIMdQ5Z/bHDG5BDc0SfTAsIuEYwiAJtqnV4XQmCh4PKU9Ka1PEIMDs0vsFboCeys0MdJf+RLs55NkaQfXTsIOUFnjC6ARMMLuF8ZhvHXlHaS7qZ4MdvIHXr8fMIXRCOTUCdWFwo3kgJQZkSe0l70QbXizO66u3woQzlV9CMn15EQtCgHWxh62c4+gyM78QHG4rrTUrMNui4yKL4BJyTVuTKNw2Tdm4MPYuO0GAbORSaDoVtz79z0Uj3SkwUbE+9Eb8cf++jMcT9WNZ4y7MXoX5SRgz2Qpio3aMEkUSoD1ahURA23RSnu4c445BFw0SKN7Ozawy3mSJnB9suzT44jUjHhgLveXv5Ar8GQeBsXo79xK6w656TO2n01qQws2eGHKeFzOfQkm4gFHUjnGC2aB5e1SvcS08x7VchCn0LRUcMGM+hQG18y8kUmNc9ilcPT7H5USJy2UEfZbGgyGoJbIKhsiytVt56Mf3X/q2PlMUJ9dVLP5Nh0i60OZQ1X05pUNOhqAhQ3CnQe9J5i8TsQCCaY65W5xzSk51M6gC6GOer8Net9dC0tL/SVAS6J5Z26r6Q==
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: preprod-dev42
+        app.gitlab.com/env.name: preprod-dev42
+      name: api
+      labels:
+        application: v1-2-3-mano
+        component: v1-2-3-mano
+        owner: mano
+        team: mano
+        cert: wildcard
+    type: Opaque
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: api
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  namespace: mano-186-preprod-dev2
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 3000
+  selector:
+    app: api
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  labels:
+    app: api
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: api
+  namespace: mano-186-preprod-dev2
+spec:
+  rules:
+    - host: preprod-mano.dev42.fabrique.social.gouv.fr
+      http:
+        paths:
+          - backend:
+              service:
+                name: api
+                port:
+                  name: http
+            path: /
+            pathType: Prefix
+  tls:
+    - hosts:
+        - preprod-mano.dev42.fabrique.social.gouv.fr
+      secretName: wildcard-crt
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  labels:
     app: dashboard
     application: v1-2-3-mano
     component: v1-2-3-mano
