@@ -1,3 +1,10 @@
+## [1.7.2](https://github.com/SocialGouv/mano/compare/v1.7.1...v1.7.2) (2021-09-13)
+
+
+### Bug Fixes
+
+* update kostko.toml ([7515e99](https://github.com/SocialGouv/mano/commit/7515e993ad07e447b5e00f952ebdfab8c6735603))
+
 ## [1.7.1](https://github.com/SocialGouv/mano/compare/v1.7.0...v1.7.1) (2021-09-13)
 
 
