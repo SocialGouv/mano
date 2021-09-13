@@ -17,3 +17,4 @@ Voir le `README.md` de chacun des services.
 Plus d'information sur Mano ici : https://www.fabrique.social.gouv.fr/startups/mano/
 
 Pour contacter l’équipe : g.demirhan@aurore.asso.fr ou m.grimbert@aurore.asso.fr
+
