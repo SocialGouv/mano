@@ -1,3 +1,10 @@
+# [1.7.0](https://github.com/SocialGouv/mano/compare/v1.6.1...v1.7.0) (2021-09-13)
+
+
+### Features
+
+* **ci:** deploy api in production ([#21](https://github.com/SocialGouv/mano/issues/21)) ([05c1063](https://github.com/SocialGouv/mano/commit/05c10631904c4e40e77f876ac0b977b2982fd5f0))
+
 ## [1.6.1](https://github.com/SocialGouv/mano/compare/v1.6.0...v1.6.1) (2021-09-13)
 
 
