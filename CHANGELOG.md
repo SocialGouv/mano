@@ -1,3 +1,11 @@
+## [1.7.1](https://github.com/SocialGouv/mano/compare/v1.7.0...v1.7.1) (2021-09-13)
+
+
+### Bug Fixes
+
+* **ci:** add rancher id in env ([4e5b18e](https://github.com/SocialGouv/mano/commit/4e5b18e33b4962d9398ff244b27b443035d1ea20))
+* **ci:** add rancher id in env preproduction ([3f52fa8](https://github.com/SocialGouv/mano/commit/3f52fa8060e27324634f80c12c5efe99a6baa804))
+
 # [1.7.0](https://github.com/SocialGouv/mano/compare/v1.6.1...v1.7.0) (2021-09-13)
 
 
