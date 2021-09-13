@@ -1,3 +1,10 @@
+## [1.6.1](https://github.com/SocialGouv/mano/compare/v1.6.0...v1.6.1) (2021-09-13)
+
+
+### Bug Fixes
+
+* bump version ([44c6b4c](https://github.com/SocialGouv/mano/commit/44c6b4c4cc489787a37d213e0f010f5788d2d848))
+
 # [1.6.0](https://github.com/SocialGouv/mano/compare/v1.5.1...v1.6.0) (2021-09-13)
 
 
