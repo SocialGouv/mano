@@ -1,3 +1,10 @@
+## [1.7.4](https://github.com/SocialGouv/mano/compare/v1.7.3...v1.7.4) (2021-09-13)
+
+
+### Bug Fixes
+
+* update kosko charts ([978ff4e](https://github.com/SocialGouv/mano/commit/978ff4ebe455452b5fc56a39fc571d804e11f046))
+
 ## [1.7.3](https://github.com/SocialGouv/mano/compare/v1.7.2...v1.7.3) (2021-09-13)
 
 
