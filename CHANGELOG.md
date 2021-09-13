@@ -1,3 +1,10 @@
+# [1.8.0](https://github.com/SocialGouv/mano/compare/v1.7.4...v1.8.0) (2021-09-13)
+
+
+### Features
+
+* add mobile app ([#22](https://github.com/SocialGouv/mano/issues/22)) ([8266cfc](https://github.com/SocialGouv/mano/commit/8266cfc8e8de70d1feb64c3d3eefb05ab68abd7d))
+
 ## [1.7.4](https://github.com/SocialGouv/mano/compare/v1.7.3...v1.7.4) (2021-09-13)
 
 
