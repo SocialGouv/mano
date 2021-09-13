@@ -53,7 +53,10 @@ router.put(
   catchErrors(async (req, res, next) => {
     const where = { _id: req.params._id };
     where.organisation = req.user.organisation;
-    const data = await Team.update({ name: req.body.name }, { where, returning: true });
+    const updateTeam = {};
+    if (req.body.hasOwnProperty("name")) updateTeam.name = req.body.name;
+    if (req.body.hasOwnProperty("nightSession")) updateTeam.nightSession = req.body.nightSession;
+    const data = await Team.update(updateTeam, { where, returning: true });
     return res.status(200).send({ ok: true, data });
   })
 );

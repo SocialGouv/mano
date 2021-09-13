@@ -13,6 +13,7 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
 import BackButton from '../../components/backButton';
+import NightSessionModale from '../../components/NightSessionModale';
 
 const View = () => {
   const [team, setTeam] = useState(null);
@@ -65,7 +66,9 @@ const View = () => {
                 <Col md={6} />
                 <Col md={12}>
                   <FormGroup>
-                    <Label>Maraude de nuit</Label>
+                    <Label>
+                      Maraude de nuit <NightSessionModale />
+                    </Label>
                     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                       <span>Maraude de nuit</span>
                       <Input type="checkbox" name="nightSession" checked={values.nightSession} onChange={handleChange} />

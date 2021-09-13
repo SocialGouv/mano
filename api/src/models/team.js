@@ -7,6 +7,7 @@ Team.init(
   {
     _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
     name: DataTypes.TEXT,
+    nightSession: DataTypes.BOOLEAN,
     organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
   },
   { sequelize, modelName: "Team", freezeTableName: true }
