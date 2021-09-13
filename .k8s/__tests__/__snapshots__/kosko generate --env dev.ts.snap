@@ -138,7 +138,7 @@ spec:
               memory: 128Mi
           envFrom:
             - secretRef:
-                name: azure-pg-user-0123456
+                name: azure-pg-user-master
 ---
 apiVersion: v1
 kind: Service
