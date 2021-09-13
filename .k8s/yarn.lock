@@ -641,10 +641,10 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
-"@sindresorhus/is@^4.0.1":
-  version "4.0.1"
-  resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-4.0.1.tgz#d26729db850fa327b7cacc5522252194404226f5"
-  integrity sha512-Qm9hBEBu18wt1PO2flE7LPb30BHMQt1eQgbV76YntdNk73XZGpn3izvGTYxbGgzXKgbCjiia0uxTd3aTNQrY/g==
+"@sindresorhus/is@^4.1.0":
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-4.2.0.tgz#667bfc6186ae7c9e0b45a08960c551437176e1ca"
+  integrity sha512-VkE3KLBmJwcCaVARtQpfuKcKv8gcBmUubrfHGF84dXuuW6jgsRYxPtzcIhPyK9WAPpRt2/xY6zkD9MnRaJzSyw==
 
 "@sinonjs/commons@^1.7.0":
   version "1.8.1"
@@ -660,13 +660,13 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@socialgouv/kosko-charts@9.4.2":
-  version "9.4.2"
-  resolved "https://registry.yarnpkg.com/@socialgouv/kosko-charts/-/kosko-charts-9.4.2.tgz#c5c88c15c04c58b8ff7fc3ca905e1399f4caab14"
-  integrity sha512-R+uwsyp1IkSAcELkhxtmoWwex8JIZQONFLlVsQiULZsp8hMtJEh9HwAj+hF2scXuRzY61H1cdi0vPpRrfosqMA==
+"@socialgouv/kosko-charts@9.5.7":
+  version "9.5.7"
+  resolved "https://registry.yarnpkg.com/@socialgouv/kosko-charts/-/kosko-charts-9.5.7.tgz#0eb9c56899d98fa71f48bd461fa589f74b015274"
+  integrity sha512-vfK077vRLr8lqvmqcT5N6iLkUnFBWoLTrLdvmO8phF/B1UumdC3fJ2QP61TJHy6qtIhpj5c9p79l45YpxvLn2Q==
   dependencies:
     "@kubernetes-models/sealed-secrets" "^2.0.2"
-    "@sindresorhus/is" "^4.0.1"
+    "@sindresorhus/is" "^4.1.0"
     fs-extra "^10.0.0"
     kubernetes-models "^2.0.2"
     slugify "^1.6.0"

@@ -112,7 +112,7 @@ spec:
           envFrom:
             - secretRef:
                 name: azure-pg-user-master
-          image: ghcr.io/socialgouv/docker/wait-for-postgres:6.43.1
+          image: ghcr.io/socialgouv/docker/wait-for-postgres:6.45.0
           imagePullPolicy: Always
           name: wait-for-postgres
           resources:
@@ -365,7 +365,7 @@ spec:
           envFrom:
             - secretRef:
                 name: azure-pg-admin-user
-          image: ghcr.io/socialgouv/docker/azure-db:6.43.1
+          image: ghcr.io/socialgouv/docker/azure-db:6.45.0
           imagePullPolicy: IfNotPresent
           name: create-db-user
           resources:
@@ -376,20 +376,10 @@ spec:
               cpu: 100m
               memory: 64Mi
       restartPolicy: Never
-    metadata:
-      annotations:
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: master-dev42
-        app.gitlab.com/env.name: master-dev42
-      labels:
-        application: master-dev42-mano
-        component: master-dev42-mano
-        owner: mano
-        team: mano
-        cert: wildcard
   ttlSecondsAfterFinished: 86400
 metadata:
   annotations:
+    kapp.k14s.io/update-strategy: skip
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: master-dev42
     app.gitlab.com/env.name: master-dev42
@@ -420,6 +410,7 @@ stringData:
   PGUSER: user_master@manodevserver.postgres.database.azure.com
 metadata:
   annotations:
+    kapp.k14s.io/update-strategy: skip
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: master-dev42
     app.gitlab.com/env.name: master-dev42
