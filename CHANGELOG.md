@@ -1,3 +1,10 @@
+# [1.6.0](https://github.com/SocialGouv/mano/compare/v1.5.1...v1.6.0) (2021-09-13)
+
+
+### Features
+
+* add api in review ([#15](https://github.com/SocialGouv/mano/issues/15)) ([e913b5d](https://github.com/SocialGouv/mano/commit/e913b5df488a9b749feea1748a5fd24f9e7aebd4)), closes [#16](https://github.com/SocialGouv/mano/issues/16)
+
 ## [1.5.1](https://github.com/SocialGouv/mano/compare/v1.5.0...v1.5.1) (2021-09-11)
 
 
