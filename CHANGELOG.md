@@ -1,3 +1,10 @@
+## [1.7.3](https://github.com/SocialGouv/mano/compare/v1.7.2...v1.7.3) (2021-09-13)
+
+
+### Bug Fixes
+
+* update preprod api secret ([491e2f9](https://github.com/SocialGouv/mano/commit/491e2f9a7d15e3ab043cb9e487406169cbde9eae))
+
 ## [1.7.2](https://github.com/SocialGouv/mano/compare/v1.7.1...v1.7.2) (2021-09-13)
 
 
