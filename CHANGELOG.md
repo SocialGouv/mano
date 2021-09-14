@@ -1,3 +1,10 @@
+## [1.8.1](https://github.com/SocialGouv/mano/compare/v1.8.0...v1.8.1) (2021-09-14)
+
+
+### Bug Fixes
+
+* bug on email sending ([70edbb2](https://github.com/SocialGouv/mano/commit/70edbb26623f97216967685a42997b3e8067c94f))
+
 # [1.8.0](https://github.com/SocialGouv/mano/compare/v1.7.4...v1.8.0) (2021-09-13)
 
 
