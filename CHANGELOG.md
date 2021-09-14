@@ -1,3 +1,10 @@
+## [1.8.2](https://github.com/SocialGouv/mano/compare/v1.8.1...v1.8.2) (2021-09-14)
+
+
+### Bug Fixes
+
+* add night shift for teams ([#25](https://github.com/SocialGouv/mano/issues/25)) ([3cd657a](https://github.com/SocialGouv/mano/commit/3cd657ad7a546f77694cfaae43c218753c09e071))
+
 ## [1.8.1](https://github.com/SocialGouv/mano/compare/v1.8.0...v1.8.1) (2021-09-14)
 
 
