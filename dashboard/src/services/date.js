@@ -73,30 +73,24 @@ export const getMonths = () => {
 };
 
 export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHours = -12, debug = false) => {
-  try {
-    if (!dayToTest) return false;
-    referenceDay = new Date(referenceDay);
-    referenceDay.setHours(0, 0, 0, 0);
-    const startDate = new Date(referenceDay);
-    startDate.setHours(referenceDay.getHours() + offsetHours);
-    const endDate = new Date(startDate);
-    endDate.setHours(startDate.getHours() + 24);
+  if (!dayToTest) return false;
+  referenceDay = new Date(referenceDay);
+  referenceDay.setHours(0, 0, 0, 0);
+  const startDate = new Date(referenceDay);
+  startDate.setHours(referenceDay.getHours() + offsetHours);
+  const endDate = new Date(startDate);
+  endDate.setHours(startDate.getHours() + 24);
 
-    dayToTest = new Date(dayToTest).toISOString();
+  dayToTest = new Date(dayToTest).toISOString();
 
-    if (debug) {
-      console.log({
-        dayToTest,
-        startDate: startDate.toISOString(),
-        endDate: endDate.toISOString(),
-        test: dayToTest > startDate.toISOString() && dayToTest <= endDate.toISOString(),
-      });
-    }
-
-    return dayToTest > startDate.toISOString() && dayToTest <= endDate.toISOString();
-  } catch (e) {
-    console.log('error getIsDayWithinHoursOffsetOfDay', dayToTest, referenceDay, offsetHours);
-    console.log(e);
+  if (debug) {
+    console.log({
+      dayToTest,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      test: dayToTest > startDate.toISOString() && dayToTest <= endDate.toISOString(),
+    });
   }
-  return false;
+
+  return dayToTest > startDate.toISOString() && dayToTest <= endDate.toISOString();
 };

@@ -51,7 +51,6 @@ const View = () => {
           onSubmit={async (body) => {
             try {
               const response = await API.put({ path: `/team/${team._id}`, body });
-              console.log(response);
               if (response.ok) {
                 toastr.success('Mise à jour !');
                 setAuth({
