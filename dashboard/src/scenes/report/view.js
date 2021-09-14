@@ -240,7 +240,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const data = allActions
     ?.filter((a) => a.team === currentTeam._id)
     .filter((a) => a.status === status)
-    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam.nightSession ? 12 : 0))
+    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0))
     .map((action) => ({
       ...action,
       person: persons.find((p) => p._id === action.person),
@@ -305,8 +305,8 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
 
   const data = actions
     ?.filter((a) => a.team === currentTeam._id)
-    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam.nightSession ? 12 : 0))
-    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam.nightSession ? 12 : 0))
+    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0))
     .map((action) => ({
       ...action,
       person: persons.find((p) => p._id === action.person),
@@ -364,7 +364,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) =
 
   const data = comments
     .filter((c) => c.team === currentTeam._id)
-    .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam.nightSession ? 12 : 0))
+    .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
     .filter((c) => {
       const commentIsPassage = c.comment.includes('Passage enregistré');
       if (forPassages) return commentIsPassage;
@@ -477,7 +477,7 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
 
   const data = territoryObservations
     .filter((o) => o.team === currentTeam._id)
-    .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam.nightSession ? 12 : 0));
+    .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0));
 
   useEffect(() => {
     onUpdateResults(data.length);
