@@ -21,7 +21,7 @@ class NewActionForm extends React.Component {
     name: '',
     dueAt: null,
     withTime: false,
-    person: null,
+    persons: [null],
     forCurrentPerson: false,
     posting: false,
     status: TODO,
@@ -31,7 +31,7 @@ class NewActionForm extends React.Component {
     const { route } = this.props;
     if (route.params?.person) {
       this.setState({
-        person: route.params.person,
+        persons: [route.params.person],
         forCurrentPerson: true,
       });
     }
@@ -51,9 +51,9 @@ class NewActionForm extends React.Component {
   };
 
   handleFocus = () => {
-    const { route } = this.props;
-    if (route.params?.person) {
-      this.setState({ person: route.params.person });
+    const newPerson = this.props?.route?.params?.person;
+    if (newPerson) {
+      this.setState({ persons: [...this.state.persons.filter((p) => p._id !== newPerson?._id), newPerson] });
     }
   };
 
@@ -91,10 +91,25 @@ class NewActionForm extends React.Component {
         ...response.data,
         editable: true,
       });
-      setTimeout(() => {
+      if (!response.ok) {
         this.setState({ posting: false });
-      }, 250);
+        Alert.alert(response.error || response.code);
+        return;
+      }
+      if (!newAction) newAction = response.data;
     }
+    const { navigation, route } = this.props;
+    // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
+    this.backRequestHandled = true;
+    Sentry.setContext('action', { _id: newAction._id });
+    navigation.navigate('Action', {
+      fromRoute: route.params.fromRoute,
+      ...newAction,
+      editable: true,
+    });
+    setTimeout(() => {
+      this.setState({ posting: false });
+    }, 250);
   };
 
   onBack = () => {
@@ -104,14 +119,15 @@ class NewActionForm extends React.Component {
   };
 
   canGoBack = () => {
-    const { name, person, dueAt, forCurrentPerson } = this.state;
-    if (!name.length && (forCurrentPerson || person === null) && !dueAt) return true;
+    const { name, persons, dueAt, forCurrentPerson } = this.state;
+    if (!name.length && (forCurrentPerson || !persons.length) && !dueAt) return true;
     return false;
   };
 
   isReadyToSave = () => {
     const { name, dueAt } = this.state;
     if (!name || !name.length || !name.trim().length) return false;
+    if (!persons.length) return false;
     if (!dueAt) return false;
     return true;
   };
