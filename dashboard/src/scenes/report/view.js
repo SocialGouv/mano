@@ -184,7 +184,7 @@ const View = () => {
               </div>
             </div>
             <div>
-              {`Compte rendu de l'équipe ${currentTeam?.name || ""}`}
+              {`Compte rendu de l'équipe ${currentTeam?.name || ''}`}
               <br />
               {getPeriodTitle(report.date, currentTeam?.nightSession)}
             </div>
@@ -307,10 +307,6 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
     ?.filter((a) => a.team === currentTeam._id)
     .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam.nightSession ? 12 : 0))
     .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam.nightSession ? 12 : 0))
-    .map((a) => {
-      getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam.nightSession ? 12 : 0, true);
-      return a;
-    })
     .map((action) => ({
       ...action,
       person: persons.find((p) => p._id === action.person),
