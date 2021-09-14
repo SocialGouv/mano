@@ -1,3 +1,15 @@
+# [1.9.0](https://github.com/SocialGouv/mano/compare/v1.8.2...v1.9.0) (2021-09-14)
+
+
+### Bug Fixes
+
+* can set status of action while creating ([#28](https://github.com/SocialGouv/mano/issues/28)) ([15b4bb5](https://github.com/SocialGouv/mano/commit/15b4bb555fe1026571808aa7a2dbd5f846eebfcd))
+
+
+### Features
+
+* can show structures in the app ([#34](https://github.com/SocialGouv/mano/issues/34)) ([1a6dd07](https://github.com/SocialGouv/mano/commit/1a6dd07e8e11916bf0024eddd3a48a7b0caa2111))
+
 ## [1.8.2](https://github.com/SocialGouv/mano/compare/v1.8.1...v1.8.2) (2021-09-14)
 
 
