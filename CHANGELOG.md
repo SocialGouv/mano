@@ -1,3 +1,10 @@
+# [1.10.0](https://github.com/SocialGouv/mano/compare/v1.9.0...v1.10.0) (2021-09-14)
+
+
+### Features
+
+* add metabase ([#35](https://github.com/SocialGouv/mano/issues/35)) ([4f58930](https://github.com/SocialGouv/mano/commit/4f58930a8c2bcfed9ffe72ac8441e0f75a0122fb))
+
 # [1.9.0](https://github.com/SocialGouv/mano/compare/v1.8.2...v1.9.0) (2021-09-14)
 
 
