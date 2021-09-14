@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
@@ -13,11 +13,14 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
 import BackButton from '../../components/backButton';
+import NightSessionModale from '../../components/NightSessionModale';
+import AuthContext from '../../contexts/auth';
 
 const View = () => {
   const [team, setTeam] = useState(null);
   const { id } = useParams();
   const history = useHistory();
+  const { teams, setAuth, currentTeam, setCurrentTeam } = useContext(AuthContext);
 
   useEffect(() => {
     (async () => {
@@ -31,6 +34,7 @@ const View = () => {
     if (confirm) {
       const res = await API.delete({ path: `/team/${id}` });
       if (!res.ok) return;
+      setAuth({ teams: teams.filter((t) => t._id !== id) });
       toastr.success('Suppression réussie');
       history.goBack();
     }
@@ -47,7 +51,16 @@ const View = () => {
           onSubmit={async (body) => {
             try {
               const response = await API.put({ path: `/team/${team._id}`, body });
-              if (response.ok) toastr.success('Mis à jour !');
+              if (response.ok) {
+                toastr.success('Mise à jour !');
+                setAuth({
+                  teams: teams.map((t) => {
+                    if (t._id !== id) return t;
+                    return response.data;
+                  }),
+                });
+                if (currentTeam._id === id) setCurrentTeam(response.data);
+              }
             } catch (errorUpdatingTeam) {
               console.log('error in updating team', errorUpdatingTeam);
               toastr.error('Erreur!', errorUpdatingTeam.message);
@@ -60,6 +73,18 @@ const View = () => {
                   <FormGroup>
                     <Label>Nom</Label>
                     <Input name="name" value={values.name} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={6} />
+                <Col md={12}>
+                  <FormGroup>
+                    <Label>
+                      Maraude de nuit <NightSessionModale />
+                    </Label>
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                      <span>Maraude de nuit</span>
+                      <Input type="checkbox" name="nightSession" checked={values.nightSession} onChange={handleChange} />
+                    </div>
                   </FormGroup>
                 </Col>
               </Row>

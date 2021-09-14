@@ -71,3 +71,26 @@ export const getMonths = () => {
   }
   return months;
 };
+
+export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHours = -12, debug = false) => {
+  if (!dayToTest) return false;
+  referenceDay = new Date(referenceDay);
+  referenceDay.setHours(0, 0, 0, 0);
+  const startDate = new Date(referenceDay);
+  startDate.setHours(referenceDay.getHours() + offsetHours);
+  const endDate = new Date(startDate);
+  endDate.setHours(startDate.getHours() + 24);
+
+  dayToTest = new Date(dayToTest).toISOString();
+
+  if (debug) {
+    console.log({
+      dayToTest,
+      startDate: startDate.toISOString(),
+      endDate: endDate.toISOString(),
+      test: dayToTest > startDate.toISOString() && dayToTest <= endDate.toISOString(),
+    });
+  }
+
+  return dayToTest > startDate.toISOString() && dayToTest <= endDate.toISOString();
+};

@@ -76,7 +76,7 @@ const Reception = () => {
     setPassages((p) => p + (selectedPersons.length || 1));
     await incrementPassage(todaysReport, {
       persons: selectedPersons,
-      onSuccess: () => onSelectPerson([]),
+      // onSuccess: () => onSelectPerson([]),
     });
     setAddingPassage(false);
   };
@@ -86,7 +86,11 @@ const Reception = () => {
 
   return (
     <Container style={{ padding: 0 }}>
-      <Header title={`Accueil du ${new Date().toLocaleDateString('fr', { day: 'numeric', weekday: 'long', month: 'long', year: 'numeric' })}`} />
+      <Header
+        title={`Accueil du ${new Date().toLocaleDateString('fr', { day: 'numeric', weekday: 'long', month: 'long', year: 'numeric' })} de l'équipe ${
+          currentTeam?.nightSession ? 'de nuit ' : ''
+        }${currentTeam?.name || ''}`}
+      />
       <Row style={{ paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid #ddd' }}>
         <Col
           md={3}
@@ -140,6 +144,7 @@ const Reception = () => {
               color="link"
               title="Ajouter un passage anonyme"
               padding="0px"
+              disabled={addingPassage}
             />
             <ButtonCustom
               onClick={async () => {
@@ -152,6 +157,7 @@ const Reception = () => {
               color="link"
               title="Retirer un passage"
               padding="0px"
+              disabled={addingPassage}
             />
           </Card>
         </Col>

@@ -14,6 +14,7 @@ import Table from '../../components/table';
 
 import { toFrenchDate } from '../../utils';
 import AuthContext from '../../contexts/auth';
+import NightSessionModale from '../../components/NightSessionModale';
 
 const List = () => {
   const [teams, setTeams] = useState(null);
@@ -41,6 +42,16 @@ const List = () => {
           { title: 'Nom', dataKey: 'name' },
           { title: 'Créée le', dataKey: 'createdAt', render: (i) => toFrenchDate(i.createdAt) },
           { title: 'Organisation', dataKey: 'Organisation', render: (i) => i.Organisation.name || '' },
+          {
+            title: (
+              <>
+                <span>Maraude de nuit</span>
+                <NightSessionModale />
+              </>
+            ),
+            dataKey: 'nightSession',
+            render: (i) => (i.nightSession ? '🌒' : '☀️'),
+          },
         ]}
       />
     </Container>
