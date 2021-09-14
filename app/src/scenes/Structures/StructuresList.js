@@ -49,21 +49,13 @@ class Structures extends React.Component {
     this.setState({ refreshing: false, loading: false });
   };
 
-  onCreateStructureRequest = () =>
-    this.props.navigation.navigate('NewStructureForm', { fromRoute: 'StructuresList' });
+  onCreateStructureRequest = () => this.props.navigation.navigate('NewStructureForm', { fromRoute: 'StructuresList' });
 
   keyExtractor = (structure) => structure._id;
   renderRow = ({ item: structure }) => {
     const { name } = structure;
     const { push } = this.props.navigation;
-    return (
-      <Row
-        withNextButton
-        onPress={() => push('Structure', { ...structure, fromRoute: 'StructuresList' })}
-        Icon={PersonIcon}
-        caption={name}
-      />
-    );
+    return <Row withNextButton onPress={() => push('Structure', { ...structure, fromRoute: 'StructuresList' })} Icon={PersonIcon} caption={name} />;
   };
 
   render() {
