@@ -186,7 +186,7 @@ const View = () => {
             <div>
               {`Compte rendu de l'équipe ${currentTeam?.name || ""}`}
               <br />
-              {getPeriodTitle(report.date, currentTeam.nightSession)}
+              {getPeriodTitle(report.date, currentTeam?.nightSession)}
             </div>
           </div>
         }
