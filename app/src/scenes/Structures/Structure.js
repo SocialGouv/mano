@@ -19,6 +19,7 @@ import PinIcon from '../../icons/PinIcon';
 import PhoneIcon from '../../icons/PhoneIcon';
 import StructuresContext from '../../contexts/structures';
 import withContext from '../../contexts/withContext';
+import { MyText } from '../../components/MyText';
 
 const isEven = (value) => {
   if (value % 2 === 0) return true;
@@ -300,7 +301,12 @@ class Structure extends React.Component {
                 editable={editable}
               />
               <Label label="Catégories" big={!editable} />
-              <Tags data={categories} onChange={(categories) => this.setState({ categories, cagetoriesUpdated: true })} editable={editable} />
+              <Tags
+                data={categories}
+                onChange={(categories) => this.setState({ categories, cagetoriesUpdated: true })}
+                editable={editable}
+                renderTag={(name) => <MyText>{name}</MyText>}
+              />
               <ButtonsContainer>
                 <ButtonDelete onPress={this.onDeleteRequest} />
                 <Button
