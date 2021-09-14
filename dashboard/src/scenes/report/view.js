@@ -308,7 +308,6 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
     .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam.nightSession ? 12 : 0))
     .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam.nightSession ? 12 : 0))
     .map((a) => {
-      console.log('PUUTIN');
       getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam.nightSession ? 12 : 0, true);
       return a;
     })
