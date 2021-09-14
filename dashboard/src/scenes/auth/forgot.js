@@ -23,7 +23,7 @@ const View = () => {
     return (
       <AuthWrapper>
         <Title>Réinitialiser le mot de passe</Title>
-        <HowReset>Un lien pour réinitialiser votre mot de passe a été envoyé dans votre boîte mail.</HowReset>
+        <HowReset>Si l'adresse de courriel que vous avez saisie correspond effectivement à un compte utilisateur.rice MANO, alors un lien pour réinitialiser le mot de passe de ce compte a été envoyé à l'instant à cette adresse.</HowReset>
       </AuthWrapper>
     );
   }
