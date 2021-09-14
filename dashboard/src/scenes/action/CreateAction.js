@@ -15,6 +15,7 @@ import { toFrenchDate } from '../../utils';
 import AuthContext from '../../contexts/auth';
 import ActionsContext, { DONE, TODO } from '../../contexts/actions';
 import RefreshContext from '../../contexts/refresh';
+import SelectStatus from '../../components/SelectStatus';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
@@ -27,10 +28,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
   title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${toFrenchDate(completedAt)}` : '');
 
   const onAddAction = async (body) => {
-    if (!!completedAt) {
-      body.completedAt = completedAt;
-      body.status = DONE;
-    }
+    if (body.status !== TODO) body.completedAt = completedAt || Date.now();
     const res = await addAction(body);
     return res;
   };
@@ -63,6 +61,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
               team: null,
               dueAt: !!completedAt ? new Date(completedAt) : new Date(),
               withTime: false,
+              status: !!completedAt ? DONE : TODO,
             }}
             onSubmit={async (values, actions) => {
               if (!values.name) return toastr.error('Erreur!', 'Le nom est obligatoire');
@@ -74,7 +73,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                 team: values.team,
                 dueAt: values.dueAt,
                 withTime: values.withTime,
-                status: TODO,
+                status: values.status,
               };
               if (typeof values.person === 'string') {
                 body.person = values.person;
@@ -124,14 +123,18 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                       />
                     </FormGroup>
                   </Col>
-                  <Col md={4}>
+                  <Col md={6}>
                     <FormGroup>
                       <SelectPerson value={values.person} onChange={handleChange} isMulti={isMulti} />
                     </FormGroup>
                   </Col>
-                  <Col md={4}>
+                  <Col md={6}>
+                    <Label>Statut</Label>
+                    <SelectStatus name="status" value={values.status || ''} onChange={handleChange} />
+                  </Col>
+                  <Col md={6}>
                     <FormGroup>
-                      <Label>{!!completedAt ? 'Initialement prévue le' : 'À faire le'}</Label>
+                      <Label>Échéance</Label>
                       <div>
                         <DatePicker
                           locale="fr"
@@ -145,7 +148,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                       </div>
                     </FormGroup>
                   </Col>
-                  <Col md={4}>
+                  <Col md={6}>
                     <FormGroup>
                       <Label>Afficher l'heure</Label>
                       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>

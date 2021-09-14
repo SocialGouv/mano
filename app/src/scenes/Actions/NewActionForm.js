@@ -14,6 +14,7 @@ import withContext from '../../contexts/withContext';
 import AuthContext from '../../contexts/auth';
 import ActionsContext, { TODO } from '../../contexts/actions';
 import PersonsContext from '../../contexts/persons';
+import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
 
 class NewActionForm extends React.Component {
   state = {
@@ -23,6 +24,7 @@ class NewActionForm extends React.Component {
     person: null,
     forCurrentPerson: false,
     posting: false,
+    status: TODO,
   };
 
   async componentDidMount() {
@@ -63,7 +65,7 @@ class NewActionForm extends React.Component {
   };
 
   onCreateAction = async () => {
-    const { name, person, dueAt, withTime } = this.state;
+    const { name, person, dueAt, withTime, status } = this.state;
     const { addAction, currentTeam } = this.props.context;
     this.setState({ posting: true });
     const response = await addAction({
@@ -72,7 +74,8 @@ class NewActionForm extends React.Component {
       team: currentTeam._id,
       dueAt,
       withTime,
-      status: TODO,
+      status,
+      completedAt: status !== TODO ? new Date().toISOString() : null,
     });
     if (!response.ok) {
       this.setState({ posting: false });
@@ -149,7 +152,7 @@ class NewActionForm extends React.Component {
   };
 
   render() {
-    const { name, person, dueAt, withTime, forCurrentPerson, posting } = this.state;
+    const { name, person, dueAt, withTime, forCurrentPerson, posting, status } = this.state;
     const { persons } = this.props.context;
     return (
       <SceneContainer>
@@ -163,6 +166,7 @@ class NewActionForm extends React.Component {
               onSearchRequest={this.onSearchPerson}
               disabled={forCurrentPerson}
             />
+            <ActionStatusSelect onSelect={(status) => this.setState({ status })} value={status} editable />
             <DateAndTimeInput
               label="Échéance"
               setDate={(dueAt) => this.setState({ dueAt })}
