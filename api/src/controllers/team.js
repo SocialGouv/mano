@@ -56,7 +56,8 @@ router.put(
     const updateTeam = {};
     if (req.body.hasOwnProperty("name")) updateTeam.name = req.body.name;
     if (req.body.hasOwnProperty("nightSession")) updateTeam.nightSession = req.body.nightSession;
-    const data = await Team.update(updateTeam, { where, returning: true });
+    await Team.update(updateTeam, { where });
+    const data = await Team.findOne({ where });
     return res.status(200).send({ ok: true, data });
   })
 );

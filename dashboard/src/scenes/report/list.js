@@ -20,7 +20,11 @@ const List = () => {
 
   return (
     <Container style={{ padding: '40px 0' }}>
-      <Header title={`Comptes Rendus de l'équipe ${currentTeam?.name || ''}`} onRefresh={refreshReports} loading={loading} />
+      <Header
+        title={`Comptes rendus de l'équipe ${currentTeam?.nightSession ? 'de nuit ' : ''}${currentTeam?.name || ''}`}
+        onRefresh={refreshReports}
+        loading={loading}
+      />
       {getMonths().map((date, index) => (
         <HitMonth debug={index === 0} date={date} key={date} reports={reports} team={currentTeam} />
       ))}

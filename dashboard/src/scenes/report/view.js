@@ -7,6 +7,7 @@ import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
 
 import { toFrenchDate } from '../../utils';
+import { getIsDayWithinHoursOffsetOfDay, theDayAfter } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -31,6 +32,14 @@ import Card from '../../components/Card';
 import CreateObservation from '../../components/CreateObservation';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
+
+const getPeriodTitle = (date, nightSession) => {
+  if (!nightSession) return `Journée du ${toFrenchDate(date)}`;
+  date = new Date(date);
+  const endDate = theDayAfter(date);
+  if (endDate.getMonth() === date.getMonth()) return `Nuit du ${date.getDate()} au ${toFrenchDate(endDate)}`;
+  return `Nuit du ${toFrenchDate(date)} au ${toFrenchDate(endDate)}`;
+};
 
 const View = () => {
   const { id } = useParams();
@@ -174,7 +183,11 @@ const View = () => {
                 <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onNextReport} />
               </div>
             </div>
-            <div>{`Compte rendu du ${toFrenchDate(report.date)} de l'équipe ${currentTeam.name}`}</div>
+            <div>
+              {`Compte rendu de l'équipe ${currentTeam.name}`}
+              <br />
+              {getPeriodTitle(report.date, currentTeam.nightSession)}
+            </div>
           </div>
         }
       />
@@ -227,7 +240,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const data = allActions
     ?.filter((a) => a.team === currentTeam._id)
     .filter((a) => a.status === status)
-    .filter((a) => a.completedAt?.slice(0, 10) === date.slice(0, 10))
+    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam.nightSession ? 12 : 0))
     .map((action) => ({
       ...action,
       person: persons.find((p) => p._id === action.person),
@@ -292,8 +305,13 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
 
   const data = actions
     ?.filter((a) => a.team === currentTeam._id)
-    .filter((a) => a.createdAt?.slice(0, 10) === date.slice(0, 10))
-    .filter((a) => a.completedAt?.slice(0, 10) !== date.slice(0, 10))
+    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam.nightSession ? 12 : 0))
+    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam.nightSession ? 12 : 0))
+    .map((a) => {
+      console.log('PUUTIN');
+      getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam.nightSession ? 12 : 0, true);
+      return a;
+    })
     .map((action) => ({
       ...action,
       person: persons.find((p) => p._id === action.person),
@@ -351,7 +369,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) =
 
   const data = comments
     .filter((c) => c.team === currentTeam._id)
-    .filter((c) => c.createdAt.slice(0, 10) === date.slice(0, 10))
+    .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam.nightSession ? 12 : 0))
     .filter((c) => {
       const commentIsPassage = c.comment.includes('Passage enregistré');
       if (forPassages) return commentIsPassage;
@@ -462,7 +480,9 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   const { territoryObservations } = useContext(TerritoryObservationsContext);
   const { territories } = useContext(TerritoryContext);
 
-  const data = territoryObservations.filter((o) => o.team === currentTeam._id).filter((o) => o.createdAt.slice(0, 10) === date.slice(0, 10));
+  const data = territoryObservations
+    .filter((o) => o.team === currentTeam._id)
+    .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam.nightSession ? 12 : 0));
 
   useEffect(() => {
     onUpdateResults(data.length);
