@@ -19,7 +19,7 @@ const DASHBBOARD_DOMAIN = `/\.fabrique\.social\.gouv\.fr$/`;
 const DASHBBOARD_PREPROD_DOMAIN = `/\.dev\.fabrique\.social\.gouv\.fr$/`;
 
 const X_TIPIMAIL_APIUSER = process.env.X_TIPIMAIL_APIUSER || "";
-const X_TIPIMAIL_APIKEY = process.env.X_TIPIMAIL_APIUSER || "";
+const X_TIPIMAIL_APIKEY = process.env.X_TIPIMAIL_APIKEY || "";
 
 const ENCRYPTED_FIELDS_ONLY = process.env.ENCRYPTED_FIELDS_ONLY === "true" ? true : false;
 
