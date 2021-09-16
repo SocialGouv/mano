@@ -1,4 +1,4 @@
-const { version } = require("../package.json");
+const { version, mobileAppVersion } = require("../package.json");
 
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.SECRET || "not_so_secret_4";
@@ -8,6 +8,7 @@ const PGHOST = process.env.PGHOST;
 const PGPORT = process.env.PGPORT;
 const PGUSER = process.env.PGUSER;
 const VERSION = version;
+const MOBILE_APP_VERSION = mobileAppVersion;
 const PGPASSWORD = process.env.PGPASSWORD || null;
 const SENTRY_KEY = process.env.SENTRY_KEY || "https://e3eb487403dd4789b47cf6da857bb4bf@sentry.fabrique.social.gouv.fr/52";
 const PGDATABASE = process.env.PGDATABASE;
@@ -37,6 +38,7 @@ module.exports = {
   PGDATABASE,
   SENTRY_KEY,
   VERSION,
+  MOBILE_APP_VERSION,
   ENCRYPTED_FIELDS_ONLY,
   X_TIPIMAIL_APIUSER,
   X_TIPIMAIL_APIKEY,
