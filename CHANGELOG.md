@@ -1,3 +1,10 @@
+## [1.10.1](https://github.com/SocialGouv/mano/compare/v1.10.0...v1.10.1) (2021-09-17)
+
+
+### Bug Fixes
+
+* **dashboard:** increase k8s startup delay ([#41](https://github.com/SocialGouv/mano/issues/41)) ([f7abbff](https://github.com/SocialGouv/mano/commit/f7abbff2ee10993c28f137dc2e38f1358b212178))
+
 # [1.10.0](https://github.com/SocialGouv/mano/compare/v1.9.0...v1.10.0) (2021-09-14)
 
 
