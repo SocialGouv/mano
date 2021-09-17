@@ -24,6 +24,9 @@ const manifests = create("dashboard", {
           memory: "128Mi",
         },
       },
+      startupProbe: {
+        initialDelaySeconds: 30,
+      },
     },
   },
 });
