@@ -7,11 +7,11 @@ import './src/services/api-interface-with-app';
 import './src/services/encryption';
 
 import * as Sentry from '@sentry/react-native';
-import { SENTRY_URL } from './src/config';
+import { SENTRY_XXX } from './src/config';
 
 if (!__DEV__) {
   Sentry.init({
-    dsn: SENTRY_URL,
+    dsn: SENTRY_XXX,
     environment: 'app',
   });
 }
