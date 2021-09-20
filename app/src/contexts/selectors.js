@@ -9,6 +9,8 @@ import ReportsContext from './reports';
 import TerritoryContext from './territory';
 import TerritoryObservationsContext, { observationsKeyLabels } from './territoryObservations';
 
+// we split those "selectors" to help poor machines with heavy calculation
+
 export const ReportsSelectorsContext = React.createContext();
 
 export const ReportsSelectorsProvider = ({ children }) => {
