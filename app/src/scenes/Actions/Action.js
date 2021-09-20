@@ -306,7 +306,6 @@ class Action extends React.Component {
   getPersons() {
     const { action } = this.state;
     const { context, route } = this.props;
-    console.log(route?.params?.actions);
     if (route?.params?.actions?.length > 1) {
       return route?.params?.actions?.map((a) => context.persons.find((p) => p._id === a.person));
     } else if (Boolean(action.person)) {
