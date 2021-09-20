@@ -95,9 +95,6 @@ class NewActionForm extends React.Component {
       if (!newAction) newAction = response.data;
       actions.push(response.data);
     }
-    if (persons.length > 1) {
-      Alert.alert('Actions créées !', `Pour ${persons.map((person) => context.persons.find((p) => p._id === person)?.name).join(', ')}`);
-    }
     const { navigation, route } = this.props;
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
     this.backRequestHandled = true;
