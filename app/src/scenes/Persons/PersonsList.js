@@ -13,6 +13,8 @@ import Search from '../../components/Search';
 import withContext from '../../contexts/withContext';
 import PersonsContext from '../../contexts/persons';
 import RefreshContext from '../../contexts/refresh';
+import { PersonsSelectorsContext } from '../../contexts/selectors';
+import { filterBySearch } from '../../utils/search';
 
 class PersonsList extends React.Component {
   state = {
@@ -65,16 +67,16 @@ class PersonsList extends React.Component {
     { useNativeDriver: true }
   );
 
-  filterPersons = (persons) => {
+  filterPersons = () => {
     const { search } = this.state;
+    const { personsFullPopulated } = this.props.context;
     const params = this.props.route?.params?.filters || {};
     const filterTeams = params?.filterTeams || [];
     const filterAlertness = params?.filterAlertness || false;
 
+    let persons = personsFullPopulated;
     if (filterAlertness) persons = persons.filter((p) => Boolean(p.alertness));
-    if (search?.length) {
-      persons = persons.filter((p) => p.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
-    }
+    if (search?.length) persons = filterBySearch(search, persons);
     if (filterTeams.length) {
       persons = persons.filter((p) => {
         for (let assignedTeam of p.assignedTeams) {
@@ -88,13 +90,13 @@ class PersonsList extends React.Component {
 
   render() {
     const { refreshing, loading } = this.state;
-    const { persons, personKey } = this.props.context;
+    const { personKey } = this.props.context;
     const params = this.props.route?.params?.filters || {};
     const filterTeams = params?.filterTeams || [];
     const filterAlertness = params?.filterAlertness || false;
     const numberOfFilters = Number(Boolean(filterAlertness)) + filterTeams.length;
 
-    const data = this.filterPersons(persons);
+    const data = this.filterPersons();
 
     return (
       <SceneContainer>
@@ -131,4 +133,4 @@ class PersonsList extends React.Component {
   }
 }
 
-export default compose(withContext(PersonsContext), withContext(RefreshContext))(PersonsList);
+export default compose(withContext(PersonsContext), withContext(RefreshContext), withContext(PersonsSelectorsContext))(PersonsList);

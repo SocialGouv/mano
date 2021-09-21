@@ -35,7 +35,7 @@ import TerritoryObservation from './scenes/Territories/TerritoryObservation';
 import PersonsFilter from './scenes/Persons/PersonsFilter';
 import RootContextsProvider from './contexts/rootProvider';
 import { StructuresProvider } from './contexts/structures';
-import { ActionsByStatusProvider } from './contexts/selectors';
+import { ActionsByStatusProvider, PersonsSelectorsProvider } from './contexts/selectors';
 import EnvironmentIndicator from './components/EnvironmentIndicator';
 import API from './services/api';
 import Charte from './scenes/Menu/Charte';
@@ -204,15 +204,17 @@ class App extends React.Component {
         <RootContextsProvider>
           <ActionsByStatusProvider>
             <StructuresProvider>
-              <NavigationContainer ref={this.containerRef}>
-                <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
-                  <AppStack.Screen name="LoginStack" component={LoginNavigator} />
-                  <AppStack.Screen name="Home" component={TabNavigator} />
-                  <AppStack.Screen name="Persons" component={PersonsNavigator} />
-                  <AppStack.Screen name="Actions" component={ActionsNavigator} />
-                </AppStack.Navigator>
-                <EnvironmentIndicator />
-              </NavigationContainer>
+              <PersonsSelectorsProvider>
+                <NavigationContainer ref={this.containerRef}>
+                  <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
+                    <AppStack.Screen name="LoginStack" component={LoginNavigator} />
+                    <AppStack.Screen name="Home" component={TabNavigator} />
+                    <AppStack.Screen name="Persons" component={PersonsNavigator} />
+                    <AppStack.Screen name="Actions" component={ActionsNavigator} />
+                  </AppStack.Navigator>
+                  <EnvironmentIndicator />
+                </NavigationContainer>
+              </PersonsSelectorsProvider>
             </StructuresProvider>
           </ActionsByStatusProvider>
         </RootContextsProvider>
