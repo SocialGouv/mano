@@ -45,7 +45,7 @@
     "ip-anonymize": "^0.1.0",
     "javascript-time-ago": "^2.3.4",
     "jsonwebtoken": "^8.5.1",
-    "libphonenumber-js": "^1.9.13",
+    "libphonenumber-js": "^1.9.34",
     "npm": "^7.19.1",
     "prop-types": "^15.7.2",
     "react": "16.13.1",
