@@ -1,3 +1,10 @@
+## [1.10.3](https://github.com/SocialGouv/mano/compare/v1.10.2...v1.10.3) (2021-09-21)
+
+
+### Bug Fixes
+
+* search in app ([#45](https://github.com/SocialGouv/mano/issues/45)) ([b77abdc](https://github.com/SocialGouv/mano/commit/b77abdccb18b9b5360ebc8af8cd98eaa1ef933e5))
+
 ## [1.10.2](https://github.com/SocialGouv/mano/compare/v1.10.1...v1.10.2) (2021-09-21)
 
 
