@@ -1,3 +1,10 @@
+## [1.10.2](https://github.com/SocialGouv/mano/compare/v1.10.1...v1.10.2) (2021-09-21)
+
+
+### Bug Fixes
+
+* **ci:** semantic release update package.json ([#37](https://github.com/SocialGouv/mano/issues/37)) ([22b1098](https://github.com/SocialGouv/mano/commit/22b1098264975e31ea7776716926625102f59f2e)), closes [#38](https://github.com/SocialGouv/mano/issues/38)
+
 ## [1.10.1](https://github.com/SocialGouv/mano/compare/v1.10.0...v1.10.1) (2021-09-17)
 
 
