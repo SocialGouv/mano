@@ -18,7 +18,7 @@
     "base64-js": "^1.5.1",
     "bootstrap": "^4.6.0",
     "dayjs": "^1.10.4",
-    "formik": "^2.2.6",
+    "formik": "^2.2.9",
     "libsodium": "^0.7.9",
     "libsodium-wrappers": "^0.7.9",
     "moment": "^2.29.1",
