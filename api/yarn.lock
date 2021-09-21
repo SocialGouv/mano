@@ -124,7 +124,7 @@
   dependencies:
     defer-to-connect "^1.0.1"
 
-"@types/jsonwebtoken@^8.5.0":
+"@types/jsonwebtoken@^8.5.5":
   version "8.5.5"
   resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-8.5.5.tgz#da5f2f4baee88f052ef3e4db4c1a0afb46cff22c"
   integrity sha512-OGqtHQ7N5/Ap/TUwO6IgHDuLiAoTmHhGpNvgkCm/F4N6pKzx/RBSfr2OXZSwC6vkfnsEdb6+7DNZVtiXiwdwFw==
