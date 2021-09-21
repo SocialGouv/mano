@@ -28,7 +28,7 @@ const prepareItemForSearch = (item) => {
 };
 
 export const filterBySearch = (search, items = []) => {
-  search = search.toLocaleLowerCase();
+  search = search.toLocaleLowerCase().trim();
   const firstItems = items.filter((item) => item?.name?.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
   const firstItemsIds = firstItems.map((item) => item._id);
   const lastItems = items
