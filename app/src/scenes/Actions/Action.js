@@ -422,12 +422,16 @@ class Action extends React.Component {
                   />
                 )}
                 ifEmpty="Pas encore de commentaire">
-                <NewCommentInput
-                  forwardRef={(r) => (this.newCommentRef = r)}
-                  onFocus={() => this._scrollToInput(this.newCommentRef)}
-                  action={this.props.route?.params?.actions?.length > 1 ? this.props.route?.params?.actions.map((a) => a._id) : action._id}
-                  writeComment={(writingComment) => this.setState({ writingComment })}
-                />
+                {this.props.route?.params?.actions?.length < 1 ? (
+                  <NewCommentInput
+                    forwardRef={(r) => (this.newCommentRef = r)}
+                    onFocus={() => this._scrollToInput(this.newCommentRef)}
+                    action={action._id}
+                    writeComment={(writingComment) => this.setState({ writingComment })}
+                  />
+                ) : (
+                  <></>
+                )}
               </SubList>
             </>
           )}

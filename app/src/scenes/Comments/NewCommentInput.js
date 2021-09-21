@@ -20,35 +20,20 @@ class NewCommentInput extends React.Component {
     const { comment } = this.state;
     const { person, action, context } = this.props;
 
-    let response;
+    const body = {
+      comment,
+    };
     if (person) {
-      response = await context.addComment({
-        comment,
-        person,
-        item: person,
-        type: 'person',
-      });
+      body.person = person;
+      body.item = person;
+      body.type = 'person';
     }
     if (action) {
-      // Save comment for multiple actions
-      if (Array.isArray(action)) {
-        for (const a of action) {
-          response = await context.addComment({
-            comment,
-            action: a,
-            item: a,
-            type: 'action',
-          });
-        }
-      } else {
-        response = await context.addComment({
-          comment,
-          action,
-          item: action,
-          type: 'action',
-        });
-      }
+      body.action = action;
+      body.item = action;
+      body.type = 'action';
     }
+    const response = await context.addComment(body);
     if (!response.ok) {
       this.setState({ posting: false });
       Alert.alert(response.error || response.code);
