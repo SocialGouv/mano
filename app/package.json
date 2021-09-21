@@ -43,7 +43,7 @@
     "fast-text-encoding": "^1.0.3",
     "install": "^0.13.0",
     "ip-anonymize": "^0.1.0",
-    "javascript-time-ago": "^2.3.4",
+    "javascript-time-ago": "^2.3.8",
     "jsonwebtoken": "^8.5.1",
     "libphonenumber-js": "^1.9.13",
     "npm": "^7.19.1",
