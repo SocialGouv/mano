@@ -15,13 +15,16 @@ import AuthContext from '../../contexts/auth';
 import ActionsContext, { TODO } from '../../contexts/actions';
 import PersonsContext from '../../contexts/persons';
 import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
+import Label from '../../components/Label';
+import Tags from '../../components/Tags';
+import { MyText } from '../../components/MyText';
 
 class NewActionForm extends React.Component {
   state = {
     name: '',
     dueAt: null,
     withTime: false,
-    person: null,
+    persons: [],
     forCurrentPerson: false,
     posting: false,
     status: TODO,
@@ -31,7 +34,7 @@ class NewActionForm extends React.Component {
     const { route } = this.props;
     if (route.params?.person) {
       this.setState({
-        person: route.params.person,
+        persons: [route.params.person],
         forCurrentPerson: true,
       });
     }
@@ -52,8 +55,12 @@ class NewActionForm extends React.Component {
 
   handleFocus = () => {
     const { route } = this.props;
-    if (route.params?.person) {
-      this.setState({ person: route.params.person });
+    const { persons } = this.state;
+    const newPerson = route?.params?.person;
+    if (newPerson) {
+      this.setState({
+        persons: [...persons.filter((p) => p !== newPerson), newPerson],
+      });
     }
   };
 
@@ -65,36 +72,42 @@ class NewActionForm extends React.Component {
   };
 
   onCreateAction = async () => {
-    const { name, person, dueAt, withTime, status } = this.state;
-    const { addAction, currentTeam } = this.props.context;
+    const { name, persons, dueAt, withTime, status } = this.state;
+    const { context } = this.props;
     this.setState({ posting: true });
-    const response = await addAction({
-      name,
-      person,
-      team: currentTeam._id,
-      dueAt,
-      withTime,
-      status,
-      completedAt: status !== TODO ? new Date().toISOString() : null,
-    });
-    if (!response.ok) {
-      this.setState({ posting: false });
-      Alert.alert(response.error || response.code);
-      return;
-    }
-    if (response.ok) {
-      const { navigation, route } = this.props;
-      this.backRequestHandled = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
-      Sentry.setContext('action', { _id: response.data._id });
-      navigation.navigate('Action', {
-        fromRoute: route.params.fromRoute,
-        ...response.data,
-        editable: true,
+    let newAction = null;
+    const actions = [];
+    for (const person of persons) {
+      const response = await context.addAction({
+        name,
+        person,
+        team: context.currentTeam._id,
+        dueAt,
+        withTime,
+        status,
+        completedAt: status !== TODO ? new Date().toISOString() : null,
       });
-      setTimeout(() => {
+      if (!response.ok) {
         this.setState({ posting: false });
-      }, 250);
+        Alert.alert(response.error || response.code);
+        return;
+      }
+      if (!newAction) newAction = response.data;
+      actions.push(response.data);
     }
+    const { navigation, route } = this.props;
+    // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
+    this.backRequestHandled = true;
+    Sentry.setContext('action', { _id: newAction._id });
+    navigation.navigate('Action', {
+      fromRoute: route.params.fromRoute,
+      actions,
+      ...newAction,
+      editable: true,
+    });
+    setTimeout(() => {
+      this.setState({ posting: false });
+    }, 250);
   };
 
   onBack = () => {
@@ -104,14 +117,15 @@ class NewActionForm extends React.Component {
   };
 
   canGoBack = () => {
-    const { name, person, dueAt, forCurrentPerson } = this.state;
-    if (!name.length && (forCurrentPerson || person === null) && !dueAt) return true;
+    const { name, persons, dueAt, forCurrentPerson } = this.state;
+    if (!name.length && (forCurrentPerson || !persons.length) && !dueAt) return true;
     return false;
   };
 
   isReadyToSave = () => {
-    const { name, dueAt } = this.state;
+    const { name, dueAt, persons } = this.state;
     if (!name || !name.length || !name.trim().length) return false;
+    if (!persons.length) return false;
     if (!dueAt) return false;
     return true;
   };
@@ -152,20 +166,33 @@ class NewActionForm extends React.Component {
   };
 
   render() {
-    const { name, person, dueAt, withTime, forCurrentPerson, posting, status } = this.state;
-    const { persons } = this.props.context;
+    const { name, persons, dueAt, withTime, forCurrentPerson, posting, status } = this.state;
+    const { context } = this.props;
     return (
       <SceneContainer>
         <ScreenTitle title="Nouvelle action" onBack={this.onGoBackRequested} />
         <ScrollContainer keyboardShouldPersistTaps="handled">
           <View>
             <InputLabelled label="Nom de l’action" onChangeText={(name) => this.setState({ name })} value={name} placeholder="Rdv chez le dentiste" />
-            <InputFromSearchList
-              label="Personne concernée"
-              value={persons.find((p) => p._id === person)?.name || '-- Aucune --'}
-              onSearchRequest={this.onSearchPerson}
-              disabled={forCurrentPerson}
-            />
+            {forCurrentPerson ? (
+              <InputFromSearchList
+                label="Personne concernée"
+                value={context.persons.find((p) => p._id === persons[0])?.name || '-- Aucune --'}
+                onSearchRequest={this.onSearchPerson}
+                disabled
+              />
+            ) : (
+              <>
+                <Label label="Personne(s) concerné(es)" />
+                <Tags
+                  data={persons}
+                  onChange={(persons) => this.setState({ persons })}
+                  editable
+                  onAddRequest={this.onSearchPerson}
+                  renderTag={(person) => <MyText>{context.persons.find((p) => p._id === person)?.name}</MyText>}
+                />
+              </>
+            )}
             <ActionStatusSelect onSelect={(status) => this.setState({ status })} value={status} editable />
             <DateAndTimeInput
               label="Échéance"

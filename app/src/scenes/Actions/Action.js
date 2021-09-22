@@ -24,6 +24,9 @@ import ActionsContext, { CANCEL, TODO } from '../../contexts/actions';
 import CommentsContext from '../../contexts/comments';
 import PersonsContext from '../../contexts/persons';
 import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
+import Label from '../../components/Label';
+import Tags from '../../components/Tags';
+import { MyText } from '../../components/MyText';
 
 class Action extends React.Component {
   castToAction = (action = {}) => ({
@@ -111,21 +114,36 @@ class Action extends React.Component {
   onUpdateAction = async () => {
     this.setState({ updating: true });
     const { dueAt, action, status } = this.state;
+    const multipleActions = this.props.route?.params?.actions?.length > 1;
     if (!dueAt) {
       Alert.alert("Vous devez rentrer une date d'échéance");
       this.setState({ updating: false });
       return false;
     }
-    const response = await this.props.context.updateAction(
-      Object.assign(
-        {},
-        this.castToAction(this.state),
-        {
-          completedAt: action.status === TODO && status !== TODO ? new Date().toISOString() : null,
-        },
-        { _id: action._id }
-      )
-    );
+    let response;
+    if (multipleActions) {
+      // Update multiple actions.
+      for (const a of this.props.route?.params?.actions) {
+        response = await this.props.context.updateAction(
+          Object.assign(
+            {},
+            this.castToAction(this.state),
+            { completedAt: action.status === TODO && status !== TODO ? new Date().toISOString() : null },
+            { _id: a._id, person: a.person }
+          )
+        );
+      }
+    } else {
+      response = await this.props.context.updateAction(
+        Object.assign(
+          {},
+          this.castToAction(this.state),
+          { completedAt: action.status === TODO && status !== TODO ? new Date().toISOString() : null },
+          { _id: action._id }
+        )
+      );
+    }
+
     if (response.error) {
       Alert.alert(response.error);
       this.setState({ updating: false });
@@ -139,7 +157,11 @@ class Action extends React.Component {
           { text: 'Non merci !', onPress: this.onBack, style: 'cancel' },
         ]);
       } else {
-        Alert.alert('Action mise-à-jour !', null, [{ text: 'OK', onPress: this.onBack }]);
+        if (multipleActions) {
+          Alert.alert('Actions mises à jour !');
+          return true;
+        }
+        Alert.alert('Action mise à jour !', null, [{ text: 'OK', onPress: this.onBack }]);
       }
       return true;
     }
@@ -184,10 +206,18 @@ class Action extends React.Component {
   onDelete = async () => {
     const { action } = this.state;
     const { deleteAction } = this.props.context;
-    const response = await deleteAction(action._id);
+    const multipleActions = this.props.route?.params?.actions?.length > 1;
+    let response;
+    if (multipleActions) {
+      for (const a of this.props.route?.params?.actions) {
+        response = await deleteAction(a._id);
+      }
+    } else {
+      response = await deleteAction(action._id);
+    }
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
-      Alert.alert('Action supprimée !');
+      Alert.alert(multipleActions ? 'Actions supprimées !' : 'Action supprimée !');
       this.onBack();
     }
   };
@@ -277,16 +307,27 @@ class Action extends React.Component {
     }, 250);
   };
 
+  getPersons() {
+    const { action } = this.state;
+    const { context, route } = this.props;
+    if (route?.params?.actions?.length > 1) {
+      return route?.params?.actions?.map((a) => context.persons.find((p) => p._id === a.person));
+    } else if (action.person) {
+      return [context.persons.find((p) => p._id === action.person)];
+    }
+    return [];
+  }
+
   render() {
     const { loading, name, dueAt, withTime, description, categories, user, status, updating, editable, action } = this.state;
     const { navigation, context } = this.props;
 
-    const person = !!action.person && context.persons.find((p) => p._id === action.person);
+    const persons = this.getPersons();
 
     return (
       <SceneContainer>
         <ScreenTitle
-          title={person?.name ? `${name} - ${person?.name}` : name}
+          title={persons?.length && persons.length === 1 ? `${name} - ${persons[0].name}` : name}
           onBack={this.onGoBackRequested}
           onEdit={!editable ? this.onEdit : null}
           onSave={!editable ? null : this.onUpdateAction}
@@ -305,12 +346,24 @@ class Action extends React.Component {
                 placeholder="Nom de l’action"
                 editable={editable}
               />
-              <InputFromSearchList
-                label="Personne concernée"
-                value={person?.name || '-- Aucune --'}
-                onSearchRequest={this.onSearchPerson}
-                editable={editable}
-              />
+              {persons.length < 2 ? (
+                <InputFromSearchList
+                  label="Personne concernée"
+                  value={persons[0]?.name || '-- Aucune --'}
+                  onSearchRequest={this.onSearchPerson}
+                  editable={editable}
+                />
+              ) : (
+                <>
+                  <Label label="Personne(s) concerné(es)" />
+                  <Tags
+                    data={persons}
+                    onChange={(persons) => this.setState({ persons })}
+                    onAddRequest={this.onSearchPerson}
+                    renderTag={(person) => <MyText>{person?.name}</MyText>}
+                  />
+                </>
+              )}
               <ActionStatusSelect
                 onSelect={(status) => this.setState({ status })}
                 onSelectAndSave={(status) => this.setState({ status }, this.onUpdateAction)}
@@ -373,12 +426,16 @@ class Action extends React.Component {
                   />
                 )}
                 ifEmpty="Pas encore de commentaire">
-                <NewCommentInput
-                  forwardRef={(r) => (this.newCommentRef = r)}
-                  onFocus={() => this._scrollToInput(this.newCommentRef)}
-                  action={action._id}
-                  writeComment={(writingComment) => this.setState({ writingComment })}
-                />
+                {this.props.route?.params?.actions?.length < 1 ? (
+                  <NewCommentInput
+                    forwardRef={(r) => (this.newCommentRef = r)}
+                    onFocus={() => this._scrollToInput(this.newCommentRef)}
+                    action={action._id}
+                    writeComment={(writingComment) => this.setState({ writingComment })}
+                  />
+                ) : (
+                  <></>
+                )}
               </SubList>
             </>
           )}

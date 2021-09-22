@@ -2,10 +2,10 @@ import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import ResetIcon from '../icons/ResetIcon';
 import PlusIcon from '../icons/PlusIcon';
-import { MyText, MyTextInput } from './MyText';
+import { MyTextInput } from './MyText';
+import Button from './Button';
 
-const Tags = ({ data = [], onChange = () => null, editable }) => {
-  const removeItem = (index) => [...data.slice(0, index), ...data.slice(index + 1, data.length)];
+const Tags = ({ data = [], onAddRequest, renderTag, onChange, editable }) => {
   const addItem = (item) => [...data, item];
   const [text, setText] = useState('');
   const inputRef = useRef(null);
@@ -15,37 +15,42 @@ const Tags = ({ data = [], onChange = () => null, editable }) => {
     setText('');
   };
 
+  const renderAddTag = () => {
+    if (!editable) return null;
+    if (onAddRequest) return <Button caption="Ajouter" onPress={onAddRequest} />;
+    return (
+      <TagItemAdd>
+        <TagInput
+          onChangeText={setText}
+          value={text}
+          onSubmitEditing={onSubmit}
+          clearButtonMode="never"
+          returnKeyType="done"
+          ref={inputRef}
+          placeholder="Ajouter"
+        />
+        {text ? (
+          <ResetContainer onPress={onSubmit}>
+            <PlusIconStyled color="#888888" size={10} />
+          </ResetContainer>
+        ) : null}
+      </TagItemAdd>
+    );
+  };
+
   return (
     <TagWrapper>
-      {data.map((name, i) => (
-        <TagItem key={`${name}${i}`}>
-          <MyText>{name}</MyText>
+      {data.map((tag, i) => (
+        <TagItem key={`${tag}${i}`}>
+          {renderTag(tag)}
           {!!editable && (
-            <ResetContainer onPress={() => onChange(removeItem(i))}>
+            <ResetContainer onPress={() => onChange(data.filter((tag, index) => index !== i))}>
               <ResetIcon />
             </ResetContainer>
           )}
         </TagItem>
       ))}
-
-      {!!editable && (
-        <TagItemAdd>
-          <TagInput
-            onChangeText={setText}
-            value={text}
-            onSubmitEditing={onSubmit}
-            clearButtonMode="never"
-            returnKeyType="done"
-            ref={inputRef}
-            placeholder="Ajouter"
-          />
-          {text ? (
-            <ResetContainer onPress={onSubmit}>
-              <PlusIconStyled color="#888888" size={10} />
-            </ResetContainer>
-          ) : null}
-        </TagItemAdd>
-      )}
+      {renderAddTag()}
     </TagWrapper>
   );
 };
@@ -62,6 +67,7 @@ const TagWrapper = styled.View`
   display: flex;
   flex-flow: row;
   flex-wrap: wrap;
+  min-height: 50px;
   margin-bottom: 50px;
 `;
 
