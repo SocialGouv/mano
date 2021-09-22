@@ -157,11 +157,8 @@ class Action extends React.Component {
           { text: 'Non merci !', onPress: this.onBack, style: 'cancel' },
         ]);
       } else {
-        if (multipleActions) {
-          Alert.alert('Actions mises à jour !');
-          return true;
-        }
-        Alert.alert('Action mise à jour !', null, [{ text: 'OK', onPress: this.onBack }]);
+        Alert.alert(multipleActions ? 'Actions mises à jour !' : 'Action mise à jour !', null, [{ text: 'OK', onPress: this.onBack }]);
+        return true;
       }
       return true;
     }
@@ -225,6 +222,8 @@ class Action extends React.Component {
   isUpdateDisabled = (calledFrom) => {
     const { action } = this.state;
     const newAction = { ...action, ...this.castToAction(this.state) };
+    console.log(JSON.stringify(action));
+    console.log(JSON.stringify(newAction));
     if (JSON.stringify(action) !== JSON.stringify(newAction)) return false;
     return true;
   };
