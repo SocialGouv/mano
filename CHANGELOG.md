@@ -1,3 +1,10 @@
+## [1.11.1](https://github.com/SocialGouv/mano/compare/v1.11.0...v1.11.1) (2021-09-22)
+
+
+### Bug Fixes
+
+* can go back when update multiple actions ([e9a3472](https://github.com/SocialGouv/mano/commit/e9a347269ab3ccdb7fd2ab9f088066291416555b))
+
 # [1.11.0](https://github.com/SocialGouv/mano/compare/v1.10.3...v1.11.0) (2021-09-22)
 
 
