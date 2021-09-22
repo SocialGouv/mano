@@ -1,3 +1,10 @@
+# [1.11.0](https://github.com/SocialGouv/mano/compare/v1.10.3...v1.11.0) (2021-09-22)
+
+
+### Features
+
+* can create action for multiple persons in app ([#36](https://github.com/SocialGouv/mano/issues/36)) ([e3e3de5](https://github.com/SocialGouv/mano/commit/e3e3de556834b0d5d6e32f9263f1ccfcaa1ad2be)), closes [#44](https://github.com/SocialGouv/mano/issues/44)
+
 ## [1.10.3](https://github.com/SocialGouv/mano/compare/v1.10.2...v1.10.3) (2021-09-21)
 
 
