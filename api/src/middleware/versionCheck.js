@@ -1,4 +1,4 @@
-const MIN_VER = [2, 3, 11];
+const MINIMUM_MOBILE_APP_VERSION = [2, 3, 11];
 
 module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "dashboard") return next();
@@ -8,9 +8,9 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
   const appVer = version.split(".").map((d) => parseInt(d));
 
   for (let i = 0; i < 3; i++) {
-    if (appVer[i] > MIN_VER[i]) {
+    if (appVer[i] > MINIMUM_MOBILE_APP_VERSION[i]) {
       return next();
-    } else if (appVer[i] < MIN_VER[i]) {
+    } else if (appVer[i] < MINIMUM_MOBILE_APP_VERSION[i]) {
       return res.status(403).send({ ok: false, message: "Veuillez mettre à jour votre application!" });
     }
   }

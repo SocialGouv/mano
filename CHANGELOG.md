@@ -1,3 +1,31 @@
+## [1.10.3](https://github.com/SocialGouv/mano/compare/v1.10.2...v1.10.3) (2021-09-21)
+
+
+### Bug Fixes
+
+* search in app ([#45](https://github.com/SocialGouv/mano/issues/45)) ([b77abdc](https://github.com/SocialGouv/mano/commit/b77abdccb18b9b5360ebc8af8cd98eaa1ef933e5))
+
+## [1.10.2](https://github.com/SocialGouv/mano/compare/v1.10.1...v1.10.2) (2021-09-21)
+
+
+### Bug Fixes
+
+* **ci:** semantic release update package.json ([#37](https://github.com/SocialGouv/mano/issues/37)) ([22b1098](https://github.com/SocialGouv/mano/commit/22b1098264975e31ea7776716926625102f59f2e)), closes [#38](https://github.com/SocialGouv/mano/issues/38)
+
+## [1.10.1](https://github.com/SocialGouv/mano/compare/v1.10.0...v1.10.1) (2021-09-17)
+
+
+### Bug Fixes
+
+* **dashboard:** increase k8s startup delay ([#41](https://github.com/SocialGouv/mano/issues/41)) ([f7abbff](https://github.com/SocialGouv/mano/commit/f7abbff2ee10993c28f137dc2e38f1358b212178))
+
+# [1.10.0](https://github.com/SocialGouv/mano/compare/v1.9.0...v1.10.0) (2021-09-14)
+
+
+### Features
+
+* add metabase ([#35](https://github.com/SocialGouv/mano/issues/35)) ([4f58930](https://github.com/SocialGouv/mano/commit/4f58930a8c2bcfed9ffe72ac8441e0f75a0122fb))
+
 # [1.9.0](https://github.com/SocialGouv/mano/compare/v1.8.2...v1.9.0) (2021-09-14)
 
 
