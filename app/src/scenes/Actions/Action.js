@@ -157,7 +157,11 @@ class Action extends React.Component {
           { text: 'Non merci !', onPress: this.onBack, style: 'cancel' },
         ]);
       } else {
-        Alert.alert(multipleActions ? 'Actions mises à jour !' : 'Action mise à jour !', null, [{ text: 'OK', onPress: this.onBack }]);
+        if (multipleActions) {
+          Alert.alert('Actions mises à jour !');
+          return true;
+        }
+        Alert.alert('Action mise à jour !', null, [{ text: 'OK', onPress: this.onBack }]);
       }
       return true;
     }
@@ -308,7 +312,7 @@ class Action extends React.Component {
     const { context, route } = this.props;
     if (route?.params?.actions?.length > 1) {
       return route?.params?.actions?.map((a) => context.persons.find((p) => p._id === a.person));
-    } else if (Boolean(action.person)) {
+    } else if (action.person) {
       return [context.persons.find((p) => p._id === action.person)];
     }
     return [];
