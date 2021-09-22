@@ -76,6 +76,7 @@ class NewActionForm extends React.Component {
     const { context } = this.props;
     this.setState({ posting: true });
     let newAction = null;
+    const actions = [];
     for (const person of persons) {
       const response = await context.addAction({
         name,
@@ -92,9 +93,7 @@ class NewActionForm extends React.Component {
         return;
       }
       if (!newAction) newAction = response.data;
-    }
-    if (persons.length > 1) {
-      Alert.alert('Actions créées !', `Pour ${persons.map((person) => context.persons.find((p) => p._id === person)?.name).join(', ')}`);
+      actions.push(response.data);
     }
     const { navigation, route } = this.props;
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
@@ -102,6 +101,7 @@ class NewActionForm extends React.Component {
     Sentry.setContext('action', { _id: newAction._id });
     navigation.navigate('Action', {
       fromRoute: route.params.fromRoute,
+      actions,
       ...newAction,
       editable: true,
     });
