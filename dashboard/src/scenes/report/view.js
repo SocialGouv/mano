@@ -527,8 +527,6 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
 const Description = ({ report }) => {
   const { updateReport } = useContext(ReportsContext);
 
-  console.log({ report });
-
   return (
     <>
       <DescriptionBox className="noprint" report={report}>
