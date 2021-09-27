@@ -319,9 +319,11 @@ class Action extends React.Component {
 
   render() {
     const { loading, name, dueAt, withTime, description, categories, user, status, updating, editable, action } = this.state;
-    const { navigation, context } = this.props;
+    const { navigation, context, route } = this.props;
 
     const persons = this.getPersons();
+
+    const canComment = !route?.params?.actions || route?.params?.actions?.length <= 1;
 
     return (
       <SceneContainer>
@@ -425,15 +427,13 @@ class Action extends React.Component {
                   />
                 )}
                 ifEmpty="Pas encore de commentaire">
-                {this.props.route?.params?.actions?.length < 1 ? (
+                {!!canComment && (
                   <NewCommentInput
                     forwardRef={(r) => (this.newCommentRef = r)}
                     onFocus={() => this._scrollToInput(this.newCommentRef)}
                     action={action._id}
                     writeComment={(writingComment) => this.setState({ writingComment })}
                   />
-                ) : (
-                  <></>
                 )}
               </SubList>
             </>
