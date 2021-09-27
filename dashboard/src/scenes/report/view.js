@@ -30,6 +30,7 @@ import UserName from '../../components/UserName';
 import ButtonCustom from '../../components/ButtonCustom';
 import Card from '../../components/Card';
 import CreateObservation from '../../components/CreateObservation';
+import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -526,6 +527,8 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
 const Description = ({ report }) => {
   const { updateReport } = useContext(ReportsContext);
 
+  console.log({ report });
+
   return (
     <>
       <DescriptionBox className="noprint" report={report}>
@@ -553,7 +556,7 @@ const Description = ({ report }) => {
               <Col md={6}>
                 <FormGroup>
                   <Label>Collaboration</Label>
-                  <Input name="collaboration" type="text" value={values.collaboration} onChange={handleChange} />
+                  <SelectAndCreateCollaboration value={values.collaboration} onChange={handleChange} />
                 </FormGroup>
               </Col>
               <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -567,7 +570,7 @@ const Description = ({ report }) => {
         {!!report?.collaboration && (
           <>
             <Title>Collaboration</Title>
-            <p dangerouslySetInnerHTML={{ __html: report?.collaboration?.split('\n').join('<br />') || 'Pas de description' }} />
+            <p dangerouslySetInnerHTML={{ __html: report?.collaboration || 'Pas de collaboration' }} />
           </>
         )}
         <Title>Description</Title>
