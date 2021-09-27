@@ -81,8 +81,11 @@ router.put(
     const report = await Report.findOne({ where });
     if (!report) return res.status(404).send({ ok: false, error: "Not Found" });
 
+    console.log(req.body);
+
     const updatedReport = {};
     if (req.body.hasOwnProperty("description")) updatedReport.description = req.body.description || null;
+    if (req.body.hasOwnProperty("collaboration")) updatedReport.collaboration = req.body.collaboration || null;
     if (req.body.hasOwnProperty("passages")) updatedReport.passages = req.body.passages || null;
     if (req.body.hasOwnProperty("services")) updatedReport.services = req.body.services || null;
 
