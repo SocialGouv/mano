@@ -1,10 +1,11 @@
-import React, { useState } from "react";
-import queryString from "query-string";
-import { Redirect } from "react-router-dom";
-import styled from "styled-components";
+import React, { useState } from 'react';
+import queryString from 'query-string';
+import { Redirect } from 'react-router-dom';
+import styled from 'styled-components';
+import { toastr } from 'react-redux-toastr';
 
-import API from "../../services/api";
-import ChangePassword from "../../components/ChangePassword";
+import API from '../../services/api';
+import ChangePassword from '../../components/ChangePassword';
 
 const Reset = ({ location }) => {
   const [redirect, setRedirect] = useState(false);
@@ -18,16 +19,17 @@ const Reset = ({ location }) => {
     <AuthWrapper>
       <Title>Modifiez votre mot de passe</Title>
       <ChangePassword
-        onSubmit={({ newPassword }) =>
+        onSubmit={({ newPassword }) => {
+          API.toastr = toastr;
           API.post({
-            path: "/user/forgot_password_reset",
-            skipEncryption: "/user/forgot_password_reset",
+            path: '/user/forgot_password_reset',
+            skipEncryption: '/user/forgot_password_reset',
             body: {
               token,
               password: newPassword,
             },
-          })
-        }
+          });
+        }}
         onFinished={() => setRedirect(true)}
         withCurrentPassword={false}
       />

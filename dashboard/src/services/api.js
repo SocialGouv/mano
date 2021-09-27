@@ -165,7 +165,7 @@ class ApiService {
       return decryptedItem;
     } catch (errorDecrypt) {
       if (this.sendCaptureError < 5) {
-        capture(errorDecrypt, {
+        capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
           extra: {
             message: 'ERROR DECRYPTING ITEM',
             item,
