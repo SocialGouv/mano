@@ -14,7 +14,7 @@ const SelectAndCreateCollaboration = ({ value, onChange }) => {
   const { organisation, setAuth } = useContext(AuthContext);
 
   const onChangeRequest = (event) => {
-    onChange({ currentTarget: { value: event.value, name: 'collaboration' } });
+    onChange({ currentTarget: { value: event?.value || null, name: 'collaboration' } });
   };
 
   return (
@@ -22,7 +22,7 @@ const SelectAndCreateCollaboration = ({ value, onChange }) => {
       options={(organisation.collaborations || []).map((collab) => ({ value: collab, label: collab }))}
       name="collaboration"
       isSearchable
-      isClearable
+      isClearable={!!value}
       components={{ NoOptionsMessage }}
       onChange={onChangeRequest}
       placeholder={' -- Choisir une collaboration -- '}
@@ -37,10 +37,10 @@ const SelectAndCreateCollaboration = ({ value, onChange }) => {
           toastr.clean();
           toastr.success('Collaboration créée !');
           setAuth({ organisation: response.data });
-          onChangeRequest(collab);
+          onChangeRequest({ value: collab });
         }
       }}
-      value={{ value, label: value }}
+      value={{ value: value, label: value }}
       formatOptionLabel={({ value: collab, __isNew__ }) => {
         if (__isNew__) return <span>Créer "{collab}"</span>;
         return <span>{collab}</span>;

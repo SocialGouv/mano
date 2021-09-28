@@ -251,7 +251,7 @@ const Stats = () => {
             data={getPieData(
               reports.filter((r) => r.team === currentTeam._id),
               'collaboration',
-              { options: organisation.collaborations }
+              { options: organisation.collaborations || [] }
             )}
           />
         </TabPane>
