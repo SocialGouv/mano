@@ -1,3 +1,10 @@
+## [1.11.3](https://github.com/SocialGouv/mano/compare/v1.11.2...v1.11.3) (2021-09-29)
+
+
+### Bug Fixes
+
+* sentry+small fixes ([#74](https://github.com/SocialGouv/mano/issues/74)) ([2b2a76b](https://github.com/SocialGouv/mano/commit/2b2a76b8e23537413d3e85143cbdb46126e6dc5f))
+
 ## [1.11.2](https://github.com/SocialGouv/mano/compare/v1.11.1...v1.11.2) (2021-09-27)
 
 
