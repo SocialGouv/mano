@@ -45,12 +45,6 @@ class PersonsSearch extends React.Component {
 
   onBack = async () => {
     const { navigation, route } = this.props;
-    if (!this.person?._id) {
-      await new Promise((res) => setTimeout(res, 500));
-    }
-    if (!this.person?._id) {
-      capture('error navigating to person', { extra: this.state });
-    }
     navigation.navigate(route.params.fromRoute, {
       person: this.person?._id,
     });

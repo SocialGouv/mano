@@ -23,7 +23,10 @@ const View = () => {
     return (
       <AuthWrapper>
         <Title>Réinitialiser le mot de passe</Title>
-        <HowReset>Si l'adresse de courriel que vous avez saisie correspond effectivement à un compte utilisateur.rice MANO, alors un lien pour réinitialiser le mot de passe de ce compte a été envoyé à l'instant à cette adresse.</HowReset>
+        <HowReset>
+          Si l'adresse de courriel que vous avez saisie correspond effectivement à un compte utilisateur.rice MANO, alors un lien pour réinitialiser
+          le mot de passe de ce compte a été envoyé à l'instant à cette adresse.
+        </HowReset>
       </AuthWrapper>
     );
   }
@@ -36,6 +39,7 @@ const View = () => {
         initialValues={{ email: '' }}
         onSubmit={async (body, actions) => {
           try {
+            API.toastr = toastr;
             const response = await API.post({
               path: '/user/forgot_password',
               skipEncryption: '/user/forgot_password',

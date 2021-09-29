@@ -1,5 +1,5 @@
 # Mano
-![Mobile version](https://img.shields.io/badge/mobile%20app%20version-2.5.1-blue)
+![Mobile version](https://img.shields.io/badge/mobile%20app%20version-2.5.2-blue)
 
 Code source de [Mano](https://mano-app.fabrique.social.gouv.fr/), organisé en plusieurs services : 
  - [Application mobile](https://github.com/SocialGouv/mano/tree/main/app)
