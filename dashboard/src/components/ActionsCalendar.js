@@ -7,6 +7,7 @@ import { isOnSameDay, theDayAfter, theDayBefore, today } from '../services/date'
 import Table from './table';
 import { toFrenchDate } from '../utils';
 import ActionStatus from './ActionStatus';
+import styled from 'styled-components';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Status'] }) => {
   const history = useHistory();
@@ -60,7 +61,19 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           },
         },
         { title: 'Nom', dataKey: 'name' },
-        { title: 'Personne suivie', dataKey: 'person', render: (action) => <span>{action?.personName || ''}</span> },
+        {
+          title: 'Personne suivie',
+          dataKey: 'person',
+          render: (action) => (
+            <BoldOnHover
+              onClick={(e) => {
+                e.stopPropagation();
+                if (action.person) history.push(`/person/${action.person}`);
+              }}>
+              {action?.personName || ''}
+            </BoldOnHover>
+          ),
+        },
         { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
         { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
       ].filter((column) => columns.includes(column.title))}
@@ -102,5 +115,12 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
     </>
   );
 };
+
+const BoldOnHover = styled.span`
+  &:hover {
+    font-weight: bold;
+    cursor: zoom-in;
+  }
+`;
 
 export default ActionsCalendar;
