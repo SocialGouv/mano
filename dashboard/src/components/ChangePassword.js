@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FormGroup, Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
 import ButtonCustom from './ButtonCustom';
+import PasswordInput from './PasswordInput';
 
 /* eslint-disable no-extend-native */
 String.prototype.capitalize = function () {
@@ -53,68 +54,92 @@ const codesToHints = {
   NO_SPECIAL: 'au moins un caractère spécial',
 };
 
-const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => (
-  <Formik
-    initialValues={{ password: '', newPassword: '', verifyPassword: '' }}
-    onSubmit={async (body, actions) => {
-      try {
-        if (checkErrorPassword(body.newPassword.trim())) {
-          return toastr.error(codesToErrors[checkErrorPassword(body.newPassword)]);
+const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
+  const [showPassword, setShowPassword] = useState(false);
+  return (
+    <Formik
+      initialValues={{ password: '', newPassword: '', verifyPassword: '' }}
+      onSubmit={async (body, actions) => {
+        try {
+          if (checkErrorPassword(body.newPassword.trim())) {
+            return toastr.error(codesToErrors[checkErrorPassword(body.newPassword)]);
+          }
+          if (body.newPassword.trim() !== body.verifyPassword.trim()) {
+            return toastr.error('Les mots de passe ne sont pas identiques !');
+          }
+          onFinished({
+            body: {
+              newPassword: body.newPassword.trim(),
+              verifyPassword: body.verifyPassword.trim(),
+              password: body.password.trim(),
+            },
+          });
+          const res = await onSubmit(body);
+          actions.setSubmitting(false);
+          if (res.ok) {
+            toastr.success('Mot de passe mis à jour!');
+            onFinished(true);
+          }
+        } catch (errorUpdatePassword) {
+          console.log('error in updating password', errorUpdatePassword);
+          toastr.error('Erreur', errorUpdatePassword);
         }
-        if (body.newPassword.trim() !== body.verifyPassword.trim()) {
-          return toastr.error('Les mots de passe ne sont pas identiques !');
-        }
-        onFinished({
-          body: {
-            newPassword: body.newPassword.trim(),
-            verifyPassword: body.verifyPassword.trim(),
-            password: body.password.trim(),
-          },
-        });
-        const res = await onSubmit(body);
-        actions.setSubmitting(false);
-        if (res.ok) {
-          toastr.success('Mot de passe mis à jour!');
-          onFinished(true);
-        }
-      } catch (errorUpdatePassword) {
-        console.log('error in updating password', errorUpdatePassword);
-        toastr.error('Erreur', errorUpdatePassword);
-      }
-    }}>
-    {({ values, isSubmitting, handleChange, handleSubmit }) => {
-      return (
-        <div autoComplete="off">
-          {!!withCurrentPassword && (
+      }}>
+      {({ values, isSubmitting, handleChange, handleSubmit }) => {
+        return (
+          <div autoComplete="off">
+            {!!withCurrentPassword && (
+              <FormGroup>
+                <Label>Mot de passe</Label>
+                <PasswordInput
+                  InputComponent={Input}
+                  value={values.password}
+                  name="password"
+                  onChange={handleChange}
+                  showPassword={showPassword}
+                  setShowPassword={setShowPassword}
+                />
+              </FormGroup>
+            )}
             <FormGroup>
-              <Label>Mot de passe</Label>
-              <Input name="password" type="password" value={values.password} onChange={handleChange} />
+              <Label>Nouveau mot de passe</Label>
+              <PasswordInput
+                InputComponent={Input}
+                name="newPassword"
+                value={values.newPassword}
+                onChange={handleChange}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+              />
+              {Object.keys(codesToHints).map((check, index, array) => {
+                let caption = codesToHints[check];
+                if (index === 0) caption = caption?.capitalize();
+                if (index !== array.length - 1) caption = `${caption}, `;
+                return (
+                  <PasswordHint key={caption} disabled={!checks[check](values.newPassword)}>
+                    {caption}
+                  </PasswordHint>
+                );
+              })}
             </FormGroup>
-          )}
-          <FormGroup>
-            <Label>Nouveau mot de passe</Label>
-            <Input name="newPassword" type="password" value={values.newPassword} onChange={handleChange} />
-            {Object.keys(codesToHints).map((check, index, array) => {
-              let caption = codesToHints[check];
-              if (index === 0) caption = caption?.capitalize();
-              if (index !== array.length - 1) caption = `${caption}, `;
-              return (
-                <PasswordHint key={caption} disabled={!checks[check](values.newPassword)}>
-                  {caption}
-                </PasswordHint>
-              );
-            })}
-          </FormGroup>
-          <FormGroup>
-            <Label>Confirmez le nouveau mot de passe</Label>
-            <Input name="verifyPassword" type="password" value={values.verifyPassword} onChange={handleChange} />
-          </FormGroup>
-          <ButtonCustom title="Mettre à jour" type="submit" color="info" disabled={isSubmitting} onClick={handleSubmit} />
-        </div>
-      );
-    }}
-  </Formik>
-);
+            <FormGroup>
+              <Label>Confirmez le nouveau mot de passe</Label>
+              <PasswordInput
+                InputComponent={Input}
+                value={values.verifyPassword}
+                name="verifyPassword"
+                onChange={handleChange}
+                showPassword={showPassword}
+                setShowPassword={setShowPassword}
+              />
+            </FormGroup>
+            <ButtonCustom title="Mettre à jour" type="submit" color="info" disabled={isSubmitting} onClick={handleSubmit} />
+          </div>
+        );
+      }}
+    </Formik>
+  );
+};
 
 const PasswordHint = styled.span`
   font-size: 11px;

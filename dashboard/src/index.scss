@@ -172,7 +172,7 @@ input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
-  -webkit-box-shadow: 0 0 0 30px #49c3a666 inset !important;
+  -webkit-box-shadow: 0 0 0 30px rgba(222, 243, 237, 1) inset !important;
 }
 $theme-colors: (
   'primary': #49c3a6,

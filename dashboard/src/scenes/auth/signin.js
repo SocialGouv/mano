@@ -4,13 +4,14 @@ import { Formik, Field } from 'formik';
 import validator from 'validator';
 import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import { version } from '../../../package.json';
 import API from '../../services/api';
 import AuthContext from '../../contexts/auth';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import RefreshContext from '../../contexts/refresh';
+import PasswordInput from '../../components/PasswordInput';
 
 const SignIn = () => {
   const { setAuth, setCurrentTeam, resetAuth, user } = useContext(AuthContext);
@@ -19,6 +20,7 @@ const SignIn = () => {
   const [showErrors, setShowErrors] = useState(false);
   const [showSelectTeam, setShowSelectTeam] = useState(false);
   const [showEncryption, setShowEncryption] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   const onSigninValidated = ({ organisation }) => {
     if (!!organisation?.receptionEnabled) {
@@ -126,13 +128,15 @@ const SignIn = () => {
               </StyledFormGroup>
               <StyledFormGroup>
                 <div>
-                  <InputField
+                  <PasswordInput
+                    InputComponent={InputField}
                     validate={(v) => validator.isEmpty(v) && 'Ce champ est obligatoire'}
                     name="password"
-                    type="password"
                     id="password"
                     value={values.password}
                     onChange={handleChangeRequest}
+                    setShowPassword={setShowPassword}
+                    showPassword={showPassword}
                   />
                   <label htmlFor="password">Mot de passe</label>
                 </div>
@@ -144,15 +148,18 @@ const SignIn = () => {
               {!!showEncryption && (
                 <StyledFormGroup>
                   <div>
-                    <InputField
+                    <PasswordInput
+                      InputComponent={InputField}
                       validate={(v) => validator.isEmpty(v) && 'Ce champ est obligatoire'}
                       name="orgEncryptionKey"
-                      type="search"
+                      type="search" // for the delete button
                       autoComplete="off"
                       id="orgEncryptionKey"
                       autoFocus
                       value={values.orgEncryptionKey}
                       onChange={handleChangeRequest}
+                      showPassword={showPassword}
+                      setShowPassword={setShowPassword}
                     />
                     <label htmlFor="orgEncryptionKey">Clé de chiffrement d'organisation</label>
                   </div>
@@ -217,30 +224,34 @@ const InputField = styled(Field)`
   padding: 0.625rem;
   margin-bottom: 0.375rem;
   border-radius: 4px;
-  border: 1px solid #a7b0b7;
+  border: 1px solid #49c3a6;
   color: #252b2f;
   -webkit-transition: border 0.2s ease;
   transition: border 0.2s ease;
   line-height: 1.2em;
   &:focus {
     outline: none;
-    border: 1px solid ${theme.main}CC;
+    border: 1px solid ${theme.main}EE;
     & + label {
       color: ${theme.main}CC;
     }
   }
 
   &#orgEncryptionKey {
-    font-family: password;
-    font-size: 9px;
-    line-height: 18px;
-    letter-spacing: 1.2px;
+    ${(props) => !props.showPassword && encryptedFontCss}
   }
+`;
+
+const encryptedFontCss = css`
+  font-family: password;
+  font-size: 9px;
+  line-height: 18px;
+  letter-spacing: 1.2px;
 `;
 
 const StyledFormGroup = styled(FormGroup)`
   margin-bottom: 25px;
-  div {
+  > div {
     display: flex;
     flex-direction: column-reverse;
   }
