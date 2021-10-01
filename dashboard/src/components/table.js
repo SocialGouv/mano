@@ -46,7 +46,7 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
             <tr onClick={() => (onRowClick ? onRowClick(item) : null)} key={item[rowKey] || item._id}>
               {columns.map((column) => {
                 return (
-                  <td className="table-cell" key={item[rowKey] + column.dataKey + item[column.dataKey]}>
+                  <td className="table-cell" key={item[rowKey] + column.dataKey}>
                     {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
                   </td>
                 );

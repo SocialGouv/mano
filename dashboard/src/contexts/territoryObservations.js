@@ -1,13 +1,18 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
+import AuthContext from './auth';
 
 const TerritoryObservationsContext = React.createContext();
 
 export const TerritoryObservationsProvider = ({ children }) => {
   const [state, setState] = useState({ territoryObservations: [], obsKey: 0, loading: true });
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
+
+  const { organisation } = useContext(AuthContext);
+
+  const customFieldsObs = organisation.customFieldsObs ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields;
 
   const setTerritoryObs = (territoryObservations) => {
     if (territoryObservations) {
@@ -65,7 +70,7 @@ export const TerritoryObservationsProvider = ({ children }) => {
 
   const addTerritoryObs = async (obs) => {
     try {
-      const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(obs) });
+      const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
       if (res.ok) {
         setState(({ territoryObservations, obsKey, ...s }) => ({
           ...s,
@@ -82,7 +87,7 @@ export const TerritoryObservationsProvider = ({ children }) => {
 
   const updateTerritoryObs = async (obs) => {
     try {
-      const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(obs) });
+      const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
       if (res.ok) {
         setState(({ territoryObservations, obsKey, ...s }) => ({
           ...s,
@@ -104,6 +109,7 @@ export const TerritoryObservationsProvider = ({ children }) => {
     <TerritoryObservationsContext.Provider
       value={{
         ...state,
+        customFieldsObs,
         refreshTerritoryObs,
         setTerritoryObs,
         deleteTerritoryObs,
@@ -117,21 +123,61 @@ export const TerritoryObservationsProvider = ({ children }) => {
 
 export default TerritoryObservationsContext;
 
-const encryptedFields = [
-  'persons',
-  'personsMale',
-  'personsFemale',
-  'police',
-  'material',
-  'atmosphere',
-  'mediation',
-  'comment',
-  'team',
-  'user',
-  'territory',
+export const defaultCustomFields = [
+  {
+    name: 'personsMale',
+    label: 'Nombre de personnes non connues hommes rencontrées',
+    type: 'number',
+    enabled: true,
+    required: true,
+  },
+  {
+    name: 'personsFemale',
+    label: 'Nombre de personnes non connues femmes rencontrées',
+    type: 'number',
+    enabled: true,
+    required: true,
+  },
+  {
+    name: 'police',
+    label: 'Présence policière',
+    type: 'yes-no',
+    enabled: true,
+    required: true,
+  },
+  {
+    name: 'material',
+    label: 'Nombre de matériel ramassé',
+    type: 'number',
+    enabled: true,
+    required: true,
+  },
+  {
+    name: 'atmosphere',
+    label: 'Ambiance',
+    options: ['Violences', 'Tensions', 'RAS'],
+    type: 'enum',
+    enabled: true,
+    required: true,
+  },
+  {
+    name: 'mediation',
+    label: 'Nombre de médiations avec les riverains / les structures',
+    type: 'number',
+    enabled: true,
+    required: true,
+  },
+  {
+    name: 'comment',
+    label: 'Commentaire',
+    type: 'text',
+    enabled: true,
+    required: true,
+  },
 ];
 
-export const prepareObsForEncryption = (obs) => {
+export const prepareObsForEncryption = (customFields) => (obs) => {
+  const encryptedFields = customFields.map((f) => f.name);
   const decrypted = {};
   for (let field of encryptedFields) {
     decrypted[field] = obs[field];
@@ -149,12 +195,4 @@ export const prepareObsForEncryption = (obs) => {
   };
 };
 
-export const observationsKeyLabels = {
-  personsMale: 'Nombre de personnes non connues hommes rencontrées',
-  personsFemale: 'Nombre de personnes non connues femmes rencontrées',
-  police: 'Présence policière',
-  material: 'Nombre de matériel ramassé',
-  atmosphere: 'Ambiance',
-  mediation: 'Nombre de médiations avec les riverains / les structures',
-  comment: 'Commentaire',
-};
+export const observationsKeyLabels = defaultCustomFields.map((f) => f.name);

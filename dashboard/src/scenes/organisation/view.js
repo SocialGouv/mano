@@ -15,6 +15,8 @@ import SelectCustom from '../../components/SelectCustom';
 import AuthContext from '../../contexts/auth';
 import { actionsCategories } from '../../contexts/actions';
 import styled from 'styled-components';
+import { defaultCustomFields } from '../../contexts/territoryObservations';
+import TableCustomeFields from '../../components/TableCustomFields';
 
 const View = () => {
   const { organisation, setAuth } = useContext(AuthContext);
@@ -79,7 +81,7 @@ const View = () => {
                   <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
                 </div>
                 <hr />
-                <Title>Réglage de l'accueil de jour</Title>
+                <Title>Réglage de l'Accueil de jour</Title>
                 <Row>
                   <Col md={12}>
                     <FormGroup>
@@ -108,6 +110,13 @@ const View = () => {
                   <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
                 </div>
                 <hr />
+                <Title>Réglage des Observations</Title>
+                <Row>
+                  <TableCustomeFields
+                    customFields="customFieldsObs"
+                    data={organisation.customFieldsObs ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields}
+                  />
+                </Row>
               </React.Fragment>
             );
           }}
