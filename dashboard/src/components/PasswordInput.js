@@ -15,6 +15,7 @@ const InputWithEye = styled.div`
   align-items: center;
   position: relative;
   margin-bottom: 0.375rem;
+  cursor: pointer;
 
   > input {
     margin-bottom: 0;
