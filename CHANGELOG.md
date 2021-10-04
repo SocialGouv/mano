@@ -1,3 +1,10 @@
+## [1.12.1](https://github.com/SocialGouv/mano/compare/v1.12.0...v1.12.1) (2021-10-04)
+
+
+### Bug Fixes
+
+* access person from actions list ([#79](https://github.com/SocialGouv/mano/issues/79)) ([c704ef0](https://github.com/SocialGouv/mano/commit/c704ef0884d41080febd22e5eaf94949833cf450))
+
 # [1.12.0](https://github.com/SocialGouv/mano/compare/v1.11.3...v1.12.0) (2021-10-04)
 
 
