@@ -1,5 +1,5 @@
 name: Deactivate
-description: "Delete review branch environment and database"
+
 on:
   pull_request:
     types: [closed]
