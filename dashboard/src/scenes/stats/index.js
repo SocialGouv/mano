@@ -140,7 +140,7 @@ const Stats = () => {
         )}
       </Row>
       <Nav tabs style={{ marginBottom: 20 }}>
-        {['Général', 'Actions', 'Personnes suivies', 'Observations'].map((tabCaption, index) => (
+        {['Général', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'].map((tabCaption, index) => (
           <NavItem key={index} style={{ cursor: 'pointer' }}>
             <NavLink key={index} className={`${activeTab === index && 'active'}`} onClick={() => setActiveTab(index)}>
               {tabCaption}
@@ -243,6 +243,17 @@ const Stats = () => {
             <CustomResponsivePie title="Présence policière" data={getPieData(observations, 'police')} />
             <CustomResponsivePie title="Ambiance" data={getPieData(observations, 'atmosphere', { options: ['Violences', 'Tensions', 'RAS'] })} />
           </Row>
+        </TabPane>
+        <TabPane tabId={4}>
+          <Title>Statistiques des comptes-rendus</Title>
+          <CustomResponsivePie
+            title="Répartition des comptes-rendus par collaboration"
+            data={getPieData(
+              reports.filter((r) => r.team === currentTeam._id),
+              'collaboration',
+              { options: organisation.collaborations || [] }
+            )}
+          />
         </TabPane>
       </TabContent>
     </Container>

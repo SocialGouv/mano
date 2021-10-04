@@ -62,9 +62,24 @@ router.put(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") return res.status(403).send({ ok: false, error: "Forbidden" });
-    const result = await Organisation.update(req.body, { where: { _id: req.params._id }, returning: true });
-    if (result[0] === 0) return res.status(404).send({ ok: false, error: "Not Found" });
-    return res.status(200).send({ ok: true, data: result[1][0] });
+
+    const query = { where: { _id: req.params._id } };
+    const organisation = await Organisation.findOne(query);
+    if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    const updateOrg = {};
+
+    if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
+    if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
+    if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
+    if (req.body.hasOwnProperty("encryptionEnabled")) updateOrg.encryptionEnabled = req.body.encryptionEnabled;
+    if (req.body.hasOwnProperty("encryptionLastUpdateAt")) updateOrg.encryptionLastUpdateAt = req.body.encryptionLastUpdateAt;
+    if (req.body.hasOwnProperty("receptionEnabled")) updateOrg.receptionEnabled = req.body.receptionEnabled;
+    if (req.body.hasOwnProperty("services")) updateOrg.services = req.body.services;
+
+    await organisation.update(updateOrg);
+
+    return res.status(200).send({ ok: true, data: organisation });
   })
 );
 
