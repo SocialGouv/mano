@@ -2,15 +2,14 @@ name: Deactivate
 
 on:
   pull_request:
-    types: [ closed ]
-    
+    types: [closed]
 jobs:
-
   deactivate:
     name: Deactivate review branch
     runs-on: ubuntu-latest
     steps:
-
-    - uses: SocialGouv/actions/k8s-deactivate@v1
-      with:
-        kube-config: ${{ secrets.KUBECONFIG  }}
+      - uses: SocialGouv/actions/k8s-deactivate@v1
+        with:
+          kube-config: ${{ secrets.KUBECONFIG  }}
+          rancherId: ${{ secrets.RANCHER_PROJECT_ID }}
+          socialgouvBaseDomain: ${{ secrets.SOCIALGOUV_BASE_DOMAIN }}
