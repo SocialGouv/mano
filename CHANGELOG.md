@@ -1,3 +1,10 @@
+## [1.12.2](https://github.com/SocialGouv/mano/compare/v1.12.1...v1.12.2) (2021-10-04)
+
+
+### Bug Fixes
+
+* **docker:** use nginx image ([#83](https://github.com/SocialGouv/mano/issues/83)) ([628c006](https://github.com/SocialGouv/mano/commit/628c006c7a600a4d9c2abb063d7512a5e7b52b68))
+
 ## [1.12.1](https://github.com/SocialGouv/mano/compare/v1.12.0...v1.12.1) (2021-10-04)
 
 
