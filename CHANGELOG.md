@@ -1,3 +1,15 @@
+# [1.12.0](https://github.com/SocialGouv/mano/compare/v1.11.3...v1.12.0) (2021-10-04)
+
+
+### Bug Fixes
+
+* collaborations ([#78](https://github.com/SocialGouv/mano/issues/78)) ([cd4e5ef](https://github.com/SocialGouv/mano/commit/cd4e5ef44adb3b6b3f9fa5ec47616ee7bd25bbac))
+
+
+### Features
+
+* can make passwords visible ([#81](https://github.com/SocialGouv/mano/issues/81)) ([dfd7884](https://github.com/SocialGouv/mano/commit/dfd7884bebad0d3103c14ffc838ccadda43419f6))
+
 ## [1.11.3](https://github.com/SocialGouv/mano/compare/v1.11.2...v1.11.3) (2021-09-29)
 
 
