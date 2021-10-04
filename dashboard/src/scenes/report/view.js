@@ -286,7 +286,19 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
               },
             },
             { title: 'Nom', dataKey: 'name' },
-            { title: 'Personne suivie', dataKey: 'person', render: (action) => <span>{action.person?.name || ''}</span> },
+            {
+              title: 'Personne suivie',
+              dataKey: 'person',
+              render: (action) => (
+                <BoldOnHover
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (action.person?._id) history.push(`/person/${action.person?._id}`);
+                  }}>
+                  {action.person?.name || ''}
+                </BoldOnHover>
+              ),
+            },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
@@ -344,7 +356,19 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
               },
             },
             { title: 'Nom', dataKey: 'name' },
-            { title: 'Personne suivie', dataKey: 'person', render: (action) => (action.person ? action.person.name : '') },
+            {
+              title: 'Personne suivie',
+              dataKey: 'person',
+              render: (action) => (
+                <BoldOnHover
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (action.person?._id) history.push(`/person/${action.person?._id}`);
+                  }}>
+                  {action.person?.name || ''}
+                </BoldOnHover>
+              ),
+            },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt) },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
@@ -354,6 +378,13 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
     </>
   );
 };
+
+const BoldOnHover = styled.span`
+  &:hover {
+    font-weight: bold;
+    cursor: zoom-in;
+  }
+`;
 
 const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) => {
   const history = useHistory();

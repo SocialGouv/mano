@@ -22,6 +22,7 @@ import { filterBySearch } from '../search/utils';
 import { ActionsSelectorsContext } from '../../contexts/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
+import styled from 'styled-components';
 
 const filterActions = (actions, { page, limit, status, currentTeam, search }) => {
   if (status) actions = actions.filter((a) => a.status === status);
@@ -134,6 +135,15 @@ const List = () => {
               {
                 title: 'Personne suivie',
                 dataKey: 'personName',
+                render: (action) => (
+                  <BoldOnHover
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      if (action.person) history.push(`/person/${action.person}`);
+                    }}>
+                    {action.personName}
+                  </BoldOnHover>
+                ),
               },
               { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
               { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -145,5 +155,12 @@ const List = () => {
     </Container>
   );
 };
+
+const BoldOnHover = styled.span`
+  &:hover {
+    font-weight: bold;
+    cursor: zoom-in;
+  }
+`;
 
 export default List;
