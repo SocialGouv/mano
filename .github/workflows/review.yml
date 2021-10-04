@@ -282,7 +282,7 @@ jobs:
         run: kubectl create -f namespace.yml || true
 
       - name: Deploy application
-        run: kapp --dangerous-override-ownership-of-existing-resources -y deploy -a ${{ env.project }} --namespace ${{ env.namespace }} -f manifests.yml
+        run: kubectl apply --namespace ${{ env.namespace }} -f manifests.yml
 
       - name: Notify deployment end
         uses: bobheadxi/deployments@v0.6.0
