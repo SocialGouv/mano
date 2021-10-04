@@ -2,88 +2,14 @@ name: Deactivate
 description: "Delete review branch environment and database"
 on:
   pull_request:
-    types: [ closed ]
+    types: [closed]
 jobs:
   deactivate:
     name: Deactivate review branch
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v2
-
-      - name: Load environment variables
-        shell: bash
-        run: |
-          cat ".github/dev.env" >> $GITHUB_ENV
-
-      - name: Yarn cache setup
-        uses: c-hive/gha-yarn-cache@v1
+      - uses: SocialGouv/actions/k8s-deactivate@v1
         with:
-          directory: .k8s
-
-
-      - name: Install kosko-charts dependencies
-        shell: bash
-        run: yarn --cwd .k8s install --frozen-lockfile --prefer-offline
-
-      - name: Generate k8s namespace
-        shell: bash
-        run: |
-          GITHUB_REF=$GITHUB_HEAD_REF
-          yarn --cwd .k8s --silent generate --env dev _namespace > namespace-dev.yml
-        env:
-          RANCHER_PROJECT_ID: ${{ env.RANCHER_PROJECT_ID }}
-          SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
-
-      - name: Get namespace name
-        uses: mikefarah/yq@master
-        id: namespace
-        with:
-          cmd: yq eval '.metadata.name' namespace-dev.yml
-
-      - name: Inject slug/short variables
-        uses: rlespinasse/github-slug-action@3.5.1
-
-      - name: Get branch, project and namespace names
-        shell: bash
-        run: |
-          echo "branch=${GITHUB_HEAD_REF_SLUG_URL}" >> $GITHUB_ENV
-          echo "project=${GITHUB_REPOSITORY_NAME_PART_SLUG_URL}" >> $GITHUB_ENV
-          echo "namespace=${NAMESPACE}" >> $GITHUB_ENV
-        env:
-          NAMESPACE: ${{ steps.namespace.outputs.result }}
-
-      - name: Get branch, project and namespace names
-        shell: bash
-        run: |
-          echo "branch : ${{ env.branch }}" 
-          echo "project : ${{ env.project }}" 
-          echo "namespace : ${{ env.namespace }}"
-      - name: Install Kapp
-        uses: vmware-tanzu/carvel-setup-action@v1
-        with:
-          only: kapp
-          token: ${{ github.token }}
-
-      - name: Debug kapp version
-        shell: bash
-        run: kapp --version
-
-      - name: Create kubernetes config
-        shell: bash
-        run: |
-          mkdir ~/.kube
-          echo "${{ secrets.KUBECONFIG }}" | base64 -d > ~/.kube/config
-      - name: Delete k8s environment
-        shell: bash
-        run: |
-          echo "kubectl delete -f ./namespace-dev.yml"
-          kubectl delete -f ./namespace-dev.yml || true
-          echo "🪦"
-      - name: Mark environment as deactivated
-        uses: bobheadxi/deployments@v0.4.3
-        with:
-          step: deactivate-env
-          token: ${{ github.token }}
-          env: ${{ steps.namespace.outputs.result }}
-          desc: "Environment ${{ env.namespace }} has been deactivated"
+          kube-config: ${{ secrets.KUBECONFIG  }}
+          rancherId: ${{ secrets.RANCHER_PROJECT_ID }}
+          socialgouvBaseDomain: ${{ secrets.SOCIALGOUV_BASE_DOMAIN }}
