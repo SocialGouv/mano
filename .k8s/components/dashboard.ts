@@ -16,12 +16,12 @@ const manifests = create("dashboard", {
     container: {
       resources: {
         requests: {
-          cpu: "10m",
-          memory: "64Mi",
+          cpu: "100m",
+          memory: "128Mi",
         },
         limits: {
-          cpu: "200m",
-          memory: "128Mi",
+          cpu: "500m",
+          memory: "256Mi",
         },
       },
       startupProbe: {

@@ -3,7 +3,7 @@ import { ok } from "assert";
 
 import { Deployment } from "kubernetes-models/apps/v1/Deployment";
 
-import environments from "@socialgouv/kosko-charts/environments"
+import environments from "@socialgouv/kosko-charts/environments";
 import { create } from "@socialgouv/kosko-charts/components/app";
 import { addInitContainerCommand } from "@socialgouv/kosko-charts/utils";
 
@@ -25,12 +25,12 @@ export default async () => {
       container: {
         resources: {
           requests: {
-            cpu: "100m",
-            memory: "128Mi",
+            cpu: "250m",
+            memory: "256Mi",
           },
           limits: {
-            cpu: "500m",
-            memory: "512Mi",
+            cpu: "1",
+            memory: "1Gi",
           },
         },
       },
@@ -44,7 +44,7 @@ export default async () => {
   if (env.env === "dev") {
     const deployment = getDeployment(manifests);
     ok(deployment);
-    const ciEnv = environments(process.env)
+    const ciEnv = environments(process.env);
 
     addInitContainerCommand(deployment, {
       command: ["yarn"],
