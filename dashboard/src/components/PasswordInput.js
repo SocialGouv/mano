@@ -4,7 +4,7 @@ import EyeIcon from '../assets/icons/EyeIcon';
 
 const PasswordInput = ({ InputComponent, showPassword, setShowPassword, type, ...props }) => (
   <InputWithEye>
-    <InputComponent className={showPassword ? 'show-password' : 'hide-password'} type={showPassword ? 'text' : 'password'} {...props} />
+    <InputComponent className={showPassword ? 'show-password' : 'hide-password'} type={type || showPassword ? 'text' : 'password'} {...props} />
     <EyeIcon strikedThrough={showPassword} onClick={() => setShowPassword(!showPassword)} />
   </InputWithEye>
 );
