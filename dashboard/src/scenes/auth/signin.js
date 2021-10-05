@@ -4,7 +4,7 @@ import { Formik, Field } from 'formik';
 import validator from 'validator';
 import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import { version } from '../../../package.json';
 import API from '../../services/api';
 import AuthContext from '../../contexts/auth';
@@ -237,16 +237,12 @@ const InputField = styled(Field)`
     }
   }
 
-  &#orgEncryptionKey {
-    ${(props) => !props.showPassword && encryptedFontCss}
+  &#orgEncryptionKey.hide-password {
+    font-family: password;
+    font-size: 9px;
+    line-height: 18px;
+    letter-spacing: 1.2px;
   }
-`;
-
-const encryptedFontCss = css`
-  font-family: password;
-  font-size: 9px;
-  line-height: 18px;
-  letter-spacing: 1.2px;
 `;
 
 const StyledFormGroup = styled(FormGroup)`
