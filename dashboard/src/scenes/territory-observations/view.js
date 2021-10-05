@@ -4,10 +4,11 @@ import dayjs from 'dayjs';
 import { Button as CloseButton } from 'reactstrap';
 import AuthContext from '../../contexts/auth';
 import UserName from '../../components/UserName';
-import { observationsKeyLabels } from '../../contexts/territoryObservations';
+import TerritoryObservationsContext from '../../contexts/territoryObservations';
 
 const View = ({ obs, onDelete, onClick, noBorder }) => {
   const { teams } = useContext(AuthContext);
+  const { customFieldsObs } = useContext(TerritoryObservationsContext);
 
   return (
     <StyledObservation noBorder={noBorder}>
@@ -18,27 +19,14 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
       </div>
       <div className="time">{dayjs(obs.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
-        <Item filledUp={!!obs.personsMale}>
-          {observationsKeyLabels.personsMale}: {obs.personsMale}
-        </Item>
-        <Item filledUp={!!obs.personsFemale}>
-          {observationsKeyLabels.personsFemale}: {obs.personsFemale}
-        </Item>
-        <Item filledUp={!!obs.police}>
-          {observationsKeyLabels.police}: {obs.police}
-        </Item>
-        <Item filledUp={!!obs.material}>
-          {observationsKeyLabels.material}: {obs.material}
-        </Item>
-        <Item filledUp={!!obs.atmosphere}>
-          {observationsKeyLabels.atmosphere}: {obs.atmosphere}
-        </Item>
-        <Item filledUp={!!obs.mediation}>
-          {observationsKeyLabels.mediation}: {obs.mediation}
-        </Item>
-        <Item filledUp={!!obs.comment}>
-          {observationsKeyLabels.comment}: {obs.comment?.split('\\n')?.join('\u000A')}
-        </Item>
+        {customFieldsObs.map(({ name, label }) => {
+          console.log(obs, name, obs[name]);
+          return (
+            <Item filledUp={!!obs[name]}>
+              {label}: {obs[name]}
+            </Item>
+          );
+        })}
         <Item></Item>
       </div>
     </StyledObservation>
