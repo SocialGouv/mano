@@ -21,7 +21,7 @@ const Reset = ({ location }) => {
       <ChangePassword
         onSubmit={({ newPassword }) => {
           API.toastr = toastr;
-          API.post({
+          return API.post({
             path: '/user/forgot_password_reset',
             skipEncryption: '/user/forgot_password_reset',
             body: {
