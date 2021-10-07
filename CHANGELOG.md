@@ -1,3 +1,10 @@
+## [1.12.3](https://github.com/SocialGouv/mano/compare/v1.12.2...v1.12.3) (2021-10-07)
+
+
+### Bug Fixes
+
+* error message when resetting password ([#87](https://github.com/SocialGouv/mano/issues/87)) ([589c43d](https://github.com/SocialGouv/mano/commit/589c43d85502b8709309d7e8115ec5d3320962e7))
+
 ## [1.12.2](https://github.com/SocialGouv/mano/compare/v1.12.1...v1.12.2) (2021-10-04)
 
 
