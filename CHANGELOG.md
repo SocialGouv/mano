@@ -1,3 +1,11 @@
+## [1.12.4](https://github.com/SocialGouv/mano/compare/v1.12.3...v1.12.4) (2021-10-11)
+
+
+### Bug Fixes
+
+* **dashboard:** label is clickable ([cd90c73](https://github.com/SocialGouv/mano/commit/cd90c73f2ea33921c629fa564a5776a496d852a0))
+* **style:** remove invalid style ([aaa8d2c](https://github.com/SocialGouv/mano/commit/aaa8d2c1e55694dbfbe223cf4435e7f07b99e0ed))
+
 ## [1.12.3](https://github.com/SocialGouv/mano/compare/v1.12.2...v1.12.3) (2021-10-07)
 
 
