@@ -39,6 +39,7 @@ const ButtonCustom = ({
 
 const STYLES = {
   danger: `background: ${theme.redLight}; color: ${theme.redDark};`,
+  warning: `background: ${theme.orangeLight}; color: ${theme.orangeDark};`,
   primary: `background: ${theme.main}; color: ${theme.white};`,
   secondary: `background: ${theme.black}; color: ${theme.white};`,
   link: `background: transparent; color: ${theme.main};`,

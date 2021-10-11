@@ -38,6 +38,7 @@ import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
 import { toFrenchDate } from '../../utils';
 import AuthContext from '../../contexts/auth';
+import OutOfActiveList from './OutOfActiveList';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
 
@@ -321,6 +322,7 @@ const Summary = ({ person }) => {
               <hr />
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <OutOfActiveList person={person} />
                 <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
               </div>
