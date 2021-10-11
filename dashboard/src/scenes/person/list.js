@@ -83,8 +83,10 @@ const List = () => {
           </div>
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', botrder: '1px solid black' }}>
-          <input type="checkbox" style={{ marginRight: 10 }} value={alertness} onChange={() => setFilterAlertness(!alertness)} />
-          <div>N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière</div>
+          <label>
+            <input type="checkbox" style={{ marginRight: 10 }} value={alertness} onChange={() => setFilterAlertness(!alertness)} />
+            N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
+          </label>
         </Col>
       </Row>
       <Filters base={filterPersonsBase} filters={filters} onChange={setFilters} title="Autres filtres: " />
