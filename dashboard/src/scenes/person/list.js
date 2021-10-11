@@ -22,8 +22,18 @@ import { filterBySearch } from '../search/utils';
 import { displayBirthDate } from '../../services/date';
 import { PersonsSelectorsContext } from '../../contexts/selectors';
 import CreatePerson from './CreatePerson';
+import PlacesContext from '../../contexts/places';
+import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
 
-const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness } = {}) => {
+const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness, relsPersonPlace, places } = {}) => {
+  // First we have to filter persons by places.
+  if (filters?.find((f) => f.field === 'places' && Boolean(f.value))) {
+    const placeNames = filters.filter((f) => f.field === 'places').map((f) => f.value);
+    const placesIds = places.filter((place) => placeNames.includes(place.name)).map((place) => place._id);
+    const personsIds = relsPersonPlace.filter((rel) => placesIds.includes(rel.place)).map((rel) => rel.person);
+    persons = persons.filter((p) => personsIds.includes(p._id));
+    filters = filters.filter((f) => f.field !== 'places');
+  }
   if (!!filters?.filter((f) => Boolean(f?.value)).length) persons = filterData(persons, filters);
   if (search?.length) {
     persons = filterBySearch(search, persons);
@@ -43,10 +53,21 @@ const getData = (persons = [], { page, limit, search, filterTeams, filters, aler
 
 const List = () => {
   const [filters, setFilters] = useState([]);
-
+  const { places } = useContext(PlacesContext);
+  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
   const { personsFullPopulated } = useContext(PersonsSelectorsContext);
   const { organisation, teams } = useContext(AuthContext);
   const history = useHistory();
+
+  // Add places in filters.
+  const filterPersons = [
+    ...filterPersonsBase,
+    {
+      label: 'Lieux fréquentés',
+      field: 'places',
+      options: [...new Set(places.map((place) => place.name))],
+    },
+  ];
 
   const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
 
@@ -54,7 +75,7 @@ const List = () => {
 
   if (!personsFullPopulated) return <Loading />;
 
-  const { data, total } = getData(personsFullPopulated, { page, limit, search, filterTeams, alertness, filters });
+  const { data, total } = getData(personsFullPopulated, { page, limit, search, filterTeams, alertness, filters, relsPersonPlace, places });
 
   return (
     <Container style={{ padding: '40px 0' }}>
@@ -89,7 +110,7 @@ const List = () => {
           </label>
         </Col>
       </Row>
-      <Filters base={filterPersonsBase} filters={filters} onChange={setFilters} title="Autres filtres: " />
+      <Filters base={filterPersons} filters={filters} onChange={setFilters} title="Autres filtres: " />
       <Table
         data={data}
         rowKey={'_id'}
