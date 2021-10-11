@@ -82,7 +82,7 @@ const List = () => {
             <SelectTeamMultiple onChange={setFilterTeams} value={filterTeams} colored />
           </div>
         </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', botrder: '1px solid black' }}>
+        <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
           <label>
             <input type="checkbox" style={{ marginRight: 10 }} value={alertness} onChange={() => setFilterAlertness(!alertness)} />
             N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
