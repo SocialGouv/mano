@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Col, Container, Row } from 'reactstrap';
+import { Badge, Col, Container, Row } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import Header from '../../components/header';
@@ -131,7 +131,22 @@ const List = () => {
                   });
                 },
               },
-              { title: 'Nom', dataKey: 'name' },
+              {
+                title: 'Nom',
+                dataKey: 'name',
+                render: (action) => (
+                  <>
+                    <div>{action.name}</div>
+                    <div>
+                      {action.categories.map((category) => (
+                        <Badge style={{ margin: '0 2px' }} color="info">
+                          {category}
+                        </Badge>
+                      ))}
+                    </div>
+                  </>
+                ),
+              },
               {
                 title: 'Personne suivie',
                 dataKey: 'personName',

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import { Badge, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import { isOnSameDay, theDayAfter, theDayBefore, today } from '../services/date';
@@ -60,7 +60,22 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
             });
           },
         },
-        { title: 'Nom', dataKey: 'name' },
+        {
+          title: 'Nom',
+          dataKey: 'name',
+          render: (action) => (
+            <>
+              <div>{action.name}</div>
+              <div>
+                {action.categories.map((category) => (
+                  <Badge style={{ margin: '0 2px' }} color="info">
+                    {category}
+                  </Badge>
+                ))}
+              </div>
+            </>
+          ),
+        },
         {
           title: 'Personne suivie',
           dataKey: 'person',
