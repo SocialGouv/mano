@@ -68,7 +68,7 @@ const List = () => {
       </Row>
       <Row style={{ marginBottom: 20 }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche: </span>
+          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
           <Search
             placeholder="Par mot clé, présent dans le nom, la description, un commentaire, une action, ..."
             value={search}
@@ -77,7 +77,7 @@ const List = () => {
         </Col>
         <Col md={12} />
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par équipe en charge:</span>
+          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par équipe en charge :</span>
           <div style={{ width: 300 }}>
             <SelectTeamMultiple onChange={setFilterTeams} value={filterTeams} colored />
           </div>
@@ -89,7 +89,7 @@ const List = () => {
           </label>
         </Col>
       </Row>
-      <Filters base={filterPersonsBase} filters={filters} onChange={setFilters} title="Autres filtres: " />
+      <Filters base={filterPersonsBase} filters={filters} onChange={setFilters} title="Autres filtres : " />
       <Table
         data={data}
         rowKey={'_id'}
