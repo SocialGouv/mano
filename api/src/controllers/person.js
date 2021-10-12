@@ -75,10 +75,18 @@ router.get(
     if (!!req.query.limit) query.limit = limit;
     if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
 
+    if (ENCRYPTED_FIELDS_ONLY || req.query.encryptedOnly) {
+      const data = await Person.findAll({
+        where: {
+          organisation: req.user.organisation,
+          encrypted: { [Op.ne]: null },
+        },
+        attributes: ["_id", "encrypted", "encryptedEntityKey"],
+      });
+      return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
+    }
+
     const data = await Person.findAll(query);
-
-    if (ENCRYPTED_FIELDS_ONLY) return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
-
     const teams = await Team.findAll(query);
     const relTeamPersons = await RelPersonTeam.findAll({
       where: {

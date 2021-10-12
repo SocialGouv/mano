@@ -36,6 +36,8 @@ class ApiService {
         };
       }
 
+      if (this.enableEncrypt && !skipEncryption) query = { ...query, encryptedOnly: '1' };
+
       const url = this.getUrl(path, query);
       const response = await fetch(url, options);
 
