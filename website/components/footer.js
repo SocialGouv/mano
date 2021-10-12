@@ -8,8 +8,8 @@ export default function Footer() {
   const [emailMaxime, setEmailMaxime] = useState("");
 
   useEffect(() => {
-    setEmailGuillaume(window.atob(maxime));
-    setEmailMaxime(window.atob(guillaume));
+    setEmailGuillaume(window.atob(guillaume));
+    setEmailMaxime(window.atob(maxime));
   }, []);
   return (
     <>
