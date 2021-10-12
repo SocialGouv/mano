@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Container, FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink } from 'reactstrap';
+import { Container, FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -65,6 +65,11 @@ const View = () => {
         {`Dossier de ${person?.name}`}
         <UserName id={person.user} wrapper={(name) => ` (créée par ${name})`} />
       </Title>
+      {person.outOfActiveList && (
+        <Alert color="warning">
+          {person?.name} est en dehors de la file active, pour le motif suivant : <b>{person.outOfActiveListReason}</b>
+        </Alert>
+      )}
       <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }}>
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
