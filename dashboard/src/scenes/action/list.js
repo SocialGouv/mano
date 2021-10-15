@@ -71,23 +71,23 @@ const List = () => {
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche: </span>
+          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
           <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par équipe en charge:</span>
+          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par équipe en charge :</span>
           <div style={{ width: 300 }}>
             <SelectTeam onChange={setCurrentTeam} teamId={currentTeam?._id} teams={user.role === 'admin' ? teams : user.teams} />
           </div>
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par status: </span>
+          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par status : </span>
           <div style={{ width: 300 }}>
             <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
           </div>
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Afficher par: </span>
+          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Afficher par : </span>
           <div style={{ width: 300 }}>
             <SelectCustom
               onChange={setShowAs}
