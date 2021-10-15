@@ -26,6 +26,19 @@ const passwordCheckError =
   "Le mot de passe n'est pas valide. Il doit comprendre 6 caractères, au moins une lettre, un chiffre et un caractère spécial";
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
+const COOKIE_MAX_AGE = JWT_MAX_AGE * 1000;
+
+function cookieOptions() {
+  if (config.ENVIRONMENT === "development") {
+    return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, sameSite: "None" };
+  } else {
+    return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
+  }
+}
+
+function logoutCookieOptions() {
+  return { httpOnly: true, secure: true, sameSite: "None" };
+}
 
 router.get(
   "/me",
@@ -35,6 +48,15 @@ router.get(
     const teams = await user.getTeams();
     const organisation = await user.getOrganisation();
     return res.status(200).send({ ok: true, user: { ...user.toJSON(), teams, organisation } });
+  })
+);
+
+router.post(
+  "/logout",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res) => {
+    res.clearCookie("jwt", logoutCookieOptions());
+    return res.status(200).send({ ok: true });
   })
 );
 
@@ -60,6 +82,23 @@ router.post(
     const teams = userTeams.map((rel) => orgTeams.find((t) => t._id === rel.team));
 
     const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
+    res.cookie("jwt", token, cookieOptions());
+
+    return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
+  })
+);
+
+router.get(
+  "/signin-token",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res) => {
+    const token = req.cookies.jwt;
+    const user = await User.findOne({ where: { _id: req.user._id } });
+
+    const organisation = await user.getOrganisation();
+    const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
+    const userTeams = await RelUserTeam.findAll({ where: { user: user._id, team: { [Op.in]: orgTeams.map((t) => t._id) } } });
+    const teams = userTeams.map((rel) => orgTeams.find((t) => t._id === rel.team));
 
     return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
   })
