@@ -1,3 +1,10 @@
+## [1.12.5](https://github.com/SocialGouv/mano/compare/v1.12.4...v1.12.5) (2021-10-15)
+
+
+### Bug Fixes
+
+* remove React does not recognize the showPassword prop on a DOM element warning ([#86](https://github.com/SocialGouv/mano/issues/86)) ([97cb377](https://github.com/SocialGouv/mano/commit/97cb37738d83131e6ae418cc83dfbabc4a93a830))
+
 ## [1.12.4](https://github.com/SocialGouv/mano/compare/v1.12.3...v1.12.4) (2021-10-11)
 
 
