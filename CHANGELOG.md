@@ -1,3 +1,10 @@
+## [1.12.6](https://github.com/SocialGouv/mano/compare/v1.12.5...v1.12.6) (2021-10-15)
+
+
+### Bug Fixes
+
+* **dashboard:** due at in action ([#95](https://github.com/SocialGouv/mano/issues/95)) ([18e6f50](https://github.com/SocialGouv/mano/commit/18e6f5065ccf9e28ce16413bec8b2aadd07d4431))
+
 ## [1.12.5](https://github.com/SocialGouv/mano/compare/v1.12.4...v1.12.5) (2021-10-15)
 
 
