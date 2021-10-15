@@ -1,17 +1,16 @@
-import React from "react";
-import styled from "styled-components";
+import React from 'react';
+import styled from 'styled-components';
 
-const ShowDate = ({ date }) => {
+const DateBloc = ({ date }) => {
   if (!date) return <div />;
-  const d = new Date(date);
-  const utcDate = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate(), d.getHours(), d.getMinutes(), 0, 0));
+  date = new Date(date);
   return (
     <Container>
-      <DayText>{date && utcDate.toLocaleString("fr-FR", { weekday: "long" })}</DayText>
-      <DayNum>{date && utcDate.getDate()}</DayNum>
+      <DayText>{date && date.toLocaleString('fr-FR', { weekday: 'long' })}</DayText>
+      <DayNum>{date && date.getDate()}</DayNum>
       <MonthText>
-        {date && utcDate.toLocaleString("fr-FR", { month: "long" })}
-        {date && utcDate.getFullYear() !== new Date().getFullYear() && `\u00A0${utcDate.getFullYear()}`}
+        {date && date.toLocaleString('fr-FR', { month: 'long' })}
+        {date && date.getFullYear() !== new Date().getFullYear() && `\u00A0${date.getFullYear()}`}
       </MonthText>
     </Container>
   );
@@ -49,4 +48,4 @@ const DayText = styled.span`
   font-size: 14px;
 `;
 
-export default ShowDate;
+export default DateBloc;
