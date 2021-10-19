@@ -23,6 +23,7 @@ import { ActionsSelectorsContext } from '../../contexts/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import styled from 'styled-components';
+import ActionName from '../../components/ActionName';
 
 const filterActions = (actions, { page, limit, status, currentTeam, search }) => {
   if (status) actions = actions.filter((a) => a.status === status);
@@ -134,18 +135,7 @@ const List = () => {
               {
                 title: 'Nom',
                 dataKey: 'name',
-                render: (action) => (
-                  <>
-                    <div>{action.name}</div>
-                    <div>
-                      {action.categories.map((category) => (
-                        <Badge style={{ margin: '0 2px' }} color="info">
-                          {category}
-                        </Badge>
-                      ))}
-                    </div>
-                  </>
-                ),
+                render: (action) => <ActionName action={action} />,
               },
               {
                 title: 'Personne suivie',
