@@ -51,7 +51,7 @@ const List = () => {
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche: </span>
+          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
           <Search placeholder="Par mot clé, présent dans le nom, une observation, ..." value={search} onChange={setSearch} />
         </Col>
       </Row>

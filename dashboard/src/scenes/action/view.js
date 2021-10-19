@@ -86,7 +86,7 @@ const View = () => {
                           selected={values.dueAt ? new Date(values.dueAt) : new Date()}
                           onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
                           dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
-                          showTimeInput
+                          showTimeInput={values.withTime}
                         />
                       </div>
                     </FormGroup>
