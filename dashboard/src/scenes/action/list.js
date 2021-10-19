@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Badge, Col, Container, Row } from 'reactstrap';
+import { Col, Container, Row } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import Header from '../../components/header';

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Badge, Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
+import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import { isOnSameDay, theDayAfter, theDayBefore, today } from '../services/date';
