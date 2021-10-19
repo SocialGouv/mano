@@ -57,6 +57,7 @@
     "react-native-device-info": "^8.0.6",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-keychain": "^6.2.0",
+    "react-native-mmkv-storage": "^0.6.6",
     "react-native-pager-view": "^5.1.2",
     "react-native-pdf": "^6.3.0",
     "react-native-reanimated": "^2.0.0",

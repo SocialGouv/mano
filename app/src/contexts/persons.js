@@ -6,6 +6,7 @@ import { capture } from '../services/sentry';
 import ActionsContext from './actions';
 import CommentsContext from './comments';
 import RelsPersonPlaceContext from './relPersonPlace';
+import MMKVStorage from 'react-native-mmkv-storage';
 
 const PersonsContext = React.createContext();
 
@@ -14,25 +15,39 @@ export const PersonsProvider = ({ children }) => {
   const { actions, deleteAction } = useContext(ActionsContext);
   const { relsPersonPlace, deleteRelation } = useContext(RelsPersonPlaceContext);
 
-  const [state, setState] = useState({ personKey: 0, persons: [], encrypted: [], loading: false, lastRefresh: undefined });
+  const [state, setState] = useState({ personKey: 0, persons: [], loading: false, lastRefresh: undefined });
 
-  const setPersons = (persons, encrypted) => {
+  const MMKV = new MMKVStorage.Loader().initialize();
+
+  const setPersons = (persons, encrypted, lastRefresh = Date.now()) => {
+    console.log('setPersons', lastRefresh, persons.length);
     persons = persons.sort(sortPersons);
-    setState(({ personKey }) => ({ persons, encrypted, personKey: personKey + 1, loading: false, lastRefresh: Date.now() }));
+    setState(({ personKey }) => ({ persons, encrypted, personKey: personKey + 1, loading: false, lastRefresh }));
   };
 
-  const refreshPersons = async (setProgress, initialLoad) => {
+  const refreshPersons = async (setProgress, initialLoad = false) => {
     setState((state) => ({ ...state, loading: true }));
-    if (!!initialLoad && !state.lastRefresh) {
-      const response = await API.get({ path: '/person', batch: 1000, setProgress });
-      if (!response.ok) {
-        capture('error getting persons', { extra: { response } });
-        setState((state) => ({ ...state, loading: false }));
-        return false;
+    const localData = await MMKV.getMapAsync('persons');
+    if (initialLoad) {
+      if (localData) {
+        const lastRefresh = localData.map((person) => person.updatedAt).reduce((a, b) => (a > b ? a : b));
+        setPersons(localData, [], new Date(lastRefresh).getTime());
+        return true;
       }
-      setPersons(response.decryptedData, response.data);
-      return true;
+      if (!state.lastRefresh) {
+        const response = await API.get({ path: '/person', batch: 1000, setProgress });
+        if (!response.ok) {
+          capture('error getting persons', { extra: { response } });
+          setState((state) => ({ ...state, loading: false }));
+          return false;
+        }
+        await MMKV.setMapAsync('persons', response.decryptedData);
+        await MMKV.setStringAsync('string', 'string');
+        setPersons(response.decryptedData, response.data);
+        return true;
+      }
     }
+
     const response = await API.get({ path: '/person', query: { lastRefresh: state.lastRefresh } });
     if (!response.ok) {
       capture('error refreshing persons', { extra: { response } });
@@ -40,6 +55,8 @@ export const PersonsProvider = ({ children }) => {
       return false;
     }
     if (response.decryptedData) {
+      const merged = mergeNewUpdatedData(response.decryptedData, state.persons);
+      await MMKV.setMapAsync('persons', merged);
       setPersons(mergeNewUpdatedData(response.decryptedData, state.persons), mergeNewUpdatedData(response.data, state.encrypted));
       return true;
     }
