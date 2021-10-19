@@ -25,15 +25,8 @@ import CreatePerson from './CreatePerson';
 import PlacesContext from '../../contexts/places';
 import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
 
-const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness, relsPersonPlace, places } = {}) => {
+const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness } = {}) => {
   // First we have to filter persons by places.
-  if (filters?.find((f) => f.field === 'places' && Boolean(f.value))) {
-    const placeNames = filters.filter((f) => f.field === 'places').map((f) => f.value);
-    const placesIds = places.filter((place) => placeNames.includes(place.name)).map((place) => place._id);
-    const personsIds = relsPersonPlace.filter((rel) => placesIds.includes(rel.place)).map((rel) => rel.person);
-    persons = persons.filter((p) => personsIds.includes(p._id));
-    filters = filters.filter((f) => f.field !== 'places');
-  }
   if (!!filters?.filter((f) => Boolean(f?.value)).length) persons = filterData(persons, filters);
   if (search?.length) {
     persons = filterBySearch(search, persons);
