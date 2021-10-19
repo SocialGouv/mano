@@ -21,15 +21,14 @@ import TerritoryObservationsContext from '../../contexts/territoryObservations';
 
 class TerritoryObservation extends React.Component {
   castToTerritoryObservation = (territoryObservation = {}) => ({
-    personsMale: territoryObservation.personsMale?.trim() || '',
-    personsFemale: territoryObservation.personsFemale?.trim() || '',
-    police: territoryObservation.police?.trim() || '',
-    material: territoryObservation.material?.trim() || '',
-    atmosphere: territoryObservation.atmosphere?.trim() || '',
-    mediation: territoryObservation.mediation?.trim() || '',
-    comment: territoryObservation.comment?.trim() || '',
+    personsMale: (territoryObservation.personsMale || '').trim(),
+    personsFemale: (territoryObservation.personsFemale || '').trim(),
+    police: (territoryObservation.police || '').trim(),
+    material: (territoryObservation.material || '').trim(),
+    atmosphere: (territoryObservation.atmosphere || '').trim(),
+    mediation: (territoryObservation.mediation || '').trim(),
+    comment: (territoryObservation.comment || '').trim(),
     createdAt: territoryObservation.createdAt || null,
-    user: territoryObservation.user || {},
     entityKey: territoryObservation.entityKey || '',
   });
 
