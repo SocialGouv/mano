@@ -27,8 +27,6 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const { addTerritoryObs, updateTerritoryObs, customFieldsObs } = useContext(TerritoryObservationsContext);
   const { territories } = useContext(TerritoryContext);
 
-  console.log(customFieldsObs.map((c) => c.name));
-
   return (
     <CreateStyle>
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
@@ -49,6 +47,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               for (const customField of customFieldsObs.filter((f) => f.enabled)) {
                 body[customField.name] = values[customField.name];
               }
+              console.log(customFieldsObs, values, body);
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
               actions.setSubmitting(false);
               if (res.ok) {

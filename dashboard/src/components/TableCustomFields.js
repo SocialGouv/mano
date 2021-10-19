@@ -19,7 +19,7 @@ const typeOptions = [
 ];
 
 const newField = () => ({
-  name: `custom-${new Date().toISOString()}`,
+  name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,
   label: '',
   type: 'Texte',
   enabled: false,
@@ -65,11 +65,15 @@ const TableCustomeFields = ({ data, customFields }) => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
-      console.log(mutableData);
+      console.log(
+        mutableData,
+        mutableData.filter((field) => !!field.label.length)
+      );
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
         body: { [customFields]: JSON.stringify(mutableData.filter((field) => !!field.label.length)) },
       });
+      console.log(JSON.parse(response.data[customFields]));
       if (response.ok) {
         toastr.success('Mise à jour !');
         setAuth({ organisation: response.data });
@@ -81,8 +85,6 @@ const TableCustomeFields = ({ data, customFields }) => {
     }
     setIsSubmitting(false);
   };
-
-  console.log(mutableData[mutableData.length - 1]);
 
   return (
     <>

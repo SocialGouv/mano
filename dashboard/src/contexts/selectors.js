@@ -9,7 +9,7 @@ import PlacesContext from './places';
 import RelsPersonPlaceContext from './relPersonPlace';
 import ReportsContext from './reports';
 import TerritoryContext from './territory';
-import TerritoryObservationsContext, { observationsKeyLabels } from './territoryObservations';
+import TerritoryObservationsContext from './territoryObservations';
 
 // we split those "selectors" to help poor machines with heavy calculation
 
@@ -102,9 +102,19 @@ export const TerritoriesSelectorsContext = React.createContext();
 
 export const TerritoriesSelectorsProvider = ({ children }) => {
   const { territories, territoryKey } = useContext(TerritoryContext);
-  const { territoryObservations, obsKey } = useContext(TerritoryObservationsContext);
+  const { territoryObservations, customFieldsObs, obsKey } = useContext(TerritoryObservationsContext);
 
   const [territoriesFullPopulated, setTerritoriesFullPopulated] = useState([]);
+
+  const observationsKeyLabels = {};
+  for (const field of customFieldsObs) {
+    observationsKeyLabels[field.name] = field.label;
+  }
+
+  // the idea is to be able to look for a territory
+  // with the keywords "matériel ramassé" for example
+  // which is the label for the key 'material'
+  //so we replace all the keys by the label associated
 
   useEffect(() => {
     setTerritoriesFullPopulated(

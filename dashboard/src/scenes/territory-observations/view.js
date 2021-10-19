@@ -20,10 +20,15 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
       <div className="time">{dayjs(obs.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
         {customFieldsObs.map(({ name, label }) => {
-          console.log(obs, name, obs[name]);
           return (
             <Item filledUp={!!obs[name]}>
-              {label}: {obs[name]}
+              {label}:{' '}
+              {obs[name]?.split?.('\n')?.map((sentence, index) => (
+                <React.Fragment key={sentence + index}>
+                  {sentence}
+                  <br />
+                </React.Fragment>
+              ))}
             </Item>
           );
         })}
@@ -34,7 +39,7 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
 };
 
 const Item = styled.span`
-  display: block;
+  display: inline-block;
   ${(props) => !props.filledUp && 'opacity: 0.25;'}
 `;
 
