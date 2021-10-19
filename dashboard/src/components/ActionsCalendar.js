@@ -8,6 +8,7 @@ import Table from './table';
 import { toFrenchDate } from '../utils';
 import ActionStatus from './ActionStatus';
 import styled from 'styled-components';
+import ActionName from './ActionName';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Status'] }) => {
   const history = useHistory();
@@ -60,7 +61,11 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
             });
           },
         },
-        { title: 'Nom', dataKey: 'name' },
+        {
+          title: 'Nom',
+          dataKey: 'name',
+          render: (action) => <ActionName action={action} />,
+        },
         {
           title: 'Personne suivie',
           dataKey: 'person',

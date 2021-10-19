@@ -38,6 +38,7 @@ import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
 import { toFrenchDate } from '../../utils';
 import AuthContext from '../../contexts/auth';
+import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
@@ -361,7 +362,7 @@ const Actions = ({ person, onUpdateResults }) => {
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         columns={[
-          { title: 'Nom', dataKey: 'name' },
+          { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
           { title: 'À faire le', dataKey: 'dueAt', render: (action) => toFrenchDate(action.dueAt) },
           {
             title: 'Heure',
