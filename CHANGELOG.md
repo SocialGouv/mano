@@ -1,3 +1,16 @@
+# [1.14.0](https://github.com/SocialGouv/mano/compare/v1.13.0...v1.14.0) (2021-10-19)
+
+
+### Bug Fixes
+
+* **app:** phone number on app ([#99](https://github.com/SocialGouv/mano/issues/99)) ([d58a41f](https://github.com/SocialGouv/mano/commit/d58a41fc5b8c32032015428a0042d2e9e80c3780))
+* **app:** territory observation save ([#98](https://github.com/SocialGouv/mano/issues/98)) ([f5342e2](https://github.com/SocialGouv/mano/commit/f5342e2bd3afcf72e855977c682b0316df47256d))
+
+
+### Features
+
+* **dashboard:** add categories in actions list ([#90](https://github.com/SocialGouv/mano/issues/90)) ([1831168](https://github.com/SocialGouv/mano/commit/18311681dacd7e90405192eb47fef6b9e7157327))
+
 # [1.13.0](https://github.com/SocialGouv/mano/compare/v1.12.6...v1.13.0) (2021-10-19)
 
 
