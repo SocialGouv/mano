@@ -11,7 +11,10 @@ export const filterData = (data, filters) => {
       data = data
         .map((item) => {
           const itemValue = item[filter.field];
-          if (!itemValue) return null;
+          if (itemValue === undefined) return null;
+          if (typeof itemValue === 'boolean') {
+            return itemValue === (filter.value === 'Oui') ? item : null;
+          }
           if (typeof itemValue === 'string') {
             if (itemValue === filter.value) return item;
             return null;

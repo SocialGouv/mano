@@ -22,6 +22,7 @@ import { filterBySearch } from '../search/utils';
 import { displayBirthDate } from '../../services/date';
 import { PersonsSelectorsContext } from '../../contexts/selectors';
 import CreatePerson from './CreatePerson';
+import { theme } from '../../config';
 
 const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) persons = filterData(persons, filters);
@@ -98,18 +99,29 @@ const List = () => {
           {
             title: 'Nom',
             dataKey: 'name',
+            render: (p) => {
+              if (p.outOfActiveList)
+                return (
+                  <div style={{ color: theme.black50 }}>
+                    <div>{p.name}</div>
+                    <div>Sortie de file active : {p.outOfActiveListReason}</div>
+                  </div>
+                );
+              return p.name;
+            },
           },
           {
             title: 'Date de naissance',
             dataKey: '_id',
-            render: (p) =>
-              !p.birthdate ? (
-                ''
-              ) : (
+            render: (p) => {
+              if (!p.birthdate) return '';
+              else if (p.outOfActiveList) return <i style={{ color: theme.black50 }}>{displayBirthDate(p.birthdate)}</i>;
+              return (
                 <span>
                   <i>{displayBirthDate(p.birthdate)}</i>
                 </span>
-              ),
+              );
+            },
           },
           {
             title: 'Vigilance',
@@ -117,7 +129,14 @@ const List = () => {
             render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
           },
           { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
-          { title: 'Suivi(e) depuis le', dataKey: 'createdAt', render: (p) => toFrenchDate(p.createdAt || '') },
+          {
+            title: 'Suivi(e) depuis le',
+            dataKey: 'createdAt',
+            render: (p) => {
+              if (p.outOfActiveList) return <div style={{ color: theme.black50 }}>{toFrenchDate(p.createdAt || '')}</div>;
+              return toFrenchDate(p.createdAt || '');
+            },
+          },
         ]}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />

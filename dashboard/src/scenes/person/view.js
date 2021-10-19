@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Container, FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink } from 'reactstrap';
+import { Container, FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -38,6 +38,7 @@ import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
 import { toFrenchDate } from '../../utils';
 import AuthContext from '../../contexts/auth';
+import OutOfActiveList from './OutOfActiveList';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
 
@@ -64,6 +65,11 @@ const View = () => {
         {`Dossier de ${person?.name}`}
         <UserName id={person.user} wrapper={(name) => ` (créée par ${name})`} />
       </Title>
+      {person.outOfActiveList && (
+        <Alert color="warning">
+          {person?.name} est en dehors de la file active, pour le motif suivant : <b>{person.outOfActiveListReason}</b>
+        </Alert>
+      )}
       <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }}>
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
@@ -321,6 +327,7 @@ const Summary = ({ person }) => {
               <hr />
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <OutOfActiveList person={person} />
                 <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
               </div>

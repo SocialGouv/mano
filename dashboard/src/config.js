@@ -13,6 +13,8 @@ const theme = {
   white: '#FFFFFF',
   redDark: '#F5222D',
   redLight: '#FBE4E4',
+  orangeLight: '#FEF3C7',
+  orangeDark: '#D97706',
 };
 
 const getHost = () => {
