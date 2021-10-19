@@ -169,6 +169,8 @@ const encryptedFields = [
   'consumptions',
   'phone',
   'assignedTeams',
+  'outOfActiveList',
+  'outOfActiveListReason',
 ];
 
 export const preparePersonForEncryption = (person) => {
@@ -336,6 +338,17 @@ export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française'];
 
 export const yesNoOptions = ['Oui', 'Non'];
 
+export const outOfActiveListReasonOptions = [
+  'Relai vers autre structure',
+  'Hébergée',
+  'Décès',
+  'Incarcération',
+  'Départ vers autre région',
+  'Perdu de vue',
+  'Hospitalisation',
+  'Reconduite à la frontière',
+];
+
 export const filterPersonsBase = [
   {
     label: 'Genre',
@@ -391,5 +404,15 @@ export const filterPersonsBase = [
     label: 'Avec animaux',
     field: 'hasAnimal',
     options: yesNoOptions,
+  },
+  {
+    label: 'Sortie de file active',
+    field: 'outOfActiveList',
+    options: yesNoOptions,
+  },
+  {
+    label: 'Motif de sortie de file active',
+    field: 'outOfActiveListReason',
+    options: outOfActiveListReasonOptions,
   },
 ];
