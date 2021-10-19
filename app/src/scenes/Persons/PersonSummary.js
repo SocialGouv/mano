@@ -176,11 +176,11 @@ class PersonSummary extends React.Component {
             <Row>
               <InputLabelled
                 label="Téléphone"
-                onChangeText={this.setPhone}
+                onChangeText={(phone) => onChange({ phone })}
                 value={phone}
                 placeholder="06 12 52 32 13"
                 textContentType="telephoneNumber"
-                keyboardType="number-pad"
+                keyboardType="phone-pad"
                 autoCorrect={false}
                 editable={editable}
                 noMargin={editable || phone?.length}
