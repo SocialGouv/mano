@@ -48,6 +48,11 @@ if (!ENCRYPTED_FIELDS_ONLY) {
   schema.healthInsurance = { type: DataTypes.TEXT, defaultValue: "" }; //` Sans / AME / CMU / CMUC / Autre`
   schema.vulnerabilities = { type: DataTypes.ARRAY(DataTypes.TEXT), defaultValue: [] }; //`Pathologie chronique / Psychologique / injecteur / handicap`
   schema.consumptions = { type: DataTypes.ARRAY(DataTypes.TEXT), defaultValue: [] }; // `Crack , Opiace etc ...`
+
+  // ActiveList
+  // FR: File Active (https://www.anfh.fr/file-active-psychiatrie), EN: Active List.
+  schema.outOfActiveList = { type: DataTypes.BOOLEAN, defaultValue: false }; // See: https://trello.com/c/Si0kbPet/464-renseigner-une-sortie-de-file-active-avec-un-motif
+  schema.outOfActiveListReason = { type: DataTypes.TEXT, defaultValue: "" }; // `Relai vers autre structure / Hébergée / Décès / Incarcération / Départ vers autre région / Perdu de vue / Hospitalisation / Reconduite à la frontière`
 }
 
 Person.init(schema, { sequelize, modelName: "Person", freezeTableName: true });

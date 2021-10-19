@@ -31,6 +31,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Card from '../../components/Card';
 import CreateObservation from '../../components/CreateObservation';
 import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
+import ActionName from '../../components/ActionName';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -285,7 +286,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
                 });
               },
             },
-            { title: 'Nom', dataKey: 'name' },
+            { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
             {
               title: 'Personne suivie',
               dataKey: 'person',
@@ -355,7 +356,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
                 });
               },
             },
-            { title: 'Nom', dataKey: 'name' },
+            { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
             {
               title: 'Personne suivie',
               dataKey: 'person',
