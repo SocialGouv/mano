@@ -1,3 +1,10 @@
+# [1.13.0](https://github.com/SocialGouv/mano/compare/v1.12.6...v1.13.0) (2021-10-19)
+
+
+### Features
+
+* **dashboard:** active list ([#92](https://github.com/SocialGouv/mano/issues/92)) ([942476c](https://github.com/SocialGouv/mano/commit/942476c317d9b3f9a3d0cbbedd59f81b097e66aa))
+
 ## [1.12.6](https://github.com/SocialGouv/mano/compare/v1.12.5...v1.12.6) (2021-10-15)
 
 
