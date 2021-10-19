@@ -51,9 +51,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                 territory: values.territory,
                 _id: observation._id,
               };
-              console.log({
-                body,
-              });
+
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
               actions.setSubmitting(false);
               if (res.ok) {
