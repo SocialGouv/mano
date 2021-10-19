@@ -75,9 +75,11 @@ export const RefreshProvider = ({ children }) => {
       await relsPersonPlaceContext.refreshRelsPersonPlace(initialLoad);
       setProgress((p) => (p * total + relsPersonPlace) / total);
 
-      setLoading('Chargement des rapports');
-      await reportsContext.refreshReports(initialLoad);
-      setProgress((p) => (p * total + reports) / total);
+      // We currently don't need the rapports in loading.
+
+      // setLoading('Chargement des rapports');
+      // await reportsContext.refreshReports(initialLoad);
+      // setProgress((p) => (p * total + reports) / total);
 
       setFullScreen(false);
 
