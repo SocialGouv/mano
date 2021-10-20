@@ -48,7 +48,7 @@ const Reception = () => {
   const createReport = async () => addReport(today(), currentTeam._id);
 
   useEffect(() => {
-    if (!reportsLoading && !todaysReport) createReport();
+    if (!reportsLoading && !todaysReport && !!currentTeam._id) createReport();
   }, [reportsLoading, currentTeam?._id]);
 
   const services = todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {};
