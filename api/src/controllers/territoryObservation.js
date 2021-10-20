@@ -6,6 +6,7 @@ const { catchErrors } = require("../errors");
 const TerritoryObservation = require("../models/territoryObservation");
 const User = require("../models/user");
 const encryptedTransaction = require("../utils/encryptedTransaction");
+const { Op, where, fn, col } = require("sequelize");
 
 //checked
 router.post(

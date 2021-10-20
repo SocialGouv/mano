@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
+import { getData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import RelsPersonPlaceContext from './relPersonPlace';
 
@@ -21,12 +22,19 @@ export const PlacesProvider = ({ children }) => {
 
   const refreshPlaces = async () => {
     setState((state) => ({ ...state, loading: true }));
-    const response = await API.get({ path: '/place' });
-    if (!response.ok) {
-      capture('error getting places', { extra: { response } });
-      return setState((state) => ({ ...state, loading: false }));
+    try {
+      const places = await getData({
+        collectionName: 'place',
+        data: state.places,
+        isInitialization: true,
+      });
+      setPlaces(places);
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
     }
-    setPlaces(response.decryptedData);
   };
 
   const deletePlace = async (id) => {

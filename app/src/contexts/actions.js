@@ -22,7 +22,6 @@ export const ActionsProvider = ({ children }) => {
         data: state.actions,
         isInitialization: true,
         setProgress,
-        lastRefresh: 0,
       });
       setState(({ actionKey }) => ({
         actionKey: actionKey + 1,

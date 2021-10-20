@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
+import { getData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import TerritoryObservationsContext from './territoryObservations';
 
@@ -13,6 +14,24 @@ export const TerritoriesProvider = ({ children }) => {
   const setTerritories = (territories) => setState(({ territoryKey }) => ({ territories, territoryKey: territoryKey + 1, loading: false }));
 
   const refreshTerritories = async (setProgress, initialLoad) => {
+    setState((state) => ({ ...state, loading: true }));
+    try {
+      setTerritories(
+        await getData({
+          collectionName: 'territory',
+          data: state.territories,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh: state.lastRefresh || 0,
+        })
+      );
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
+    }
+    /*
     setState((state) => ({ ...state, loading: true }));
     if (!initialLoad) {
       const refreshResponse = await API.get({ path: '/territory', query: { lastRefresh: state.lastRefresh } });
@@ -41,6 +60,7 @@ export const TerritoriesProvider = ({ children }) => {
       return setState((state) => ({ ...state, loading: false }));
     }
     setTerritories(response.decryptedData);
+    */
   };
 
   const deleteTerritory = async (id) => {
