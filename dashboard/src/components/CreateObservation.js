@@ -41,13 +41,13 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               const body = {
                 createdAt: values.createdAt,
                 team: values.team,
+                user: user._id,
                 territory: values.territory,
                 _id: observation._id,
               };
               for (const customField of customFieldsObs.filter((f) => f.enabled)) {
                 body[customField.name] = values[customField.name];
               }
-              console.log(customFieldsObs, values, body);
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
               actions.setSubmitting(false);
               if (res.ok) {
@@ -72,7 +72,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                           className="form-control"
                           selected={values.createdAt ? new Date(values.createdAt) : new Date()}
                           onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
-                          timeInputLabel="Time:"
+                          timeInputLabel="Heure :"
                           dateFormat="dd/MM/yyyy hh:mm"
                           showTimeInput
                         />

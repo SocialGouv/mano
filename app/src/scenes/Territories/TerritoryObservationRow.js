@@ -17,6 +17,37 @@ const hitSlop = {
   bottom: 20,
 };
 
+const fieldIsEmpty = (value) => {
+  if (value === null) return true;
+  if (value === undefined) return true;
+  if (typeof value === 'string' && !value.length) return true;
+  if (Array.isArray(value) && !value.length) return true;
+  return false;
+};
+
+const showBoolean = (value) => {
+  if (value === null) return '';
+  if (value === undefined) return '';
+  if (!value) return 'Non';
+  return 'Oui';
+};
+
+const computeCustomFieldDisplay = (field, value) => {
+  if (['text', 'number'].includes(field.type)) return value;
+  if (['textarea'].includes(field.type)) return value?.split('\\n')?.join('\u000A');
+  if (!!['date-with-time'].includes(field.type) && !!value) {
+    return new Date(value).getLocaleDateAndTime('fr');
+  }
+  if (!!['date'].includes(field.type) && !!value) {
+    return new Date(value).getLocaleDate('fr');
+  }
+  if (['boolean'].includes(field.type)) return showBoolean(value);
+  if (['yes-no'].includes(field.type)) return value;
+  if (['enum'].includes(field.type)) return value;
+  if (['multi-choice'].includes(field.type)) return value?.join(', ');
+  return JSON.stringify(value);
+};
+
 const TerritoryObservationRow = ({ onUpdate, observation, context, showActionSheetWithOptions, id }) => {
   const onPressRequest = async () => {
     const options = ['Supprimer', 'Annuler'];
@@ -55,18 +86,20 @@ const TerritoryObservationRow = ({ onUpdate, observation, context, showActionShe
     }
   };
 
-  const { user, createdAt, personsMale, personsFemale, police, material, atmosphere, mediation, comment } = observation;
+  const { user, createdAt } = observation;
+  const { customFieldsObs } = context;
 
   return (
     <Container>
       <CaptionsContainer>
-        <CommentStyled filledUp={!!personsMale}>Nombre de personnes non connues hommes rencontrées: {personsMale}</CommentStyled>
-        <CommentStyled filledUp={!!personsFemale}>Nombre de personnes non connues femmes rencontrées: {personsFemale}</CommentStyled>
-        <CommentStyled filledUp={!!police}>Présence policière: {police}</CommentStyled>
-        <CommentStyled filledUp={!!material}>Nombre de matériel ramassé: {material}</CommentStyled>
-        <CommentStyled filledUp={!!atmosphere}>Ambiance: {atmosphere}</CommentStyled>
-        <CommentStyled filledUp={!!mediation}>Nombre de médiations avec les riverains / les structures: {mediation}</CommentStyled>
-        <CommentStyled filledUp={!!comment}>Commentaire: {comment?.split('\\n')?.join('\u000A')}</CommentStyled>
+        {customFieldsObs.map((field) => {
+          const { name, label } = field;
+          return (
+            <CommentStyled key={name} fieldIsEmpty={fieldIsEmpty(observation[name])}>
+              {label}: {computeCustomFieldDisplay(field, observation[name])}
+            </CommentStyled>
+          );
+        })}
         <CreationDate>
           {!!user && <UserName caption="Observation faite par" id={user?._id || user} />}
           {'\u000A'}
@@ -104,7 +137,7 @@ const CommentStyled = styled(MyText)`
   font-size: 17px;
   margin-bottom: 10px;
   color: rgba(30, 36, 55, 0.75);
-  ${(props) => !props.filledUp && 'opacity: 0.25;'}
+  ${(props) => props.fieldIsEmpty && 'opacity: 0.25;'}
 `;
 
 const CreationDate = styled(MyText)`

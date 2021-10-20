@@ -183,7 +183,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment,
                               className="form-control"
                               selected={values.createdAt ? new Date(values.createdAt) : new Date()}
                               onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
-                              timeInputLabel="Time:"
+                              timeInputLabel="Heure :"
                               dateFormat="dd/MM/yyyy HH:mm"
                               showTimeInput
                             />

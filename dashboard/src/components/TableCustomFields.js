@@ -11,7 +11,8 @@ const typeOptions = [
   { value: 'text', label: 'Texte' },
   { value: 'textarea', label: 'Zone de texte multi-lignes' },
   { value: 'number', label: 'Nombre' },
-  { value: 'date', label: 'Date' },
+  { value: 'date', label: 'Date sans heure' },
+  { value: 'date-with-time', label: 'Date avec heure' },
   { value: 'yes-no', label: 'Oui/Non' },
   { value: 'enum', label: 'Choix dans une liste' },
   { value: 'multi-choice', label: 'Choix multiple dans une liste' },
@@ -24,6 +25,7 @@ const newField = () => ({
   type: 'Texte',
   enabled: false,
   required: false,
+  showInStats: false,
 });
 
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
@@ -58,22 +60,32 @@ const TableCustomeFields = ({ data, customFields }) => {
     setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, required })));
   };
 
+  const onShowStatsChange = (fieldToUpdate) => (event) => {
+    const showInStats = event.target.checked;
+    setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, showInStats })));
+  };
+
   const onAddAField = () => {
     setMutableData([...mutableData, newField()]);
   };
 
-  const handleSubmit = async () => {
+  const onDelete = (fieldToDelete) => {
+    const confirm = window.confirm('Voulez-vous vraiment supprimer ce champ ? Cette opération est irréversible.');
+    if (confirm) {
+      const dataToSave = mutableData.filter((f) => f.name !== fieldToDelete.name);
+      setMutableData(dataToSave);
+      handleSubmit(dataToSave);
+    }
+  };
+
+  const handleSubmit = async (newData) => {
+    if (!newData) newData = mutableData.filter((field) => !!field.label.length);
     setIsSubmitting(true);
     try {
-      console.log(
-        mutableData,
-        mutableData.filter((field) => !!field.label.length)
-      );
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { [customFields]: JSON.stringify(mutableData.filter((field) => !!field.label.length)) },
+        body: { [customFields]: JSON.stringify(newData) },
       });
-      console.log(JSON.parse(response.data[customFields]));
       if (response.ok) {
         toastr.success('Mise à jour !');
         setAuth({ organisation: response.data });
@@ -97,7 +109,7 @@ const TableCustomeFields = ({ data, customFields }) => {
             dataKey: 'label',
             render: (f) => (
               <CellWrapper>
-                <Name rows="2" cols="25" onChange={onLabelChange(f)} value={f.label} placeholder="Tapez ici le nom du champ" />
+                <Name rows="2" cols="15" onChange={onLabelChange(f)} value={f.label} placeholder="Tapez ici le nom du champ" />
               </CellWrapper>
             ),
           },
@@ -133,11 +145,21 @@ const TableCustomeFields = ({ data, customFields }) => {
             dataKey: 'required',
             render: (f) => <input type="checkbox" checked={f.required} onChange={onRequiredChange(f)} />,
           },
+          {
+            title: 'Voir dans les satistiques',
+            dataKey: 'showInStats',
+            render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
+          },
+          {
+            title: 'Supprimer ?',
+            dataKey: 'name',
+            render: (f) => <ButtonCustom title="Supprimer" loading={isSubmitting} onClick={() => onDelete(f)} width={75} color="danger" />,
+          },
         ]}
       />
       <ButtonsWrapper>
         <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={onAddAField} width={200} />
-        <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} width={200} />
+        <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={() => handleSubmit()} width={200} />
       </ButtonsWrapper>
     </>
   );
@@ -153,7 +175,7 @@ const Name = styled.textarea`
 `;
 
 const CellWrapper = styled.div`
-  width: 200px;
+  width: 150px;
   margin: auto;
 `;
 

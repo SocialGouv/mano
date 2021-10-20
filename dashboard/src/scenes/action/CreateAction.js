@@ -142,7 +142,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                           className="form-control"
                           selected={new Date(values.dueAt)}
                           onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
-                          timeInputLabel="Time:"
+                          timeInputLabel="Heure :"
                           dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
                           showTimeInput
                         />

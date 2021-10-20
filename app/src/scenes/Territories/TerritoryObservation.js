@@ -4,37 +4,39 @@ import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Button from '../../components/Button';
-import API from '../../services/api';
 import Spinner from '../../components/Spinner';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
-import InputLabelled from '../../components/InputLabelled';
-import YesNoSelect from '../../components/Selects/YesNoSelect';
-import AtmosphereSelect from '../../components/Selects/AtmosphereSelect';
 import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
-import DateAndTimeInput from '../../components/DateAndTimeInput';
 import { compose } from 'recompose';
 import withContext from '../../contexts/withContext';
 import AuthContext from '../../contexts/auth';
 import TerritoryObservationsContext from '../../contexts/territoryObservations';
+import CustomFieldInput from '../../components/CustomFieldInput';
+
+const cleanValue = (value) => {
+  if (typeof value === 'string') return (value || '').trim();
+  return value;
+};
 
 class TerritoryObservation extends React.Component {
-  castToTerritoryObservation = (territoryObservation = {}) => ({
-    personsMale: (territoryObservation.personsMale || '').trim(),
-    personsFemale: (territoryObservation.personsFemale || '').trim(),
-    police: (territoryObservation.police || '').trim(),
-    material: (territoryObservation.material || '').trim(),
-    atmosphere: (territoryObservation.atmosphere || '').trim(),
-    mediation: (territoryObservation.mediation || '').trim(),
-    comment: (territoryObservation.comment || '').trim(),
-    createdAt: territoryObservation.createdAt || null,
-    entityKey: territoryObservation.entityKey || '',
-  });
+  castToTerritoryObservation = (territoryObservation = {}, customFieldsObs) => {
+    const toReturn = {};
+    for (const field of customFieldsObs) {
+      toReturn[field.name] = cleanValue(territoryObservation[field.name]);
+    }
+    return {
+      ...toReturn,
+      createdAt: territoryObservation.createdAt || null,
+      user: territoryObservation.user || {},
+      entityKey: territoryObservation.entityKey || '',
+    };
+  };
 
   state = {
     territoryObservation: {},
-    ...this.castToTerritoryObservation(this.props.route?.params),
+    ...this.castToTerritoryObservation(this.props.route?.params, this.props.context.customFieldsObs),
 
     territory: this.props.route?.params.territory || {},
     loading: false,
@@ -59,19 +61,21 @@ class TerritoryObservation extends React.Component {
   onEdit = () => this.setState(({ editable }) => ({ editable: !editable }));
 
   setTerritoryObservation = (structureDB) => {
+    const { customFieldsObs } = this.props.context;
     this.setState({
-      territoryObservation: Object.assign({}, this.castToTerritoryObservation(structureDB), {
+      territoryObservation: Object.assign({}, this.castToTerritoryObservation(structureDB, customFieldsObs), {
         _id: structureDB._id,
       }),
-      ...this.castToTerritoryObservation(structureDB),
+      ...this.castToTerritoryObservation(structureDB, customFieldsObs),
       loading: false,
     });
   };
 
   getTerritoryObservation = async () => {
-    const { _id } = this.props.route.params;
+    const { route, context } = this.props;
+    const { _id } = route.params;
     if (!_id) return;
-    this.setTerritoryObservation(this.props.context.territoryObservations.find((obs) => obs._id === _id));
+    this.setTerritoryObservation(context.territoryObservations.find((obs) => obs._id === _id));
   };
 
   onSaveObservation = async () => {
@@ -84,10 +88,18 @@ class TerritoryObservation extends React.Component {
   onCreateTerritoryObservation = async () => {
     this.setState({ updating: true });
     const { territory } = this.state;
-    const { addTerritoryObs, currentTeam } = this.props.context;
-    const response = await addTerritoryObs(
-      Object.assign({}, this.castToTerritoryObservation(this.state), {
+    const { addTerritoryObs, currentTeam, user, customFieldsObs } = this.props.context;
+    console.log(
+      Object.assign({}, this.castToTerritoryObservation(this.state, customFieldsObs), {
         territory: territory._id,
+        user: user._id,
+        team: currentTeam._id,
+      })
+    );
+    const response = await addTerritoryObs(
+      Object.assign({}, this.castToTerritoryObservation(this.state, customFieldsObs), {
+        territory: territory._id,
+        user: user._id,
         team: currentTeam._id,
       })
     );
@@ -106,10 +118,11 @@ class TerritoryObservation extends React.Component {
   };
 
   onUpdateTerritoryObservation = async () => {
+    const { customFieldsObs } = this.props.context;
     this.setState({ updating: true });
     const { territoryObservation } = this.state;
     const response = await this.props.context.updateTerritoryObs(
-      Object.assign({}, this.castToTerritoryObservation(this.state), {
+      Object.assign({}, this.castToTerritoryObservation(this.state, customFieldsObs), {
         _id: territoryObservation._id,
       })
     );
@@ -152,13 +165,14 @@ class TerritoryObservation extends React.Component {
 
   isUpdateDisabled = () => {
     const { territoryObservation } = this.state;
+    const { customFieldsObs } = this.props.context;
     const newTerritoryObservation = {
       ...territoryObservation,
-      ...this.castToTerritoryObservation(this.state),
+      ...this.castToTerritoryObservation(this.state, customFieldsObs),
     };
     if (
-      JSON.stringify(this.castToTerritoryObservation(territoryObservation)) !==
-      JSON.stringify(this.castToTerritoryObservation(newTerritoryObservation))
+      JSON.stringify(this.castToTerritoryObservation(territoryObservation, customFieldsObs)) !==
+      JSON.stringify(this.castToTerritoryObservation(newTerritoryObservation, customFieldsObs))
     ) {
       return false;
     }
@@ -210,21 +224,8 @@ class TerritoryObservation extends React.Component {
   };
 
   render() {
-    const {
-      loading,
-      territory,
-      updating,
-      editable,
-      personsMale,
-      personsFemale,
-      police,
-      material,
-      atmosphere,
-      mediation,
-      createdAt,
-      comment,
-      territoryObservation,
-    } = this.state;
+    const { loading, territory, updating, editable, createdAt, territoryObservation } = this.state;
+    const { customFieldsObs } = this.props.context;
 
     return (
       <SceneContainer>
@@ -241,67 +242,21 @@ class TerritoryObservation extends React.Component {
           ) : (
             <View>
               <CreatedAt>{new Date(createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
-              <InputLabelled
-                label="Nombre de personnes non connues hommes rencontrées"
-                onChangeText={(personsMale) => this.setState({ personsMale })}
-                value={personsMale}
-                placeholder="Nombre de personnes non connues rencontrées"
-                keyboardType="number-pad"
-                editable={editable}
-                ref={(r) => (this.personsMaleRef = r)}
-                onFocus={() => this._scrollToInput(this.personsMaleRef)}
-              />
-              <InputLabelled
-                label="Nombre de personnes non connues femmes - rencontrées"
-                onChangeText={(personsFemale) => this.setState({ personsFemale })}
-                value={personsFemale}
-                placeholder="Nombre de personnes non connues femmes rencontrées"
-                keyboardType="number-pad"
-                editable={editable}
-                ref={(r) => (this.personsFemaleRef = r)}
-                onFocus={() => this._scrollToInput(this.personsFemaleRef)}
-              />
-              <YesNoSelect label="Présence policière" value={police} onSelect={(police) => this.setState({ police })} editable={editable} />
-              <InputLabelled
-                label="Nombre de matériel ramassé"
-                onChangeText={(material) => this.setState({ material })}
-                value={material}
-                placeholder="Nombre de matériel ramassé"
-                keyboardType="number-pad"
-                editable={editable}
-                ref={(r) => (this.materialRef = r)}
-                onFocus={() => this._scrollToInput(this.materialRef)}
-              />
-              <AtmosphereSelect value={atmosphere} onSelect={(atmosphere) => this.setState({ atmosphere })} editable={editable} />
-              <InputLabelled
-                label="Nombre de médiations avec les riverains / les structures"
-                onChangeText={(mediation) => this.setState({ mediation })}
-                value={mediation}
-                placeholder="Nombre de médiations avec les riverains / les structures"
-                keyboardType="number-pad"
-                editable={editable}
-                ref={(r) => (this.mediationRef = r)}
-                onFocus={() => this._scrollToInput(this.mediationRef)}
-              />
-              <InputLabelled
-                label="Commentaire"
-                onChangeText={(comment) => this.setState({ comment })}
-                value={comment}
-                placeholder="Commentaire"
-                multiline
-                ref={(r) => (this.commentRef = r)}
-                onFocus={() => this._scrollToInput(this.commentRef)}
-              />
-              <DateAndTimeInput
-                label="Observation faite le"
-                setDate={(createdAt) => this.setState({ createdAt })}
-                date={createdAt}
-                showTime
-                showDay
-                withTime
-                editable
-                required
-              />
+              {customFieldsObs.map((field) => {
+                const { label, name } = field;
+                return (
+                  <CustomFieldInput
+                    label={label}
+                    field={field}
+                    value={this.state[name]}
+                    handleChange={(newValue) => this.setState({ [name]: newValue })}
+                    editable={editable}
+                    ref={(r) => (this[`${name}-ref`] = r)}
+                    onFocus={() => this._scrollToInput(this[`${name}-ref`])}
+                  />
+                );
+              })}
+
               <ButtonsContainer>
                 {territoryObservation?._id ? (
                   <>

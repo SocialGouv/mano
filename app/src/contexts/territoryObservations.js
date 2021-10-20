@@ -130,6 +130,7 @@ export const defaultCustomFields = [
     type: 'number',
     enabled: true,
     required: true,
+    showInStats: true,
   },
   {
     name: 'personsFemale',
@@ -137,6 +138,7 @@ export const defaultCustomFields = [
     type: 'number',
     enabled: true,
     required: true,
+    showInStats: true,
   },
   {
     name: 'police',
@@ -144,6 +146,7 @@ export const defaultCustomFields = [
     type: 'yes-no',
     enabled: true,
     required: true,
+    showInStats: true,
   },
   {
     name: 'material',
@@ -151,6 +154,7 @@ export const defaultCustomFields = [
     type: 'number',
     enabled: true,
     required: true,
+    showInStats: true,
   },
   {
     name: 'atmosphere',
@@ -159,6 +163,7 @@ export const defaultCustomFields = [
     type: 'enum',
     enabled: true,
     required: true,
+    showInStats: true,
   },
   {
     name: 'mediation',
@@ -166,6 +171,7 @@ export const defaultCustomFields = [
     type: 'number',
     enabled: true,
     required: true,
+    showInStats: true,
   },
   {
     name: 'comment',
@@ -173,11 +179,14 @@ export const defaultCustomFields = [
     type: 'text',
     enabled: true,
     required: true,
+    showInStats: true,
   },
 ];
 
+const compulsoryEncryptedFields = ['territory', 'user', 'team'];
+
 export const prepareObsForEncryption = (customFields) => (obs) => {
-  const encryptedFields = customFields.map((f) => f.name);
+  const encryptedFields = [...customFields.map((f) => f.name), ...compulsoryEncryptedFields];
   const decrypted = {};
   for (let field of encryptedFields) {
     decrypted[field] = obs[field];
@@ -195,4 +204,4 @@ export const prepareObsForEncryption = (customFields) => (obs) => {
   };
 };
 
-export const observationsKeyLabels = defaultCustomFields.map((f) => f.label);
+export const observationsKeyLabels = defaultCustomFields.map((f) => f.name);

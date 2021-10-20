@@ -5,6 +5,15 @@ import { Button as CloseButton } from 'reactstrap';
 import AuthContext from '../../contexts/auth';
 import UserName from '../../components/UserName';
 import TerritoryObservationsContext from '../../contexts/territoryObservations';
+import CustomFieldDisplay from '../../components/CustomFieldDisplay';
+
+const fieldIsEmpty = (value) => {
+  if (value === null) return true;
+  if (value === undefined) return true;
+  if (typeof value === 'string' && !value.length) return true;
+  if (Array.isArray(value) && !value.length) return true;
+  return false;
+};
 
 const View = ({ obs, onDelete, onClick, noBorder }) => {
   const { teams } = useContext(AuthContext);
@@ -19,20 +28,14 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
       </div>
       <div className="time">{dayjs(obs.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
-        {customFieldsObs.map(({ name, label }) => {
+        {customFieldsObs.map((field) => {
+          const { name, label } = field;
           return (
-            <Item filledUp={!!obs[name]}>
-              {label}:{' '}
-              {obs[name]?.split?.('\n')?.map((sentence, index) => (
-                <React.Fragment key={sentence + index}>
-                  {sentence}
-                  <br />
-                </React.Fragment>
-              ))}
+            <Item key={name} fieldIsEmpty={fieldIsEmpty(obs[name])}>
+              {label}: <CustomFieldDisplay field={field} value={obs[field.name]} />
             </Item>
           );
         })}
-        <Item></Item>
       </div>
     </StyledObservation>
   );
@@ -40,7 +43,7 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
 
 const Item = styled.span`
   display: inline-block;
-  ${(props) => !props.filledUp && 'opacity: 0.25;'}
+  ${(props) => props.fieldIsEmpty && 'opacity: 0.25;'}
 `;
 
 const StyledObservation = styled.div`
