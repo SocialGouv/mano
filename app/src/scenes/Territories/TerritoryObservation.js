@@ -89,13 +89,6 @@ class TerritoryObservation extends React.Component {
     this.setState({ updating: true });
     const { territory } = this.state;
     const { addTerritoryObs, currentTeam, user, customFieldsObs } = this.props.context;
-    console.log(
-      Object.assign({}, this.castToTerritoryObservation(this.state, customFieldsObs), {
-        territory: territory._id,
-        user: user._id,
-        team: currentTeam._id,
-      })
-    );
     const response = await addTerritoryObs(
       Object.assign({}, this.castToTerritoryObservation(this.state, customFieldsObs), {
         territory: territory._id,
@@ -242,20 +235,22 @@ class TerritoryObservation extends React.Component {
           ) : (
             <View>
               <CreatedAt>{new Date(createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
-              {customFieldsObs.map((field) => {
-                const { label, name } = field;
-                return (
-                  <CustomFieldInput
-                    label={label}
-                    field={field}
-                    value={this.state[name]}
-                    handleChange={(newValue) => this.setState({ [name]: newValue })}
-                    editable={editable}
-                    ref={(r) => (this[`${name}-ref`] = r)}
-                    onFocus={() => this._scrollToInput(this[`${name}-ref`])}
-                  />
-                );
-              })}
+              {customFieldsObs
+                .filter((f) => f.enabled)
+                .map((field) => {
+                  const { label, name } = field;
+                  return (
+                    <CustomFieldInput
+                      label={label}
+                      field={field}
+                      value={this.state[name]}
+                      handleChange={(newValue) => this.setState({ [name]: newValue })}
+                      editable={editable}
+                      ref={(r) => (this[`${name}-ref`] = r)}
+                      onFocus={() => this._scrollToInput(this[`${name}-ref`])}
+                    />
+                  );
+                })}
 
               <ButtonsContainer>
                 {territoryObservation?._id ? (

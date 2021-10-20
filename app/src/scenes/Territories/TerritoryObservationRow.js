@@ -92,14 +92,16 @@ const TerritoryObservationRow = ({ onUpdate, observation, context, showActionShe
   return (
     <Container>
       <CaptionsContainer>
-        {customFieldsObs.map((field) => {
-          const { name, label } = field;
-          return (
-            <CommentStyled key={name} fieldIsEmpty={fieldIsEmpty(observation[name])}>
-              {label}: {computeCustomFieldDisplay(field, observation[name])}
-            </CommentStyled>
-          );
-        })}
+        {customFieldsObs
+          .filter((f) => f.enabled)
+          .map((field) => {
+            const { name, label } = field;
+            return (
+              <CommentStyled key={name} fieldIsEmpty={fieldIsEmpty(observation[name])}>
+                {label}: {computeCustomFieldDisplay(field, observation[name])}
+              </CommentStyled>
+            );
+          })}
         <CreationDate>
           {!!user && <UserName caption="Observation faite par" id={user?._id || user} />}
           {'\u000A'}

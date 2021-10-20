@@ -28,14 +28,16 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
       </div>
       <div className="time">{dayjs(obs.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
-        {customFieldsObs.map((field) => {
-          const { name, label } = field;
-          return (
-            <Item key={name} fieldIsEmpty={fieldIsEmpty(obs[name])}>
-              {label}: <CustomFieldDisplay field={field} value={obs[field.name]} />
-            </Item>
-          );
-        })}
+        {customFieldsObs
+          .filter((f) => f.enabled)
+          .map((field) => {
+            const { name, label } = field;
+            return (
+              <Item key={name} fieldIsEmpty={fieldIsEmpty(obs[name])}>
+                {label}: <CustomFieldDisplay field={field} value={obs[field.name]} />
+              </Item>
+            );
+          })}
       </div>
     </StyledObservation>
   );

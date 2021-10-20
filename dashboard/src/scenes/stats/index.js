@@ -229,6 +229,7 @@ const Stats = () => {
           <Title>Statistiques des observations de territoire</Title>
           <Row>
             {customFieldsObs
+              .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['number'].includes(field.type))
               .map((field) => (
@@ -237,6 +238,7 @@ const Stats = () => {
                 </Col>
               ))}
             {customFieldsObs
+              .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['date', 'date-with-time'].includes(field.type))
               .map((field) => (
@@ -245,6 +247,7 @@ const Stats = () => {
                 </Col>
               ))}
             {customFieldsObs
+              .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
               .map((field) => (
