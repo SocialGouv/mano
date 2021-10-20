@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const { Op } = require("sequelize");
 
 const { catchErrors } = require("../errors");
 
@@ -68,6 +69,9 @@ router.get(
 
     // const data = await Comment.findAll(query);
     // return res.status(200).send({ ok: true, data, hasMore: data.length === limit });
+    if (req.query.lastRefresh) {
+      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
+    }
 
     const actions = await Action.findAll(query);
 

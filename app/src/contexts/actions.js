@@ -1,6 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
+import { getData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import AuthContext from './auth';
 import CommentsContext from './comments';
@@ -11,32 +12,38 @@ export const ActionsProvider = ({ children }) => {
   const { addComment, deleteComment, comments } = useContext(CommentsContext);
   const { user } = useContext(AuthContext);
 
-  const [state, setState] = useState({ actionKey: 0, actions: [], encrypted: [], loading: false });
+  const [state, setState] = useState({ actionKey: 0, actions: [], loading: false });
 
   const refreshActions = async (setProgress) => {
     setState((state) => ({ ...state, loading: true }));
-    const response = await API.get({ path: '/action', batch: 1000, setProgress });
-    if (!response.ok) {
-      capture('error getting actions', { extra: { response } });
-      return setState((state) => ({ ...state, loading: false }));
+    try {
+      const actions = await getData({
+        collectionName: 'action',
+        data: state.actions,
+        isInitialization: true,
+        setProgress,
+        lastRefresh: 0,
+      });
+      setState(({ actionKey }) => ({
+        actionKey: actionKey + 1,
+        actions,
+        loading: false,
+      }));
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
     }
-    setState(({ actionKey }) => ({
-      actionKey: actionKey + 1,
-      actions: response.decryptedData,
-      encrypted: response.data,
-      loading: false,
-    }));
-    return response.decryptedData;
   };
 
   const deleteAction = async (id) => {
     const res = await API.delete({ path: `/action/${id}` });
     if (res.ok) {
-      setState(({ actionKey, actions, encrypted, ...s }) => ({
+      setState(({ actionKey, actions, ...s }) => ({
         ...s,
         actionKey: actionKey + 1,
         actions: actions.filter((a) => a._id !== id),
-        encrypted: encrypted.filter((a) => a._id !== id),
       }));
       for (let comment of comments.filter((c) => c.action === id)) {
         await deleteComment(comment._id);
@@ -49,11 +56,10 @@ export const ActionsProvider = ({ children }) => {
     try {
       const response = await API.post({ path: '/action', body: prepareActionForEncryption(action) });
       if (response.ok) {
-        setState(({ actions, encrypted, actionKey, ...s }) => ({
+        setState(({ actions, actionKey, ...s }) => ({
           ...s,
           actionKey: actionKey + 1,
           actions: [response.decryptedData, ...actions],
-          encrypted: [response.data, ...encrypted],
         }));
       }
       return response;
@@ -80,15 +86,11 @@ export const ActionsProvider = ({ children }) => {
         body: prepareActionForEncryption(action),
       });
       if (response.ok) {
-        setState(({ actions, encrypted, actionKey, ...s }) => ({
+        setState(({ actions, actionKey, ...s }) => ({
           ...s,
           actionKey: actionKey + 1,
           actions: actions.map((a) => {
             if (a._id === response.decryptedData._id) return response.decryptedData;
-            return a;
-          }),
-          encrypted: encrypted.map((a) => {
-            if (a._id === response.data._id) return response.data;
             return a;
           }),
         }));

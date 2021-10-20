@@ -1,12 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { mergeNewUpdatedData } from '../services/dataManagement';
+import { getData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import ActionsContext from './actions';
 import CommentsContext from './comments';
 import RelsPersonPlaceContext from './relPersonPlace';
-import MMKVStorage from 'react-native-mmkv-storage';
 
 const PersonsContext = React.createContext();
 
@@ -17,48 +16,30 @@ export const PersonsProvider = ({ children }) => {
 
   const [state, setState] = useState({ personKey: 0, persons: [], loading: false, lastRefresh: undefined });
 
-  const MMKV = new MMKVStorage.Loader().initialize();
-
-  const setPersons = (persons, encrypted, lastRefresh = Date.now()) => {
-    console.log('setPersons', lastRefresh, persons.length);
+  const setPersons = (persons) => {
+    console.log('setPersons', persons.length);
     persons = persons.sort(sortPersons);
-    setState(({ personKey }) => ({ persons, encrypted, personKey: personKey + 1, loading: false, lastRefresh }));
+    setState(({ personKey }) => ({ persons, personKey: personKey + 1, loading: false, lastRefresh: Date.now() }));
   };
 
-  const refreshPersons = async (setProgress, initialLoad = false) => {
+  const refreshPersons = async (setProgress = () => {}, initialLoad = false) => {
     setState((state) => ({ ...state, loading: true }));
-    const localData = await MMKV.getMapAsync('persons');
-    if (initialLoad) {
-      if (localData) {
-        const lastRefresh = localData.map((person) => person.updatedAt).reduce((a, b) => (a > b ? a : b));
-        setPersons(localData, [], new Date(lastRefresh).getTime());
-        return true;
-      }
-      if (!state.lastRefresh) {
-        const response = await API.get({ path: '/person', batch: 1000, setProgress });
-        if (!response.ok) {
-          capture('error getting persons', { extra: { response } });
-          setState((state) => ({ ...state, loading: false }));
-          return false;
-        }
-        await MMKV.setMapAsync('persons', response.decryptedData);
-        await MMKV.setStringAsync('string', 'string');
-        setPersons(response.decryptedData, response.data);
-        return true;
-      }
-    }
-
-    const response = await API.get({ path: '/person', query: { lastRefresh: state.lastRefresh } });
-    if (!response.ok) {
-      capture('error refreshing persons', { extra: { response } });
+    try {
+      setPersons(
+        await getData({
+          collectionName: 'person',
+          data: state.persons,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh: state.lastRefresh || 0,
+        }),
+        []
+      );
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
-    }
-    if (response.decryptedData) {
-      const merged = mergeNewUpdatedData(response.decryptedData, state.persons);
-      await MMKV.setMapAsync('persons', merged);
-      setPersons(mergeNewUpdatedData(response.decryptedData, state.persons), mergeNewUpdatedData(response.data, state.encrypted));
-      return true;
     }
   };
 
@@ -89,11 +70,10 @@ export const PersonsProvider = ({ children }) => {
       if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
       const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
       if (response.ok) {
-        setState(({ persons, encrypted, personKey, ...s }) => ({
+        setState(({ persons, personKey, ...s }) => ({
           ...s,
           personKey: personKey + 1,
           persons: [response.decryptedData, ...persons].sort(sortPersons),
-          encrypted: [response.data, ...encrypted],
         }));
       }
       return response;
@@ -111,15 +91,11 @@ export const PersonsProvider = ({ children }) => {
       });
       if (response.ok) {
         const newPerson = response.decryptedData;
-        setState(({ persons, encrypted, personKey, ...s }) => ({
+        setState(({ persons, personKey, ...s }) => ({
           ...s,
           personKey: personKey + 1,
           persons: persons.map((p) => {
             if (p._id === person._id) return newPerson;
-            return p;
-          }),
-          encrypted: encrypted.map((p) => {
-            if (p._id === person._id) return response.data;
             return p;
           }),
         }));

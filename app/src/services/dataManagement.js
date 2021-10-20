@@ -1,3 +1,6 @@
+import API from '../services/api';
+import MMKVStorage from 'react-native-mmkv-storage';
+
 export const mergeNewUpdatedData = (newData, oldData) => {
   const oldDataIds = oldData.map((p) => p._id);
   const updatedItems = newData.filter((p) => oldDataIds.includes(p._id));
@@ -12,4 +15,20 @@ export const mergeNewUpdatedData = (newData, oldData) => {
   ];
 };
 
-// export function
+// Get data from cache or fetch from server.
+export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
+  const MMKV = new MMKVStorage.Loader().initialize();
+  if (isInitialization) {
+    data = (await MMKV.getMapAsync(collectionName)) || [];
+    if (data?.length) {
+      lastRefresh = new Date(data.map((item) => item.updatedAt).reduce((a, b) => (a > b ? a : b))).getTime();
+    }
+  }
+
+  const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
+  if (!response.ok) throw { message: `Error getting ${collectionName} data`, response };
+
+  data = mergeNewUpdatedData(response.decryptedData, data);
+  await MMKV.setMapAsync(collectionName, data);
+  return data;
+}
