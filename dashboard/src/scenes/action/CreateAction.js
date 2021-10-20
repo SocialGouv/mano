@@ -66,7 +66,8 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
             onSubmit={async (values, actions) => {
               if (!values.name) return toastr.error('Erreur!', 'Le nom est obligatoire');
               if (!values.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
-              if (!values.person) return toastr.error('Erreur!', 'La personne suivie est obligatoire');
+              if (!isMulti && !values.person) return toastr.error('Erreur!', 'La personne suivie est obligatoire');
+              if (isMulti && !values.person?.length) return toastr.error('Erreur!', 'Une personne suivie est obligatoire');
               if (!values.dueAt) return toastr.error('Erreur!', "La date d'échéance est obligatoire");
               const body = {
                 name: values.name,
