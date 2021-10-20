@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
+import { getData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import TerritoryObservationsContext from './territoryObservations';
 
@@ -14,33 +15,22 @@ export const TerritoriesProvider = ({ children }) => {
 
   const refreshTerritories = async (setProgress, initialLoad) => {
     setState((state) => ({ ...state, loading: true }));
-    if (!initialLoad) {
-      const refreshResponse = await API.get({ path: '/territory', query: { lastRefresh: state.lastRefresh } });
-      if (!refreshResponse.ok) {
-        capture('error refreshing territories', { extra: { refreshResponse } });
-        return setState((state) => ({ ...state, loading: false }));
-      }
-      if (refreshResponse.decryptedData) {
-        const territoriesIds = state.territories.map((t) => t._id);
-        const updatedTerritories = refreshResponse.decryptedData.filter((t) => territoriesIds.includes(t._id));
-        const newTerritories = refreshResponse.decryptedData.filter((t) => !territoriesIds.includes(t._id));
-        setTerritories([
-          ...newTerritories,
-          ...state.territories.map((territory) => {
-            const updatedTerritory = updatedTerritories.find((t) => t._id === territory._id);
-            if (updatedTerritory) return updatedTerritory;
-            return territory;
-          }),
-        ]);
-        return;
-      }
+    try {
+      setTerritories(
+        await getData({
+          collectionName: 'territory',
+          data: state.territories,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh: state.lastRefresh || 0,
+        })
+      );
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
     }
-    const response = await API.get({ path: '/territory', batch: 1000, setProgress });
-    if (!response.ok) {
-      capture('error getting territories', { extra: { response } });
-      return setState((state) => ({ ...state, loading: false }));
-    }
-    setTerritories(response.decryptedData);
   };
 
   const deleteTerritory = async (id) => {

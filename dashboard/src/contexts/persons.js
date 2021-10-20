@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { mergeNewUpdatedData } from '../services/dataManagement';
+import { getData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import ActionsContext from './actions';
 import CommentsContext from './comments';
@@ -14,34 +14,32 @@ export const PersonsProvider = ({ children }) => {
   const { actions, deleteAction } = useContext(ActionsContext);
   const { relsPersonPlace, deleteRelation } = useContext(RelsPersonPlaceContext);
 
-  const [state, setState] = useState({ personKey: 0, persons: [], encrypted: [], loading: false, lastRefresh: undefined });
+  const [state, setState] = useState({ personKey: 0, persons: [], loading: false, lastRefresh: undefined });
 
-  const setPersons = (persons, encrypted) => {
+  const setPersons = (persons) => {
+    console.log('setPersons', persons.length);
     persons = persons.sort(sortPersons);
-    setState(({ personKey }) => ({ persons, encrypted, personKey: personKey + 1, loading: false, lastRefresh: Date.now() }));
+    setState(({ personKey }) => ({ persons, personKey: personKey + 1, loading: false, lastRefresh: Date.now() }));
   };
 
-  const refreshPersons = async (setProgress, initialLoad) => {
+  const refreshPersons = async (setProgress = () => {}, initialLoad = false) => {
     setState((state) => ({ ...state, loading: true }));
-    if (!!initialLoad && !state.lastRefresh) {
-      const response = await API.get({ path: '/person', batch: 1000, setProgress });
-      if (!response.ok) {
-        capture('error getting persons', { extra: { response } });
-        setState((state) => ({ ...state, loading: false }));
-        return false;
-      }
-      setPersons(response.decryptedData, response.data);
+    try {
+      setPersons(
+        await getData({
+          collectionName: 'person',
+          data: state.persons,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh: state.lastRefresh || 0,
+        }),
+        []
+      );
       return true;
-    }
-    const response = await API.get({ path: '/person', query: { lastRefresh: state.lastRefresh } });
-    if (!response.ok) {
-      capture('error refreshing persons', { extra: { response } });
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
-    }
-    if (response.decryptedData) {
-      setPersons(mergeNewUpdatedData(response.decryptedData, state.persons), mergeNewUpdatedData(response.data, state.encrypted));
-      return true;
     }
   };
 
@@ -72,11 +70,10 @@ export const PersonsProvider = ({ children }) => {
       if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
       const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
       if (response.ok) {
-        setState(({ persons, encrypted, personKey, ...s }) => ({
+        setState(({ persons, personKey, ...s }) => ({
           ...s,
           personKey: personKey + 1,
           persons: [response.decryptedData, ...persons].sort(sortPersons),
-          encrypted: [response.data, ...encrypted],
         }));
       }
       return response;
@@ -94,15 +91,11 @@ export const PersonsProvider = ({ children }) => {
       });
       if (response.ok) {
         const newPerson = response.decryptedData;
-        setState(({ persons, encrypted, personKey, ...s }) => ({
+        setState(({ persons, personKey, ...s }) => ({
           ...s,
           personKey: personKey + 1,
           persons: persons.map((p) => {
             if (p._id === person._id) return newPerson;
-            return p;
-          }),
-          encrypted: encrypted.map((p) => {
-            if (p._id === person._id) return response.data;
             return p;
           }),
         }));

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import API from '../services/api';
+import { getData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
 const RelsPersonPlaceContext = React.createContext();
@@ -16,12 +17,19 @@ export const RelsPersonPlaceProvider = ({ children }) => {
 
   const refreshRelsPersonPlace = async () => {
     setState((state) => ({ ...state, loading: true }));
-    const response = await API.get({ path: '/relPersonPlace' });
-    if (!response.ok) {
-      capture('error getting relPlacePersons', { extra: { response } });
-      return setState((state) => ({ ...state, loading: false }));
+    try {
+      const places = await getData({
+        collectionName: 'relPersonPlace',
+        data: state.relsPersonPlace,
+        isInitialization: true,
+      });
+      setRelsPersonPlace(places);
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
     }
-    setRelsPersonPlace(response.decryptedData);
   };
 
   const deleteRelation = async (id) => {

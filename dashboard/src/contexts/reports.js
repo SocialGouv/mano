@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
+import { getData } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import CommentsContext from './comments';
 
@@ -13,12 +14,19 @@ export const ReportsProvider = ({ children }) => {
 
   const refreshReports = async () => {
     setState((state) => ({ ...state, loading: true }));
-    const response = await API.get({ path: '/report' });
-    if (!response.ok) {
-      capture('error getting reports', { extra: { response } });
-      return setState((state) => ({ ...state, loading: false }));
+    try {
+      const data = await getData({
+        collectionName: 'report',
+        data: state.report,
+        isInitialization: true,
+      });
+      setReports(data);
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
     }
-    setReports(response.decryptedData);
   };
 
   const deleteReport = async (id) => {
