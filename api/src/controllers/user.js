@@ -4,7 +4,6 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { Op } = require("sequelize");
-const cookieParser = require("cookie-parser");
 
 const { catchErrors } = require("../errors");
 const { validatePassword } = require("../utils");
@@ -88,7 +87,6 @@ router.post(
 
     const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
     res.cookie("jwt", token, cookieOptions());
-    // res.set("Set-Cookie", "mattia1=hello; Path=/, mattia2=world; Path=/");
 
     return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
   })
