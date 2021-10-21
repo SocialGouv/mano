@@ -28,9 +28,9 @@ const passwordCheckError =
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 const COOKIE_MAX_AGE = JWT_MAX_AGE * 1000;
 
-function cookieOptions() {
+function cookieOptions(req) {
   if (config.ENVIRONMENT === "development") {
-    return { maxAge: COOKIE_MAX_AGE, httpOnly: false, secure: false, sameSite: "None" };
+    return { maxAge: COOKIE_MAX_AGE, httpOnly: req.headers.platform === "dashboard", secure: req.headers.platform === "dashboard", sameSite: "None" };
   } else {
     return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
   }
@@ -86,7 +86,7 @@ router.post(
     const teams = userTeams.map((rel) => orgTeams.find((t) => t._id === rel.team));
 
     const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
-    res.cookie("jwt", token, cookieOptions());
+    res.cookie("jwt", token, cookieOptions(req));
 
     return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
   })

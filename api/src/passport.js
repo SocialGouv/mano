@@ -8,6 +8,7 @@ module.exports = (app) => {
   const jwtStrategyOptions = {
     jwtFromRequest: (req) => {
       let token = req.cookies.jwt;
+      console.log({ token });
       if (!token) token = ExtractJwt.fromAuthHeaderWithScheme("JWT")(req);
       return token;
     },
