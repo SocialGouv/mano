@@ -244,7 +244,7 @@ jobs:
           name: namespace.yml
 
       - name: Get namespace name
-        uses: mikefarah/yq@4.13.4
+        uses: mikefarah/yq@v4.13.4
         id: namespace
         with:
           cmd: yq eval '.metadata.name' namespace.yml
