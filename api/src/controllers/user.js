@@ -4,6 +4,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { Op } = require("sequelize");
+const cookieParser = require("cookie-parser");
 
 const { catchErrors } = require("../errors");
 const { validatePassword } = require("../utils");
@@ -30,14 +31,18 @@ const COOKIE_MAX_AGE = JWT_MAX_AGE * 1000;
 
 function cookieOptions() {
   if (config.ENVIRONMENT === "development") {
-    return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, sameSite: "None" };
+    return { maxAge: COOKIE_MAX_AGE, httpOnly: false, secure: false, sameSite: "None" };
   } else {
     return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
   }
 }
 
 function logoutCookieOptions() {
-  return { httpOnly: true, secure: true, sameSite: "None" };
+  if (config.ENVIRONMENT === "development") {
+    return { httpOnly: false, secure: false, sameSite: "None" };
+  } else {
+    return { httpOnly: true, secure: true, sameSite: "None" };
+  }
 }
 
 router.get(
@@ -63,6 +68,8 @@ router.post(
 router.post(
   "/signin",
   catchErrors(async (req, res) => {
+    res.clearCookie("jwt", logoutCookieOptions());
+
     let { password, email } = req.body;
     if (!password || !email) return res.status(400).send({ ok: false, error: "Missing password" });
     email = (email || "").trim().toLowerCase();
@@ -83,6 +90,7 @@ router.post(
 
     const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
     res.cookie("jwt", token, cookieOptions());
+    // res.set("Set-Cookie", "mattia1=hello; Path=/, mattia2=world; Path=/");
 
     return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
   })

@@ -23,10 +23,12 @@ import { MANO_DOWNLOAD_URL } from '../../config';
 
 const initState = {
   email: '',
+  userName: '',
   loading: false,
   example: 'example@example.com',
   password: '',
   encryptionKey: '',
+  authViaCookie: false,
   showPassword: false,
   showEncryptionKeyInput: false,
 };
@@ -35,12 +37,35 @@ class Login extends React.Component {
   state = initState;
 
   componentDidMount() {
-    this.props.context.resetAuth();
+    this.checkAuthVithCookie();
     setTimeout(() => {
       RNBootSplash.hide({ duration: 250 });
       this.checkVersion();
     }, 500);
   }
+
+  checkAuthVithCookie = async () => {
+    const response = await API.get({
+      path: '/user/signin-token',
+      skipEncryption: '/user/signin-token',
+    });
+    const { token, ok, user } = response;
+    if (ok && token && user) {
+      const { organisation } = user;
+      this.setState({
+        userName: user.name,
+        authViaCookie: true,
+        showEncryptionKeyInput: !!organisation.encryptionEnabled,
+      });
+    } else {
+      this.props.context.resetAuth();
+    }
+  };
+
+  onLogout = async () => {
+    await API.logout();
+    this.setState(initState);
+  };
 
   checkVersion = async () => {
     const response = await API.get({ path: '/version' });
@@ -66,20 +91,30 @@ class Login extends React.Component {
 
   onForgetPassword = () => this.props.navigation.navigate('ForgetPassword');
   onConnect = async () => {
-    const { email, isValid, example, password, showEncryptionKeyInput, encryptionKey } = this.state;
-    const { navigation, context } = this.props;
-    if (!isValid) {
-      Alert.alert("L'email n'est pas valide.", `Il doit être de la forme ${example}`);
-      this.emailInput.focus();
-      return;
-    }
-    if (password === '') {
-      Alert.alert('Mot de passe incorrect', 'Le mot de passe ne peut pas être vide');
-      this.passwordInput.focus();
-      return;
+    const { email, isValid, example, password, authViaCookie } = this.state;
+    if (!authViaCookie) {
+      if (!isValid) {
+        Alert.alert("L'email n'est pas valide.", `Il doit être de la forme ${example}`);
+        this.emailInput.focus();
+        return;
+      }
+      if (password === '') {
+        Alert.alert('Mot de passe incorrect', 'Le mot de passe ne peut pas être vide');
+        this.passwordInput.focus();
+        return;
+      }
     }
     this.setState({ loading: true });
-    const response = await API.post({ path: '/user/signin', body: { password, email }, skipEncryption: true });
+    const response = authViaCookie
+      ? await API.get({
+          path: '/user/signin-token',
+          skipEncryption: '/user/signin-token',
+        })
+      : await API.post({
+          path: '/user/signin',
+          skipEncryption: '/user/signin',
+          body: { password, email },
+        });
     if (response.error) {
       Alert.alert(response.error, null, [{ text: 'OK', onPress: () => this.passwordInput.focus() }], {
         cancelable: true,
@@ -88,48 +123,47 @@ class Login extends React.Component {
       this.setState({ loading: false, password: '' });
       return;
     }
-    if (response.user.role === 'superadmin') {
-      Alert.alert("Vous n'avez pas d'organisation dans Mano");
-      this.setState({ loading: false });
-      return;
+    if (response.ok) return this.onLoginSuccess(response);
+    setTimeout(() => {
+      this.setState(initState);
+    }, 500);
+  };
+
+  onLoginSuccess = async (response) => {
+    if (!response.ok) return;
+    const { email, showEncryptionKeyInput, encryptionKey } = this.state;
+    const { navigation, context } = this.props;
+    Keyboard.dismiss();
+    API.token = response.token;
+    API.showTokenExpiredError = true;
+    if (!!response.user.organisation?.encryptionEnabled && !showEncryptionKeyInput) {
+      return this.setState({ loading: false, showEncryptionKeyInput: true });
     }
-    if (response.ok) {
-      Keyboard.dismiss();
-      API.token = response.token;
-      API.showTokenExpiredError = true;
-      context.setAuth({
-        user: response.user,
-        organisation: response.user.organisation,
-      });
-      if (!!response.user.organisation?.encryptionEnabled && !showEncryptionKeyInput) {
-        return this.setState({ loading: false, showEncryptionKeyInput: true });
-      }
-      if (encryptionKey) {
-        API.setOrgEncryptionKey(encryptionKey);
-      }
-      await AsyncStorage.setItem('persistent_email', email);
-      const { data: teams } = await API.get({ path: '/team' });
-      const { data: users } = await API.get({ path: '/user', query: { minimal: true } });
-      context.setAuth({
-        user: response.user,
-        organisation: response.user.organisation,
-        teams,
-        users,
-      });
-      API.navigation = navigation;
-      // getting teams before going to team selection
-      if (!__DEV__ && !response.user.lastChangePasswordAt) {
-        navigation.navigate('ForceChangePassword');
+    if (encryptionKey) {
+      API.setOrgEncryptionKey(encryptionKey);
+    }
+    await AsyncStorage.setItem('persistent_email', email);
+    const { data: teams } = await API.get({ path: '/team' });
+    const { data: users } = await API.get({ path: '/user', query: { minimal: true } });
+    context.setAuth({
+      user: response.user,
+      organisation: response.user.organisation,
+      teams,
+      users,
+    });
+    API.navigation = navigation;
+    // getting teams before going to team selection
+    if (!__DEV__ && !response.user.lastChangePasswordAt) {
+      navigation.navigate('ForceChangePassword');
+    } else {
+      if (!response.user?.termsAccepted) {
+        navigation.navigate('CharteAcceptance');
+      } else if (response.user?.teams?.length === 1) {
+        context.setCurrentTeam(response.user.teams[0]);
+        context.refresh({ showFullScreen: true, initialLoad: true });
+        navigation.navigate('Home');
       } else {
-        if (!response.user?.termsAccepted) {
-          navigation.navigate('CharteAcceptance');
-        } else if (response.user?.teams?.length === 1) {
-          context.setCurrentTeam(response.user.teams[0]);
-          this.props.context.refresh({ showFullScreen: true, initialLoad: true });
-          navigation.navigate('Home');
-        } else {
-          navigation.navigate('TeamSelection');
-        }
+        navigation.navigate('TeamSelection');
       }
     }
     setTimeout(() => {
@@ -151,36 +185,41 @@ class Login extends React.Component {
   };
 
   render() {
-    const { password, loading, showPassword, encryptionKey, showEncryptionKeyInput } = this.state;
+    const { password, loading, showPassword, encryptionKey, showEncryptionKeyInput, authViaCookie, userName } = this.state;
     return (
       <Background testID="login-screen">
         <SceneContainer>
           <ScrollContainer ref={(r) => (this.scrollView = r)} keyboardShouldPersistTaps="handled">
             <View>
               <StatusBar backgroundColor={colors.app.color} />
-              <Title heavy>Bienvenue !</Title>
-              <SubTitle>Veuillez saisir un e-mail enregistré auprès de votre administrateur</SubTitle>
-              <EmailInput
-                onChange={this.onChange}
-                ref={(r) => (this.emailInput = r)}
-                onFocus={() => this._scrollToInput(this.emailInput)}
-                onSubmitEditing={() => this.passwordInput.focus()}
-              />
-              <InputLabelled
-                ref={(r) => (this.passwordInput = r)}
-                onChangeText={(password) => this.setState({ password })}
-                label="Mot de passe"
-                placeholder="unSecret23!"
-                onFocus={() => this._scrollToInput(this.passwordInput)}
-                value={password}
-                autoCompleteType="password"
-                autoCapitalize="none"
-                secureTextEntry={!showPassword}
-                returnKeyType="done"
-                onSubmitEditing={this.onConnect}
-                EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
-                onEndIconPress={this.toggleShowPassword}
-              />
+              <Title heavy>{userName ? `Bienvenue ${userName?.split(' ')?.[0]} !` : 'Bienvenue !'}</Title>
+              {!authViaCookie && (
+                <>
+                  <SubTitle>Veuillez saisir un e-mail enregistré auprès de votre administrateur</SubTitle>
+                  <EmailInput
+                    onChange={this.onChange}
+                    ref={(r) => (this.emailInput = r)}
+                    onFocus={() => this._scrollToInput(this.emailInput)}
+                    onSubmitEditing={() => this.passwordInput.focus()}
+                  />
+                  <InputLabelled
+                    ref={(r) => (this.passwordInput = r)}
+                    onChangeText={(password) => this.setState({ password })}
+                    label="Mot de passe"
+                    placeholder="unSecret23!"
+                    onFocus={() => this._scrollToInput(this.passwordInput)}
+                    value={password}
+                    autoCompleteType="password"
+                    autoCapitalize="none"
+                    secureTextEntry={!showPassword}
+                    returnKeyType="done"
+                    onSubmitEditing={this.onConnect}
+                    EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
+                    onEndIconPress={this.toggleShowPassword}
+                  />
+                </>
+              )}
+              {!!showEncryptionKeyInput && !!authViaCookie && <SubTitle>Veuillez saisir la clé de chiffrement de votre organisation</SubTitle>}
               {!!showEncryptionKeyInput && (
                 <InputLabelled
                   ref={(r) => (this.encryptionKey = r)}
@@ -203,6 +242,11 @@ class Login extends React.Component {
               <ButtonsContainer>
                 <Button caption="Connecter" onPress={this.onConnect} loading={loading} disabled={loading} />
               </ButtonsContainer>
+              {!!authViaCookie && (
+                <TouchableWithoutFeedback onPress={this.onLogout}>
+                  <Hint>Me connecter avec un autre email</Hint>
+                </TouchableWithoutFeedback>
+              )}
               <Version>Mano v{version}</Version>
             </View>
           </ScrollContainer>

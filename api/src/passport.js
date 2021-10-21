@@ -7,8 +7,8 @@ const User = require("./models/user"); // load up the user model
 module.exports = (app) => {
   const jwtStrategyOptions = {
     jwtFromRequest: (req) => {
-      let token = ExtractJwt.fromAuthHeaderWithScheme("JWT")(req);
-      if (!token) token = req.cookies.jwt;
+      let token = req.cookies.jwt;
+      if (!token) token = ExtractJwt.fromAuthHeaderWithScheme("JWT")(req);
       return token;
     },
     secretOrKey: SECRET,

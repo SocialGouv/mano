@@ -5,6 +5,10 @@ import API from './api';
 import { MMKV } from './dataManagement';
 
 API.logout = async (from) => {
+  await API.post({
+    path: '/user/logout',
+    skipEncryption: '/user/logout',
+  });
   await AsyncStorage.removeItem('persistent_email');
   if (API.navigation) {
     API.navigation.reset({
