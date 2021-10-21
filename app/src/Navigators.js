@@ -5,7 +5,6 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AgendaIcon, StructuresIcon, PersonIcon, MenuIcon, TerritoryIcon } from './icons';
 import { AppState } from 'react-native';
-import logEvents from './services/logEvents';
 import Login from './scenes/Login/Login';
 import Action from './scenes/Actions/Action';
 import NewActionForm from './scenes/Actions/NewActionForm';
@@ -177,13 +176,10 @@ const AppStack = createStackNavigator();
 
 class App extends React.Component {
   async componentDidMount() {
-    await logEvents.initLogEvents();
-    logEvents.logAppVisit();
     AppState.addEventListener('change', this.onAppChange);
   }
 
   componentWillUnmount() {
-    logEvents.logAppClose();
     AppState.removeEventListener('focus', this.onAppChange);
   }
 
@@ -191,9 +187,6 @@ class App extends React.Component {
   onAppChange = (nextAppState) => {
     if (this.appState.match(/inactive|background/) && nextAppState === 'active') {
       if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
-      logEvents.logAppVisit();
-    } else {
-      logEvents.logAppClose();
     }
     this.appState = nextAppState;
   };
