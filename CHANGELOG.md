@@ -1,3 +1,10 @@
+# [1.17.0](https://github.com/SocialGouv/mano/compare/v1.16.0...v1.17.0) (2021-10-21)
+
+
+### Features
+
+* **website:** add matomo website ([#109](https://github.com/SocialGouv/mano/issues/109)) ([f5f8528](https://github.com/SocialGouv/mano/commit/f5f852866201f15e89afb98debb93409fc4fd6dc))
+
 # [1.16.0](https://github.com/SocialGouv/mano/compare/v1.15.0...v1.16.0) (2021-10-21)
 
 
