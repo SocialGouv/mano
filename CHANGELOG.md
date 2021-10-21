@@ -1,3 +1,10 @@
+# [1.16.0](https://github.com/SocialGouv/mano/compare/v1.15.0...v1.16.0) (2021-10-21)
+
+
+### Features
+
+* add cookie to preserve session ([#96](https://github.com/SocialGouv/mano/issues/96)) ([9a20b48](https://github.com/SocialGouv/mano/commit/9a20b48357c7637141639da7ef7c493ec478aae0))
+
 # [1.15.0](https://github.com/SocialGouv/mano/compare/v1.14.1...v1.15.0) (2021-10-21)
 
 
