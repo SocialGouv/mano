@@ -1,3 +1,10 @@
+## [1.14.1](https://github.com/SocialGouv/mano/compare/v1.14.0...v1.14.1) (2021-10-21)
+
+
+### Bug Fixes
+
+* create report when current team exists ([#105](https://github.com/SocialGouv/mano/issues/105)) ([fcc55f6](https://github.com/SocialGouv/mano/commit/fcc55f62fd340de79be688844abe0f03a93340d9))
+
 # [1.14.0](https://github.com/SocialGouv/mano/compare/v1.13.0...v1.14.0) (2021-10-19)
 
 
