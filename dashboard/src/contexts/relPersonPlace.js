@@ -1,29 +1,44 @@
 import React, { useState } from 'react';
 import API from '../services/api';
-import { getData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
 const RelsPersonPlaceContext = React.createContext();
 
 export const RelsPersonPlaceProvider = ({ children }) => {
-  const [state, setState] = useState({ relsPersonPlace: [], relsKey: 0 });
+  const [state, setState] = useState({ relsPersonPlace: [], relsKey: 0, loading: false, lastRefresh: undefined });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-rel-person-places', 0);
 
-  const setRelsPersonPlace = (relsPersonPlace) =>
-    setState(({ relsKey }) => ({
-      relsPersonPlace,
-      relsKey: relsKey + 1,
-      loading: false,
+  const setRelsPersonPlace = (relsPersonPlace) => {
+    if (relsPersonPlace) {
+      setState(({ relsKey }) => ({
+        relsPersonPlace,
+        relsKey: relsKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
+  };
+
+  const setBatchData = (newRelsPersonPlace) =>
+    setState(({ relsPersonPlace, ...oldState }) => ({
+      ...oldState,
+      relsPersonPlace: [...relsPersonPlace, ...newRelsPersonPlace],
     }));
 
-  const refreshRelsPersonPlace = async () => {
+  const refreshRelsPersonPlace = async (setProgress, initialLoad) => {
     setState((state) => ({ ...state, loading: true }));
     try {
-      const places = await getData({
-        collectionName: 'relPersonPlace',
-        data: state.relsPersonPlace,
-        isInitialization: true,
-      });
-      setRelsPersonPlace(places);
+      setRelsPersonPlace(
+        await getData({
+          collectionName: 'relPersonPlace',
+          data: state.relsPersonPlace,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh,
+          setBatchData,
+        })
+      );
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });

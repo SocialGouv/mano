@@ -1,25 +1,31 @@
 import React, { useState } from 'react';
 import API from '../services/api';
-import { getData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
 const TerritoryObservationsContext = React.createContext();
 
 export const TerritoryObservationsProvider = ({ children }) => {
   const [state, setState] = useState({ territoryObservations: [], obsKey: 0, loading: true });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
 
   const setTerritoryObs = (territoryObservations) => {
-    setState(({ obsKey }) => ({
-      territoryObservations,
-      obsKey: obsKey + 1,
-      loading: false,
-    }));
+    if (territoryObservations) {
+      setState(({ obsKey }) => ({
+        territoryObservations,
+        obsKey: obsKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
   };
+
   const setBatchData = (newObs) =>
     setState(({ territoryObservations, ...oldState }) => ({
       ...oldState,
       territoryObservations: [...territoryObservations, ...newObs],
     }));
+
   const refreshTerritoryObs = async (setProgress) => {
     setState((state) => ({ ...state, loading: true }));
     try {
@@ -29,11 +35,13 @@ export const TerritoryObservationsProvider = ({ children }) => {
         isInitialization: true,
         setProgress,
         setBatchData,
-        lastRefresh: state.lastRefresh || 0,
+        lastRefresh,
       });
       setTerritoryObs(data);
-      for (const obs of data.filter((obs) => Boolean(obs.territory?._id) && !obs.territory)) {
-        await updateTerritoryObs({ ...obs, territory: obs.territory._id });
+      if (data) {
+        for (const obs of data.filter((obs) => Boolean(obs.territory?._id) && !obs.territory)) {
+          await updateTerritoryObs({ ...obs, territory: obs.territory._id });
+        }
       }
       return true;
     } catch (e) {

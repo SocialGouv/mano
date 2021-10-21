@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { getData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import RelsPersonPlaceContext from './relPersonPlace';
 
@@ -11,24 +11,39 @@ const sortPlaces = (p1, p2) => p1.name.localeCompare(p2.name);
 export const PlacesProvider = ({ children }) => {
   const { relsPersonPlace, deleteRelation } = useContext(RelsPersonPlaceContext);
 
-  const [state, setState] = useState({ places: [], placeKey: 0 });
+  const [state, setState] = useState({ places: [], placeKey: 0, loading: false, lastRefresh: undefined });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-places', 0);
 
-  const setPlaces = (places) =>
-    setState(({ placeKey }) => ({
-      places: places.sort(sortPlaces),
-      placeKey: placeKey + 1,
-      loading: false,
+  const setPlaces = (places) => {
+    if (places) {
+      setState(({ placeKey }) => ({
+        places: places.sort(sortPlaces),
+        placeKey: placeKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
+  };
+
+  const setBatchData = (newPlaces) =>
+    setState(({ places, ...oldState }) => ({
+      ...oldState,
+      places: [...places, ...newPlaces],
     }));
 
-  const refreshPlaces = async () => {
+  const refreshPlaces = async (setProgress, initialLoad) => {
     setState((state) => ({ ...state, loading: true }));
     try {
-      const places = await getData({
-        collectionName: 'place',
-        data: state.places,
-        isInitialization: true,
-      });
-      setPlaces(places);
+      setPlaces(
+        await getData({
+          collectionName: 'place',
+          data: state.places,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh,
+          setBatchData,
+        })
+      );
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });

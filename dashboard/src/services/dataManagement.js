@@ -1,4 +1,5 @@
 /* eslint-disable no-throw-literal */
+import { useState } from 'react';
 import API from '../services/api';
 // import MMKVStorage from 'react-native-mmkv-storage';
 
@@ -14,6 +15,15 @@ export const mergeNewUpdatedData = (newData, oldData) => {
       return person;
     }),
   ];
+};
+
+// export const useStorage = (key, defaultValue) => {
+//   const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);
+//   return [value, setValue];
+// };
+export const useStorage = (key, defaultValue) => {
+  const [value, setValue] = useState(defaultValue);
+  return [value, setValue];
 };
 
 // Get data from server (no cache yet).

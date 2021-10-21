@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-
+const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 
 const Place = require("../models/place");
@@ -37,12 +37,23 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    const data = await Place.findAll({
+    const query = {
       where: {
         organisation: req.user.organisation,
       },
-    });
-    return res.status(200).send({ ok: true, data });
+      order: [["createdAt", "DESC"]],
+    };
+    if (req.query.lastRefresh) {
+      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
+    }
+
+    const total = await Place.count(query);
+    const limit = parseInt(req.query.limit, 10);
+    if (!!req.query.limit) query.limit = limit;
+    if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
+
+    const data = await Place.findAll(query);
+    return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
   })
 );
 

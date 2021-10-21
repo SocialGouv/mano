@@ -231,4 +231,4 @@ const Version = styled(MyText)`
   /* color: #ddd; */
 `;
 
-export default compose(withContext(RefreshContext), withContext(AuthContext))(Login);
+export default compose(withContext(AuthContext), withContext(RefreshContext))(Login);

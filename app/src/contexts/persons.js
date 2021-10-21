@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { getData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import ActionsContext from './actions';
 import CommentsContext from './comments';
@@ -15,14 +15,25 @@ export const PersonsProvider = ({ children }) => {
   const { relsPersonPlace, deleteRelation } = useContext(RelsPersonPlaceContext);
 
   const [state, setState] = useState({ personKey: 0, persons: [], loading: false, lastRefresh: undefined });
-
-  const setPersons = (persons) => {
-    console.log('setPersons', persons.length);
-    persons = persons.sort(sortPersons);
-    setState(({ personKey }) => ({ persons, personKey: personKey + 1, loading: false, lastRefresh: Date.now() }));
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-persons', 0);
+  const setPersons = (newPersons) => {
+    if (newPersons) {
+      setState(({ personKey }) => ({
+        persons: newPersons.sort(sortPersons),
+        personKey: personKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
   };
 
-  const refreshPersons = async (setProgress = () => {}, initialLoad = false) => {
+  const setBatchData = (newPersons) =>
+    setState(({ persons, ...oldState }) => ({
+      ...oldState,
+      persons: [...persons, ...newPersons],
+    }));
+
+  const refreshPersons = async (setProgress, initialLoad = false) => {
     setState((state) => ({ ...state, loading: true }));
     try {
       setPersons(
@@ -31,7 +42,8 @@ export const PersonsProvider = ({ children }) => {
           data: state.persons,
           isInitialization: initialLoad,
           setProgress,
-          lastRefresh: state.lastRefresh || 0,
+          lastRefresh,
+          setBatchData,
         })
       );
       return true;
@@ -252,9 +264,7 @@ const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
 };
 
 /*
-
 Choices on selects
-
 */
 
 export const reasonsOptions = [
@@ -328,6 +338,17 @@ export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française'];
 
 export const yesNoOptions = ['Oui', 'Non'];
 
+export const outOfActiveListReasonOptions = [
+  'Relai vers autre structure',
+  'Hébergée',
+  'Décès',
+  'Incarcération',
+  'Départ vers autre région',
+  'Perdu de vue',
+  'Hospitalisation',
+  'Reconduite à la frontière',
+];
+
 export const filterPersonsBase = [
   {
     label: 'Genre',
@@ -383,5 +404,15 @@ export const filterPersonsBase = [
     label: 'Avec animaux',
     field: 'hasAnimal',
     options: yesNoOptions,
+  },
+  {
+    label: 'Sortie de file active',
+    field: 'outOfActiveList',
+    options: yesNoOptions,
+  },
+  {
+    label: 'Motif de sortie de file active',
+    field: 'outOfActiveListReason',
+    options: outOfActiveListReasonOptions,
   },
 ];

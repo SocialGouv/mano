@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { getData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import TerritoryObservationsContext from './territoryObservations';
 
@@ -10,8 +10,24 @@ export const TerritoriesProvider = ({ children }) => {
   const { territoryObservations, deleteTerritoryObs } = useContext(TerritoryObservationsContext);
 
   const [state, setState] = useState({ territories: [], territoryKey: 0 });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-territories', 0);
 
-  const setTerritories = (territories) => setState(({ territoryKey }) => ({ territories, territoryKey: territoryKey + 1, loading: false }));
+  const setTerritories = (territories) => {
+    if (territories) {
+      setState(({ territoryKey }) => ({
+        territories,
+        territoryKey: territoryKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
+  };
+
+  const setBatchData = (newTerritories) =>
+    setState(({ territories, ...oldState }) => ({
+      ...oldState,
+      territories: [...territories, ...newTerritories],
+    }));
 
   const refreshTerritories = async (setProgress, initialLoad) => {
     setState((state) => ({ ...state, loading: true }));
@@ -22,7 +38,8 @@ export const TerritoriesProvider = ({ children }) => {
           data: state.territories,
           isInitialization: initialLoad,
           setProgress,
-          lastRefresh: state.lastRefresh || 0,
+          lastRefresh,
+          setBatchData,
         })
       );
       return true;

@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { getData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import AuthContext from './auth';
 import CommentsContext from './comments';
@@ -13,21 +12,38 @@ export const ActionsProvider = ({ children }) => {
   const { user } = useContext(AuthContext);
 
   const [state, setState] = useState({ actionKey: 0, actions: [], loading: false });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-actions', 0);
 
-  const refreshActions = async (setProgress) => {
-    setState((state) => ({ ...state, loading: true }));
-    try {
-      const actions = await getData({
-        collectionName: 'action',
-        data: state.actions,
-        isInitialization: true,
-        setProgress,
-      });
+  const setActions = (newActions) => {
+    if (newActions) {
       setState(({ actionKey }) => ({
+        actions: newActions,
         actionKey: actionKey + 1,
-        actions,
         loading: false,
       }));
+    }
+    setLastRefresh(Date.now());
+  };
+
+  const setBatchData = (newActions) =>
+    setState(({ actions, ...oldState }) => ({
+      ...oldState,
+      actions: [...actions, ...newActions],
+    }));
+
+  const refreshActions = async (setProgress, initialLoad) => {
+    setState((state) => ({ ...state, loading: true }));
+    try {
+      setActions(
+        await getData({
+          collectionName: 'action',
+          data: state.actions,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh,
+          setBatchData,
+        })
+      );
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });

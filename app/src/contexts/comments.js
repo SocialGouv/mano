@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { getData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import AuthContext from './auth';
 
@@ -10,15 +10,18 @@ const CommentsContext = React.createContext();
 export const CommentsProvider = ({ children }) => {
   const { currentTeam, organisation, user } = useContext(AuthContext);
 
-  const [state, setState] = useState({ commentKey: 0, comments: [], loading: false, lastRefresh: undefined });
+  const [state, setState] = useState({ commentKey: 0, comments: [], loading: false });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-comments', 0);
 
   const setComments = (newComments) => {
-    setState(({ commentKey }) => ({
-      comments: newComments,
-      commentKey: commentKey + 1,
-      loading: false,
-      lastRefresh: Date.now(),
-    }));
+    if (newComments) {
+      setState(({ commentKey }) => ({
+        comments: newComments,
+        commentKey: commentKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
   };
 
   const setBatchData = (newComments) =>
@@ -36,7 +39,7 @@ export const CommentsProvider = ({ children }) => {
           data: state.comments,
           isInitialization: initialLoad,
           setProgress,
-          lastRefresh: state.lastRefresh || 0,
+          lastRefresh,
           setBatchData,
         })
       );

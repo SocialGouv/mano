@@ -1,6 +1,7 @@
 import React, { useContext, useState } from 'react';
 import Loader from '../components/Loader';
 import API from '../services/api';
+import { useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import ActionsContext from './actions';
 import AuthContext from './auth';
@@ -15,7 +16,7 @@ import TerritoryObservationsContext from './territoryObservations';
 const RefreshContext = React.createContext();
 
 export const RefreshProvider = ({ children }) => {
-  const [lastRefresh, setLastRefresh] = useState(undefined);
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh', 0);
   const [loading, setLoading] = useState('');
   const [progress, setProgress] = useState(0);
   const [fullScreen, setFullScreen] = useState(false);
@@ -41,7 +42,7 @@ export const RefreshProvider = ({ children }) => {
     setLoading('Chargement...');
     const response = await API.get({
       path: '/public/stats',
-      query: { organisation: organisation._id, lastRefresh: initialLoad ? undefined : lastRefresh },
+      query: { organisation: organisation._id, lastRefresh },
     });
     if (!response.ok) {
       capture('error getting stats', { extra: response });
@@ -56,7 +57,16 @@ export const RefreshProvider = ({ children }) => {
       setFullScreen(showFullScreen);
 
       const { actions, persons, territories, territoryObservations, places, relsPersonPlace, comments, reports } = await getTotal(initialLoad);
-      const total = actions + persons + territories + territoryObservations + places + comments + reports + relsPersonPlace;
+      // fior a better UX for the loader, it's better to have at least one item
+      const total =
+        (actions || 1) +
+        (persons || 1) +
+        (territories || 1) +
+        (territoryObservations || 1) +
+        (places || 1) +
+        (comments || 1) +
+        (reports || 1) +
+        (relsPersonPlace || 1);
 
       setLoading('Chargement des personnes');
       const isOK = await personsContext.refreshPersons((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
@@ -70,14 +80,11 @@ export const RefreshProvider = ({ children }) => {
       await territoryContext.refreshTerritories((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setLoading('Chargement des lieux');
-      await placesContext.refreshPlaces(initialLoad);
-      setProgress((p) => (p * total + places) / total);
-      await relsPersonPlaceContext.refreshRelsPersonPlace(initialLoad);
-      setProgress((p) => (p * total + relsPersonPlace) / total);
+      await placesContext.refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      await relsPersonPlaceContext.refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setLoading('Chargement des rapports');
-      await reportsContext.refreshReports(initialLoad);
-      setProgress((p) => (p * total + reports) / total);
+      await reportsContext.refreshReports((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setFullScreen(false);
 
@@ -97,7 +104,8 @@ export const RefreshProvider = ({ children }) => {
     setFullScreen(showFullScreen);
 
     const { actions, persons, comments } = await getTotal();
-    const total = actions + persons + comments;
+    const total = (actions || 1) + (persons || 1) + (comments || 1);
+    console.log({ actions, persons, comments });
 
     setLoading('Chargement des actions');
     await actionsContext.refreshActions((batch) => setProgress((p) => (p * total + batch) / total));
@@ -124,10 +132,8 @@ export const RefreshProvider = ({ children }) => {
     await actionsContext.refreshActions((batch) => setProgress((p) => (p * total + batch) / total));
 
     setLoading('Chargement des lieux');
-    await placesContext.refreshPlaces();
-    setProgress((p) => (p * total + places) / total);
-    await relsPersonPlaceContext.refreshRelsPersonPlace();
-    setProgress((p) => (p * total + relsPersonPlace) / total);
+    await placesContext.refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total));
+    await relsPersonPlaceContext.refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total));
 
     setLoading('Chargement des commentaires');
     await commentsContext.refreshComments((batch) => setProgress((p) => (p * total + batch) / total));
@@ -157,10 +163,8 @@ export const RefreshProvider = ({ children }) => {
     const total = places + relsPersonPlace;
 
     setLoading('Chargement des lieux');
-    await placesContext.refreshPlaces();
-    setProgress((p) => (p * total + places) / total);
-    await relsPersonPlaceContext.refreshRelsPersonPlace();
-    setProgress((p) => (p * total + relsPersonPlace) / total);
+    await placesContext.refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total));
+    await relsPersonPlaceContext.refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total));
 
     reset();
   };

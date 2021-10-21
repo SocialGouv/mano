@@ -21,6 +21,7 @@ if (ENVIRONMENT !== "development") {
 }
 
 function capture(err, context = {}) {
+  console.log("capture", err, JSON.stringify(context));
   if (typeof context === "string") {
     context = JSON.parse(context);
   } else {

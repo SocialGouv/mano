@@ -1,24 +1,43 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { getData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import CommentsContext from './comments';
 
 const ReportsContext = React.createContext();
 
 export const ReportsProvider = ({ children }) => {
-  const [state, setState] = useState({ reports: [], reportsKey: 0, loading: true });
   const { addComment } = useContext(CommentsContext);
 
-  const setReports = (reports) => setState(({ reportsKey }) => ({ reports, reportsKey: reportsKey + 1, loading: false }));
+  const [state, setState] = useState({ reports: [], reportsKey: 0, loading: true, lastRefresh: undefined });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-reports', 0);
+  const setReports = (reports) => {
+    if (reports) {
+      setState(({ reportsKey }) => ({
+        reports,
+        reportsKey: reportsKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
+  };
 
-  const refreshReports = async () => {
+  const setBatchData = (newReports) =>
+    setState(({ reports, ...oldState }) => ({
+      ...oldState,
+      reports: [...reports, ...newReports],
+    }));
+
+  const refreshReports = async (setProgress, initialLoad) => {
     setState((state) => ({ ...state, loading: true }));
     try {
       const data = await getData({
         collectionName: 'report',
-        data: state.report,
-        isInitialization: true,
+        data: state.reports,
+        isInitialization: initialLoad,
+        setProgress,
+        lastRefresh,
+        setBatchData,
       });
       setReports(data);
       return true;
