@@ -4,6 +4,9 @@ import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-d
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
 import lifecycle from 'page-lifecycle';
+import { Provider } from 'react-redux';
+import { combineReducers, createStore } from 'redux';
+import ReduxToastr, { reducer as toastr } from 'react-redux-toastr';
 
 import Account from './scenes/account';
 import Auth from './scenes/auth';
@@ -27,6 +30,9 @@ import AuthContext from './contexts/auth';
 import API from './services/api';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
+import RootContextsProvider, { FullPopulatedSelectorsProvider } from './contexts/rootProvider';
+
+const store = createStore(combineReducers({ toastr }));
 
 registerLocale('fr', fr);
 
@@ -42,30 +48,37 @@ const App = () => {
     };
   }, []);
   return (
-    <div className="main-container">
-      <div className="main">
-        <Router>
-          <Switch>
-            <Route path="/auth" component={Auth} />
-            <RestrictedRoute path="/charte" component={Charte} />
-            <RestrictedRoute path="/account" component={Account} />
-            <RestrictedRoute path="/user" component={User} />
-            <RestrictedRoute path="/person" component={Person} />
-            <RestrictedRoute path="/place" component={Place} />
-            <RestrictedRoute path="/action" component={Action} />
-            <RestrictedRoute path="/territory" component={Territory} />
-            <RestrictedRoute path="/structure" component={Structure} />
-            <RestrictedRoute path="/team" component={Team} />
-            <RestrictedRoute path="/organisation" component={Organisation} />
-            <RestrictedRoute path="/stats" component={Stats} />
-            <RestrictedRoute path="/reception" component={Reception} />
-            <RestrictedRoute path="/search" component={SearchView} />
-            <RestrictedRoute path="/report" component={Report} />
-            <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
-          </Switch>
-        </Router>
-      </div>
-    </div>
+    <Provider store={store}>
+      <RootContextsProvider>
+        <FullPopulatedSelectorsProvider>
+          <div className="main-container">
+            <div className="main">
+              <Router>
+                <Switch>
+                  <Route path="/auth" component={Auth} />
+                  <RestrictedRoute path="/charte" component={Charte} />
+                  <RestrictedRoute path="/account" component={Account} />
+                  <RestrictedRoute path="/user" component={User} />
+                  <RestrictedRoute path="/person" component={Person} />
+                  <RestrictedRoute path="/place" component={Place} />
+                  <RestrictedRoute path="/action" component={Action} />
+                  <RestrictedRoute path="/territory" component={Territory} />
+                  <RestrictedRoute path="/structure" component={Structure} />
+                  <RestrictedRoute path="/team" component={Team} />
+                  <RestrictedRoute path="/organisation" component={Organisation} />
+                  <RestrictedRoute path="/stats" component={Stats} />
+                  <RestrictedRoute path="/reception" component={Reception} />
+                  <RestrictedRoute path="/search" component={SearchView} />
+                  <RestrictedRoute path="/report" component={Report} />
+                  <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
+                </Switch>
+              </Router>
+            </div>
+          </div>
+          <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
+        </FullPopulatedSelectorsProvider>
+      </RootContextsProvider>
+    </Provider>
   );
 };
 
