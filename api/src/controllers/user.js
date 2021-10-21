@@ -68,8 +68,6 @@ router.post(
 router.post(
   "/signin",
   catchErrors(async (req, res) => {
-    res.clearCookie("jwt", logoutCookieOptions());
-
     let { password, email } = req.body;
     if (!password || !email) return res.status(400).send({ ok: false, error: "Missing password" });
     email = (email || "").trim().toLowerCase();
