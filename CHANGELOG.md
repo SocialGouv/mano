@@ -1,3 +1,10 @@
+# [1.15.0](https://github.com/SocialGouv/mano/compare/v1.14.1...v1.15.0) (2021-10-21)
+
+
+### Features
+
+* **dashboard:** add places in filters for persons ([#89](https://github.com/SocialGouv/mano/issues/89)) ([90aef52](https://github.com/SocialGouv/mano/commit/90aef52566faaa696714c71e7d13cd2ec9ab4488))
+
 ## [1.14.1](https://github.com/SocialGouv/mano/compare/v1.14.0...v1.14.1) (2021-10-21)
 
 
