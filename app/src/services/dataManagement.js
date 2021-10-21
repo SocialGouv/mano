@@ -15,9 +15,9 @@ export const mergeNewUpdatedData = (newData, oldData) => {
   ];
 };
 
+const MMKV = new MMKVStorage.Loader().initialize();
 // Get data from cache or fetch from server.
 export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
-  const MMKV = new MMKVStorage.Loader().initialize();
   if (isInitialization) {
     data = (await MMKV.getMapAsync(collectionName)) || [];
     if (data?.length) {

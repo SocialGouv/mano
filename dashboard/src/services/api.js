@@ -97,9 +97,8 @@ class ApiService {
       let limit = args.batch;
       let data = [];
       let decryptedData = [];
-      let query = { ...args.query, limit, page };
-      delete args.query;
       while (hasMore) {
+        let query = { ...args.query, limit, page };
         const response = await this.execute({ method: 'GET', query, ...args });
         if (!response.ok) {
           capture('error getting batch', { extra: { response } });
