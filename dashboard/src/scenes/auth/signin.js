@@ -18,6 +18,7 @@ const SignIn = () => {
   const { refresh } = useContext(RefreshContext);
   const history = useHistory();
   const [showErrors, setShowErrors] = useState(false);
+  const [userName, setUserName] = useState(false);
   const [showSelectTeam, setShowSelectTeam] = useState(false);
   const [showEncryption, setShowEncryption] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
@@ -32,6 +33,16 @@ const SignIn = () => {
     }
   };
 
+  const onLogout = async () => {
+    await API.logout();
+    setShowErrors(false);
+    setUserName('');
+    setShowSelectTeam(false);
+    setShowEncryption(false);
+    setShowPassword(false);
+    setAuthViaCookie(false);
+  };
+
   useEffect(() => {
     (async () => {
       const { token, ok, user } = await API.get({
@@ -40,6 +51,7 @@ const SignIn = () => {
       });
       if (ok && token && user) {
         setAuthViaCookie(true);
+        setUserName(user.name);
         const { organisation } = user;
         if (!!organisation.encryptionEnabled) setShowEncryption(true);
       }
@@ -73,7 +85,7 @@ const SignIn = () => {
 
   return (
     <AuthWrapper>
-      <Title>Se connecter</Title>
+      <Title>{userName ? `Bienvenue ${userName?.split(' ')?.[0]} !` : 'Bienvenue !'}</Title>
       <Formik
         initialValues={{ email: '', password: '', orgEncryptionKey: '' }}
         onSubmit={async (values, actions) => {
@@ -196,6 +208,7 @@ const SignIn = () => {
                 </StyledFormGroup>
               )}
               <Submit loading={isSubmitting} type="submit" color="primary" title="Se connecter" />
+              {!!authViaCookie && <ChangeUserButton color="link" title="Me connecter avec un autre utilisateur" onClick={onLogout} />}
               <p
                 style={{
                   fontSize: 12,
@@ -243,6 +256,13 @@ const Submit = styled(ButtonCustom)`
   margin: auto;
   font-size: 16px;
   min-height: 42px;
+`;
+
+const ChangeUserButton = styled(ButtonCustom)`
+  font-family: Helvetica;
+  margin: auto;
+  margin-top: 15px;
+  font-weight: normal;
 `;
 
 const InputField = styled(Field)`
