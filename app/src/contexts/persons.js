@@ -32,8 +32,7 @@ export const PersonsProvider = ({ children }) => {
           isInitialization: initialLoad,
           setProgress,
           lastRefresh: state.lastRefresh || 0,
-        }),
-        []
+        })
       );
       return true;
     } catch (e) {

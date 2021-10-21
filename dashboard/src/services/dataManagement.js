@@ -1,3 +1,4 @@
+/* eslint-disable no-throw-literal */
 import API from '../services/api';
 // import MMKVStorage from 'react-native-mmkv-storage';
 
