@@ -112,7 +112,6 @@ class ApiService {
         hasMore = response.hasMore;
         page = response.hasMore ? page + 1 : page;
         // at least 1 for showing progress
-        console.log(args.path, response.data.length);
         if (args.setProgress) args.setProgress(response.data.length || 1);
         if (args.setBatchData) args.setBatchData(response.data);
         await new Promise((res) => setTimeout(res, 50));

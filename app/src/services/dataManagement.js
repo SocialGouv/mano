@@ -35,8 +35,6 @@ export async function getData({ collectionName, data = [], isInitialization = fa
   const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
   if (!response.ok) throw { message: `Error getting ${collectionName} data`, response };
 
-  console.log(collectionName, lastRefresh, data.length, response.decryptedData.length);
-
   // avoid sending data if no new data, to avoid big useless `map` calculations in selectors
   if (!response.decryptedData.length && !isInitialization) return null;
 
