@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
 import validator from 'validator';
@@ -18,9 +18,12 @@ const SignIn = () => {
   const { refresh } = useContext(RefreshContext);
   const history = useHistory();
   const [showErrors, setShowErrors] = useState(false);
+  const [userName, setUserName] = useState(false);
   const [showSelectTeam, setShowSelectTeam] = useState(false);
   const [showEncryption, setShowEncryption] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [authViaCookie, setAuthViaCookie] = useState(false);
 
   const onSigninValidated = ({ organisation }) => {
     if (!!organisation?.receptionEnabled) {
@@ -29,6 +32,35 @@ const SignIn = () => {
       history.push('/');
     }
   };
+
+  const onLogout = async () => {
+    await API.logout();
+    setShowErrors(false);
+    setUserName('');
+    setShowSelectTeam(false);
+    setShowEncryption(false);
+    setShowPassword(false);
+    setAuthViaCookie(false);
+  };
+
+  useEffect(() => {
+    (async () => {
+      const { token, ok, user } = await API.get({
+        path: '/user/signin-token',
+        skipEncryption: '/user/signin-token',
+      });
+      if (ok && token && user) {
+        setAuthViaCookie(true);
+        setUserName(user.name);
+        const { organisation } = user;
+        if (!!organisation.encryptionEnabled) setShowEncryption(true);
+      }
+
+      return setLoading(false);
+    })();
+  }, []);
+
+  if (loading) return <></>;
 
   if (showSelectTeam) {
     return (
@@ -53,7 +85,7 @@ const SignIn = () => {
 
   return (
     <AuthWrapper>
-      <Title>Se connecter</Title>
+      <Title>{userName ? `Bienvenue ${userName?.split(' ')?.[0]} !` : 'Bienvenue !'}</Title>
       <Formik
         initialValues={{ email: '', password: '', orgEncryptionKey: '' }}
         onSubmit={async (values, actions) => {
@@ -63,11 +95,16 @@ const SignIn = () => {
               password: values.password,
             };
             API.toastr = toastr;
-            const { user, token, ok } = await API.post({
-              path: '/user/signin',
-              skipEncryption: '/user/signin',
-              body,
-            });
+            const { user, token, ok } = authViaCookie
+              ? await API.get({
+                  path: '/user/signin-token',
+                  skipEncryption: '/user/signin-token',
+                })
+              : await API.post({
+                  path: '/user/signin',
+                  skipEncryption: '/user/signin',
+                  body,
+                });
             if (!ok) return actions.setSubmitting(false);
             API.init({ resetAuth, history, toastr });
             const { organisation } = user;
@@ -112,39 +149,43 @@ const SignIn = () => {
 
           return (
             <form onSubmit={handleSubmitRequest}>
-              <StyledFormGroup>
-                <div>
-                  <InputField
-                    validate={(v) => !validator.isEmail(v) && 'Adresse email invalide'}
-                    name="email"
-                    type="email"
-                    id="email"
-                    value={values.email}
-                    onChange={handleChangeRequest}
-                  />
-                  <label htmlFor="email">Email </label>
-                </div>
-                {!!showErrors && <p style={{ fontSize: 12, color: 'rgb(253, 49, 49)' }}>{errors.email}</p>}
-              </StyledFormGroup>
-              <StyledFormGroup>
-                <div>
-                  <PasswordInput
-                    InputComponent={InputField}
-                    validate={(v) => validator.isEmpty(v) && 'Ce champ est obligatoire'}
-                    name="password"
-                    id="password"
-                    value={values.password}
-                    onChange={handleChangeRequest}
-                    setShowPassword={setShowPassword}
-                    showPassword={showPassword}
-                  />
-                  <label htmlFor="password">Mot de passe</label>
-                </div>
-                {!!showErrors && <p style={{ fontSize: 12, color: 'rgb(253, 49, 49)' }}>{errors.password}</p>}
-              </StyledFormGroup>
-              <div style={{ textAlign: 'right', marginBottom: 20, marginTop: -20, fontSize: 12 }}>
-                <Link to="/auth/forgot">Mot de passe oublié ?</Link>
-              </div>
+              {!authViaCookie && (
+                <>
+                  <StyledFormGroup>
+                    <div>
+                      <InputField
+                        validate={(v) => !validator.isEmail(v) && 'Adresse email invalide'}
+                        name="email"
+                        type="email"
+                        id="email"
+                        value={values.email}
+                        onChange={handleChangeRequest}
+                      />
+                      <label htmlFor="email">Email </label>
+                    </div>
+                    {!!showErrors && <p style={{ fontSize: 12, color: 'rgb(253, 49, 49)' }}>{errors.email}</p>}
+                  </StyledFormGroup>
+                  <StyledFormGroup>
+                    <div>
+                      <PasswordInput
+                        InputComponent={InputField}
+                        validate={(v) => validator.isEmpty(v) && 'Ce champ est obligatoire'}
+                        name="password"
+                        id="password"
+                        value={values.password}
+                        onChange={handleChangeRequest}
+                        setShowPassword={setShowPassword}
+                        showPassword={showPassword}
+                      />
+                      <label htmlFor="password">Mot de passe</label>
+                    </div>
+                    {!!showErrors && <p style={{ fontSize: 12, color: 'rgb(253, 49, 49)' }}>{errors.password}</p>}
+                  </StyledFormGroup>
+                  <div style={{ textAlign: 'right', marginBottom: 20, marginTop: -20, fontSize: 12 }}>
+                    <Link to="/auth/forgot">Mot de passe oublié ?</Link>
+                  </div>
+                </>
+              )}
               {!!showEncryption && (
                 <StyledFormGroup>
                   <div>
@@ -167,6 +208,7 @@ const SignIn = () => {
                 </StyledFormGroup>
               )}
               <Submit loading={isSubmitting} type="submit" color="primary" title="Se connecter" />
+              {!!authViaCookie && <ChangeUserButton color="link" title="Me connecter avec un autre utilisateur" onClick={onLogout} />}
               <p
                 style={{
                   fontSize: 12,
@@ -214,6 +256,13 @@ const Submit = styled(ButtonCustom)`
   margin: auto;
   font-size: 16px;
   min-height: 42px;
+`;
+
+const ChangeUserButton = styled(ButtonCustom)`
+  font-family: Helvetica;
+  margin: auto;
+  margin-top: 15px;
+  font-weight: normal;
 `;
 
 const InputField = styled(Field)`

@@ -145,8 +145,7 @@ const Drawer = () => {
               </DropdownItem>
               <DropdownItem
                 onClick={() => {
-                  API.resetAuth();
-                  window.location.replace('/auth');
+                  API.logout();
                 }}>
                 Se déconnecter
               </DropdownItem>

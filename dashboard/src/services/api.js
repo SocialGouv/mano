@@ -14,6 +14,8 @@ class ApiService {
       if (this.token) headers.Authorization = `JWT ${this.token}`;
       const options = {
         method,
+        mode: 'cors',
+        credentials: 'include',
         headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: this.platform, version },
       };
       if (body) {
@@ -41,7 +43,7 @@ class ApiService {
 
       if (!response.ok && response.status === 401) {
         if (this.handleLogoutError) this.handleLogoutError();
-        if (this.logout) this.logout('401');
+        if (this.logout && !['/user/logout', '/user/signin-token'].includes(path)) this.logout('401');
         return response;
       }
 

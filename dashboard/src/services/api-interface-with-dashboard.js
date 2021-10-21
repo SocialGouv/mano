@@ -9,11 +9,17 @@ API.init = ({ resetAuth, history, toastr }) => {
 };
 
 API.logout = async (from) => {
-  if (API.history) {
-    API.history.push('/auth');
-    if (from === '401' && API.showTokenExpiredError && API.toastr) API.toastr.error('Votre session a expiré, veuillez vous reconnecter');
-  } else {
-    if (window.location.pathname !== '/auth') window.location.replace('/auth');
+  await API.post({
+    path: '/user/logout',
+    skipEncryption: '/user/logout',
+  });
+  if (window.location.pathname !== '/auth') {
+    if (API.history) {
+      API.history.push('/auth');
+      if (from === '401' && API.showTokenExpiredError && API.toastr) API.toastr.error('Votre session a expiré, veuillez vous reconnecter');
+    } else {
+      window.location.replace('/auth');
+    }
   }
   API.token = null;
   API.enableEncrypt = null;
