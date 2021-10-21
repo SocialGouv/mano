@@ -33,6 +33,16 @@ const SignIn = () => {
     }
   };
 
+  const onLogout = async () => {
+    await API.logout();
+    setShowErrors(false);
+    setUserName('');
+    setShowSelectTeam(false);
+    setShowEncryption(false);
+    setShowPassword(false);
+    setAuthViaCookie(false);
+  };
+
   useEffect(() => {
     (async () => {
       const { token, ok, user } = await API.get({
@@ -41,6 +51,7 @@ const SignIn = () => {
       });
       if (ok && token && user) {
         setAuthViaCookie(true);
+        setUserName(user.name);
         const { organisation } = user;
         if (!!organisation.encryptionEnabled) setShowEncryption(true);
       }
