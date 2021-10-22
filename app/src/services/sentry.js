@@ -3,7 +3,7 @@ import * as Sentry from '@sentry/react-native';
 // https://docs.sentry.io/platforms/javascript/enriching-events/context/#example-usages
 
 export const capture = (err, context = {}) => {
-  console.log('capture', err, context);
+  console.log('capture', err, JSON.stringify(context, null, 2));
   if (typeof context === 'string') {
     context = JSON.parse(context);
   } else {

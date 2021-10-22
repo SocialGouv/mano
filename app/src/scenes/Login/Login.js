@@ -97,6 +97,10 @@ class Login extends React.Component {
       Keyboard.dismiss();
       API.token = response.token;
       API.showTokenExpiredError = true;
+      context.setAuth({
+        user: response.user,
+        organisation: response.user.organisation,
+      });
       if (!!response.user.organisation?.encryptionEnabled && !showEncryptionKeyInput) {
         return this.setState({ loading: false, showEncryptionKeyInput: true });
       }
@@ -121,7 +125,7 @@ class Login extends React.Component {
           navigation.navigate('CharteAcceptance');
         } else if (response.user?.teams?.length === 1) {
           context.setCurrentTeam(response.user.teams[0]);
-          context.refresh({ showFullScreen: true, initialLoad: true });
+          this.props.context.refresh({ showFullScreen: true, initialLoad: true });
           navigation.navigate('Home');
         } else {
           navigation.navigate('TeamSelection');
