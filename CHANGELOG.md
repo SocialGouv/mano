@@ -1,3 +1,10 @@
+# [1.18.0](https://github.com/SocialGouv/mano/compare/v1.17.0...v1.18.0) (2021-10-22)
+
+
+### Features
+
+* **app:** local cache ([#107](https://github.com/SocialGouv/mano/issues/107)) ([b143d53](https://github.com/SocialGouv/mano/commit/b143d53404f40d37a1dfe1787b3af9353acecea2))
+
 # [1.17.0](https://github.com/SocialGouv/mano/compare/v1.16.0...v1.17.0) (2021-10-21)
 
 
