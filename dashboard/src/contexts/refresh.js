@@ -105,7 +105,6 @@ export const RefreshProvider = ({ children }) => {
 
     const { actions, persons, comments } = await getTotal();
     const total = (actions || 1) + (persons || 1) + (comments || 1);
-    console.log({ actions, persons, comments });
 
     setLoading('Chargement des actions');
     await actionsContext.refreshActions((batch) => setProgress((p) => (p * total + batch) / total));

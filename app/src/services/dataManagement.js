@@ -26,10 +26,6 @@ export const useStorage = (key, defaultValue) => {
 export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
   if (isInitialization) {
     data = (await MMKV.getMapAsync(collectionName)) || [];
-    // remove this `lastRefresh` as every collection now has their own `lastRefresh`
-    // if (data?.length) {
-    //   lastRefresh = new Date(data.map((item) => item.updatedAt).reduce((a, b) => (a > b ? a : b))).getTime();
-    // }
   }
 
   const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
