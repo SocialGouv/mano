@@ -136,6 +136,10 @@ class Login extends React.Component {
     Keyboard.dismiss();
     API.token = response.token;
     API.showTokenExpiredError = true;
+    context.setAuth({
+      user: response.user,
+      organisation: response.user.organisation,
+    });
     if (!!response.user.organisation?.encryptionEnabled && !showEncryptionKeyInput) {
       return this.setState({ loading: false, showEncryptionKeyInput: true });
     }
