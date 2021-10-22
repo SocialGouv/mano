@@ -1,3 +1,10 @@
+## [1.18.1](https://github.com/SocialGouv/mano/compare/v1.18.0...v1.18.1) (2021-10-22)
+
+
+### Bug Fixes
+
+* compulsory person in creating action from CreateAction ([#104](https://github.com/SocialGouv/mano/issues/104)) ([1f319bc](https://github.com/SocialGouv/mano/commit/1f319bcec2d9fe5c37d1f89f5f19d52ab76fcf82))
+
 # [1.18.0](https://github.com/SocialGouv/mano/compare/v1.17.0...v1.18.0) (2021-10-22)
 
 
