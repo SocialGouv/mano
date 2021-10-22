@@ -1,24 +1,51 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import CommentsContext from './comments';
 
 const ReportsContext = React.createContext();
 
 export const ReportsProvider = ({ children }) => {
-  const [state, setState] = useState({ reports: [], reportsKey: 0, loading: true });
   const { addComment } = useContext(CommentsContext);
 
-  const setReports = (reports) => setState(({ reportsKey }) => ({ reports, reportsKey: reportsKey + 1, loading: false }));
-
-  const refreshReports = async () => {
-    setState((state) => ({ ...state, loading: true }));
-    const response = await API.get({ path: '/report' });
-    if (!response.ok) {
-      capture('error getting reports', { extra: { response } });
-      return setState((state) => ({ ...state, loading: false }));
+  const [state, setState] = useState({ reports: [], reportsKey: 0, loading: true, lastRefresh: undefined });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-reports', 0);
+  const setReports = (reports) => {
+    if (reports) {
+      setState(({ reportsKey }) => ({
+        reports,
+        reportsKey: reportsKey + 1,
+        loading: false,
+      }));
     }
-    setReports(response.decryptedData);
+    setLastRefresh(Date.now());
+  };
+
+  const setBatchData = (newReports) =>
+    setState(({ reports, ...oldState }) => ({
+      ...oldState,
+      reports: [...reports, ...newReports],
+    }));
+
+  const refreshReports = async (setProgress, initialLoad) => {
+    setState((state) => ({ ...state, loading: true }));
+    try {
+      const data = await getData({
+        collectionName: 'report',
+        data: state.reports,
+        isInitialization: initialLoad,
+        setProgress,
+        lastRefresh,
+        setBatchData,
+      });
+      setReports(data);
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
+    }
   };
 
   const deleteReport = async (id) => {

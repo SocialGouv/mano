@@ -5,6 +5,7 @@ const passport = require("passport");
 const { catchErrors } = require("../errors");
 const Territory = require("../models/territory");
 const encryptedTransaction = require("../utils/encryptedTransaction");
+const { Op } = require("sequelize");
 
 //checked
 router.post(

@@ -24,6 +24,11 @@ class ApiService {
         }
       }
 
+      query = {
+        ...query,
+        organisation: this.organisation?._id,
+      };
+
       if (['PUT', 'POST', 'DELETE'].includes(method) && this.enableEncrypt) {
         if (this.blockEncrypt && !skipEncryption) {
           if (this.handleBlockEncrypt) this.handleBlockEncrypt();
@@ -96,7 +101,8 @@ class ApiService {
       let data = [];
       let decryptedData = [];
       while (hasMore) {
-        const response = await this.execute({ method: 'GET', query: { page, limit }, ...args });
+        let query = { ...args.query, limit, page };
+        const response = await this.execute({ method: 'GET', ...args, query });
         if (!response.ok) {
           capture('error getting batch', { extra: { response } });
           return { ok: false, data: [] };
@@ -105,7 +111,8 @@ class ApiService {
         decryptedData.push(...(response.decryptedData || []));
         hasMore = response.hasMore;
         page = response.hasMore ? page + 1 : page;
-        if (args.setProgress) args.setProgress(response.data.length);
+        // at least 1 for showing progress
+        if (args.setProgress) args.setProgress(response.data.length || 1);
         if (args.setBatchData) args.setBatchData(response.data);
         await new Promise((res) => setTimeout(res, 50));
       }

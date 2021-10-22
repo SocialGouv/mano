@@ -17,10 +17,10 @@ router.get(
   catchErrors(async (req, res) => {
     const query = {};
     if (req.query.organisation) query.where = { organisation: req.query.organisation };
-    const actions = await Action.count(query);
+    if (Number(req.query.lastRefresh)) query.where.updatedAt = { $gte: req.query.lastRefresh };
     const places = await Place.count(query);
     const relsPersonPlace = await RelPersonPlace.count(query);
-    if (req.query.lastRefresh) query.where.updatedAt = { $gte: req.query.lastRefresh };
+    const actions = await Action.count(query);
     const persons = await Person.count(query);
     const comments = await Comment.count(query);
     const reports = await Report.count(query);

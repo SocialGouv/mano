@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { mergeNewUpdatedData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import ActionsContext from './actions';
 import CommentsContext from './comments';
@@ -14,34 +14,43 @@ export const PersonsProvider = ({ children }) => {
   const { actions, deleteAction } = useContext(ActionsContext);
   const { relsPersonPlace, deleteRelation } = useContext(RelsPersonPlaceContext);
 
-  const [state, setState] = useState({ personKey: 0, persons: [], encrypted: [], loading: false, lastRefresh: undefined });
-
-  const setPersons = (persons, encrypted) => {
-    persons = persons.sort(sortPersons);
-    setState(({ personKey }) => ({ persons, encrypted, personKey: personKey + 1, loading: false, lastRefresh: Date.now() }));
+  const [state, setState] = useState({ personKey: 0, persons: [], loading: false, lastRefresh: undefined });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-persons', 0);
+  const setPersons = (newPersons) => {
+    if (newPersons) {
+      setState(({ personKey }) => ({
+        persons: newPersons.sort(sortPersons),
+        personKey: personKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
   };
 
-  const refreshPersons = async (setProgress, initialLoad) => {
+  const setBatchData = (newPersons) =>
+    setState(({ persons, ...oldState }) => ({
+      ...oldState,
+      persons: [...persons, ...newPersons],
+    }));
+
+  const refreshPersons = async (setProgress, initialLoad = false) => {
     setState((state) => ({ ...state, loading: true }));
-    if (!!initialLoad && !state.lastRefresh) {
-      const response = await API.get({ path: '/person', batch: 1000, setProgress });
-      if (!response.ok) {
-        capture('error getting persons', { extra: { response } });
-        setState((state) => ({ ...state, loading: false }));
-        return false;
-      }
-      setPersons(response.decryptedData, response.data);
+    try {
+      setPersons(
+        await getData({
+          collectionName: 'person',
+          data: state.persons,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh,
+          setBatchData,
+        })
+      );
       return true;
-    }
-    const response = await API.get({ path: '/person', query: { lastRefresh: state.lastRefresh } });
-    if (!response.ok) {
-      capture('error refreshing persons', { extra: { response } });
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
-    }
-    if (response.decryptedData) {
-      setPersons(mergeNewUpdatedData(response.decryptedData, state.persons), mergeNewUpdatedData(response.data, state.encrypted));
-      return true;
     }
   };
 
@@ -72,11 +81,10 @@ export const PersonsProvider = ({ children }) => {
       if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
       const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
       if (response.ok) {
-        setState(({ persons, encrypted, personKey, ...s }) => ({
+        setState(({ persons, personKey, ...s }) => ({
           ...s,
           personKey: personKey + 1,
           persons: [response.decryptedData, ...persons].sort(sortPersons),
-          encrypted: [response.data, ...encrypted],
         }));
       }
       return response;
@@ -94,15 +102,11 @@ export const PersonsProvider = ({ children }) => {
       });
       if (response.ok) {
         const newPerson = response.decryptedData;
-        setState(({ persons, encrypted, personKey, ...s }) => ({
+        setState(({ persons, personKey, ...s }) => ({
           ...s,
           personKey: personKey + 1,
           persons: persons.map((p) => {
             if (p._id === person._id) return newPerson;
-            return p;
-          }),
-          encrypted: encrypted.map((p) => {
-            if (p._id === person._id) return response.data;
             return p;
           }),
         }));
@@ -260,9 +264,7 @@ const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
 };
 
 /*
-
 Choices on selects
-
 */
 
 export const reasonsOptions = [
@@ -336,6 +338,17 @@ export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française'];
 
 export const yesNoOptions = ['Oui', 'Non'];
 
+export const outOfActiveListReasonOptions = [
+  'Relai vers autre structure',
+  'Hébergée',
+  'Décès',
+  'Incarcération',
+  'Départ vers autre région',
+  'Perdu de vue',
+  'Hospitalisation',
+  'Reconduite à la frontière',
+];
+
 export const filterPersonsBase = [
   {
     label: 'Genre',
@@ -391,5 +404,15 @@ export const filterPersonsBase = [
     label: 'Avec animaux',
     field: 'hasAnimal',
     options: yesNoOptions,
+  },
+  {
+    label: 'Sortie de file active',
+    field: 'outOfActiveList',
+    options: yesNoOptions,
+  },
+  {
+    label: 'Motif de sortie de file active',
+    field: 'outOfActiveListReason',
+    options: outOfActiveListReasonOptions,
   },
 ];

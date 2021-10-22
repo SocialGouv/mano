@@ -1,34 +1,53 @@
 import React, { useState } from 'react';
 import API from '../services/api';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
 const TerritoryObservationsContext = React.createContext();
 
 export const TerritoryObservationsProvider = ({ children }) => {
   const [state, setState] = useState({ territoryObservations: [], obsKey: 0, loading: true });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
 
   const setTerritoryObs = (territoryObservations) => {
-    setState(({ obsKey }) => ({
-      territoryObservations,
-      obsKey: obsKey + 1,
-      loading: false,
-    }));
+    if (territoryObservations) {
+      setState(({ obsKey }) => ({
+        territoryObservations,
+        obsKey: obsKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
   };
+
   const setBatchData = (newObs) =>
     setState(({ territoryObservations, ...oldState }) => ({
       ...oldState,
       territoryObservations: [...territoryObservations, ...newObs],
     }));
-  const refreshTerritoryObs = async (setProgress, initialLoad) => {
+
+  const refreshTerritoryObs = async (setProgress) => {
     setState((state) => ({ ...state, loading: true }));
-    const response = await API.get({ path: '/territory-observation', batch: 1000, setProgress, setBatchData });
-    if (!response.ok) {
-      capture('error getting observations', { extra: { response } });
-      return setState((state) => ({ ...state, loading: false }));
-    }
-    setTerritoryObs(response.decryptedData);
-    for (const obs of response.decryptedData.filter((obs) => Boolean(obs.territory?._id))) {
-      await updateTerritoryObs({ ...obs, territory: obs.territory._id });
+    try {
+      const data = await getData({
+        collectionName: 'territory-observation',
+        data: state.territoryObservations,
+        isInitialization: true,
+        setProgress,
+        setBatchData,
+        lastRefresh,
+      });
+      setTerritoryObs(data);
+      if (data) {
+        for (const obs of data.filter((obs) => Boolean(obs.territory?._id) && !obs.territory)) {
+          await updateTerritoryObs({ ...obs, territory: obs.territory._id });
+        }
+      }
+      return true;
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
     }
   };
 

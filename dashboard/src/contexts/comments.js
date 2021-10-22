@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
-import { mergeNewUpdatedData } from '../services/dataManagement';
+import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import AuthContext from './auth';
 
@@ -10,16 +10,19 @@ const CommentsContext = React.createContext();
 export const CommentsProvider = ({ children }) => {
   const { currentTeam, organisation, user } = useContext(AuthContext);
 
-  const [state, setState] = useState({ commentKey: 0, comments: [], encrypted: [], loading: false, lastRefresh: undefined });
+  const [state, setState] = useState({ commentKey: 0, comments: [], loading: false });
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-comments', 0);
 
-  const setComments = (newComments, encrypted) =>
-    setState(({ commentKey }) => ({
-      comments: newComments,
-      encrypted,
-      commentKey: commentKey + 1,
-      loading: false,
-      lastRefresh: Date.now(),
-    }));
+  const setComments = (newComments) => {
+    if (newComments) {
+      setState(({ commentKey }) => ({
+        comments: newComments,
+        commentKey: commentKey + 1,
+        loading: false,
+      }));
+    }
+    setLastRefresh(Date.now());
+  };
 
   const setBatchData = (newComments) =>
     setState(({ comments, ...oldState }) => ({
@@ -29,23 +32,22 @@ export const CommentsProvider = ({ children }) => {
 
   const refreshComments = async (setProgress, initialLoad) => {
     setState((state) => ({ ...state, loading: true }));
-    if (!!initialLoad && !state.lastRefresh) {
-      const response = await API.get({ path: '/comment', batch: 1000, setProgress, setBatchData });
-      if (!response.ok) {
-        capture('error getting comments', { extra: { response } });
-        setState((state) => ({ ...state, loading: false }));
-        return false;
-      }
-      setComments(response.decryptedData, response.data);
+    try {
+      setComments(
+        await getData({
+          collectionName: 'comment',
+          data: state.comments,
+          isInitialization: initialLoad,
+          setProgress,
+          lastRefresh,
+          setBatchData,
+        })
+      );
       return true;
-    }
-    const response = await API.get({ path: '/comment', query: { lastRefresh: state.lastRefresh } });
-    if (!response.ok) {
-      capture('error refreshing comments', { extra: { response } });
-      return setState((state) => ({ ...state, loading: false }));
-    }
-    if (response.decryptedData) {
-      setComments(mergeNewUpdatedData(response.decryptedData, state.comments), mergeNewUpdatedData(response.data, state.encrypted));
+    } catch (e) {
+      capture(e.message, { extra: { response: e.response } });
+      setState((state) => ({ ...state, loading: false }));
+      return false;
     }
   };
 
@@ -68,11 +70,10 @@ export const CommentsProvider = ({ children }) => {
       if (!body.organisation) body.organisation = organisation._id;
       const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
       if (response.ok) {
-        setState(({ comments, encrypted, commentKey, s }) => ({
+        setState(({ comments, commentKey, s }) => ({
           ...s,
           commentKey: commentKey + 1,
           comments: [response.decryptedData, ...comments],
-          encrypted: [response.data, ...encrypted],
         }));
       }
       return response;
@@ -88,15 +89,11 @@ export const CommentsProvider = ({ children }) => {
         body: prepareCommentForEncryption(comment),
       });
       if (response.ok) {
-        setState(({ comments, commentKey, encrypted, ...s }) => ({
+        setState(({ comments, commentKey, ...s }) => ({
           ...s,
           commentKey: commentKey + 1,
           comments: comments.map((c) => {
             if (c._id === comment._id) return response.decryptedData;
-            return c;
-          }),
-          encrypted: encrypted.map((c) => {
-            if (c._id === comment._id) return response.data;
             return c;
           }),
         }));

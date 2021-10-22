@@ -50,8 +50,6 @@ router.get(
     };
     if (req.query.lastRefresh) {
       query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      const data = await Comment.findAll(query);
-      return res.status(200).send({ ok: true, data });
     }
 
     const total = await Comment.count(query);

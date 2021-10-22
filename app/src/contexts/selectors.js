@@ -5,6 +5,8 @@ import ActionsContext, { CANCEL, DONE, TODO } from './actions';
 import AuthContext from './auth';
 import CommentsContext from './comments';
 import PersonsContext from './persons';
+import PlacesContext from './places';
+import RelsPersonPlaceContext from './relPersonPlace';
 import ReportsContext from './reports';
 import TerritoryContext from './territory';
 import TerritoryObservationsContext, { observationsKeyLabels } from './territoryObservations';
@@ -38,6 +40,8 @@ export const PersonsSelectorsProvider = ({ children }) => {
   const { comments, commentKey } = useContext(CommentsContext);
   const { persons, personKey } = useContext(PersonsContext);
   const { actions, actionKey } = useContext(ActionsContext);
+  const { relsPersonPlace, relsKey } = useContext(RelsPersonPlaceContext);
+  const { places } = useContext(PlacesContext);
 
   const [personsFullPopulated, setPersonsFullPopulated] = useState([]);
 
@@ -48,10 +52,18 @@ export const PersonsSelectorsProvider = ({ children }) => {
           ...p,
           comments: comments.filter((c) => c.person === p._id),
           actions: actions.filter((c) => c.person === p._id).map((a) => ({ ...a, comments: comments.filter((c) => c.action === a._id) })),
+          places: [
+            ...new Set(
+              relsPersonPlace
+                .filter((c) => c.person === p._id)
+                .map((rel) => places.find((place) => place._id === rel.place)?.name)
+                .filter(Boolean) // just to remove empty names in case it happens (it happened in dev)
+            ),
+          ],
         }))
       );
     }, 500);
-  }, [commentKey, personKey, actionKey]);
+  }, [commentKey, personKey, actionKey, relsKey]);
 
   return <PersonsSelectorsContext.Provider value={{ personsFullPopulated }}>{children}</PersonsSelectorsContext.Provider>;
 };
