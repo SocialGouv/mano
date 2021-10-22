@@ -1,7 +1,7 @@
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, encryptVerificationKey, checkEncryptedVerificationKey } from './encryption';
 import { capture } from './sentry';
 
 class ApiService {
@@ -25,11 +25,6 @@ class ApiService {
           options.body = JSON.stringify(body);
         }
       }
-
-      query = {
-        ...query,
-        organisation: this.organisation?._id,
-      };
 
       if (['PUT', 'POST', 'DELETE'].includes(method) && this.enableEncrypt) {
         if (this.blockEncrypt && !skipEncryption) {
@@ -113,6 +108,7 @@ class ApiService {
         decryptedData.push(...(response.decryptedData || []));
         hasMore = response.hasMore;
         page = response.hasMore ? page + 1 : page;
+        // at least 1 for showing progress
         if (args.setProgress) args.setProgress(response.data.length || 1);
         if (args.setBatchData) args.setBatchData(response.data);
         await new Promise((res) => setTimeout(res, 50));
@@ -127,11 +123,22 @@ class ApiService {
 
   setOrgEncryptionKey = async (orgEncryptionKey) => {
     this.hashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
+    const { encryptedVerificationKey } = this.organisation;
+    if (!encryptedVerificationKey) {
+      capture('encryptedVerificationKey not setup yet', { extra: { organisation: this.organisation } });
+    } else {
+      const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, this.hashedOrgEncryptionKey);
+      if (!encryptionKeyIsValid) {
+        this.handleWrongKey();
+        return false;
+      }
+    }
     this.enableEncrypt = true;
     this.orgEncryptionKey = orgEncryptionKey;
     this.sendCaptureError = 0;
     this.wrongKeyWarned = false;
     this.blockEncrypt = false;
+    return true;
   };
 
   encryptItem = async (item) => {

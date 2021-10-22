@@ -53,6 +53,7 @@ const SignIn = () => {
         setAuthViaCookie(true);
         setUserName(user.name);
         const { organisation } = user;
+        API.organisation = organisation;
         if (!!organisation.encryptionEnabled) setShowEncryption(true);
       }
 
@@ -113,7 +114,10 @@ const SignIn = () => {
               return actions.setSubmitting(false);
             }
             if (token) API.token = token;
-            if (!!values.orgEncryptionKey) await API.setOrgEncryptionKey(values.orgEncryptionKey.trim());
+            if (!!values.orgEncryptionKey) {
+              const encryptionIsValid = await API.setOrgEncryptionKey(values.orgEncryptionKey.trim());
+              if (!encryptionIsValid) return;
+            }
             const teamResponse = await API.get({ path: '/team' });
             const teams = teamResponse.data;
             const usersResponse = await API.get({ path: '/user', query: { minimal: true } });

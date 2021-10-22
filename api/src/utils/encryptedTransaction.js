@@ -30,9 +30,11 @@ const encryptedTransaction = (req) => (dbOperation) =>
       const organisation = await checkIfCanChangeData();
 
       if (changeMasterKey === "true") {
+        const { encryptedVerificationKey } = req.body;
         organisation.set({
           encryptionEnabled: encryptionEnabled === "true",
           encryptionLastUpdateAt: new Date(),
+          encryptedVerificationKey,
         });
         await organisation.save({ transaction: tx });
       }

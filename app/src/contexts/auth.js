@@ -26,7 +26,6 @@ export const AuthProvider = ({ children }) => {
 
   useEffect(() => {
     if (!!auth?.organisation?._id && auth.organisation._id !== organisationId) {
-      console.log('clear storage');
       MMKV?.clearStore();
       MMKV?.clearMemoryCache();
       setOrganisationId(auth.organisation._id);

@@ -1,7 +1,7 @@
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
 import { capture } from './sentry';
 
 class ApiService {
@@ -121,11 +121,22 @@ class ApiService {
 
   setOrgEncryptionKey = async (orgEncryptionKey) => {
     this.hashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
+    const { encryptedVerificationKey } = this.organisation;
+    if (!encryptedVerificationKey) {
+      capture('encryptedVerificationKey not setup yet', { extra: { organisation: this.organisation } });
+    } else {
+      const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, this.hashedOrgEncryptionKey);
+      if (!encryptionKeyIsValid) {
+        this.handleWrongKey();
+        return false;
+      }
+    }
     this.enableEncrypt = true;
     this.orgEncryptionKey = orgEncryptionKey;
     this.sendCaptureError = 0;
     this.wrongKeyWarned = false;
     this.blockEncrypt = false;
+    return true;
   };
 
   encryptItem = async (item) => {
