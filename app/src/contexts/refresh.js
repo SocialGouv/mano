@@ -1,4 +1,5 @@
-import React, { useContext, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useCallback, useContext, useEffect, useState } from 'react';
 import Loader from '../components/Loader';
 import API from '../services/api';
 import { useStorage } from '../services/dataManagement';
@@ -29,7 +30,7 @@ export const RefreshProvider = ({ children }) => {
   const placesContext = useContext(PlacesContext);
   const relsPersonPlaceContext = useContext(RelsPersonPlaceContext);
   const reportsContext = useContext(ReportsContext);
-  const { organisation } = useContext(AuthContext);
+  const { organisationId } = useContext(AuthContext);
 
   const reset = async () => {
     await new Promise((res) => setTimeout(res, 150));
@@ -42,7 +43,7 @@ export const RefreshProvider = ({ children }) => {
     setLoading('Chargement...');
     const response = await API.get({
       path: '/public/stats',
-      query: { organisation: organisation._id, lastRefresh },
+      query: { organisation: organisationId, lastRefresh },
     });
     if (!response.ok) {
       capture('error getting stats', { extra: response });

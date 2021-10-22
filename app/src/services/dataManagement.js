@@ -15,7 +15,7 @@ export const mergeNewUpdatedData = (newData, oldData) => {
   ];
 };
 
-const MMKV = new MMKVStorage.Loader().initialize();
+export const MMKV = new MMKVStorage.Loader().initialize();
 
 export const useStorage = (key, defaultValue) => {
   const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);

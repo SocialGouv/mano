@@ -24,11 +24,6 @@ class ApiService {
         }
       }
 
-      query = {
-        ...query,
-        organisation: this.organisation?._id,
-      };
-
       if (['PUT', 'POST', 'DELETE'].includes(method) && this.enableEncrypt) {
         if (this.blockEncrypt && !skipEncryption) {
           if (this.handleBlockEncrypt) this.handleBlockEncrypt();
