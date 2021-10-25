@@ -3,6 +3,8 @@ export default {
     color: '#49c3a6',
     secondary: '#f05a68',
     colorDark: '#3ab39a',
+    colorGrey: '#8C9294',
+    colorBackgroundDarkGrey: '#74776b',
   },
   delete: {
     backgroundColor: '#f00',

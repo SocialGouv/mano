@@ -102,6 +102,7 @@ class PersonSummary extends React.Component {
       context,
       route,
       phone,
+      backgroundColor,
       ...person
     } = this.props;
     const { actions, places, relsPersonPlace, comments } = context;
@@ -111,7 +112,7 @@ class PersonSummary extends React.Component {
         {loading ? (
           <Spinner />
         ) : (
-          <ScrollContainer ref={(r) => (this.scrollView = r)}>
+          <ScrollContainer ref={(r) => (this.scrollView = r)} backgroundColor={backgroundColor || colors.app.color}>
             <InputLabelled
               label="Nom prénom ou Pseudonyme"
               onChangeText={(name) => onChange({ name })}

@@ -10,7 +10,7 @@ const tabsHorizontalMargin = 0.1;
 const tabsWidth = windowWidth * (1 - 2 * tabsHorizontalMargin);
 const tabMarginHorizontal = tabsWidth * 0.02;
 
-const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs }) => {
+const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs, backgroundColor = colors.app.colorDark }) => {
   const indicatorPosition = useRef(new Animated.Value(state.index)).current;
 
   useEffect(() => {
@@ -22,7 +22,7 @@ const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs }) =>
   }, [state.index]);
   const tabWidth = tabsWidth * ((1 / numberOfTabs) * 0.9);
   return (
-    <Animated.View style={styles.container(parentScroll)}>
+    <Animated.View style={styles.container(parentScroll, backgroundColor)}>
       <Animated.View style={[styles.indicatorStyle(tabWidth), styles.indicatorPosition(indicatorPosition, tabWidth, numberOfTabs)]} />
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
@@ -68,12 +68,12 @@ const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs }) =>
 };
 
 const styles = StyleSheet.create({
-  container: (parentScroll) => ({
+  container: (parentScroll, backgroundColor) => ({
     height: tabHeight,
     borderRadius: tabHeight,
     overflow: 'hidden',
     zIndex: 1000,
-    backgroundColor: colors.app.colorDark,
+    backgroundColor,
     marginHorizontal: windowWidth * tabsHorizontalMargin,
     marginBottom: 10,
     flexGrow: 0,

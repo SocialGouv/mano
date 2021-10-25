@@ -15,6 +15,7 @@ import ActionsContext from '../../contexts/actions';
 import PersonsContext from '../../contexts/persons';
 import PlacesContext from '../../contexts/places';
 import CommentsContext from '../../contexts/comments';
+import colors from '../../utils/colors';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -45,6 +46,7 @@ class Person extends React.Component {
       assignedTeams: person.assignedTeams || [],
       hasAnimal: person.hasAnimal?.trim() || '',
       entityKey: person.entityKey || '',
+      outOfActiveList: person.outOfActiveList || false,
     };
   };
 
@@ -206,19 +208,26 @@ class Person extends React.Component {
   };
 
   render() {
-    const { name, updating, editable } = this.state;
+    const { name, updating, editable, person } = this.state;
 
     return (
-      <SceneContainer>
+      <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}>
         <ScreenTitle
           title={name}
           onBack={this.onGoBackRequested}
           onEdit={!editable ? this.onEdit : null}
           onSave={!editable ? null : this.onUpdatePerson}
           saving={updating}
+          backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
         />
         <TabNavigator.Navigator
-          tabBar={(props) => <Tabs numberOfTabs={2} {...props} />}
+          tabBar={(props) => (
+            <Tabs
+              numberOfTabs={2}
+              {...props}
+              backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
+            />
+          )}
           lazy
           removeClippedSubviews={Platform.OS === 'android'}
           swipeEnabled>
@@ -227,6 +236,7 @@ class Person extends React.Component {
               <PersonSummary
                 {...this.state}
                 {...this.props}
+                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
                 onChange={this.onChange}
                 onUpdatePerson={this.onUpdatePerson}
                 writeComment={(writingComment) => this.setState({ writingComment })}
@@ -242,6 +252,7 @@ class Person extends React.Component {
               <FoldersNavigator
                 {...this.state}
                 {...this.props}
+                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
                 onChange={this.onChange}
                 onUpdatePerson={this.onUpdatePerson}
                 onEdit={this.onEdit}
