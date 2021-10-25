@@ -73,6 +73,9 @@ class PersonsList extends React.Component {
     const params = this.props.route?.params?.filters || {};
     const filterTeams = params?.filterTeams || [];
     const filterAlertness = params?.filterAlertness || false;
+    const filterOutOfActiveList = params?.filterOutOfActiveList || '';
+
+    console.log('filterOutOfActiveList', filterOutOfActiveList, typeof filterOutOfActiveList);
 
     let persons = personsFullPopulated;
     if (filterAlertness) persons = persons.filter((p) => Boolean(p.alertness));
@@ -94,7 +97,8 @@ class PersonsList extends React.Component {
     const params = this.props.route?.params?.filters || {};
     const filterTeams = params?.filterTeams || [];
     const filterAlertness = params?.filterAlertness || false;
-    const numberOfFilters = Number(Boolean(filterAlertness)) + filterTeams.length;
+    const filterOutOfActiveList = params?.filterOutOfActiveList || '';
+    const numberOfFilters = Number(Boolean(filterAlertness)) + filterTeams.length + Number(['Oui', 'Non'].includes(filterOutOfActiveList));
 
     const data = this.filterPersons();
 

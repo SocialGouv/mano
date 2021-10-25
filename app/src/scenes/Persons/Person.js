@@ -47,6 +47,7 @@ class Person extends React.Component {
       hasAnimal: person.hasAnimal?.trim() || '',
       entityKey: person.entityKey || '',
       outOfActiveList: person.outOfActiveList || false,
+      outOfActiveListReason: person.outOfActiveListReason || '',
     };
   };
 
@@ -116,7 +117,7 @@ class Person extends React.Component {
       return false;
     }
     if (response.ok) {
-      if (alert) Alert.alert('Personne mise-à-jour !');
+      if (alert) Alert.alert('Personne mise à jour !');
       this.setPerson(response.data);
       this.setState({ updating: false, editable: false });
       return true;

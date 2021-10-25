@@ -38,7 +38,7 @@ export const PaginationProvider = ({ children }) => {
   };
   const setFilterTeams = (filterTeams) => setState((oldState) => ({ ...oldState, filterTeams, page: 0 }));
   const setFilterAlertness = (alertness) => setState((oldState) => ({ ...oldState, alertness, page: 0 }));
-
+  const setFilterOutOfActiveList = (outOfActiveList) => setState((oldState) => ({ ...oldState, outOfActiveList, page: 0 }));
   useEffect(() => {
     setPage(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -54,6 +54,7 @@ export const PaginationProvider = ({ children }) => {
         setSearch,
         setFilterTeams,
         setFilterAlertness,
+        setFilterOutOfActiveList,
       }}>
       {children}
     </PaginationContext.Provider>

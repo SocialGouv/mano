@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, findNodeHandle, Linking } from 'react-native';
+import { Alert, findNodeHandle, Linking, Text, View } from 'react-native';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import * as Sentry from '@sentry/react-native';
@@ -88,6 +88,23 @@ class PersonSummary extends React.Component {
     }, 250);
   };
 
+  onRemoveFromActiveList = async () => {
+    const { navigation, person } = this.props;
+    navigation.push('Persons', {
+      screen: 'PersonsOutOfActiveListReason',
+      params: { person, fromRoute: 'Person' },
+    });
+  };
+
+  onGetBackToActiveList = async () => {
+    const { navigation, person } = this.props;
+    await this.props.context.updatePerson({ ...person, outOfActiveListReason: '', outOfActiveList: false });
+    navigation.replace('Persons', {
+      screen: 'Person',
+      params: { ...person },
+    });
+  };
+
   render() {
     const {
       loading,
@@ -113,6 +130,13 @@ class PersonSummary extends React.Component {
           <Spinner />
         ) : (
           <ScrollContainer ref={(r) => (this.scrollView = r)} backgroundColor={backgroundColor || colors.app.color}>
+            {person.outOfActiveList && (
+              <AlterOutOfActiveList>
+                <Text style={{ color: colors.app.colorWhite }}>
+                  {person?.name} est en dehors de la file active, pour le motif suivant : {person.outOfActiveListReason}
+                </Text>
+              </AlterOutOfActiveList>
+            )}
             <InputLabelled
               label="Nom prénom ou Pseudonyme"
               onChangeText={(name) => onChange({ name })}
@@ -226,10 +250,18 @@ class PersonSummary extends React.Component {
             <ButtonsContainer>
               <ButtonDelete onPress={onDeleteRequest} />
               <Button
-                caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+                caption={editable ? 'Mettre à jour' : 'Modifier'}
                 onPress={editable ? onUpdatePerson : onEdit}
                 disabled={editable ? isUpdateDisabled() : false}
                 loading={updating}
+              />
+            </ButtonsContainer>
+            <ButtonsContainer>
+              <Button
+                caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
+                style={{ marginRight: 10 }}
+                onPress={() => (person.outOfActiveList ? this.onGetBackToActiveList() : this.onRemoveFromActiveList())}
+                color={colors.warning.color}
               />
             </ButtonsContainer>
 
@@ -306,6 +338,13 @@ const Row = styled.View`
   flex-direction: row;
   align-items: center;
   margin-bottom: 30px;
+`;
+
+const AlterOutOfActiveList = styled.View`
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background-color: ${colors.app.colorGrey};
+  padding: 10px;
 `;
 
 export default compose(

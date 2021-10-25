@@ -40,6 +40,7 @@ import EnvironmentIndicator from './components/EnvironmentIndicator';
 import API from './services/api';
 import Charte from './scenes/Menu/Charte';
 import CharteAcceptance from './scenes/Login/CharteAcceptance';
+import PersonsOutOfActiveListReason from './scenes/Persons/PersonsOutOfActiveListReason';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -65,6 +66,7 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
       <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
+      <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
     </PersonsStack.Navigator>
   );
 };
