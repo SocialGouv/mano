@@ -13,7 +13,6 @@ export default function PersonsOutOfActiveListReason({ navigation, route }) {
   const { updatePerson } = useContext(PersonsContext);
 
   const { person } = route.params;
-
   return (
     <SceneContainer>
       <ScreenTitle title="Sortie de file active" onBack={() => navigation.goBack()} />
@@ -21,14 +20,14 @@ export default function PersonsOutOfActiveListReason({ navigation, route }) {
         <View>
           <OutOfActiveListReasonSelect value={reason} onSelect={(value) => setReason(value)} editable={true} />
           <Button
-            caption="Créer"
+            caption="Valider"
             disabled={!reason}
             loading={submitting}
             onPress={async () => {
               setSubmitting(true);
               await updatePerson({ ...person, outOfActiveListReason: reason, outOfActiveList: true });
               setSubmitting(false);
-              navigation.replace('Persons', { screen: 'Person', params: { ...person } });
+              navigation.goBack();
             }}
           />
         </View>

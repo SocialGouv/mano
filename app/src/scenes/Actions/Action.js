@@ -222,8 +222,6 @@ class Action extends React.Component {
   isUpdateDisabled = (calledFrom) => {
     const { action } = this.state;
     const newAction = { ...action, ...this.castToAction(this.state) };
-    console.log(JSON.stringify(action));
-    console.log(JSON.stringify(newAction));
     if (JSON.stringify(action) !== JSON.stringify(newAction)) return false;
     return true;
   };

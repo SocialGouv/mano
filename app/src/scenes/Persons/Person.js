@@ -64,14 +64,21 @@ class Person extends React.Component {
     editable: this.props.route?.params?.editable || false,
     updating: false,
   };
+
   componentDidMount() {
-    this.getData();
+    this.getPerson();
     this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
+    this.props.navigation.addListener('focus', this.handleFocus);
   }
 
   componentWillUnmount() {
     this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
+    this.props.navigation.removeListener('focus', this.handleFocus);
   }
+
+  handleFocus = () => {
+    this.getPerson();
+  };
 
   handleBeforeRemove = (e) => {
     if (this.backRequestHandled) return;
@@ -80,10 +87,6 @@ class Person extends React.Component {
   };
 
   onEdit = () => this.setState(({ editable }) => ({ editable: !editable }));
-
-  getData = async () => {
-    await this.getPerson();
-  };
 
   setPerson = (personDB) => {
     this.setState({

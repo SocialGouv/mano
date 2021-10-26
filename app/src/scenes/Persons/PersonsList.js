@@ -75,8 +75,6 @@ class PersonsList extends React.Component {
     const filterAlertness = params?.filterAlertness || false;
     const filterOutOfActiveList = params?.filterOutOfActiveList || '';
 
-    console.log('filterOutOfActiveList', filterOutOfActiveList, typeof filterOutOfActiveList);
-
     let persons = personsFullPopulated;
     if (filterAlertness) persons = persons.filter((p) => Boolean(p.alertness));
     if (filterOutOfActiveList) {
