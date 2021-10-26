@@ -342,14 +342,17 @@ const Summary = ({ person }) => {
 
 const Actions = ({ person, onUpdateResults }) => {
   const { actions } = useContext(ActionsContext);
+  const [data, setData] = useState([]);
+  const history = useHistory();
 
-  const data = actions.filter((a) => a.person === person._id);
+  useEffect(() => {
+    if (!person) return;
+    setData(actions.filter((a) => a.person === person._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)));
+  }, [actions, person]);
 
   useEffect(() => {
     onUpdateResults(data.length);
   }, [data.length]);
-
-  const history = useHistory();
 
   return (
     <React.Fragment>

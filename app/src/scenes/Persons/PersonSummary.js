@@ -235,7 +235,7 @@ class PersonSummary extends React.Component {
             <SubList
               label="Actions"
               onAdd={this.onAddActionRequest}
-              data={actions.filter((a) => a.person === person.person._id)}
+              data={actions.filter((a) => a.person === person.person._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1))}
               renderItem={(action, index) => (
                 <ActionRow
                   key={index}
