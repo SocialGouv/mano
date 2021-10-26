@@ -1,3 +1,10 @@
+## [1.18.4](https://github.com/SocialGouv/mano/compare/v1.18.3...v1.18.4) (2021-10-26)
+
+
+### Bug Fixes
+
+* **dashboard,app:** sort actions by dueDate desc ([#117](https://github.com/SocialGouv/mano/issues/117)) ([99d657e](https://github.com/SocialGouv/mano/commit/99d657e49be138a59ed6a112cebc8b0bebf5311c))
+
 ## [1.18.3](https://github.com/SocialGouv/mano/compare/v1.18.2...v1.18.3) (2021-10-26)
 
 
