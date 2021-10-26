@@ -1,5 +1,6 @@
 import { HiOutlineMail } from "react-icons/hi";
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 export default function Footer() {
   const maxime = "bS5ncmltYmVydEBhdXJvcmUuYXNzby5mcg==";
@@ -88,12 +89,14 @@ export default function Footer() {
           <a className="w-20 mb-10 md:mb-0" href="/">
             <img
               className="object-contain w-full h-full"
-              src="logo-white.png"
+              src="/logo-white.png"
               alt=""
             />
           </a>
           <p className="text-xs text-white opacity-40">
-            <a href="/legal">Mentions légales</a>
+            <Link href="/legal">
+              <a>Mentions légales</a>
+            </Link>
           </p>
           <p className="text-xs text-white opacity-40">
             &copy; 2021 Mano - Tous droits réservés

@@ -1,3 +1,24 @@
+## [1.18.4](https://github.com/SocialGouv/mano/compare/v1.18.3...v1.18.4) (2021-10-26)
+
+
+### Bug Fixes
+
+* **dashboard,app:** sort actions by dueDate desc ([#117](https://github.com/SocialGouv/mano/issues/117)) ([99d657e](https://github.com/SocialGouv/mano/commit/99d657e49be138a59ed6a112cebc8b0bebf5311c))
+
+## [1.18.3](https://github.com/SocialGouv/mano/compare/v1.18.2...v1.18.3) (2021-10-26)
+
+
+### Bug Fixes
+
+* **website:** src root for img ([ae57f88](https://github.com/SocialGouv/mano/commit/ae57f8856dfafb73aad9c9b2ebf37ba516e12c28))
+
+## [1.18.2](https://github.com/SocialGouv/mano/compare/v1.18.1...v1.18.2) (2021-10-26)
+
+
+### Bug Fixes
+
+* static website ([#114](https://github.com/SocialGouv/mano/issues/114)) ([8ab9550](https://github.com/SocialGouv/mano/commit/8ab9550fdf281c3996d68685dc476b783901821c))
+
 ## [1.18.1](https://github.com/SocialGouv/mano/compare/v1.18.0...v1.18.1) (2021-10-22)
 
 

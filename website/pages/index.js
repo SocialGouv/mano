@@ -33,7 +33,7 @@ export default function Index() {
         <div className="block w-full h-60 md:hidden">
           <img
             className="object-cover w-full h-full"
-            src="hero.jpg"
+            src="/hero.jpg"
             alt="Crédits photo: Nathan Dumlao @https://unsplash.com/photos/i__uqGnARyI"
           />
         </div>
@@ -73,7 +73,7 @@ export default function Index() {
         <div className="absolute inset-y-0 right-0 hidden md:block w-35/100">
           <img
             className="object-cover w-full h-full"
-            src="hero.jpg"
+            src="/hero.jpg"
             alt="Crédits photo: Nathan Dumlao @https://unsplash.com/photos/i__uqGnARyI"
           />
         </div>
@@ -93,7 +93,7 @@ export default function Index() {
           <div className="grid grid-cols-1 gap-20">
             <div className="grid grid-cols-12">
               <div className="mb-6 col-span-full flex-center md:col-span-6 md:col-start-7 md:row-start-1">
-                <img className="w-40" src="mockup/one.png" alt="" />
+                <img className="w-40" src="/mockup/one.png" alt="" />
               </div>
               <div className="text-center col-span-full md:col-span-5 md:text-left md:row-start-1 md:flex md:flex-col md:justify-center">
                 <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">
@@ -110,7 +110,7 @@ export default function Index() {
             </div>
             <div className="grid grid-cols-12">
               <div className="mb-6 col-span-full md:col-span-6 flex-center">
-                <img className="w-40" src="mockup/two.png" alt="" />
+                <img className="w-40" src="/mockup/two.png" alt="" />
               </div>
               <div className="text-center col-span-full md:col-span-5 md:col-start-8 md:flex md:text-left md:justify-center md:flex-col">
                 <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">
@@ -127,7 +127,7 @@ export default function Index() {
             </div>
             <div className="grid grid-cols-12">
               <div className="mb-6 col-span-full flex-center md:col-span-6 md:col-start-7 md:row-start-1">
-                <img className="w-full" src="mockup/three.png" alt="" />
+                <img className="w-full" src="/mockup/three.png" alt="" />
               </div>
               <div className="text-center col-span-full md:col-span-5 md:text-left md:row-start-1 md:flex md:flex-col md:justify-center">
                 <h4 className="mb-2 text-xl font-semibold text-black md:text-2xl lg:text-3xl">
