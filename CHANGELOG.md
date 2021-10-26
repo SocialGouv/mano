@@ -1,3 +1,10 @@
+## [1.18.3](https://github.com/SocialGouv/mano/compare/v1.18.2...v1.18.3) (2021-10-26)
+
+
+### Bug Fixes
+
+* **website:** src root for img ([ae57f88](https://github.com/SocialGouv/mano/commit/ae57f8856dfafb73aad9c9b2ebf37ba516e12c28))
+
 ## [1.18.2](https://github.com/SocialGouv/mano/compare/v1.18.1...v1.18.2) (2021-10-26)
 
 
