@@ -13,6 +13,9 @@ import ActionName from './ActionName';
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Status'] }) => {
   const history = useHistory();
   const location = useLocation();
+  const [theDayBeforeActions, setTheDayBeforeActions] = useState([]);
+  const [theDayAfterActions, setTheDayAfterActions] = useState([]);
+  const [theCurrentDayActions, setTheCurrentDayActions] = useState([]);
 
   const [currentDate, setCurrentDate] = useState(() => {
     const savedDate = new URLSearchParams(location.search)?.get('calendarDate');
@@ -21,9 +24,15 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   });
   const [activeTab, setActiveTab] = useState(Number(new URLSearchParams(location.search)?.get('calendarTab') || 2));
 
-  const theDayBeforeActions = actions.filter((a) => a.dueAt?.slice(0, 10) === theDayBefore(currentDate).toISOString().slice(0, 10));
-  const theDayAfterActions = actions.filter((a) => a.dueAt?.slice(0, 10) === theDayAfter(currentDate).toISOString().slice(0, 10));
-  const theCurrentDayActions = actions.filter((a) => a.dueAt?.slice(0, 10) === currentDate.toISOString().slice(0, 10));
+  useEffect(() => {
+    if (!currentDate || !actions?.length) return;
+    const theDayBeforeComputed = theDayBefore(currentDate).toISOString().slice(0, 10);
+    const theDayAfterComputed = theDayAfter(currentDate).toISOString().slice(0, 10);
+    const theCurrentDayComputed = currentDate.toISOString().slice(0, 10);
+    setTheDayBeforeActions(actions.filter((a) => a.dueAt?.slice(0, 10) === theDayBeforeComputed));
+    setTheDayAfterActions(actions.filter((a) => a.dueAt?.slice(0, 10) === theDayAfterComputed));
+    setTheCurrentDayActions(actions.filter((a) => a.dueAt?.slice(0, 10) === theCurrentDayComputed));
+  }, [actions, currentDate]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
