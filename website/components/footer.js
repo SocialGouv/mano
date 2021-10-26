@@ -89,7 +89,7 @@ export default function Footer() {
           <a className="w-20 mb-10 md:mb-0" href="/">
             <img
               className="object-contain w-full h-full"
-              src="logo-white.png"
+              src="/logo-white.png"
               alt=""
             />
           </a>
