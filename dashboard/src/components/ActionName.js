@@ -7,7 +7,7 @@ export default function ActionName({ action }) {
       <div>{action.name}</div>
       <div>
         {action.categories.map((category) => (
-          <Badge style={{ margin: '0 2px' }} color="info">
+          <Badge style={{ margin: '0 2px' }} color="info" key={category}>
             {category}
           </Badge>
         ))}
