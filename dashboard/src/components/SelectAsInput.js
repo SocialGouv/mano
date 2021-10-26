@@ -4,7 +4,6 @@ import SelectCustom from './SelectCustom';
 const SelectAsInput = ({ options, name, onChange, value, ...props }) => {
   return (
     <SelectCustom
-      placeholder={' -- Choisir -- '}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
       {...props}

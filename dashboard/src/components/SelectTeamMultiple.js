@@ -15,7 +15,6 @@ const SelectTeamMultiple = ({ onChange, value = [] }) => {
       getOptionLabel={(id) => teams.find((team) => team._id === id)?.name}
       isMulti
       // isClearable
-      placeholder={' -- Choisir -- '}
     />
   );
 };

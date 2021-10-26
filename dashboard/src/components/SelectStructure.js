@@ -22,7 +22,6 @@ const SelectStructure = ({ value = '', onChange, name }) => {
       <SelectCustom
         options={data}
         name={name || ''}
-        placeholder="-- Choisir --"
         value={data.find((o) => o._id === value)}
         onChange={(structure) => onChange({ currentTarget: { value: structure?._id || null, name } })}
         getOptionValue={(i) => i?._id}

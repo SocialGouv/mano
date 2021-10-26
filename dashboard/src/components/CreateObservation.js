@@ -140,7 +140,6 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                         onChange={(territory) => handleChange({ currentTarget: { value: territory._id, name: 'territory' } })}
                         isClearable={false}
                         value={territories.find((i) => i._id === values.territory)}
-                        placeholder={' -- Choisir -- '}
                         getOptionValue={(i) => i._id}
                         getOptionLabel={(i) => i.name}
                       />

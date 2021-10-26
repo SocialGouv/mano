@@ -19,7 +19,6 @@ const SelectTeam = ({ onChange = () => null, teamId = null, teams = null }) => {
         onChange={(id) => onChange(teams.find((team) => team._id === id))}
         getOptionValue={(id) => id}
         getOptionLabel={(id) => teams.find((team) => team._id === id)?.name}
-        placeholder={' -- Choisir -- '}
         isClearable={false}
       />
     </div>

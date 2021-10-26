@@ -18,7 +18,6 @@ const SelectPerson = ({ value = '', onChange, isMulti = false, noLabel = false, 
           onChange({ currentTarget: { value: isMulti ? person.map((p) => p._id) : person._id, name: 'person' } });
         }}
         value={isMulti ? persons.filter((i) => value?.includes(i._id)) : persons.find((i) => i._id === value)}
-        placeholder={' -- Choisir -- '}
         getOptionValue={(i) => i._id}
         getOptionLabel={(i) => i?.name || ''}
         {...props}

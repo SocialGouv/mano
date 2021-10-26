@@ -94,7 +94,6 @@ const AddPlace = ({ personId }) => {
                         onChange={(v) => handleChange({ currentTarget: { value: v, name: 'place' } })}
                         isClearable={false}
                         value={values.place}
-                        placeholder={' -- Choisir -- '}
                         getOptionValue={(i) => i._id}
                         getOptionLabel={(i) => i.name}
                       />
