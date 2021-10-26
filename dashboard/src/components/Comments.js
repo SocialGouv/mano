@@ -20,20 +20,25 @@ import AuthContext from '../contexts/auth';
 const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
-
+  const [comments, setComments] = useState([]);
   const commentsContext = useContext(CommentsContext);
 
-  const comments = commentsContext.comments
-    .filter((c) => {
-      if (!!personId) return c.person === personId;
-      if (!!actionId) return c.action === actionId;
-      return false;
-    })
-    .filter((c) => {
-      const commentIsPassage = c?.comment?.includes('Passage enregistré');
-      if (forPassages) return commentIsPassage;
-      return !commentIsPassage;
-    });
+  useEffect(() => {
+    if (!personId && !actionId) return;
+    setComments(
+      commentsContext.comments
+        .filter((c) => {
+          if (!!personId) return c.person === personId;
+          if (!!actionId) return c.action === actionId;
+          return false;
+        })
+        .filter((c) => {
+          const commentIsPassage = c?.comment?.includes('Passage enregistré');
+          if (forPassages) return commentIsPassage;
+          return !commentIsPassage;
+        })
+    );
+  }, [commentsContext.comments, personId, actionId, forPassages]);
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(comments.length);
