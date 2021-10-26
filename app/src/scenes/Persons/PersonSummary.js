@@ -90,22 +90,18 @@ class PersonSummary extends React.Component {
 
   onRemoveFromActiveList = async () => {
     const { navigation, person } = this.props;
-    navigation.push('Persons', {
-      screen: 'PersonsOutOfActiveListReason',
-      params: { person, fromRoute: 'Person' },
-    });
+    navigation.push('PersonsOutOfActiveListReason', { person, fromRoute: 'Person' });
   };
 
   onGetBackToActiveList = async () => {
-    const { navigation, person } = this.props;
-    await this.props.context.updatePerson({ ...person, outOfActiveListReason: '', outOfActiveList: false });
-    navigation.replace('Persons', {
-      screen: 'Person',
-      params: { ...person },
-    });
+    const { onUpdatePerson, onChange } = this.props;
+    await onChange({ outOfActiveListReason: '', outOfActiveList: false });
+    await onUpdatePerson(false);
   };
 
-  render() {
+  // FIXME: it's a bad pattern to have passed {...this.state} and {...this.props} to the component PersonSummary
+  // we'll need to do some refacto there
+  getEditablePersonFromProps = () => {
     const {
       loading,
       updating,
@@ -120,8 +116,32 @@ class PersonSummary extends React.Component {
       route,
       phone,
       backgroundColor,
-      ...person
+      writeComment,
+      writingComment,
+      person, // original person
+      ...editablePerson
     } = this.props;
+    return editablePerson;
+  };
+
+  render() {
+    const {
+      loading,
+      updating,
+      editable,
+      navigation,
+      onChange,
+      onUpdatePerson,
+      onEdit,
+      isUpdateDisabled,
+      onDeleteRequest,
+      context,
+      phone,
+      backgroundColor,
+      // FIXME: wrong pattern
+      person: originalPerson,
+    } = this.props;
+    const person = this.getEditablePersonFromProps();
     const { actions, places, relsPersonPlace, comments } = context;
 
     return (
@@ -259,7 +279,6 @@ class PersonSummary extends React.Component {
             <ButtonsContainer>
               <Button
                 caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
-                style={{ marginRight: 10 }}
                 onPress={() => (person.outOfActiveList ? this.onGetBackToActiveList() : this.onRemoveFromActiveList())}
                 color={colors.warning.color}
               />
@@ -268,7 +287,7 @@ class PersonSummary extends React.Component {
             <SubList
               label="Actions"
               onAdd={this.onAddActionRequest}
-              data={actions.filter((a) => a.person === person.person._id)}
+              data={actions.filter((a) => a.person === originalPerson._id)}
               renderItem={(action, index) => (
                 <ActionRow
                   key={index}
@@ -288,7 +307,7 @@ class PersonSummary extends React.Component {
             />
             <SubList
               label="Commentaires"
-              data={comments.filter((c) => c.person === person.person._id)}
+              data={comments.filter((c) => c.person === originalPerson._id)}
               renderItem={(comment, index) => (
                 <CommentRow
                   key={index}
@@ -304,14 +323,14 @@ class PersonSummary extends React.Component {
               <NewCommentInput
                 forwardRef={(r) => (this.newCommentRef = r)}
                 onFocus={() => this._scrollToInput(this.newCommentRef)}
-                person={person.person._id}
+                person={originalPerson._id}
                 writeComment={this.props.writeComment}
               />
             </SubList>
             <SubList
               label="Lieux fréquentés"
               onAdd={this.onAddPlaceRequest}
-              data={relsPersonPlace.filter((rel) => rel.person === person.person._id)}
+              data={relsPersonPlace.filter((rel) => rel.person === originalPerson._id)}
               renderItem={(rel, index) => {
                 const place = { ...places.find((pl) => pl._id === rel.place), ...rel };
                 return (
