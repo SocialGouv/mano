@@ -79,6 +79,9 @@ class PersonsList extends React.Component {
 
     let persons = personsFullPopulated;
     if (filterAlertness) persons = persons.filter((p) => Boolean(p.alertness));
+    if (filterOutOfActiveList) {
+      persons = persons.filter((p) => (filterOutOfActiveList === 'Oui' ? p.outOfActiveList : !p.outOfActiveList));
+    }
     if (search?.length) persons = filterBySearch(search, persons);
     if (filterTeams.length) {
       persons = persons.filter((p) => {
