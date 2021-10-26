@@ -12,7 +12,7 @@ export const TerritoryObservationsProvider = ({ children }) => {
 
   const { organisation } = useContext(AuthContext);
 
-  const customFieldsObs = organisation.customFieldsObs ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields;
+  const customFieldsObs = typeof organisation.customFieldsObs === 'string' ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields;
 
   const setTerritoryObs = (territoryObservations) => {
     if (territoryObservations) {
@@ -176,7 +176,7 @@ export const defaultCustomFields = [
   {
     name: 'comment',
     label: 'Commentaire',
-    type: 'text',
+    type: 'textarea',
     enabled: true,
     required: true,
     showInStats: true,

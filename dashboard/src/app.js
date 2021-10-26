@@ -48,9 +48,9 @@ const App = () => {
     };
   }, []);
   return (
-    <RootContextsProvider>
-      <FullPopulatedSelectorsProvider>
-        <Provider store={store}>
+    <Provider store={store}>
+      <RootContextsProvider>
+        <FullPopulatedSelectorsProvider>
           <div className="main-container">
             <div className="main">
               <Router>
@@ -76,9 +76,9 @@ const App = () => {
             </div>
           </div>
           <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-        </Provider>
-      </FullPopulatedSelectorsProvider>
-    </RootContextsProvider>
+        </FullPopulatedSelectorsProvider>
+      </RootContextsProvider>
+    </Provider>
   );
 };
 
