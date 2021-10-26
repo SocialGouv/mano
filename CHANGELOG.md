@@ -1,3 +1,10 @@
+## [1.18.2](https://github.com/SocialGouv/mano/compare/v1.18.1...v1.18.2) (2021-10-26)
+
+
+### Bug Fixes
+
+* static website ([#114](https://github.com/SocialGouv/mano/issues/114)) ([8ab9550](https://github.com/SocialGouv/mano/commit/8ab9550fdf281c3996d68685dc476b783901821c))
+
 ## [1.18.1](https://github.com/SocialGouv/mano/compare/v1.18.0...v1.18.1) (2021-10-22)
 
 
