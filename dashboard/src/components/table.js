@@ -34,9 +34,7 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
         )}
         <tr>
           {columns.map((column) => (
-            <td className={`column-header ${column.left && 'align-left'}`} key={column.title}>
-              {column.title}
-            </td>
+            <td className={`column-header ${column.left && 'align-left'}`} key={column.title} dangerouslySetInnerHTML={{ __html: column.title }} />
           ))}
         </tr>
       </thead>
@@ -46,7 +44,7 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
             <tr onClick={() => (onRowClick ? onRowClick(item) : null)} key={item[rowKey] || item._id}>
               {columns.map((column) => {
                 return (
-                  <td className="table-cell" key={item[rowKey] + column.dataKey}>
+                  <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
                     {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
                   </td>
                 );
@@ -109,7 +107,13 @@ const TableWrapper = styled.table`
     padding: 5px 0;
     /* padding-left: 20px; */
     font-size: 14px;
-    min-width: 100px;
+    &.small {
+      min-width: 50px;
+    }
+    /* if not this class, there is a bug ! try it */
+    &.not-small {
+      min-width: 100px;
+    }
   }
 
   .column-header {

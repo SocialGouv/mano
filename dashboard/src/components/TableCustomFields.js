@@ -1,5 +1,7 @@
+import { Formik } from 'formik';
 import React, { useContext, useState } from 'react';
 import { toastr } from 'react-redux-toastr';
+import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import AuthContext from '../contexts/auth';
 import API from '../services/api';
@@ -22,7 +24,7 @@ const typeOptions = [
 const newField = () => ({
   name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,
   label: '',
-  type: 'Texte',
+  type: 'text',
   enabled: false,
   required: false,
   showInStats: false,
@@ -33,31 +35,13 @@ const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type)
 const TableCustomeFields = ({ data, customFields }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mutableData, setMutableData] = useState(data);
+  const [editingField, setEditingField] = useState(null);
+  const [isNewField, setIsNewField] = useState(null);
   const { organisation, setAuth } = useContext(AuthContext);
-
-  const onLabelChange = (fieldToUpdate) => (event) => {
-    const label = event.target.value;
-    setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, label })));
-  };
-
-  const onTypeChange = (fieldToUpdate) => (event) => {
-    const type = event.value;
-    setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, type })));
-  };
-
-  const onOptionsChange = (fieldToUpdate) => (values) => {
-    const options = values.map((options) => options.value);
-    setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, options })));
-  };
 
   const onEnabledChange = (fieldToUpdate) => (event) => {
     const enabled = event.target.checked;
     setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, enabled })));
-  };
-
-  const onRequiredChange = (fieldToUpdate) => (event) => {
-    const required = event.target.checked;
-    setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, required })));
   };
 
   const onShowStatsChange = (fieldToUpdate) => (event) => {
@@ -65,8 +49,12 @@ const TableCustomeFields = ({ data, customFields }) => {
     setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, showInStats })));
   };
 
-  const onAddAField = () => {
-    setMutableData([...mutableData, newField()]);
+  const onSaveField = async (editedField) => {
+    const isUpdate = !!mutableData.find((f) => f.name === editedField.name);
+    const newData = isUpdate ? mutableData.map((field) => (field.name !== editedField.name ? field : editedField)) : [...mutableData, editedField];
+    await handleSubmit(newData);
+    setIsNewField(false);
+    setEditingField(null);
   };
 
   const onDelete = (fieldToDelete) => {
@@ -105,11 +93,16 @@ const TableCustomeFields = ({ data, customFields }) => {
         rowKey="name"
         columns={[
           {
+            dataKey: '_id',
+            render: (field) => <EditButton onClick={() => setEditingField(field)}>&#9998;</EditButton>,
+            small: true,
+          },
+          {
             title: 'Nom',
             dataKey: 'label',
             render: (f) => (
               <CellWrapper>
-                <Name rows="2" cols="15" onChange={onLabelChange(f)} value={f.label} placeholder="Tapez ici le nom du champ" />
+                <span>{f.label}</span>
               </CellWrapper>
             ),
           },
@@ -118,60 +111,142 @@ const TableCustomeFields = ({ data, customFields }) => {
             dataKey: 'type',
             render: (f) => (
               <CellWrapper>
-                <SelectCustom options={typeOptions} value={getValueFromType(f.type)} onChange={onTypeChange(f)} />
+                <span>{getValueFromType(f.type).label}</span>
               </CellWrapper>
             ),
           },
           {
             title: 'Options',
             dataKey: 'options',
-            render: (f) =>
-              !['enum', 'multi-choice'].includes(f.type) ? null : (
-                <CellWrapper>
-                  <SelectCustom
-                    creatable
-                    options={(f.options || []).sort((c1, c2) => c1.localeCompare(c2)).map((opt) => ({ value: opt, label: opt }))}
-                    value={(f.options || []).map((opt) => ({ value: opt, label: opt }))}
-                    isMulti
-                    onChange={onOptionsChange(f)}
-                    placeholder={' -- Choisir -- '}
-                  />
-                </CellWrapper>
-              ),
+            render: (f) => <CellWrapper>{!['enum', 'multi-choice'].includes(f.type) ? null : f.options.join(', ')}</CellWrapper>,
           },
           { title: 'Activé', dataKey: 'enabled', render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} /> },
+          // {
+          //   title: 'Obligatoire',
+          //   dataKey: 'required',
+          //   render: (f) => <input type="checkbox" checked={f.required} onChange={onRequiredChange(f)} />,
+          // },
           {
-            title: 'Obligatoire',
-            dataKey: 'required',
-            render: (f) => <input type="checkbox" checked={f.required} onChange={onRequiredChange(f)} />,
-          },
-          {
-            title: 'Voir dans les satistiques',
+            title: 'Voir dans les<br />satistiques',
             dataKey: 'showInStats',
             render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
           },
           {
-            title: 'Supprimer ?',
+            title: '',
             dataKey: 'name',
+            small: true,
             render: (f) => <ButtonCustom title="Supprimer" loading={isSubmitting} onClick={() => onDelete(f)} width={75} color="danger" />,
           },
         ]}
       />
       <ButtonsWrapper>
-        <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={onAddAField} width={200} />
+        <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={() => setIsNewField(true)} width={200} />
         <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={() => handleSubmit()} width={200} />
       </ButtonsWrapper>
+      <EditCustomField
+        editingField={editingField}
+        onClose={() => {
+          setEditingField(null);
+          setIsNewField(false);
+        }}
+        onSaveField={onSaveField}
+        isNewField={isNewField}
+      />
     </>
   );
 };
 
-const Name = styled.textarea`
-  resize: none;
-  border-color: #ccc;
-  border-radius: 4px;
-  padding: 8px;
-  display: inline-block;
-  vertical-align: middle;
+const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => {
+  const open = Boolean(editingField) || isNewField;
+
+  return (
+    <CreateStyle>
+      <Modal key={isNewField || editingField?.name} isOpen={open} toggle={() => onClose(null)} size="lg">
+        <ModalHeader toggle={() => onClose(null)}>{isNewField ? 'Modifier le champ' : 'Créer une nouveau champ'}</ModalHeader>
+        <ModalBody>
+          <Formik key={open} initialValues={editingField || newField()} onSubmit={onSaveField}>
+            {({ values: field, handleChange, handleSubmit, isSubmitting }) => {
+              console.log({ field });
+              return (
+                <React.Fragment>
+                  <Row>
+                    <Col md={12}>
+                      <FormGroup>
+                        <Label>Nom</Label>
+                        <Input type="textarea" name="label" value={field.label} onChange={handleChange} />
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label>Type</Label>
+                        <SelectCustom
+                          options={typeOptions}
+                          value={getValueFromType(field.type)}
+                          onChange={({ value }) => handleChange({ currentTarget: { value, name: 'type' } })}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      {!!['enum', 'multi-choice'].includes(field.type) && (
+                        <FormGroup>
+                          <Label>Type</Label>
+                          <SelectCustom
+                            creatable
+                            options={(field.options || []).sort((c1, c2) => c1.localeCompare(c2)).map((opt) => ({ value: opt, label: opt }))}
+                            value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}
+                            isMulti
+                            onChange={(v) => handleChange({ currentTarget: { value: v.map((v) => v.value), name: 'options' } })}
+                          />
+                        </FormGroup>
+                      )}
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label></Label>
+                        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                          <span>Activé</span>
+                          <Input type="checkbox" name="enabled" checked={field.enabled} onChange={handleChange} />
+                        </div>
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label></Label>
+                        <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                          <span>Voir dans les satistiques</span>
+                          <Input type="checkbox" name="showInStats" checked={field.showInStats} onChange={handleChange} />
+                        </div>
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <br />
+                  <ButtonCustom
+                    color="info"
+                    disabled={isSubmitting}
+                    loading={isSubmitting}
+                    onClick={() => !isSubmitting && handleSubmit()}
+                    title="Enregistrer"
+                  />
+                </React.Fragment>
+              );
+            }}
+          </Formik>
+        </ModalBody>
+      </Modal>
+    </CreateStyle>
+  );
+};
+
+const CreateStyle = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const EditButton = styled.button`
+  width: 30px;
+  border: none;
+  background: transparent;
 `;
 
 const CellWrapper = styled.div`

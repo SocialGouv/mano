@@ -52,7 +52,7 @@ const View = () => {
                 <Col md={12}>
                   <FormGroup>
                     <Label>Description</Label>
-                    <Input rows={7} type="textarea" name="description" value={values.description} onChange={handleChange} />
+                    <Input type="textarea" name="description" value={values.description} onChange={handleChange} />
                   </FormGroup>
                 </Col>
               </Row>
