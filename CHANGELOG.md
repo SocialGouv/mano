@@ -1,3 +1,10 @@
+# [1.19.0](https://github.com/SocialGouv/mano/compare/v1.18.4...v1.19.0) (2021-10-27)
+
+
+### Features
+
+* **app:** out of active list ([#113](https://github.com/SocialGouv/mano/issues/113)) ([6814421](https://github.com/SocialGouv/mano/commit/6814421ec0a51d3dcee4c0568a6ab81de9940376))
+
 ## [1.18.4](https://github.com/SocialGouv/mano/compare/v1.18.3...v1.18.4) (2021-10-26)
 
 
