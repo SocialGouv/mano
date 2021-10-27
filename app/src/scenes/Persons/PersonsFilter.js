@@ -11,15 +11,16 @@ import { compose } from 'recompose';
 import AuthContext from '../../contexts/auth';
 import withContext from '../../contexts/withContext';
 import PersonsContext from '../../contexts/persons';
+import OutOfActiveListSelect from '../../components/Selects/OutOfActiveListSelect';
+import { View } from 'react-native';
 
 const PersonsFilter = ({ route, context, navigation }) => {
-  const [filterAlertness, setFilterAlertness] = useState(
-    route.params?.filters?.filterAlertness || false
-  );
+  const [filterAlertness, setFilterAlertness] = useState(route.params?.filters?.filterAlertness || false);
   const [filterTeams, setFilterByTeam] = useState(route.params?.filters?.filterTeams || []);
+  const [filterOutOfActiveList, setFilterOutOfActiveList] = useState(route.params?.filters?.filterOutOfActiveList || '');
 
   const onBackRequested = () => {
-    navigation.navigate('PersonsList', { filters: { filterAlertness, filterTeams } });
+    navigation.navigate('PersonsList', { filters: { filterAlertness, filterTeams, filterOutOfActiveList } });
   };
 
   return (
@@ -39,25 +40,26 @@ const PersonsFilter = ({ route, context, navigation }) => {
               key={_id}
               label={name}
               value={isSelected}
-              onPress={() =>
-                setFilterByTeam(
-                  isSelected
-                    ? filterTeams.filter((teamId) => teamId !== _id)
-                    : [...filterTeams, _id]
-                )
-              }
+              onPress={() => setFilterByTeam(isSelected ? filterTeams.filter((teamId) => teamId !== _id) : [...filterTeams, _id])}
             />
           );
         })}
+        <OutOfActiveListSelectWapper>
+          <OutOfActiveListSelect value={filterOutOfActiveList} editable={true} onSelect={(value) => setFilterOutOfActiveList(value)} />
+        </OutOfActiveListSelectWapper>
       </ScrollContainer>
     </SceneContainer>
   );
 };
 
+const OutOfActiveListSelectWapper = styled(View)`
+  margin-top: 20px;
+`;
+
 const Category = styled(MyText)`
   font-size: 15px;
   color: ${colors.app.color};
-  margin-vertical: 15px;
+  margin: 15px 0;
 `;
 
 export default compose(withContext(AuthContext), withContext(PersonsContext))(PersonsFilter);

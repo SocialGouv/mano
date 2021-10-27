@@ -15,6 +15,7 @@ import ActionsContext from '../../contexts/actions';
 import PersonsContext from '../../contexts/persons';
 import PlacesContext from '../../contexts/places';
 import CommentsContext from '../../contexts/comments';
+import colors from '../../utils/colors';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -45,6 +46,8 @@ class Person extends React.Component {
       assignedTeams: person.assignedTeams || [],
       hasAnimal: person.hasAnimal?.trim() || '',
       entityKey: person.entityKey || '',
+      outOfActiveList: person.outOfActiveList || false,
+      outOfActiveListReason: person.outOfActiveListReason || '',
     };
   };
 
@@ -61,14 +64,21 @@ class Person extends React.Component {
     editable: this.props.route?.params?.editable || false,
     updating: false,
   };
+
   componentDidMount() {
-    this.getData();
+    this.getPerson();
     this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
+    this.props.navigation.addListener('focus', this.handleFocus);
   }
 
   componentWillUnmount() {
     this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
+    this.props.navigation.removeListener('focus', this.handleFocus);
   }
+
+  handleFocus = () => {
+    this.getPerson();
+  };
 
   handleBeforeRemove = (e) => {
     if (this.backRequestHandled) return;
@@ -77,10 +87,6 @@ class Person extends React.Component {
   };
 
   onEdit = () => this.setState(({ editable }) => ({ editable: !editable }));
-
-  getData = async () => {
-    await this.getPerson();
-  };
 
   setPerson = (personDB) => {
     this.setState({
@@ -114,7 +120,7 @@ class Person extends React.Component {
       return false;
     }
     if (response.ok) {
-      if (alert) Alert.alert('Personne mise-à-jour !');
+      if (alert) Alert.alert('Personne mise à jour !');
       this.setPerson(response.data);
       this.setState({ updating: false, editable: false });
       return true;
@@ -206,19 +212,26 @@ class Person extends React.Component {
   };
 
   render() {
-    const { name, updating, editable } = this.state;
+    const { name, updating, editable, person } = this.state;
 
     return (
-      <SceneContainer>
+      <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}>
         <ScreenTitle
           title={name}
           onBack={this.onGoBackRequested}
           onEdit={!editable ? this.onEdit : null}
           onSave={!editable ? null : this.onUpdatePerson}
           saving={updating}
+          backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
         />
         <TabNavigator.Navigator
-          tabBar={(props) => <Tabs numberOfTabs={2} {...props} />}
+          tabBar={(props) => (
+            <Tabs
+              numberOfTabs={2}
+              {...props}
+              backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
+            />
+          )}
           lazy
           removeClippedSubviews={Platform.OS === 'android'}
           swipeEnabled>
@@ -227,6 +240,7 @@ class Person extends React.Component {
               <PersonSummary
                 {...this.state}
                 {...this.props}
+                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
                 onChange={this.onChange}
                 onUpdatePerson={this.onUpdatePerson}
                 writeComment={(writingComment) => this.setState({ writingComment })}
@@ -242,6 +256,7 @@ class Person extends React.Component {
               <FoldersNavigator
                 {...this.state}
                 {...this.props}
+                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
                 onChange={this.onChange}
                 onUpdatePerson={this.onUpdatePerson}
                 onEdit={this.onEdit}

@@ -1,11 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import {
-  TouchableOpacity,
-  ActivityIndicator,
-  TouchableWithoutFeedback,
-  Dimensions,
-} from 'react-native';
+import { TouchableOpacity, ActivityIndicator, TouchableWithoutFeedback, Dimensions } from 'react-native';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
 import Spacer from './Spacer';

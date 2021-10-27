@@ -24,18 +24,15 @@ class FileMedical extends React.Component {
       onEdit,
       isUpdateDisabled,
       updating,
+      backgroundColor,
     } = this.props;
 
     return (
       <>
-        <SubHeader center onBack={navigation.goBack} caption="Dossier médical" />
-        <ScrollContainer>
+        <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Dossier médical" />
+        <ScrollContainer backgroundColor={backgroundColor || colors.app.color}>
           <View>
-            <HealthInsuranceSelect
-              value={healthInsurance}
-              onSelect={(healthInsurance) => onChange({ healthInsurance })}
-              editable={editable}
-            />
+            <HealthInsuranceSelect value={healthInsurance} onSelect={(healthInsurance) => onChange({ healthInsurance })} editable={editable} />
 
             <InputLabelled
               label="Structure de suivi médical"
@@ -49,11 +46,7 @@ class FileMedical extends React.Component {
               onChange={(vulnerabilities) => onChange({ vulnerabilities })}
               editable={editable}
             />
-            <ConsumptionsMultiCheckBoxes
-              values={consumptions}
-              onChange={(consumptions) => onChange({ consumptions })}
-              editable={editable}
-            />
+            <ConsumptionsMultiCheckBoxes values={consumptions} onChange={(consumptions) => onChange({ consumptions })} editable={editable} />
             {!editable && <Spacer />}
             <ButtonsContainer>
               <Button

@@ -13,6 +13,7 @@ import Button from '../../components/Button';
 import InputLabelled from '../../components/InputLabelled';
 import EmploymentSituationSelect from '../../components/Selects/EmploymentSituationSelect';
 import AddressDetailSelect, { isFreeFieldAddressDetail } from '../../components/Selects/AddressDetailSelect';
+import colors from '../../utils/colors';
 
 class FileSocial extends React.Component {
   render() {
@@ -33,12 +34,13 @@ class FileSocial extends React.Component {
       onUpdatePerson,
       onEdit,
       isUpdateDisabled,
+      backgroundColor,
     } = this.props;
 
     return (
       <>
-        <SubHeader center onBack={navigation.goBack} caption="Dossier social" />
-        <ScrollContainer>
+        <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Dossier social" />
+        <ScrollContainer backgroundColor={backgroundColor || colors.app.color}>
           <PersonalSituationSelect value={personalSituation} onSelect={(personalSituation) => onChange({ personalSituation })} editable={editable} />
           <InputLabelled
             label="Structure de suivi social"

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Alert, findNodeHandle, Linking } from 'react-native';
+import { Alert, findNodeHandle, Linking, Text, View } from 'react-native';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import * as Sentry from '@sentry/react-native';
@@ -88,7 +88,20 @@ class PersonSummary extends React.Component {
     }, 250);
   };
 
-  render() {
+  onRemoveFromActiveList = async () => {
+    const { navigation, person } = this.props;
+    navigation.push('PersonsOutOfActiveListReason', { person, fromRoute: 'Person' });
+  };
+
+  onGetBackToActiveList = async () => {
+    const { onUpdatePerson, onChange } = this.props;
+    await onChange({ outOfActiveListReason: '', outOfActiveList: false });
+    await onUpdatePerson(false);
+  };
+
+  // FIXME: it's a bad pattern to have passed {...this.state} and {...this.props} to the component PersonSummary
+  // we'll need to do some refacto there
+  getEditablePersonFromProps = () => {
     const {
       loading,
       updating,
@@ -102,8 +115,33 @@ class PersonSummary extends React.Component {
       context,
       route,
       phone,
-      ...person
+      backgroundColor,
+      writeComment,
+      writingComment,
+      person, // original person
+      ...editablePerson
     } = this.props;
+    return editablePerson;
+  };
+
+  render() {
+    const {
+      loading,
+      updating,
+      editable,
+      navigation,
+      onChange,
+      onUpdatePerson,
+      onEdit,
+      isUpdateDisabled,
+      onDeleteRequest,
+      context,
+      phone,
+      backgroundColor,
+      // FIXME: wrong pattern
+      person: originalPerson,
+    } = this.props;
+    const person = this.getEditablePersonFromProps();
     const { actions, places, relsPersonPlace, comments } = context;
 
     return (
@@ -111,7 +149,14 @@ class PersonSummary extends React.Component {
         {loading ? (
           <Spinner />
         ) : (
-          <ScrollContainer ref={(r) => (this.scrollView = r)}>
+          <ScrollContainer ref={(r) => (this.scrollView = r)} backgroundColor={backgroundColor || colors.app.color}>
+            {person.outOfActiveList && (
+              <AlterOutOfActiveList>
+                <Text style={{ color: colors.app.colorWhite }}>
+                  {person?.name} est en dehors de la file active, pour le motif suivant : {person.outOfActiveListReason}
+                </Text>
+              </AlterOutOfActiveList>
+            )}
             <InputLabelled
               label="Nom prénom ou Pseudonyme"
               onChangeText={(name) => onChange({ name })}
@@ -225,17 +270,24 @@ class PersonSummary extends React.Component {
             <ButtonsContainer>
               <ButtonDelete onPress={onDeleteRequest} />
               <Button
-                caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+                caption={editable ? 'Mettre à jour' : 'Modifier'}
                 onPress={editable ? onUpdatePerson : onEdit}
                 disabled={editable ? isUpdateDisabled() : false}
                 loading={updating}
+              />
+            </ButtonsContainer>
+            <ButtonsContainer>
+              <Button
+                caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
+                onPress={() => (person.outOfActiveList ? this.onGetBackToActiveList() : this.onRemoveFromActiveList())}
+                color={colors.warning.color}
               />
             </ButtonsContainer>
 
             <SubList
               label="Actions"
               onAdd={this.onAddActionRequest}
-              data={actions.filter((a) => a.person === person.person._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1))}
+              data={actions.filter((a) => a.person === originalPerson._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1))}
               renderItem={(action, index) => (
                 <ActionRow
                   key={index}
@@ -255,7 +307,7 @@ class PersonSummary extends React.Component {
             />
             <SubList
               label="Commentaires"
-              data={comments.filter((c) => c.person === person.person._id)}
+              data={comments.filter((c) => c.person === originalPerson._id)}
               renderItem={(comment, index) => (
                 <CommentRow
                   key={index}
@@ -271,14 +323,14 @@ class PersonSummary extends React.Component {
               <NewCommentInput
                 forwardRef={(r) => (this.newCommentRef = r)}
                 onFocus={() => this._scrollToInput(this.newCommentRef)}
-                person={person.person._id}
+                person={originalPerson._id}
                 writeComment={this.props.writeComment}
               />
             </SubList>
             <SubList
               label="Lieux fréquentés"
               onAdd={this.onAddPlaceRequest}
-              data={relsPersonPlace.filter((rel) => rel.person === person.person._id)}
+              data={relsPersonPlace.filter((rel) => rel.person === originalPerson._id)}
               renderItem={(rel, index) => {
                 const place = { ...places.find((pl) => pl._id === rel.place), ...rel };
                 return (
@@ -305,6 +357,13 @@ const Row = styled.View`
   flex-direction: row;
   align-items: center;
   margin-bottom: 30px;
+`;
+
+const AlterOutOfActiveList = styled.View`
+  margin-bottom: 20px;
+  border-radius: 10px;
+  background-color: ${colors.app.colorGrey};
+  padding: 10px;
 `;
 
 export default compose(
