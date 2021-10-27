@@ -15,12 +15,14 @@ import SelectCustom from '../../components/SelectCustom';
 import AuthContext from '../../contexts/auth';
 import { actionsCategories } from '../../contexts/actions';
 import styled from 'styled-components';
+import { defaultCustomFields } from '../../contexts/territoryObservations';
+import TableCustomFields from '../../components/TableCustomFields';
 
 const View = () => {
   const { organisation, setAuth } = useContext(AuthContext);
 
   return (
-    <Container style={{ padding: '40px 0' }}>
+    <Container style={{ padding: '40px 0', margin: '0 -40px' }}>
       <Header title={<BackButton />} />
       <Box>
         <Formik
@@ -39,7 +41,7 @@ const View = () => {
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => {
             return (
-              <React.Fragment>
+              <>
                 <Title>Infos</Title>
                 <Row>
                   <Col md={6}>
@@ -79,7 +81,7 @@ const View = () => {
                   <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
                 </div>
                 <hr />
-                <Title>Réglage de l'accueil de jour</Title>
+                <Title>Réglage de l'Accueil de jour</Title>
                 <Row>
                   <Col md={12}>
                     <FormGroup>
@@ -108,7 +110,19 @@ const View = () => {
                   <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
                 </div>
                 <hr />
-              </React.Fragment>
+                {/* this custom fields is only working if encryption is enabled */}
+                {organisation.encryptionEnabled && (
+                  <>
+                    <Title>Réglage des Observations</Title>
+                    <Row>
+                      <TableCustomFields
+                        customFields="customFieldsObs"
+                        data={organisation.customFieldsObs ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields}
+                      />
+                    </Row>
+                  </>
+                )}
+              </>
             );
           }}
         </Formik>

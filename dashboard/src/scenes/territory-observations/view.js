@@ -4,10 +4,20 @@ import dayjs from 'dayjs';
 import { Button as CloseButton } from 'reactstrap';
 import AuthContext from '../../contexts/auth';
 import UserName from '../../components/UserName';
-import { observationsKeyLabels } from '../../contexts/territoryObservations';
+import TerritoryObservationsContext from '../../contexts/territoryObservations';
+import CustomFieldDisplay from '../../components/CustomFieldDisplay';
+
+const fieldIsEmpty = (value) => {
+  if (value === null) return true;
+  if (value === undefined) return true;
+  if (typeof value === 'string' && !value.length) return true;
+  if (Array.isArray(value) && !value.length) return true;
+  return false;
+};
 
 const View = ({ obs, onDelete, onClick, noBorder }) => {
   const { teams } = useContext(AuthContext);
+  const { customFieldsObs } = useContext(TerritoryObservationsContext);
 
   return (
     <StyledObservation noBorder={noBorder}>
@@ -18,36 +28,24 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
       </div>
       <div className="time">{dayjs(obs.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
-        <Item filledUp={!!obs.personsMale}>
-          {observationsKeyLabels.personsMale}: {obs.personsMale}
-        </Item>
-        <Item filledUp={!!obs.personsFemale}>
-          {observationsKeyLabels.personsFemale}: {obs.personsFemale}
-        </Item>
-        <Item filledUp={!!obs.police}>
-          {observationsKeyLabels.police}: {obs.police}
-        </Item>
-        <Item filledUp={!!obs.material}>
-          {observationsKeyLabels.material}: {obs.material}
-        </Item>
-        <Item filledUp={!!obs.atmosphere}>
-          {observationsKeyLabels.atmosphere}: {obs.atmosphere}
-        </Item>
-        <Item filledUp={!!obs.mediation}>
-          {observationsKeyLabels.mediation}: {obs.mediation}
-        </Item>
-        <Item filledUp={!!obs.comment}>
-          {observationsKeyLabels.comment}: {obs.comment?.split('\\n')?.join('\u000A')}
-        </Item>
-        <Item></Item>
+        {customFieldsObs
+          .filter((f) => f.enabled)
+          .map((field) => {
+            const { name, label } = field;
+            return (
+              <Item key={name} fieldIsEmpty={fieldIsEmpty(obs[name])}>
+                {label}: <CustomFieldDisplay field={field} value={obs[field.name]} />
+              </Item>
+            );
+          })}
       </div>
     </StyledObservation>
   );
 };
 
 const Item = styled.span`
-  display: block;
-  ${(props) => !props.filledUp && 'opacity: 0.25;'}
+  display: inline-block;
+  ${(props) => props.fieldIsEmpty && 'opacity: 0.25;'}
 `;
 
 const StyledObservation = styled.div`

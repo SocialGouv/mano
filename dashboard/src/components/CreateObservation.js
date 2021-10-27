@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import styled from 'styled-components';
 import { Formik } from 'formik';
@@ -9,10 +9,10 @@ import 'react-datepicker/dist/react-datepicker.css';
 import AuthContext from '../contexts/auth';
 import TerritoryObservationsContext from '../contexts/territoryObservations';
 import SelectTeam from './SelectTeam';
-import SelectAsInput from './SelectAsInput';
 import ButtonCustom from './ButtonCustom';
 import TerritoryContext from '../contexts/territory';
 import SelectCustom from './SelectCustom';
+import CustomFieldInput from './CustomFieldInput';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
 
@@ -24,7 +24,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   }, [forceOpen]);
 
   const { user } = useContext(AuthContext);
-  const { addTerritoryObs, updateTerritoryObs } = useContext(TerritoryObservationsContext);
+  const { addTerritoryObs, updateTerritoryObs, customFieldsObs } = useContext(TerritoryObservationsContext);
   const { territories } = useContext(TerritoryContext);
 
   return (
@@ -39,19 +39,15 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               if (!values.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
               if (!values.territory) return toastr.error('Erreur!', 'Le territoire est obligatoire');
               const body = {
-                personsMale: values.personsMale,
-                personsFemale: values.personsFemale,
-                police: values.police,
-                material: values.material,
-                atmosphere: values.atmosphere,
-                mediation: values.mediation,
-                comment: values.comment,
                 createdAt: values.createdAt,
                 team: values.team,
+                user: user._id,
                 territory: values.territory,
                 _id: observation._id,
               };
-
+              for (const customField of customFieldsObs.filter((f) => f.enabled)) {
+                body[customField.name] = values[customField.name];
+              }
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
               actions.setSubmitting(false);
               if (res.ok) {
@@ -62,48 +58,11 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Nombre de personnes non connues hommes rencontrées</Label>
-                      <Input name="personsMale" type="number" value={values.personsMale} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Nombre de personnes non connues femmes rencontrées</Label>
-                      <Input name="personsFemale" type="number" value={values.personsFemale} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Présence policière</Label>
-                      <SelectAsInput options={policeSelect} name="police" value={values.police || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Nombre de matériel ramassé</Label>
-                      <Input name="material" type="number" value={values.material} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Ambiance</Label>
-                      <SelectAsInput options={atmosphereSelect} name="atmosphere" value={values.atmosphere || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Nombre de médiations avec les riverains / les structures</Label>
-                      <Input name="mediation" type="number" value={values.mediation} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Commentaire</Label>
-                      <Input name="comment" type="textarea" value={values.comment} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
+                  {customFieldsObs
+                    .filter((f) => f.enabled)
+                    .map((field) => (
+                      <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                    ))}
                   <Col md={6}>
                     <FormGroup>
                       <Label>Observation faite le</Label>
@@ -113,7 +72,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                           className="form-control"
                           selected={values.createdAt ? new Date(values.createdAt) : new Date()}
                           onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
-                          timeInputLabel="Time:"
+                          timeInputLabel="Heure :"
                           dateFormat="dd/MM/yyyy hh:mm"
                           showTimeInput
                         />

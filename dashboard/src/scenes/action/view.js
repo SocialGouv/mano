@@ -118,7 +118,7 @@ const View = () => {
                             className="form-control"
                             selected={values.completedAt ? new Date(values.completedAt) : new Date()}
                             onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
-                            timeInputLabel="Time:"
+                            timeInputLabel="Heure :"
                             dateFormat="dd/MM/yyyy HH:mm"
                             showTimeInput
                           />

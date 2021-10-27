@@ -32,7 +32,7 @@ const EncryptionKey = () => {
   const { actions } = useContext(ActionsContext);
   const { comments } = useContext(CommentsContext);
   const { territories } = useContext(TerritoryContext);
-  const { territoryObservations: observations } = useContext(TerritoryObservationsContext);
+  const { territoryObservations: observations, customFieldsObs } = useContext(TerritoryObservationsContext);
   const { places } = useContext(PlacesContext);
   const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
   const { reports } = useContext(ReportsContext);
@@ -69,7 +69,7 @@ const EncryptionKey = () => {
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(API.encryptItem));
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(API.encryptItem));
       const encryptedTerritories = await Promise.all(territories.map(prepareTerritoryForEncryption).map(API.encryptItem));
-      const encryptedTerritoryObservations = await Promise.all(observations.map(prepareObsForEncryption).map(API.encryptItem));
+      const encryptedTerritoryObservations = await Promise.all(observations.map(prepareObsForEncryption(customFieldsObs)).map(API.encryptItem));
       const encryptedPlaces = await Promise.all(places.map(preparePlaceForEncryption).map(API.encryptItem));
       const encryptedRelsPersonPlace = await Promise.all(relsPersonPlace.map(prepareRelPersonPlaceForEncryption).map(API.encryptItem));
       const encryptedReports = await Promise.all(reports.map(prepareReportForEncryption).map(API.encryptItem));

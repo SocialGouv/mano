@@ -13,6 +13,7 @@ Organisation.init(
     encryptionLastUpdateAt: DataTypes.DATE,
     receptionEnabled: { type: DataTypes.BOOLEAN },
     services: DataTypes.ARRAY(DataTypes.TEXT),
+    customFieldsObs: DataTypes.JSONB,
   },
   { sequelize, modelName: "Organisation", freezeTableName: true }
 );

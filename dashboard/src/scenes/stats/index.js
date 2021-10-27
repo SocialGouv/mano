@@ -89,7 +89,7 @@ const Stats = () => {
   const { comments } = useContext(CommentsContext);
   const { reports } = useContext(ReportsContext);
   const { territories } = useContext(TerritoryContext);
-  const { territoryObservations: allObservations } = useContext(TerritoryObservationsContext);
+  const { territoryObservations: allObservations, customFieldsObs } = useContext(TerritoryObservationsContext);
   const { places } = useContext(PlacesContext);
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -228,20 +228,35 @@ const Stats = () => {
         <TabPane tabId={3}>
           <Title>Statistiques des observations de territoire</Title>
           <Row>
-            <Col md={3} style={{ marginBottom: '20px' }}>
-              <BlockTotal title="Hommes non connus rencontrés" unit="hommes" data={observations} field="personsMale" debug />
-            </Col>
-            <Col md={3} style={{ marginBottom: '20px' }}>
-              <BlockTotal title="Femmes non connues rencontrées" unit="femmes" data={observations} field="personsFemale" />
-            </Col>
-            <Col md={3} style={{ marginBottom: '20px' }}>
-              <BlockTotal title="Matériel ramassé" unit="pièces" data={observations} field="material" />
-            </Col>
-            <Col md={3} style={{ marginBottom: '20px' }}>
-              <BlockTotal title="Nombre de médiations" unit="médiations" data={observations} field="mediation" />
-            </Col>
-            <CustomResponsivePie title="Présence policière" data={getPieData(observations, 'police')} />
-            <CustomResponsivePie title="Ambiance" data={getPieData(observations, 'atmosphere', { options: ['Violences', 'Tensions', 'RAS'] })} />
+            {customFieldsObs
+              .filter((f) => f.enabled)
+              .filter((f) => f.showInStats)
+              .filter((field) => ['number'].includes(field.type))
+              .map((field) => (
+                <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+                  <BlockTotal title={field.label} data={observations} field={field.name} />
+                </Col>
+              ))}
+            {customFieldsObs
+              .filter((f) => f.enabled)
+              .filter((f) => f.showInStats)
+              .filter((field) => ['date', 'date-with-time'].includes(field.type))
+              .map((field) => (
+                <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+                  <BlockDateWithTime data={observations} field={field} />
+                </Col>
+              ))}
+            {customFieldsObs
+              .filter((f) => f.enabled)
+              .filter((f) => f.showInStats)
+              .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
+              .map((field) => (
+                <CustomResponsivePie
+                  title={field.label}
+                  key={field.name}
+                  data={getPieData(observations, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+                />
+              ))}
           </Row>
         </TabPane>
         <TabPane tabId={4}>
@@ -271,7 +286,7 @@ const getPieData = (source, key, { options = null, isBoolean = false } = {}) => 
         newData['Non renseigné']++;
         return newData;
       }
-      if (options) {
+      if (options && options.length) {
         for (let option of [...options, 'Uniquement']) {
           if (typeof person[key] === 'string' ? person[key] === option : person[key].includes(option)) {
             if (!newData[option]) newData[option] = 0;
@@ -424,6 +439,18 @@ const getDuration = (timestampFromNow) => {
   if (inMonths < 24) return [Math.round(inMonths), 'mois'];
   const inYears = inDays / 365.25;
   return [Math.round(inYears), 'années'];
+};
+
+const BlockDateWithTime = ({ data, field }) => {
+  if (!data.filter((item) => Boolean(item[field.name])).length) return null;
+
+  const averageField =
+    data.filter((item) => Boolean(item[field.name])).reduce((total, item) => total + Date.parse(item[field.name]), 0) / (data.length || 1);
+
+  const durationFromNowToAverage = Date.now() - averageField;
+  const [count, unit] = getDuration(durationFromNowToAverage);
+
+  return <Card title={field.label + ' (moyenne)'} unit={unit} count={count} />;
 };
 
 const BlockCreatedAt = ({ persons }) => {
