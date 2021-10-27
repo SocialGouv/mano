@@ -1,3 +1,10 @@
+# [1.20.0](https://github.com/SocialGouv/mano/compare/v1.19.0...v1.20.0) (2021-10-27)
+
+
+### Features
+
+* model observations customizable ([#106](https://github.com/SocialGouv/mano/issues/106)) ([48701c8](https://github.com/SocialGouv/mano/commit/48701c89c5f49641b0b6066cdf700ed35d421f2a))
+
 # [1.19.0](https://github.com/SocialGouv/mano/compare/v1.18.4...v1.19.0) (2021-10-27)
 
 
