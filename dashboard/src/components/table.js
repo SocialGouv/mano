@@ -34,7 +34,11 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
         )}
         <tr>
           {columns.map((column) => (
-            <td className={`column-header ${column.left && 'align-left'}`} key={column.title} dangerouslySetInnerHTML={{ __html: column.title }} />
+            <td
+              className={`column-header ${column.left && 'align-left'}`}
+              key={column.title || column.dataKey}
+              dangerouslySetInnerHTML={{ __html: column.title }}
+            />
           ))}
         </tr>
       </thead>
