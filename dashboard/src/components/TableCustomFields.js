@@ -32,7 +32,7 @@ const newField = () => ({
 
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
 
-const TableCustomeFields = ({ data, customFields }) => {
+const TableCustomFields = ({ data, customFields }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
@@ -265,4 +265,4 @@ const ButtonsWrapper = styled.div`
   }
 `;
 
-export default TableCustomeFields;
+export default TableCustomFields;
