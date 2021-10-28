@@ -123,7 +123,6 @@ const CreateTerritory = () => {
                         isClearable={false}
                         isMulti
                         value={values.types}
-                        placeholder={' -- Choisir -- '}
                         getOptionValue={(i) => i}
                         getOptionLabel={(i) => i}
                       />

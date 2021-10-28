@@ -72,7 +72,6 @@ const View = () => {
                         value={(values.categories || []).map((cat) => ({ value: cat, label: cat }))}
                         isMulti
                         onChange={(cats) => handleChange({ target: { value: cats.map((cat) => cat.value), name: 'categories' } })}
-                        placeholder={' -- Choisir -- '}
                       />
                     </FormGroup>
                   </Col>
@@ -101,7 +100,6 @@ const View = () => {
                         value={(values.services || []).map((cat) => ({ value: cat, label: cat }))}
                         isMulti
                         onChange={(cats) => handleChange({ target: { value: cats.map((cat) => cat.value), name: 'services' } })}
-                        placeholder={' -- Choisir -- '}
                       />
                     </FormGroup>
                   </Col>

@@ -469,7 +469,6 @@ const Reasons = ({ value, onChange }) => (
       isClearable={false}
       isMulti
       value={value}
-      placeholder={' -- Choisir -- '}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
     />
@@ -486,7 +485,6 @@ const Vunerabilities = ({ value, onChange }) => (
       isClearable={false}
       isMulti
       value={value}
-      placeholder={' -- Choisir -- '}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
     />
@@ -503,7 +501,6 @@ const Ressources = ({ value, onChange }) => (
       isClearable={false}
       isMulti
       value={value}
-      placeholder={' -- Choisir -- '}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
     />
@@ -520,7 +517,6 @@ const Consommations = ({ value, onChange }) => (
       isClearable={false}
       isMulti
       value={value}
-      placeholder={' -- Choisir -- '}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
     />

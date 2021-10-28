@@ -67,7 +67,6 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
                   onChange={onChangeField}
                   getOptionLabel={(f) => base.find((filter) => filter.field === f)?.label}
                   getOptionValue={(f) => f}
-                  placeholder={' -- Choisir -- '}
                   isClearable={true}
                   isMulti={false}
                 />
@@ -80,7 +79,6 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
                     getOptionLabel={(f) => f}
                     getOptionValue={(f) => f}
                     onChange={onChangeValue}
-                    placeholder={' -- Choisir -- '}
                     isClearable={!value}
                   />
                 )}

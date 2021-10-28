@@ -10,7 +10,6 @@ const SelectStatus = ({ onChange, value, name = 'status' }) => {
       onChange={(v) => onChange({ target: { value: v?._id, name } })}
       getOptionValue={(i) => i?._id}
       getOptionLabel={(i) => mappedIdsToLabels.find((o) => o._id === i._id)?.name}
-      placeholder={' -- Choisir -- '}
     />
   );
 };

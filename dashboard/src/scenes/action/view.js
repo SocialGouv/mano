@@ -141,7 +141,6 @@ const View = () => {
                         isClearable={false}
                         isMulti
                         value={values.categories}
-                        placeholder={' -- Choisir -- '}
                         getOptionValue={(i) => i}
                         getOptionLabel={(i) => i}
                       />
