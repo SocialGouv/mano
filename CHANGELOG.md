@@ -1,3 +1,15 @@
+# [1.21.0](https://github.com/SocialGouv/mano/compare/v1.20.1...v1.21.0) (2021-11-02)
+
+
+### Bug Fixes
+
+* **dashboard:** show message for custom fields when organisation not encrypted ([#126](https://github.com/SocialGouv/mano/issues/126)) ([de16299](https://github.com/SocialGouv/mano/commit/de16299b8d9fe5acd82fed1ff82692559e9003da))
+
+
+### Features
+
+* **dashboard:** show more stuff in organisations for superadmin to better pilot ([#127](https://github.com/SocialGouv/mano/issues/127)) ([204703c](https://github.com/SocialGouv/mano/commit/204703cacb462e14d5634108ea948f4739325c9f))
+
 ## [1.20.1](https://github.com/SocialGouv/mano/compare/v1.20.0...v1.20.1) (2021-11-02)
 
 
