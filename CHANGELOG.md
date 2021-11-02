@@ -1,3 +1,10 @@
+## [1.21.1](https://github.com/SocialGouv/mano/compare/v1.21.0...v1.21.1) (2021-11-02)
+
+
+### Bug Fixes
+
+* **dashboard:** wording on comments ([1c1f5ee](https://github.com/SocialGouv/mano/commit/1c1f5ee43fdcff0d0ee596c44cbb5ded1caa9056))
+
 # [1.21.0](https://github.com/SocialGouv/mano/compare/v1.20.1...v1.21.0) (2021-11-02)
 
 
