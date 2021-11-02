@@ -108,18 +108,32 @@ const View = () => {
                   <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
                 </div>
                 <hr />
+                <Title>Réglage des Observations de Territoires</Title>
                 {/* this custom fields is only working if encryption is enabled */}
-                {organisation.encryptionEnabled && (
-                  <>
-                    <Title>Réglage des Observations</Title>
+                <>
+                  {organisation.encryptionEnabled ? (
                     <Row>
                       <TableCustomFields
                         customFields="customFieldsObs"
                         data={organisation.customFieldsObs ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields}
                       />
                     </Row>
-                  </>
-                )}
+                  ) : (
+                    <>
+                      <Row>
+                        <Col md={10}>
+                          <p>
+                            Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les observations de territoires,
+                            n'existe que pour les organisations chiffrées.
+                          </p>
+                        </Col>
+                      </Row>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                        <EncryptionKey />
+                      </div>
+                    </>
+                  )}
+                </>
               </>
             );
           }}
