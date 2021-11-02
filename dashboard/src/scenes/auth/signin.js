@@ -122,7 +122,7 @@ const SignIn = () => {
             actions.setSubmitting(false);
             if (['superadmin'].includes(user.role)) {
               history.push('/organisation');
-            } else if (user.teams.length <= 1) {
+            } else if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
               onSigninValidated(user);
               refresh({ initialLoad: true, showFullScreen: true });

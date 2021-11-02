@@ -41,7 +41,7 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
                 onClick={!!onSortBy ? onNameClick : null}
                 className={`column-header ${column.left && 'align-left'} ${!!onSortBy && 'clickable'}`}
                 key={column.title || dataKey}>
-                <span dangerouslySetInnerHTML={{ __html: column.title }} />
+                <span>{column.title}</span>
                 {(sortBy === sortableKey || sortBy === dataKey) && (
                   <>
                     {sortOrder === 'ASC' && <span onClick={() => onSortOrder('DESC')}>{`\u00A0\u2193`}</span>}

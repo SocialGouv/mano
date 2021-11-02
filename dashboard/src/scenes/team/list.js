@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -7,7 +7,6 @@ import { toastr } from 'react-redux-toastr';
 import API from '../../services/api';
 
 import Header from '../../components/header';
-import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
@@ -17,23 +16,13 @@ import AuthContext from '../../contexts/auth';
 import NightSessionModale from '../../components/NightSessionModale';
 
 const List = () => {
-  const [teams, setTeams] = useState(null);
+  const { teams } = useContext(AuthContext);
   const history = useHistory();
-  const [refresh, setRefresh] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      const { data } = await API.get({ path: '/team' });
-      setTeams(data);
-    })();
-  }, [refresh]);
-
-  if (!teams) return <Loading />;
 
   return (
     <Container style={{ padding: '40px 0' }}>
       <Header title="Équipes" />
-      <Create onChange={() => setRefresh(true)} />
+      <Create />
       <Table
         data={teams}
         onRowClick={(i) => history.push(`/team/${i._id}`)}
@@ -60,26 +49,38 @@ const List = () => {
 
 //Organisation
 
-const Create = ({ onChange }) => {
-  const [open, setOpen] = useState(false);
-  const { organisation, setAuth } = useContext(AuthContext);
+const Create = () => {
+  const { organisation, setAuth, teams, user } = useContext(AuthContext);
+  const [open, setOpen] = useState(!teams.length);
+
+  const onboardingForTeams = !teams.length;
 
   return (
     <CreateWrapper>
       <ButtonCustom color="primary" onClick={() => setOpen(true)} title="Créer une nouvelle équipe" padding="12px 24px" />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
-        <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle équipe</ModalHeader>
+        <ModalHeader toggle={() => setOpen(false)}>{onboardingForTeams ? 'Bienvenue dans Mano !' : 'Créer une nouvelle équipe'}</ModalHeader>
         <ModalBody>
+          <span>Veuillez créer une première équipe avant de commencer à utiliser la plateforme</span>
+          <br />
+          <br />
           <Formik
             initialValues={{ name: '' }}
             onSubmit={async (values, actions) => {
-              const res = await API.post({ path: '/team', body: { name: values.name, organisation: organisation._id } });
+              const newTeamRes = await API.post({ path: '/team', body: { name: values.name, organisation: organisation._id } });
+              if (!newTeamRes.ok) return actions.setSubmitting(false);
+              if (onboardingForTeams) {
+                const userPutRes = await API.put({ path: `/user/${user._id}`, body: { team: [newTeamRes.data._id] } });
+                if (!userPutRes.ok) return actions.setSubmitting(false);
+                const meResponse = await API.get({ path: '/user/me' });
+                setAuth({ user: meResponse.user });
+                toastr.success('Création réussie !', `Vous êtes dans l'équipe ${newTeamRes.data.name}`);
+              } else {
+                toastr.success('Création réussie !');
+              }
               actions.setSubmitting(false);
-              if (!res.ok) return;
-              toastr.success('Création réussie !');
               const { data: teams } = await API.get({ path: '/team' });
               setAuth({ teams });
-              onChange();
               setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => {
