@@ -33,13 +33,24 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
           </tr>
         )}
         <tr>
-          {columns.map((column) => (
-            <td
-              className={`column-header ${column.left && 'align-left'}`}
-              key={column.title || column.dataKey}
-              dangerouslySetInnerHTML={{ __html: column.title }}
-            />
-          ))}
+          {columns.map((column) => {
+            const { onSortBy, onSortOrder, sortBy, sortOrder, sortableKey, dataKey } = column;
+            const onNameClick = () => onSortBy(sortableKey || dataKey);
+            return (
+              <td
+                onClick={!!onSortBy ? onNameClick : null}
+                className={`column-header ${column.left && 'align-left'} ${!!onSortBy && 'clickable'}`}
+                key={column.title || dataKey}>
+                <span dangerouslySetInnerHTML={{ __html: column.title }} />
+                {(sortBy === sortableKey || sortBy === dataKey) && (
+                  <>
+                    {sortOrder === 'ASC' && <span onClick={() => onSortOrder('DESC')}>{`\u00A0\u2193`}</span>}
+                    {sortOrder === 'DESC' && <span onClick={() => onSortOrder('ASC')}>{`\u00A0\u2191`}</span>}
+                  </>
+                )}
+              </td>
+            );
+          })}
         </tr>
       </thead>
       <tbody>
@@ -128,6 +139,10 @@ const TableWrapper = styled.table`
 
   .align-left {
     text-align: left;
+  }
+
+  .clickable {
+    cursor: pointer;
   }
 
   .table-cell {

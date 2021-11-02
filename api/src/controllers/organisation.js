@@ -1,10 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const { fn } = require("sequelize");
 
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const User = require("../models/user");
+const Action = require("../models/action");
+const Person = require("../models/person");
+const Territory = require("../models/territory");
+const Report = require("../models/report");
 
 //@checked
 router.post(
@@ -40,7 +45,34 @@ router.get(
     const where = {};
     if (req.user.role !== "superadmin") where._id = req.user.organisation;
     const data = await Organisation.findAll({ where });
-    return res.status(200).send({ ok: true, data });
+    if (req.query.withCounters !== "true") return res.status(200).send({ ok: true, data });
+    const countQuery = {
+      group: ["organisation"],
+      attributes: ["organisation", [fn("COUNT", "TagName"), "countByOrg"]],
+    };
+    const actions = (await Action.findAll(countQuery)).map((item) => item.toJSON());
+    const persons = (await Person.findAll(countQuery)).map((item) => item.toJSON());
+    const territories = (await Territory.findAll(countQuery)).map((item) => item.toJSON());
+    const reports = (await Report.findAll(countQuery)).map((item) => item.toJSON());
+
+    return res.status(200).send({
+      ok: true,
+      data: data
+        .map((org) => org.toJSON())
+        .map((org) => {
+          const counters = {
+            actions: Number(actions.find((a) => a.organisation === org._id)?.countByOrg),
+            persons: Number(persons.find((p) => p.organisation === org._id)?.countByOrg),
+            territories: Number(territories.find((t) => t.organisation === org._id)?.countByOrg),
+            reports: Number(reports.find((r) => r.organisation === org._id)?.countByOrg),
+          };
+          return {
+            ...org,
+            counters,
+            countersTotal: Object.keys(counters).reduce((total, key) => total + (counters[key] || 0), 0),
+          };
+        }),
+    });
   })
 );
 
