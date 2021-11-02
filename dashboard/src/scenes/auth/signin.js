@@ -208,7 +208,7 @@ const SignIn = () => {
                 </StyledFormGroup>
               )}
               <Submit loading={isSubmitting} type="submit" color="primary" title="Se connecter" />
-              {!!authViaCookie && <ChangeUserButton color="link" title="Me connecter avec un autre utilisateur" onClick={onLogout} />}
+              {!!authViaCookie && <ChangeUserButton color="link" title="Me connecter avec un autre utilisateur" onClick={onLogout} type="button" />}
               <p
                 style={{
                   fontSize: 12,
