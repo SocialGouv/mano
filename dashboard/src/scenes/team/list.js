@@ -50,7 +50,7 @@ const List = () => {
 //Organisation
 
 const Create = () => {
-  const { organisation, setAuth, teams, user } = useContext(AuthContext);
+  const { organisation, setAuth, teams, user, setCurrentTeam } = useContext(AuthContext);
   const [open, setOpen] = useState(!teams.length);
 
   const onboardingForTeams = !teams.length;
@@ -74,6 +74,7 @@ const Create = () => {
                 if (!userPutRes.ok) return actions.setSubmitting(false);
                 const meResponse = await API.get({ path: '/user/me' });
                 setAuth({ user: meResponse.user });
+                setCurrentTeam(meResponse.user.teams[0]);
                 toastr.success('Création réussie !', `Vous êtes dans l'équipe ${newTeamRes.data.name}`);
               } else {
                 toastr.success('Création réussie !');
