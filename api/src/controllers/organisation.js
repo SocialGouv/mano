@@ -61,10 +61,12 @@ router.get(
         .map((org) => org.toJSON())
         .map((org) => {
           const counters = {
-            actions: Number(actions.find((a) => a.organisation === org._id)?.countByOrg),
-            persons: Number(persons.find((p) => p.organisation === org._id)?.countByOrg),
-            territories: Number(territories.find((t) => t.organisation === org._id)?.countByOrg),
-            reports: Number(reports.find((r) => r.organisation === org._id)?.countByOrg),
+            actions: actions.find((a) => a.organisation === org._id) ? Number(actions.find((a) => a.organisation === org._id).countByOrg) : 0,
+            persons: persons.find((p) => p.organisation === org._id) ? Number(persons.find((p) => p.organisation === org._id).countByOrg) : 0,
+            territories: territories.find((t) => t.organisation === org._id)
+              ? Number(territories.find((t) => t.organisation === org._id).countByOrg)
+              : 0,
+            reports: reports.find((r) => r.organisation === org._id) ? Number(reports.find((r) => r.organisation === org._id).countByOrg) : 0,
           };
           return {
             ...org,
