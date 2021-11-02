@@ -176,7 +176,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment,
                       </Col>
                       <Col md={6}>
                         <FormGroup>
-                          <Label>Créé le</Label>
+                          <Label>Créé le / Concerne le</Label>
                           <div>
                             <DatePicker
                               locale="fr"
