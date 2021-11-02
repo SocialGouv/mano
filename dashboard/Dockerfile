@@ -1,6 +1,6 @@
-FROM node:16 as builder
+FROM node:16-alpine as builder
 
-RUN apk add --no-cache gcc autoconf automake build-base libpng-dev nasm
+RUN apk add --no-cache gcc autoconf automake build-base libpng-dev nasm pyton
 
 WORKDIR /app
 
