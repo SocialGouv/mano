@@ -1,3 +1,10 @@
+## [1.20.1](https://github.com/SocialGouv/mano/compare/v1.20.0...v1.20.1) (2021-11-02)
+
+
+### Bug Fixes
+
+* **dashboard:** wrong "connect again" behavior on dashboard ([#125](https://github.com/SocialGouv/mano/issues/125)) ([6a5b1ea](https://github.com/SocialGouv/mano/commit/6a5b1ea6ad2b907aa587cbc220ab277944836c23))
+
 # [1.20.0](https://github.com/SocialGouv/mano/compare/v1.19.0...v1.20.0) (2021-10-27)
 
 
