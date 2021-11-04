@@ -18,9 +18,11 @@ const Drawer = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const { user, organisation, teams, currentTeam, setCurrentTeam } = useContext(AuthContext);
 
+  const onboardingForTeams = !teams.length;
+
   return (
     <>
-      <Sidebar className="noprint">
+      <Sidebar className="noprint" onboardingForTeams={onboardingForTeams}>
         <Nav>
           <div style={{ marginBottom: 30, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <Logo size={100} hide />
@@ -65,7 +67,7 @@ const Drawer = () => {
             </li>
           )}
           {['admin'].includes(user.role) && (
-            <li>
+            <li id="teams">
               <NavLink to="/team" activeClassName="active">
                 Équipes
               </NavLink>
@@ -189,6 +191,15 @@ const Sidebar = styled.div`
   justify-content: space-between;
   overflow-y: auto;
   border-right: 1px solid rgba(0, 0, 0, 0.1);
+
+  ${(p) =>
+    p.onboardingForTeams &&
+    `
+    li:not(#teams) {
+      opacity: 0.2;
+      pointer-events: none;
+    }
+  `}
 `;
 
 const TopBar = styled.div`

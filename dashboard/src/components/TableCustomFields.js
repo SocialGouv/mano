@@ -127,7 +127,13 @@ const TableCustomFields = ({ data, customFields }) => {
           //   render: (f) => <input type="checkbox" checked={f.required} onChange={onRequiredChange(f)} />,
           // },
           {
-            title: 'Voir dans les<br />satistiques',
+            title: (
+              <>
+                Voir dans les
+                <br />
+                satistiques
+              </>
+            ),
             dataKey: 'showInStats',
             render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
           },
