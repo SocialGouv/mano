@@ -1,3 +1,10 @@
+# [1.22.0](https://github.com/SocialGouv/mano/compare/v1.21.1...v1.22.0) (2021-11-04)
+
+
+### Features
+
+* **dashboard:** onboarding for admin redirects to first team creation ([#128](https://github.com/SocialGouv/mano/issues/128)) ([0fc04ed](https://github.com/SocialGouv/mano/commit/0fc04eda3f621b594970cbdd11ce2494801ae755))
+
 ## [1.21.1](https://github.com/SocialGouv/mano/compare/v1.21.0...v1.21.1) (2021-11-02)
 
 
