@@ -1,3 +1,10 @@
+# [1.23.0](https://github.com/SocialGouv/mano/compare/v1.22.0...v1.23.0) (2021-11-04)
+
+
+### Features
+
+* **all:** deploy on node 16 ([#129](https://github.com/SocialGouv/mano/issues/129)) ([d65ffdd](https://github.com/SocialGouv/mano/commit/d65ffdd0227a1583dc1e9bc7a75bedba9c234201))
+
 # [1.22.0](https://github.com/SocialGouv/mano/compare/v1.21.1...v1.22.0) (2021-11-04)
 
 
