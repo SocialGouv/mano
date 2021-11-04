@@ -1,4 +1,4 @@
-FROM node:12-alpine as builder
+FROM node:14-alpine as builder
 
 RUN apk add --no-cache gcc autoconf automake build-base libpng-dev nasm
 
