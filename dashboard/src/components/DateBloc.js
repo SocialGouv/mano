@@ -1,16 +1,22 @@
 import React from 'react';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
+import utc from 'dayjs/plugin/utc';
+import 'dayjs/locale/fr';
+
+dayjs.extend(utc);
+dayjs.locale('fr');
 
 const DateBloc = ({ date }) => {
   if (!date) return <div />;
-  date = new Date(date);
+  date = dayjs.utc(date);
   return (
     <Container>
-      <DayText>{date && date.toLocaleString('fr-FR', { weekday: 'long' })}</DayText>
-      <DayNum>{date && date.getDate()}</DayNum>
+      <DayText>{date && date.format('dddd')}</DayText>
+      <DayNum>{date && date.format('D')}</DayNum>
       <MonthText>
-        {date && date.toLocaleString('fr-FR', { month: 'long' })}
-        {date && date.getFullYear() !== new Date().getFullYear() && `\u00A0${date.getFullYear()}`}
+        {date && date.format('MMMM')}
+        {date && date.format('YYYY') !== dayjs.utc().format('YYYY') && ` ${date.format('YYYY')}`}
       </MonthText>
     </Container>
   );
