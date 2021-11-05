@@ -1,3 +1,10 @@
+# [1.24.0](https://github.com/SocialGouv/mano/compare/v1.23.0...v1.24.0) (2021-11-05)
+
+
+### Features
+
+* set encryption verification key ([#124](https://github.com/SocialGouv/mano/issues/124)) ([b283625](https://github.com/SocialGouv/mano/commit/b2836258d0fcd4e71dbbd617b0158265e127c414))
+
 # [1.23.0](https://github.com/SocialGouv/mano/compare/v1.22.0...v1.23.0) (2021-11-04)
 
 

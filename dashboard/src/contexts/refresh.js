@@ -29,7 +29,7 @@ export const RefreshProvider = ({ children }) => {
   const placesContext = useContext(PlacesContext);
   const relsPersonPlaceContext = useContext(RelsPersonPlaceContext);
   const reportsContext = useContext(ReportsContext);
-  const { organisation } = useContext(AuthContext);
+  const { organisationId } = useContext(AuthContext);
 
   const reset = async () => {
     await new Promise((res) => setTimeout(res, 150));
@@ -42,7 +42,7 @@ export const RefreshProvider = ({ children }) => {
     setLoading('Chargement...');
     const response = await API.get({
       path: '/public/stats',
-      query: { organisation: organisation._id, lastRefresh },
+      query: { organisation: organisationId, lastRefresh },
     });
     if (!response.ok) {
       capture('error getting stats', { extra: response });
@@ -52,7 +52,7 @@ export const RefreshProvider = ({ children }) => {
     return response.data || {};
   };
 
-  const refresh = async ({ showFullScreen = false, initialLoad = false } = {}) => {
+  const refresh = async ({ showFullScreen = false, initialLoad = false } = {}, onDecryptOk) => {
     try {
       setFullScreen(showFullScreen);
 
@@ -71,7 +71,12 @@ export const RefreshProvider = ({ children }) => {
       setLoading('Chargement des personnes');
       const isOK = await personsContext.refreshPersons((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
-      if (!isOK) return reset();
+      if (!isOK) {
+        reset();
+        return false;
+      }
+
+      if (onDecryptOk) onDecryptOk();
 
       setLoading('Chargement des actions');
       await actionsContext.refreshActions((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
@@ -95,8 +100,10 @@ export const RefreshProvider = ({ children }) => {
       await commentsContext.refreshComments((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       reset();
+      return true;
     } catch (error) {
       capture('error loading app ' + error, { extra: { error } });
+      return false;
     }
   };
 

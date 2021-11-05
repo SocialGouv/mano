@@ -105,7 +105,11 @@ class Login extends React.Component {
         return this.setState({ loading: false, showEncryptionKeyInput: true });
       }
       if (encryptionKey) {
-        API.setOrgEncryptionKey(encryptionKey);
+        const keyIsValid = await API.setOrgEncryptionKey(encryptionKey);
+        if (!keyIsValid) {
+          this.setState({ loading: false });
+          return;
+        }
       }
       await AsyncStorage.setItem('persistent_email', email);
       const { data: teams } = await API.get({ path: '/team' });
