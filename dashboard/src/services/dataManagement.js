@@ -21,6 +21,10 @@ export const mergeNewUpdatedData = (newData, oldData) => {
 //   const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);
 //   return [value, setValue];
 // };
+
+// app feature only
+export const MMKV = null;
+
 export const useStorage = (key, defaultValue) => {
   const [value, setValue] = useState(defaultValue);
   return [value, setValue];
