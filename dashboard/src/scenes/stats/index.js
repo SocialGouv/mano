@@ -265,7 +265,7 @@ const Stats = () => {
             title="Répartition des comptes-rendus par collaboration"
             data={getPieData(
               reports.filter((r) => r.team === currentTeam._id),
-              'collaboration',
+              'collaborations',
               { options: organisation.collaborations || [] }
             )}
           />
