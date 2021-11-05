@@ -52,7 +52,7 @@ export const RefreshProvider = ({ children }) => {
     return response.data || {};
   };
 
-  const refresh = async ({ showFullScreen = false, initialLoad = false } = {}) => {
+  const refresh = async ({ showFullScreen = false, initialLoad = false } = {}, onDecryptOk) => {
     try {
       setFullScreen(showFullScreen);
 
@@ -71,7 +71,12 @@ export const RefreshProvider = ({ children }) => {
       setLoading('Chargement des personnes');
       const isOK = await personsContext.refreshPersons((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
-      if (!isOK) return reset();
+      if (!isOK) {
+        reset();
+        return false;
+      }
+
+      if (onDecryptOk) onDecryptOk();
 
       setLoading('Chargement des actions');
       await actionsContext.refreshActions((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
@@ -95,8 +100,10 @@ export const RefreshProvider = ({ children }) => {
       await commentsContext.refreshComments((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       reset();
+      return true;
     } catch (error) {
       capture('error loading app ' + error, { extra: { error } });
+      return false;
     }
   };
 

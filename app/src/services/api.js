@@ -82,7 +82,7 @@ class ApiService {
           headers,
         },
       });
-      if (this.handleError) this.handleError(errorExecuteApi);
+      if (this.handleError) this.handleError(errorExecuteApi, 'Désolé une erreur est survenue');
       throw errorExecuteApi;
     }
   };
@@ -166,7 +166,7 @@ class ApiService {
       try {
         JSON.parse(content);
       } catch (errorDecryptParsing) {
-        if (this.handleError) this.handleError(errorDecryptParsing, 'Error parsing item');
+        if (this.handleError) this.handleError(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
         console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
       }
 
@@ -187,6 +187,14 @@ class ApiService {
           },
         });
         this.sendCaptureError++;
+      }
+      if (!!this.organisation.encryptedVerificationKey) {
+        if (this.handleError)
+          this.handleError(
+            "Désolé, un élément n'a pas pu être déchiffré",
+            "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
+          );
+        return item;
       }
       if (!this.wrongKeyWarned && this.handleWrongKey) {
         this.wrongKeyWarned = true;
