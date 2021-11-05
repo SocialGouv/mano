@@ -1,3 +1,10 @@
+## [1.24.4](https://github.com/SocialGouv/mano/compare/v1.24.3...v1.24.4) (2021-11-05)
+
+
+### Bug Fixes
+
+* **app,api:** upgrade app version ([#139](https://github.com/SocialGouv/mano/issues/139)) ([61858ea](https://github.com/SocialGouv/mano/commit/61858ea54a07e99dd743b2a570e467756c6f5b4d))
+
 ## [1.24.3](https://github.com/SocialGouv/mano/compare/v1.24.2...v1.24.3) (2021-11-05)
 
 
