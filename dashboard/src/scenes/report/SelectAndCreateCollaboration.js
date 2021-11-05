@@ -10,43 +10,48 @@ const NoOptionsMessage = () => (
   </span>
 );
 
-const SelectAndCreateCollaboration = ({ value, onChange }) => {
+const SelectAndCreateCollaboration = ({ values, onChange }) => {
   const { organisation, setAuth } = useContext(AuthContext);
 
-  const onChangeRequest = (event) => {
-    onChange({ currentTarget: { value: event?.value || null, name: 'collaboration' } });
+  const onChangeRequest = (newCollabs) => {
+    onChange({ currentTarget: { value: newCollabs || [], name: 'collaborations' } });
+  };
+
+  const onCreateOption = async (collab) => {
+    toastr.info('Création de la nouvelle collaboration...');
+    onChangeRequest([...(organisation.collaborations || []), collab]);
+    await new Promise((res) => setTimeout(res, 2000));
+    const response = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { collaborations: [...(organisation.collaborations || []), collab].sort((c1, c2) => c1.localeCompare(c2)) },
+    });
+    if (response.ok) {
+      toastr.clean();
+      toastr.success('Collaboration créée !');
+      setAuth({ organisation: response.data });
+      onChangeRequest([...(organisation.collaborations || []), collab]);
+    } else {
+      onChangeRequest(organisation.collaborations || []);
+    }
   };
 
   return (
     <SelectCustom
+      creatable
+      format
+      onCreateOption={onCreateOption}
       options={(organisation.collaborations || []).map((collab) => ({ value: collab, label: collab }))}
-      name="collaboration"
+      value={(values || []).map((opt) => ({ value: opt, label: opt }))}
       isSearchable
-      isClearable={!!value}
+      isMulti
+      name="collaborations"
       components={{ NoOptionsMessage }}
-      onChange={onChangeRequest}
+      onChange={(v) => onChangeRequest(v.map((v) => v.value))}
       placeholder={' -- Choisir une collaboration -- '}
-      onCreateOption={async (collab) => {
-        toastr.info('Création de la nouvelle collaboration...');
-        await new Promise((res) => setTimeout(res, 2000));
-        const response = await API.put({
-          path: `/organisation/${organisation._id}`,
-          body: { collaborations: [...(organisation.collaborations || []), collab].sort((c1, c2) => c1.localeCompare(c2)) },
-        });
-        if (response.ok) {
-          toastr.clean();
-          toastr.success('Collaboration créée !');
-          setAuth({ organisation: response.data });
-          onChangeRequest({ value: collab });
-        }
-      }}
-      value={{ value: value, label: value }}
       formatOptionLabel={({ value: collab, __isNew__ }) => {
         if (__isNew__) return <span>Créer "{collab}"</span>;
         return <span>{collab}</span>;
       }}
-      format
-      creatable
     />
   );
 };

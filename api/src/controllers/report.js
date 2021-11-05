@@ -83,7 +83,7 @@ router.put(
 
     const updatedReport = {};
     if (req.body.hasOwnProperty("description")) updatedReport.description = req.body.description || null;
-    if (req.body.hasOwnProperty("collaboration")) updatedReport.collaboration = req.body.collaboration || null;
+    if (req.body.hasOwnProperty("collaborations")) updatedReport.collaborations = req.body.collaborations || [];
     if (req.body.hasOwnProperty("passages")) updatedReport.passages = req.body.passages || null;
     if (req.body.hasOwnProperty("services")) updatedReport.services = req.body.services || null;
 

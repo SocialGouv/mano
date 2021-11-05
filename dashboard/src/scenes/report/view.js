@@ -586,7 +586,7 @@ const Description = ({ report }) => {
               <Col md={6}>
                 <FormGroup>
                   <Label>Collaboration</Label>
-                  <SelectAndCreateCollaboration value={values.collaboration} onChange={handleChange} />
+                  <SelectAndCreateCollaboration values={values.collaborations} onChange={handleChange} />
                 </FormGroup>
               </Col>
               <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -597,10 +597,10 @@ const Description = ({ report }) => {
         </Formik>
       </DescriptionBox>
       <DescriptionBox className="printonly" report={report}>
-        {!!report?.collaboration && (
+        {!!report?.collaborations?.length && (
           <>
-            <Title>Collaboration</Title>
-            <p dangerouslySetInnerHTML={{ __html: report?.collaboration || 'Pas de collaboration' }} />
+            <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
+            <p dangerouslySetInnerHTML={{ __html: report?.collaborations.join(', ') || 'Pas de collaboration' }} />
           </>
         )}
         <Title>Description</Title>
@@ -655,7 +655,7 @@ const DescriptionBox = styled(StyledBox)`
     margin-bottom: 40px;
   }
   @media print {
-    ${(props) => props.report?.description?.length < 1 && props.report?.collaboration?.length < 1 && 'display: none !important;'}
+    ${(props) => props.report?.description?.length < 1 && props.report?.collaborations?.length < 1 && 'display: none !important;'}
     margin-bottom: 40px;
     page-break-inside: avoid;
   }
