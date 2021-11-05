@@ -11,7 +11,7 @@ export const filterData = (data, filters) => {
       data = data
         .map((item) => {
           const itemValue = item[filter.field];
-          if ([null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
+          if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
           if (typeof itemValue === 'boolean') {
             return itemValue === (filter.value === 'Oui') ? item : null;
           }
