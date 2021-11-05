@@ -1,3 +1,11 @@
+## [1.24.1](https://github.com/SocialGouv/mano/compare/v1.24.0...v1.24.1) (2021-11-05)
+
+
+### Bug Fixes
+
+* **api,dashboard:** multiple collaborations ([#135](https://github.com/SocialGouv/mano/issues/135)) ([66f6946](https://github.com/SocialGouv/mano/commit/66f69469211046a68a706de20f4346c9c1fe0fe9))
+* **dashboard:** button for description ([#137](https://github.com/SocialGouv/mano/issues/137)) ([7c80e79](https://github.com/SocialGouv/mano/commit/7c80e7972a385edbb84667b06c34549a98192aa4))
+
 # [1.24.0](https://github.com/SocialGouv/mano/compare/v1.23.0...v1.24.0) (2021-11-05)
 
 
