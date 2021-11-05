@@ -1,3 +1,11 @@
+## [1.24.2](https://github.com/SocialGouv/mano/compare/v1.24.1...v1.24.2) (2021-11-05)
+
+
+### Bug Fixes
+
+* **dashboard:** encrypted field at the end of the file ([#138](https://github.com/SocialGouv/mano/issues/138)) ([1491a29](https://github.com/SocialGouv/mano/commit/1491a292b8ae2680f9703352903efd48057f3938))
+* **dashboard:** fix utc problem for display date ([#133](https://github.com/SocialGouv/mano/issues/133)) ([b2d108a](https://github.com/SocialGouv/mano/commit/b2d108a766e6d9c57e1fc09f1e3ba92c3edae747))
+
 ## [1.24.1](https://github.com/SocialGouv/mano/compare/v1.24.0...v1.24.1) (2021-11-05)
 
 
