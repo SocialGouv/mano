@@ -32,6 +32,7 @@ import Card from '../../components/Card';
 import CreateObservation from '../../components/CreateObservation';
 import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionName from '../../components/ActionName';
+import ReportDescriptionModale from '../../components/ReportDescriptionModale';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -577,13 +578,23 @@ const Description = ({ report }) => {
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (
             <Row>
-              <Col md={6}>
+              <Col md={5}>
                 <FormGroup>
-                  <Label>Description</Label>
-                  <Input name="description" type="textarea" value={values.description} onChange={handleChange} />
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: report?.description?.length ? 'row' : 'column',
+                      alignItems: report?.description?.length ? 'center' : 'flex-start',
+                      justifyContent: 'flex-start',
+                    }}>
+                    <Label>Description</Label>
+                    <ReportDescriptionModale report={report} />
+                  </div>
+                  <p>{report.description}</p>
                 </FormGroup>
               </Col>
-              <Col md={6}>
+              <Col md={2} />
+              <Col md={5}>
                 <FormGroup>
                   <Label>Collaboration</Label>
                   <SelectAndCreateCollaboration value={values.collaboration} onChange={handleChange} />
