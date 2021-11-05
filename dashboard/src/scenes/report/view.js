@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Col, Container, Input, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
+import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
