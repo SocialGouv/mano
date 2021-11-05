@@ -42,7 +42,7 @@ function capture(err, context = {}) {
       Sentry.captureMessage(e, context);
     }
   }
-  if (Sentry && err) {
+  if (ENVIRONMENT !== "development") {
     if (typeof err === "string") {
       Sentry.captureMessage(err, context);
     } else {

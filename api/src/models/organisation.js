@@ -11,6 +11,7 @@ Organisation.init(
     collaborations: { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] },
     encryptionEnabled: { type: DataTypes.BOOLEAN },
     encryptionLastUpdateAt: DataTypes.DATE,
+    encryptedVerificationKey: DataTypes.TEXT,
     receptionEnabled: { type: DataTypes.BOOLEAN },
     services: DataTypes.ARRAY(DataTypes.TEXT),
     customFieldsObs: DataTypes.JSONB,

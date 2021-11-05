@@ -41,7 +41,7 @@ API.handleLogoutError = () => {
   API.showTokenExpiredError = false;
 };
 
-API.handleError = (error, subtitle) => Alert.alert(error.toString(), subtitle);
+API.handleError = (error, subtitle) => Alert.alert(error?.toString(), subtitle);
 
 API.handleWrongKey = () => {
   Alert.alert('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');

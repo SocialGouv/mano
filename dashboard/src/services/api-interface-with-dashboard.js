@@ -59,7 +59,7 @@ API.platform = 'dashboard';
 
 API.handleBlockEncrypt = () => API.toastr.error('Erreur !', "Vous ne pouvez pas modifier le contenu. La clé de chiffrement n'est pas la bonne");
 
-API.handleError = (error) => API.toastr.error('Erreur !', error?.toString(), { timeOut: 0 });
+API.handleError = (error, subtitle) => API.toastr.error(error?.toString(), subtitle, { timeOut: 0 });
 
 API.handleApiError = (res) => {
   try {

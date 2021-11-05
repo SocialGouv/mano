@@ -1,7 +1,7 @@
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
 import { capture } from './sentry';
 
 class ApiService {
@@ -82,7 +82,7 @@ class ApiService {
           headers,
         },
       });
-      if (this.handleError) this.handleError(errorExecuteApi);
+      if (this.handleError) this.handleError(errorExecuteApi, 'Désolé une erreur est survenue');
       throw errorExecuteApi;
     }
   };
@@ -121,11 +121,22 @@ class ApiService {
 
   setOrgEncryptionKey = async (orgEncryptionKey) => {
     this.hashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
+    const { encryptedVerificationKey } = this.organisation;
+    if (!encryptedVerificationKey) {
+      capture('encryptedVerificationKey not setup yet', { extra: { organisation: this.organisation } });
+    } else {
+      const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, this.hashedOrgEncryptionKey);
+      if (!encryptionKeyIsValid) {
+        this.handleWrongKey();
+        return false;
+      }
+    }
     this.enableEncrypt = true;
     this.orgEncryptionKey = orgEncryptionKey;
     this.sendCaptureError = 0;
     this.wrongKeyWarned = false;
     this.blockEncrypt = false;
+    return true;
   };
 
   encryptItem = async (item) => {
@@ -155,7 +166,7 @@ class ApiService {
       try {
         JSON.parse(content);
       } catch (errorDecryptParsing) {
-        if (this.handleError) this.handleError(errorDecryptParsing, 'Error parsing item');
+        if (this.handleError) this.handleError(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
         console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
       }
 
@@ -176,6 +187,14 @@ class ApiService {
           },
         });
         this.sendCaptureError++;
+      }
+      if (!!this.organisation.encryptedVerificationKey) {
+        if (this.handleError)
+          this.handleError(
+            "Désolé, un élément n'a pas pu être déchiffré",
+            "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
+          );
+        return item;
       }
       if (!this.wrongKeyWarned && this.handleWrongKey) {
         this.wrongKeyWarned = true;

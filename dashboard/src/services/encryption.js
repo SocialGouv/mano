@@ -112,4 +112,23 @@ const encrypt = async (content, entityKey, masterKey) => {
   };
 };
 
-export { derivedMasterKey, generateEntityKey, encrypt, decrypt };
+const verificationPassphrase = 'Surprise !';
+const encryptVerificationKey = async (masterKey) => {
+  const encryptedVerificationKey = await _encrypt_and_prepend_nonce(encodeContent(verificationPassphrase), masterKey);
+
+  return encryptedVerificationKey;
+};
+
+const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey) => {
+  try {
+    const decryptedVerificationKey_uint8array = await _decrypt_after_extracting_nonce(encryptedVerificationKey, masterKey);
+    const decryptedVerificationKey = window.atob(new TextDecoder().decode(decryptedVerificationKey_uint8array));
+
+    return decryptedVerificationKey === verificationPassphrase;
+  } catch (e) {
+    console.log('error checkEncryptedVerificationKey', e);
+  }
+  return false;
+};
+
+export { derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey };

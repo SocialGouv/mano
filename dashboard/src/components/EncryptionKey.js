@@ -19,6 +19,7 @@ import ReportsContext, { prepareReportForEncryption } from '../contexts/reports'
 import { capture } from '../services/sentry';
 import RelsPersonPlaceContext, { prepareRelPersonPlaceForEncryption } from '../contexts/relPersonPlace';
 import RefreshContext from '../contexts/refresh';
+import { encryptVerificationKey } from '../services/encryption';
 
 const EncryptionKey = () => {
   const [open, setOpen] = useState(false);
@@ -65,6 +66,7 @@ const EncryptionKey = () => {
       });
 
       setEncryptingStatus('Chiffrement des données...');
+      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
       const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(API.encryptItem));
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(API.encryptItem));
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(API.encryptItem));
@@ -93,6 +95,7 @@ const EncryptionKey = () => {
           places: encryptedPlaces,
           relsPersonPlace: encryptedRelsPersonPlace,
           reports: encryptedReports,
+          encryptedVerificationKey,
         },
         query: {
           encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,

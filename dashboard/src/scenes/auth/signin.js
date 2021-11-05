@@ -12,10 +12,11 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import RefreshContext from '../../contexts/refresh';
 import PasswordInput from '../../components/PasswordInput';
+import { encryptVerificationKey } from '../../services/encryption';
 
 const SignIn = () => {
-  const { setAuth, setCurrentTeam, resetAuth, user } = useContext(AuthContext);
-  const { refresh } = useContext(RefreshContext);
+  const { setAuth, setCurrentTeam, resetAuth, user, organisation } = useContext(AuthContext);
+  const rc = useContext(RefreshContext);
   const history = useHistory();
   const [showErrors, setShowErrors] = useState(false);
   const [userName, setUserName] = useState(false);
@@ -30,6 +31,14 @@ const SignIn = () => {
       history.push('/reception');
     } else {
       history.push('/');
+    }
+  };
+
+  const setEncryptionVerificationKey = async (organisation) => {
+    if (!organisation.encryptedVerificationKey) {
+      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
+      const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
+      if (orgRes.ok) setAuth({ organisation: orgRes.data });
     }
   };
 
@@ -53,6 +62,7 @@ const SignIn = () => {
         setAuthViaCookie(true);
         setUserName(user.name);
         const { organisation } = user;
+        API.organisation = organisation;
         if (!!organisation.encryptionEnabled) setShowEncryption(true);
       }
 
@@ -73,7 +83,7 @@ const SignIn = () => {
               title={team.name}
               onClick={() => {
                 setCurrentTeam(team);
-                refresh({ initialLoad: true, showFullScreen: true });
+                rc.refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
                 onSigninValidated(user);
               }}
             />
@@ -113,7 +123,11 @@ const SignIn = () => {
               return actions.setSubmitting(false);
             }
             if (token) API.token = token;
-            if (!!values.orgEncryptionKey) await API.setOrgEncryptionKey(values.orgEncryptionKey.trim());
+            API.organisation = organisation;
+            if (!!values.orgEncryptionKey) {
+              const encryptionIsValid = await API.setOrgEncryptionKey(values.orgEncryptionKey.trim());
+              if (!encryptionIsValid) return;
+            }
             const teamResponse = await API.get({ path: '/team' });
             const teams = teamResponse.data;
             const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
@@ -125,7 +139,7 @@ const SignIn = () => {
             } else if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
               onSigninValidated(user);
-              refresh({ initialLoad: true, showFullScreen: true });
+              rc.refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
             } else if (!teams.length) {
               history.push('/team');
             } else {
