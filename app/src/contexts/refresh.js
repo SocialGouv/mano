@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import Loader from '../components/Loader';
 import API from '../services/api';
 import { useStorage } from '../services/dataManagement';
