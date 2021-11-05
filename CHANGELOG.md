@@ -1,3 +1,10 @@
+## [1.24.3](https://github.com/SocialGouv/mano/compare/v1.24.2...v1.24.3) (2021-11-05)
+
+
+### Bug Fixes
+
+* **website:** email nathan ([#141](https://github.com/SocialGouv/mano/issues/141)) ([77b4c8e](https://github.com/SocialGouv/mano/commit/77b4c8e83914d5c0bddf111a4d502bbeb4189d80))
+
 ## [1.24.2](https://github.com/SocialGouv/mano/compare/v1.24.1...v1.24.2) (2021-11-05)
 
 
