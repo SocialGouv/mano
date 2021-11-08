@@ -1,6 +1,6 @@
 {
   "name": "mano",
-  "version": "2.6.0",
+  "version": "2.7.0",
   "private": true,
   "scripts": {
     "get-ip": "./get-ip.sh",
@@ -41,6 +41,7 @@
     "base64-js": "^1.5.1",
     "buffer": "^6.0.3",
     "fast-text-encoding": "^1.0.3",
+    "fetch-retry": "^5.0.1",
     "install": "^0.13.0",
     "ip-anonymize": "^0.1.0",
     "javascript-time-ago": "^2.3.4",

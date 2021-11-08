@@ -49,12 +49,20 @@ const createSheet = (data) => {
   ]
    */
 
-  const header = data.reduce((columns, item) => {
-    for (let key of Object.keys(item)) {
-      if (!columns.find((col) => col === key)) columns.push(key);
-    }
-    return columns;
-  }, []);
+  const encryptionFields = ['encryptedEntityKey', 'entityKey'];
+
+  const header = [
+    ...data
+      .reduce((columns, item) => {
+        for (let key of Object.keys(item)) {
+          if (!columns.find((col) => col === key)) columns.push(key);
+        }
+        return columns;
+      }, [])
+      .filter((column) => !encryptionFields.includes(column)),
+    ...encryptionFields,
+  ];
+
   const sheet = data.reduce(
     (xlsxData, item, index) => {
       const row = [];
@@ -310,7 +318,7 @@ const Stats = () => {
             title="Répartition des comptes-rendus par collaboration"
             data={getPieData(
               reports.filter((r) => r.team === currentTeam._id),
-              'collaboration',
+              'collaborations',
               { options: organisation.collaborations || [] }
             )}
           />

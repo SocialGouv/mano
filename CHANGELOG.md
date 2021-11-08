@@ -1,3 +1,47 @@
+## [1.24.6](https://github.com/SocialGouv/mano/compare/v1.24.5...v1.24.6) (2021-11-08)
+
+
+### Bug Fixes
+
+* **website:** nathan instead of maxime ([#143](https://github.com/SocialGouv/mano/issues/143)) ([6408ab8](https://github.com/SocialGouv/mano/commit/6408ab86d74a563b69e622272a31a457019ce228))
+
+## [1.24.5](https://github.com/SocialGouv/mano/compare/v1.24.4...v1.24.5) (2021-11-08)
+
+
+### Bug Fixes
+
+* **dashboard:** set encryption verification key only for encrypted organisations ([#142](https://github.com/SocialGouv/mano/issues/142)) ([05c886e](https://github.com/SocialGouv/mano/commit/05c886e2ab7a2aee3ef1d2e7261f563b6070f945))
+
+## [1.24.4](https://github.com/SocialGouv/mano/compare/v1.24.3...v1.24.4) (2021-11-05)
+
+
+### Bug Fixes
+
+* **app,api:** upgrade app version ([#139](https://github.com/SocialGouv/mano/issues/139)) ([61858ea](https://github.com/SocialGouv/mano/commit/61858ea54a07e99dd743b2a570e467756c6f5b4d))
+
+## [1.24.3](https://github.com/SocialGouv/mano/compare/v1.24.2...v1.24.3) (2021-11-05)
+
+
+### Bug Fixes
+
+* **website:** email nathan ([#141](https://github.com/SocialGouv/mano/issues/141)) ([77b4c8e](https://github.com/SocialGouv/mano/commit/77b4c8e83914d5c0bddf111a4d502bbeb4189d80))
+
+## [1.24.2](https://github.com/SocialGouv/mano/compare/v1.24.1...v1.24.2) (2021-11-05)
+
+
+### Bug Fixes
+
+* **dashboard:** encrypted field at the end of the file ([#138](https://github.com/SocialGouv/mano/issues/138)) ([1491a29](https://github.com/SocialGouv/mano/commit/1491a292b8ae2680f9703352903efd48057f3938))
+* **dashboard:** fix utc problem for display date ([#133](https://github.com/SocialGouv/mano/issues/133)) ([b2d108a](https://github.com/SocialGouv/mano/commit/b2d108a766e6d9c57e1fc09f1e3ba92c3edae747))
+
+## [1.24.1](https://github.com/SocialGouv/mano/compare/v1.24.0...v1.24.1) (2021-11-05)
+
+
+### Bug Fixes
+
+* **api,dashboard:** multiple collaborations ([#135](https://github.com/SocialGouv/mano/issues/135)) ([66f6946](https://github.com/SocialGouv/mano/commit/66f69469211046a68a706de20f4346c9c1fe0fe9))
+* **dashboard:** button for description ([#137](https://github.com/SocialGouv/mano/issues/137)) ([7c80e79](https://github.com/SocialGouv/mano/commit/7c80e7972a385edbb84667b06c34549a98192aa4))
+
 # [1.24.0](https://github.com/SocialGouv/mano/compare/v1.23.0...v1.24.0) (2021-11-05)
 
 

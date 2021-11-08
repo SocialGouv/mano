@@ -38,8 +38,11 @@ class ApiService {
         };
       }
 
+      options.retries = 3;
+      options.retryDelay = 1000;
+
       const url = this.getUrl(path, query);
-      const response = await fetch(url, options);
+      const response = await this.fetch(url, options);
 
       if (!response.ok && response.status === 401) {
         if (this.handleLogoutError) this.handleLogoutError();

@@ -36,8 +36,11 @@ class ApiService {
         };
       }
 
+      options.retries = 3;
+      options.retryDelay = 1000;
+
       const url = this.getUrl(path, query);
-      const response = await fetch(url, options);
+      const response = await this.fetch(url, options);
 
       if (!response.ok && response.status === 401) {
         if (this.handleLogoutError) this.handleLogoutError();
@@ -188,12 +191,13 @@ class ApiService {
         });
         this.sendCaptureError++;
       }
-      if (!!this.organisation.encryptedVerificationKey) {
-        if (this.handleError)
+      if (this.organisation.encryptedVerificationKey) {
+        if (this.handleError) {
           this.handleError(
             "Désolé, un élément n'a pas pu être déchiffré",
             "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
           );
+        }
         return item;
       }
       if (!this.wrongKeyWarned && this.handleWrongKey) {

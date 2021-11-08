@@ -35,7 +35,7 @@ const SignIn = () => {
   };
 
   const setEncryptionVerificationKey = async (organisation) => {
-    if (!organisation.encryptedVerificationKey) {
+    if (!!organisation.encryptionEnabled && !organisation.encryptedVerificationKey) {
       const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
       const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
       if (orgRes.ok) setAuth({ organisation: orgRes.data });

@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Col, Container, Input, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
+import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
@@ -32,6 +32,7 @@ import Card from '../../components/Card';
 import CreateObservation from '../../components/CreateObservation';
 import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionName from '../../components/ActionName';
+import ReportDescriptionModale from '../../components/ReportDescriptionModale';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -577,16 +578,26 @@ const Description = ({ report }) => {
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (
             <Row>
-              <Col md={6}>
+              <Col md={5}>
                 <FormGroup>
-                  <Label>Description</Label>
-                  <Input name="description" type="textarea" value={values.description} onChange={handleChange} />
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: report?.description?.length ? 'row' : 'column',
+                      alignItems: report?.description?.length ? 'center' : 'flex-start',
+                      justifyContent: 'flex-start',
+                    }}>
+                    <Label>Description</Label>
+                    <ReportDescriptionModale report={report} />
+                  </div>
+                  <p>{report.description}</p>
                 </FormGroup>
               </Col>
-              <Col md={6}>
+              <Col md={2} />
+              <Col md={5}>
                 <FormGroup>
                   <Label>Collaboration</Label>
-                  <SelectAndCreateCollaboration value={values.collaboration} onChange={handleChange} />
+                  <SelectAndCreateCollaboration values={values.collaborations} onChange={handleChange} />
                 </FormGroup>
               </Col>
               <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -597,10 +608,10 @@ const Description = ({ report }) => {
         </Formik>
       </DescriptionBox>
       <DescriptionBox className="printonly" report={report}>
-        {!!report?.collaboration && (
+        {!!report?.collaborations?.length && (
           <>
-            <Title>Collaboration</Title>
-            <p dangerouslySetInnerHTML={{ __html: report?.collaboration || 'Pas de collaboration' }} />
+            <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
+            <p dangerouslySetInnerHTML={{ __html: report?.collaborations.join(', ') || 'Pas de collaboration' }} />
           </>
         )}
         <Title>Description</Title>
@@ -655,7 +666,7 @@ const DescriptionBox = styled(StyledBox)`
     margin-bottom: 40px;
   }
   @media print {
-    ${(props) => props.report?.description?.length < 1 && props.report?.collaboration?.length < 1 && 'display: none !important;'}
+    ${(props) => props.report?.description?.length < 1 && props.report?.collaborations?.length < 1 && 'display: none !important;'}
     margin-bottom: 40px;
     page-break-inside: avoid;
   }
