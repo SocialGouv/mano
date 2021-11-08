@@ -18,6 +18,7 @@
     "base64-js": "^1.5.1",
     "bootstrap": "^4.6.0",
     "dayjs": "^1.10.7",
+    "fetch-retry": "^5.0.1",
     "formik": "^2.2.6",
     "libsodium": "^0.7.9",
     "libsodium-wrappers": "^0.7.9",
