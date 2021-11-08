@@ -1,59 +1,62 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React from "react";
-import styled from "styled-components";
-import { ResponsivePie } from "@nivo/pie";
+import React from 'react';
+import styled from 'styled-components';
+import { ResponsivePie } from '@nivo/pie';
 
-import { theme } from "../config";
-import { Col } from "reactstrap";
-import { ResponsiveBar } from "@nivo/bar";
+import { theme } from '../config';
+import { Col, Row } from 'reactstrap';
+import { ResponsiveBar } from '@nivo/bar';
 
-export const CustomResponsivePie = ({ data, title }) => {
+export const CustomResponsivePie = ({ data, title, onAddFilter, field }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
   return (
-    <Col md={12} style={{ marginBottom: "20px" }}>
-      <CardWrapper>
+    <CardWrapper>
+      <Col md={12}>
         <CardTitle>{title}</CardTitle>
-        <DataWrapper>
-          <Data>
-            <tbody>
-              {[...data]
-                .sort((a, b) => (a.value < b.value ? 1 : -1))
-                .map(({ key, label, value }) => (
-                  <tr key={key + label + value}>
-                    <td>{label}</td>
-                    <td>{value}</td>
-                    <td>{`${Math.round((value / total) * 1000) / 10}%`}</td>
-                  </tr>
-                ))}
-              <tr>
-                <td>Total</td>
-                <td>{total}</td>
-                <td>100%</td>
-              </tr>
-            </tbody>
-          </Data>
-          <PieContainer>
-            <ResponsivePie
-              data={data}
-              sortByValue
-              margin={{ top: 40, right: 0, bottom: 40, left: 0 }}
-              innerRadius={0.5}
-              padAngle={0.7}
-              cornerRadius={3}
-              colors={{ scheme: "nivo" }}
-              borderWidth={1}
-              borderColor={{ from: "color", modifiers: [["darker", 0.2]] }}
-              radialLabelsSkipAngle={8}
-              radialLabelsTextColor="#333333"
-              radialLabelsLinkColor={{ from: "color" }}
-              sliceLabelsSkipAngle={8}
-              sliceLabelsTextColor="#333333"
-              valueFormat={(value) => `${value} (${Math.round((value / total) * 1000) / 10}%)`}
-            />
-          </PieContainer>
-        </DataWrapper>
-      </CardWrapper>
-    </Col>
+      </Col>
+      <DataWrapper md={4}>
+        <Data>
+          <tbody>
+            {[...data]
+              .sort((a, b) => (a.value < b.value ? 1 : -1))
+              .map(({ key, label, value }) => (
+                <tr key={key + label + value}>
+                  <td>{label}</td>
+                  <td>{value}</td>
+                  <td>{`${Math.round((value / total) * 1000) / 10}%`}</td>
+                </tr>
+              ))}
+            <tr>
+              <td>Total</td>
+              <td>{total}</td>
+              <td>100%</td>
+            </tr>
+          </tbody>
+        </Data>
+      </DataWrapper>
+      <Col md={8}>
+        <PieContainer>
+          <ResponsivePie
+            data={data}
+            sortByValue
+            fit
+            margin={{ top: 40, right: 0, bottom: 40, left: 0 }}
+            innerRadius={0.5}
+            padAngle={0.7}
+            cornerRadius={3}
+            colors={{ scheme: 'nivo' }}
+            borderWidth={1}
+            borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
+            arcLinkLabelsSkipAngle={8}
+            arcLabelsSkipAngle={8}
+            enableArcLinkLabels
+            onClick={({ id }) => onAddFilter({ value: id, field })}
+            sliceLabelsTextColor="#333333"
+            valueFormat={(value) => `${value} (${Math.round((value / total) * 1000) / 10}%)`}
+          />
+        </PieContainer>
+      </Col>
+    </CardWrapper>
   );
 };
 
@@ -61,105 +64,99 @@ export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisT
   const getItemValue = (item) => Object.values(item)[1];
   const total = data.reduce((sum, item) => sum + getItemValue(item), 0);
   return (
-    <Col md={12} style={{ marginTop: "20px" }}>
-      <CardWrapper>
+    <CardWrapper>
+      <Col md={12}>
         <CardTitle>{title}</CardTitle>
-        <DataWrapper>
-          <Data>
-            <tbody>
-              {[...data].map((item) => (
-                <tr key={item.name}>
-                  <td>{item.name}</td>
-                  <td>{getItemValue(item)}</td>
-                  <td>{`${Math.round((getItemValue(item) / total) * 1000) / 10}%`}</td>
-                </tr>
-              ))}
-              <tr>
-                <td>Total</td>
-                <td>{total}</td>
-                <td>100%</td>
+      </Col>
+      <DataWrapper md={6}>
+        <Data>
+          <tbody>
+            {[...data].map((item) => (
+              <tr key={item.name}>
+                <td>{item.name}</td>
+                <td>{getItemValue(item)}</td>
+                <td>{`${Math.round((getItemValue(item) / total) * 1000) / 10}%`}</td>
               </tr>
-            </tbody>
-          </Data>
-          <BarContainer>
-            <ResponsiveBar
-              data={data}
-              keys={categories}
-              indexBy="name"
-              margin={{ top: 40, right: 0, bottom: 50, left: 60 }}
-              padding={0.3}
-              valueScale={{ type: "linear" }}
-              indexScale={{ type: "band", round: true }}
-              colors={{ scheme: "nivo" }}
-              borderColor={{ from: "color", modifiers: [["darker", 1.6]] }}
-              axisTop={null}
-              axisRight={null}
-              axisBottom={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: axisTitleX,
-                legendPosition: "middle",
-                legendOffset: 35,
-              }}
-              axisLeft={{
-                tickSize: 5,
-                tickPadding: 5,
-                tickRotation: 0,
-                legend: axisTitleY,
-                legendPosition: "middle",
-                legendOffset: -50,
-              }}
-              labelSkipWidth={0}
-              labelSkipHeight={0}
-              labelTextColor={{ from: "color", modifiers: [["darker", 1.6]] }}
-              legends={[
-                {
-                  dataFrom: "keys",
-                  anchor: "bottom-right",
-                  direction: "column",
-                  justify: false,
-                  translateX: 120,
-                  translateY: 0,
-                  itemsSpacing: 2,
-                  itemWidth: 100,
-                  itemHeight: 20,
-                  itemDirection: "left-to-right",
-                  itemOpacity: 0.85,
-                  symbolSize: 20,
-                  effects: [{ on: "hover", style: { itemOpacity: 1 } }],
-                },
-              ]}
-              animate={true}
-              motionStiffness={90}
-              motionDamping={15}
-            />
-          </BarContainer>
-        </DataWrapper>
-      </CardWrapper>
-    </Col>
+            ))}
+            <tr>
+              <td>Total</td>
+              <td>{total}</td>
+              <td>100%</td>
+            </tr>
+          </tbody>
+        </Data>
+      </DataWrapper>
+      <Col md={6}>
+        <BarContainer>
+          <ResponsiveBar
+            data={data}
+            keys={categories}
+            indexBy="name"
+            margin={{ top: 40, right: 0, bottom: 50, left: 60 }}
+            padding={0.3}
+            valueScale={{ type: 'linear' }}
+            indexScale={{ type: 'band', round: true }}
+            colors={{ scheme: 'nivo' }}
+            borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+            axisTop={null}
+            axisRight={null}
+            axisBottom={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: axisTitleX,
+              legendPosition: 'middle',
+              legendOffset: 35,
+            }}
+            axisLeft={{
+              tickSize: 5,
+              tickPadding: 5,
+              tickRotation: 0,
+              legend: axisTitleY,
+              legendPosition: 'middle',
+              legendOffset: -50,
+            }}
+            labelSkipWidth={0}
+            labelSkipHeight={0}
+            labelTextColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
+            legends={[
+              {
+                dataFrom: 'keys',
+                anchor: 'bottom-right',
+                direction: 'column',
+                justify: false,
+                translateX: 120,
+                translateY: 0,
+                itemsSpacing: 2,
+                itemWidth: 100,
+                itemHeight: 20,
+                itemDirection: 'left-to-right',
+                itemOpacity: 0.85,
+                symbolSize: 20,
+                effects: [{ on: 'hover', style: { itemOpacity: 1 } }],
+              },
+            ]}
+            animate={true}
+            motionStiffness={90}
+            motionDamping={15}
+          />
+        </BarContainer>
+      </Col>
+    </CardWrapper>
   );
 };
 
-const CardWrapper = styled.div`
+const CardWrapper = styled(Row)`
   background: ${theme.white};
-  padding: 40px;
   border-radius: 20px;
-  display: flex;
-  height: 100%;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 10px;
+  padding-bottom: 30px;
+  width: 100%;
 `;
 
-const DataWrapper = styled.div`
-  display: flex;
-  height: 100%;
-  width: 100%;
-  justify-content: space-between;
+const DataWrapper = styled(Col)`
+  justify-content: center;
   align-items: center;
-  margin-bottom: 10px;
+  display: flex;
 `;
 
 const Data = styled.table`
@@ -185,7 +182,7 @@ const Data = styled.table`
 
 const PieContainer = styled.div`
   height: 30vw;
-  width: 35vw;
+  width: 100%;
   * {
     font-weight: bold;
   }
@@ -205,4 +202,5 @@ const CardTitle = styled.div`
   line-height: 24px;
   text-align: center;
   color: ${theme.black};
+  margin-bottom: 15px;
 `;

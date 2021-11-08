@@ -11,7 +11,7 @@ export const filterData = (data, filters) => {
       data = data
         .map((item) => {
           const itemValue = item[filter.field];
-          if (itemValue === undefined) return null;
+          if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
           if (typeof itemValue === 'boolean') {
             return itemValue === (filter.value === 'Oui') ? item : null;
           }
@@ -19,6 +19,8 @@ export const filterData = (data, filters) => {
             if (itemValue === filter.value) return item;
             return null;
           }
+          // type is array
+          if (!itemValue.length && filter.value === 'Non renseigné') return item;
           if (itemValue.includes(filter.value)) {
             let newValues = itemValue.filter((value) => value !== filter.value);
             if (!newValues.length) newValues = ['Uniquement'];
@@ -52,7 +54,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
         </Row>
         {filters.map(({ field, value }, index) => {
           const filterFields = base.map((filter) => filter.field);
-          const filterValues = !!field ? base.find((filter) => filter.field === field)?.options : [];
+          const filterValues = !!field ? [...base.find((filter) => filter.field === field)?.options, 'Non renseigné'] : [];
 
           const onChangeField = (newField) => onChange(filters.map((f, i) => (i === index ? { field: newField, value: null } : f)));
           const onChangeValue = (newValue) => onChange(filters.map((f, i) => (i === index ? { field, value: newValue } : f)));

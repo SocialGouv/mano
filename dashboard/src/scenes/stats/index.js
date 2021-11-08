@@ -103,6 +103,10 @@ const Stats = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
 
+  const addFilter = ({ field, value }) => {
+    setFilterPersons((filters) => [...filters, { field, value }]);
+  };
+
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
 
   useEffect(() => {
@@ -208,64 +212,105 @@ const Stats = () => {
             <BlockCreatedAt persons={persons} />
             <BlockWanderingAt persons={persons} />
           </Row>
-          <Row>
-            <CustomResponsivePie title="Nationalité" data={getPieData(persons, 'nationalitySituation', { options: nationalitySituationOptions })} />
-            <CustomResponsivePie
-              title="Situation personnelle"
-              data={getPieData(persons, 'personalSituation', { options: personalSituationOptions })}
-            />
-          </Row>
-          <Row>
-            <CustomResponsivePie title="Motif de la situation de rue" data={getPieData(persons, 'reasons', { options: reasonsOptions })} />
-            <CustomResponsivePie title="Ressources des personnes suivies" data={getPieData(persons, 'resources', { options: ressourcesOptions })} />
-          </Row>
-          <Row>
-            <AgeRangeBar persons={persons} />
-            <StatsCreatedAtRangeBar persons={persons} />
-            <CustomResponsivePie title="Type d'hébergement" data={getAdressPieData(persons)} />
-            <CustomResponsivePie title="Consommations" data={getPieData(persons, 'consumptions', { options: consumptionsOptions })} />
-            <CustomResponsivePie title="Type de vulnérabilité" data={getPieData(persons, 'vulnerabilities', { options: vulnerabilitiesOptions })} />
-            <CustomResponsivePie
-              title="Couverture médicale des personnes"
-              data={getPieData(persons, 'healthInsurance', { options: healthInsuranceOptions })}
-            />
-            <CustomResponsivePie title="Avec animaux" data={getPieData(persons, 'hasAnimal')} />
-            <CustomResponsivePie title="Personnes très vulnérables" data={getPieData(persons, 'alertness', { isBoolean: true })} />
-          </Row>
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Nationalité"
+            field="nationalitySituation"
+            data={getPieData(persons, 'nationalitySituation', { options: nationalitySituationOptions })}
+          />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Situation personnelle"
+            field="personalSituation"
+            data={getPieData(persons, 'personalSituation', { options: personalSituationOptions })}
+          />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Motif de la situation de rue"
+            field="reasons"
+            data={getPieData(persons, 'reasons', { options: reasonsOptions })}
+          />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Ressources des personnes suivies"
+            field="resources"
+            data={getPieData(persons, 'resources', { options: ressourcesOptions })}
+          />
+          <AgeRangeBar persons={persons} />
+          <StatsCreatedAtRangeBar persons={persons} />
+          <CustomResponsivePie onAddFilter={addFilter} title="Type d'hébergement" data={getAdressPieData(persons)} />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Consommations"
+            field="consumptions"
+            data={getPieData(persons, 'consumptions', { options: consumptionsOptions })}
+          />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Type de vulnérabilité"
+            field="vulnerabilities"
+            data={getPieData(persons, 'vulnerabilities', { options: vulnerabilitiesOptions })}
+          />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Couverture médicale des personnes"
+            field="healthInsurance"
+            data={getPieData(persons, 'healthInsurance', { options: healthInsuranceOptions })}
+          />
+          <CustomResponsivePie onAddFilter={addFilter} title="Avec animaux" data={getPieData(persons, 'hasAnimal')} />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Personnes très vulnérables"
+            field="alertness"
+            data={getPieData(persons, 'alertness', { isBoolean: true })}
+          />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Sortie de file active"
+            field="outOfActiveList"
+            data={getPieData(persons, 'outOfActiveList', { isBoolean: true })}
+          />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
+            title="Raison de sortie de file active"
+            field="outOfActiveListReason"
+            data={getPieData(
+              persons.filter((p) => !!p.outOfActiveList),
+              'outOfActiveListReason'
+            )}
+          />
         </TabPane>
         <TabPane tabId={3}>
           <Title>Statistiques des observations de territoire</Title>
-          <Row>
-            {customFieldsObs
-              .filter((f) => f.enabled)
-              .filter((f) => f.showInStats)
-              .filter((field) => ['number'].includes(field.type))
-              .map((field) => (
-                <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-                  <BlockTotal title={field.label} data={observations} field={field.name} />
-                </Col>
-              ))}
-            {customFieldsObs
-              .filter((f) => f.enabled)
-              .filter((f) => f.showInStats)
-              .filter((field) => ['date', 'date-with-time'].includes(field.type))
-              .map((field) => (
-                <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-                  <BlockDateWithTime data={observations} field={field} />
-                </Col>
-              ))}
-            {customFieldsObs
-              .filter((f) => f.enabled)
-              .filter((f) => f.showInStats)
-              .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
-              .map((field) => (
-                <CustomResponsivePie
-                  title={field.label}
-                  key={field.name}
-                  data={getPieData(observations, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
-                />
-              ))}
-          </Row>
+          {customFieldsObs
+            .filter((f) => f.enabled)
+            .filter((f) => f.showInStats)
+            .filter((field) => ['number'].includes(field.type))
+            .map((field) => (
+              <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+                <BlockTotal title={field.label} data={observations} field={field.name} />
+              </Col>
+            ))}
+          {customFieldsObs
+            .filter((f) => f.enabled)
+            .filter((f) => f.showInStats)
+            .filter((field) => ['date', 'date-with-time'].includes(field.type))
+            .map((field) => (
+              <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+                <BlockDateWithTime data={observations} field={field} />
+              </Col>
+            ))}
+          {customFieldsObs
+            .filter((f) => f.enabled)
+            .filter((f) => f.showInStats)
+            .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
+            .map((field) => (
+              <CustomResponsivePie
+                title={field.label}
+                key={field.name}
+                data={getPieData(observations, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+              />
+            ))}
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des comptes-rendus</Title>
