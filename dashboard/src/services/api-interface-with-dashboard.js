@@ -1,5 +1,8 @@
 import API from './api';
 import { capture } from './sentry';
+import fetchRetry from 'fetch-retry';
+
+API.fetch = fetchRetry(window.fetch);
 
 API.init = ({ resetAuth, history, toastr }) => {
   API.resetAuth = resetAuth;

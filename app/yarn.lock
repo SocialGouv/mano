@@ -4391,6 +4391,11 @@ fbjs@^3.0.0:
     setimmediate "^1.0.5"
     ua-parser-js "^0.7.18"
 
+fetch-retry@^5.0.1:
+  version "5.0.1"
+  resolved "https://registry.yarnpkg.com/fetch-retry/-/fetch-retry-5.0.1.tgz#d46d6d9607b075383693b104383e30e430db59bf"
+  integrity sha512-ENMet8exSRjJO8I5PoKChm0psngw0VrBOD9fUH4YO7sE7Dpqnb0/iFEGHZn633z6MPNVJv4zZNrGgQ4lmQt1nw==
+
 figures@^2.0.0:
   version "2.0.0"
   resolved "https://registry.yarnpkg.com/figures/-/figures-2.0.0.tgz#3ab1a2d2a62c8bfb431a0c94cb797a2fce27c962"
