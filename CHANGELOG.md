@@ -1,3 +1,10 @@
+## [1.24.6](https://github.com/SocialGouv/mano/compare/v1.24.5...v1.24.6) (2021-11-08)
+
+
+### Bug Fixes
+
+* **website:** nathan instead of maxime ([#143](https://github.com/SocialGouv/mano/issues/143)) ([6408ab8](https://github.com/SocialGouv/mano/commit/6408ab86d74a563b69e622272a31a457019ce228))
+
 ## [1.24.5](https://github.com/SocialGouv/mano/compare/v1.24.4...v1.24.5) (2021-11-08)
 
 
