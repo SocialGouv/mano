@@ -1,3 +1,10 @@
+# [1.25.0](https://github.com/SocialGouv/mano/compare/v1.24.6...v1.25.0) (2021-11-08)
+
+
+### Features
+
+* **app,dashboard:** fetch-retry to prevent network error ([#144](https://github.com/SocialGouv/mano/issues/144)) ([06f8ff1](https://github.com/SocialGouv/mano/commit/06f8ff176ad97a85485695eeb203b79c4398c086))
+
 ## [1.24.6](https://github.com/SocialGouv/mano/compare/v1.24.5...v1.24.6) (2021-11-08)
 
 
