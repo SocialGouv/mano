@@ -89,13 +89,15 @@ const createSheet = (data) => {
   return XLSX.utils.aoa_to_sheet(sheet);
 };
 
+const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
+
 const Stats = () => {
   const { teams, organisation, user, currentTeam } = useContext(AuthContext);
   const { persons: allPersons, loading: personsLoading } = useContext(PersonsContext);
   const { refresh } = useContext(RefreshContext);
   const { actions: allActions, loading: actionsLoading } = useContext(ActionsContext);
   const { comments } = useContext(CommentsContext);
-  const { reports } = useContext(ReportsContext);
+  const { reports: allreports } = useContext(ReportsContext);
   const { territories } = useContext(TerritoryContext);
   const { territoryObservations: allObservations, customFieldsObs } = useContext(TerritoryObservationsContext);
   const { places } = useContext(PlacesContext);
@@ -118,6 +120,8 @@ const Stats = () => {
   const persons = getDataForPeriod(allPersons, period, filterPersons);
   const actions = getDataForPeriod(allActions, period);
   const observations = getDataForPeriod(allObservations, period);
+  const reports = getDataForPeriod(allreports, period);
+  const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
 
   const onExportToCSV = () => {
     const workbook = XLSX.utils.book_new();
@@ -129,7 +133,7 @@ const Stats = () => {
     XLSX.utils.book_append_sheet(workbook, createSheet(allObservations), 'observations de territoires');
     XLSX.utils.book_append_sheet(workbook, createSheet(places), 'lieux fréquentés');
     XLSX.utils.book_append_sheet(workbook, createSheet(teams), 'équipes');
-    XLSX.utils.book_append_sheet(workbook, createSheet(reports), 'comptes rendus');
+    XLSX.utils.book_append_sheet(workbook, createSheet(allreports), 'comptes rendus');
     XLSX.writeFile(workbook, 'data.xlsx');
   };
 
@@ -148,13 +152,16 @@ const Stats = () => {
         )}
       </Row>
       <Nav tabs style={{ marginBottom: 20 }}>
-        {['Général', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'].map((tabCaption, index) => (
-          <NavItem key={index} style={{ cursor: 'pointer' }}>
-            <NavLink key={index} className={`${activeTab === index && 'active'}`} onClick={() => setActiveTab(index)}>
-              {tabCaption}
-            </NavLink>
-          </NavItem>
-        ))}
+        {tabs.map((tabCaption, index) => {
+          if (!organisation.receptionEnabled && index === 1) return null;
+          return (
+            <NavItem key={index} style={{ cursor: 'pointer' }}>
+              <NavLink key={index} className={`${activeTab === index && 'active'}`} onClick={() => setActiveTab(index)}>
+                {tabCaption}
+              </NavLink>
+            </NavItem>
+          );
+        })}
       </Nav>
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0}>
@@ -178,7 +185,22 @@ const Stats = () => {
             ))}
           </Row>
         </TabPane>
-        <TabPane tabId={1}>
+        {!!organisation.receptionEnabled && (
+          <TabPane tabId={1}>
+            <Title>Statistiques de l'accueil</Title>
+            <Row>
+              <Block data={reports.reduce((passages, rep) => passages + (rep.passages || 0), 0)} title="Nombre de passages" />
+              {organisation.services?.map((service) => (
+                <Block
+                  key={service}
+                  data={reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0)}
+                  title={service}
+                />
+              ))}
+            </Row>
+          </TabPane>
+        )}
+        <TabPane tabId={2}>
           <Title>Statistiques des actions</Title>
           <CustomResponsivePie
             title="Répartition des actions par catégorie"
@@ -200,7 +222,7 @@ const Stats = () => {
             )}
           />
         </TabPane>
-        <TabPane tabId={2}>
+        <TabPane tabId={3}>
           <Title>Statistiques des personnes suivies</Title>
           <Filters base={filterPersonsBase} filters={filterPersons} onChange={setFilterPersons} />
           <Row>
@@ -233,7 +255,7 @@ const Stats = () => {
             <CustomResponsivePie title="Personnes très vulnérables" data={getPieData(persons, 'alertness', { isBoolean: true })} />
           </Row>
         </TabPane>
-        <TabPane tabId={3}>
+        <TabPane tabId={4}>
           <Title>Statistiques des observations de territoire</Title>
           <Row>
             {customFieldsObs
@@ -267,7 +289,7 @@ const Stats = () => {
               ))}
           </Row>
         </TabPane>
-        <TabPane tabId={4}>
+        <TabPane tabId={5}>
           <Title>Statistiques des comptes-rendus</Title>
           <CustomResponsivePie
             title="Répartition des comptes-rendus par collaboration"
@@ -436,7 +458,7 @@ const StatsCreatedAtRangeBar = ({ persons }) => {
 
 const Block = ({ data, title = 'Nombre de personnes suivies' }) => (
   <Col md={4} style={{ marginBottom: 20 }}>
-    <Card title={title} count={data.length} />
+    <Card title={title} count={!isNaN(data) ? data : data.length} />
   </Col>
 );
 
