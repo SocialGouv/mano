@@ -1,3 +1,10 @@
+## [1.24.5](https://github.com/SocialGouv/mano/compare/v1.24.4...v1.24.5) (2021-11-08)
+
+
+### Bug Fixes
+
+* **dashboard:** set encryption verification key only for encrypted organisations ([#142](https://github.com/SocialGouv/mano/issues/142)) ([05c886e](https://github.com/SocialGouv/mano/commit/05c886e2ab7a2aee3ef1d2e7261f563b6070f945))
+
 ## [1.24.4](https://github.com/SocialGouv/mano/compare/v1.24.3...v1.24.4) (2021-11-05)
 
 
