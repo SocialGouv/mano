@@ -1,3 +1,10 @@
+# [1.26.0](https://github.com/SocialGouv/mano/compare/v1.25.0...v1.26.0) (2021-11-08)
+
+
+### Features
+
+* **dashboard:** enhance stats - new filters - click on pie to filter ([#140](https://github.com/SocialGouv/mano/issues/140)) ([c8be85a](https://github.com/SocialGouv/mano/commit/c8be85a7bed5f679ea09ced428254731608826f5))
+
 # [1.25.0](https://github.com/SocialGouv/mano/compare/v1.24.6...v1.25.0) (2021-11-08)
 
 
