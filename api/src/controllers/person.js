@@ -113,6 +113,8 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
+    if (!person.user) req.body.user = req.user._id; // mitigate weird bug that puts no user for person creation
+
     if (["Non", ""].includes(req.body.address)) {
       req.body.addressDetail = "";
     }
