@@ -1,23 +1,23 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useActions, CANCEL, DONE, TODO } from '../recoil/actions';
+import useAuth from '../recoil/auth';
+import { useComments } from '../recoil/comments';
+import { usePersons } from '../recoil/persons';
+import { usePlaces } from '../recoil/places';
+import { useRelsPerson } from '../recoil/relPersonPlace';
+import { useReports } from '../recoil/reports';
+import { useTerritories } from '../recoil/territory';
 import { isOnSameDay, today } from '../services/date';
-import ActionsContext, { CANCEL, DONE, TODO } from './actions';
-import AuthContext from './auth';
-import CommentsContext from './comments';
-import PersonsContext from './persons';
-import PlacesContext from './places';
-import RelsPersonPlaceContext from './relPersonPlace';
-import ReportsContext from './reports';
-import TerritoryContext from './territory';
-import TerritoryObservationsContext from './territoryObservations';
+import { useTerritoryObservations } from '../recoil/territoryObservations';
 
 // we split those "selectors" to help poor machines with heavy calculation
 
 export const ReportsSelectorsContext = React.createContext();
 
 export const ReportsSelectorsProvider = ({ children }) => {
-  const { currentTeam } = useContext(AuthContext);
-  const { reports } = useContext(ReportsContext);
+  const { currentTeam } = useAuth();
+  const { reports } = useReports();
 
   const todaysReport = reports.filter((a) => a.team === currentTeam?._id).find((rep) => isOnSameDay(new Date(rep.date), today()));
 
@@ -37,11 +37,11 @@ export const ReportsSelectorsProvider = ({ children }) => {
 export const PersonsSelectorsContext = React.createContext();
 
 export const PersonsSelectorsProvider = ({ children }) => {
-  const { comments, commentKey } = useContext(CommentsContext);
-  const { persons, personKey } = useContext(PersonsContext);
-  const { actions, actionKey } = useContext(ActionsContext);
-  const { relsPersonPlace, relsKey } = useContext(RelsPersonPlaceContext);
-  const { places } = useContext(PlacesContext);
+  const { comments } = useComments();
+  const { persons } = usePersons();
+  const { actions } = useActions();
+  const { relsPersonPlace } = useRelsPerson();
+  const { places } = usePlaces();
 
   const [personsFullPopulated, setPersonsFullPopulated] = useState([]);
 
@@ -63,7 +63,7 @@ export const PersonsSelectorsProvider = ({ children }) => {
         }))
       );
     }, 500);
-  }, [commentKey, personKey, actionKey, relsKey]);
+  }, [comments, persons, actions, relsPersonPlace]);
 
   return <PersonsSelectorsContext.Provider value={{ personsFullPopulated }}>{children}</PersonsSelectorsContext.Provider>;
 };
@@ -71,10 +71,10 @@ export const PersonsSelectorsProvider = ({ children }) => {
 export const ActionsSelectorsContext = React.createContext();
 
 export const ActionsSelectorsProvider = ({ children }) => {
-  const { currentTeam } = useContext(AuthContext);
-  const { comments, commentKey } = useContext(CommentsContext);
-  const { persons, personKey } = useContext(PersonsContext);
-  const { actions, actionKey } = useContext(ActionsContext);
+  const { currentTeam } = useAuth();
+  const { comments } = useComments();
+  const { persons } = usePersons();
+  const { actions } = useActions();
 
   const [actionsFullPopulated, setActionsFullPopulated] = useState([]);
   const [actionsFullPopulatedForCurrentTeam, setActionsFullPopulatedForCurrentTeam] = useState([]);
@@ -89,7 +89,7 @@ export const ActionsSelectorsProvider = ({ children }) => {
       setActionsFullPopulated(newActionsFullPopulated);
       setActionsFullPopulatedForCurrentTeam(newActionsFullPopulated.filter((a) => a.team === currentTeam?._id));
     }, 1000);
-  }, [commentKey, personKey, actionKey, currentTeam?._id]);
+  }, [comments, persons, actions, currentTeam?._id]);
 
   return (
     <ActionsSelectorsContext.Provider value={{ actionsFullPopulated, actionsFullPopulatedForCurrentTeam }}>
@@ -101,8 +101,8 @@ export const ActionsSelectorsProvider = ({ children }) => {
 export const TerritoriesSelectorsContext = React.createContext();
 
 export const TerritoriesSelectorsProvider = ({ children }) => {
-  const { territories, territoryKey } = useContext(TerritoryContext);
-  const { territoryObservations, customFieldsObs, obsKey } = useContext(TerritoryObservationsContext);
+  const { territories } = useTerritories();
+  const { territoryObservations, customFieldsObs } = useTerritoryObservations();
 
   const [territoriesFullPopulated, setTerritoriesFullPopulated] = useState([]);
 
@@ -131,7 +131,7 @@ export const TerritoriesSelectorsProvider = ({ children }) => {
           }),
       }))
     );
-  }, [territoryKey, obsKey]);
+  }, [territories, territoryObservations]);
 
   return <TerritoriesSelectorsContext.Provider value={{ territoriesFullPopulated }}>{children}</TerritoriesSelectorsContext.Provider>;
 };
@@ -139,9 +139,9 @@ export const TerritoriesSelectorsProvider = ({ children }) => {
 export const ActionsByStatusContext = React.createContext();
 
 export const ActionsByStatusProvider = ({ children }) => {
-  const { currentTeam } = useContext(AuthContext);
-  const { persons, personKey } = useContext(PersonsContext);
-  const { actions, actionKey } = useContext(ActionsContext);
+  const { currentTeam } = useAuth();
+  const { persons } = usePersons();
+  const { actions } = useActions();
 
   const [actionsByStatus, setActionsByStatus] = useState({
     [TODO]: [],
@@ -160,7 +160,7 @@ export const ActionsByStatusProvider = ({ children }) => {
       [DONE]: currentTeamActions.filter((a) => a.status === DONE),
       [CANCEL]: currentTeamActions.filter((a) => a.status === CANCEL),
     });
-  }, [currentTeam?._id, personKey, actionKey]);
+  }, [currentTeam?._id, persons, actions]);
 
   return <ActionsByStatusContext.Provider value={{ actionsByStatus }}>{children}</ActionsByStatusContext.Provider>;
 };

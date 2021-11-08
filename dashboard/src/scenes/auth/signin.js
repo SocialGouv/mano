@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useContext, useEffect } from 'react';
 import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
@@ -6,16 +7,16 @@ import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { version } from '../../../package.json';
-import API from '../../services/api';
-import AuthContext from '../../contexts/auth';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import RefreshContext from '../../contexts/refresh';
 import PasswordInput from '../../components/PasswordInput';
 import { encryptVerificationKey } from '../../services/encryption';
+import useAuth from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const SignIn = () => {
-  const { setAuth, setCurrentTeam, resetAuth, user, organisation } = useContext(AuthContext);
+  const { setOrganisation, setTeams, setUsers, setUser, setCurrentTeam, user, organisation } = useAuth();
   const rc = useContext(RefreshContext);
   const history = useHistory();
   const [showErrors, setShowErrors] = useState(false);
@@ -25,6 +26,7 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authViaCookie, setAuthViaCookie] = useState(false);
+  const API = useApi();
 
   const onSigninValidated = ({ organisation }) => {
     if (!!organisation?.receptionEnabled) {
@@ -38,7 +40,7 @@ const SignIn = () => {
     if (!!organisation.encryptionEnabled && !organisation.encryptedVerificationKey) {
       const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
       const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
-      if (orgRes.ok) setAuth({ organisation: orgRes.data });
+      if (orgRes.ok) setOrganisation(orgRes.data);
     }
   };
 
@@ -62,7 +64,7 @@ const SignIn = () => {
         setAuthViaCookie(true);
         setUserName(user.name);
         const { organisation } = user;
-        API.organisation = organisation;
+        setOrganisation(organisation);
         if (!!organisation.encryptionEnabled) setShowEncryption(true);
       }
 
@@ -116,14 +118,13 @@ const SignIn = () => {
                   body,
                 });
             if (!ok) return actions.setSubmitting(false);
-            API.init({ resetAuth, history, toastr });
             const { organisation } = user;
             if (!!organisation.encryptionEnabled && !showEncryption) {
               setShowEncryption(true);
               return actions.setSubmitting(false);
             }
-            if (token) API.token = token;
-            API.organisation = organisation;
+            if (token) API.setToken(token);
+            setOrganisation(organisation);
             if (!!values.orgEncryptionKey) {
               const encryptionIsValid = await API.setOrgEncryptionKey(values.orgEncryptionKey.trim());
               if (!encryptionIsValid) return;
@@ -132,7 +133,9 @@ const SignIn = () => {
             const teams = teamResponse.data;
             const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
             const users = usersResponse.data;
-            setAuth({ teams, users, user, organisation });
+            setTeams(teams);
+            setUsers(users);
+            setUser(user);
             actions.setSubmitting(false);
             if (['superadmin'].includes(user.role)) {
               history.push('/organisation');

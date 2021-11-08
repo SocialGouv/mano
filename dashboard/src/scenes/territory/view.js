@@ -14,13 +14,13 @@ import Box from '../../components/Box';
 import ButtonCustom from '../../components/ButtonCustom';
 
 import Observations from '../territory-observations/list';
-import TerritoryContext, { territoryTypes } from '../../contexts/territory';
 import SelectCustom from '../../components/SelectCustom';
+import { useTerritories, territoryTypes } from '../../recoil/territory';
 
 const View = () => {
   const { id } = useParams();
   const history = useHistory();
-  const { territories, deleteTerritory, updateTerritory } = useContext(TerritoryContext);
+  const { territories, deleteTerritory, updateTerritory } = useTerritories();
   const territory = territories.find((t) => t._id === id);
 
   const deleteData = async () => {

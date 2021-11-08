@@ -7,19 +7,19 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
-import AuthContext from '../contexts/auth';
-import PersonsContext, { preparePersonForEncryption } from '../contexts/persons';
-import ActionsContext, { prepareActionForEncryption } from '../contexts/actions';
-import CommentsContext, { prepareCommentForEncryption } from '../contexts/comments';
-import TerritoryContext, { prepareTerritoryForEncryption } from '../contexts/territory';
-import TerritoryObservationsContext, { prepareObsForEncryption } from '../contexts/territoryObservations';
-import PlacesContext, { preparePlaceForEncryption } from '../contexts/places';
-import API from '../services/api';
-import ReportsContext, { prepareReportForEncryption } from '../contexts/reports';
-import { capture } from '../services/sentry';
-import RelsPersonPlaceContext, { prepareRelPersonPlaceForEncryption } from '../contexts/relPersonPlace';
+import useAuth from '../recoil/auth';
+import { preparePersonForEncryption, usePersons } from '../recoil/persons';
+import { prepareActionForEncryption, useActions } from '../recoil/actions';
+import { prepareCommentForEncryption, useComments } from '../recoil/comments';
+import { prepareObsForEncryption, useTerritoryObservations } from '../recoil/territoryObservations';
+import { useReports, prepareReportForEncryption } from '../recoil/reports';
+import { useTerritories, prepareTerritoryForEncryption } from '../recoil/territory';
+import { preparePlaceForEncryption, usePlaces } from '../recoil/places';
+import { prepareRelPersonPlaceForEncryption, useRelsPerson } from '../recoil/relPersonPlace';
 import RefreshContext from '../contexts/refresh';
 import { encryptVerificationKey } from '../services/encryption';
+import { capture } from '../services/sentry';
+import useApi from '../services/api-interface-with-dashboard';
 
 const EncryptionKey = () => {
   const [open, setOpen] = useState(false);
@@ -28,16 +28,17 @@ const EncryptionKey = () => {
   const [encryptingProgress, setEncryptingProgress] = useState(0);
   const [cancellingEncryption, setCancellingEncryption] = useState(false);
 
-  const { user, organisation, setAuth } = useContext(AuthContext);
-  const { persons } = useContext(PersonsContext);
-  const { actions } = useContext(ActionsContext);
-  const { comments } = useContext(CommentsContext);
-  const { territories } = useContext(TerritoryContext);
-  const { territoryObservations: observations, customFieldsObs } = useContext(TerritoryObservationsContext);
-  const { places } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
-  const { reports } = useContext(ReportsContext);
+  const { user, organisation, setOrganisation } = useAuth();
+  const { persons } = usePersons();
+  const { actions } = useActions();
+  const { comments } = useComments();
+  const { territories } = useTerritories();
+  const { territoryObservations: observations, customFieldsObs } = useTerritoryObservations();
+  const { places } = usePlaces();
+  const { relsPersonPlace } = useRelsPerson();
+  const { reports } = useReports();
   const { loading } = useContext(RefreshContext);
+  const API = useApi();
 
   const totalToEncrypt =
     persons.length +
@@ -83,7 +84,7 @@ const EncryptionKey = () => {
       const elpasedBarInterval = setInterval(() => {
         setEncryptingProgress((p) => p + updateStatusBarInterval);
       }, updateStatusBarInterval * 1000);
-      API.organisation.encryptionEnabled = true;
+      setOrganisation({ ...organisation, encryptionEnabled: true });
       const res = await API.post({
         path: '/encrypt',
         body: {
@@ -108,8 +109,7 @@ const EncryptionKey = () => {
         setEncryptingProgress(totalDurationOnServer);
         setEncryptingStatus('Données chiffrées !');
         toastr.success('Données chiffrées !', 'Veuillez noter la clé puis vous reconnecter');
-        setAuth({ organisation: res.data });
-        API.organisation = res.data;
+        setOrganisation(res.data);
       }
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);

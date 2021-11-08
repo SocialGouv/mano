@@ -1,17 +1,17 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import Loader from '../components/Loader';
-import API from '../services/api';
+import { useActions } from '../recoil/actions';
+import useAuth from '../recoil/auth';
+import { useComments } from '../recoil/comments';
+import { usePersons } from '../recoil/persons';
+import { usePlaces } from '../recoil/places';
+import { useRelsPerson } from '../recoil/relPersonPlace';
+import { useReports } from '../recoil/reports';
+import { useTerritories } from '../recoil/territory';
+import useApi from '../services/api-interface-with-dashboard';
 import { useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import ActionsContext from './actions';
-import AuthContext from './auth';
-import CommentsContext from './comments';
-import PersonsContext from './persons';
-import PlacesContext from './places';
-import RelsPersonPlaceContext from './relPersonPlace';
-import ReportsContext from './reports';
-import TerritoryContext from './territory';
-import TerritoryObservationsContext from './territoryObservations';
+import { useTerritoryObservations } from '../recoil/territoryObservations';
 
 const RefreshContext = React.createContext();
 
@@ -20,16 +20,17 @@ export const RefreshProvider = ({ children }) => {
   const [loading, setLoading] = useState('');
   const [progress, setProgress] = useState(0);
   const [fullScreen, setFullScreen] = useState(false);
+  const API = useApi();
 
-  const actionsContext = useContext(ActionsContext);
-  const personsContext = useContext(PersonsContext);
-  const commentsContext = useContext(CommentsContext);
-  const territoryContext = useContext(TerritoryContext);
-  const territoryObservationsContext = useContext(TerritoryObservationsContext);
-  const placesContext = useContext(PlacesContext);
-  const relsPersonPlaceContext = useContext(RelsPersonPlaceContext);
-  const reportsContext = useContext(ReportsContext);
-  const { organisationId } = useContext(AuthContext);
+  const { refreshActions } = useActions();
+  const { refreshPersons } = usePersons();
+  const { refreshComments } = useComments();
+  const { refreshTerritories } = useTerritories();
+  const { refreshTerritoryObs } = useTerritoryObservations();
+  const { refreshPlaces } = usePlaces();
+  const { refreshRelsPersonPlace } = useRelsPerson();
+  const { refreshReports } = useReports();
+  const { organisationId } = useAuth();
 
   const reset = async () => {
     await new Promise((res) => setTimeout(res, 150));
@@ -69,7 +70,7 @@ export const RefreshProvider = ({ children }) => {
         (relsPersonPlace || 1);
 
       setLoading('Chargement des personnes');
-      const isOK = await personsContext.refreshPersons((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      const isOK = await refreshPersons((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       if (!isOK) {
         reset();
@@ -79,25 +80,25 @@ export const RefreshProvider = ({ children }) => {
       if (onDecryptOk) onDecryptOk();
 
       setLoading('Chargement des actions');
-      await actionsContext.refreshActions((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      await refreshActions((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setLoading('Chargement des territoires');
-      await territoryContext.refreshTerritories((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      await refreshTerritories((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setLoading('Chargement des lieux');
-      await placesContext.refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
-      await relsPersonPlaceContext.refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      await refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      await refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setLoading('Chargement des rapports');
-      await reportsContext.refreshReports((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      await refreshReports((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setFullScreen(false);
 
       setLoading('Chargement des observations');
-      await territoryObservationsContext.refreshTerritoryObs((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      await refreshTerritoryObs((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setLoading('Chargement des commentaires');
-      await commentsContext.refreshComments((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
+      await refreshComments((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       reset();
       return true;
@@ -107,57 +108,57 @@ export const RefreshProvider = ({ children }) => {
     }
   };
 
-  const refreshActions = async (showFullScreen = false) => {
+  const actionsRefresher = async (showFullScreen = false) => {
     setFullScreen(showFullScreen);
 
     const { actions, persons, comments } = await getTotal();
     const total = (actions || 1) + (persons || 1) + (comments || 1);
 
     setLoading('Chargement des actions');
-    await actionsContext.refreshActions((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshActions((batch) => setProgress((p) => (p * total + batch) / total));
 
     setLoading('Chargement des personnes');
-    await personsContext.refreshPersons((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshPersons((batch) => setProgress((p) => (p * total + batch) / total));
 
     setLoading('Chargement des commentaires');
-    await commentsContext.refreshComments((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshComments((batch) => setProgress((p) => (p * total + batch) / total));
 
     reset();
   };
 
-  const refreshPersons = async (showFullScreen = false) => {
+  const personsRefresher = async (showFullScreen = false) => {
     setFullScreen(showFullScreen);
 
     const { actions, persons, comments, places, relsPersonPlace } = await getTotal();
     const total = actions + persons + comments + places + relsPersonPlace;
 
     setLoading('Chargement des personnes');
-    await personsContext.refreshPersons((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshPersons((batch) => setProgress((p) => (p * total + batch) / total));
 
     setLoading('Chargement des actions');
-    await actionsContext.refreshActions((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshActions((batch) => setProgress((p) => (p * total + batch) / total));
 
     setLoading('Chargement des lieux');
-    await placesContext.refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total));
-    await relsPersonPlaceContext.refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total));
 
     setLoading('Chargement des commentaires');
-    await commentsContext.refreshComments((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshComments((batch) => setProgress((p) => (p * total + batch) / total));
 
     reset();
   };
 
-  const refreshTerritories = async (showFullScreen = false) => {
+  const territoriesRefresher = async (showFullScreen = false) => {
     setFullScreen(showFullScreen);
 
     const { territories, territoryObservations } = await getTotal();
     const total = territories + territoryObservations;
 
     setLoading('Chargement des observations');
-    await territoryObservationsContext.refreshTerritoryObs((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshTerritoryObs((batch) => setProgress((p) => (p * total + batch) / total));
 
     setLoading('Chargement des territoires');
-    await territoryContext.refreshTerritories((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshTerritories((batch) => setProgress((p) => (p * total + batch) / total));
 
     reset();
   };
@@ -169,8 +170,8 @@ export const RefreshProvider = ({ children }) => {
     const total = places + relsPersonPlace;
 
     setLoading('Chargement des lieux');
-    await placesContext.refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total));
-    await relsPersonPlaceContext.refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total));
+    await refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total));
 
     reset();
   };
@@ -180,8 +181,8 @@ export const RefreshProvider = ({ children }) => {
       value={{
         loading,
         refresh,
-        refreshActions,
-        refreshPersons,
+        actionsRefresher,
+        personsRefresher,
         refreshTerritories,
         refreshPlacesAndRelations,
       }}>

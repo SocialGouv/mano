@@ -14,12 +14,12 @@ import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import AuthContext from '../../contexts/auth';
-import TerritoryContext, { territoryTypes } from '../../contexts/territory';
+import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import RefreshContext from '../../contexts/refresh';
 import SelectCustom from '../../components/SelectCustom';
 import { TerritoriesSelectorsContext } from '../../contexts/selectors';
+import useAuth from '../../recoil/auth';
 
 const filterTerritories = (territories, { page, limit, search }) => {
   if (search?.length) territories = filterBySearch(search, territories);
@@ -30,7 +30,7 @@ const filterTerritories = (territories, { page, limit, search }) => {
 
 const List = () => {
   const { territoriesFullPopulated } = useContext(TerritoriesSelectorsContext);
-  const { organisation } = useContext(AuthContext);
+  const { organisation } = useAuth();
   const history = useHistory();
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
@@ -74,13 +74,13 @@ const List = () => {
 const CreateTerritory = () => {
   const [open, setOpen] = useState(false);
   const history = useHistory();
-  const { currentTeam } = useContext(AuthContext);
-  const { addTerritory } = useContext(TerritoryContext);
-  const { refreshTerritories, loading } = useContext(RefreshContext);
+  const { currentTeam } = useAuth();
+  const { addTerritory } = useTerritories();
+  const { territoriesRefresher, loading } = useContext(RefreshContext);
 
   return (
     <CreateStyle>
-      <LinkButton disabled={!!loading} onClick={() => refreshTerritories()} color="link" style={{ marginRight: 10 }}>
+      <LinkButton disabled={!!loading} onClick={() => territoriesRefresher()} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
       <ButtonCustom

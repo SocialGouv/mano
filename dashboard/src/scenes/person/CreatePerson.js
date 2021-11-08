@@ -7,21 +7,21 @@ import { toastr } from 'react-redux-toastr';
 import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import AuthContext from '../../contexts/auth';
-import PersonsContext from '../../contexts/persons';
 import RefreshContext from '../../contexts/refresh';
+import useAuth from '../../recoil/auth';
+import { usePersons } from '../../recoil/persons';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
-  const { currentTeam } = useContext(AuthContext);
+  const { currentTeam } = useAuth();
   const history = useHistory();
-  const { addPerson, persons } = useContext(PersonsContext);
-  const { refreshPersons, loading } = useContext(RefreshContext);
+  const { addPerson, persons } = usePersons();
+  const { personsRefresher, loading } = useContext(RefreshContext);
 
   return (
     <>
       {!!refreshable && (
-        <LinkButton onClick={() => refreshPersons()} disabled={!!loading} color="link" style={{ marginRight: 10 }}>
+        <LinkButton onClick={() => personsRefresher()} disabled={!!loading} color="link" style={{ marginRight: 10 }}>
           Rafraichir
         </LinkButton>
       )}

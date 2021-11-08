@@ -1,17 +1,18 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Container, FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
-import API from '../services/api';
 import Header from '../components/header';
 import Loading from '../components/loading';
 import ButtonCustom from '../components/ButtonCustom';
-import AuthContext from '../contexts/auth';
 import ChangePassword from '../components/ChangePassword';
+import useAuth from '../recoil/auth';
+import useApi from '../services/api-interface-with-dashboard';
 
 const Account = () => {
-  const { user, setAuth } = useContext(AuthContext);
+  const { user, setUser } = useAuth();
+  const API = useApi();
 
   if (!user) return <Loading />;
 
@@ -27,7 +28,7 @@ const Account = () => {
               if (response.ok) {
                 toastr.success('Mis à jour !');
                 const { user } = await API.get({ path: '/user/me' });
-                setAuth({ user });
+                setUser(user);
               }
             } catch (userUpdateError) {
               console.log('error in user update', userUpdateError);
@@ -67,6 +68,7 @@ const Account = () => {
 
 const LinkToChangePassword = () => {
   const [open, setOpen] = useState(false);
+  const API = useApi();
 
   return (
     <>

@@ -1,13 +1,13 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { toastr } from 'react-redux-toastr';
 
 import ButtonCustom from './ButtonCustom';
 import { Formik } from 'formik';
-import ReportsContext from '../contexts/reports';
+import { useReports } from '../recoil/reports';
 
 const ReportDescriptionModale = ({ report }) => {
-  const { updateReport } = useContext(ReportsContext);
+  const { updateReport } = useReports();
 
   const [open, setOpen] = useState(false);
 

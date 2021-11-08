@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { Label } from 'reactstrap';
 
-import API from '../services/api';
+import useApi from '../services/api-interface-with-dashboard';
 import SelectCustom from './SelectCustom';
 
 const SelectStructure = ({ value = '', onChange, name }) => {
   const [data, setData] = useState(null);
+  const API = useApi();
 
   useEffect(() => {
     (async () => {

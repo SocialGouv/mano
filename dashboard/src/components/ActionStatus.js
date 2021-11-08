@@ -1,6 +1,6 @@
 import { Badge } from 'reactstrap';
 import React from 'react';
-import { DONE, TODO, CANCEL } from '../contexts/actions';
+import { DONE, TODO, CANCEL } from '../recoil/actions';
 
 const ActionStatus = ({ status }) => {
   if (status === TODO) return <Badge color="danger">{status}</Badge>;

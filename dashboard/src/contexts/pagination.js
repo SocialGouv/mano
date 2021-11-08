@@ -1,12 +1,13 @@
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { TODO } from './actions';
-import AuthContext from './auth';
+import useAuth from '../recoil/auth';
+import { TODO } from '../recoil/actions';
 
 const PaginationContext = React.createContext();
 
 export const PaginationProvider = ({ children }) => {
-  const { currentTeam } = useContext(AuthContext);
+  const { currentTeam } = useAuth();
+
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);

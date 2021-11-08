@@ -1,12 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
-
-import API from '../../services/api';
 
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -14,13 +12,15 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
 import BackButton from '../../components/backButton';
 import NightSessionModale from '../../components/NightSessionModale';
-import AuthContext from '../../contexts/auth';
+import useAuth from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const View = () => {
   const [team, setTeam] = useState(null);
   const { id } = useParams();
   const history = useHistory();
-  const { teams, setAuth, currentTeam, setCurrentTeam } = useContext(AuthContext);
+  const { teams, setTeams, currentTeam, setCurrentTeam } = useAuth();
+  const API = useApi();
 
   useEffect(() => {
     (async () => {
@@ -34,7 +34,7 @@ const View = () => {
     if (confirm) {
       const res = await API.delete({ path: `/team/${id}` });
       if (!res.ok) return;
-      setAuth({ teams: teams.filter((t) => t._id !== id) });
+      setTeams(teams.filter((t) => t._id !== id));
       toastr.success('Suppression réussie');
       history.goBack();
     }
@@ -53,12 +53,12 @@ const View = () => {
               const response = await API.put({ path: `/team/${team._id}`, body });
               if (response.ok) {
                 toastr.success('Mise à jour !');
-                setAuth({
-                  teams: teams.map((t) => {
+                setTeams(
+                  teams.map((t) => {
                     if (t._id !== id) return t;
                     return response.data;
-                  }),
-                });
+                  })
+                );
                 if (currentTeam._id === id) setCurrentTeam(response.data);
               }
             } catch (errorUpdatingTeam) {

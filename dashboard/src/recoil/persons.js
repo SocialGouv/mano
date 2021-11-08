@@ -1,55 +1,54 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useState } from 'react';
-import API from '../services/api';
+import { useState } from 'react';
+import { atom, useRecoilState } from 'recoil';
+import { useComments } from '../recoil/comments';
+import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import ActionsContext from './actions';
-import CommentsContext from './comments';
-import RelsPersonPlaceContext from './relPersonPlace';
+import { useActions } from './actions';
+import { useRelsPerson } from './relPersonPlace';
 
-const PersonsContext = React.createContext();
+const personsState = atom({
+  key: 'personsState',
+  default: [],
+});
 
-export const PersonsProvider = ({ children }) => {
-  const { addComment, deleteComment, comments } = useContext(CommentsContext);
-  const { actions, deleteAction } = useContext(ActionsContext);
-  const { relsPersonPlace, deleteRelation } = useContext(RelsPersonPlaceContext);
+export const usePersons = () => {
+  const { comments, addComment, deleteComment } = useComments();
+  const { deleteAction, actions } = useActions();
+  const { relsPersonPlace, deleteRelation } = useRelsPerson();
+  const API = useApi();
 
-  const [state, setState] = useState({ personKey: 0, persons: [], loading: false, lastRefresh: undefined });
+  const [persons, setPersons] = useRecoilState(personsState);
+  const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-persons', 0);
-  const setPersons = (newPersons) => {
-    if (newPersons) {
-      setState(({ personKey }) => ({
-        persons: newPersons.sort(sortPersons),
-        personKey: personKey + 1,
-        loading: false,
-      }));
-    }
+
+  const setPersonsFullState = (newPersons) => {
+    if (newPersons) setPersons(newPersons.sort(sortPersons));
+    setLoading(false);
     setLastRefresh(Date.now());
   };
 
-  const setBatchData = (newPersons) =>
-    setState(({ persons, ...oldState }) => ({
-      ...oldState,
-      persons: [...persons, ...newPersons],
-    }));
+  const setBatchData = (newPersons) => setPersons((persons) => [...persons, ...newPersons]);
 
   const refreshPersons = async (setProgress, initialLoad = false) => {
-    setState((state) => ({ ...state, loading: true }));
+    setLoading(true);
     try {
-      setPersons(
+      setPersonsFullState(
         await getData({
           collectionName: 'person',
-          data: state.persons,
+          data: persons,
           isInitialization: initialLoad,
           setProgress,
           lastRefresh,
           setBatchData,
+          API,
         })
       );
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });
-      setState((state) => ({ ...state, loading: false }));
+      setLoading(false);
       return false;
     }
   };
@@ -57,11 +56,7 @@ export const PersonsProvider = ({ children }) => {
   const deletePerson = async (id) => {
     const res = await API.delete({ path: `/person/${id}` });
     if (res.ok) {
-      setState(({ persons, personKey, ...s }) => ({
-        ...s,
-        personKey: personKey + 1,
-        persons: persons.filter((p) => p._id !== id),
-      }));
+      setPersons((persons) => persons.filter((p) => p._id !== id));
       for (const action of actions.filter((a) => a.person === id)) {
         await deleteAction(action._id);
       }
@@ -77,15 +72,11 @@ export const PersonsProvider = ({ children }) => {
 
   const addPerson = async (person) => {
     try {
-      const existingPerson = state.persons.find((p) => p.name === person.name);
+      const existingPerson = persons.find((p) => p.name === person.name);
       if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
       const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
       if (response.ok) {
-        setState(({ persons, personKey, ...s }) => ({
-          ...s,
-          personKey: personKey + 1,
-          persons: [response.decryptedData, ...persons].sort(sortPersons),
-        }));
+        setPersons((persons) => [response.decryptedData, ...persons].sort(sortPersons));
       }
       return response;
     } catch (error) {
@@ -95,21 +86,19 @@ export const PersonsProvider = ({ children }) => {
   };
   const updatePerson = async (person) => {
     try {
-      const oldPerson = state.persons.find((a) => a._id === person._id);
+      const oldPerson = persons.find((a) => a._id === person._id);
       const response = await API.put({
         path: `/person/${person._id}`,
         body: preparePersonForEncryption(person),
       });
       if (response.ok) {
         const newPerson = response.decryptedData;
-        setState(({ persons, personKey, ...s }) => ({
-          ...s,
-          personKey: personKey + 1,
-          persons: persons.map((p) => {
+        setPersons((persons) =>
+          persons.map((p) => {
             if (p._id === person._id) return newPerson;
             return p;
-          }),
-        }));
+          })
+        );
         const comment = commentForUpdatePerson({ newPerson, oldPerson });
         if (comment) {
           const response = await addComment(comment);
@@ -127,21 +116,15 @@ export const PersonsProvider = ({ children }) => {
     }
   };
 
-  return (
-    <PersonsContext.Provider
-      value={{
-        ...state,
-        refreshPersons,
-        deletePerson,
-        addPerson,
-        updatePerson,
-      }}>
-      {children}
-    </PersonsContext.Provider>
-  );
+  return {
+    persons,
+    loading,
+    refreshPersons,
+    deletePerson,
+    addPerson,
+    updatePerson,
+  };
 };
-
-export default PersonsContext;
 
 /*
 

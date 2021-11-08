@@ -14,7 +14,6 @@ import ActionStatus from '../../components/ActionStatus';
 import DateBloc from '../../components/DateBloc';
 
 import { toFrenchDate } from '../../utils';
-import AuthContext from '../../contexts/auth';
 import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
 import SelectTeam from '../../components/SelectTeam';
@@ -24,6 +23,7 @@ import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import styled from 'styled-components';
 import ActionName from '../../components/ActionName';
+import useAuth from '../../recoil/auth';
 
 const filterActions = (actions, { page, limit, status, currentTeam, search }) => {
   if (status) actions = actions.filter((a) => a.status === status);
@@ -41,7 +41,7 @@ const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
   const { actionsFullPopulated } = useContext(ActionsSelectorsContext);
-  const { user, teams, currentTeam, setCurrentTeam } = useContext(AuthContext);
+  const { user, teams, currentTeam, setCurrentTeam } = useAuth();
 
   const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
   const history = useHistory();

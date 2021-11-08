@@ -1,12 +1,12 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
 import SelectCustom from '../../components/SelectCustom';
-import PersonsContext from '../../contexts/persons';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
+import { usePersons } from '../../recoil/persons';
 
 const SelectAndCreatePerson = ({ value, onChange, autoCreate }) => {
-  const { persons, addPerson } = useContext(PersonsContext);
+  const { persons, addPerson } = usePersons();
 
   return (
     <SelectCustom

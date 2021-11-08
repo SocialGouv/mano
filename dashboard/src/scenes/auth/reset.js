@@ -4,11 +4,12 @@ import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 
-import API from '../../services/api';
 import ChangePassword from '../../components/ChangePassword';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const Reset = ({ location }) => {
   const [redirect, setRedirect] = useState(false);
+  const API = useApi();
 
   const { token } = queryString.parse(location.search);
 

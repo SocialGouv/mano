@@ -1,10 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
-
-import API from '../../services/api';
 
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -12,11 +10,12 @@ import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
 
 import { toFrenchDate } from '../../utils';
-import AuthContext from '../../contexts/auth';
 import NightSessionModale from '../../components/NightSessionModale';
+import useAuth from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const List = () => {
-  const { teams } = useContext(AuthContext);
+  const { teams } = useAuth();
   const history = useHistory();
 
   return (
@@ -50,8 +49,9 @@ const List = () => {
 //Organisation
 
 const Create = () => {
-  const { organisation, setAuth, teams, user, setCurrentTeam } = useContext(AuthContext);
+  const { organisation, setUser, setTeams, teams, user, setCurrentTeam } = useAuth();
   const [open, setOpen] = useState(!teams.length);
+  const API = useApi();
 
   const onboardingForTeams = !teams.length;
 
@@ -73,7 +73,7 @@ const Create = () => {
                 const userPutRes = await API.put({ path: `/user/${user._id}`, body: { team: [newTeamRes.data._id] } });
                 if (!userPutRes.ok) return actions.setSubmitting(false);
                 const meResponse = await API.get({ path: '/user/me' });
-                setAuth({ user: meResponse.user });
+                setUser(meResponse.user);
                 setCurrentTeam(meResponse.user.teams[0]);
                 toastr.success('Création réussie !', `Vous êtes dans l'équipe ${newTeamRes.data.name}`);
               } else {
@@ -81,7 +81,7 @@ const Create = () => {
               }
               actions.setSubmitting(false);
               const { data: teams } = await API.get({ path: '/team' });
-              setAuth({ teams });
+              setTeams(teams);
               setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => {

@@ -1,20 +1,20 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Container, Collapse } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 
 import Header from '../../components/header';
 
 import { toFrenchDate } from '../../utils';
-import AuthContext from '../../contexts/auth';
-import ReportsContext from '../../contexts/reports';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import styled from 'styled-components';
 import { getMonths, isOnSameDay } from '../../services/date';
+import useAuth from '../../recoil/auth';
+import { useReports } from '../../recoil/reports';
 
 const List = () => {
-  const { currentTeam } = useContext(AuthContext);
-  const { reports: allReports, loading, refreshReports } = useContext(ReportsContext);
+  const { currentTeam } = useAuth();
+  const { reports: allReports, loading, refreshReports } = useReports();
 
   const reports = allReports.filter((r) => r.team === currentTeam._id);
 
@@ -35,7 +35,7 @@ const List = () => {
 const HitMonth = ({ date, reports, team, debug }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [submiting, setSubmiting] = useState(false);
-  const { addReport } = useContext(ReportsContext);
+  const { addReport } = useReports();
 
   const history = useHistory();
 

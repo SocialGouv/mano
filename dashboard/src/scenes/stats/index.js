@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useState, useContext } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import XLSX from 'xlsx';
@@ -9,8 +9,8 @@ import Header from '../../components/header';
 
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
-import AuthContext from '../../contexts/auth';
-import PersonsContext, {
+import {
+  usePersons,
   consumptionsOptions,
   healthInsuranceOptions,
   nationalitySituationOptions,
@@ -19,18 +19,19 @@ import PersonsContext, {
   ressourcesOptions,
   vulnerabilitiesOptions,
   filterPersonsBase,
-} from '../../contexts/persons';
-import ActionsContext from '../../contexts/actions';
-import CommentsContext from '../../contexts/comments';
-import TerritoryContext from '../../contexts/territory';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
-import PlacesContext from '../../contexts/places';
+} from '../../recoil/persons';
+import { useTerritoryObservations } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
-import ReportsContext from '../../contexts/reports';
 import RefreshContext from '../../contexts/refresh';
 import Card from '../../components/Card';
+import useAuth from '../../recoil/auth';
+import { useComments } from '../../recoil/comments';
+import { useActions } from '../../recoil/actions';
+import { usePlaces } from '../../recoil/places';
+import { useReports } from '../../recoil/reports';
+import { useTerritories } from '../../recoil/territory';
 moment.locale('fr');
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
@@ -92,16 +93,15 @@ const createSheet = (data) => {
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
 
 const Stats = () => {
-  const { teams, organisation, user, currentTeam } = useContext(AuthContext);
-  const { persons: allPersons, loading: personsLoading } = useContext(PersonsContext);
-  const { refresh } = useContext(RefreshContext);
-  const { actions: allActions, loading: actionsLoading } = useContext(ActionsContext);
-  const { comments } = useContext(CommentsContext);
-  const { reports: allreports } = useContext(ReportsContext);
-  const { territories } = useContext(TerritoryContext);
-  const { territoryObservations: allObservations, customFieldsObs } = useContext(TerritoryObservationsContext);
-  const { places } = useContext(PlacesContext);
-  const [loading, setLoading] = useState(false);
+  const { teams, organisation, user, currentTeam } = useAuth();
+  const { persons: allPersons } = usePersons();
+  const { refresh, loading } = useContext(RefreshContext);
+  const { actions: allActions } = useActions();
+  const { comments } = useComments();
+  const { reports } = useReports();
+  const { territories } = useTerritories();
+  const { territoryObservations: allObservations, customFieldsObs } = useTerritoryObservations();
+  const { places } = usePlaces();
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
 
@@ -110,14 +110,6 @@ const Stats = () => {
   };
 
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
-
-  useEffect(() => {
-    if (loading) refresh();
-  }, [loading]);
-
-  useEffect(() => {
-    if (!personsLoading && !actionsLoading) setLoading(false);
-  }, [personsLoading, actionsLoading]);
 
   if (loading) return <Loading />;
 
@@ -143,7 +135,7 @@ const Stats = () => {
 
   return (
     <Container>
-      <Header title="Statistiques" onRefresh={() => setLoading(true)} />
+      <Header title="Statistiques" onRefresh={() => refresh()} />
       <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center' }}>
         <Col md={8} style={{ display: 'flex' }}>
           <span style={{ marginRight: 10, display: 'inline-flex', alignItems: 'center' }}>Choisissez une période :</span>

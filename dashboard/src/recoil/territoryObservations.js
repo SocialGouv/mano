@@ -1,57 +1,52 @@
-import React, { useContext, useState } from 'react';
-import API from '../services/api';
+import { useState } from 'react';
+import useAuth from './auth';
+import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import AuthContext from './auth';
+import { atom, useRecoilState } from 'recoil';
 
-const TerritoryObservationsContext = React.createContext();
+const territoryObservationsState = atom({
+  key: 'territoryObservationsState',
+  default: [],
+});
 
-export const TerritoryObservationsProvider = ({ children }) => {
-  const [state, setState] = useState({ territoryObservations: [], obsKey: 0, loading: true });
+export const useTerritoryObservations = () => {
+  const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
+  const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
+  const { organisation } = useAuth();
 
-  const { organisation } = useContext(AuthContext);
+  const API = useApi();
 
   const customFieldsObs = typeof organisation.customFieldsObs === 'string' ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields;
 
-  const setTerritoryObs = (territoryObservations) => {
-    if (territoryObservations) {
-      setState(({ obsKey }) => ({
-        territoryObservations,
-        obsKey: obsKey + 1,
-        loading: false,
-      }));
+  const setTerritoryObsFullState = (newTerritoryObservations) => {
+    if (newTerritoryObservations) {
+      setTerritoryObs(newTerritoryObservations);
+      setLoading(false);
     }
     setLastRefresh(Date.now());
   };
 
-  const setBatchData = (newObs) =>
-    setState(({ territoryObservations, ...oldState }) => ({
-      ...oldState,
-      territoryObservations: [...territoryObservations, ...newObs],
-    }));
+  const setBatchData = (newObs) => setTerritoryObs((territoryObservations) => [...territoryObservations, ...newObs]);
 
   const refreshTerritoryObs = async (setProgress) => {
-    setState((state) => ({ ...state, loading: true }));
+    setLoading(true);
     try {
       const data = await getData({
         collectionName: 'territory-observation',
-        data: state.territoryObservations,
+        data: territoryObservations,
         isInitialization: true,
         setProgress,
         setBatchData,
         lastRefresh,
+        API,
       });
-      setTerritoryObs(data);
-      if (data) {
-        for (const obs of data.filter((obs) => Boolean(obs.territory?._id) && !obs.territory)) {
-          await updateTerritoryObs({ ...obs, territory: obs.territory._id });
-        }
-      }
+      setTerritoryObsFullState(data);
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });
-      setState((state) => ({ ...state, loading: false }));
+      setLoading(false);
       return false;
     }
   };
@@ -59,11 +54,7 @@ export const TerritoryObservationsProvider = ({ children }) => {
   const deleteTerritoryObs = async (id) => {
     const res = await API.delete({ path: `/territory-observation/${id}` });
     if (res.ok) {
-      setState(({ territoryObservations, obsKey, ...s }) => ({
-        ...s,
-        obsKey: obsKey + 1,
-        territoryObservations: territoryObservations.filter((p) => p._id !== id),
-      }));
+      setTerritoryObs((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
     }
     return res;
   };
@@ -72,11 +63,7 @@ export const TerritoryObservationsProvider = ({ children }) => {
     try {
       const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
       if (res.ok) {
-        setState(({ territoryObservations, obsKey, ...s }) => ({
-          ...s,
-          obsKey: obsKey + 1,
-          territoryObservations: [res.decryptedData, ...territoryObservations],
-        }));
+        setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
       }
       return res;
     } catch (error) {
@@ -89,14 +76,12 @@ export const TerritoryObservationsProvider = ({ children }) => {
     try {
       const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
       if (res.ok) {
-        setState(({ territoryObservations, obsKey, ...s }) => ({
-          ...s,
-          obsKey: obsKey + 1,
-          territoryObservations: territoryObservations.map((a) => {
+        setTerritoryObs((territoryObservations) =>
+          territoryObservations.map((a) => {
             if (a._id === obs._id) return res.decryptedData;
             return a;
-          }),
-        }));
+          })
+        );
       }
       return res;
     } catch (error) {
@@ -105,23 +90,17 @@ export const TerritoryObservationsProvider = ({ children }) => {
     }
   };
 
-  return (
-    <TerritoryObservationsContext.Provider
-      value={{
-        ...state,
-        customFieldsObs,
-        refreshTerritoryObs,
-        setTerritoryObs,
-        deleteTerritoryObs,
-        addTerritoryObs,
-        updateTerritoryObs,
-      }}>
-      {children}
-    </TerritoryObservationsContext.Provider>
-  );
+  return {
+    territoryObservations,
+    loading,
+    customFieldsObs,
+    refreshTerritoryObs,
+    setTerritoryObs,
+    deleteTerritoryObs,
+    addTerritoryObs,
+    updateTerritoryObs,
+  };
 };
-
-export default TerritoryObservationsContext;
 
 export const defaultCustomFields = [
   {

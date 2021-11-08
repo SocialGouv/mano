@@ -1,6 +1,5 @@
 /* eslint-disable no-throw-literal */
 import { useState } from 'react';
-import API from '../services/api';
 // import MMKVStorage from 'react-native-mmkv-storage';
 
 export const mergeNewUpdatedData = (newData, oldData) => {
@@ -30,18 +29,21 @@ export const useStorage = (key, defaultValue) => {
   return [value, setValue];
 };
 
-// Get data from server (no cache yet).
-export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
-  /*
-  const MMKV = new MMKVStorage.Loader().initialize();
-  if (isInitialization) {
-    data = (await MMKV.getMapAsync(collectionName)) || [];
-    if (data?.length) {
-      lastRefresh = new Date(data.map((item) => item.updatedAt).reduce((a, b) => (a > b ? a : b))).getTime();
+export const localStorageEffect =
+  (key) =>
+  ({ setSelf, onSet }) => {
+    const savedValue = localStorage.getItem(key);
+    if (savedValue != null) {
+      setSelf(JSON.parse(savedValue));
     }
-  }
-  */
 
+    onSet((newValue, _, isReset) => {
+      isReset ? localStorage.removeItem(key) : localStorage.setItem(key, JSON.stringify(newValue));
+    });
+  };
+
+// Get data from server (no cache yet).
+export async function getData({ API, collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
   const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
   if (!response.ok) throw { message: `Error getting ${collectionName} data`, response };
 

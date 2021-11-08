@@ -1,53 +1,53 @@
-import React, { useContext, useState } from 'react';
-import API from '../services/api';
+import { useState } from 'react';
+import { atom, useRecoilState } from 'recoil';
+import { useRelsPerson } from '../recoil/relPersonPlace';
+import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import RelsPersonPlaceContext from './relPersonPlace';
-
-const PlacesContext = React.createContext();
 
 const sortPlaces = (p1, p2) => p1.name.localeCompare(p2.name);
 
-export const PlacesProvider = ({ children }) => {
-  const { relsPersonPlace, deleteRelation } = useContext(RelsPersonPlaceContext);
+const placesState = atom({
+  key: 'placesState',
+  default: [],
+});
 
-  const [state, setState] = useState({ places: [], placeKey: 0, loading: false, lastRefresh: undefined });
+export const usePlaces = () => {
+  const { relsPersonPlace, deleteRelation } = useRelsPerson();
+  const API = useApi();
+
+  const [places, setPlaces] = useRecoilState(placesState);
+  const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-places', 0);
 
-  const setPlaces = (places) => {
-    if (places) {
-      setState(({ placeKey }) => ({
-        places: places.sort(sortPlaces),
-        placeKey: placeKey + 1,
-        loading: false,
-      }));
+  const setPlacesFullState = (newPlaces) => {
+    if (newPlaces) {
+      setPlaces(newPlaces.sort(sortPlaces));
     }
+    setLoading(false);
     setLastRefresh(Date.now());
   };
 
-  const setBatchData = (newPlaces) =>
-    setState(({ places, ...oldState }) => ({
-      ...oldState,
-      places: [...places, ...newPlaces],
-    }));
+  const setBatchData = (newPlaces) => setPlacesFullState((places) => [...places, ...newPlaces]);
 
   const refreshPlaces = async (setProgress, initialLoad) => {
-    setState((state) => ({ ...state, loading: true }));
+    setLoading(true);
     try {
-      setPlaces(
+      setPlacesFullState(
         await getData({
           collectionName: 'place',
-          data: state.places,
+          data: places,
           isInitialization: initialLoad,
           setProgress,
           lastRefresh,
           setBatchData,
+          API,
         })
       );
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });
-      setState((state) => ({ ...state, loading: false }));
+      setLoading(false);
       return false;
     }
   };
@@ -55,11 +55,7 @@ export const PlacesProvider = ({ children }) => {
   const deletePlace = async (id) => {
     const res = await API.delete({ path: `/place/${id}` });
     if (res.ok) {
-      setState(({ placeKey, places, ...s }) => ({
-        ...s,
-        placeKey: placeKey + 1,
-        places: places.filter((p) => p._id !== id),
-      }));
+      setPlaces((places) => places.filter((p) => p._id !== id));
       for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === id)) {
         await deleteRelation(relPersonPlace._id);
       }
@@ -69,14 +65,12 @@ export const PlacesProvider = ({ children }) => {
 
   const addPlace = async (place) => {
     try {
+      setLoading(true);
       const res = await API.post({ path: '/place', body: preparePlaceForEncryption(place) });
       if (res.ok) {
-        setState(({ places, placeKey, ...s }) => ({
-          ...s,
-          placeKey: placeKey + 1,
-          places: [res.decryptedData, ...places].sort(sortPlaces),
-        }));
+        setPlaces((places) => [res.decryptedData, ...places].sort(sortPlaces));
       }
+      setLoading(false);
       return res;
     } catch (error) {
       capture('error in creating place' + error, { extra: { error, place } });
@@ -86,22 +80,22 @@ export const PlacesProvider = ({ children }) => {
 
   const updatePlace = async (place) => {
     try {
+      setLoading(true);
       const res = await API.put({
         path: `/place/${place._id}`,
         body: preparePlaceForEncryption(place),
       });
       if (res.ok) {
-        setState(({ places, placeKey, ...s }) => ({
-          ...s,
-          placeKey: placeKey + 1,
-          places: places
+        setPlaces((places) =>
+          places
             .map((p) => {
               if (p._id === place._id) return res.decryptedData;
               return p;
             })
-            .sort(sortPlaces),
-        }));
+            .sort(sortPlaces)
+        );
       }
+      setLoading(false);
       return res;
     } catch (error) {
       capture(error, { extra: { message: 'error in updating place', place } });
@@ -109,22 +103,16 @@ export const PlacesProvider = ({ children }) => {
     }
   };
 
-  return (
-    <PlacesContext.Provider
-      value={{
-        ...state,
-        refreshPlaces,
-        setPlaces,
-        deletePlace,
-        addPlace,
-        updatePlace,
-      }}>
-      {children}
-    </PlacesContext.Provider>
-  );
+  return {
+    places,
+    loading,
+    refreshPlaces,
+    setPlaces,
+    deletePlace,
+    addPlace,
+    updatePlace,
+  };
 };
-
-export default PlacesContext;
 
 const encryptedFields = ['user', 'name'];
 

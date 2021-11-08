@@ -1,8 +1,8 @@
-import React, { useContext } from "react";
-import AuthContext from "../contexts/auth";
+import React from 'react';
+import useAuth from '../recoil/auth';
 
 const UserName = ({ id, wrapper = (name) => name }) => {
-  const { users } = useContext(AuthContext);
+  const { users } = useAuth();
 
   const user = users.find((u) => u._id === id);
 

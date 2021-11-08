@@ -1,8 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import API from '../../services/api';
 
 import Header from '../../components/header';
 import Page from '../../components/pagination';
@@ -13,8 +12,9 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import AuthContext from '../../contexts/auth';
 import { toFrenchDate } from '../../utils';
+import useAuth from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const List = () => {
   const [structures, setStructures] = useState(null);
@@ -22,6 +22,7 @@ const List = () => {
   const [pagination, setPagination] = useState();
   const [refresh, setRefresh] = useState(false);
   const [search, setSearch] = useState('');
+  const API = useApi();
 
   useEffect(() => {
     setPagination({});
@@ -68,7 +69,8 @@ const List = () => {
 
 const Create = ({ onChange }) => {
   const [open, setOpen] = useState(false);
-  const { currentTeam } = useContext(AuthContext);
+  const { currentTeam } = useAuth();
+  const API = useApi();
 
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>

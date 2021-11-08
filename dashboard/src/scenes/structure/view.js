@@ -6,17 +6,19 @@ import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
-import API from '../../services/api';
 import ButtonCustom from '../../components/ButtonCustom';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
 import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const View = () => {
   const [structure, setStructure] = useState(null);
   const { id } = useParams();
   const history = useHistory();
+  const API = useApi();
+
   useEffect(() => {
     (async () => {
       const { data } = await API.get({ path: `/structure/${id}` });

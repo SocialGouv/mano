@@ -13,8 +13,7 @@ import Search from '../../components/search';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import AuthContext from '../../contexts/auth';
-import { filterPersonsBase } from '../../contexts/persons';
+import { filterPersonsBase } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import PaginationContext from '../../contexts/pagination';
 import Filters, { filterData } from '../../components/Filters';
@@ -22,9 +21,10 @@ import { filterBySearch } from '../search/utils';
 import { displayBirthDate } from '../../services/date';
 import { PersonsSelectorsContext } from '../../contexts/selectors';
 import CreatePerson from './CreatePerson';
-import PlacesContext from '../../contexts/places';
-import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
 import { theme } from '../../config';
+import useAuth from '../../recoil/auth';
+import { useRelsPerson } from '../../recoil/relPersonPlace';
+import { usePlaces } from '../../recoil/places';
 
 const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness } = {}) => {
   // First we have to filter persons by places.
@@ -47,10 +47,10 @@ const getData = (persons = [], { page, limit, search, filterTeams, filters, aler
 
 const List = () => {
   const [filters, setFilters] = useState([]);
-  const { places } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
+  const { places } = usePlaces();
+  const { relsPersonPlace } = useRelsPerson();
   const { personsFullPopulated } = useContext(PersonsSelectorsContext);
-  const { organisation, teams } = useContext(AuthContext);
+  const { organisation, teams } = useAuth();
   const history = useHistory();
 
   // Add places in filters.

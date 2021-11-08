@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Col, Row } from 'reactstrap';
 import { toastr } from 'react-redux-toastr';
@@ -8,10 +8,10 @@ import Box from '../../components/Box';
 import ButtonCustom from '../../components/ButtonCustom';
 import Observation from './view';
 import CreateObservation from '../../components/CreateObservation';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
+import { useTerritoryObservations } from '../../recoil/territoryObservations';
 
 const List = ({ territory = {} }) => {
-  const { territoryObservations, deleteTerritoryObs } = useContext(TerritoryObservationsContext);
+  const { territoryObservations, deleteTerritoryObs } = useTerritoryObservations();
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
 

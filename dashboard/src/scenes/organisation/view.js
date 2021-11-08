@@ -1,10 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext } from 'react';
+import React from 'react';
 import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
+import styled from 'styled-components';
 
-import API from '../../services/api';
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import BackButton from '../../components/backButton';
@@ -12,14 +12,15 @@ import Box from '../../components/Box';
 import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
-import AuthContext from '../../contexts/auth';
-import { actionsCategories } from '../../contexts/actions';
-import styled from 'styled-components';
-import { defaultCustomFields } from '../../contexts/territoryObservations';
+import { actionsCategories } from '../../recoil/actions';
+import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
+import useAuth from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const View = () => {
-  const { organisation, setAuth } = useContext(AuthContext);
+  const { organisation, setOrganisation } = useAuth();
+  const API = useApi();
 
   return (
     <Container style={{ padding: '40px 0', margin: '0 -40px' }}>
@@ -32,7 +33,7 @@ const View = () => {
               const response = await API.put({ path: `/organisation/${organisation._id}`, body });
               if (response.ok) {
                 toastr.success('Mise à jour !');
-                setAuth({ organisation: response.data });
+                setOrganisation(response.data);
               }
             } catch (orgUpdateError) {
               console.log('error in updating organisation', orgUpdateError);

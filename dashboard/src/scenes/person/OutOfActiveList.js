@@ -1,15 +1,15 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import PersonsContext, { outOfActiveListReasonOptions } from '../../contexts/persons';
+import { outOfActiveListReasonOptions, usePersons } from '../../recoil/persons';
 import SelectAsInput from '../../components/SelectAsInput';
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
-  const { updatePerson } = useContext(PersonsContext);
+  const { updatePerson } = usePersons();
 
   const handleSetOutOfActiveList = async (outOfActiveListReason = '') => {
     person.outOfActiveList = !person.outOfActiveList;

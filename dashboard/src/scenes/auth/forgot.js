@@ -6,12 +6,13 @@ import validator from 'validator';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 
-import API from '../../services/api';
 import { theme } from '../../config';
 import ButtonCustom from '../../components/ButtonCustom';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const View = () => {
   const [done, setDone] = useState(false);
+  const API = useApi();
 
   const validateEmail = (value) => {
     if (!validator.isEmail(value)) {

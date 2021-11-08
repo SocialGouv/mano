@@ -12,21 +12,21 @@ import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import AuthContext from '../../contexts/auth';
-import ActionsContext from '../../contexts/actions';
-import CommentsContext from '../../contexts/comments';
-import PersonsContext from '../../contexts/persons';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
-import TerritoryContext from '../../contexts/territory';
+import { useTerritoryObservations } from '../../recoil/territoryObservations';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
 import RefreshContext from '../../contexts/refresh';
 import PaginationContext, { PaginationProvider } from '../../contexts/pagination';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
-import PlacesContext from '../../contexts/places';
 import { filterBySearch } from './utils';
-import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
+import useAuth from '../../recoil/auth';
+import { useComments } from '../../recoil/comments';
+import { useActions } from '../../recoil/actions';
+import { usePersons } from '../../recoil/persons';
+import { useRelsPerson } from '../../recoil/relPersonPlace';
+import { usePlaces } from '../../recoil/places';
+import { useTerritories } from '../../recoil/territory';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -105,9 +105,9 @@ const View = () => {
 
 const Actions = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { actions } = useContext(ActionsContext);
-  const { persons } = useContext(PersonsContext);
-  const { currentTeam } = useContext(AuthContext);
+  const { actions } = useActions();
+  const { persons } = usePersons();
+  const { currentTeam } = useAuth();
 
   const data = filterBySearch(
     search,
@@ -169,8 +169,8 @@ const Alertness = styled.span`
 
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { persons } = useContext(PersonsContext);
-  const { teams } = useContext(AuthContext);
+  const { persons } = usePersons();
+  const { teams } = useAuth();
 
   const data = filterBySearch(search, persons);
 
@@ -219,10 +219,10 @@ const Persons = ({ search, onUpdateResults }) => {
 const Comments = ({ search, onUpdateResults }) => {
   const history = useHistory();
 
-  const { comments } = useContext(CommentsContext);
-  const { persons } = useContext(PersonsContext);
-  const { actions } = useContext(ActionsContext);
-  const { currentTeam } = useContext(AuthContext);
+  const { comments } = useComments();
+  const { persons } = usePersons();
+  const { actions } = useActions();
+  const { currentTeam } = useAuth();
 
   const data = filterBySearch(
     search,
@@ -329,7 +329,7 @@ const Comments = ({ search, onUpdateResults }) => {
 
 const Territories = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { territories } = useContext(TerritoryContext);
+  const { territories } = useTerritories();
 
   const data = filterBySearch(search, territories);
 
@@ -365,9 +365,9 @@ const Territories = ({ search, onUpdateResults }) => {
 
 const Places = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { places } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
-  const { persons } = useContext(PersonsContext);
+  const { places } = usePlaces();
+  const { relsPersonPlace } = useRelsPerson();
+  const { persons } = usePersons();
 
   const data = filterBySearch(search, places);
 
@@ -415,9 +415,9 @@ const Places = ({ search, onUpdateResults }) => {
 
 const TerritoryObservations = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { currentTeam } = useContext(AuthContext);
-  const { territoryObservations } = useContext(TerritoryObservationsContext);
-  const { territories } = useContext(TerritoryContext);
+  const { currentTeam } = useAuth();
+  const { territoryObservations } = useTerritoryObservations();
+  const { territories } = useTerritories();
 
   const data = filterBySearch(
     search,

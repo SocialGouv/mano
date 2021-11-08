@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import AuthContext from '../contexts/auth';
+import useAuth from '../recoil/auth';
 
 const TagTeam = ({ teamId }) => {
-  const { teams } = useContext(AuthContext);
+  const { teams } = useAuth();
   const teamIndex = teams?.findIndex((t) => t._id === teamId);
   const team = teams?.find((t) => t._id === teamId);
   return (

@@ -1,62 +1,51 @@
-import React, { useContext, useState } from 'react';
-import { atom } from 'recoil';
-import API from '../services/api';
+import { useState } from 'react';
+import { atom, useRecoilState } from 'recoil';
+import useAuth from '../recoil/auth';
+import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
+import { useComments } from './comments';
 
-const counter = atom({
-  key: 'actions',
+export const actionsState = atom({
+  key: 'actionsState',
   default: [],
 });
 
-const [lastRefresh, setLastRefresh] = useStorage('last-refresh-actions', 0);
+export const useActions = () => {
+  const { comments, addComment, deleteComment } = useComments();
+  const { user } = useAuth();
+  const API = useApi();
 
-import AuthContext from './auth';
-import CommentsContext from './comments';
-
-const ActionsContext = React.createContext({});
-
-export const ActionsProvider = ({ children }) => {
-  const { addComment, deleteComment, comments } = useContext(CommentsContext);
-  const { user } = useContext(AuthContext);
-
-  const [state, setState] = useState({ actionKey: 0, actions: [], loading: false });
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-actions', 0);
 
-  const setActions = (newActions) => {
-    if (newActions) {
-      setState(({ actionKey }) => ({
-        actions: newActions,
-        actionKey: actionKey + 1,
-        loading: false,
-      }));
-    }
+  const setActionsFullState = (newActions) => {
+    if (newActions) setActions(newActions);
+    setLoading(false);
     setLastRefresh(Date.now());
   };
 
-  const setBatchData = (newActions) =>
-    setState(({ actions, ...oldState }) => ({
-      ...oldState,
-      actions: [...actions, ...newActions],
-    }));
+  const setBatchData = (newActions) => setActions((actions) => [...actions, ...newActions]);
 
   const refreshActions = async (setProgress, initialLoad) => {
-    setState((state) => ({ ...state, loading: true }));
+    setLoading(true);
     try {
-      setActions(
+      setActionsFullState(
         await getData({
           collectionName: 'action',
-          data: state.actions,
+          data: actions,
           isInitialization: initialLoad,
           setProgress,
           lastRefresh,
           setBatchData,
+          API,
         })
       );
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });
-      setState((state) => ({ ...state, loading: false }));
+      setLoading(false);
       return false;
     }
   };
@@ -64,11 +53,7 @@ export const ActionsProvider = ({ children }) => {
   const deleteAction = async (id) => {
     const res = await API.delete({ path: `/action/${id}` });
     if (res.ok) {
-      setState(({ actionKey, actions, ...s }) => ({
-        ...s,
-        actionKey: actionKey + 1,
-        actions: actions.filter((a) => a._id !== id),
-      }));
+      setActions((actions) => actions.filter((a) => a._id !== id));
       for (let comment of comments.filter((c) => c.action === id)) {
         await deleteComment(comment._id);
       }
@@ -79,13 +64,7 @@ export const ActionsProvider = ({ children }) => {
   const addAction = async (action) => {
     try {
       const response = await API.post({ path: '/action', body: prepareActionForEncryption(action) });
-      if (response.ok) {
-        setState(({ actions, actionKey, ...s }) => ({
-          ...s,
-          actionKey: actionKey + 1,
-          actions: [response.decryptedData, ...actions],
-        }));
-      }
+      if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
       return response;
     } catch (error) {
       capture('error in creating action' + error, { extra: { error, action } });
@@ -95,7 +74,7 @@ export const ActionsProvider = ({ children }) => {
 
   const updateAction = async (action, { oldAction = null } = {}) => {
     let response = null;
-    if (!oldAction) oldAction = state.actions.find((a) => a._id === action._id);
+    if (!oldAction) oldAction = actions.find((a) => a._id === action._id);
     const statusChanged = action.status && oldAction.status !== action.status;
     try {
       if (statusChanged) {
@@ -110,14 +89,12 @@ export const ActionsProvider = ({ children }) => {
         body: prepareActionForEncryption(action),
       });
       if (response.ok) {
-        setState(({ actions, actionKey, ...s }) => ({
-          ...s,
-          actionKey: actionKey + 1,
-          actions: actions.map((a) => {
+        setActions((actions) =>
+          actions.map((a) => {
             if (a._id === response.decryptedData._id) return response.decryptedData;
             return a;
-          }),
-        }));
+          })
+        );
       }
       return response;
     } catch (error) {
@@ -145,21 +122,15 @@ export const ActionsProvider = ({ children }) => {
     }
   };
 
-  return (
-    <ActionsContext.Provider
-      value={{
-        ...state,
-        refreshActions,
-        deleteAction,
-        updateAction,
-        addAction,
-      }}>
-      {children}
-    </ActionsContext.Provider>
-  );
+  return {
+    refreshActions,
+    deleteAction,
+    updateAction,
+    addAction,
+    actions,
+    loading,
+  };
 };
-
-export default ActionsContext;
 
 const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user'];
 

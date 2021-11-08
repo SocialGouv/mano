@@ -1,10 +1,10 @@
 import { Formik } from 'formik';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { toastr } from 'react-redux-toastr';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
-import AuthContext from '../contexts/auth';
-import API from '../services/api';
+import useAuth from '../recoil/auth';
+import useApi from '../services/api-interface-with-dashboard';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import Table from './table';
@@ -37,7 +37,8 @@ const TableCustomFields = ({ data, customFields }) => {
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
   const [isNewField, setIsNewField] = useState(null);
-  const { organisation, setAuth } = useContext(AuthContext);
+  const { organisation, setOrganisation } = useAuth();
+  const API = useApi();
 
   const onEnabledChange = (fieldToUpdate) => (event) => {
     const enabled = event.target.checked;
@@ -76,7 +77,7 @@ const TableCustomFields = ({ data, customFields }) => {
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
-        setAuth({ organisation: response.data });
+        setOrganisation(response.data);
         setMutableData(JSON.parse(response.data[customFields]));
       }
     } catch (orgUpdateError) {

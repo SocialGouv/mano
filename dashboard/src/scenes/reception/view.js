@@ -6,8 +6,6 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 import Header from '../../components/header';
 
-import AuthContext from '../../contexts/auth';
-import ReportsContext from '../../contexts/reports';
 import { today } from '../../services/date';
 import { ActionsByStatusContext, ReportsSelectorsContext } from '../../contexts/selectors';
 import Card from '../../components/Card';
@@ -16,19 +14,21 @@ import { theme } from '../../config';
 import CreateAction from '../action/CreateAction';
 import SelectAndCreatePerson from './SelectAndCreatePerson';
 import ButtonCustom from '../../components/ButtonCustom';
-import PersonsContext from '../../contexts/persons';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectStatus from '../../components/SelectStatus';
-import { TODO } from '../../contexts/actions';
+import { TODO } from '../../recoil/actions';
+import useAuth from '../../recoil/auth';
+import { usePersons } from '../../recoil/persons';
+import { useReports } from '../../recoil/reports';
 
 const Reception = () => {
-  const { currentTeam, organisation } = useContext(AuthContext);
-  const { loading: reportsLoading, addReport, updateReport, incrementPassage } = useContext(ReportsContext);
+  const { currentTeam, organisation } = useAuth();
+  const { loading: reportsLoading, addReport, updateReport, incrementPassage } = useReports();
   const { actionsByStatus } = useContext(ActionsByStatusContext);
   const { todaysReport, lastReport } = useContext(ReportsSelectorsContext);
   const [status, setStatus] = useState(TODO);
 
-  const { persons } = useContext(PersonsContext);
+  const { persons } = usePersons();
   const history = useHistory();
   const location = useLocation();
 
