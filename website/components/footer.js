@@ -6,11 +6,11 @@ export default function Footer() {
   const nathan = "bmF0aGFuLmZyYWRpbi5tYW5vQGdtYWlsLmNvbQ==";
   const guillaume = "Zy5kZW1pcmhhbkBhdXJvcmUuYXNzby5mcg==";
   const [emailGuillaume, setEmailGuillaume] = useState("");
-  const [emailMaxime, setEmailMaxime] = useState("");
+  const [emailNathan, setEmailNathan] = useState("");
 
   useEffect(() => {
     setEmailGuillaume(window.atob(guillaume));
-    setEmailMaxime(window.atob(nathan));
+    setEmailNathan(window.atob(nathan));
   }, []);
   return (
     <>
@@ -29,7 +29,7 @@ export default function Footer() {
                 Pour toutes questions sur les fonctionnalités de MANO, pour une présentation
                 complète en présentiel ou commencer à utiliser l'outil{`\u00A0`}:<br />
                 <span className=" block text-base  mt-3 font-medium ">
-                  Maxime Grimbert,
+                  Nathan Fradin,
                   <br />
                   chargé de déploiement
                 </span>
@@ -41,7 +41,7 @@ export default function Footer() {
                 }}>
                 <HiOutlineMail className="text-lg" />
                 <span suppressHydrationWarning className="text-base font-medium">
-                  {emailMaxime}
+                  {emailNathan}
                 </span>
               </button>
             </div>
