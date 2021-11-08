@@ -1,3 +1,10 @@
+## [1.26.1](https://github.com/SocialGouv/mano/compare/v1.26.0...v1.26.1) (2021-11-08)
+
+
+### Bug Fixes
+
+* **api:** current user in person when no user registered ([#145](https://github.com/SocialGouv/mano/issues/145)) ([14f3146](https://github.com/SocialGouv/mano/commit/14f3146adc71a546d5ba25079c0401a2a4bf4253))
+
 # [1.26.0](https://github.com/SocialGouv/mano/compare/v1.25.0...v1.26.0) (2021-11-08)
 
 
