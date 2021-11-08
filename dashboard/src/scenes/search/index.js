@@ -27,6 +27,7 @@ import TagTeam from '../../components/TagTeam';
 import PlacesContext from '../../contexts/places';
 import { filterBySearch } from './utils';
 import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
+import useOnReloadHotkeys from '../../hooks/useOnReloadHotkeys';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -38,6 +39,8 @@ const View = () => {
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(initTabs.findIndex((value) => value.toLowerCase() === searchParams.get('tab')) || 0);
+
+  useOnReloadHotkeys(refresh);
 
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
 

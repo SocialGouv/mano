@@ -31,6 +31,7 @@ import Filters, { filterData } from '../../components/Filters';
 import ReportsContext from '../../contexts/reports';
 import RefreshContext from '../../contexts/refresh';
 import Card from '../../components/Card';
+import useOnReloadHotkeys from '../../hooks/useOnReloadHotkeys';
 moment.locale('fr');
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
@@ -104,6 +105,8 @@ const Stats = () => {
   const [filterPersons, setFilterPersons] = useState([]);
 
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
+
+  useOnReloadHotkeys(refresh);
 
   useEffect(() => {
     if (loading) refresh();

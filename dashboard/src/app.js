@@ -47,6 +47,7 @@ const App = () => {
       lifecycle.removeEventListener('statechange', onWindowFocus);
     };
   }, []);
+
   return (
     <Provider store={store}>
       <RootContextsProvider>

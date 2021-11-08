@@ -20,6 +20,7 @@ import PaginationContext from '../../contexts/pagination';
 import RefreshContext from '../../contexts/refresh';
 import SelectCustom from '../../components/SelectCustom';
 import { TerritoriesSelectorsContext } from '../../contexts/selectors';
+import useOnReloadHotkeys from '../../hooks/useOnReloadHotkeys';
 
 const filterTerritories = (territories, { page, limit, search }) => {
   if (search?.length) territories = filterBySearch(search, territories);
@@ -77,6 +78,8 @@ const CreateTerritory = () => {
   const { currentTeam } = useContext(AuthContext);
   const { addTerritory } = useContext(TerritoryContext);
   const { refreshTerritories, loading } = useContext(RefreshContext);
+
+  useOnReloadHotkeys(refreshTerritories);
 
   return (
     <CreateStyle>

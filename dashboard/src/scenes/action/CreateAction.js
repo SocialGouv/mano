@@ -16,6 +16,7 @@ import AuthContext from '../../contexts/auth';
 import ActionsContext, { DONE, TODO } from '../../contexts/actions';
 import RefreshContext from '../../contexts/refresh';
 import SelectStatus from '../../components/SelectStatus';
+import useOnReloadHotkeys from '../../hooks/useOnReloadHotkeys';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
@@ -24,6 +25,8 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
   const { addAction } = useContext(ActionsContext);
   const { loading, refreshActions } = useContext(RefreshContext);
   const history = useHistory();
+
+  useOnReloadHotkeys(refreshable ? refreshActions : null);
 
   title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${toFrenchDate(completedAt)}` : '');
 

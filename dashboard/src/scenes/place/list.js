@@ -19,6 +19,7 @@ import { filterBySearch } from '../search/utils';
 import { toFrenchDate } from '../../utils';
 import RefreshContext from '../../contexts/refresh';
 import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
+import useOnReloadHotkeys from '../../hooks/useOnReloadHotkeys';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -89,6 +90,8 @@ const Create = () => {
   const { currentTeam } = useContext(AuthContext);
   const { addPlace, loading } = useContext(PlacesContext);
   const { refreshPlacesAndRelations } = useContext(RefreshContext);
+  useOnReloadHotkeys(refreshPlacesAndRelations);
+
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
       <LinkButton disabled={!!loading} onClick={() => refreshPlacesAndRelations()} color="link" style={{ marginRight: 10 }}>

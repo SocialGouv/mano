@@ -10,6 +10,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import AuthContext from '../../contexts/auth';
 import PersonsContext from '../../contexts/persons';
 import RefreshContext from '../../contexts/refresh';
+import useOnReloadHotkeys from '../../hooks/useOnReloadHotkeys';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
@@ -17,6 +18,7 @@ const CreatePerson = ({ refreshable }) => {
   const history = useHistory();
   const { addPerson, persons } = useContext(PersonsContext);
   const { refreshPersons, loading } = useContext(RefreshContext);
+  useOnReloadHotkeys(refreshable ? refreshPersons : null);
 
   return (
     <>
