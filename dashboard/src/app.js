@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect } from 'react';
+import { RecoilRoot } from 'recoil';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
@@ -48,37 +49,39 @@ const App = () => {
     };
   }, []);
   return (
-    <Provider store={store}>
-      <RootContextsProvider>
-        <FullPopulatedSelectorsProvider>
-          <div className="main-container">
-            <div className="main">
-              <Router>
-                <Switch>
-                  <Route path="/auth" component={Auth} />
-                  <RestrictedRoute path="/charte" component={Charte} />
-                  <RestrictedRoute path="/account" component={Account} />
-                  <RestrictedRoute path="/user" component={User} />
-                  <RestrictedRoute path="/person" component={Person} />
-                  <RestrictedRoute path="/place" component={Place} />
-                  <RestrictedRoute path="/action" component={Action} />
-                  <RestrictedRoute path="/territory" component={Territory} />
-                  <RestrictedRoute path="/structure" component={Structure} />
-                  <RestrictedRoute path="/team" component={Team} />
-                  <RestrictedRoute path="/organisation" component={Organisation} />
-                  <RestrictedRoute path="/stats" component={Stats} />
-                  <RestrictedRoute path="/reception" component={Reception} />
-                  <RestrictedRoute path="/search" component={SearchView} />
-                  <RestrictedRoute path="/report" component={Report} />
-                  <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
-                </Switch>
-              </Router>
+    <RecoilRoot>
+      <Provider store={store}>
+        <RootContextsProvider>
+          <FullPopulatedSelectorsProvider>
+            <div className="main-container">
+              <div className="main">
+                <Router>
+                  <Switch>
+                    <Route path="/auth" component={Auth} />
+                    <RestrictedRoute path="/charte" component={Charte} />
+                    <RestrictedRoute path="/account" component={Account} />
+                    <RestrictedRoute path="/user" component={User} />
+                    <RestrictedRoute path="/person" component={Person} />
+                    <RestrictedRoute path="/place" component={Place} />
+                    <RestrictedRoute path="/action" component={Action} />
+                    <RestrictedRoute path="/territory" component={Territory} />
+                    <RestrictedRoute path="/structure" component={Structure} />
+                    <RestrictedRoute path="/team" component={Team} />
+                    <RestrictedRoute path="/organisation" component={Organisation} />
+                    <RestrictedRoute path="/stats" component={Stats} />
+                    <RestrictedRoute path="/reception" component={Reception} />
+                    <RestrictedRoute path="/search" component={SearchView} />
+                    <RestrictedRoute path="/report" component={Report} />
+                    <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
+                  </Switch>
+                </Router>
+              </div>
             </div>
-          </div>
-          <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-        </FullPopulatedSelectorsProvider>
-      </RootContextsProvider>
-    </Provider>
+            <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
+          </FullPopulatedSelectorsProvider>
+        </RootContextsProvider>
+      </Provider>
+    </RecoilRoot>
   );
 };
 
