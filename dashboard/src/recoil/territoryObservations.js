@@ -1,24 +1,31 @@
 import { useState } from 'react';
-import useAuth from './auth';
+import { organisationState } from './auth';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import { atom, useRecoilState } from 'recoil';
+import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 
-const territoryObservationsState = atom({
+export const territoryObservationsState = atom({
   key: 'territoryObservationsState',
   default: [],
+});
+
+export const customFieldsObsSelector = selector({
+  key: 'customFieldsObsSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    return typeof organisation.customFieldsObs === 'string' ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields;
+  },
 });
 
 export const useTerritoryObservations = () => {
   const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
   const [loading, setLoading] = useState(true);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
-  const { organisation } = useAuth();
 
   const API = useApi();
 
-  const customFieldsObs = typeof organisation.customFieldsObs === 'string' ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields;
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   const setTerritoryObsFullState = (newTerritoryObservations) => {
     if (newTerritoryObservations) {

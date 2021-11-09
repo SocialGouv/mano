@@ -8,7 +8,7 @@ import { capture } from '../services/sentry';
 import { useActions } from './actions';
 import { useRelsPerson } from './relPersonPlace';
 
-const personsState = atom({
+export const personsState = atom({
   key: 'personsState',
   default: [],
 });

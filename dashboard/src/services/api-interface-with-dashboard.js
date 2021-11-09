@@ -16,7 +16,6 @@ const useApi = () => {
       window.location.replace('/auth');
     }
     toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
-    window.location.replace('/auth');
     setShowTokenExpiredError(false);
   };
 

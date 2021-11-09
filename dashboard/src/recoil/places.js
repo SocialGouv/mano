@@ -7,7 +7,7 @@ import { capture } from '../services/sentry';
 
 const sortPlaces = (p1, p2) => p1.name.localeCompare(p2.name);
 
-const placesState = atom({
+export const placesState = atom({
   key: 'placesState',
   default: [],
 });
@@ -21,6 +21,7 @@ export const usePlaces = () => {
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-places', 0);
 
   const setPlacesFullState = (newPlaces) => {
+    console.log({ newPlaces });
     if (newPlaces) {
       setPlaces(newPlaces.sort(sortPlaces));
     }
@@ -28,7 +29,7 @@ export const usePlaces = () => {
     setLastRefresh(Date.now());
   };
 
-  const setBatchData = (newPlaces) => setPlacesFullState((places) => [...places, ...newPlaces]);
+  const setBatchData = (newPlaces) => setPlaces((places) => [...places, ...newPlaces]);
 
   const refreshPlaces = async (setProgress, initialLoad) => {
     setLoading(true);

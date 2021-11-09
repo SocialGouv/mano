@@ -18,7 +18,7 @@ import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import RefreshContext from '../../contexts/refresh';
 import SelectCustom from '../../components/SelectCustom';
-import { TerritoriesSelectorsContext } from '../../contexts/selectors';
+import { TerritoriesSelectorsContext } from '../../recoil/selectors';
 import useAuth from '../../recoil/auth';
 
 const filterTerritories = (territories, { page, limit, search }) => {

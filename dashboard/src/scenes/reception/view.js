@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -7,7 +7,7 @@ import { useHistory, useLocation } from 'react-router-dom';
 import Header from '../../components/header';
 
 import { today } from '../../services/date';
-import { ActionsByStatusContext, ReportsSelectorsContext } from '../../contexts/selectors';
+import { actionsByStatusSelector, lastReportSelector, todaysReportSelector } from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
@@ -20,13 +20,15 @@ import { TODO } from '../../recoil/actions';
 import useAuth from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';
+import { useRecoilValue } from 'recoil';
 
 const Reception = () => {
   const { currentTeam, organisation } = useAuth();
   const { loading: reportsLoading, addReport, updateReport, incrementPassage } = useReports();
-  const { actionsByStatus } = useContext(ActionsByStatusContext);
-  const { todaysReport, lastReport } = useContext(ReportsSelectorsContext);
   const [status, setStatus] = useState(TODO);
+  const actionsByStatus = useRecoilValue(actionsByStatusSelector(status));
+  const todaysReport = useRecoilValue(todaysReportSelector);
+  const lastReport = useRecoilValue(lastReportSelector);
 
   const { persons } = usePersons();
   const history = useHistory();

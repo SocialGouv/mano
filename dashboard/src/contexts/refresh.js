@@ -183,7 +183,7 @@ export const RefreshProvider = ({ children }) => {
         refresh,
         actionsRefresher,
         personsRefresher,
-        refreshTerritories,
+        territoriesRefresher,
         refreshPlacesAndRelations,
       }}>
       {children}

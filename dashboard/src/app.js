@@ -41,6 +41,7 @@ const App = () => {
   const API = useApi();
 
   const onWindowFocus = () => {
+    console.log(API.token);
     if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
   };
 
@@ -96,10 +97,8 @@ export default function ContextedApp() {
     <RecoilRoot>
       <Provider store={store}>
         <RootContextsProvider>
-          <FullPopulatedSelectorsProvider>
-            <App />
-            <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-          </FullPopulatedSelectorsProvider>
+          <App />
+          <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
         </RootContextsProvider>
       </Provider>
     </RecoilRoot>

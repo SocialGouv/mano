@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useRecoilValue, useResetRecoilState } from 'recoil';
+import { atom, useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
@@ -10,6 +9,14 @@ import { capture } from './sentry';
 const getUrl = (path, query) => {
   return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
 };
+
+const hashedOrgEncryptionKeyState = atom({ key: 'hashedOrgEncryptionKeyState', default: null });
+const enableEncryptState = atom({ key: 'enableEncryptState', default: false });
+const orgEncryptionKeyState = atom({ key: 'orgEncryptionKeyState', default: null });
+const tokenState = atom({ key: 'tokenState', default: null });
+const sendCaptureErrorState = atom({ key: 'sendCaptureErrorState', default: 0 });
+const wrongKeyWarnedState = atom({ key: 'wrongKeyWarnedState', default: false });
+const blockEncryptState = atom({ key: 'blockEncryptState', default: false });
 
 const useApiService = ({
   handleError,
@@ -28,13 +35,13 @@ const useApiService = ({
   const resetTeamsState = useResetRecoilState(teamsState);
   const resetCurrentTeamState = useResetRecoilState(currentTeamState);
 
-  const [hashedOrgEncryptionKey, setHashedOrgEncryptionKey] = useState(null);
-  const [enableEncrypt, setEnableEncrypt] = useState(false);
-  const [orgEncryptionKey, setOrgEncryptionKeyCache] = useState(null);
-  const [token, setToken] = useState(null);
-  const [sendCaptureError, setSendCaptureError] = useState(0);
-  const [wrongKeyWarned, setWrongKeyWarned] = useState(false);
-  const [blockEncrypt, setBlockEncrypt] = useState(false);
+  const [hashedOrgEncryptionKey, setHashedOrgEncryptionKey] = useRecoilState(hashedOrgEncryptionKeyState);
+  const [enableEncrypt, setEnableEncrypt] = useRecoilState(enableEncryptState);
+  const [orgEncryptionKey, setOrgEncryptionKeyCache] = useRecoilState(orgEncryptionKeyState);
+  const [token, setToken] = useRecoilState(tokenState);
+  const [sendCaptureError, setSendCaptureError] = useRecoilState(sendCaptureErrorState);
+  const [wrongKeyWarned, setWrongKeyWarned] = useRecoilState(wrongKeyWarnedState);
+  const [blockEncrypt, setBlockEncrypt] = useRecoilState(blockEncryptState);
 
   const reset = () => {
     setHashedOrgEncryptionKey(null);
@@ -261,6 +268,8 @@ const useApiService = ({
 
   const post = (args) => execute({ method: 'POST', ...args });
   const put = (args) => execute({ method: 'PUT', ...args });
+
+  console.log({ token });
 
   return {
     setOrgEncryptionKey,

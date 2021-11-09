@@ -5,7 +5,7 @@ import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
-const reportsState = atom({
+export const reportsState = atom({
   key: 'reportsState',
   default: [],
 });

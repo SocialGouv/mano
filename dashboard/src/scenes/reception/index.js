@@ -1,6 +1,6 @@
 import React from 'react';
 import { Switch, Route } from 'react-router-dom';
-import { ActionsByStatusProvider, ReportsSelectorsProvider } from '../../contexts/selectors';
+import { ActionsByStatusProvider, ReportsSelectorsProvider } from '../../recoil/selectors';
 
 import View from './view';
 

@@ -123,6 +123,7 @@ const SignIn = () => {
               setShowEncryption(true);
               return actions.setSubmitting(false);
             }
+            console.log({ token });
             if (token) API.setToken(token);
             setOrganisation(organisation);
             if (!!values.orgEncryptionKey) {

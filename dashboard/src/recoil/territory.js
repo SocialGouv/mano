@@ -5,7 +5,7 @@ import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';
 
-const territoriesState = atom({
+export const territoriesState = atom({
   key: 'territoriesState',
   default: [],
 });

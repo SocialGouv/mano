@@ -12,6 +12,7 @@ import Page from '../../components/pagination';
 import Search from '../../components/search';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
+import CreatePerson from './CreatePerson';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { filterPersonsBase } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
@@ -19,12 +20,12 @@ import PaginationContext from '../../contexts/pagination';
 import Filters, { filterData } from '../../components/Filters';
 import { filterBySearch } from '../search/utils';
 import { displayBirthDate } from '../../services/date';
-import { PersonsSelectorsContext } from '../../contexts/selectors';
-import CreatePerson from './CreatePerson';
+import { personsFullPopulatedSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import useAuth from '../../recoil/auth';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';
+import { useRecoilValue } from 'recoil';
 
 const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness } = {}) => {
   // First we have to filter persons by places.
@@ -49,7 +50,7 @@ const List = () => {
   const [filters, setFilters] = useState([]);
   const { places } = usePlaces();
   const { relsPersonPlace } = useRelsPerson();
-  const { personsFullPopulated } = useContext(PersonsSelectorsContext);
+  const { personsFullPopulated } = useRecoilValue(personsFullPopulatedSelector);
   const { organisation, teams } = useAuth();
   const history = useHistory();
 

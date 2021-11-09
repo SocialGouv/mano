@@ -18,12 +18,13 @@ import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
 import SelectTeam from '../../components/SelectTeam';
 import { filterBySearch } from '../search/utils';
-import { ActionsSelectorsContext } from '../../contexts/selectors';
+import { actionsFullPopulatedSelector } from '../../recoil/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import styled from 'styled-components';
 import ActionName from '../../components/ActionName';
 import useAuth from '../../recoil/auth';
+import { useRecoilValue } from 'recoil';
 
 const filterActions = (actions, { page, limit, status, currentTeam, search }) => {
   if (status) actions = actions.filter((a) => a.status === status);
@@ -40,7 +41,7 @@ const paginateActions = (actions, { page, limit }) => {
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
-  const { actionsFullPopulated } = useContext(ActionsSelectorsContext);
+  const actionsFullPopulated = useRecoilValue(actionsFullPopulatedSelector);
   const { user, teams, currentTeam, setCurrentTeam } = useAuth();
 
   const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
