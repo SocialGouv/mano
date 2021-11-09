@@ -1,25 +1,37 @@
-import React, { useState } from 'react';
-import Loader from '../components/Loader';
-import { useActions } from '../recoil/actions';
-import useAuth from '../recoil/auth';
-import { useComments } from '../recoil/comments';
-import { usePersons } from '../recoil/persons';
-import { usePlaces } from '../recoil/places';
-import { useRelsPerson } from '../recoil/relPersonPlace';
-import { useReports } from '../recoil/reports';
-import { useTerritories } from '../recoil/territory';
+import { useActions } from './actions';
+import useAuth from './auth';
+import { useComments } from './comments';
+import { usePersons } from './persons';
+import { usePlaces } from './places';
+import { useRelsPerson } from './relPersonPlace';
+import { useReports } from './reports';
+import { useTerritories } from './territory';
 import useApi from '../services/api-interface-with-dashboard';
 import { useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import { useTerritoryObservations } from '../recoil/territoryObservations';
+import { useTerritoryObservations } from './territoryObservations';
+import { atom, useRecoilState } from 'recoil';
 
-const RefreshContext = React.createContext();
+const loadingState = atom({
+  key: 'loadingState',
+  default: '',
+});
 
-export const RefreshProvider = ({ children }) => {
+const progressState = atom({
+  key: 'progressState',
+  default: 0,
+});
+
+const loaderFullScreenState = atom({
+  key: 'loaderFullScreenState',
+  default: false,
+});
+
+export const useRefresh = () => {
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh', 0);
-  const [loading, setLoading] = useState('');
-  const [progress, setProgress] = useState(0);
-  const [fullScreen, setFullScreen] = useState(false);
+  const [loading, setLoading] = useRecoilState(loadingState);
+  const [progress, setProgress] = useRecoilState(progressState);
+  const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
   const API = useApi();
 
   const { refreshActions } = useActions();
@@ -176,20 +188,14 @@ export const RefreshProvider = ({ children }) => {
     reset();
   };
 
-  return (
-    <RefreshContext.Provider
-      value={{
-        loading,
-        refresh,
-        actionsRefresher,
-        personsRefresher,
-        territoriesRefresher,
-        refreshPlacesAndRelations,
-      }}>
-      {children}
-      <Loader loading={loading} fullScreen={fullScreen} progress={progress} />
-    </RefreshContext.Provider>
-  );
+  return {
+    loading,
+    progress,
+    fullScreen,
+    refresh,
+    actionsRefresher,
+    personsRefresher,
+    territoriesRefresher,
+    refreshPlacesAndRelations,
+  };
 };
-
-export default RefreshContext;

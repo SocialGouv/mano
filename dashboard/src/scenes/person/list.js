@@ -50,7 +50,7 @@ const List = () => {
   const [filters, setFilters] = useState([]);
   const { places } = usePlaces();
   const { relsPersonPlace } = useRelsPerson();
-  const { personsFullPopulated } = useRecoilValue(personsFullPopulatedSelector);
+  const personsFullPopulated = useRecoilValue(personsFullPopulatedSelector);
   const { organisation, teams } = useAuth();
   const history = useHistory();
 

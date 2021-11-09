@@ -13,16 +13,16 @@ import SelectPerson from '../../components/SelectPerson';
 import ButtonCustom from '../../components/ButtonCustom';
 import { toFrenchDate } from '../../utils';
 import { DONE, TODO, useActions } from '../../recoil/actions';
-import RefreshContext from '../../contexts/refresh';
 import SelectStatus from '../../components/SelectStatus';
 import useAuth from '../../recoil/auth';
+import { useRefresh } from '../../recoil/refresh';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
 
   const { user } = useAuth();
   const { addAction } = useActions();
-  const { loading, actionsRefresher } = useContext(RefreshContext);
+  const { loading, actionsRefresher } = useRefresh();
   const history = useHistory();
 
   title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${toFrenchDate(completedAt)}` : '');

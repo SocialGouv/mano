@@ -46,6 +46,7 @@ export const personsFullPopulatedSelector = selector({
     const actions = get(actionsState);
     const relsPersonPlace = get(relsPersonPlaceState);
     const places = get(placesState);
+    console.log('get persons');
     return persons.map((p) => ({
       ...p,
       comments: comments.filter((c) => c.person === p._id),
@@ -109,8 +110,8 @@ export const actionsFullPopulatedSelector = selector({
   },
 });
 
-export const territoriesFullPopulated = selector({
-  key: 'territoriesFullPopulated',
+export const territoriesFullPopulatedSelector = selector({
+  key: 'territoriesFullPopulatedSelector',
   get: ({ get }) => {
     const territories = get(territoriesState);
     const customFieldsObs = get(customFieldsObsSelector);

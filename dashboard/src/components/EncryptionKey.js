@@ -16,10 +16,10 @@ import { useReports, prepareReportForEncryption } from '../recoil/reports';
 import { useTerritories, prepareTerritoryForEncryption } from '../recoil/territory';
 import { preparePlaceForEncryption, usePlaces } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption, useRelsPerson } from '../recoil/relPersonPlace';
-import RefreshContext from '../contexts/refresh';
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
 import useApi from '../services/api-interface-with-dashboard';
+import { useRefresh } from '../recoil/refresh';
 
 const EncryptionKey = () => {
   const [open, setOpen] = useState(false);
@@ -37,7 +37,7 @@ const EncryptionKey = () => {
   const { places } = usePlaces();
   const { relsPersonPlace } = useRelsPerson();
   const { reports } = useReports();
-  const { loading } = useContext(RefreshContext);
+  const { loading } = useRefresh();
   const API = useApi();
 
   const totalToEncrypt =

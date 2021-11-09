@@ -13,7 +13,7 @@ const getUrl = (path, query) => {
 const hashedOrgEncryptionKeyState = atom({ key: 'hashedOrgEncryptionKeyState', default: null });
 const enableEncryptState = atom({ key: 'enableEncryptState', default: false });
 const orgEncryptionKeyState = atom({ key: 'orgEncryptionKeyState', default: null });
-const tokenState = atom({ key: 'tokenState', default: null });
+export const tokenState = atom({ key: 'tokenState', default: null });
 const sendCaptureErrorState = atom({ key: 'sendCaptureErrorState', default: 0 });
 const wrongKeyWarnedState = atom({ key: 'wrongKeyWarnedState', default: false });
 const blockEncryptState = atom({ key: 'blockEncryptState', default: false });
@@ -268,8 +268,6 @@ const useApiService = ({
 
   const post = (args) => execute({ method: 'POST', ...args });
   const put = (args) => execute({ method: 'PUT', ...args });
-
-  console.log({ token });
 
   return {
     setOrgEncryptionKey,

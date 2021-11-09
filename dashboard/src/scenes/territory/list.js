@@ -16,10 +16,11 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
 import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
-import RefreshContext from '../../contexts/refresh';
 import SelectCustom from '../../components/SelectCustom';
-import { TerritoriesSelectorsContext } from '../../recoil/selectors';
+import { territoriesFullPopulatedSelector } from '../../recoil/selectors';
 import useAuth from '../../recoil/auth';
+import { useRecoilValue } from 'recoil';
+import { useRefresh } from '../../recoil/refresh';
 
 const filterTerritories = (territories, { page, limit, search }) => {
   if (search?.length) territories = filterBySearch(search, territories);
@@ -29,7 +30,7 @@ const filterTerritories = (territories, { page, limit, search }) => {
 };
 
 const List = () => {
-  const { territoriesFullPopulated } = useContext(TerritoriesSelectorsContext);
+  const territoriesFullPopulated = useRecoilValue(territoriesFullPopulatedSelector);
   const { organisation } = useAuth();
   const history = useHistory();
 
@@ -76,7 +77,7 @@ const CreateTerritory = () => {
   const history = useHistory();
   const { currentTeam } = useAuth();
   const { addTerritory } = useTerritories();
-  const { territoriesRefresher, loading } = useContext(RefreshContext);
+  const { territoriesRefresher, loading } = useRefresh();
 
   return (
     <CreateStyle>

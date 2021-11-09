@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useContext } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import XLSX from 'xlsx';
@@ -24,7 +24,6 @@ import { useTerritoryObservations } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
-import RefreshContext from '../../contexts/refresh';
 import Card from '../../components/Card';
 import useAuth from '../../recoil/auth';
 import { useComments } from '../../recoil/comments';
@@ -32,6 +31,7 @@ import { useActions } from '../../recoil/actions';
 import { usePlaces } from '../../recoil/places';
 import { useReports } from '../../recoil/reports';
 import { useTerritories } from '../../recoil/territory';
+import { useRefresh } from '../../recoil/refresh';
 moment.locale('fr');
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
@@ -95,7 +95,7 @@ const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observati
 const Stats = () => {
   const { teams, organisation, user, currentTeam } = useAuth();
   const { persons: allPersons } = usePersons();
-  const { refresh, loading } = useContext(RefreshContext);
+  const { refresh, loading } = useRefresh();
   const { actions: allActions } = useActions();
   const { comments } = useComments();
   const { reports } = useReports();

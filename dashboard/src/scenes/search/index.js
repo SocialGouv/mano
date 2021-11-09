@@ -15,7 +15,6 @@ import dayjs from 'dayjs';
 import { useTerritoryObservations } from '../../recoil/territoryObservations';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
-import RefreshContext from '../../contexts/refresh';
 import PaginationContext, { PaginationProvider } from '../../contexts/pagination';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
@@ -27,11 +26,12 @@ import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';
 import { useTerritories } from '../../recoil/territory';
+import { useRefresh } from '../../recoil/refresh';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
 const View = () => {
-  const { refresh } = useContext(RefreshContext);
+  const { refresh } = useRefresh();
   const { search, setSearch } = useContext(PaginationContext);
   const [tabsContents, setTabsContents] = useState(initTabs);
   const location = useLocation();

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useContext, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
 import validator from 'validator';
@@ -9,15 +9,15 @@ import styled from 'styled-components';
 import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
-import RefreshContext from '../../contexts/refresh';
 import PasswordInput from '../../components/PasswordInput';
 import { encryptVerificationKey } from '../../services/encryption';
 import useAuth from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
+import { useRefresh } from '../../recoil/refresh';
 
 const SignIn = () => {
   const { setOrganisation, setTeams, setUsers, setUser, setCurrentTeam, user, organisation } = useAuth();
-  const rc = useContext(RefreshContext);
+  const { refresh } = useRefresh();
   const history = useHistory();
   const [showErrors, setShowErrors] = useState(false);
   const [userName, setUserName] = useState(false);
@@ -85,7 +85,7 @@ const SignIn = () => {
               title={team.name}
               onClick={() => {
                 setCurrentTeam(team);
-                rc.refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
+                refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
                 onSigninValidated(user);
               }}
             />
@@ -143,7 +143,7 @@ const SignIn = () => {
             } else if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
               onSigninValidated(user);
-              rc.refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
+              refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
             } else if (!teams.length) {
               history.push('/team');
             } else {

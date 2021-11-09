@@ -14,11 +14,11 @@ import PaginationContext from '../../contexts/pagination';
 import Page from '../../components/pagination';
 import { filterBySearch } from '../search/utils';
 import { toFrenchDate } from '../../utils';
-import RefreshContext from '../../contexts/refresh';
 import useAuth from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';
+import { useRefresh } from '../../recoil/refresh';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -88,7 +88,7 @@ const Create = () => {
   const [open, setOpen] = useState(false);
   const { currentTeam } = useAuth();
   const { addPlace, loading } = usePlaces();
-  const { refreshPlacesAndRelations } = useContext(RefreshContext);
+  const { refreshPlacesAndRelations } = useRefresh();
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
       <LinkButton disabled={!!loading} onClick={() => refreshPlacesAndRelations()} color="link" style={{ marginRight: 10 }}>
