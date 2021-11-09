@@ -17,7 +17,7 @@ import Search from '../../components/search';
 import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import SelectCustom from '../../components/SelectCustom';
-import { territoriesForSearch } from '../../recoil/selectors';
+import { territoriesFullSearchSelector } from '../../recoil/selectors';
 import useAuth from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 
@@ -27,7 +27,7 @@ const List = () => {
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
 
-  const territories = useRecoilValue(territoriesForSearch({ search }));
+  const territories = useRecoilValue(territoriesFullSearchSelector({ search }));
 
   const limit = 20;
 

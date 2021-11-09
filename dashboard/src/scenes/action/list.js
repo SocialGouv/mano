@@ -17,7 +17,7 @@ import { toFrenchDate } from '../../utils';
 import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
 import SelectTeam from '../../components/SelectTeam';
-import { actionsSearchSelector } from '../../recoil/selectors';
+import { actionsFullSearchSelector } from '../../recoil/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
@@ -42,7 +42,7 @@ const List = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   }, [showAs]);
 
-  const actionsFiltered = useRecoilValue(actionsSearchSelector({ status, search }));
+  const actionsFiltered = useRecoilValue(actionsFullSearchSelector({ status, search }));
   const limit = 20;
 
   if (!actionsFiltered) return <Loading />;

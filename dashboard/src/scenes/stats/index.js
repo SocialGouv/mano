@@ -10,7 +10,6 @@ import Header from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
-  usePersons,
   consumptionsOptions,
   healthInsuranceOptions,
   nationalitySituationOptions,
@@ -19,19 +18,21 @@ import {
   ressourcesOptions,
   vulnerabilitiesOptions,
   filterPersonsBase,
+  personsState,
 } from '../../recoil/persons';
-import { useTerritoryObservations } from '../../recoil/territoryObservations';
+import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
 import useAuth from '../../recoil/auth';
-import { useComments } from '../../recoil/comments';
-import { useActions } from '../../recoil/actions';
-import { usePlaces } from '../../recoil/places';
-import { useReports } from '../../recoil/reports';
-import { useTerritories } from '../../recoil/territory';
+import { commentsState } from '../../recoil/comments';
+import { actionsState } from '../../recoil/actions';
+import { placesState } from '../../recoil/places';
+import { reportsState } from '../../recoil/reports';
+import { territoriesState } from '../../recoil/territory';
 import { useRefresh } from '../../recoil/refresh';
+import { useRecoilValue } from 'recoil';
 moment.locale('fr');
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
@@ -94,14 +95,15 @@ const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observati
 
 const Stats = () => {
   const { teams, organisation, user, currentTeam } = useAuth();
-  const { persons: allPersons } = usePersons();
+  const allPersons = useRecoilValue(personsState);
+  const allActions = useRecoilValue(actionsState);
+  const comments = useRecoilValue(commentsState);
+  const reports = useRecoilValue(reportsState);
+  const territories = useRecoilValue(territoriesState);
+  const allObservations = useRecoilValue(territoryObservationsState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const places = useRecoilValue(placesState);
   const { refresh, loading } = useRefresh();
-  const { actions: allActions } = useActions();
-  const { comments } = useComments();
-  const { reports } = useReports();
-  const { territories } = useTerritories();
-  const { territoryObservations: allObservations, customFieldsObs } = useTerritoryObservations();
-  const { places } = usePlaces();
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
 

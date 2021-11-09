@@ -19,7 +19,7 @@ import TagTeam from '../../components/TagTeam';
 import PaginationContext from '../../contexts/pagination';
 import Filters from '../../components/Filters';
 import { displayBirthDate } from '../../services/date';
-import { personsSearchSelector } from '../../recoil/selectors';
+import { personsFullSearchSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import useAuth from '../../recoil/auth';
 import { usePlaces } from '../../recoil/places';
@@ -41,7 +41,7 @@ const List = () => {
 
   const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
 
-  const personsFiltered = useRecoilValue(personsSearchSelector({ search, filterTeams, filters, alertness }));
+  const personsFiltered = useRecoilValue(personsFullSearchSelector({ search, filterTeams, filters, alertness }));
   const { organisation, teams } = useAuth();
   const history = useHistory();
 

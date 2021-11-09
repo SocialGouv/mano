@@ -29,7 +29,6 @@ export const useComments = () => {
   const [loading, setLoading] = useRecoilState(commentsLoadingState);
 
   const setCommentsFullState = (newComments) => {
-    console.log('SETTING NEW COMMENTS');
     if (newComments) setComments(newComments);
     setLoading(false);
     setLastRefresh(Date.now());
@@ -97,8 +96,6 @@ export const useComments = () => {
       return { ok: false, error: error.message };
     }
   };
-
-  console.log('comment loading', loading);
 
   return {
     loading,
