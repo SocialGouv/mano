@@ -30,8 +30,6 @@ export const useComments = () => {
     setLastRefresh(Date.now());
   };
 
-  const setBatchData = (newComments) => setComments((oldComments) => [...oldComments, ...newComments]);
-
   const refreshComments = async (setProgress, initialLoad) => {
     setLoading(true);
     try {
@@ -42,7 +40,6 @@ export const useComments = () => {
           isInitialization: initialLoad,
           setProgress,
           lastRefresh,
-          setBatchData,
           API,
         })
       );

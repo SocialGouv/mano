@@ -78,6 +78,7 @@ export const actionsForCurrentTeamSelector = selectorFamily({
 export const actionsWithPersonNameSelector = selector({
   key: 'actionsWithPersonNameSelector',
   get: ({ get }) => {
+    console.log('actionsWithPersonNameSelector');
     const persons = get(personsState);
     const actions = get(actionsForCurrentTeamSelector());
     return actions.map((a) => ({

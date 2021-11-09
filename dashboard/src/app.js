@@ -25,7 +25,7 @@ import Report from './scenes/report';
 import Person from './scenes/person';
 
 import Drawer from './components/drawer';
-import Loader from './components/Loader';
+import Loader, { Preloader } from './components/Loader';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import Reception from './scenes/reception';
@@ -100,6 +100,7 @@ export default function ContextedApp() {
         <App />
         <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
         <Loader />
+        <Preloader />
       </Provider>
     </RecoilRoot>
   );
