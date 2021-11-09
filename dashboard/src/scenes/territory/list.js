@@ -5,8 +5,8 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
+import { useRecoilValue } from 'recoil';
 
-import { filterBySearch } from '../search/utils';
 import Header from '../../components/header';
 import Page from '../../components/pagination';
 import { toFrenchDate } from '../../utils';
@@ -17,30 +17,24 @@ import Search from '../../components/search';
 import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import SelectCustom from '../../components/SelectCustom';
-import { territoriesFullPopulatedSelector } from '../../recoil/selectors';
+import { territoriesForSearch } from '../../recoil/selectors';
 import useAuth from '../../recoil/auth';
-import { useRecoilValue } from 'recoil';
 import { useRefresh } from '../../recoil/refresh';
 
-const filterTerritories = (territories, { page, limit, search }) => {
-  if (search?.length) territories = filterBySearch(search, territories);
-
-  const data = territories.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  return { data, total: territories.length };
-};
-
 const List = () => {
-  const territoriesFullPopulated = useRecoilValue(territoriesFullPopulatedSelector);
   const { organisation } = useAuth();
   const history = useHistory();
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
 
+  const territories = useRecoilValue(territoriesForSearch({ search }));
+
   const limit = 20;
 
-  if (!territoriesFullPopulated) return <Loading />;
+  if (!territories) return <Loading />;
 
-  const { data, total } = filterTerritories(territoriesFullPopulated, { page, limit, search });
+  const data = territories.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
+  const total = territories.length;
 
   return (
     <Container style={{ padding: '40px 0' }}>

@@ -17,31 +17,17 @@ import { toFrenchDate } from '../../utils';
 import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
 import SelectTeam from '../../components/SelectTeam';
-import { filterBySearch } from '../search/utils';
-import { actionsFullPopulatedSelector } from '../../recoil/selectors';
+import { actionsSearchSelector } from '../../recoil/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
-import styled from 'styled-components';
 import ActionName from '../../components/ActionName';
 import useAuth from '../../recoil/auth';
 import { useRecoilValue } from 'recoil';
-
-const filterActions = (actions, { page, limit, status, currentTeam, search }) => {
-  if (status) actions = actions.filter((a) => a.status === status);
-  if (search?.length) actions = filterBySearch(search, actions);
-  actions = actions.filter((a) => a.team === currentTeam._id);
-  return actions;
-};
-
-const paginateActions = (actions, { page, limit }) => {
-  const data = actions.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  return { data, total: actions.length };
-};
+import ActionPersonName from '../../components/ActionPersonName';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
-  const actionsFullPopulated = useRecoilValue(actionsFullPopulatedSelector);
   const { user, teams, currentTeam, setCurrentTeam } = useAuth();
 
   const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
@@ -56,12 +42,13 @@ const List = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   }, [showAs]);
 
+  const actionsFiltered = useRecoilValue(actionsSearchSelector({ status, search }));
   const limit = 20;
 
-  if (!actionsFullPopulated) return <Loading />;
+  if (!actionsFiltered) return <Loading />;
 
-  const filteredActions = filterActions(actionsFullPopulated, { status, currentTeam, search });
-  const { data, total } = paginateActions(filteredActions, { page, limit });
+  const data = actionsFiltered.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
+  const total = actionsFiltered.length;
 
   return (
     <Container style={{ padding: '40px 0' }}>
@@ -105,7 +92,7 @@ const List = () => {
       </Row>
       {showAs === showAsOptions[0] && (
         <div style={{ minHeight: '100vh' }}>
-          <ActionsCalendar actions={filteredActions} />
+          <ActionsCalendar actions={actionsFiltered} />
         </div>
       )}
       {showAs === showAsOptions[1] && (
@@ -140,16 +127,8 @@ const List = () => {
               },
               {
                 title: 'Personne suivie',
-                dataKey: 'personName',
-                render: (action) => (
-                  <BoldOnHover
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (action.person) history.push(`/person/${action.person}`);
-                    }}>
-                    {action.personName}
-                  </BoldOnHover>
-                ),
+                dataKey: 'person',
+                render: (action) => <ActionPersonName action={action} />,
               },
               { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
               { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -161,12 +140,5 @@ const List = () => {
     </Container>
   );
 };
-
-const BoldOnHover = styled.span`
-  &:hover {
-    font-weight: bold;
-    cursor: zoom-in;
-  }
-`;
 
 export default List;

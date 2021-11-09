@@ -10,8 +10,9 @@ import { territoriesState } from './territory';
 import { isOnSameDay, today } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
+import { filterData } from '../components/Filters';
+import { filterBySearch } from '../scenes/search/utils';
 
-// we split those "selectors" to help poor machines with heavy calculation
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
   get: ({ get }) => {
@@ -38,19 +39,14 @@ export const lastReportSelector = selector({
   },
 });
 
-export const personsFullPopulatedSelector = selector({
-  key: 'personsFullPopulatedSelector',
+export const personsWithPlacesSelector = selector({
+  key: 'personsWithPlacesSelector',
   get: ({ get }) => {
     const persons = get(personsState);
-    const comments = get(commentsState);
-    const actions = get(actionsState);
     const relsPersonPlace = get(relsPersonPlaceState);
     const places = get(placesState);
-    console.log('get persons');
     return persons.map((p) => ({
       ...p,
-      comments: comments.filter((c) => c.person === p._id),
-      actions: actions.filter((c) => c.person === p._id).map((a) => ({ ...a, comments: comments.filter((c) => c.action === a._id) })),
       places: [
         ...new Set(
           relsPersonPlace
@@ -63,28 +59,56 @@ export const personsFullPopulatedSelector = selector({
   },
 });
 
-export const actionsForCurrentTeamSelector = selectorFamily({
-  key: 'actionsForCurrentTeamSelector',
+export const personsSearchSelector = selectorFamily({
+  key: 'personsSearchSelector',
   get:
-    (forCurrentTeam = true) =>
+    ({ search = '', filterTeams = [], filters = [], alertness = false }) =>
     ({ get }) => {
-      const actions = get(actionsState);
-      const currentTeam = get(currentTeamState);
-      if (!forCurrentTeam) return actions;
-      return actions.filter((a) => a.team === currentTeam?._id);
+      const persons = get(personsWithPlacesSelector);
+      let personsFiltered = persons;
+      if (!!filters?.filter((f) => Boolean(f?.value)).length) personsFiltered = filterData(personsFiltered, filters);
+      if (!!alertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
+      if (filterTeams.length) {
+        personsFiltered = personsFiltered.filter((p) => {
+          for (let assignedTeam of p.assignedTeams) {
+            if (filterTeams.includes(assignedTeam)) return true;
+          }
+          return false;
+        });
+      }
+      if (search?.length) {
+        const personsFilteredIds = personsFiltered.map((p) => p._id);
+        const comments = get(commentsState);
+        const actions = get(actionsState);
+        const actionsOfFilteredPersons = actions.filter((a) => personsFilteredIds.includes(a.person));
+        const actionsOfFilteredPersonsIds = actionsOfFilteredPersons.map((a) => a._id);
+        const commentsOfFilteredPersons = comments.filter((c) => personsFilteredIds.includes(c.person));
+        const commentsOfFilteredActions = comments.filter((c) => actionsOfFilteredPersonsIds.includes(c.action));
+        const personsIdsFilteredByActionsSearch = filterBySearch(search, actionsOfFilteredPersons).map((a) => a.person);
+        const personsIdsFilteredByActionsCommentsSearch = filterBySearch(search, commentsOfFilteredPersons).map((c) => c.person);
+        const personsIdsFilteredByPersonsCommentsSearch = filterBySearch(search, commentsOfFilteredActions).map((c) => c.person);
+        const personsIdsFilteredByPersonsSearch = filterBySearch(search, personsFiltered).map((c) => c._id);
+
+        const personsIdsFilterBySearch = [
+          ...new Set([
+            ...personsIdsFilteredByActionsSearch,
+            ...personsIdsFilteredByActionsCommentsSearch,
+            ...personsIdsFilteredByPersonsCommentsSearch,
+            ...personsIdsFilteredByPersonsSearch,
+          ]),
+        ];
+        personsFiltered = personsFiltered.filter((p) => personsIdsFilterBySearch.includes(p._id));
+      }
+      return personsFiltered;
     },
 });
 
-export const actionsWithPersonNameSelector = selector({
-  key: 'actionsWithPersonNameSelector',
+export const actionsForCurrentTeamSelector = selector({
+  key: 'actionsForCurrentTeamSelector',
   get: ({ get }) => {
-    console.log('actionsWithPersonNameSelector');
-    const persons = get(personsState);
-    const actions = get(actionsForCurrentTeamSelector());
-    return actions.map((a) => ({
-      ...a,
-      personName: persons.find((p) => p._id === a.person)?.name || '',
-    }));
+    const actions = get(actionsState);
+    const currentTeam = get(currentTeamState);
+    return actions.filter((a) => a.team === currentTeam?._id);
   },
 });
 
@@ -93,28 +117,42 @@ export const actionsByStatusSelector = selectorFamily({
   get:
     (status) =>
     ({ get }) => {
-      const actions = get(actionsWithPersonNameSelector);
-      const currentTeam = get(currentTeamState);
-      return actions.filter((a) => a.status === status).filter((a) => a.team === currentTeam?._id);
+      const actions = get(actionsForCurrentTeamSelector);
+      return actions.filter((a) => a.status === status);
     },
 });
 
-export const actionsFullPopulatedSelector = selector({
-  key: 'actionsFullPopulatedSelector',
-  get: ({ get }) => {
-    const comments = get(commentsState);
-    const actions = get(actionsWithPersonNameSelector);
-    return actions.map((a) => ({
-      ...a,
-      comments: comments.filter((c) => c.action === a._id),
-    }));
-  },
+export const actionsSearchSelector = selectorFamily({
+  key: 'actionsSearchSelector',
+  get:
+    ({ status, search = '' }) =>
+    ({ get }) => {
+      const actions = get(actionsForCurrentTeamSelector);
+      let actionsFiltered = actions;
+      if (status) actionsFiltered = actionsFiltered.filter((a) => a.status === status);
+      if (search?.length) {
+        const actionsFilteredIds = actionsFiltered.map((p) => p._id);
+        const comments = get(commentsState);
+        const persons = get(personsWithPlacesSelector);
+        const personsOfFilteredActions = persons.filter((a) => actionsFilteredIds.includes(a.person));
+        const commentsOfFilteredActions = comments.filter((c) => actionsFilteredIds.includes(c.action));
+        const actionsIdsFilteredByActionsSearch = filterBySearch(search, actionsFiltered).map((a) => a._id);
+        const actionsIdsFilteredByActionsCommentsSearch = filterBySearch(search, commentsOfFilteredActions).map((c) => c.action);
+        const personIdsFilteredByPersonsSearch = filterBySearch(search, personsOfFilteredActions).map((p) => p._id);
+        const actionIdsFilteredByPersonsSearch = actionsFiltered.filter((a) => personIdsFilteredByPersonsSearch.includes(a.person));
+
+        const actionsIdsFilterBySearch = [
+          ...new Set([...actionsIdsFilteredByActionsSearch, ...actionsIdsFilteredByActionsCommentsSearch, ...actionIdsFilteredByPersonsSearch]),
+        ];
+        actionsFiltered = actionsFiltered.filter((a) => actionsIdsFilterBySearch.includes(a._id));
+      }
+      return actionsFiltered;
+    },
 });
 
-export const territoriesFullPopulatedSelector = selector({
-  key: 'territoriesFullPopulatedSelector',
+export const onlyFilledObservationsTerritories = selector({
+  key: 'onlyFilledObservationsTerritories',
   get: ({ get }) => {
-    const territories = get(territoriesState);
     const customFieldsObs = get(customFieldsObsSelector);
     const territoryObservations = get(territoryObservationsState);
 
@@ -123,17 +161,30 @@ export const territoriesFullPopulatedSelector = selector({
       observationsKeyLabels[field.name] = field.label;
     }
 
-    return territories.map((t) => ({
-      ...t,
-      observations: territoryObservations
-        .filter((obs) => obs.territory === t._id)
-        .map((obs) => {
-          const obsWithOnlyFilledFields = {};
-          for (let key of Object.keys(obs)) {
-            if (obs[key]) obsWithOnlyFilledFields[observationsKeyLabels[key]] = obs[key];
-          }
-          return obsWithOnlyFilledFields;
-        }),
-    }));
+    return territoryObservations.map((obs) => {
+      const obsWithOnlyFilledFields = {};
+      for (let key of Object.keys(obs)) {
+        if (obs[key]) obsWithOnlyFilledFields[observationsKeyLabels[key]] = obs[key];
+      }
+      return { territory: obs.territory, ...obsWithOnlyFilledFields };
+    });
   },
+});
+
+export const territoriesForSearch = selectorFamily({
+  key: 'territoriesForSearch',
+  get:
+    ({ search = '' }) =>
+    ({ get }) => {
+      const territories = get(territoriesState);
+      if (!search.length) return territories;
+
+      const territoryObservations = get(onlyFilledObservationsTerritories);
+
+      const territoriesIdsByTerritoriesSearch = filterBySearch(search, territories).map((t) => t._id);
+      const territoriesIdsFilteredByObsSearch = filterBySearch(search, territoryObservations).map((obs) => obs.territory);
+
+      const territoriesIdsFilterBySearch = [...new Set([...territoriesIdsByTerritoriesSearch, ...territoriesIdsFilteredByObsSearch])];
+      return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id));
+    },
 });

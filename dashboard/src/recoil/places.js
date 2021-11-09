@@ -21,10 +21,7 @@ export const usePlaces = () => {
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-places', 0);
 
   const setPlacesFullState = (newPlaces) => {
-    console.log({ newPlaces });
-    if (newPlaces) {
-      setPlaces(newPlaces.sort(sortPlaces));
-    }
+    if (newPlaces) setPlaces(newPlaces.sort(sortPlaces));
     setLoading(false);
     setLastRefresh(Date.now());
   };

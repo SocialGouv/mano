@@ -33,6 +33,7 @@ import { useComments } from '../../recoil/comments';
 import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';
 import { useTerritories } from '../../recoil/territory';
+import ActionPersonName from '../../components/ActionPersonName';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -291,15 +292,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => (
-                <BoldOnHover
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (action.person?._id) history.push(`/person/${action.person?._id}`);
-                  }}>
-                  {action.person?.name || ''}
-                </BoldOnHover>
-              ),
+              render: (action) => <ActionPersonName action={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -361,15 +354,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => (
-                <BoldOnHover
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (action.person?._id) history.push(`/person/${action.person?._id}`);
-                  }}>
-                  {action.person?.name || ''}
-                </BoldOnHover>
-              ),
+              render: (action) => <ActionPersonName action={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt) },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -380,13 +365,6 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
     </>
   );
 };
-
-const BoldOnHover = styled.span`
-  &:hover {
-    font-weight: bold;
-    cursor: zoom-in;
-  }
-`;
 
 const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) => {
   const history = useHistory();
