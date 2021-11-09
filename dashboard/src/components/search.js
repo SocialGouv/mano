@@ -7,7 +7,7 @@ const Search = React.forwardRef(({ value = '', onChange = Function.prototype, pl
   const searchDebounce = useRef(null);
 
   useEffect(() => {
-    clearTimeout(searchDebounce);
+    clearTimeout(searchDebounce.current);
     searchDebounce.current = setTimeout(() => {
       if (value !== cachedValue) onChange(cachedValue);
     }, 250);

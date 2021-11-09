@@ -28,7 +28,7 @@ const SignIn = () => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const API = useApi();
 
-  const onSigninValidated = ({ organisation }) => {
+  const onSigninValidated = () => {
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
@@ -86,7 +86,7 @@ const SignIn = () => {
               onClick={() => {
                 setCurrentTeam(team);
                 refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
-                onSigninValidated(user);
+                onSigninValidated();
               }}
             />
           ))}
@@ -142,7 +142,7 @@ const SignIn = () => {
               history.push('/organisation');
             } else if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
-              onSigninValidated(user);
+              onSigninValidated();
               refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
             } else if (!teams.length) {
               history.push('/team');
