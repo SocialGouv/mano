@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import { useComments } from '../recoil/comments';
 import useApi from '../services/api-interface-with-dashboard';
@@ -10,23 +9,29 @@ export const reportsState = atom({
   default: [],
 });
 
+export const reportsLoadingState = atom({
+  key: 'reportsLoadingState',
+  default: true,
+});
+
 export const useReports = () => {
   const { addComment } = useComments();
   const API = useApi();
 
   const [reports, setReports] = useRecoilState(reportsState);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useRecoilState(reportsLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-reports', 0);
 
   const setReportsFullState = (newReports) => {
     if (newReports) setReports(newReports);
+    setLoading(false);
     setLastRefresh(Date.now());
   };
 
   const setBatchData = (newReports) => setReports((reports) => [...reports, ...newReports]);
 
   const refreshReports = async (setProgress, initialLoad) => {
-    setLoading((state) => ({ ...state, loading: true }));
+    setLoading(true);
     try {
       const data = await getData({
         collectionName: 'report',

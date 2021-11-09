@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import useAuth from '../recoil/auth';
 import useApi from '../services/api-interface-with-dashboard';
@@ -11,13 +10,18 @@ export const actionsState = atom({
   default: [],
 });
 
+export const actionsLoadingState = atom({
+  key: 'actionsLoadingState',
+  default: true,
+});
+
 export const useActions = () => {
   const { comments, addComment, deleteComment } = useComments();
   const { user } = useAuth();
   const API = useApi();
 
   const [actions, setActions] = useRecoilState(actionsState);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useRecoilState(actionsLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-actions', 0);
 
   const setActionsFullState = (newActions) => {

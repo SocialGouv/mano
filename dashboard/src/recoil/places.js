@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import { useRelsPerson } from '../recoil/relPersonPlace';
 import useApi from '../services/api-interface-with-dashboard';
@@ -12,12 +11,17 @@ export const placesState = atom({
   default: [],
 });
 
+export const placesLoadingState = atom({
+  key: 'placesLoadingState',
+  default: true,
+});
+
 export const usePlaces = () => {
   const { relsPersonPlace, deleteRelation } = useRelsPerson();
   const API = useApi();
 
   const [places, setPlaces] = useRecoilState(placesState);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useRecoilState(placesLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-places', 0);
 
   const setPlacesFullState = (newPlaces) => {

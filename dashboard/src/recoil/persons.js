@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import { useComments } from '../recoil/comments';
 import useApi from '../services/api-interface-with-dashboard';
@@ -13,6 +12,11 @@ export const personsState = atom({
   default: [],
 });
 
+export const personsLoadingState = atom({
+  key: 'personsLoadingState',
+  default: true,
+});
+
 export const usePersons = () => {
   const { comments, addComment, deleteComment } = useComments();
   const { deleteAction, actions } = useActions();
@@ -20,7 +24,7 @@ export const usePersons = () => {
   const API = useApi();
 
   const [persons, setPersons] = useRecoilState(personsState);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useRecoilState(personsLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-persons', 0);
 
   const setPersonsFullState = (newPersons) => {

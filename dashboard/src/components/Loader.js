@@ -5,7 +5,6 @@ import picture1 from '../assets/MANO_livraison_elements-07_green.png';
 import picture2 from '../assets/MANO_livraison_elements-08_green.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
 import { useRefresh } from '../recoil/refresh';
-import { useRecoilValue } from 'recoil';
 
 function randomIntFromInterval(min, max) {
   // min and max included

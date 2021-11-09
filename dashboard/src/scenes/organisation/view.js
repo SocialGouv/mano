@@ -99,7 +99,7 @@ const View = () => {
                       <Label>Services disponibles</Label>
                       <SelectCustom
                         creatable
-                        options={(organisation.services || []).sort((c1, c2) => c1.localeCompare(c2)).map((cat) => ({ value: cat, label: cat }))}
+                        options={[...(organisation.services || [])].sort((c1, c2) => c1.localeCompare(c2)).map((cat) => ({ value: cat, label: cat }))}
                         value={(values.services || []).map((cat) => ({ value: cat, label: cat }))}
                         isMulti
                         onChange={(cats) => handleChange({ target: { value: cats.map((cat) => cat.value), name: 'services' } })}

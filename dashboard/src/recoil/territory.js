@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { atom, useRecoilState } from 'recoil';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
@@ -10,12 +9,17 @@ export const territoriesState = atom({
   default: [],
 });
 
+export const territoriesLoadingState = atom({
+  key: 'territoriesLoadingState',
+  default: true,
+});
+
 export const useTerritories = () => {
   const { territoryObservations, deleteTerritoryObs } = useTerritoryObservations();
   const API = useApi();
 
   const [territories, setTerritories] = useRecoilState(territoriesState);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useRecoilState(territoriesLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-territories', 0);
 
   const setTerritoriesFullState = (newTerritories) => {

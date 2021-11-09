@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState } from 'react';
 import { atom, selector, useRecoilState } from 'recoil';
 import useAuth from '../recoil/auth';
 import useApi from '../services/api-interface-with-dashboard';
@@ -9,6 +8,11 @@ import { capture } from '../services/sentry';
 export const commentsState = atom({
   key: 'commentsState',
   default: [],
+});
+
+export const commentsLoadingState = atom({
+  key: 'commentsLoadingState',
+  default: true,
 });
 
 export const prepareCommentsForEncryption = selector({
@@ -22,13 +26,15 @@ export const useComments = () => {
 
   const [comments, setComments] = useRecoilState(commentsState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-comments', 0);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useRecoilState(commentsLoadingState);
 
   const setCommentsFullState = (newComments) => {
+    console.log('SETTING NEW COMMENTS');
     if (newComments) setComments(newComments);
     setLoading(false);
     setLastRefresh(Date.now());
   };
+  const setBatchData = (newActions) => setComments((actions) => [...actions, ...newActions]);
 
   const refreshComments = async (setProgress, initialLoad) => {
     setLoading(true);
@@ -39,6 +45,7 @@ export const useComments = () => {
           data: comments,
           isInitialization: initialLoad,
           setProgress,
+          setBatchData,
           lastRefresh,
           API,
         })
@@ -90,6 +97,8 @@ export const useComments = () => {
       return { ok: false, error: error.message };
     }
   };
+
+  console.log('comment loading', loading);
 
   return {
     loading,

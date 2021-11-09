@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { organisationState } from './auth';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
@@ -8,6 +7,11 @@ import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 export const territoryObservationsState = atom({
   key: 'territoryObservationsState',
   default: [],
+});
+
+export const territoriesObservationsLoadingState = atom({
+  key: 'territoriesObservationsLoadingState',
+  default: true,
 });
 
 export const customFieldsObsSelector = selector({
@@ -20,7 +24,7 @@ export const customFieldsObsSelector = selector({
 
 export const useTerritoryObservations = () => {
   const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useRecoilState(territoriesObservationsLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
 
   const API = useApi();
