@@ -238,17 +238,12 @@ const Reception = ({ report }) => {
 const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const history = useHistory();
   const { actions: allActions } = useActions();
-  const { persons } = usePersons();
   const { currentTeam } = useAuth();
 
   const data = allActions
     ?.filter((a) => a.team === currentTeam._id)
     .filter((a) => a.status === status)
-    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0))
-    .map((action) => ({
-      ...action,
-      person: persons.find((p) => p._id === action.person),
-    }));
+    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -309,16 +304,11 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
 
   const { actions } = useActions();
   const { currentTeam } = useAuth();
-  const { persons } = usePersons();
 
   const data = actions
     ?.filter((a) => a.team === currentTeam._id)
     .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0))
-    .map((action) => ({
-      ...action,
-      person: persons.find((p) => p._id === action.person),
-    }));
+    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
 
   useEffect(() => {
     onUpdateResults(data.length);

@@ -40,7 +40,6 @@ const View = () => {
         initialValues={{ email: '' }}
         onSubmit={async (body, actions) => {
           try {
-            API.toastr = toastr;
             const response = await API.post({
               path: '/user/forgot_password',
               skipEncryption: '/user/forgot_password',

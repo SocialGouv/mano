@@ -10,7 +10,6 @@ import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
-import { encryptVerificationKey } from '../../services/encryption';
 import useAuth from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 import { useRefresh } from '../../recoil/refresh';
@@ -28,19 +27,12 @@ const SignIn = () => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const API = useApi();
 
-  const onSigninValidated = () => {
+  const onSigninValidated = async () => {
+    refresh({ initialLoad: true, showFullScreen: true });
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
       history.push('/');
-    }
-  };
-
-  const setEncryptionVerificationKey = async (organisation) => {
-    if (!!organisation.encryptionEnabled && !organisation.encryptedVerificationKey) {
-      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
-      const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
-      if (orgRes.ok) setOrganisation(orgRes.data);
     }
   };
 
@@ -85,7 +77,6 @@ const SignIn = () => {
               title={team.name}
               onClick={() => {
                 setCurrentTeam(team);
-                refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
                 onSigninValidated();
               }}
             />
@@ -106,7 +97,6 @@ const SignIn = () => {
               email: values.email,
               password: values.password,
             };
-            API.toastr = toastr;
             const { user, token, ok } = authViaCookie
               ? await API.get({
                   path: '/user/signin-token',
@@ -123,7 +113,6 @@ const SignIn = () => {
               setShowEncryption(true);
               return actions.setSubmitting(false);
             }
-            console.log({ token });
             if (token) API.setToken(token);
             setOrganisation(organisation);
             if (!!values.orgEncryptionKey) {
@@ -143,7 +132,6 @@ const SignIn = () => {
             } else if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
               onSigninValidated();
-              refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
             } else if (!teams.length) {
               history.push('/team');
             } else {

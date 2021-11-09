@@ -53,7 +53,7 @@ const useAuth = () => {
     }
   }, [organisation?._id]);
 
-  return { user, organisation, currentTeam, teams, users, setUsers, setUser, setOrganisation, setTeams, setCurrentTeam };
+  return { user, organisation, currentTeam, teams, users, setUsers, setUser, setOrganisation, setTeams, setCurrentTeam, organisationId };
 };
 
 export default useAuth;

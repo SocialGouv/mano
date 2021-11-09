@@ -47,7 +47,7 @@ const Reception = () => {
     return params.map((id) => persons.find((p) => p._id === id));
   });
 
-  const createReport = async () => addReport(today(), currentTeam._id);
+  const createReport = () => addReport(today(), currentTeam._id);
 
   useEffect(() => {
     if (!reportsLoading && !todaysReport && !!currentTeam._id) createReport();

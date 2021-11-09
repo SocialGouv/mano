@@ -11,6 +11,7 @@ import { useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';
 import { atom, useRecoilState } from 'recoil';
+import { encryptVerificationKey } from '../services/encryption';
 
 const loadingState = atom({
   key: 'loadingState',
@@ -42,7 +43,7 @@ export const useRefresh = () => {
   const { refreshPlaces } = usePlaces();
   const { refreshRelsPersonPlace } = useRelsPerson();
   const { refreshReports } = useReports();
-  const { organisationId } = useAuth();
+  const { organisationId, organisation, setOrganisation, user } = useAuth();
 
   const reset = async () => {
     await new Promise((res) => setTimeout(res, 150));
@@ -65,7 +66,16 @@ export const useRefresh = () => {
     return response.data || {};
   };
 
-  const refresh = async ({ showFullScreen = false, initialLoad = false } = {}, onDecryptOk) => {
+  // temporary migration : until all organisations have an `encryptedVerificationKey`
+  const setEncryptionVerificationKey = async () => {
+    if (!organisation.encryptedVerificationKey && ['admin'].includes(user.role)) {
+      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
+      const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
+      if (orgRes.ok) setOrganisation(orgRes.data);
+    }
+  };
+
+  const refresh = async ({ showFullScreen = false, initialLoad = false } = {}) => {
     try {
       setFullScreen(showFullScreen);
 
@@ -89,7 +99,7 @@ export const useRefresh = () => {
         return false;
       }
 
-      if (onDecryptOk) onDecryptOk();
+      if (isOK) setEncryptionVerificationKey();
 
       setLoading('Chargement des actions');
       await refreshActions((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
