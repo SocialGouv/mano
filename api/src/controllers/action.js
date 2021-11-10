@@ -21,7 +21,7 @@ router.post(
 
     if (!req.body.team) return res.status(400).send({ ok: false, error: "Team is required" });
     if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
-      throw new Error("No team while creating action");
+      return res.send(403).send({ ok: false, error: "No team while creating action" });
     }
 
     if (req.body.hasOwnProperty("name")) newAction.name = req.body.name || null;

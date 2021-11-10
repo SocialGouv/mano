@@ -155,15 +155,14 @@ router.post(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") {
-      res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
-      throw new Error("attempt of creating a user with no admin role");
+      capture("attempt of creating a user with no admin role", { user: req.user });
+      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
     }
-
-    if (!req.body.name) throw new Error("A name is required");
-    if (!req.body.email) throw new Error("An email is required");
-    if (!req.body.password) throw new Error("A password is required");
-    if (!req.body.organisation) throw new Error("An organisation is required");
-    if (!req.body.role) throw new Error("A role is required");
+    if (!req.body.name) return res.status(403).send({ ok: false, error: "A name is required" });
+    if (!req.body.email) return res.status(403).send({ ok: false, error: "An email is required" });
+    if (!req.body.password) return res.status(403).send({ ok: false, error: "A password is required" });
+    if (!req.body.organisation) return res.status(403).send({ ok: false, error: "An organisation is required" });
+    if (!req.body.role) return res.status(403).send({ ok: false, error: "A role is required" });
     const newUser = {};
     newUser.name = req.body.name;
     newUser.email = req.body.email.trim().toLowerCase();
@@ -297,8 +296,8 @@ router.put(
     const _id = req.params._id;
 
     if (req.user.role !== "admin") {
-      res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
-      throw new Error("attempt of updating a user with no admin role");
+      capture("attempt of updating a user with no admin role", { user: req.user });
+      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
     }
     const { name, email, team, role } = req.body;
 
@@ -332,8 +331,8 @@ router.delete(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") {
-      res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
-      throw new Error("attempt of deleting a user with no admin role");
+      capture("attempt of deleting a user with no admin role", { user: req.user });
+      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
     }
 
     const userId = req.params._id;

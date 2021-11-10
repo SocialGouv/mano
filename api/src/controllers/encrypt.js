@@ -30,7 +30,8 @@ router.post(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") {
-      throw new Error("Only an admin can change the encryption");
+      capture("Only an admin can cancel the encryption", { user: req.user });
+      return res.send(403).send({ ok: false, error: "Only an admin can cancel the encryption" });
     }
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     organisation.set({ encryptionEnabled: false });
@@ -43,7 +44,8 @@ router.post(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") {
-      throw new Error("Only an admin can change the encryption");
+      capture("Only an admin can change the encryption", { user: req.user });
+      return res.send(403).send({ ok: false, error: "Only an admin can change the encryption" });
     }
 
     const { ok, error, status } = await encryptedTransaction(req)(async (tx) => {

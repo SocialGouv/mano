@@ -47,7 +47,8 @@ router.post(
     if (!team) return res.status(400).send({ ok: false, error: "Team is required" });
     if (!date) return res.status(400).send({ ok: false, error: "Date is required" });
     if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
-      throw new Error("not permission creating report");
+      capture("not permission creating report", { user: req.user });
+      return res.send(403).send({ ok: false, error: "not permission creating report" });
     }
 
     const data = await Report.create({ team, date, organisation: req.user.organisation });
