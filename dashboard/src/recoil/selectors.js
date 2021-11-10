@@ -180,7 +180,7 @@ export const actionsSearchSelector = selectorFamily({
   get:
     ({ search = '' }) =>
     ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
+      const actions = get(actionsState);
       if (!search?.length) return [];
       return filterBySearch(search, actions);
     },
@@ -191,7 +191,7 @@ export const actionsFullSearchSelector = selectorFamily({
   get:
     ({ status, search = '' }) =>
     ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
+      const actions = get(actionsState);
       let actionsFiltered = actions;
       if (status) actionsFiltered = actionsFiltered.filter((a) => a.status === status);
       if (search?.length) {
@@ -214,20 +214,11 @@ export const actionsFullSearchSelector = selectorFamily({
     },
 });
 
-export const territoriesObservationsForCurrentTeamSelector = selector({
-  key: 'territoriesObservationsForCurrentTeamSelector',
-  get: ({ get }) => {
-    const observations = get(territoryObservationsState);
-    const currentTeam = get(currentTeamState);
-    return observations.filter((a) => a.team === currentTeam?._id);
-  },
-});
-
 export const onlyFilledObservationsTerritories = selector({
   key: 'onlyFilledObservationsTerritories',
   get: ({ get }) => {
     const customFieldsObs = get(customFieldsObsSelector);
-    const territoryObservations = get(territoriesObservationsForCurrentTeamSelector);
+    const territoryObservations = get(territoryObservationsState);
 
     const observationsKeyLabels = {};
     for (const field of customFieldsObs) {
