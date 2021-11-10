@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, selector, useRecoilState } from 'recoil';
+import { atom, useRecoilState } from 'recoil';
 import { useAuth } from '../recoil/auth';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
@@ -13,11 +13,6 @@ export const commentsState = atom({
 export const commentsLoadingState = atom({
   key: 'commentsLoadingState',
   default: true,
-});
-
-export const prepareCommentsForEncryption = selector({
-  key: 'prepareCommentsForEncryption',
-  get: ({ get }) => get(commentsState).map(prepareCommentForEncryption),
 });
 
 export const useComments = () => {
