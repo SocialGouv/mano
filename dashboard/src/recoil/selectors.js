@@ -79,6 +79,26 @@ export const commentsForCurrentTeamSelector = selector({
   },
 });
 
+export const commentsFilteredSelector = selectorFamily({
+  key: 'commentsForCurrentTeamSelector',
+  get:
+    ({ personId, actionId, forPassages }) =>
+    ({ get }) => {
+      const comments = get(commentsForCurrentTeamSelector);
+      return comments
+        .filter((c) => {
+          if (!!personId) return c.person === personId;
+          if (!!actionId) return c.action === actionId;
+          return false;
+        })
+        .filter((c) => {
+          const commentIsPassage = c?.comment?.includes('Passage enregistré');
+          if (forPassages) return commentIsPassage;
+          return !commentIsPassage;
+        });
+    },
+});
+
 export const commentsSearchSelector = selectorFamily({
   key: 'commentsSearchSelector',
   get:

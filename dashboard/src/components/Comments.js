@@ -16,29 +16,15 @@ import Loading from './loading';
 import { Formik } from 'formik';
 import { useAuth } from '../recoil/auth';
 import { useComments } from '../recoil/comments';
+import { useRecoilValue } from 'recoil';
+import { commentsFilteredSelector } from '../recoil/selectors';
 
 const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
-  const [comments, setComments] = useState([]);
-  const { comments: commentsFullState, deleteComment, addComment, updateComment, loading } = useComments();
+  const { deleteComment, addComment, updateComment, loading } = useComments();
 
-  useEffect(() => {
-    if (!personId && !actionId) return;
-    setComments(
-      commentsFullState
-        .filter((c) => {
-          if (!!personId) return c.person === personId;
-          if (!!actionId) return c.action === actionId;
-          return false;
-        })
-        .filter((c) => {
-          const commentIsPassage = c?.comment?.includes('Passage enregistré');
-          if (forPassages) return commentIsPassage;
-          return !commentIsPassage;
-        })
-    );
-  }, [commentsFullState, personId, actionId, forPassages]);
+  const comments = useRecoilValue(commentsFilteredSelector({ personId, actionId, forPassages }));
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(comments.length);
