@@ -31,7 +31,7 @@ router.post(
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") {
       capture("Only an admin can cancel the encryption", { user: req.user });
-      return res.send(403).send({ ok: false, error: "Only an admin can cancel the encryption" });
+      return res.send(403).send({ ok: false, error: "Seul un admin peut annuler le chiffrement" });
     }
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     organisation.set({ encryptionEnabled: false });
@@ -45,7 +45,7 @@ router.post(
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") {
       capture("Only an admin can change the encryption", { user: req.user });
-      return res.send(403).send({ ok: false, error: "Only an admin can change the encryption" });
+      return res.send(403).send({ ok: false, error: "Seul un admin peut modifier le chiffrement" });
     }
 
     const { ok, error, status } = await encryptedTransaction(req)(async (tx) => {
