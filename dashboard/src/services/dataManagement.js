@@ -29,21 +29,16 @@ export const useStorage = (key, defaultValue) => {
   return [value, setValue];
 };
 
-export const localStorageEffect =
-  (key) =>
-  ({ setSelf, onSet }) => {
-    const savedValue = localStorage.getItem(key);
-    if (savedValue != null) {
-      setSelf(JSON.parse(savedValue));
-    }
-
-    onSet((newValue, _, isReset) => {
-      isReset ? localStorage.removeItem(key) : localStorage.setItem(key, JSON.stringify(newValue));
-    });
-  };
-
 // Get data from server (no cache yet).
-export async function getData({ API, collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
+export async function getData({
+  API,
+  collectionName,
+  data = [],
+  isInitialization = false,
+  setProgress = () => {},
+  setBatchData = null,
+  lastRefresh = 0,
+}) {
   const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
   if (!response.ok) throw { message: `Error getting ${collectionName} data`, response };
 
