@@ -404,7 +404,7 @@ const Places = ({ search, onUpdateResults }) => {
 
 const TerritoryObservations = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { territories } = useTerritories();
+  const territories = useRecoilValue(territoriesState);
 
   const data = useRecoilValue(territoriesObservationsSearchSelector({ search })).map((obs) => ({
     ...obs,

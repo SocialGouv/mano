@@ -19,7 +19,7 @@ import CreateAction from '../action/CreateAction';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
 import { CANCEL, DONE, useActions } from '../../recoil/actions';
-import { useTerritoryObservations } from '../../recoil/territoryObservations';
+import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -32,8 +32,9 @@ import { useAuth } from '../../recoil/auth';
 import { useComments } from '../../recoil/comments';
 import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';
-import { useTerritories } from '../../recoil/territory';
+import { territoriesState } from '../../recoil/territory';
 import ActionPersonName from '../../components/ActionPersonName';
+import { useRecoilValue } from 'recoil';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -474,8 +475,8 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   const [openObservationModale, setOpenObservationModale] = useState(null);
 
   const { currentTeam } = useAuth();
-  const { territoryObservations } = useTerritoryObservations();
-  const { territories } = useTerritories();
+  const territories = useRecoilValue(territoriesState);
+  const territoryObservations = useRecoilValue(territoryObservationsState);
 
   const data = territoryObservations
     .filter((o) => o.team === currentTeam._id)

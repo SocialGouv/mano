@@ -8,18 +8,19 @@ import 'react-datepicker/dist/react-datepicker.css';
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
 import { useAuth } from '../recoil/auth';
-import { preparePersonForEncryption, usePersons } from '../recoil/persons';
-import { prepareActionForEncryption, useActions } from '../recoil/actions';
-import { prepareCommentForEncryption, useComments } from '../recoil/comments';
-import { prepareObsForEncryption, useTerritoryObservations } from '../recoil/territoryObservations';
-import { useReports, prepareReportForEncryption } from '../recoil/reports';
-import { useTerritories, prepareTerritoryForEncryption } from '../recoil/territory';
-import { preparePlaceForEncryption, usePlaces } from '../recoil/places';
-import { prepareRelPersonPlaceForEncryption, useRelsPerson } from '../recoil/relPersonPlace';
+import { personsState, preparePersonForEncryption } from '../recoil/persons';
+import { actionsState, prepareActionForEncryption } from '../recoil/actions';
+import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
+import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
+import { prepareReportForEncryption, reportsState } from '../recoil/reports';
+import { prepareTerritoryForEncryption, territoriesState } from '../recoil/territory';
+import { placesState, preparePlaceForEncryption } from '../recoil/places';
+import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
 import useApi from '../services/api-interface-with-dashboard';
 import { useRefresh } from '../recoil/refresh';
+import { useRecoilValue } from 'recoil';
 
 const EncryptionKey = () => {
   const [open, setOpen] = useState(false);
@@ -29,14 +30,15 @@ const EncryptionKey = () => {
   const [cancellingEncryption, setCancellingEncryption] = useState(false);
 
   const { user, organisation, setOrganisation } = useAuth();
-  const { persons } = usePersons();
-  const { actions } = useActions();
-  const { comments } = useComments();
-  const { territories } = useTerritories();
-  const { territoryObservations: observations, customFieldsObs } = useTerritoryObservations();
-  const { places } = usePlaces();
-  const { relsPersonPlace } = useRelsPerson();
-  const { reports } = useReports();
+  const persons = useRecoilValue(personsState);
+  const actions = useRecoilValue(actionsState);
+  const comments = useRecoilValue(commentsState);
+  const territories = useRecoilValue(territoriesState);
+  const observations = useRecoilValue(territoryObservationsState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const places = useRecoilValue(placesState);
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
+  const reports = useRecoilValue(reportsState);
   const { loading } = useRefresh();
   const API = useApi();
 
