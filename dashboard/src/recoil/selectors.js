@@ -70,21 +70,12 @@ export const placesSearchSelector = selectorFamily({
     },
 });
 
-export const commentsForCurrentTeamSelector = selector({
-  key: 'commentsForCurrentTeamSelector',
-  get: ({ get }) => {
-    const comments = get(commentsState);
-    const currentTeam = get(currentTeamState);
-    return comments.filter((c) => c.team === currentTeam?._id);
-  },
-});
-
 export const commentsFilteredSelector = selectorFamily({
-  key: 'commentsForCurrentTeamSelector',
+  key: 'commentsFilteredSelector',
   get:
     ({ personId, actionId, forPassages }) =>
     ({ get }) => {
-      const comments = get(commentsForCurrentTeamSelector);
+      const comments = get(commentsState);
       return comments
         .filter((c) => {
           if (!!personId) return c.person === personId;
@@ -104,7 +95,7 @@ export const commentsSearchSelector = selectorFamily({
   get:
     ({ search = '' }) =>
     ({ get }) => {
-      const comments = get(commentsForCurrentTeamSelector);
+      const comments = get(commentsState);
       if (!search?.length) return [];
       return filterBySearch(search, comments);
     },
@@ -140,7 +131,7 @@ export const personsFullSearchSelector = selectorFamily({
       }
       if (search?.length) {
         const personsFilteredIds = personsFiltered.map((p) => p._id);
-        const comments = get(commentsForCurrentTeamSelector);
+        const comments = get(commentsState);
         const actions = get(actionsState);
         const actionsOfFilteredPersons = actions.filter((a) => personsFilteredIds.includes(a.person));
         const actionsOfFilteredPersonsIds = actionsOfFilteredPersons.map((a) => a._id);
@@ -205,7 +196,7 @@ export const actionsFullSearchSelector = selectorFamily({
       if (status) actionsFiltered = actionsFiltered.filter((a) => a.status === status);
       if (search?.length) {
         const actionsFilteredIds = actionsFiltered.map((p) => p._id);
-        const comments = get(commentsForCurrentTeamSelector);
+        const comments = get(commentsState);
         const persons = get(personsWithPlacesSelector);
         const personsOfFilteredActions = persons.filter((a) => actionsFilteredIds.includes(a.person));
         const commentsOfFilteredActions = comments.filter((c) => actionsFilteredIds.includes(c.action));
