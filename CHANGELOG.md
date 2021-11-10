@@ -1,3 +1,10 @@
+## [1.27.1](https://github.com/SocialGouv/mano/compare/v1.27.0...v1.27.1) (2021-11-10)
+
+
+### Bug Fixes
+
+* **api:** clean ([#151](https://github.com/SocialGouv/mano/issues/151)) ([3a58997](https://github.com/SocialGouv/mano/commit/3a5899734d7b1e12f230613d2c901c1349ce867e))
+
 # [1.27.0](https://github.com/SocialGouv/mano/compare/v1.26.1...v1.27.0) (2021-11-08)
 
 
