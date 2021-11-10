@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { toastr } from 'react-redux-toastr';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import useApi from '../services/api-interface-with-dashboard';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';

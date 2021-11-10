@@ -1,7 +1,7 @@
 import React from 'react';
 import { toastr } from 'react-redux-toastr';
 import SelectCustom from '../../components/SelectCustom';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 
 const NoOptionsMessage = () => (

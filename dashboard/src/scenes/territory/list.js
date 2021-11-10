@@ -18,7 +18,7 @@ import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesFullSearchSelector } from '../../recoil/selectors';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 
 const List = () => {

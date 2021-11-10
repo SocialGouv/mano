@@ -15,7 +15,7 @@ import Table from '../../components/table';
 import CreateWrapper from '../../components/createWrapper';
 import SelectCustom from '../../components/SelectCustom';
 import TagTeam from '../../components/TagTeam';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 
 const List = () => {

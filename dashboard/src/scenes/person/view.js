@@ -40,7 +40,7 @@ import Places from '../../components/Places';
 import { toFrenchDate } from '../../utils';
 import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
 

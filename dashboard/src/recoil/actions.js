@@ -1,5 +1,5 @@
 import { atom, useRecoilState } from 'recoil';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';

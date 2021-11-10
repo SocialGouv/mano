@@ -1,5 +1,5 @@
 import { useActions } from './actions';
-import useAuth from './auth';
+import { useAuth } from './auth';
 import { useComments } from './comments';
 import { usePersons } from './persons';
 import { usePlaces } from './places';

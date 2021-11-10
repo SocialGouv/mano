@@ -1,5 +1,5 @@
 import React from 'react';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 
 const UserName = ({ id, wrapper = (name) => name }) => {
   const { users } = useAuth();

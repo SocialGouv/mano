@@ -14,7 +14,7 @@ import PaginationContext from '../../contexts/pagination';
 import Page from '../../components/pagination';
 import { filterBySearch } from '../search/utils';
 import { toFrenchDate } from '../../utils';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';

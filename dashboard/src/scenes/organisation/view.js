@@ -15,7 +15,7 @@ import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories } from '../../recoil/actions';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 
 const View = () => {

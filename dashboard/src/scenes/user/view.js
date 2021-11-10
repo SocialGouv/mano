@@ -13,7 +13,7 @@ import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectCustom from '../../components/SelectCustom';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 
 const View = () => {

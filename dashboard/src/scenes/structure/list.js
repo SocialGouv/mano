@@ -13,7 +13,7 @@ import { toastr } from 'react-redux-toastr';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
 import { toFrenchDate } from '../../utils';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 
 const List = () => {

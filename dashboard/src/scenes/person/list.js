@@ -21,7 +21,7 @@ import Filters from '../../components/Filters';
 import { displayBirthDate } from '../../services/date';
 import { personsFullSearchSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { usePlaces } from '../../recoil/places';
 import { useRecoilValue } from 'recoil';
 

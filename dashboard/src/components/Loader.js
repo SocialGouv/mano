@@ -51,10 +51,6 @@ const Loader = () => {
   );
 };
 
-export const Preloader = () => {
-  return null;
-};
-
 const Hidden = styled.div`
   position: fixed;
   top: 0;

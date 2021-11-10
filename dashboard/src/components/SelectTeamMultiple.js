@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import SelectCustom from './SelectCustom';
 
 const SelectTeamMultiple = ({ onChange, value = [] }) => {

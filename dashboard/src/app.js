@@ -25,12 +25,12 @@ import Report from './scenes/report';
 import Person from './scenes/person';
 
 import Drawer from './components/drawer';
-import Loader, { Preloader } from './components/Loader';
+import Loader from './components/Loader';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
-import useAuth from './recoil/auth';
+import { useAuth } from './recoil/auth';
 import useApi from './services/api-interface-with-dashboard';
 import { tokenState } from './services/api';
 
@@ -100,7 +100,6 @@ export default function ContextedApp() {
         <App />
         <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
         <Loader />
-        <Preloader />
       </Provider>
     </RecoilRoot>
   );

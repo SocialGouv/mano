@@ -14,7 +14,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { toFrenchDate } from '../../utils';
 import { DONE, TODO, useActions } from '../../recoil/actions';
 import SelectStatus from '../../components/SelectStatus';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {

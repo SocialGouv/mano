@@ -11,7 +11,7 @@ import Table from '../../components/table';
 
 import { toFrenchDate } from '../../utils';
 import NightSessionModale from '../../components/NightSessionModale';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 
 const List = () => {

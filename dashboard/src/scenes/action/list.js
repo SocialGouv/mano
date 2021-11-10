@@ -21,7 +21,7 @@ import { actionsFullSearchSelector } from '../../recoil/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { useRecoilValue } from 'recoil';
 import ActionPersonName from '../../components/ActionPersonName';
 

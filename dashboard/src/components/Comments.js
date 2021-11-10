@@ -14,7 +14,7 @@ import SelectUser from './SelectUser';
 import { theme } from '../config';
 import Loading from './loading';
 import { Formik } from 'formik';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import { useComments } from '../recoil/comments';
 
 const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {

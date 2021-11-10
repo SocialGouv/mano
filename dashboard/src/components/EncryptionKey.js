@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import { preparePersonForEncryption, usePersons } from '../recoil/persons';
 import { prepareActionForEncryption, useActions } from '../recoil/actions';
 import { prepareCommentForEncryption, useComments } from '../recoil/comments';

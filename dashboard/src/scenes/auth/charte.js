@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Document, Page } from 'react-pdf';
 import ButtonCustom from '../../components/ButtonCustom';
 import charte from '../../assets/charte.pdf';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 
 const Charte = () => {

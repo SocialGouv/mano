@@ -9,7 +9,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import styled from 'styled-components';
 import { getMonths, isOnSameDay } from '../../services/date';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { useReports } from '../../recoil/reports';
 
 const List = () => {

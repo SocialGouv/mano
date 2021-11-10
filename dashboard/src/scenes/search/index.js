@@ -17,7 +17,7 @@ import UserName from '../../components/UserName';
 import PaginationContext, { PaginationProvider } from '../../contexts/pagination';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { useActions } from '../../recoil/actions';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';

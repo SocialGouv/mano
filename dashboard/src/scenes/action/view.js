@@ -20,7 +20,7 @@ import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
 import SelectCustom from '../../components/SelectCustom';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { useActions, CANCEL, DONE } from '../../recoil/actions';
 
 const View = () => {

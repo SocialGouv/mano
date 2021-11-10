@@ -12,7 +12,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
 import BackButton from '../../components/backButton';
 import NightSessionModale from '../../components/NightSessionModale';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 
 const View = () => {

@@ -8,7 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
 import useApi from '../services/api-interface-with-dashboard';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 
 const DeleteOrganisation = () => {
   const [open, setOpen] = useState(false);

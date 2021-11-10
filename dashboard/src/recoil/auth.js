@@ -29,7 +29,7 @@ export const currentTeamState = atom({
   default: null,
 });
 
-const useAuth = () => {
+export const useAuth = () => {
   const [user, setUser] = useRecoilState(userState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const [teams, setTeams] = useRecoilState(teamsState);
@@ -55,5 +55,3 @@ const useAuth = () => {
 
   return { user, organisation, currentTeam, teams, users, setUsers, setUser, setOrganisation, setTeams, setCurrentTeam, organisationId };
 };
-
-export default useAuth;

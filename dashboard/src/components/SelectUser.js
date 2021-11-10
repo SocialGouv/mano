@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import SelectCustom from './SelectCustom';
 
 const SelectUser = ({ value, onChange, ...props }) => {

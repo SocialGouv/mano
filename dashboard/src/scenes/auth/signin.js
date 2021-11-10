@@ -10,7 +10,7 @@ import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 import { useRefresh } from '../../recoil/refresh';
 

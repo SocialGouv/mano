@@ -5,7 +5,7 @@ import { Button as CloseButton } from 'reactstrap';
 import UserName from '../../components/UserName';
 import { useTerritoryObservations } from '../../recoil/territoryObservations';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 
 const fieldIsEmpty = (value) => {
   if (value === null) return true;

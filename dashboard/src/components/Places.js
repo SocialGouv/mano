@@ -12,7 +12,7 @@ import { usePlaces } from '../recoil/places';
 import Table from './table';
 import { toFrenchDate } from '../utils';
 import SelectCustom from './SelectCustom';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import { useRelsPerson } from '../recoil/relPersonPlace';
 
 const Places = ({ personId = '', onUpdateResults }) => {

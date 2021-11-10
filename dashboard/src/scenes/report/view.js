@@ -28,7 +28,7 @@ import CreateObservation from '../../components/CreateObservation';
 import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionName from '../../components/ActionName';
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { useComments } from '../../recoil/comments';
 import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';

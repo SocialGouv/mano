@@ -25,7 +25,7 @@ import DateRangePickerWithPresets from '../../components/DateRangePickerWithPres
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
 import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
@@ -98,7 +98,7 @@ const Stats = () => {
   const allPersons = useRecoilValue(personsState);
   const allActions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
-  const reports = useRecoilValue(reportsState);
+  const allreports = useRecoilValue(reportsState);
   const territories = useRecoilValue(territoriesState);
   const allObservations = useRecoilValue(territoryObservationsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);

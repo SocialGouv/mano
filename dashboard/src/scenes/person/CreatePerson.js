@@ -7,7 +7,7 @@ import { toastr } from 'react-redux-toastr';
 import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import useAuth from '../../recoil/auth';
+import { useAuth } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useRefresh } from '../../recoil/refresh';
 

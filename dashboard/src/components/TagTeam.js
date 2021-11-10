@@ -1,6 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 
 const TagTeam = ({ teamId }) => {
   const { teams } = useAuth();

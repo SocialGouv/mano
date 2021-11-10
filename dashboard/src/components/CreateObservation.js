@@ -11,7 +11,7 @@ import SelectTeam from './SelectTeam';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import CustomFieldInput from './CustomFieldInput';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import { useTerritories } from '../recoil/territory';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];

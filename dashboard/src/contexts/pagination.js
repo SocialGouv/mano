@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import useAuth from '../recoil/auth';
+import { useAuth } from '../recoil/auth';
 import { TODO } from '../recoil/actions';
 
 const PaginationContext = React.createContext();
