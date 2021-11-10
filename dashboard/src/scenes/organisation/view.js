@@ -22,8 +22,6 @@ const View = () => {
   const { organisation, setOrganisation } = useAuth();
   const API = useApi();
 
-  console.log({ organisation });
-
   return (
     <Container style={{ padding: '40px 0', margin: '0 -40px' }}>
       <Header title={<BackButton />} />

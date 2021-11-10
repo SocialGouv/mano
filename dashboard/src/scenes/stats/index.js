@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import XLSX from 'xlsx';
@@ -19,6 +19,7 @@ import {
   vulnerabilitiesOptions,
   filterPersonsBase,
   personsState,
+  usePersons,
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
@@ -27,7 +28,7 @@ import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
 import { useAuth } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
-import { actionsState } from '../../recoil/actions';
+import { actionsState, useActions } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
 import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
@@ -95,7 +96,9 @@ const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observati
 
 const Stats = () => {
   const { teams, organisation, user, currentTeam } = useAuth();
+  const { loading: personsLoading } = usePersons();
   const allPersons = useRecoilValue(personsState);
+  const { loading: actionsLoading } = useActions();
   const allActions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
   const allreports = useRecoilValue(reportsState);
@@ -103,7 +106,8 @@ const Stats = () => {
   const allObservations = useRecoilValue(territoryObservationsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const places = useRecoilValue(placesState);
-  const { refresh, loading } = useRefresh();
+  const { refresh } = useRefresh();
+  const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
 
@@ -112,6 +116,14 @@ const Stats = () => {
   };
 
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
+
+  useEffect(() => {
+    if (loading) refresh();
+  }, [loading]);
+
+  useEffect(() => {
+    if (!personsLoading && !actionsLoading) setLoading(false);
+  }, [personsLoading, actionsLoading]);
 
   if (loading) return <Loading />;
 
@@ -137,7 +149,7 @@ const Stats = () => {
 
   return (
     <Container>
-      <Header title="Statistiques" onRefresh={() => refresh()} />
+      <Header title="Statistiques" onRefresh={() => setLoading(true)} />
       <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center' }}>
         <Col md={8} style={{ display: 'flex' }}>
           <span style={{ marginRight: 10, display: 'inline-flex', alignItems: 'center' }}>Choisissez une période :</span>

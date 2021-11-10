@@ -21,7 +21,7 @@ import { useAuth } from '../../recoil/auth';
 import { useActions } from '../../recoil/actions';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
-import { useTerritories } from '../../recoil/territory';
+import { territoriesState, useTerritories } from '../../recoil/territory';
 import { useRefresh } from '../../recoil/refresh';
 import { useRecoilValue } from 'recoil';
 import {
