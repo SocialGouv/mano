@@ -63,7 +63,21 @@ router.delete(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     const { _id } = req.params;
-    await RelPersonPlace.destroy({ where: { _id } });
+    try {
+      await RelPersonPlace.destroy({ where: { _id } });
+    } catch (e) {
+      const query = {
+        where: {
+          _id: req.params._id,
+          organisation: req.user.organisation,
+        },
+      };
+
+      const relPersonPlace = await RelPersonPlace.findOne(query);
+      relPersonPlace.set({ user: req.user._id });
+      await relPersonPlace.save();
+      await RelPersonPlace.destroy({ where: { _id } });
+    }
     res.status(200).send({ ok: true });
   })
 );
