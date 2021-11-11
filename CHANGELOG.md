@@ -1,3 +1,10 @@
+## [1.27.3](https://github.com/SocialGouv/mano/compare/v1.27.2...v1.27.3) (2021-11-11)
+
+
+### Bug Fixes
+
+* **dashboard:** description linebreaks + prevent XSS ([#152](https://github.com/SocialGouv/mano/issues/152)) ([e247d57](https://github.com/SocialGouv/mano/commit/e247d577e17bbf8f3a9d17a3fb4fa49f5ddda9f2))
+
 ## [1.27.2](https://github.com/SocialGouv/mano/compare/v1.27.1...v1.27.2) (2021-11-11)
 
 
