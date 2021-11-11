@@ -26,6 +26,11 @@ User.init(
     defaultScope: {
       attributes: { exclude: ["password", "forgotPasswordResetToken", "forgotPasswordResetExpires"] },
     },
+    scopes: {
+      withPassword: {
+        attributes: {},
+      },
+    },
   }
 );
 
