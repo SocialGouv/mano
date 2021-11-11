@@ -1,3 +1,10 @@
+## [1.27.2](https://github.com/SocialGouv/mano/compare/v1.27.1...v1.27.2) (2021-11-11)
+
+
+### Bug Fixes
+
+* **dashboard:** e is not defined in createaction ([#154](https://github.com/SocialGouv/mano/issues/154)) ([e60b1c7](https://github.com/SocialGouv/mano/commit/e60b1c7fd0d034356d1d6eb985f6337497bef74f))
+
 ## [1.27.1](https://github.com/SocialGouv/mano/compare/v1.27.0...v1.27.1) (2021-11-10)
 
 
