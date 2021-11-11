@@ -1,3 +1,10 @@
+## [1.27.4](https://github.com/SocialGouv/mano/compare/v1.27.3...v1.27.4) (2021-11-11)
+
+
+### Bug Fixes
+
+* **api:** exclude sensitive data from user response ([#147](https://github.com/SocialGouv/mano/issues/147)) ([f7b8295](https://github.com/SocialGouv/mano/commit/f7b8295bd6378ab858fd83c3d4fefb192a320c6e))
+
 ## [1.27.3](https://github.com/SocialGouv/mano/compare/v1.27.2...v1.27.3) (2021-11-11)
 
 
