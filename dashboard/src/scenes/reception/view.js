@@ -110,7 +110,7 @@ const Reception = () => {
             <SelectAndCreatePerson value={selectedPersons} onChange={onSelectPerson} autoCreate />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
-            <CreateAction noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p._id)} />
+            <CreateAction noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
             <ButtonCustom
               onClick={onAddPassage}
               color="primary"
