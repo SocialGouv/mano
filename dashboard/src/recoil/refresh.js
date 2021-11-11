@@ -111,7 +111,7 @@ export const useRefresh = () => {
       await refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
       await refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
-      setLoading('Chargement des rapports');
+      setLoading('Chargement des comptes-rendus');
       await refreshReports((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setFullScreen(false);
@@ -185,7 +185,7 @@ export const useRefresh = () => {
     reset();
   };
 
-  const refreshPlacesAndRelations = async (showFullScreen = false) => {
+  const placesAndRelationsRefresher = async (showFullScreen = false) => {
     setFullScreen(showFullScreen);
 
     const { places, relsPersonPlace } = await getTotal();
@@ -198,6 +198,18 @@ export const useRefresh = () => {
     reset();
   };
 
+  const reportsRefresher = async (showFullScreen = false) => {
+    setFullScreen(showFullScreen);
+
+    const { reports } = await getTotal();
+    const total = reports || 1;
+
+    setLoading('Chargement des comptes-rendus');
+    await refreshReports((batch) => setProgress((p) => (p * total + batch) / total));
+
+    reset();
+  };
+
   return {
     loading,
     progress,
@@ -205,7 +217,8 @@ export const useRefresh = () => {
     refresh,
     actionsRefresher,
     personsRefresher,
+    reportsRefresher,
     territoriesRefresher,
-    refreshPlacesAndRelations,
+    placesAndRelationsRefresher,
   };
 };

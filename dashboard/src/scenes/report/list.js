@@ -10,11 +10,14 @@ import { theme } from '../../config';
 import styled from 'styled-components';
 import { getMonths, isOnSameDay } from '../../services/date';
 import { useAuth } from '../../recoil/auth';
-import { useReports } from '../../recoil/reports';
+import { reportsState, useReports } from '../../recoil/reports';
+import { useRefresh } from '../../recoil/refresh';
+import { useRecoilValue } from 'recoil';
 
 const List = () => {
   const { currentTeam } = useAuth();
-  const { reports: allReports, loading, refreshReports } = useReports();
+  const allReports = useRecoilValue(reportsState);
+  const { reportsRefresher, loading } = useRefresh();
 
   const reports = allReports.filter((r) => r.team === currentTeam._id);
 
@@ -22,7 +25,7 @@ const List = () => {
     <Container style={{ padding: '40px 0' }}>
       <Header
         title={`Comptes rendus de l'équipe ${currentTeam?.nightSession ? 'de nuit ' : ''}${currentTeam?.name || ''}`}
-        onRefresh={refreshReports}
+        onRefresh={reportsRefresher}
         loading={loading}
       />
       {getMonths().map((date, index) => (

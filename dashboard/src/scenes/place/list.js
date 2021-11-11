@@ -88,10 +88,10 @@ const Create = () => {
   const [open, setOpen] = useState(false);
   const { currentTeam } = useAuth();
   const { addPlace, loading } = usePlaces();
-  const { refreshPlacesAndRelations } = useRefresh();
+  const { placesAndRelationsRefresher } = useRefresh();
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
-      <LinkButton disabled={!!loading} onClick={() => refreshPlacesAndRelations()} color="link" style={{ marginRight: 10 }}>
+      <LinkButton disabled={!!loading} onClick={() => placesAndRelationsRefresher()} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
       <ButtonCustom
