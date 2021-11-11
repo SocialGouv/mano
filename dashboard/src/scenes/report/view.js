@@ -590,7 +590,14 @@ const Description = ({ report }) => {
                     <Label>Description</Label>
                     <ReportDescriptionModale report={report} />
                   </div>
-                  <p>{report.description}</p>
+                  <p>
+                    {report?.description?.split('\n').map((sentence, index) => (
+                      <React.Fragment key={index}>
+                        {sentence}
+                        <br />
+                      </React.Fragment>
+                    ))}
+                  </p>
                 </FormGroup>
               </Col>
               <Col md={2} />
@@ -611,11 +618,20 @@ const Description = ({ report }) => {
         {!!report?.collaborations?.length && (
           <>
             <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
-            <p dangerouslySetInnerHTML={{ __html: report?.collaborations.join(', ') || 'Pas de collaboration' }} />
+            <p>{report?.collaborations.join(', ')}</p>
           </>
         )}
         <Title>Description</Title>
-        <p dangerouslySetInnerHTML={{ __html: report?.description?.split('\n').join('<br />') || 'Pas de description' }} />
+        <p>
+          {!report?.description
+            ? 'Pas de description'
+            : report?.description?.split('\n').map((sentence, index) => (
+                <React.Fragment key={index}>
+                  {sentence}
+                  <br />
+                </React.Fragment>
+              ))}
+        </p>
       </DescriptionBox>
     </>
   );
