@@ -19,7 +19,19 @@ User.init(
     forgotPasswordResetExpires: DataTypes.DATE,
     role: { type: DataTypes.TEXT, defaultValue: "normal" },
   },
-  { sequelize, modelName: "User", freezeTableName: true }
+  {
+    sequelize,
+    modelName: "User",
+    freezeTableName: true,
+    defaultScope: {
+      attributes: { exclude: ["password", "forgotPasswordResetToken", "forgotPasswordResetExpires"] },
+    },
+    scopes: {
+      withPassword: {
+        attributes: {},
+      },
+    },
+  }
 );
 
 User.beforeCreate(async (user) => {

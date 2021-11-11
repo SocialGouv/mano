@@ -69,8 +69,10 @@ router.post(
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
 
+    const { password: expectedPassword } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
+
     // const match = process.env.NODE_ENV === "development" || (await comparePassword(password, user.password));
-    const match = await comparePassword(password, user.password);
+    const match = await comparePassword(password, expectedPassword);
     if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
     user.lastLoginAt = new Date();
 
