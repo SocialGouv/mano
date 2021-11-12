@@ -1,3 +1,10 @@
+# [1.28.0](https://github.com/SocialGouv/mano/compare/v1.27.6...v1.28.0) (2021-11-12)
+
+
+### Features
+
+* **dashboard:** select team on action update ([#155](https://github.com/SocialGouv/mano/issues/155)) ([e621450](https://github.com/SocialGouv/mano/commit/e6214508d78b7b1eb32ac1a9201e0e42b0ff48b5))
+
 ## [1.27.6](https://github.com/SocialGouv/mano/compare/v1.27.5...v1.27.6) (2021-11-12)
 
 
