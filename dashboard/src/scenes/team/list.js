@@ -11,8 +11,9 @@ import Table from '../../components/table';
 
 import { toFrenchDate } from '../../utils';
 import NightSessionModale from '../../components/NightSessionModale';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, useAuth, userState } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 const List = () => {
   const { teams } = useAuth();
@@ -29,7 +30,6 @@ const List = () => {
         columns={[
           { title: 'Nom', dataKey: 'name' },
           { title: 'Créée le', dataKey: 'createdAt', render: (i) => toFrenchDate(i.createdAt) },
-          { title: 'Organisation', dataKey: 'Organisation', render: (i) => i.Organisation.name || '' },
           {
             title: (
               <>
@@ -49,7 +49,10 @@ const List = () => {
 //Organisation
 
 const Create = () => {
-  const { organisation, setUser, setTeams, teams, user, setCurrentTeam } = useAuth();
+  const [teams, setTeams] = useRecoilState(teamsState);
+  const [user, setUser] = useRecoilState(userState);
+  const organisation = useRecoilValue(organisationState);
+  const setCurrentTeam = useSetRecoilState(currentTeamState);
   const [open, setOpen] = useState(!teams.length);
   const API = useApi();
 

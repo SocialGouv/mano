@@ -50,7 +50,7 @@ const Reception = () => {
   const createReport = () => addReport(today(), currentTeam._id);
 
   useEffect(() => {
-    if (!reportsLoading && !todaysReport && !!currentTeam._id) createReport();
+    if (!reportsLoading && !todaysReport && !!currentTeam?._id) createReport();
   }, [reportsLoading, currentTeam?._id]);
 
   const services = todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {};

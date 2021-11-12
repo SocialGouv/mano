@@ -59,6 +59,7 @@ const View = () => {
                     return response.data;
                   })
                 );
+                console.log(teams, response.data);
                 if (currentTeam._id === id) setCurrentTeam(response.data);
               }
             } catch (errorUpdatingTeam) {

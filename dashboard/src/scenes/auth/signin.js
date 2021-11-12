@@ -10,10 +10,11 @@ import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, useAuth, usersState, userState } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 
 /*
 TODO:
@@ -27,8 +28,12 @@ index.js:1 Warning: Can't perform a React state update on an unmounted component
 */
 
 const SignIn = () => {
-  const { setOrganisation, setTeams, setUsers, setUser, setCurrentTeam, user, organisation } = useAuth();
   const { refresh } = useRefresh();
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const setCurrentTeam = useSetRecoilState(currentTeamState);
+  const setTeams = useSetRecoilState(teamsState);
+  const setUsers = useSetRecoilState(usersState);
+  const [user, setUser] = useRecoilState(userState);
   const history = useHistory();
   const [showErrors, setShowErrors] = useState(false);
   const [userName, setUserName] = useState(false);
@@ -41,6 +46,7 @@ const SignIn = () => {
 
   // temporary migration : until all organisations have an `encryptedVerificationKey`
   const setEncryptionVerificationKey = async (organisation, user) => {
+    if (!organisation.encryptionEnabled) return;
     if (!organisation.encryptedVerificationKey && ['admin'].includes(user.role)) {
       const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
       const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
