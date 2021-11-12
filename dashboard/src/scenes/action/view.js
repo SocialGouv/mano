@@ -20,12 +20,14 @@ import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
 import SelectCustom from '../../components/SelectCustom';
+import SelectTeam from '../../components/SelectTeam';
+
 import { useAuth } from '../../recoil/auth';
 import { useActions, CANCEL, DONE } from '../../recoil/actions';
 
 const View = () => {
   const { id } = useParams();
-  const { organisation } = useAuth();
+  const { organisation, user } = useAuth();
   const { deleteAction, updateAction, actions, refreshActions } = useActions();
   const history = useHistory();
 
@@ -72,9 +74,19 @@ const View = () => {
                       <Input name="name" type="textarea" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>
-                  <Col md={6}>
+                  <Col md={3}>
                     <Label>Statut</Label>
                     <SelectStatus name="status" value={values.status || ''} onChange={handleChange} />
+                  </Col>
+                  <Col md={3}>
+                    <FormGroup>
+                      <Label>Sous l'équipe</Label>
+                      <SelectTeam
+                        teams={user.teams}
+                        teamId={values.team}
+                        onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                      />
+                    </FormGroup>
                   </Col>
                   <Col md={4}>
                     <FormGroup>
