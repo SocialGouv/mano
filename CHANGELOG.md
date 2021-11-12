@@ -1,3 +1,10 @@
+## [1.28.1](https://github.com/SocialGouv/mano/compare/v1.28.0...v1.28.1) (2021-11-12)
+
+
+### Bug Fixes
+
+* **dashboard:** slow search ([#157](https://github.com/SocialGouv/mano/issues/157)) ([b07912c](https://github.com/SocialGouv/mano/commit/b07912c1e41b3be6c3a76fa5d37d55c9c6c3a37c))
+
 # [1.28.0](https://github.com/SocialGouv/mano/compare/v1.27.6...v1.28.0) (2021-11-12)
 
 
