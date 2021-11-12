@@ -35,14 +35,11 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    console.log("NEW ACTION");
-    console.log({ newAction });
-
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       const data = await Action.create(newAction, { returning: true, transaction: tx });
       return data;
     });
-    console.log({ ok, data, error, status });
+
     return res.status(status).send({ ok, data, error });
   })
 );
