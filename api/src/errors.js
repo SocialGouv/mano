@@ -34,7 +34,9 @@ const sendError = (err, req, res, next) => {
 
   capture(err, { extra: { body, query, params, route, method }, user });
 
-  return res.status(err.status || 500).send({ ok: false, code: "SERVER_ERROR", error: err.message });
+  return res
+    .status(err.status || 500)
+    .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
 };
 
 module.exports = { catchErrors, notFound, sendError };
