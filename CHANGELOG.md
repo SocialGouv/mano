@@ -1,3 +1,10 @@
+## [1.28.2](https://github.com/SocialGouv/mano/compare/v1.28.1...v1.28.2) (2021-11-12)
+
+
+### Bug Fixes
+
+* **api:** send default error to user ([#146](https://github.com/SocialGouv/mano/issues/146)) ([f06d450](https://github.com/SocialGouv/mano/commit/f06d4502e2b77cdabac17b1c37453edcef8f8dbf))
+
 ## [1.28.1](https://github.com/SocialGouv/mano/compare/v1.28.0...v1.28.1) (2021-11-12)
 
 
