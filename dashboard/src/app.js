@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect } from 'react';
+import React, { useEffect } from 'react';
+import { RecoilRoot, useRecoilState } from 'recoil';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
@@ -24,21 +25,25 @@ import Report from './scenes/report';
 import Person from './scenes/person';
 
 import Drawer from './components/drawer';
+import Loader from './components/Loader';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import AuthContext from './contexts/auth';
-import API from './services/api';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
-import RootContextsProvider, { FullPopulatedSelectorsProvider } from './contexts/rootProvider';
+import { useAuth } from './recoil/auth';
+import useApi from './services/api-interface-with-dashboard';
+import { tokenState } from './services/api';
 
 const store = createStore(combineReducers({ toastr }));
 
 registerLocale('fr', fr);
 
 const App = () => {
+  const API = useApi();
+  const token = useRecoilState(tokenState);
+
   const onWindowFocus = () => {
-    if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
+    if (token) API.get({ path: '/check-auth' }); // will force logout if session is expired
   };
 
   useEffect(() => {
@@ -48,42 +53,35 @@ const App = () => {
     };
   }, []);
   return (
-    <Provider store={store}>
-      <RootContextsProvider>
-        <FullPopulatedSelectorsProvider>
-          <div className="main-container">
-            <div className="main">
-              <Router>
-                <Switch>
-                  <Route path="/auth" component={Auth} />
-                  <RestrictedRoute path="/charte" component={Charte} />
-                  <RestrictedRoute path="/account" component={Account} />
-                  <RestrictedRoute path="/user" component={User} />
-                  <RestrictedRoute path="/person" component={Person} />
-                  <RestrictedRoute path="/place" component={Place} />
-                  <RestrictedRoute path="/action" component={Action} />
-                  <RestrictedRoute path="/territory" component={Territory} />
-                  <RestrictedRoute path="/structure" component={Structure} />
-                  <RestrictedRoute path="/team" component={Team} />
-                  <RestrictedRoute path="/organisation" component={Organisation} />
-                  <RestrictedRoute path="/stats" component={Stats} />
-                  <RestrictedRoute path="/reception" component={Reception} />
-                  <RestrictedRoute path="/search" component={SearchView} />
-                  <RestrictedRoute path="/report" component={Report} />
-                  <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
-                </Switch>
-              </Router>
-            </div>
-          </div>
-          <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-        </FullPopulatedSelectorsProvider>
-      </RootContextsProvider>
-    </Provider>
+    <div className="main-container">
+      <div className="main">
+        <Router>
+          <Switch>
+            <Route path="/auth" component={Auth} />
+            <RestrictedRoute path="/charte" component={Charte} />
+            <RestrictedRoute path="/account" component={Account} />
+            <RestrictedRoute path="/user" component={User} />
+            <RestrictedRoute path="/person" component={Person} />
+            <RestrictedRoute path="/place" component={Place} />
+            <RestrictedRoute path="/action" component={Action} />
+            <RestrictedRoute path="/territory" component={Territory} />
+            <RestrictedRoute path="/structure" component={Structure} />
+            <RestrictedRoute path="/team" component={Team} />
+            <RestrictedRoute path="/organisation" component={Organisation} />
+            <RestrictedRoute path="/stats" component={Stats} />
+            <RestrictedRoute path="/reception" component={Reception} />
+            <RestrictedRoute path="/search" component={SearchView} />
+            <RestrictedRoute path="/report" component={Report} />
+            <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
+          </Switch>
+        </Router>
+      </div>
+    </div>
   );
 };
 
 const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   if (!!user && !user?.termsAccepted) return <Route {...rest} path="/auth" component={Charte} />;
   return (
     <>
@@ -95,4 +93,14 @@ const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
   );
 };
 
-export default App;
+export default function ContextedApp() {
+  return (
+    <RecoilRoot>
+      <Provider store={store}>
+        <App />
+        <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
+        <Loader />
+      </Provider>
+    </RecoilRoot>
+  );
+}

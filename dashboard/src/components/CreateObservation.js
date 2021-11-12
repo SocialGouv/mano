@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from 'reactstrap';
 import DatePicker from 'react-datepicker';
 import styled from 'styled-components';
@@ -6,13 +6,14 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import AuthContext from '../contexts/auth';
-import TerritoryObservationsContext from '../contexts/territoryObservations';
+import { useTerritoryObservations } from '../recoil/territoryObservations';
 import SelectTeam from './SelectTeam';
 import ButtonCustom from './ButtonCustom';
-import TerritoryContext from '../contexts/territory';
 import SelectCustom from './SelectCustom';
 import CustomFieldInput from './CustomFieldInput';
+import { useAuth } from '../recoil/auth';
+import { territoriesState } from '../recoil/territory';
+import { useRecoilValue } from 'recoil';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
 
@@ -23,9 +24,9 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
     if (forceOpen > 0) setOpen(true);
   }, [forceOpen]);
 
-  const { user } = useContext(AuthContext);
-  const { addTerritoryObs, updateTerritoryObs, customFieldsObs } = useContext(TerritoryObservationsContext);
-  const { territories } = useContext(TerritoryContext);
+  const { user } = useAuth();
+  const { addTerritoryObs, updateTerritoryObs, customFieldsObs } = useTerritoryObservations();
+  const territories = useRecoilValue(territoriesState);
 
   return (
     <CreateStyle>

@@ -1,79 +1,66 @@
-import API from './api';
+import { useState } from 'react';
+import { useHistory } from 'react-router';
+import useApiService from './api';
 import { capture } from './sentry';
 import fetchRetry from 'fetch-retry';
+import { toastr } from 'react-redux-toastr';
 
-API.fetch = fetchRetry(window.fetch);
+const useApi = () => {
+  const [showTokenExpiredError, setShowTokenExpiredError] = useState(false);
+  const history = useHistory();
 
-API.init = ({ resetAuth, history, toastr }) => {
-  API.resetAuth = resetAuth;
-  API.history = history;
-  API.toastr = toastr;
-  API.showTokenExpiredError = true;
-};
-
-API.logout = async (from) => {
-  await API.post({
-    path: '/user/logout',
-    skipEncryption: '/user/logout',
-  });
-  if (window.location.pathname !== '/auth') {
-    if (API.history) {
-      API.history.push('/auth');
-      if (from === '401' && API.showTokenExpiredError && API.toastr) API.toastr.error('Votre session a expiré, veuillez vous reconnecter');
+  const handleWrongKey = () => {
+    if (history) {
+      history.push('/auth');
     } else {
       window.location.replace('/auth');
     }
-  }
-  API.token = null;
-  API.enableEncrypt = null;
-  API.wrongKeyWarned = null;
-  API.hashedOrgEncryptionKey = null;
-  API.orgEncryptionKey = null;
-  API.sendCaptureError = null;
-  API.blockEncrypt = null;
-  API.organisation = null;
-  if (API.resetAuth) API.resetAuth();
-  API.showTokenExpiredError = false;
-};
+    toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+    setShowTokenExpiredError(false);
+  };
 
-API.cancelEncryption = async () => {
-  API.token = null;
-  API.enableEncrypt = null;
-  API.wrongKeyWarned = null;
-  API.hashedOrgEncryptionKey = null;
-  API.orgEncryptionKey = null;
-  API.sendCaptureError = null;
-  API.blockEncrypt = null;
-};
-
-API.handleWrongKey = () => {
-  API.toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
-  if (API.history) {
-    API.history.push('/auth');
-  } else {
-    if (window.location.pathname !== '/auth') window.location.replace('/auth');
-  }
-  API.showTokenExpiredError = false;
-  API.token = null;
-  if (API.resetAuth) API.resetAuth();
-};
-
-API.platform = 'dashboard';
-
-API.handleBlockEncrypt = () => API.toastr.error('Erreur !', "Vous ne pouvez pas modifier le contenu. La clé de chiffrement n'est pas la bonne");
-
-API.handleError = (error, subtitle) => API.toastr.error(error?.toString(), subtitle, { timeOut: 0 });
-
-API.handleApiError = (res) => {
-  try {
-    if (res?.error?.message) {
-      API.toastr.error('Erreur !', res?.error?.message);
-    } else if (res?.error) {
-      API.toastr.error('Erreur !', res?.error);
-    } else if (res?.code) {
-      API.toastr.error('Erreur !', res?.code);
+  const onLogout = async (status) => {
+    if (window.location.pathname !== '/auth') {
+      if (history) {
+        history.push('/auth');
+        if (status === '401' && showTokenExpiredError && toastr) toastr.error('Votre session a expiré, veuillez vous reconnecter');
+      } else {
+        window.location.replace('/auth');
+      }
     }
-  } catch (errorApi) {
-    capture(errorApi, { extra: { API, res } });
-  }
+  };
+
+  const platform = 'dashboard';
+
+  const handleBlockEncrypt = () => toastr?.error('Erreur !', "Vous ne pouvez pas modifier le contenu. La clé de chiffrement n'est pas la bonne");
+
+  const handleError = (error, subtitle) => toastr?.error(error?.toString(), subtitle, { timeOut: 0 });
+
+  const handleApiError = (res) => {
+    try {
+      if (res?.error?.message) {
+        toastr?.error('Erreur !', res?.error?.message);
+      } else if (res?.error) {
+        toastr?.error('Erreur !', res?.error);
+      } else if (res?.code) {
+        toastr?.error('Erreur !', res?.code);
+      }
+    } catch (errorApi) {
+      capture(errorApi, { extra: { res } });
+    }
+  };
+
+  const api = useApiService({
+    handleError,
+    handleBlockEncrypt,
+    onLogout,
+    handleApiError,
+    handleWrongKey,
+    platform,
+    fetch: fetchRetry(window.fetch),
+  });
+
+  return api;
 };
+
+export default useApi;

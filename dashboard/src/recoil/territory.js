@@ -1,51 +1,53 @@
-import React, { useContext, useState } from 'react';
-import API from '../services/api';
+import { atom, useRecoilState } from 'recoil';
+import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import TerritoryObservationsContext from './territoryObservations';
+import { useTerritoryObservations } from './territoryObservations';
 
-const TerritoryContext = React.createContext();
+export const territoriesState = atom({
+  key: 'territoriesState',
+  default: [],
+});
 
-export const TerritoriesProvider = ({ children }) => {
-  const { territoryObservations, deleteTerritoryObs } = useContext(TerritoryObservationsContext);
+export const territoriesLoadingState = atom({
+  key: 'territoriesLoadingState',
+  default: true,
+});
 
-  const [state, setState] = useState({ territories: [], territoryKey: 0 });
+export const useTerritories = () => {
+  const { territoryObservations, deleteTerritoryObs } = useTerritoryObservations();
+  const API = useApi();
+
+  const [territories, setTerritories] = useRecoilState(territoriesState);
+  const [loading, setLoading] = useRecoilState(territoriesLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-territories', 0);
 
-  const setTerritories = (territories) => {
-    if (territories) {
-      setState(({ territoryKey }) => ({
-        territories,
-        territoryKey: territoryKey + 1,
-        loading: false,
-      }));
-    }
+  const setTerritoriesFullState = (newTerritories) => {
+    if (newTerritories) setTerritories(newTerritories);
+    setLoading(false);
     setLastRefresh(Date.now());
   };
 
-  const setBatchData = (newTerritories) =>
-    setState(({ territories, ...oldState }) => ({
-      ...oldState,
-      territories: [...territories, ...newTerritories],
-    }));
+  const setBatchData = (newTerritories) => setTerritories((territories) => [...territories, ...newTerritories]);
 
   const refreshTerritories = async (setProgress, initialLoad) => {
-    setState((state) => ({ ...state, loading: true }));
+    setLoading(true);
     try {
-      setTerritories(
+      setTerritoriesFullState(
         await getData({
           collectionName: 'territory',
-          data: state.territories,
+          data: territories,
           isInitialization: initialLoad,
           setProgress,
           lastRefresh,
           setBatchData,
+          API,
         })
       );
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });
-      setState((state) => ({ ...state, loading: false }));
+      setLoading(false);
       return false;
     }
   };
@@ -53,11 +55,7 @@ export const TerritoriesProvider = ({ children }) => {
   const deleteTerritory = async (id) => {
     const res = await API.delete({ path: `/territory/${id}` });
     if (res.ok) {
-      setState(({ territories, territoryKey, ...s }) => ({
-        ...s,
-        territoryKey: territoryKey + 1,
-        territories: territories.filter((t) => t._id !== id),
-      }));
+      setTerritories((territories) => territories.filter((t) => t._id !== id));
       for (let obs of territoryObservations.filter((o) => o.territory === id)) {
         await deleteTerritoryObs(obs._id);
       }
@@ -70,11 +68,7 @@ export const TerritoriesProvider = ({ children }) => {
       const res = await API.post({ path: '/territory', body: prepareTerritoryForEncryption(territory) });
 
       if (res.ok) {
-        setState(({ territories, territoryKey, ...s }) => ({
-          ...s,
-          territoryKey: territoryKey + 1,
-          territories: [res.decryptedData, ...territories],
-        }));
+        setTerritories((territories) => [res.decryptedData, ...territories]);
       }
       return res;
     } catch (error) {
@@ -90,14 +84,12 @@ export const TerritoriesProvider = ({ children }) => {
         body: prepareTerritoryForEncryption(territory),
       });
       if (res.ok) {
-        setState(({ territories, territoryKey, ...s }) => ({
-          ...s,
-          territoryKey: territoryKey + 1,
-          territories: territories.map((a) => {
+        setTerritories((territories) =>
+          territories.map((a) => {
             if (a._id === territory._id) return res.decryptedData;
             return a;
-          }),
-        }));
+          })
+        );
       }
       return res;
     } catch (error) {
@@ -106,22 +98,16 @@ export const TerritoriesProvider = ({ children }) => {
     }
   };
 
-  return (
-    <TerritoryContext.Provider
-      value={{
-        ...state,
-        refreshTerritories,
-        setTerritories,
-        deleteTerritory,
-        addTerritory,
-        updateTerritory,
-      }}>
-      {children}
-    </TerritoryContext.Provider>
-  );
+  return {
+    territories,
+    loading,
+    refreshTerritories,
+    setTerritories,
+    deleteTerritory,
+    addTerritory,
+    updateTerritory,
+  };
 };
-
-export default TerritoryContext;
 
 const encryptedFields = ['name', 'perimeter', 'types', 'user'];
 

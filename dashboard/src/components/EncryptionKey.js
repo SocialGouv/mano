@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
@@ -7,19 +7,20 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
-import AuthContext from '../contexts/auth';
-import PersonsContext, { preparePersonForEncryption } from '../contexts/persons';
-import ActionsContext, { prepareActionForEncryption } from '../contexts/actions';
-import CommentsContext, { prepareCommentForEncryption } from '../contexts/comments';
-import TerritoryContext, { prepareTerritoryForEncryption } from '../contexts/territory';
-import TerritoryObservationsContext, { prepareObsForEncryption } from '../contexts/territoryObservations';
-import PlacesContext, { preparePlaceForEncryption } from '../contexts/places';
-import API from '../services/api';
-import ReportsContext, { prepareReportForEncryption } from '../contexts/reports';
-import { capture } from '../services/sentry';
-import RelsPersonPlaceContext, { prepareRelPersonPlaceForEncryption } from '../contexts/relPersonPlace';
-import RefreshContext from '../contexts/refresh';
+import { useAuth } from '../recoil/auth';
+import { personsState, preparePersonForEncryption } from '../recoil/persons';
+import { actionsState, prepareActionForEncryption } from '../recoil/actions';
+import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
+import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
+import { prepareReportForEncryption, reportsState } from '../recoil/reports';
+import { prepareTerritoryForEncryption, territoriesState } from '../recoil/territory';
+import { placesState, preparePlaceForEncryption } from '../recoil/places';
+import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
+import { capture } from '../services/sentry';
+import useApi from '../services/api-interface-with-dashboard';
+import { useRefresh } from '../recoil/refresh';
+import { useRecoilValue } from 'recoil';
 
 const EncryptionKey = () => {
   const [open, setOpen] = useState(false);
@@ -28,16 +29,18 @@ const EncryptionKey = () => {
   const [encryptingProgress, setEncryptingProgress] = useState(0);
   const [cancellingEncryption, setCancellingEncryption] = useState(false);
 
-  const { user, organisation, setAuth } = useContext(AuthContext);
-  const { persons } = useContext(PersonsContext);
-  const { actions } = useContext(ActionsContext);
-  const { comments } = useContext(CommentsContext);
-  const { territories } = useContext(TerritoryContext);
-  const { territoryObservations: observations, customFieldsObs } = useContext(TerritoryObservationsContext);
-  const { places } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
-  const { reports } = useContext(ReportsContext);
-  const { loading } = useContext(RefreshContext);
+  const { user, organisation, setOrganisation } = useAuth();
+  const persons = useRecoilValue(personsState);
+  const actions = useRecoilValue(actionsState);
+  const comments = useRecoilValue(commentsState);
+  const territories = useRecoilValue(territoriesState);
+  const observations = useRecoilValue(territoryObservationsState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const places = useRecoilValue(placesState);
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
+  const reports = useRecoilValue(reportsState);
+  const { loading } = useRefresh();
+  const API = useApi();
 
   const totalToEncrypt =
     persons.length +
@@ -83,7 +86,7 @@ const EncryptionKey = () => {
       const elpasedBarInterval = setInterval(() => {
         setEncryptingProgress((p) => p + updateStatusBarInterval);
       }, updateStatusBarInterval * 1000);
-      API.organisation.encryptionEnabled = true;
+      setOrganisation({ ...organisation, encryptionEnabled: true });
       const res = await API.post({
         path: '/encrypt',
         body: {
@@ -108,8 +111,7 @@ const EncryptionKey = () => {
         setEncryptingProgress(totalDurationOnServer);
         setEncryptingStatus('Données chiffrées !');
         toastr.success('Données chiffrées !', 'Veuillez noter la clé puis vous reconnecter');
-        setAuth({ organisation: res.data });
-        API.organisation = res.data;
+        setOrganisation(res.data);
       }
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);

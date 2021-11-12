@@ -7,11 +7,10 @@ import styled from 'styled-components';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 
-import API from '../../services/api';
-
 import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
 import { generatePassword, toFrenchDate } from '../../utils';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const List = () => {
   const [organisations, setOrganisation] = useState(null);
@@ -19,6 +18,7 @@ const List = () => {
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('ASC');
   const [refresh, setRefresh] = useState(false);
+  const API = useApi();
 
   useEffect(() => {
     (async () => {
@@ -116,6 +116,7 @@ const StyledCounters = styled.p`
 
 const Create = ({ onChange }) => {
   const [open, setOpen] = useState(false);
+  const API = useApi();
 
   return (
     <CreateWrapper>

@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext } from 'react';
-import AuthContext from '../contexts/auth';
+import React from 'react';
+import { useAuth } from '../recoil/auth';
 import SelectCustom from './SelectCustom';
 
 const SelectTeamMultiple = ({ onChange, value = [] }) => {
-  const { teams } = useContext(AuthContext);
-
+  const { teams } = useAuth();
   return (
     <SelectCustom
       options={teams.map(({ _id }) => _id)}

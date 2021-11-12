@@ -1,11 +1,11 @@
-import React, { useContext, useEffect, useState } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useEffect, useState } from 'react';
 import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 
-import API from '../../services/api';
 import { generatePassword, toFrenchDate } from '../../utils';
 import Header from '../../components/header';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
@@ -13,15 +13,17 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import Table from '../../components/table';
 import CreateWrapper from '../../components/createWrapper';
-import AuthContext from '../../contexts/auth';
 import SelectCustom from '../../components/SelectCustom';
 import TagTeam from '../../components/TagTeam';
+import { useAuth } from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const List = () => {
   const [users, setUsers] = useState(null);
   const history = useHistory();
   const [refresh, setRefresh] = useState(false);
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
+  const API = useApi();
 
   useEffect(() => {
     (async () => {
@@ -71,7 +73,8 @@ const TeamWrapper = styled.div`
 
 const Create = ({ onChange }) => {
   const [open, setOpen] = useState(false);
-  const { organisation } = useContext(AuthContext);
+  const { organisation } = useAuth();
+  const API = useApi();
 
   return (
     <CreateWrapper>

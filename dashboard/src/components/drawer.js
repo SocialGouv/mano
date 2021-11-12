@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
@@ -7,16 +7,17 @@ import logo from '../assets/logo-green.png';
 import SelectTeam from './SelectTeam';
 
 import { theme } from '../config';
-import API from '../services/api';
 
 import legal from '../assets/legal.pdf';
 import privacy from '../assets/privacy.pdf';
 import charte from '../assets/charte.pdf';
-import AuthContext from '../contexts/auth';
+import { useAuth } from '../recoil/auth';
+import useApi from '../services/api-interface-with-dashboard';
 
 const Drawer = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { user, organisation, teams, currentTeam, setCurrentTeam } = useContext(AuthContext);
+  const { user, organisation, teams, currentTeam, setCurrentTeam } = useAuth();
+  const API = useApi();
 
   const onboardingForTeams = !teams.length;
 

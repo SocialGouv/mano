@@ -10,15 +10,15 @@ import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
 import Search from '../../components/search';
-import AuthContext from '../../contexts/auth';
-import PlacesContext from '../../contexts/places';
 import PaginationContext from '../../contexts/pagination';
 import Page from '../../components/pagination';
-import PersonsContext from '../../contexts/persons';
 import { filterBySearch } from '../search/utils';
 import { toFrenchDate } from '../../utils';
-import RefreshContext from '../../contexts/refresh';
-import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
+import { useAuth } from '../../recoil/auth';
+import { usePersons } from '../../recoil/persons';
+import { useRelsPerson } from '../../recoil/relPersonPlace';
+import { usePlaces } from '../../recoil/places';
+import { useRefresh } from '../../recoil/refresh';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -28,10 +28,10 @@ const filterPlaces = (places, { page, limit, search }) => {
 };
 
 const List = () => {
-  const { places } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
-  const { persons } = useContext(PersonsContext);
-  const { organisation } = useContext(AuthContext);
+  const { places } = usePlaces();
+  const { relsPersonPlace } = useRelsPerson();
+  const { persons } = usePersons();
+  const { organisation } = useAuth();
   const history = useHistory();
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
@@ -86,12 +86,12 @@ const List = () => {
 
 const Create = () => {
   const [open, setOpen] = useState(false);
-  const { currentTeam } = useContext(AuthContext);
-  const { addPlace, loading } = useContext(PlacesContext);
-  const { refreshPlacesAndRelations } = useContext(RefreshContext);
+  const { currentTeam } = useAuth();
+  const { addPlace, loading } = usePlaces();
+  const { placesAndRelationsRefresher } = useRefresh();
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
-      <LinkButton disabled={!!loading} onClick={() => refreshPlacesAndRelations()} color="link" style={{ marginRight: 10 }}>
+      <LinkButton disabled={!!loading} onClick={() => placesAndRelationsRefresher()} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
       <ButtonCustom

@@ -1,12 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
-
-import API from '../../services/api';
 
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -14,19 +12,21 @@ import ButtonCustom from '../../components/ButtonCustom';
 import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import AuthContext from '../../contexts/auth';
 import SelectCustom from '../../components/SelectCustom';
+import { useAuth } from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const View = () => {
-  const [user, setUser] = useState(null);
+  const [localUser, setLocalUser] = useState(null);
   const { id } = useParams();
   const history = useHistory();
-  const { setAuth, ...auth } = useContext(AuthContext);
+  const { setUser, organisation, user } = useAuth();
+  const API = useApi();
 
   useEffect(() => {
     (async () => {
       const { data } = await API.get({ path: `/user/${id}` });
-      setUser(data);
+      setLocalUser(data);
     })();
   }, []);
 
@@ -40,22 +40,22 @@ const View = () => {
     }
   };
 
-  if (!user) return <Loading />;
+  if (!localUser) return <Loading />;
 
   return (
     <Container style={{ padding: '40px 0' }}>
       <Header title={<BackButton />} />
       <Box>
         <Formik
-          initialValues={user}
+          initialValues={localUser}
           onSubmit={async (body, actions) => {
             try {
-              body.organisation = auth.organisation._id;
+              body.organisation = organisation._id;
               const res = await API.put({ path: `/user/${id}`, body });
               if (!res.ok) return actions.setSubmitting(false);
-              if (auth.user._id === id) {
+              if (user._id === id) {
                 const { data } = await API.get({ path: `/user/${id}` });
-                setAuth({ user: data });
+                setUser(data);
               }
               actions.setSubmitting(false);
               toastr.success('Mis à jour !');
@@ -85,7 +85,7 @@ const View = () => {
                     <div>
                       <SelectTeamMultiple
                         onChange={(team) => handleChange({ target: { value: team || [], name: 'team' } })}
-                        organisation={auth.organisation._id}
+                        organisation={organisation._id}
                         value={values.team || []}
                         colored
                       />

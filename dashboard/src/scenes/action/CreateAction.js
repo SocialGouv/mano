@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label, Button as LinkButton } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -12,17 +12,17 @@ import SelectTeam from '../../components/SelectTeam';
 import SelectPerson from '../../components/SelectPerson';
 import ButtonCustom from '../../components/ButtonCustom';
 import { toFrenchDate } from '../../utils';
-import AuthContext from '../../contexts/auth';
-import ActionsContext, { DONE, TODO } from '../../contexts/actions';
-import RefreshContext from '../../contexts/refresh';
+import { DONE, TODO, useActions } from '../../recoil/actions';
 import SelectStatus from '../../components/SelectStatus';
+import { useAuth } from '../../recoil/auth';
+import { useRefresh } from '../../recoil/refresh';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
 
-  const { user } = useContext(AuthContext);
-  const { addAction } = useContext(ActionsContext);
-  const { loading, refreshActions } = useContext(RefreshContext);
+  const { user } = useAuth();
+  const { addAction } = useActions();
+  const { loading, actionsRefresher } = useRefresh();
   const history = useHistory();
 
   title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${toFrenchDate(completedAt)}` : '');
@@ -40,7 +40,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
   return (
     <Wrapper {...wrapperProps}>
       {!!refreshable && (
-        <LinkButton onClick={() => refreshActions()} disabled={!!loading} color="link" style={{ marginRight: 10 }}>
+        <LinkButton onClick={() => actionsRefresher()} disabled={!!loading} color="link" style={{ marginRight: 10 }}>
           Rafraichir
         </LinkButton>
       )}

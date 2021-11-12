@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Container, FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
@@ -17,7 +17,8 @@ import Comments from '../../components/Comments';
 import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import PersonsContext, {
+import {
+  usePersons,
   addressDetails,
   addressDetailsFixedFields,
   consumptionsOptions,
@@ -30,16 +31,16 @@ import PersonsContext, {
   ressourcesOptions,
   vulnerabilitiesOptions,
   yesNoOptions,
-} from '../../contexts/persons';
-import ActionsContext from '../../contexts/actions';
+} from '../../recoil/persons';
+import { useActions } from '../../recoil/actions';
 import UserName from '../../components/UserName';
 import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
 import { toFrenchDate } from '../../utils';
-import AuthContext from '../../contexts/auth';
 import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
+import { useAuth } from '../../recoil/auth';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
 
@@ -47,8 +48,8 @@ const View = () => {
   const { id } = useParams();
   const location = useLocation();
   const history = useHistory();
-  const { persons } = useContext(PersonsContext);
-  const { organisation } = useContext(AuthContext);
+  const { persons } = usePersons();
+  const { organisation } = useAuth();
   const [tabsContents, setTabsContents] = useState(initTabs);
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(
@@ -114,7 +115,7 @@ const View = () => {
 
 const Summary = ({ person }) => {
   const history = useHistory();
-  const { updatePerson, deletePerson } = useContext(PersonsContext);
+  const { updatePerson, deletePerson } = usePersons();
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
@@ -341,7 +342,7 @@ const Summary = ({ person }) => {
 };
 
 const Actions = ({ person, onUpdateResults }) => {
-  const { actions } = useContext(ActionsContext);
+  const { actions } = useActions();
   const [data, setData] = useState([]);
   const history = useHistory();
 

@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react';
-import AuthContext from '../contexts/auth';
+import React, { useState } from 'react';
+import { useRecoilValue } from 'recoil';
+import { usersState } from '../recoil/auth';
 import SelectCustom from './SelectCustom';
 
 const SelectUser = ({ value, onChange, ...props }) => {
   const [search, setSearch] = useState('');
-  const { users: allUsers } = useContext(AuthContext);
+  const allUsers = useRecoilValue(usersState);
 
   const users = search?.length ? allUsers.filter((p) => p.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) : allUsers;
 

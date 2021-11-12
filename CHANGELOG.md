@@ -1,3 +1,17 @@
+## [1.27.6](https://github.com/SocialGouv/mano/compare/v1.27.5...v1.27.6) (2021-11-12)
+
+
+### Bug Fixes
+
+* **dashboard:** state management with recoil ([#150](https://github.com/SocialGouv/mano/issues/150)) ([967a66a](https://github.com/SocialGouv/mano/commit/967a66acfdac8b53050542690ffb74cda3276b27))
+
+## [1.27.5](https://github.com/SocialGouv/mano/compare/v1.27.4...v1.27.5) (2021-11-12)
+
+
+### Bug Fixes
+
+* **api:** fixes passwords flow (reset, change, etc.) ([#156](https://github.com/SocialGouv/mano/issues/156)) ([09666ef](https://github.com/SocialGouv/mano/commit/09666efcfaa2b2a2cdd529d6361bd49cecda6785))
+
 ## [1.27.4](https://github.com/SocialGouv/mano/compare/v1.27.3...v1.27.4) (2021-11-11)
 
 

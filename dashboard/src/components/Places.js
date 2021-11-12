@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, FormGroup, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { Formik } from 'formik';
@@ -8,18 +8,18 @@ import { useHistory } from 'react-router-dom';
 
 import Box from './Box';
 import ButtonCustom from './ButtonCustom';
-import PlacesContext from '../contexts/places';
-import AuthContext from '../contexts/auth';
-import RelsPersonPlaceContext from '../contexts/relPersonPlace';
+import { usePlaces } from '../recoil/places';
 import Table from './table';
 import { toFrenchDate } from '../utils';
 import SelectCustom from './SelectCustom';
+import { useAuth } from '../recoil/auth';
+import { useRelsPerson } from '../recoil/relPersonPlace';
 
 const Places = ({ personId = '', onUpdateResults }) => {
   const history = useHistory();
 
-  const { places } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
+  const { places } = usePlaces();
+  const { relsPersonPlace } = useRelsPerson();
 
   const data = relsPersonPlace
     .filter((relation) => relation.person === personId)
@@ -61,9 +61,9 @@ const Title = styled.h1`
 
 const AddPlace = ({ personId }) => {
   const [open, setOpen] = useState(false);
-  const { currentTeam } = useContext(AuthContext);
-  const { places } = useContext(PlacesContext);
-  const { addRelation } = useContext(RelsPersonPlaceContext);
+  const { currentTeam } = useAuth();
+  const { places } = usePlaces();
+  const { addRelation } = useRelsPerson();
 
   return (
     <div style={{ marginTop: 15, marginBottom: 30 }}>

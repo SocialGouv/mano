@@ -12,46 +12,22 @@ import Page from '../../components/pagination';
 import Search from '../../components/search';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
+import CreatePerson from './CreatePerson';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import AuthContext from '../../contexts/auth';
-import { filterPersonsBase } from '../../contexts/persons';
+import { filterPersonsBase } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import PaginationContext from '../../contexts/pagination';
-import Filters, { filterData } from '../../components/Filters';
-import { filterBySearch } from '../search/utils';
+import Filters from '../../components/Filters';
 import { displayBirthDate } from '../../services/date';
-import { PersonsSelectorsContext } from '../../contexts/selectors';
-import CreatePerson from './CreatePerson';
-import PlacesContext from '../../contexts/places';
-import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
+import { personsFullSearchSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-
-const getData = (persons = [], { page, limit, search, filterTeams, filters, alertness } = {}) => {
-  // First we have to filter persons by places.
-  if (!!filters?.filter((f) => Boolean(f?.value)).length) persons = filterData(persons, filters);
-  if (search?.length) {
-    persons = filterBySearch(search, persons);
-  }
-  if (!!alertness) persons = persons.filter((p) => !!p.alertness);
-  if (filterTeams.length) {
-    persons = persons.filter((p) => {
-      for (let assignedTeam of p.assignedTeams) {
-        if (filterTeams.includes(assignedTeam)) return true;
-      }
-      return false;
-    });
-  }
-  const data = persons.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  return { data, total: persons.length };
-};
+import { useAuth } from '../../recoil/auth';
+import { usePlaces } from '../../recoil/places';
+import { useRecoilValue } from 'recoil';
 
 const List = () => {
   const [filters, setFilters] = useState([]);
-  const { places } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
-  const { personsFullPopulated } = useContext(PersonsSelectorsContext);
-  const { organisation, teams } = useContext(AuthContext);
-  const history = useHistory();
+  const { places } = usePlaces();
 
   // Add places in filters.
   const filterPersons = [
@@ -65,11 +41,16 @@ const List = () => {
 
   const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
 
+  const personsFiltered = useRecoilValue(personsFullSearchSelector({ search, filterTeams, filters, alertness }));
+  const { organisation, teams } = useAuth();
+  const history = useHistory();
+
   const limit = 20;
 
-  if (!personsFullPopulated) return <Loading />;
+  if (!personsFiltered) return <Loading />;
 
-  const { data, total } = getData(personsFullPopulated, { page, limit, search, filterTeams, alertness, filters, relsPersonPlace, places });
+  const data = personsFiltered.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
+  const total = personsFiltered.length;
 
   return (
     <Container style={{ padding: '40px 0' }}>

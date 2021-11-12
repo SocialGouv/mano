@@ -1,20 +1,20 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Col, Button, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import API from '../services/api';
-
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
-import AuthContext from '../contexts/auth';
+import useApi from '../services/api-interface-with-dashboard';
+import { useAuth } from '../recoil/auth';
 
 const DeleteOrganisation = () => {
   const [open, setOpen] = useState(false);
 
-  const { user, organisation, resetAuth } = useContext(AuthContext);
+  const { user, organisation } = useAuth();
+  const API = useApi();
 
   if (!['admin'].includes(user.role)) return null;
 
@@ -43,7 +43,7 @@ const DeleteOrganisation = () => {
                 actions.setSubmitting(false);
                 if (res.ok) {
                   toastr.success('Organisation supprimée');
-                  resetAuth();
+                  API.logout();
                 }
               } catch (organisationDeleteError) {
                 console.log('erreur in organisation delete', organisationDeleteError);

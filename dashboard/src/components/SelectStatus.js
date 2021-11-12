@@ -1,5 +1,5 @@
 import React from 'react';
-import { mappedIdsToLabels } from '../contexts/actions';
+import { mappedIdsToLabels } from '../recoil/actions';
 import SelectCustom from './SelectCustom';
 
 const SelectStatus = ({ onChange, value, name = 'status' }) => {

@@ -12,26 +12,32 @@ import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import AuthContext from '../../contexts/auth';
-import ActionsContext from '../../contexts/actions';
-import CommentsContext from '../../contexts/comments';
-import PersonsContext from '../../contexts/persons';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
-import TerritoryContext from '../../contexts/territory';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
-import RefreshContext from '../../contexts/refresh';
 import PaginationContext, { PaginationProvider } from '../../contexts/pagination';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
-import PlacesContext from '../../contexts/places';
-import { filterBySearch } from './utils';
-import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
+import { useAuth } from '../../recoil/auth';
+import { useActions } from '../../recoil/actions';
+import { usePersons } from '../../recoil/persons';
+import { useRelsPerson } from '../../recoil/relPersonPlace';
+import { territoriesState } from '../../recoil/territory';
+import { useRefresh } from '../../recoil/refresh';
+import { useRecoilValue } from 'recoil';
+import {
+  actionsSearchSelector,
+  commentsSearchSelector,
+  personsSearchSelector,
+  placesSearchSelector,
+  territoriesObservationsSearchSelector,
+  territoriesSearchSelector,
+} from '../../recoil/selectors';
+import ActionPersonName from '../../components/ActionPersonName';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
 const View = () => {
-  const { refresh } = useContext(RefreshContext);
+  const { refresh } = useRefresh();
   const { search, setSearch } = useContext(PaginationContext);
   const [tabsContents, setTabsContents] = useState(initTabs);
   const location = useLocation();
@@ -105,17 +111,8 @@ const View = () => {
 
 const Actions = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { actions } = useContext(ActionsContext);
-  const { persons } = useContext(PersonsContext);
-  const { currentTeam } = useContext(AuthContext);
 
-  const data = filterBySearch(
-    search,
-    actions?.filter((a) => a.team === currentTeam._id)
-  ).map((action) => ({
-    ...action,
-    person: persons.find((p) => p._id === action?.person),
-  }));
+  const data = useRecoilValue(actionsSearchSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -149,7 +146,7 @@ const Actions = ({ search, onUpdateResults }) => {
               },
             },
             { title: 'Nom', dataKey: 'name' },
-            { title: 'Personne suivie', dataKey: 'person', render: (action) => <span>{action.person?.name || ''}</span> },
+            { title: 'Personne suivie', dataKey: 'person', render: (action) => <ActionPersonName action={action} /> },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
@@ -169,10 +166,9 @@ const Alertness = styled.span`
 
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { persons } = useContext(PersonsContext);
-  const { teams } = useContext(AuthContext);
+  const { teams } = useAuth();
 
-  const data = filterBySearch(search, persons);
+  const data = useRecoilValue(personsSearchSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -219,15 +215,10 @@ const Persons = ({ search, onUpdateResults }) => {
 const Comments = ({ search, onUpdateResults }) => {
   const history = useHistory();
 
-  const { comments } = useContext(CommentsContext);
-  const { persons } = useContext(PersonsContext);
-  const { actions } = useContext(ActionsContext);
-  const { currentTeam } = useContext(AuthContext);
+  const { persons } = usePersons();
+  const { actions } = useActions();
 
-  const data = filterBySearch(
-    search,
-    comments?.filter((c) => c.team === currentTeam._id)
-  ).map((comment) => {
+  const data = useRecoilValue(commentsSearchSelector({ search })).map((comment) => {
     const commentPopulated = { ...comment };
     if (comment.person) {
       commentPopulated.person = persons.find((p) => p._id === comment?.person);
@@ -329,9 +320,8 @@ const Comments = ({ search, onUpdateResults }) => {
 
 const Territories = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { territories } = useContext(TerritoryContext);
 
-  const data = filterBySearch(search, territories);
+  const data = useRecoilValue(territoriesSearchSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -365,11 +355,10 @@ const Territories = ({ search, onUpdateResults }) => {
 
 const Places = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { places } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
-  const { persons } = useContext(PersonsContext);
+  const { relsPersonPlace } = useRelsPerson();
+  const { persons } = usePersons();
 
-  const data = filterBySearch(search, places);
+  const data = useRecoilValue(placesSearchSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -415,14 +404,9 @@ const Places = ({ search, onUpdateResults }) => {
 
 const TerritoryObservations = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { currentTeam } = useContext(AuthContext);
-  const { territoryObservations } = useContext(TerritoryObservationsContext);
-  const { territories } = useContext(TerritoryContext);
+  const territories = useRecoilValue(territoriesState);
 
-  const data = filterBySearch(
-    search,
-    territoryObservations?.filter((o) => o.team === currentTeam._id)
-  ).map((obs) => ({
+  const data = useRecoilValue(territoriesObservationsSearchSelector({ search })).map((obs) => ({
     ...obs,
     territory: territories.find((t) => t._id === obs.territory),
   }));
