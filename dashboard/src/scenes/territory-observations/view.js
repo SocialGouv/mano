@@ -1,11 +1,11 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { Button as CloseButton } from 'reactstrap';
-import AuthContext from '../../contexts/auth';
 import UserName from '../../components/UserName';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
+import { useTerritoryObservations } from '../../recoil/territoryObservations';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
+import { useAuth } from '../../recoil/auth';
 
 const fieldIsEmpty = (value) => {
   if (value === null) return true;
@@ -16,8 +16,8 @@ const fieldIsEmpty = (value) => {
 };
 
 const View = ({ obs, onDelete, onClick, noBorder }) => {
-  const { teams } = useContext(AuthContext);
-  const { customFieldsObs } = useContext(TerritoryObservationsContext);
+  const { teams } = useAuth();
+  const { customFieldsObs } = useTerritoryObservations();
 
   return (
     <StyledObservation noBorder={noBorder}>

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext } from 'react';
+import React from 'react';
 import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
@@ -11,16 +11,16 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
-import PlacesContext from '../../contexts/places';
-import PersonsContext from '../../contexts/persons';
-import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
+import { usePersons } from '../../recoil/persons';
+import { useRelsPerson } from '../../recoil/relPersonPlace';
+import { usePlaces } from '../../recoil/places';
 
 const View = () => {
   const { id } = useParams();
   const history = useHistory();
-  const { places, updatePlace, deletePlace } = useContext(PlacesContext);
-  const { relsPersonPlace } = useContext(RelsPersonPlaceContext);
-  const { persons } = useContext(PersonsContext);
+  const { places, updatePlace, deletePlace } = usePlaces();
+  const { relsPersonPlace } = useRelsPerson();
+  const { persons } = usePersons();
 
   const place = places.find((p) => p._id === id);
 

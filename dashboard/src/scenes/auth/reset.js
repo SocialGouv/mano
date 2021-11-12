@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import queryString from 'query-string';
 import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
-import { toastr } from 'react-redux-toastr';
 
-import API from '../../services/api';
 import ChangePassword from '../../components/ChangePassword';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const Reset = ({ location }) => {
   const [redirect, setRedirect] = useState(false);
+  const API = useApi();
 
   const { token } = queryString.parse(location.search);
 
@@ -20,7 +20,6 @@ const Reset = ({ location }) => {
       <Title>Modifiez votre mot de passe</Title>
       <ChangePassword
         onSubmit={({ newPassword }) => {
-          API.toastr = toastr;
           return API.post({
             path: '/user/forgot_password_reset',
             skipEncryption: '/user/forgot_password_reset',

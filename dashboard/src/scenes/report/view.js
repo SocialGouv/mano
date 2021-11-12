@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
@@ -18,14 +18,9 @@ import Table from '../../components/table';
 import CreateAction from '../action/CreateAction';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import AuthContext from '../../contexts/auth';
-import ActionsContext, { CANCEL, DONE } from '../../contexts/actions';
-import CommentsContext from '../../contexts/comments';
-import PersonsContext from '../../contexts/persons';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
-import TerritoryContext from '../../contexts/territory';
+import { CANCEL, DONE, useActions } from '../../recoil/actions';
+import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { capture } from '../../services/sentry';
-import ReportsContext from '../../contexts/reports';
 import UserName from '../../components/UserName';
 import ButtonCustom from '../../components/ButtonCustom';
 import Card from '../../components/Card';
@@ -33,6 +28,13 @@ import CreateObservation from '../../components/CreateObservation';
 import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionName from '../../components/ActionName';
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
+import { useAuth } from '../../recoil/auth';
+import { useComments } from '../../recoil/comments';
+import { usePersons } from '../../recoil/persons';
+import { useReports } from '../../recoil/reports';
+import { territoriesState } from '../../recoil/territory';
+import ActionPersonName from '../../components/ActionPersonName';
+import { useRecoilValue } from 'recoil';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -46,8 +48,8 @@ const getPeriodTitle = (date, nightSession) => {
 
 const View = () => {
   const { id } = useParams();
-  const { user, organisation, currentTeam } = useContext(AuthContext);
-  const { reports, deleteReport } = useContext(ReportsContext);
+  const { user, organisation, currentTeam } = useAuth();
+  const { reports, deleteReport } = useReports();
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
@@ -201,7 +203,7 @@ const View = () => {
 };
 
 const Reception = ({ report }) => {
-  const { organisation } = useContext(AuthContext);
+  const { organisation } = useAuth();
 
   if (!organisation.receptionEnabled) return null;
 
@@ -236,18 +238,13 @@ const Reception = ({ report }) => {
 
 const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const history = useHistory();
-  const { actions: allActions } = useContext(ActionsContext);
-  const { persons } = useContext(PersonsContext);
-  const { currentTeam } = useContext(AuthContext);
+  const { actions: allActions } = useActions();
+  const { currentTeam } = useAuth();
 
   const data = allActions
     ?.filter((a) => a.team === currentTeam._id)
     .filter((a) => a.status === status)
-    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0))
-    .map((action) => ({
-      ...action,
-      person: persons.find((p) => p._id === action.person),
-    }));
+    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -291,15 +288,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => (
-                <BoldOnHover
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (action.person?._id) history.push(`/person/${action.person?._id}`);
-                  }}>
-                  {action.person?.name || ''}
-                </BoldOnHover>
-              ),
+              render: (action) => <ActionPersonName action={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -314,18 +303,13 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
 const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
-  const { actions } = useContext(ActionsContext);
-  const { currentTeam } = useContext(AuthContext);
-  const { persons } = useContext(PersonsContext);
+  const { actions } = useActions();
+  const { currentTeam } = useAuth();
 
   const data = actions
     ?.filter((a) => a.team === currentTeam._id)
     .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0))
-    .map((action) => ({
-      ...action,
-      person: persons.find((p) => p._id === action.person),
-    }));
+    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -361,15 +345,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => (
-                <BoldOnHover
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    if (action.person?._id) history.push(`/person/${action.person?._id}`);
-                  }}>
-                  {action.person?.name || ''}
-                </BoldOnHover>
-              ),
+              render: (action) => <ActionPersonName action={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt) },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -381,20 +357,13 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const BoldOnHover = styled.span`
-  &:hover {
-    font-weight: bold;
-    cursor: zoom-in;
-  }
-`;
-
 const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) => {
   const history = useHistory();
 
-  const { comments } = useContext(CommentsContext);
-  const { persons } = useContext(PersonsContext);
-  const { actions } = useContext(ActionsContext);
-  const { currentTeam } = useContext(AuthContext);
+  const { comments } = useComments();
+  const { persons } = usePersons();
+  const { actions } = useActions();
+  const { currentTeam } = useAuth();
 
   const data = comments
     .filter((c) => c.team === currentTeam._id)
@@ -505,9 +474,9 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
 
-  const { currentTeam } = useContext(AuthContext);
-  const { territoryObservations } = useContext(TerritoryObservationsContext);
-  const { territories } = useContext(TerritoryContext);
+  const { currentTeam } = useAuth();
+  const territories = useRecoilValue(territoriesState);
+  const territoryObservations = useRecoilValue(territoryObservationsState);
 
   const data = territoryObservations
     .filter((o) => o.team === currentTeam._id)
@@ -558,7 +527,7 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
 };
 
 const Description = ({ report }) => {
-  const { updateReport } = useContext(ReportsContext);
+  const { updateReport } = useReports();
 
   return (
     <>

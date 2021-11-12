@@ -5,8 +5,8 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
+import { useRecoilValue } from 'recoil';
 
-import { filterBySearch } from '../search/utils';
 import Header from '../../components/header';
 import Page from '../../components/pagination';
 import { toFrenchDate } from '../../utils';
@@ -14,32 +14,27 @@ import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import AuthContext from '../../contexts/auth';
-import TerritoryContext, { territoryTypes } from '../../contexts/territory';
+import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
-import RefreshContext from '../../contexts/refresh';
 import SelectCustom from '../../components/SelectCustom';
-import { TerritoriesSelectorsContext } from '../../contexts/selectors';
-
-const filterTerritories = (territories, { page, limit, search }) => {
-  if (search?.length) territories = filterBySearch(search, territories);
-
-  const data = territories.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  return { data, total: territories.length };
-};
+import { territoriesFullSearchSelector } from '../../recoil/selectors';
+import { useAuth } from '../../recoil/auth';
+import { useRefresh } from '../../recoil/refresh';
 
 const List = () => {
-  const { territoriesFullPopulated } = useContext(TerritoriesSelectorsContext);
-  const { organisation } = useContext(AuthContext);
+  const { organisation } = useAuth();
   const history = useHistory();
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
 
+  const territories = useRecoilValue(territoriesFullSearchSelector({ search }));
+
   const limit = 20;
 
-  if (!territoriesFullPopulated) return <Loading />;
+  if (!territories) return <Loading />;
 
-  const { data, total } = filterTerritories(territoriesFullPopulated, { page, limit, search });
+  const data = territories.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
+  const total = territories.length;
 
   return (
     <Container style={{ padding: '40px 0' }}>
@@ -74,13 +69,13 @@ const List = () => {
 const CreateTerritory = () => {
   const [open, setOpen] = useState(false);
   const history = useHistory();
-  const { currentTeam } = useContext(AuthContext);
-  const { addTerritory } = useContext(TerritoryContext);
-  const { refreshTerritories, loading } = useContext(RefreshContext);
+  const { currentTeam } = useAuth();
+  const { addTerritory } = useTerritories();
+  const { territoriesRefresher, loading } = useRefresh();
 
   return (
     <CreateStyle>
-      <LinkButton disabled={!!loading} onClick={() => refreshTerritories()} color="link" style={{ marginRight: 10 }}>
+      <LinkButton disabled={!!loading} onClick={() => territoriesRefresher()} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
       <ButtonCustom

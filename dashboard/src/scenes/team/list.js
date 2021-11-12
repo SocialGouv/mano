@@ -1,10 +1,8 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
-
-import API from '../../services/api';
 
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -12,11 +10,13 @@ import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
 
 import { toFrenchDate } from '../../utils';
-import AuthContext from '../../contexts/auth';
 import NightSessionModale from '../../components/NightSessionModale';
+import { currentTeamState, organisationState, teamsState, useAuth, userState } from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 const List = () => {
-  const { teams } = useContext(AuthContext);
+  const { teams } = useAuth();
   const history = useHistory();
 
   return (
@@ -30,7 +30,6 @@ const List = () => {
         columns={[
           { title: 'Nom', dataKey: 'name' },
           { title: 'Créée le', dataKey: 'createdAt', render: (i) => toFrenchDate(i.createdAt) },
-          { title: 'Organisation', dataKey: 'Organisation', render: (i) => i.Organisation.name || '' },
           {
             title: (
               <>
@@ -50,8 +49,12 @@ const List = () => {
 //Organisation
 
 const Create = () => {
-  const { organisation, setAuth, teams, user, setCurrentTeam } = useContext(AuthContext);
+  const [teams, setTeams] = useRecoilState(teamsState);
+  const [user, setUser] = useRecoilState(userState);
+  const organisation = useRecoilValue(organisationState);
+  const setCurrentTeam = useSetRecoilState(currentTeamState);
   const [open, setOpen] = useState(!teams.length);
+  const API = useApi();
 
   const onboardingForTeams = !teams.length;
 
@@ -73,7 +76,7 @@ const Create = () => {
                 const userPutRes = await API.put({ path: `/user/${user._id}`, body: { team: [newTeamRes.data._id] } });
                 if (!userPutRes.ok) return actions.setSubmitting(false);
                 const meResponse = await API.get({ path: '/user/me' });
-                setAuth({ user: meResponse.user });
+                setUser(meResponse.user);
                 setCurrentTeam(meResponse.user.teams[0]);
                 toastr.success('Création réussie !', `Vous êtes dans l'équipe ${newTeamRes.data.name}`);
               } else {
@@ -81,7 +84,7 @@ const Create = () => {
               }
               actions.setSubmitting(false);
               const { data: teams } = await API.get({ path: '/team' });
-              setAuth({ teams });
+              setTeams(teams);
               setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => {

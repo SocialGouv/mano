@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
@@ -8,37 +8,23 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 
 import Box from './Box';
-import CommentsContext from '../contexts/comments';
 import ButtonCustom from '../components/ButtonCustom';
 import UserName from './UserName';
 import SelectUser from './SelectUser';
 import { theme } from '../config';
 import Loading from './loading';
 import { Formik } from 'formik';
-import AuthContext from '../contexts/auth';
+import { useAuth } from '../recoil/auth';
+import { useComments } from '../recoil/comments';
+import { useRecoilValue } from 'recoil';
+import { commentsFilteredSelector } from '../recoil/selectors';
 
 const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
-  const [comments, setComments] = useState([]);
-  const commentsContext = useContext(CommentsContext);
+  const { deleteComment, addComment, updateComment, loading } = useComments();
 
-  useEffect(() => {
-    if (!personId && !actionId) return;
-    setComments(
-      commentsContext.comments
-        .filter((c) => {
-          if (!!personId) return c.person === personId;
-          if (!!actionId) return c.action === actionId;
-          return false;
-        })
-        .filter((c) => {
-          const commentIsPassage = c?.comment?.includes('Passage enregistré');
-          if (forPassages) return commentIsPassage;
-          return !commentIsPassage;
-        })
-    );
-  }, [commentsContext.comments, personId, actionId, forPassages]);
+  const comments = useRecoilValue(commentsFilteredSelector({ personId, actionId, forPassages }));
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(comments.length);
@@ -47,7 +33,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
   const deleteData = async (id) => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await commentsContext.deleteComment(id);
+      const res = await deleteComment(id);
       if (!res.ok) return;
       toastr.success('Suppression réussie');
     }
@@ -65,14 +51,14 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
       commentBody.action = actionId;
       commentBody.type = 'action';
     }
-    const res = await commentsContext.addComment(commentBody);
+    const res = await addComment(commentBody);
     if (!res.ok) return;
     toastr.success('Commentaire ajouté !');
     setClearNewCommentKey((k) => k + 1);
   };
 
   const updateData = async (comment) => {
-    const res = await commentsContext.updateComment(comment);
+    const res = await updateComment(comment);
     if (!res.ok) return;
     toastr.success('Commentaire mis-à-jour');
     setEditing(null);
@@ -86,7 +72,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
         </Col>
       </Row>
       <Box>
-        {!comments.length && !!commentsContext.loading ? (
+        {!comments.length && !!loading ? (
           <Loading />
         ) : (
           <>
@@ -116,7 +102,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
                 </StyledComment>
               );
             })}
-            {!!commentsContext.loading && <Loading />}
+            {!!loading && <Loading />}
           </>
         )}
       </Box>
@@ -132,7 +118,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
 };
 
 const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment, forPassages }) => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {

@@ -1,4 +1,5 @@
-import React, { useState, useContext, useEffect } from 'react';
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useState, useEffect } from 'react';
 import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
 import validator from 'validator';
@@ -6,17 +7,33 @@ import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { version } from '../../../package.json';
-import API from '../../services/api';
-import AuthContext from '../../contexts/auth';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
-import RefreshContext from '../../contexts/refresh';
 import PasswordInput from '../../components/PasswordInput';
+import { currentTeamState, organisationState, teamsState, useAuth, usersState, userState } from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
+import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+
+/*
+TODO:
+index.js:1 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
+    at SignIn (http://localhost:8083/static/js/main.chunk.js:19285:68)
+    at Route (http://localhost:8083/static/js/vendors~main.chunk.js:262392:29)
+    at Switch (http://localhost:8083/static/js/vendors~main.chunk.js:262594:29)
+    at Router
+    at Route (http://localhost:8083/static/js/vendors~main.chunk.js:262392:29)
+
+*/
 
 const SignIn = () => {
-  const { setAuth, setCurrentTeam, resetAuth, user, organisation } = useContext(AuthContext);
-  const rc = useContext(RefreshContext);
+  const { refresh } = useRefresh();
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const setCurrentTeam = useSetRecoilState(currentTeamState);
+  const setTeams = useSetRecoilState(teamsState);
+  const setUsers = useSetRecoilState(usersState);
+  const [user, setUser] = useRecoilState(userState);
   const history = useHistory();
   const [showErrors, setShowErrors] = useState(false);
   const [userName, setUserName] = useState(false);
@@ -25,20 +42,24 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authViaCookie, setAuthViaCookie] = useState(false);
+  const API = useApi();
 
-  const onSigninValidated = ({ organisation }) => {
+  // temporary migration : until all organisations have an `encryptedVerificationKey`
+  const setEncryptionVerificationKey = async (organisation, user) => {
+    if (!organisation.encryptionEnabled) return;
+    if (!organisation.encryptedVerificationKey && ['admin'].includes(user.role)) {
+      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
+      const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
+      if (orgRes.ok) setOrganisation(orgRes.data);
+    }
+  };
+
+  const onSigninValidated = async (organisation, user) => {
+    refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation, user));
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
       history.push('/');
-    }
-  };
-
-  const setEncryptionVerificationKey = async (organisation) => {
-    if (!!organisation.encryptionEnabled && !organisation.encryptedVerificationKey) {
-      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
-      const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
-      if (orgRes.ok) setAuth({ organisation: orgRes.data });
     }
   };
 
@@ -62,7 +83,7 @@ const SignIn = () => {
         setAuthViaCookie(true);
         setUserName(user.name);
         const { organisation } = user;
-        API.organisation = organisation;
+        setOrganisation(organisation);
         if (!!organisation.encryptionEnabled) setShowEncryption(true);
       }
 
@@ -83,8 +104,7 @@ const SignIn = () => {
               title={team.name}
               onClick={() => {
                 setCurrentTeam(team);
-                rc.refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
-                onSigninValidated(user);
+                onSigninValidated(organisation, user);
               }}
             />
           ))}
@@ -104,7 +124,6 @@ const SignIn = () => {
               email: values.email,
               password: values.password,
             };
-            API.toastr = toastr;
             const { user, token, ok } = authViaCookie
               ? await API.get({
                   path: '/user/signin-token',
@@ -116,14 +135,13 @@ const SignIn = () => {
                   body,
                 });
             if (!ok) return actions.setSubmitting(false);
-            API.init({ resetAuth, history, toastr });
             const { organisation } = user;
             if (!!organisation.encryptionEnabled && !showEncryption) {
               setShowEncryption(true);
               return actions.setSubmitting(false);
             }
-            if (token) API.token = token;
-            API.organisation = organisation;
+            if (token) API.setToken(token);
+            setOrganisation(organisation);
             if (!!values.orgEncryptionKey) {
               const encryptionIsValid = await API.setOrgEncryptionKey(values.orgEncryptionKey.trim());
               if (!encryptionIsValid) return;
@@ -132,14 +150,15 @@ const SignIn = () => {
             const teams = teamResponse.data;
             const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
             const users = usersResponse.data;
-            setAuth({ teams, users, user, organisation });
+            setTeams(teams);
+            setUsers(users);
+            setUser(user);
             actions.setSubmitting(false);
             if (['superadmin'].includes(user.role)) {
               history.push('/organisation');
             } else if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
-              onSigninValidated(user);
-              rc.refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation));
+              onSigninValidated(organisation, user);
             } else if (!teams.length) {
               history.push('/team');
             } else {

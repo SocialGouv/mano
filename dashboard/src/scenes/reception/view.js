@@ -1,34 +1,36 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useContext, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import Header from '../../components/header';
 
-import AuthContext from '../../contexts/auth';
-import ReportsContext from '../../contexts/reports';
 import { today } from '../../services/date';
-import { ActionsByStatusContext, ReportsSelectorsContext } from '../../contexts/selectors';
+import { actionsByStatusSelector, lastReportSelector, todaysReportSelector } from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
 import CreateAction from '../action/CreateAction';
 import SelectAndCreatePerson from './SelectAndCreatePerson';
 import ButtonCustom from '../../components/ButtonCustom';
-import PersonsContext from '../../contexts/persons';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectStatus from '../../components/SelectStatus';
-import { TODO } from '../../contexts/actions';
+import { TODO } from '../../recoil/actions';
+import { useAuth } from '../../recoil/auth';
+import { usePersons } from '../../recoil/persons';
+import { useReports } from '../../recoil/reports';
+import { useRecoilValue } from 'recoil';
 
 const Reception = () => {
-  const { currentTeam, organisation } = useContext(AuthContext);
-  const { loading: reportsLoading, addReport, updateReport, incrementPassage } = useContext(ReportsContext);
-  const { actionsByStatus } = useContext(ActionsByStatusContext);
-  const { todaysReport, lastReport } = useContext(ReportsSelectorsContext);
+  const { currentTeam, organisation } = useAuth();
+  const { loading: reportsLoading, addReport, updateReport, incrementPassage } = useReports();
   const [status, setStatus] = useState(TODO);
+  const actionsByStatus = useRecoilValue(actionsByStatusSelector(status));
+  const todaysReport = useRecoilValue(todaysReportSelector);
+  const lastReport = useRecoilValue(lastReportSelector);
 
-  const { persons } = useContext(PersonsContext);
+  const { persons } = usePersons();
   const history = useHistory();
   const location = useLocation();
 
@@ -45,10 +47,10 @@ const Reception = () => {
     return params.map((id) => persons.find((p) => p._id === id));
   });
 
-  const createReport = async () => addReport(today(), currentTeam._id);
+  const createReport = () => addReport(today(), currentTeam._id);
 
   useEffect(() => {
-    if (!reportsLoading && !todaysReport && !!currentTeam._id) createReport();
+    if (!reportsLoading && !todaysReport && !!currentTeam?._id) createReport();
   }, [reportsLoading, currentTeam?._id]);
 
   const services = todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {};

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import XLSX from 'xlsx';
@@ -9,8 +9,7 @@ import Header from '../../components/header';
 
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
-import AuthContext from '../../contexts/auth';
-import PersonsContext, {
+import {
   consumptionsOptions,
   healthInsuranceOptions,
   nationalitySituationOptions,
@@ -19,18 +18,22 @@ import PersonsContext, {
   ressourcesOptions,
   vulnerabilitiesOptions,
   filterPersonsBase,
-} from '../../contexts/persons';
-import ActionsContext from '../../contexts/actions';
-import CommentsContext from '../../contexts/comments';
-import TerritoryContext from '../../contexts/territory';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
-import PlacesContext from '../../contexts/places';
+  personsState,
+  usePersons,
+} from '../../recoil/persons';
+import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
-import ReportsContext from '../../contexts/reports';
-import RefreshContext from '../../contexts/refresh';
 import Card from '../../components/Card';
+import { useAuth } from '../../recoil/auth';
+import { commentsState } from '../../recoil/comments';
+import { actionsState, useActions } from '../../recoil/actions';
+import { placesState } from '../../recoil/places';
+import { reportsState } from '../../recoil/reports';
+import { territoriesState } from '../../recoil/territory';
+import { useRefresh } from '../../recoil/refresh';
+import { useRecoilValue } from 'recoil';
 moment.locale('fr');
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
@@ -92,15 +95,18 @@ const createSheet = (data) => {
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
 
 const Stats = () => {
-  const { teams, organisation, user, currentTeam } = useContext(AuthContext);
-  const { persons: allPersons, loading: personsLoading } = useContext(PersonsContext);
-  const { refresh } = useContext(RefreshContext);
-  const { actions: allActions, loading: actionsLoading } = useContext(ActionsContext);
-  const { comments } = useContext(CommentsContext);
-  const { reports: allreports } = useContext(ReportsContext);
-  const { territories } = useContext(TerritoryContext);
-  const { territoryObservations: allObservations, customFieldsObs } = useContext(TerritoryObservationsContext);
-  const { places } = useContext(PlacesContext);
+  const { teams, organisation, user, currentTeam } = useAuth();
+  const { loading: personsLoading } = usePersons();
+  const allPersons = useRecoilValue(personsState);
+  const { loading: actionsLoading } = useActions();
+  const allActions = useRecoilValue(actionsState);
+  const comments = useRecoilValue(commentsState);
+  const allreports = useRecoilValue(reportsState);
+  const territories = useRecoilValue(territoriesState);
+  const allObservations = useRecoilValue(territoryObservationsState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const places = useRecoilValue(placesState);
+  const { refresh } = useRefresh();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);

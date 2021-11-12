@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { toastr } from 'react-redux-toastr';
 import SelectCustom from '../../components/SelectCustom';
-import AuthContext from '../../contexts/auth';
-import API from '../../services/api';
+import { useAuth } from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const NoOptionsMessage = () => (
   <span style={{ fontSize: 14, textAlign: 'center', color: '#808080', width: '100%', display: 'block' }}>
@@ -11,7 +11,8 @@ const NoOptionsMessage = () => (
 );
 
 const SelectAndCreateCollaboration = ({ values, onChange }) => {
-  const { organisation, setAuth } = useContext(AuthContext);
+  const { organisation, setOrganisation } = useAuth();
+  const API = useApi();
 
   const onChangeRequest = (newCollabs) => {
     onChange({ currentTarget: { value: newCollabs || [], name: 'collaborations' } });
@@ -28,7 +29,7 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
     if (response.ok) {
       toastr.clean();
       toastr.success('Collaboration créée !');
-      setAuth({ organisation: response.data });
+      setOrganisation(response.data);
       onChangeRequest([...(organisation.collaborations || []), collab]);
     } else {
       onChangeRequest(organisation.collaborations || []);

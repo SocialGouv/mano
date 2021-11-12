@@ -1,21 +1,22 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Document, Page } from 'react-pdf';
-import AuthContext from '../../contexts/auth';
 import ButtonCustom from '../../components/ButtonCustom';
 import charte from '../../assets/charte.pdf';
-import API from '../../services/api';
+import { useAuth } from '../../recoil/auth';
+import useApi from '../../services/api-interface-with-dashboard';
 
 const Charte = () => {
   const [loading, setLoading] = useState(false);
-  const { setAuth, user } = useContext(AuthContext);
+  const { setUser, user } = useAuth();
+  const API = useApi();
 
   const onSigninValidated = async () => {
     setLoading(true);
     const termsAccepted = Date.now();
     const response = await API.put({ path: '/user', body: { termsAccepted } });
     if (!response.ok) return;
-    setAuth({ user: { ...user, termsAccepted } });
+    setUser({ ...user, termsAccepted });
   };
 
   return (

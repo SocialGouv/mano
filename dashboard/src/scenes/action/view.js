@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext } from 'react';
+import React from 'react';
 import { Container, Row, Col, FormGroup, Input, Label } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
@@ -16,17 +16,17 @@ import Box from '../../components/Box';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import Comments from '../../components/Comments';
-import AuthContext from '../../contexts/auth';
-import ActionsContext, { CANCEL, DONE } from '../../contexts/actions';
 import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
 import SelectCustom from '../../components/SelectCustom';
+import { useAuth } from '../../recoil/auth';
+import { useActions, CANCEL, DONE } from '../../recoil/actions';
 
 const View = () => {
   const { id } = useParams();
-  const { organisation } = useContext(AuthContext);
-  const { deleteAction, updateAction, actions, refreshActions } = useContext(ActionsContext);
+  const { organisation } = useAuth();
+  const { deleteAction, updateAction, actions, refreshActions } = useActions();
   const history = useHistory();
 
   const action = actions.find((a) => a._id === id);
@@ -43,7 +43,7 @@ const View = () => {
     }
   };
 
-  const catsSelect = (organisation.categories || []).sort((c1, c2) => c1.localeCompare(c2));
+  const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
 
   return (
     <Container style={{ padding: '40px 0' }}>

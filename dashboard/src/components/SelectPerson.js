@@ -1,10 +1,10 @@
-import React, { useContext } from 'react';
+import React from 'react';
 import { Label } from 'reactstrap';
-import PersonsContext from '../contexts/persons';
+import { usePersons } from '../recoil/persons';
 import SelectCustom from './SelectCustom';
 
 const SelectPerson = ({ value = '', onChange, isMulti = false, noLabel = false, ...props }) => {
-  const { persons } = useContext(PersonsContext);
+  const { persons } = usePersons();
 
   return (
     <>
