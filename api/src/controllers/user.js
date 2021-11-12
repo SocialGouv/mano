@@ -71,7 +71,6 @@ router.post(
 
     const { password: expectedPassword } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
 
-    // const match = process.env.NODE_ENV === "development" || (await comparePassword(password, user.password));
     const match = await comparePassword(password, expectedPassword);
     if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
     user.lastLoginAt = new Date();
@@ -110,9 +109,13 @@ router.get(
 router.post(
   "/forgot_password",
   catchErrors(async ({ body: { email } }, res, cta) => {
+    if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
+
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
-    if (!user.password)
+
+    const { password } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
+    if (!password)
       return res.status(403).send({ ok: false, error: "Compte inactif, veuillez contacter l'administrateur", code: ACOUNT_NOT_ACTIVATED });
 
     const token = crypto.randomBytes(20).toString("hex");
@@ -141,11 +144,12 @@ router.post(
     const user = await User.findOne({ where: { forgotPasswordResetToken: token, forgotPasswordResetExpires: { [Op.gte]: new Date() } } });
 
     if (!user) return res.status(400).send({ ok: false, error: "Le lien est non valide ou expiré" });
-    user.password = password;
-    user.forgotPasswordResetToken = null;
-    user.forgotPasswordResetExpires = null;
-    user.lastChangePasswordAt = Date.now();
-
+    user.set({
+      password: password,
+      forgotPasswordResetToken: null,
+      forgotPasswordResetExpires: null,
+      lastChangePasswordAt: Date.now(),
+    });
     await user.save();
     return res.status(200).send({ ok: true });
   })
@@ -208,14 +212,20 @@ router.post(
 
     const user = await User.findOne({ where: { _id } });
 
-    const auth = await comparePassword(password, user.password);
+    const { password: expectedPassword } = await User.scope("withPassword").findOne({ where: { _id }, attributes: ["password"] });
+
+    const auth = await comparePassword(password, expectedPassword);
     if (!auth) return res.status(403).send({ ok: false, error: "Mot de passe incorrect", code: "Mot de passe incorrect" });
 
-    user.password = newPassword;
-    user.lastChangePasswordAt = Date.now();
+    user.set({
+      password: newPassword,
+      lastChangePasswordAt: Date.now(),
+    });
     await user.save();
 
-    return res.status(200).send({ ok: true, user });
+    const userWithoutPassword = await User.findOne({ where: { _id } });
+
+    return res.status(200).send({ ok: true, user: userWithoutPassword });
   })
 );
 
