@@ -53,6 +53,7 @@ const View = () => {
 
   const renderContent = () => {
     if (!search) return 'Pas de recherche, pas de résultat !';
+    if (search.length < 3) return 'Recherche trop courte (moins de 3 caractères), pas de résultat !';
     return (
       <>
         <Nav tabs fill style={{ marginBottom: 20 }}>

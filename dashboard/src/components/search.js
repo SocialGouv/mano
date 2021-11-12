@@ -10,7 +10,7 @@ const Search = React.forwardRef(({ value = '', onChange = Function.prototype, pl
     clearTimeout(searchDebounce.current);
     searchDebounce.current = setTimeout(() => {
       if (value !== cachedValue) onChange(cachedValue);
-    }, 250);
+    }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cachedValue]);
 
