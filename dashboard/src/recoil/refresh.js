@@ -53,7 +53,6 @@ export const useRefresh = () => {
 
   const getTotal = async (initialLoad = false) => {
     setLoading('Chargement...');
-    console.log({ organisationId });
     const response = await API.get({
       path: '/public/stats',
       query: { organisation: organisationId, lastRefresh },

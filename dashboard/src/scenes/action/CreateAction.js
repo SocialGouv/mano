@@ -57,6 +57,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
         <ModalBody>
           <Formik
             initialValues={{
+              name: '',
               person: isMulti ? persons : person,
               team: null,
               dueAt: !!completedAt ? new Date(completedAt) : new Date(),
