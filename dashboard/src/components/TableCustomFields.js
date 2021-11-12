@@ -73,12 +73,12 @@ const TableCustomFields = ({ data, customFields }) => {
     try {
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { [customFields]: JSON.stringify(newData) },
+        body: { [customFields]: newData },
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
         setOrganisation(response.data);
-        setMutableData(JSON.parse(response.data[customFields]));
+        setMutableData(response.data[customFields]);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
