@@ -13,6 +13,7 @@ import PasswordInput from '../../components/PasswordInput';
 import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 import { useRefresh } from '../../recoil/refresh';
+import { encryptVerificationKey } from '../../services/encryption';
 
 const SignIn = () => {
   const { setOrganisation, setTeams, setUsers, setUser, setCurrentTeam, user, organisation } = useAuth();
@@ -27,8 +28,17 @@ const SignIn = () => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const API = useApi();
 
-  const onSigninValidated = async () => {
-    refresh({ initialLoad: true, showFullScreen: true });
+  // temporary migration : until all organisations have an `encryptedVerificationKey`
+  const setEncryptionVerificationKey = async (organisation, user) => {
+    if (!organisation.encryptedVerificationKey && ['admin'].includes(user.role)) {
+      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
+      const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
+      if (orgRes.ok) setOrganisation(orgRes.data);
+    }
+  };
+
+  const onSigninValidated = async (organisation, user) => {
+    refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation, user));
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
@@ -77,7 +87,7 @@ const SignIn = () => {
               title={team.name}
               onClick={() => {
                 setCurrentTeam(team);
-                onSigninValidated();
+                onSigninValidated(organisation, user);
               }}
             />
           ))}
@@ -131,7 +141,7 @@ const SignIn = () => {
               history.push('/organisation');
             } else if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
-              onSigninValidated();
+              onSigninValidated(organisation, user);
             } else if (!teams.length) {
               history.push('/team');
             } else {
