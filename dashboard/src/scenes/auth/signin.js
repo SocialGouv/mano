@@ -15,6 +15,17 @@ import useApi from '../../services/api-interface-with-dashboard';
 import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
 
+/*
+TODO:
+index.js:1 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
+    at SignIn (http://localhost:8083/static/js/main.chunk.js:19285:68)
+    at Route (http://localhost:8083/static/js/vendors~main.chunk.js:262392:29)
+    at Switch (http://localhost:8083/static/js/vendors~main.chunk.js:262594:29)
+    at Router
+    at Route (http://localhost:8083/static/js/vendors~main.chunk.js:262392:29)
+
+*/
+
 const SignIn = () => {
   const { setOrganisation, setTeams, setUsers, setUser, setCurrentTeam, user, organisation } = useAuth();
   const { refresh } = useRefresh();
