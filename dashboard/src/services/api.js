@@ -234,7 +234,7 @@ const useApiService = ({
     setSendCaptureError(0);
     setWrongKeyWarned(false);
     setBlockEncrypt(false);
-    return true;
+    return newHashedOrgEncryptionKey;
   };
 
   const get = async (args) => {

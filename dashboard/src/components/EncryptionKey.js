@@ -62,14 +62,14 @@ const EncryptionKey = () => {
       if (!values.encryptionKeyConfirm) return toastr.error('Erreur!', 'La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
       setEncryptionKey(values.encryptionKey.trim());
-      await API.setOrgEncryptionKey(values.encryptionKey.trim());
+      const hashedOrgEncryptionKey = await API.setOrgEncryptionKey(values.encryptionKey.trim());
       capture('debug: setting encryption key', {
-        extra: { orgEncryptionKey: values.encryptionKey.trim(), hashedOrgEncryptionKey: API.hashedOrgEncryptionKey, organisation },
+        extra: { orgEncryptionKey: values.encryptionKey.trim(), hashedOrgEncryptionKey, organisation },
         user,
       });
 
       setEncryptingStatus('Chiffrement des données...');
-      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
+      const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
       const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(API.encryptItem));
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(API.encryptItem));
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(API.encryptItem));
