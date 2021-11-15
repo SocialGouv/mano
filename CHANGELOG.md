@@ -1,3 +1,10 @@
+## [1.28.3](https://github.com/SocialGouv/mano/compare/v1.28.2...v1.28.3) (2021-11-15)
+
+
+### Bug Fixes
+
+* fix org key ([#159](https://github.com/SocialGouv/mano/issues/159)) ([e6de84f](https://github.com/SocialGouv/mano/commit/e6de84fd51ff5b55e376d323f797c54e57fca7d3))
+
 ## [1.28.2](https://github.com/SocialGouv/mano/compare/v1.28.1...v1.28.2) (2021-11-12)
 
 
