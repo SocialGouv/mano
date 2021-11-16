@@ -1,3 +1,10 @@
+## [1.28.7](https://github.com/SocialGouv/mano/compare/v1.28.6...v1.28.7) (2021-11-16)
+
+
+### Bug Fixes
+
+* fix observation as JSON ([#161](https://github.com/SocialGouv/mano/issues/161)) ([412948c](https://github.com/SocialGouv/mano/commit/412948c16260581bcb50bc07520bbc48a0aaa597))
+
 ## [1.28.6](https://github.com/SocialGouv/mano/compare/v1.28.5...v1.28.6) (2021-11-16)
 
 
