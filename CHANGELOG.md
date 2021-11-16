@@ -1,3 +1,10 @@
+## [1.28.6](https://github.com/SocialGouv/mano/compare/v1.28.5...v1.28.6) (2021-11-16)
+
+
+### Bug Fixes
+
+* customFields as object not string ([#158](https://github.com/SocialGouv/mano/issues/158)) ([55db0aa](https://github.com/SocialGouv/mano/commit/55db0aaa7aebf99a1fbc15563918ead97239e124))
+
 ## [1.28.5](https://github.com/SocialGouv/mano/compare/v1.28.4...v1.28.5) (2021-11-16)
 
 
