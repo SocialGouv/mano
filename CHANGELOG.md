@@ -1,3 +1,10 @@
+## [1.28.5](https://github.com/SocialGouv/mano/compare/v1.28.4...v1.28.5) (2021-11-16)
+
+
+### Bug Fixes
+
+* **dashboard:** action list filtered ([#160](https://github.com/SocialGouv/mano/issues/160)) ([6883fed](https://github.com/SocialGouv/mano/commit/6883fedd0a6c4040d7b6f1c713773daa0c429a33))
+
 ## [1.28.4](https://github.com/SocialGouv/mano/compare/v1.28.3...v1.28.4) (2021-11-16)
 
 
