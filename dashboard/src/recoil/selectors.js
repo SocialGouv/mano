@@ -191,7 +191,7 @@ export const actionsFullSearchSelector = selectorFamily({
   get:
     ({ status, search = '' }) =>
     ({ get }) => {
-      const actions = get(actionsState);
+      const actions = get(actionsForCurrentTeamSelector);
       let actionsFiltered = actions;
       if (status) actionsFiltered = actionsFiltered.filter((a) => a.status === status);
       if (search?.length) {
