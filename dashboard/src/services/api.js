@@ -18,6 +18,22 @@ const sendCaptureErrorState = atom({ key: 'sendCaptureErrorState', default: 0 })
 const wrongKeyWarnedState = atom({ key: 'wrongKeyWarnedState', default: false });
 const blockEncryptState = atom({ key: 'blockEncryptState', default: false });
 
+export const encryptItem =
+  (hashedOrgEncryptionKey, enableEncrypt = true) =>
+  async (item) => {
+    if (!enableEncrypt) return item;
+    if (item.decrypted) {
+      if (!item.entityKey) item.entityKey = await generateEntityKey();
+      const { encryptedContent, encryptedEntityKey } = await encrypt(JSON.stringify(item.decrypted), item.entityKey, hashedOrgEncryptionKey);
+
+      item.encrypted = encryptedContent;
+      item.encryptedEntityKey = encryptedEntityKey;
+      delete item.decrypted;
+      delete item.entityKey;
+    }
+    return item;
+  };
+
 const useApiService = ({
   handleError,
   handleBlockEncrypt,
@@ -77,7 +93,7 @@ const useApiService = ({
       };
       if (body) {
         if (!skipEncryption) {
-          options.body = JSON.stringify(await encryptItem(body));
+          options.body = JSON.stringify(await encryptItem(hashedOrgEncryptionKey, enableEncrypt)(body));
         } else {
           options.body = JSON.stringify(body);
         }
@@ -149,20 +165,6 @@ const useApiService = ({
     }
   };
 
-  const encryptItem = async (item) => {
-    if (!enableEncrypt) return item;
-    if (item.decrypted) {
-      if (!item.entityKey) item.entityKey = await generateEntityKey();
-      const { encryptedContent, encryptedEntityKey } = await encrypt(JSON.stringify(item.decrypted), item.entityKey, hashedOrgEncryptionKey);
-
-      item.encrypted = encryptedContent;
-      item.encryptedEntityKey = encryptedEntityKey;
-      delete item.decrypted;
-      delete item.entityKey;
-    }
-    return item;
-  };
-
   const decryptDBItem = async (item, { debug = false } = {}) => {
     if (wrongKeyWarned) return item;
     if (!enableEncrypt) return item;
@@ -216,17 +218,19 @@ const useApiService = ({
     return item;
   };
 
-  const setOrgEncryptionKey = async (orgEncryptionKey) => {
+  const setOrgEncryptionKey = async (orgEncryptionKey, isNew = false) => {
     const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
-    setHashedOrgEncryptionKey(newHashedOrgEncryptionKey);
-    const { encryptedVerificationKey } = organisation;
-    if (!encryptedVerificationKey) {
-      capture('encryptedVerificationKey not setup yet', { extra: { organisation: organisation } });
-    } else {
-      const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
-      if (!encryptionKeyIsValid) {
-        handleWrongKey?.();
-        return false;
+    if (!isNew) {
+      setHashedOrgEncryptionKey(newHashedOrgEncryptionKey);
+      const { encryptedVerificationKey } = organisation;
+      if (!encryptedVerificationKey) {
+        capture('encryptedVerificationKey not setup yet', { extra: { organisation: organisation } });
+      } else {
+        const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
+        if (!encryptionKeyIsValid) {
+          handleWrongKey?.();
+          return false;
+        }
       }
     }
     setEnableEncrypt(true);
@@ -277,7 +281,6 @@ const useApiService = ({
     hashedOrgEncryptionKey,
     get,
     reset,
-    encryptItem,
     decryptDBItem,
     logout,
     post,

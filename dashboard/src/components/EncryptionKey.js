@@ -21,6 +21,7 @@ import { capture } from '../services/sentry';
 import useApi from '../services/api-interface-with-dashboard';
 import { useRefresh } from '../recoil/refresh';
 import { useRecoilValue } from 'recoil';
+import { encryptItem } from '../services/api';
 
 const EncryptionKey = () => {
   const [open, setOpen] = useState(false);
@@ -62,7 +63,7 @@ const EncryptionKey = () => {
       if (!values.encryptionKeyConfirm) return toastr.error('Erreur!', 'La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
       setEncryptionKey(values.encryptionKey.trim());
-      const hashedOrgEncryptionKey = await API.setOrgEncryptionKey(values.encryptionKey.trim());
+      const hashedOrgEncryptionKey = await API.setOrgEncryptionKey(values.encryptionKey.trim(), true);
       capture('debug: setting encryption key', {
         extra: { orgEncryptionKey: values.encryptionKey.trim(), hashedOrgEncryptionKey, organisation },
         user,
@@ -70,14 +71,18 @@ const EncryptionKey = () => {
 
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
-      const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(API.encryptItem));
-      const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(API.encryptItem));
-      const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(API.encryptItem));
-      const encryptedTerritories = await Promise.all(territories.map(prepareTerritoryForEncryption).map(API.encryptItem));
-      const encryptedTerritoryObservations = await Promise.all(observations.map(prepareObsForEncryption(customFieldsObs)).map(API.encryptItem));
-      const encryptedPlaces = await Promise.all(places.map(preparePlaceForEncryption).map(API.encryptItem));
-      const encryptedRelsPersonPlace = await Promise.all(relsPersonPlace.map(prepareRelPersonPlaceForEncryption).map(API.encryptItem));
-      const encryptedReports = await Promise.all(reports.map(prepareReportForEncryption).map(API.encryptItem));
+      const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedTerritories = await Promise.all(territories.map(prepareTerritoryForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedTerritoryObservations = await Promise.all(
+        observations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem(hashedOrgEncryptionKey))
+      );
+      const encryptedPlaces = await Promise.all(places.map(preparePlaceForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedRelsPersonPlace = await Promise.all(
+        relsPersonPlace.map(prepareRelPersonPlaceForEncryption).map(encryptItem(hashedOrgEncryptionKey))
+      );
+      const encryptedReports = await Promise.all(reports.map(prepareReportForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
 
       setEncryptingStatus(
         'Sauvegarde des données nouvellement chiffrées en base de donnée. Ne fermez pas votre fenêtre, cela peut prendre quelques minutes...'
