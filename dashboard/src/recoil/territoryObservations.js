@@ -18,7 +18,10 @@ export const customFieldsObsSelector = selector({
   key: 'customFieldsObsSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
-    return typeof organisation.customFieldsObs === 'string' ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields;
+    if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
+    // It should not be a string but required for legacy reasons.
+    else if (typeof organisation.customFieldsObs === 'string') return JSON.parse(organisation.customFieldsObs);
+    return defaultCustomFields;
   },
 });
 

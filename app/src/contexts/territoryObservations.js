@@ -12,7 +12,11 @@ export const TerritoryObservationsProvider = ({ children }) => {
 
   const { organisation } = useContext(AuthContext);
 
-  const customFieldsObs = typeof organisation.customFieldsObs === 'string' ? JSON.parse(organisation.customFieldsObs) : defaultCustomFields;
+  let customFieldsObs;
+  if (Array.isArray(organisation.customFieldsObs)) customFieldsObs = organisation.customFieldsObs;
+  // It should not be a string but required for legacy reasons.
+  else if (typeof organisation.customFieldsObs === 'string') customFieldsObs = JSON.parse(organisation.customFieldsObs);
+  else customFieldsObs = defaultCustomFields;
 
   const setTerritoryObs = (territoryObservations) => {
     if (territoryObservations) {
