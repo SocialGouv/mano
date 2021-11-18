@@ -17,7 +17,7 @@ const sequelizeConfig = {
   },
 };
 
-if (process.env.NODE_ENV !== "development") {
+if (process.env.NODE_ENV !== "development" && process.env.NODE_ENV !== "test") {
   sequelizeConfig.port = config.PGPORT;
   sequelizeConfig.dialectOptions = {
     ssl: {

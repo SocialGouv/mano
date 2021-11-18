@@ -8,7 +8,7 @@ const Tracing = require("@sentry/tracing");
 
 const { VERSION, ENVIRONMENT } = require("./config");
 
-if (ENVIRONMENT !== "development") {
+if (ENVIRONMENT !== "development" && ENVIRONMENT !== "test") {
   Sentry.init({
     dsn: "https://7b294e89e98e4ffdaeeb74102f050567@o548798.ingest.sentry.io/5833236",
     environment: `api-${ENVIRONMENT}`,
@@ -42,7 +42,7 @@ function capture(err, context = {}) {
       Sentry.captureMessage(e, context);
     }
   }
-  if (ENVIRONMENT !== "development") {
+  if (ENVIRONMENT !== "development" && ENVIRONMENT !== "test") {
     if (typeof err === "string") {
       Sentry.captureMessage(err, context);
     } else {

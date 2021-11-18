@@ -29,7 +29,7 @@ const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 const COOKIE_MAX_AGE = JWT_MAX_AGE * 1000;
 
 function cookieOptions() {
-  if (config.ENVIRONMENT === "development") {
+  if (config.ENVIRONMENT === "development" || config.ENVIRONMENT === "test") {
     return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, sameSite: "None" };
   } else {
     return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
