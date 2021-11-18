@@ -218,19 +218,14 @@ const useApiService = ({
     return item;
   };
 
-  const setOrgEncryptionKey = async (orgEncryptionKey, isNew = false) => {
+  const setOrgEncryptionKey = async (orgEncryptionKey, encryptedVerificationKey) => {
     const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
-    if (!isNew) {
+    if (!!encryptedVerificationKey) {
       setHashedOrgEncryptionKey(newHashedOrgEncryptionKey);
-      const { encryptedVerificationKey } = organisation;
-      if (!encryptedVerificationKey) {
-        capture('encryptedVerificationKey not setup yet', { extra: { organisation: organisation } });
-      } else {
-        const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
-        if (!encryptionKeyIsValid) {
-          handleWrongKey?.();
-          return false;
-        }
+      const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
+      if (!encryptionKeyIsValid) {
+        handleWrongKey?.();
+        return false;
       }
     }
     setEnableEncrypt(true);
