@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
-import { RecoilRoot, useRecoilState } from 'recoil';
+import { RecoilRoot } from 'recoil';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
@@ -32,7 +32,7 @@ import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { useAuth } from './recoil/auth';
 import useApi from './services/api-interface-with-dashboard';
-import { tokenState } from './services/api';
+import { tokenCached } from './services/api';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -40,10 +40,9 @@ registerLocale('fr', fr);
 
 const App = () => {
   const API = useApi();
-  const token = useRecoilState(tokenState);
 
   const onWindowFocus = (e) => {
-    if (token && e.newState === 'active') API.get({ path: '/check-auth' }); // will force logout if session is expired
+    if (tokenCached && e.newState === 'active') API.get({ path: '/check-auth' }); // will force logout if session is expired
   };
 
   useEffect(() => {

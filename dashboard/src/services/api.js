@@ -1,4 +1,4 @@
-import { atom, useRecoilState, useRecoilValue, useResetRecoilState } from 'recoil';
+import { useRecoilValue, useResetRecoilState } from 'recoil';
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
@@ -10,13 +10,13 @@ const getUrl = (path, query) => {
   return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
 };
 
-const hashedOrgEncryptionKeyState = atom({ key: 'hashedOrgEncryptionKeyState', default: null });
-const enableEncryptState = atom({ key: 'enableEncryptState', default: false });
-const orgEncryptionKeyState = atom({ key: 'orgEncryptionKeyState', default: null });
-export const tokenState = atom({ key: 'tokenState', default: null });
-const sendCaptureErrorState = atom({ key: 'sendCaptureErrorState', default: 0 });
-const wrongKeyWarnedState = atom({ key: 'wrongKeyWarnedState', default: false });
-const blockEncryptState = atom({ key: 'blockEncryptState', default: false });
+export let hashedOrgEncryptionKey = null;
+let enableEncrypt = false;
+let orgEncryptionKeyCache = null;
+let sendCaptureError = 0;
+let wrongKeyWarned = false;
+let blockEncrypt = false;
+export let tokenCached = null;
 
 export const encryptItem =
   (hashedOrgEncryptionKey, enableEncrypt = true) =>
@@ -51,22 +51,14 @@ const useApiService = ({
   const resetTeamsState = useResetRecoilState(teamsState);
   const resetCurrentTeamState = useResetRecoilState(currentTeamState);
 
-  const [hashedOrgEncryptionKey, setHashedOrgEncryptionKey] = useRecoilState(hashedOrgEncryptionKeyState);
-  const [enableEncrypt, setEnableEncrypt] = useRecoilState(enableEncryptState);
-  const [orgEncryptionKey, setOrgEncryptionKeyCache] = useRecoilState(orgEncryptionKeyState);
-  const [token, setToken] = useRecoilState(tokenState);
-  const [sendCaptureError, setSendCaptureError] = useRecoilState(sendCaptureErrorState);
-  const [wrongKeyWarned, setWrongKeyWarned] = useRecoilState(wrongKeyWarnedState);
-  const [blockEncrypt, setBlockEncrypt] = useRecoilState(blockEncryptState);
-
   const reset = () => {
-    setHashedOrgEncryptionKey(null);
-    setEnableEncrypt(false);
-    setOrgEncryptionKeyCache(null);
-    setToken(null);
-    setSendCaptureError(0);
-    setWrongKeyWarned(false);
-    setBlockEncrypt(false);
+    hashedOrgEncryptionKey = null;
+    enableEncrypt = false;
+    orgEncryptionKeyCache = null;
+    tokenCached = null;
+    sendCaptureError = 0;
+    wrongKeyWarned = false;
+    blockEncrypt = false;
     resetOrganisation();
     resetUserState();
     resetTeamsState();
@@ -84,7 +76,7 @@ const useApiService = ({
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
     try {
-      if (token) headers.Authorization = `JWT ${token}`;
+      if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
       const options = {
         method,
         mode: 'cors',
@@ -194,11 +186,11 @@ const useApiService = ({
           extra: {
             message: 'ERROR DECRYPTING ITEM',
             item,
-            orgEncryptionKey,
+            orgEncryptionKeyCache,
             hashedOrgEncryptionKey,
           },
         });
-        setSendCaptureError(sendCaptureError + 1);
+        sendCaptureError++;
       }
       if (!!organisation.encryptedVerificationKey) {
         handleError?.(
@@ -208,12 +200,12 @@ const useApiService = ({
         return item;
       }
       if (!wrongKeyWarned) {
-        setWrongKeyWarned(true);
+        wrongKeyWarned = true;
         handleWrongKey?.();
       }
       if (debug) handleError?.(errorDecrypt, 'ERROR DECRYPTING ITEM');
       // prevent false admin with bad key to be able to change the key
-      setBlockEncrypt(enableEncrypt && errorDecrypt.message.includes('FAILURE'));
+      blockEncrypt = enableEncrypt && errorDecrypt.message.includes('FAILURE');
     }
     return item;
   };
@@ -221,18 +213,18 @@ const useApiService = ({
   const setOrgEncryptionKey = async (orgEncryptionKey, encryptedVerificationKey) => {
     const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
     if (!!encryptedVerificationKey) {
-      setHashedOrgEncryptionKey(newHashedOrgEncryptionKey);
+      hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
       const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
       if (!encryptionKeyIsValid) {
         handleWrongKey?.();
         return false;
       }
     }
-    setEnableEncrypt(true);
-    setOrgEncryptionKeyCache(orgEncryptionKey); // for debug only
-    setSendCaptureError(0);
-    setWrongKeyWarned(false);
-    setBlockEncrypt(false);
+    enableEncrypt = true;
+    orgEncryptionKeyCache = orgEncryptionKey; // for debug only
+    sendCaptureError = 0;
+    wrongKeyWarned = false;
+    blockEncrypt = false;
     return newHashedOrgEncryptionKey;
   };
 
@@ -270,10 +262,8 @@ const useApiService = ({
 
   return {
     setOrgEncryptionKey,
-    setToken,
-    token,
-    blockEncrypt,
-    hashedOrgEncryptionKey,
+    setToken: (newToken) => (tokenCached = newToken),
+    // token,
     get,
     reset,
     decryptDBItem,
