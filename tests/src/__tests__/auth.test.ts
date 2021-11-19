@@ -4,10 +4,14 @@ import { useSuperAdminAndOrga } from "../utils";
 describe("Authentication page", () => {
   beforeEach(async () => {
     await page.goto("http://localhost:8090/auth");
-  });
-
-  it("should see title auth page", async () => {
-    await expect(page).toMatch("Bienvenue !");
+    try {
+      await page.waitForSelector("#email", { timeout: 1500 });
+    } catch (e) {
+      await expect(page).toClick("button[type=button]", {
+        text: "Me connecter avec un autre utilisateur",
+      });
+      await expect(page).toMatch("Bienvenue !");
+    }
   });
 
   it("should deny users to with wrong credentials", async () => {
