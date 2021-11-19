@@ -213,13 +213,13 @@ const useApiService = ({
   const setOrgEncryptionKey = async (orgEncryptionKey, encryptedVerificationKey) => {
     const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
     if (!!encryptedVerificationKey) {
-      hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
       const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
       if (!encryptionKeyIsValid) {
         handleWrongKey?.();
         return false;
       }
     }
+    hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
     enableEncrypt = true;
     orgEncryptionKeyCache = orgEncryptionKey; // for debug only
     sendCaptureError = 0;
