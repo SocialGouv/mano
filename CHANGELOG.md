@@ -1,3 +1,10 @@
+## [1.28.10](https://github.com/SocialGouv/mano/compare/v1.28.9...v1.28.10) (2021-11-19)
+
+
+### Bug Fixes
+
+* **dashboard:** hashedOrgEncryptionKey === null even after setting good key ([#165](https://github.com/SocialGouv/mano/issues/165)) ([dac4e6c](https://github.com/SocialGouv/mano/commit/dac4e6c452502d4ed908cf0b4b67c292bd4ab931))
+
 ## [1.28.9](https://github.com/SocialGouv/mano/compare/v1.28.8...v1.28.9) (2021-11-18)
 
 
