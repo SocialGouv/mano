@@ -1,3 +1,10 @@
+## [1.28.11](https://github.com/SocialGouv/mano/compare/v1.28.10...v1.28.11) (2021-11-19)
+
+
+### Bug Fixes
+
+* **dashboard:** login with no encryptionValidationKey ([#167](https://github.com/SocialGouv/mano/issues/167)) ([14cfad1](https://github.com/SocialGouv/mano/commit/14cfad18d868551b4f4fd751e75ffca4ef0402e4))
+
 ## [1.28.10](https://github.com/SocialGouv/mano/compare/v1.28.9...v1.28.10) (2021-11-19)
 
 
