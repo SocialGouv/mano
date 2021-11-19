@@ -15,6 +15,7 @@ import useApi from '../../services/api-interface-with-dashboard';
 import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { hashedOrgEncryptionKey } from '../../services/api';
 
 /*
 TODO:
@@ -48,7 +49,7 @@ const SignIn = () => {
   const setEncryptionVerificationKey = async (organisation, user) => {
     if (!organisation.encryptionEnabled) return;
     if (!organisation.encryptedVerificationKey && ['admin'].includes(user.role)) {
-      const encryptedVerificationKey = await encryptVerificationKey(API.hashedOrgEncryptionKey);
+      const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
       const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
       if (orgRes.ok) setOrganisation(orgRes.data);
     }
