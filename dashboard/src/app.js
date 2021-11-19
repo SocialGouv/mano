@@ -42,8 +42,8 @@ const App = () => {
   const API = useApi();
   const token = useRecoilState(tokenState);
 
-  const onWindowFocus = () => {
-    if (token) API.get({ path: '/check-auth' }); // will force logout if session is expired
+  const onWindowFocus = (e) => {
+    if (token && e.newState === 'active') API.get({ path: '/check-auth' }); // will force logout if session is expired
   };
 
   useEffect(() => {
@@ -52,6 +52,7 @@ const App = () => {
       lifecycle.removeEventListener('statechange', onWindowFocus);
     };
   }, []);
+
   return (
     <div className="main-container">
       <div className="main">
