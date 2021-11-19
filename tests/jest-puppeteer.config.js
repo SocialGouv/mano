@@ -7,7 +7,7 @@ if (!process.env.PGHOST || !process.env.PGDATABASE || !process.env.PGPORT) {
 
 module.exports = {
   launch: {
-    headless: true,
+    headless: process.env.CI === "true",
   },
   server: [
     {
