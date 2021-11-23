@@ -16,7 +16,7 @@ require("./db/relation");
 
 // Put together a schema
 const app = express();
-if (process.env.NODE_ENV === "development") {
+if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
   app.use(logger("dev"));
 }
 

@@ -18,7 +18,7 @@ const theme = {
 };
 
 const getHost = () => {
-  if (process.env.NODE_ENV !== 'production') {
+  if (process.env.NODE_ENV !== 'production' || process.env.REACT_APP_TEST === 'true') {
     return process.env.REACT_APP_HOST;
   }
   if (window.location.host.includes('dev')) {
@@ -28,7 +28,7 @@ const getHost = () => {
 };
 
 const HOST = getHost();
-const SCHEME = process.env.NODE_ENV === 'development' ? process.env.REACT_APP_SCHEME : 'https';
+const SCHEME = process.env.NODE_ENV === 'development' || process.env.REACT_APP_TEST === 'true' ? process.env.REACT_APP_SCHEME : 'https';
 const ENV = process.env.NODE_ENV || 'production';
 const VERSION = version;
 

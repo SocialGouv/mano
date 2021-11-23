@@ -1,0 +1,36 @@
+{
+  "name": "tests",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "test": "jest --runInBand",
+    "test:local:complete": "yarn test:init-db && yarn test:build-dashboard && yarn test",
+    "test:init-db": "node ./src/scripts/init-db.js",
+    "test:build-dashboard": "REACT_APP_HOST=127.0.0.1:8091 REACT_APP_SCHEME=http REACT_APP_TEST=true yarn --cwd ../dashboard build"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^10.0.0",
+    "jest": "^27.3.1",
+    "jest-puppeteer": "^6.0.0",
+    "pg": "^8.7.1",
+    "puppeteer": "^11.0.0",
+    "typescript": "^4.5.2",
+    "uuid": "^8.3.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.16.0",
+    "@babel/preset-env": "^7.16.0",
+    "@babel/preset-typescript": "^7.16.0",
+    "@types/bcryptjs": "^2.4.2",
+    "@types/expect-puppeteer": "^4.4.7",
+    "@types/jest": "^27.0.3",
+    "@types/jest-environment-puppeteer": "^4.4.1",
+    "@types/node": "^16.11.8",
+    "@types/pg": "^8.6.1",
+    "@types/puppeteer": "^5.4.4",
+    "@types/uuid": "^8.3.3",
+    "babel-jest": "^27.3.1"
+  }
+}
