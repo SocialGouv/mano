@@ -119,7 +119,7 @@ const TableCustomFields = ({ data, customFields }) => {
           {
             title: 'Options',
             dataKey: 'options',
-            render: (f) => <CellWrapper>{!['enum', 'multi-choice'].includes(f.type) ? null : f.options.join(', ')}</CellWrapper>,
+            render: (f) => <CellWrapper>{!['enum', 'multi-choice'].includes(f.type) ? null : (f?.options || []).join(', ')}</CellWrapper>,
           },
           { title: 'Activé', dataKey: 'enabled', render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} /> },
           // {
