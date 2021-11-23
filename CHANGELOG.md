@@ -1,3 +1,10 @@
+## [1.28.12](https://github.com/SocialGouv/mano/compare/v1.28.11...v1.28.12) (2021-11-23)
+
+
+### Bug Fixes
+
+* **dashboard:** error when no options in list ([bed207e](https://github.com/SocialGouv/mano/commit/bed207edce2ef2c5ebd5be90ebd981f1204e0cc7))
+
 ## [1.28.11](https://github.com/SocialGouv/mano/compare/v1.28.10...v1.28.11) (2021-11-19)
 
 
