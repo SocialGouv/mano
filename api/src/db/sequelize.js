@@ -30,7 +30,6 @@ const sequelize = new Sequelize(config.PGDATABASE, config.PGUSER, config.PGPASSW
 sequelize
   .authenticate()
   .then(() => {
-    capture("Connection has been established successfully.");
     require("./migrations");
     require("./migration");
   })
