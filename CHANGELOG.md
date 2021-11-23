@@ -1,3 +1,10 @@
+# [1.29.0](https://github.com/SocialGouv/mano/compare/v1.28.12...v1.29.0) (2021-11-23)
+
+
+### Features
+
+* end to end tests ([#164](https://github.com/SocialGouv/mano/issues/164)) ([7de5040](https://github.com/SocialGouv/mano/commit/7de50405ebb06d9f0f3bf8b8fdd7c3673e6cbf8d))
+
 ## [1.28.12](https://github.com/SocialGouv/mano/compare/v1.28.11...v1.28.12) (2021-11-23)
 
 

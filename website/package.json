@@ -1,6 +1,6 @@
 {
   "name": "boilerplate",
-  "version": "1.28.12",
+  "version": "1.29.0",
   "private": true,
   "engines": {
     "npm": "please-use-yarn",
