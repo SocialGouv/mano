@@ -3,8 +3,6 @@ const { Sequelize } = require("sequelize");
 const config = require("../config");
 const { capture } = require("../sentry");
 
-console.log(config.PGDATABASE, config.PGUSER, config.PGPASSWORD);
-
 const sequelizeConfig = {
   host: config.PGHOST,
   dialect: "postgres",
