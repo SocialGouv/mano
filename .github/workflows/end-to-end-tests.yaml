@@ -1,5 +1,8 @@
 name: End to End tests
-on: push
+on:
+  push:
+    tags-ignore:
+      - v*
 
 jobs:
   container-job:
@@ -60,5 +63,3 @@ jobs:
           PGUSER: postgres
           PGPASSWORD: postgres
           PGBASEURL: postgres://postgres:postgres@postgres:5432
-
-          
