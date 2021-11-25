@@ -1,3 +1,10 @@
+## [1.29.2](https://github.com/SocialGouv/mano/compare/v1.29.1...v1.29.2) (2021-11-25)
+
+
+### Bug Fixes
+
+* end 2 end timeout ([b2a9a9f](https://github.com/SocialGouv/mano/commit/b2a9a9fb1e384b6c0abd2607454a720f27dc6ce8))
+
 ## [1.29.1](https://github.com/SocialGouv/mano/compare/v1.29.0...v1.29.1) (2021-11-25)
 
 
