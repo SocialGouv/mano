@@ -20,7 +20,7 @@ import { useRefresh } from '../../recoil/refresh';
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
 
-  const { user } = useAuth();
+  const { user, teams } = useAuth();
   const { addAction } = useActions();
   const { loading, actionsRefresher } = useRefresh();
   const history = useHistory();
@@ -119,7 +119,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                     <FormGroup>
                       <Label>Sous l'équipe</Label>
                       <SelectTeam
-                        teams={user.teams}
+                        teams={user.role === 'admin' ? teams : user.teams}
                         teamId={values.team}
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                       />

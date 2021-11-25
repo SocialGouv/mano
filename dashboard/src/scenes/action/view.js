@@ -27,7 +27,7 @@ import { useActions, CANCEL, DONE } from '../../recoil/actions';
 
 const View = () => {
   const { id } = useParams();
-  const { organisation, user } = useAuth();
+  const { organisation, user, teams } = useAuth();
   const { deleteAction, updateAction, actions, refreshActions } = useActions();
   const history = useHistory();
 
@@ -82,7 +82,7 @@ const View = () => {
                     <FormGroup>
                       <Label>Sous l'équipe</Label>
                       <SelectTeam
-                        teams={user.teams}
+                        teams={user.role === 'admin' ? teams : user.teams}
                         teamId={values.team}
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                       />
