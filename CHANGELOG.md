@@ -1,3 +1,10 @@
+## [1.29.1](https://github.com/SocialGouv/mano/compare/v1.29.0...v1.29.1) (2021-11-25)
+
+
+### Bug Fixes
+
+* **dashboard:** try more fetch if fail ([#166](https://github.com/SocialGouv/mano/issues/166)) ([cada9d4](https://github.com/SocialGouv/mano/commit/cada9d422f337ecdfab22032d744cb1cfc77d468))
+
 # [1.29.0](https://github.com/SocialGouv/mano/compare/v1.28.12...v1.29.0) (2021-11-23)
 
 
