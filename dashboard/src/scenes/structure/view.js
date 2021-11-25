@@ -41,7 +41,13 @@ const View = () => {
     <Container style={{ padding: '40px 0' }}>
       <Header title={<BackButton />} />
       <Box>
-        <Formik initialValues={structure} onSubmit={async (body) => {}}>
+        <Formik
+          initialValues={structure}
+          onSubmit={async (body) => {
+            const res = await API.put({ path: `/structure/${id}`, body });
+            if (res.ok) toastr.success('Structure modifiée avec succès');
+            history.goBack();
+          }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (
             <React.Fragment>
               <Row>
