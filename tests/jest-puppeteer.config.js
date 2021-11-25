@@ -13,7 +13,7 @@ module.exports = {
     {
       command: "npx serve --single -l 8090 ../dashboard/build",
       port: 8090,
-      launchTimeout: 10000,
+      launchTimeout: 30000,
       debug: true,
     },
     {
@@ -25,7 +25,7 @@ module.exports = {
         process.env.PGPASSWORD || '""'
       } yarn --cwd ../api start:test`,
       port: 8091,
-      launchTimeout: 10000,
+      launchTimeout: 30000,
       debug: true,
     },
   ],
