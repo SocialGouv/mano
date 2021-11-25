@@ -103,8 +103,8 @@ const useApiService = ({
         };
       }
 
-      options.retries = 3;
-      options.retryDelay = 1000;
+      options.retries = 10;
+      options.retryDelay = 2000;
 
       const url = getUrl(path, query);
       const response = await fetch(url, options);
