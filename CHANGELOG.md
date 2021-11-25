@@ -1,3 +1,11 @@
+## [1.29.3](https://github.com/SocialGouv/mano/compare/v1.29.2...v1.29.3) (2021-11-25)
+
+
+### Bug Fixes
+
+* **dashboard:** structure modification ([#170](https://github.com/SocialGouv/mano/issues/170)) ([1521127](https://github.com/SocialGouv/mano/commit/1521127edc734daa53a66577f791190aaf549782))
+* **dashboard:** team selector for action ([#169](https://github.com/SocialGouv/mano/issues/169)) ([09f0f0a](https://github.com/SocialGouv/mano/commit/09f0f0a9934c3a1f05130d25268fbd23555746c4))
+
 ## [1.29.2](https://github.com/SocialGouv/mano/compare/v1.29.1...v1.29.2) (2021-11-25)
 
 
