@@ -14,8 +14,6 @@ export const TerritoryObservationsProvider = ({ children }) => {
 
   let customFieldsObs;
   if (Array.isArray(organisation.customFieldsObs)) customFieldsObs = organisation.customFieldsObs;
-  // It should not be a string but required for legacy reasons.
-  else if (typeof organisation.customFieldsObs === 'string') customFieldsObs = JSON.parse(organisation.customFieldsObs);
   else customFieldsObs = defaultCustomFields;
 
   const setTerritoryObs = (territoryObservations) => {
