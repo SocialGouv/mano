@@ -9,6 +9,7 @@ import ButtonsContainer from '../../components/ButtonsContainer';
 import Button from '../../components/Button';
 import { View } from 'react-native';
 import InputLabelled from '../../components/InputLabelled';
+import colors from '../../utils/colors';
 
 class FileMedical extends React.Component {
   render() {
