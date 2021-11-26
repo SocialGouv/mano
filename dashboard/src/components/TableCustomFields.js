@@ -92,6 +92,7 @@ const TableCustomFields = ({ data, customFields }) => {
       <Table
         data={mutableData}
         rowKey="name"
+        noData="Pas de champs personnalisés"
         columns={[
           {
             dataKey: '_id',
@@ -173,6 +174,8 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
         <ModalBody>
           <Formik key={open} initialValues={editingField || newField()} onSubmit={onSaveField}>
             {({ values: field, handleChange, handleSubmit, isSubmitting }) => {
+              console.log('field', field);
+
               return (
                 <React.Fragment>
                   <Row>
@@ -198,7 +201,9 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                           <Label>Type</Label>
                           <SelectCustom
                             creatable
-                            options={(field.options || []).sort((c1, c2) => c1.localeCompare(c2)).map((opt) => ({ value: opt, label: opt }))}
+                            options={[...(field.options || []) /* Do not mutate immutable property thanks to spread operator. */]
+                              .sort((c1, c2) => c1.localeCompare(c2))
+                              .map((opt) => ({ value: opt, label: opt }))}
                             value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}
                             isMulti
                             onChange={(v) => handleChange({ currentTarget: { value: v.map((v) => v.value), name: 'options' } })}

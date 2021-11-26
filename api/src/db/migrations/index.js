@@ -8,3 +8,4 @@ require("./2021-10-01-custom-fields-obs.js");
 require("./2021-11-05_multiple-collaborations");
 require("./2021-10-22_encrypted-verification-key");
 require("./2021-11-16_observations-as-json");
+require("./2021-11-26-custom-fields-persons");

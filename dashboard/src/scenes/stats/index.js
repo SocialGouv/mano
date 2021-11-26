@@ -20,6 +20,10 @@ import {
   filterPersonsBase,
   personsState,
   usePersons,
+  customFieldsPersonsSocial,
+  customFieldsPersonsMedical,
+  customFieldsPersonsSocialSelector,
+  customFieldsPersonsMedicalSelector,
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
@@ -105,6 +109,8 @@ const Stats = () => {
   const territories = useRecoilValue(territoriesState);
   const allObservations = useRecoilValue(territoryObservationsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const places = useRecoilValue(placesState);
   const { refresh } = useRefresh();
   const [loading, setLoading] = useState(false);
@@ -307,6 +313,41 @@ const Stats = () => {
               'outOfActiveListReason'
             )}
           />
+          {[customFieldsPersonsMedical, customFieldsPersonsSocial].map((customFields) => {
+            return (
+              <>
+                {customFields
+                  .filter((f) => f.enabled)
+                  .filter((f) => f.showInStats)
+                  .filter((field) => ['number'].includes(field.type))
+                  .map((field) => (
+                    <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+                      <BlockTotal title={field.label} data={persons} field={field.name} />
+                    </Col>
+                  ))}
+                {customFields
+                  .filter((f) => f.enabled)
+                  .filter((f) => f.showInStats)
+                  .filter((field) => ['date', 'date-with-time'].includes(field.type))
+                  .map((field) => (
+                    <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+                      <BlockDateWithTime data={persons} field={field} />
+                    </Col>
+                  ))}
+                {customFields
+                  .filter((f) => f.enabled)
+                  .filter((f) => f.showInStats)
+                  .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
+                  .map((field) => (
+                    <CustomResponsivePie
+                      title={field.label}
+                      key={field.name}
+                      data={getPieData(persons, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+                    />
+                  ))}
+              </>
+            );
+          })}
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des observations de territoire</Title>

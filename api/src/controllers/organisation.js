@@ -108,6 +108,14 @@ router.put(
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
     if (req.body.hasOwnProperty("customFieldsObs"))
       updateOrg.customFieldsObs = typeof req.body.customFieldsObs === "string" ? JSON.parse(req.body.customFieldsObs) : req.body.customFieldsObs;
+    if (req.body.hasOwnProperty("customFieldsPersonsSocial"))
+      updateOrg.customFieldsPersonsSocial =
+        typeof req.body.customFieldsPersonsSocial === "string" ? JSON.parse(req.body.customFieldsPersonsSocial) : req.body.customFieldsPersonsSocial;
+    if (req.body.hasOwnProperty("customFieldsPersonsMedical"))
+      updateOrg.customFieldsPersonsMedical =
+        typeof req.body.customFieldsPersonsMedical === "string"
+          ? JSON.parse(req.body.customFieldsPersonsMedical)
+          : req.body.customFieldsPersonsMedical;
     if (req.body.hasOwnProperty("encryptedVerificationKey")) updateOrg.encryptedVerificationKey = req.body.encryptedVerificationKey;
     if (req.body.hasOwnProperty("encryptionEnabled")) updateOrg.encryptionEnabled = req.body.encryptionEnabled;
     if (req.body.hasOwnProperty("encryptionLastUpdateAt")) updateOrg.encryptionLastUpdateAt = req.body.encryptionLastUpdateAt;

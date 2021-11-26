@@ -7,7 +7,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
-
+import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -115,7 +115,7 @@ const View = () => {
 
 const Summary = ({ person }) => {
   const history = useHistory();
-  const { updatePerson, deletePerson } = usePersons();
+  const { updatePerson, deletePerson, customFieldsPersonsMedical, customFieldsPersonsSocial } = usePersons();
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
@@ -300,7 +300,13 @@ const Summary = ({ person }) => {
                 <Col md={4}>
                   <Reasons value={values.reasons} onChange={handleChange} />
                 </Col>
+                {customFieldsPersonsSocial
+                  .filter((f) => f.enabled)
+                  .map((field) => (
+                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                  ))}
               </Row>
+
               <hr />
               <Title>Dossier médical</Title>
               <Row>
@@ -319,13 +325,13 @@ const Summary = ({ person }) => {
                     <Input name="structureMedical" value={values.structureMedical} onChange={handleChange} />
                   </FormGroup>
                 </Col>
-                <Col md={4}>
-                  <Vunerabilities value={values.vulnerabilities} onChange={handleChange} />
-                </Col>
-                <Col md={4}>
-                  <Consommations value={values.consumptions} onChange={handleChange} />
-                </Col>
+                {customFieldsPersonsMedical
+                  .filter((f) => f.enabled)
+                  .map((field) => (
+                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                  ))}
               </Row>
+
               <hr />
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -395,6 +401,11 @@ const StyledContainer = styled(Container)`
   div.row {
     padding: 10px 0;
   }
+`;
+
+const Item = styled.span`
+  display: inline-block;
+  ${(props) => props.fieldIsEmpty && 'opacity: 0.25;'}
 `;
 
 const StyledTable = styled(Table)`
