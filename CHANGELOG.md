@@ -1,3 +1,10 @@
+## [1.29.4](https://github.com/SocialGouv/mano/compare/v1.29.3...v1.29.4) (2021-11-26)
+
+
+### Bug Fixes
+
+* remove retrocompatibility for json observation custom fields ([725bc73](https://github.com/SocialGouv/mano/commit/725bc7314846ec2fc4f1f16220ad233d72307dff))
+
 ## [1.29.3](https://github.com/SocialGouv/mano/compare/v1.29.2...v1.29.3) (2021-11-25)
 
 
