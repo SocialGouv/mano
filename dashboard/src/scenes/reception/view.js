@@ -26,7 +26,7 @@ const Reception = () => {
   const { currentTeam, organisation } = useAuth();
   const { loading: reportsLoading, addReport, updateReport, incrementPassage } = useReports();
   const [status, setStatus] = useState(TODO);
-  const actionsByStatus = useRecoilValue(actionsByStatusSelector(status));
+  const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
   const lastReport = useRecoilValue(lastReportSelector);
 
@@ -171,7 +171,7 @@ const Reception = () => {
             <div style={{ margin: '15px' }}>
               <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
             </div>
-            <ActionsCalendar actions={actionsByStatus[status]} columns={['Heure', 'Nom', 'Personne suivie', 'Status']} />
+            <ActionsCalendar actions={actionsByStatus} columns={['Heure', 'Nom', 'Personne suivie', 'Status']} />
           </Container>
         </Col>
         <Col md={4}>
