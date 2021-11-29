@@ -17,7 +17,7 @@ import { defaultMedicalCustomFields } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import { usePersons } from '../../recoil/persons';

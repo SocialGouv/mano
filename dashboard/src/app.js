@@ -31,8 +31,8 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { useAuth } from './recoil/auth';
-import useApi from './services/api-interface-with-dashboard';
-import { recoilResetKeyState, tokenCached } from './services/api';
+import useApi from './services/api';
+import { tokenCached } from './services/api';
 
 const store = createStore(combineReducers({ toastr }));
 

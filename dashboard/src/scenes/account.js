@@ -8,7 +8,7 @@ import Loading from '../components/loading';
 import ButtonCustom from '../components/ButtonCustom';
 import ChangePassword from '../components/ChangePassword';
 import { useAuth } from '../recoil/auth';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 
 const Account = () => {
   const { user, setUser } = useAuth();

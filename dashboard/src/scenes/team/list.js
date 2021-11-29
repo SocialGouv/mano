@@ -12,7 +12,7 @@ import Table from '../../components/table';
 import { toFrenchDate } from '../../utils';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, organisationState, teamsState, useAuth, userState } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 const List = () => {

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Label } from 'reactstrap';
 
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 import SelectCustom from './SelectCustom';
 
 const SelectStructure = ({ value = '', onChange, name }) => {

@@ -6,7 +6,7 @@ import { usePlaces } from './places';
 import { useRelsPerson } from './relPersonPlace';
 import { useReports } from './reports';
 import { useTerritories } from './territory';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 import { useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';

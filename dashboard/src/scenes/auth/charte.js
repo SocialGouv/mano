@@ -4,7 +4,7 @@ import { Document, Page } from 'react-pdf';
 import ButtonCustom from '../../components/ButtonCustom';
 import charte from '../../assets/charte.pdf';
 import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 
 const Charte = () => {
   const [loading, setLoading] = useState(false);

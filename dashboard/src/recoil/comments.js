@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { atom, useRecoilState } from 'recoil';
 import { useAuth } from '../recoil/auth';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 

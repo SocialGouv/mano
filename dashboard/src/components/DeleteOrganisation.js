@@ -7,7 +7,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 import { useAuth } from '../recoil/auth';
 
 const DeleteOrganisation = () => {

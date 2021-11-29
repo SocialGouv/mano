@@ -8,7 +8,7 @@ import styled from 'styled-components';
 
 import { theme } from '../../config';
 import ButtonCustom from '../../components/ButtonCustom';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 
 const View = () => {
   const [done, setDone] = useState(false);

@@ -18,7 +18,7 @@ import { placesState, preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 import { useRefresh } from '../recoil/refresh';
 import { useRecoilValue } from 'recoil';
 import { encryptItem } from '../services/api';

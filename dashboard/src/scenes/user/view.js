@@ -14,7 +14,7 @@ import Box from '../../components/Box';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectCustom from '../../components/SelectCustom';
 import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 
 const View = () => {
   const [localUser, setLocalUser] = useState(null);

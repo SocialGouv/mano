@@ -12,7 +12,7 @@ import legal from '../assets/legal.pdf';
 import privacy from '../assets/privacy.pdf';
 import charte from '../assets/charte.pdf';
 import { useAuth } from '../recoil/auth';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 
 const Drawer = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);

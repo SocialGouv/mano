@@ -14,7 +14,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
 import { toFrenchDate } from '../../utils';
 import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 
 const List = () => {
   const [structures, setStructures] = useState(null);

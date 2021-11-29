@@ -2,7 +2,7 @@ import React from 'react';
 import { toastr } from 'react-redux-toastr';
 import SelectCustom from '../../components/SelectCustom';
 import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 
 const NoOptionsMessage = () => (
   <span style={{ fontSize: 14, textAlign: 'center', color: '#808080', width: '100%', display: 'block' }}>

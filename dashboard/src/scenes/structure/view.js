@@ -11,7 +11,7 @@ import Header from '../../components/header';
 import Loading from '../../components/loading';
 import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 
 const View = () => {
   const [structure, setStructure] = useState(null);
