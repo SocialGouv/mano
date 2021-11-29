@@ -168,7 +168,7 @@ export const actionsForCurrentTeamSelector = selector({
 export const actionsByStatusSelector = selectorFamily({
   key: 'actionsByStatusSelector',
   get:
-    (status) =>
+    ({ status }) =>
     ({ get }) => {
       const actions = get(actionsForCurrentTeamSelector);
       return actions.filter((a) => a.status === status);
