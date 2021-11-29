@@ -1,3 +1,10 @@
+## [1.29.5](https://github.com/SocialGouv/mano/compare/v1.29.4...v1.29.5) (2021-11-29)
+
+
+### Bug Fixes
+
+* **dashboard:** actions in reception ([#172](https://github.com/SocialGouv/mano/issues/172)) ([038575f](https://github.com/SocialGouv/mano/commit/038575f90be5cec31e5b369d5e2f01ec750586ac))
+
 ## [1.29.4](https://github.com/SocialGouv/mano/compare/v1.29.3...v1.29.4) (2021-11-26)
 
 
