@@ -44,11 +44,78 @@ export const encryptItem =
     return item;
   };
 
+const decryptDBItem = async (item, { logout, debug = false, encryptedVerificationKey = null } = {}) => {
+  if (wrongKeyWarned) return item;
+  if (!enableEncrypt) return item;
+  if (!item.encrypted) return item;
+  if (!item.encryptedEntityKey) return item;
+  try {
+    const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, hashedOrgEncryptionKey);
+
+    delete item.encrypted;
+
+    try {
+      JSON.parse(content);
+    } catch (errorDecryptParsing) {
+      toastr.error(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
+      console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
+    }
+
+    const decryptedItem = {
+      ...item,
+      ...JSON.parse(content),
+      entityKey,
+    };
+    return decryptedItem;
+  } catch (errorDecrypt) {
+    if (sendCaptureError < 5) {
+      capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
+        extra: {
+          message: 'ERROR DECRYPTING ITEM',
+          item,
+          orgEncryptionKeyCacheForDebug,
+          hashedOrgEncryptionKey,
+        },
+      });
+      sendCaptureError++;
+    }
+    if (!!encryptedVerificationKey) {
+      toastr.error(
+        "Désolé, un élément n'a pas pu être déchiffré",
+        "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
+      );
+      return item;
+    }
+    if (!wrongKeyWarned) {
+      wrongKeyWarned = true;
+      toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+      logout();
+    }
+    // prevent false admin with bad key to be able to change the key
+    blockEncrypt = enableEncrypt && errorDecrypt.message.includes('FAILURE');
+  }
+  return item;
+};
+
+const handleApiError = (res) => {
+  if (res?.error?.message) {
+    toastr?.error('Erreur !', res?.error?.message);
+  } else if (res?.error) {
+    toastr?.error('Erreur !', res?.error);
+  } else if (res?.code) {
+    toastr?.error('Erreur !', res?.code);
+  } else {
+    capture('api error unhandled', { extra: { res } });
+  }
+};
+
 export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0 });
 const useApi = () => {
   const organisation = useRecoilValue(organisationState);
   const setRecoilResetKey = useSetRecoilState(recoilResetKeyState);
   const history = useHistory();
+
+  const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey } = organisation;
 
   const reset = () => {
     hashedOrgEncryptionKey = null;
@@ -96,8 +163,8 @@ const useApi = () => {
           return { ok: false, error: "Vous ne pouvez pas modifier le contenu. La clé de chiffrement n'est pas la bonne" };
         }
         query = {
-          encryptionLastUpdateAt: organisation?.encryptionLastUpdateAt,
-          encryptionEnabled: organisation?.encryptionEnabled,
+          encryptionLastUpdateAt,
+          encryptionEnabled,
           ...query,
         };
       }
@@ -115,11 +182,11 @@ const useApi = () => {
 
       try {
         const res = await response.json();
-        if (!response.ok);
+        if (!response.ok) handleApiError(res);
         if (!!res.data && Array.isArray(res.data)) {
           const decryptedData = [];
           for (const item of res.data) {
-            const decryptedItem = await decryptDBItem(item, { debug });
+            const decryptedItem = await decryptDBItem(item, { debug, logout, encryptedVerificationKey });
             if (wrongKeyWarned) {
               return { ok: false, data: [] };
             }
@@ -128,7 +195,7 @@ const useApi = () => {
           res.decryptedData = decryptedData;
           return res;
         } else if (res.data) {
-          res.decryptedData = await decryptDBItem(res.data, { debug });
+          res.decryptedData = await decryptDBItem(res.data, { debug, logout, encryptedVerificationKey });
           return res;
         } else {
           return res;
@@ -150,59 +217,6 @@ const useApi = () => {
       toastr.error(errorExecuteApi, 'Désolé une erreur est survenue');
       throw errorExecuteApi;
     }
-  };
-
-  const decryptDBItem = async (item, { debug = false } = {}) => {
-    if (wrongKeyWarned) return item;
-    if (!enableEncrypt) return item;
-    if (!item.encrypted) return item;
-    if (!item.encryptedEntityKey) return item;
-    try {
-      const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, hashedOrgEncryptionKey);
-
-      delete item.encrypted;
-
-      try {
-        JSON.parse(content);
-      } catch (errorDecryptParsing) {
-        toastr.error(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
-        console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
-      }
-
-      const decryptedItem = {
-        ...item,
-        ...JSON.parse(content),
-        entityKey,
-      };
-      return decryptedItem;
-    } catch (errorDecrypt) {
-      if (sendCaptureError < 5) {
-        capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
-          extra: {
-            message: 'ERROR DECRYPTING ITEM',
-            item,
-            orgEncryptionKeyCacheForDebug,
-            hashedOrgEncryptionKey,
-          },
-        });
-        sendCaptureError++;
-      }
-      if (!!organisation.encryptedVerificationKey) {
-        toastr.error(
-          "Désolé, un élément n'a pas pu être déchiffré",
-          "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
-        );
-        return item;
-      }
-      if (!wrongKeyWarned) {
-        wrongKeyWarned = true;
-        toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
-        logout();
-      }
-      // prevent false admin with bad key to be able to change the key
-      blockEncrypt = enableEncrypt && errorDecrypt.message.includes('FAILURE');
-    }
-    return item;
   };
 
   const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
@@ -262,7 +276,6 @@ const useApi = () => {
     // token,
     get,
     reset,
-    decryptDBItem,
     logout,
     post,
     put,
