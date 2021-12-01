@@ -277,3 +277,18 @@ export const territoriesFullSearchSelector = selectorFamily({
       return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id));
     },
 });
+
+// export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
+//   key: 'passagesNonAnonymousPerDatePerTeamSelector',
+//   get: ({ date }) => {},
+// });
+
+// export const passagesAnonymousPerDatePerTeamSelector = selectorFamily({
+//   key: 'passagesAnonymousPerDatePerTeamSelector',
+//   get:
+//     ({ date }) =>
+//     ({ get }) => {
+//       const todaysReports = get(todaysReportSelector);
+//       return todaysReportSelector?.passages;
+//     },
+// });
