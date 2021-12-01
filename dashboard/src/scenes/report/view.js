@@ -55,6 +55,7 @@ const View = () => {
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || !!organisation.receptionEnabled ? 0 : 1));
   const [tabsContents, setTabsContents] = useState(tabs);
+  const [passages, setPassages] = useState(reports?.passages);
 
   const reportIndex = reports.findIndex((r) => r._id === id);
 
@@ -139,7 +140,7 @@ const View = () => {
       <TabContent activeTab={activeTab}>
         {!!organisation.receptionEnabled && (
           <TabPane tabId={0}>
-            <Reception report={report} />
+            <Reception report={report} passages={passages} />
           </TabPane>
         )}
         <TabPane tabId={1}>
@@ -155,7 +156,14 @@ const View = () => {
           <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
         </TabPane>
         <TabPane tabId={5}>
-          <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} forPassages />
+          <PassagesCreatedAt
+            date={report.date}
+            report={report}
+            onUpdateResults={(total) => {
+              updateTabContent(5, `Passages (${total})`);
+              setPassages(total);
+            }}
+          />
         </TabPane>
         <TabPane tabId={6}>
           <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
@@ -470,6 +478,32 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) =
   );
 };
 
+const PassagesCreatedAt = ({ report, onUpdateResults = () => null }) => {
+  const totalPassages = report?.passages || 0;
+  const [nonAnonymousPassages, setNonAnonymousPassages] = useState(0);
+  const anonymousPassages = Math.max(0, totalPassages - nonAnonymousPassages);
+
+  useEffect(() => {
+    onUpdateResults(Math.max(report?.passages || 0, nonAnonymousPassages));
+  }, [report?.passages, nonAnonymousPassages]);
+
+  return (
+    <>
+      <TabTitle>Passages</TabTitle>
+      <Row style={{ marginBottom: 20 }}>
+        <Col md={2} />
+        <Col md={4}>
+          <Card title="Nombre de passages anonymes" count={anonymousPassages} unit={`passage${report?.passages > 1 ? 's' : ''}`} />
+        </Col>
+        <Col md={4}>
+          <Card title="Nombre de passages non-anonymes" count={nonAnonymousPassages} unit={`passage${report?.passages > 1 ? 's' : ''}`} />
+        </Col>
+      </Row>
+      <CommentCreatedAt date={report?.date} onUpdateResults={setNonAnonymousPassages} forPassages />
+    </>
+  );
+};
+
 const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
@@ -627,6 +661,7 @@ const TabTitle = styled.span`
   color: #1d2021;
   text-transform: none;
   padding: 16px;
+  display: block;
   @media print {
     display: block !important;
   }
