@@ -35,6 +35,11 @@ import { useReports } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import ActionPersonName from '../../components/ActionPersonName';
 import { useRecoilValue } from 'recoil';
+import {
+  numberOfPassagesAnonymousPerDatePerTeamSelector,
+  numberOfPassagesNonAnonymousPerDatePerTeamSelector,
+  passagesNonAnonymousPerDatePerTeamSelector,
+} from '../../recoil/selectors';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -55,7 +60,6 @@ const View = () => {
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || !!organisation.receptionEnabled ? 0 : 1));
   const [tabsContents, setTabsContents] = useState(tabs);
-  const [passages, setPassages] = useState(reports?.passages);
 
   const reportIndex = reports.findIndex((r) => r._id === id);
 
@@ -109,7 +113,7 @@ const View = () => {
       <ActionCreatedAt date={report.date} />
       <ActionCompletedAt date={report.date} status={CANCEL} />
       <CommentCreatedAt date={report.date} />
-      <CommentCreatedAt date={report.date} forPassages />
+      <PassagesCreatedAt date={report.date} />
       <TerritoryObservationsCreatedAt date={report.date} />
     </div>
   );
@@ -140,7 +144,7 @@ const View = () => {
       <TabContent activeTab={activeTab}>
         {!!organisation.receptionEnabled && (
           <TabPane tabId={0}>
-            <Reception report={report} passages={passages} />
+            <Reception report={report} />
           </TabPane>
         )}
         <TabPane tabId={1}>
@@ -156,14 +160,7 @@ const View = () => {
           <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
         </TabPane>
         <TabPane tabId={5}>
-          <PassagesCreatedAt
-            date={report.date}
-            report={report}
-            onUpdateResults={(total) => {
-              updateTabContent(5, `Passages (${total})`);
-              setPassages(total);
-            }}
-          />
+          <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} />
         </TabPane>
         <TabPane tabId={6}>
           <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
@@ -212,6 +209,10 @@ const View = () => {
 
 const Reception = ({ report }) => {
   const { organisation } = useAuth();
+  const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: report.date }));
+  const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: report.date }));
+
+  const passages = numberOfNonAnonymousPassages + numberOfAnonymousPassages;
 
   if (!organisation.receptionEnabled) return null;
 
@@ -235,7 +236,7 @@ const Reception = ({ report }) => {
       <Row style={{ marginBottom: 20, flexShrink: 0 }}>
         <Col md={4} />
         <Col md={4} style={{ marginBottom: 20 }}>
-          <Card title="Nombre de passages" count={report?.passages || 0} unit={`passage${report?.passages > 1 ? 's' : ''}`} />
+          <Card title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
         </Col>
         <Col md={4} />
         {renderServices()}
@@ -365,7 +366,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) => {
+const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
   const { comments } = useComments();
@@ -376,11 +377,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) =
   const data = comments
     .filter((c) => c.team === currentTeam._id)
     .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-    .filter((c) => {
-      const commentIsPassage = c.comment.includes('Passage enregistré');
-      if (forPassages) return commentIsPassage;
-      return !commentIsPassage;
-    })
+    .filter((c) => !c.comment.includes('Passage enregistré'))
     .map((comment) => {
       const commentPopulated = { ...comment };
       if (comment.person) {
@@ -406,7 +403,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) =
       <StyledBox>
         <Table
           className="Table"
-          title={`${forPassages ? 'Passages non-anonymes' : 'Commentaires'} ajoutés le ${toFrenchDate(date)}`}
+          title={`Commentaires' ajoutés le ${toFrenchDate(date)}`}
           data={data}
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {
@@ -478,28 +475,97 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null, forPassages }) =
   );
 };
 
-const PassagesCreatedAt = ({ report, onUpdateResults = () => null }) => {
-  const totalPassages = report?.passages || 0;
-  const [nonAnonymousPassages, setNonAnonymousPassages] = useState(0);
-  const anonymousPassages = Math.max(0, totalPassages - nonAnonymousPassages);
+const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
+  const history = useHistory();
+
+  const nonAnonymousPassages = useRecoilValue(passagesNonAnonymousPerDatePerTeamSelector({ date }));
+  const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date }));
+  const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date }));
 
   useEffect(() => {
-    onUpdateResults(Math.max(report?.passages || 0, nonAnonymousPassages));
-  }, [report?.passages, nonAnonymousPassages]);
+    onUpdateResults(numberOfNonAnonymousPassages + numberOfAnonymousPassages);
+  }, [numberOfNonAnonymousPassages, numberOfAnonymousPassages]);
 
   return (
     <>
-      <TabTitle>Passages</TabTitle>
-      <Row style={{ marginBottom: 20 }}>
-        <Col md={2} />
-        <Col md={4}>
-          <Card title="Nombre de passages anonymes" count={anonymousPassages} unit={`passage${report?.passages > 1 ? 's' : ''}`} />
-        </Col>
-        <Col md={4}>
-          <Card title="Nombre de passages non-anonymes" count={nonAnonymousPassages} unit={`passage${report?.passages > 1 ? 's' : ''}`} />
-        </Col>
-      </Row>
-      <CommentCreatedAt date={report?.date} onUpdateResults={setNonAnonymousPassages} forPassages />
+      <StyledBox>
+        <TabTitle>Passages</TabTitle>
+        <Row style={{ marginBottom: 20 }}>
+          <Col md={2} />
+          <Col md={4}>
+            <Card title="Nombre de passages anonymes" count={numberOfAnonymousPassages} unit={`passage${numberOfAnonymousPassages > 1 ? 's' : ''}`} />
+          </Col>
+          <Col md={4}>
+            <Card
+              title="Nombre de passages non-anonymes"
+              count={numberOfNonAnonymousPassages}
+              unit={`passage${numberOfNonAnonymousPassages > 1 ? 's' : ''}`}
+            />
+          </Col>
+        </Row>
+        <Table
+          className="Table"
+          title={`Passages non-anonymes ajoutés le ${toFrenchDate(date)}`}
+          data={nonAnonymousPassages}
+          noData="Pas de passage ce jour"
+          onRowClick={(passage) => {
+            try {
+              history.push(`/person/${passage.person._id}`);
+            } catch (errorLoadingPassage) {
+              capture(errorLoadingPassage, { extra: { message: 'error loading passage from report', passage, date } });
+            }
+          }}
+          rowKey="_id"
+          columns={[
+            {
+              title: 'Heure',
+              dataKey: 'createdAt',
+              render: (comment) => <span>{dayjs(comment.createdAt).format('HH:mm')}</span>,
+            },
+            {
+              title: 'Utilisateur',
+              dataKey: 'user',
+              render: (comment) => <UserName id={comment.user} />,
+            },
+            {
+              title: 'Type',
+              dataKey: 'type',
+              render: (comment) => <span>Personne suivie</span>,
+            },
+            {
+              title: 'Nom',
+              dataKey: 'person',
+              render: (comment) => (
+                <>
+                  <b></b>
+                  <b>{comment.person.name}</b>
+                </>
+              ),
+            },
+            {
+              title: 'Commentaire',
+              dataKey: 'comment',
+              render: (passage) => {
+                return (
+                  <p>
+                    {passage.comment
+                      ? passage.comment.split('\n').map((c, i, a) => {
+                          if (i === a.length - 1) return c;
+                          return (
+                            <React.Fragment key={i}>
+                              {c}
+                              <br />
+                            </React.Fragment>
+                          );
+                        })
+                      : ''}
+                  </p>
+                );
+              },
+            },
+          ]}
+        />
+      </StyledBox>
     </>
   );
 };
@@ -660,7 +726,7 @@ const TabTitle = styled.span`
   width: 100%;
   color: #1d2021;
   text-transform: none;
-  padding: 16px;
+  padding: 16px 0;
   display: block;
   @media print {
     display: block !important;

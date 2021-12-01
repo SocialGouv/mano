@@ -7,7 +7,13 @@ import { useHistory, useLocation } from 'react-router-dom';
 import Header from '../../components/header';
 
 import { today } from '../../services/date';
-import { actionsByStatusSelector, lastReportSelector, todaysReportSelector } from '../../recoil/selectors';
+import {
+  actionsByStatusSelector,
+  lastReportSelector,
+  numberOfPassagesAnonymousPerDatePerTeamSelector,
+  numberOfPassagesNonAnonymousPerDatePerTeamSelector,
+  todaysReportSelector,
+} from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
@@ -21,14 +27,19 @@ import { useAuth } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';
 import { useRecoilValue } from 'recoil';
+import { useComments } from '../../recoil/comments';
 
 const Reception = () => {
   const { currentTeam, organisation } = useAuth();
-  const { loading: reportsLoading, addReport, updateReport, incrementPassage } = useReports();
+  const { loading: reportsLoading, addReport, updateReport } = useReports();
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
   const lastReport = useRecoilValue(lastReportSelector);
+  const { addComment } = useComments();
+
+  const anonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: today() }));
+  const nonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: today() }));
 
   const { persons } = usePersons();
   const history = useHistory();
@@ -38,8 +49,8 @@ const Reception = () => {
   const [passages, setPassages] = useState(todaysReport?.passages || 0);
   const [addingPassage, setAddingPassage] = useState(false);
   useEffect(() => {
-    setPassages(todaysReport?.passages || 0);
-  }, [todaysReport?.passages]);
+    setPassages(anonymousPassages + nonAnonymousPassages);
+  }, [anonymousPassages, nonAnonymousPassages]);
 
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
@@ -73,13 +84,26 @@ const Reception = () => {
     await updateReport(reportUpdate);
   };
 
-  const onAddPassage = async () => {
-    setAddingPassage(true);
-    setPassages((p) => p + (selectedPersons.length || 1));
-    await incrementPassage(todaysReport, {
-      persons: selectedPersons,
-      // onSuccess: () => onSelectPerson([]),
+  const incrementPassage = async (report, { newValue = null } = {}) => {
+    const res = await updateReport({
+      ...report,
+      passages: newValue,
     });
+    return res;
+  };
+
+  const onAddPassageForPersons = async () => {
+    if (!selectedPersons.length) return;
+    setAddingPassage(true);
+    for (const person of selectedPersons) {
+      const commentBody = {
+        comment: 'Passage enregistré',
+        item: person._id,
+        person: person._id,
+        type: 'person',
+      };
+      await addComment(commentBody);
+    }
     setAddingPassage(false);
   };
 
@@ -114,7 +138,7 @@ const Reception = () => {
           <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
             <CreateAction noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
             <ButtonCustom
-              onClick={onAddPassage}
+              onClick={onAddPassageForPersons}
               color="primary"
               title="Ajouter un passage"
               padding="12px 24px"
@@ -140,7 +164,7 @@ const Reception = () => {
               onClick={async () => {
                 setAddingPassage(true);
                 setPassages((p) => p + 1);
-                await incrementPassage(todaysReport);
+                await incrementPassage(todaysReport, { newValue: anonymousPassages + 1 });
                 setAddingPassage(false);
               }}
               color="link"
@@ -151,15 +175,15 @@ const Reception = () => {
             <ButtonCustom
               onClick={async () => {
                 setAddingPassage(true);
-                const newValue = passages - 1;
-                setPassages(newValue);
-                await incrementPassage(todaysReport, { newValue });
+                if (!anonymousPassages) return;
+                setPassages((p) => p - 1);
+                await incrementPassage(todaysReport, { newValue: anonymousPassages - 1 });
                 setAddingPassage(false);
               }}
               color="link"
-              title="Retirer un passage"
+              title="Retirer un passage anonyme"
               padding="0px"
-              disabled={addingPassage}
+              disabled={addingPassage || !anonymousPassages}
             />
           </Card>
         </Col>
