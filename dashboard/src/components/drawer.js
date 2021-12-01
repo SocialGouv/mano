@@ -62,7 +62,7 @@ const Drawer = () => {
         ) */}
           {['admin'].includes(user.role) && (
             <li>
-              <NavLink to={`/organisation/${organisation._id}`} disabled activeClassName="active">
+              <NavLink to={`/organisation/${organisation._id}`} activeClassName="active">
                 Organisation
               </NavLink>
             </li>
