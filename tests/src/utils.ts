@@ -4,7 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const postgresqlUrl = `${process.env.PGBASEURL}/${process.env.PGDATABASE}`;
 
-export async function connectWith(email: string, password: string) {
+export async function connectWith(email: string, password: string, orgEncryptionKey: string = '') {
   await page.goto("http://localhost:8090/auth");
   // Ensure not already connected
   try {
@@ -19,11 +19,16 @@ export async function connectWith(email: string, password: string) {
   await expect(page).toFill("#email", email);
   await expect(page).toFill("#password", password);
   await expect(page).toClick("button[type=submit]", { text: "Se connecter" });
+  if (!!orgEncryptionKey) {
+    await expect(page).toMatch("Clé de chiffrement d'organisation");
+    await expect(page).toFill("#orgEncryptionKey", orgEncryptionKey);
+    await expect(page).toClick("button[type=submit]", { text: "Se connecter" });
+  }
 }
 
 // React router seems broken for reason.
 export async function navigateWithReactRouter(path: string = "/search") {
-  return await page.$eval("a[href='" + path + "']", (el) =>
+  return page.$eval("a[href='" + path + "']", (el) =>
     (el as HTMLElement).click()
   );
 }
@@ -58,18 +63,18 @@ export async function useSuperAdminAndOrga() {
   );
   await client.query(
     `INSERT INTO mano."Organisation" (
-      _id, 
-      name, 
-      "createdAt", 
-      "updatedAt", 
-      categories, 
+      _id,
+      name,
+      "createdAt",
+      "updatedAt",
+      categories,
       "encryptionEnabled"
     ) VALUES (
-      $1, 
-      'Default orga', 
+      $1,
+      'Default orga',
       $2,
-      $2, 
-      null, 
+      $2,
+      null,
       false
     );`,
     [orgId, date]
@@ -78,35 +83,108 @@ export async function useSuperAdminAndOrga() {
   await client.query(`delete from mano."User" where name='Super Admin'`);
   await client.query(
     `INSERT INTO mano."User" (
-      _id, 
-      name, 
-      email, 
-      password, 
-      organisation, 
-      "lastLoginAt", 
-      "createdAt", 
-      "updatedAt", 
+      _id,
+      name,
+      email,
+      password,
+      organisation,
+      "lastLoginAt",
+      "createdAt",
+      "updatedAt",
       role,
-      "lastChangePasswordAt", 
-      "forgotPasswordResetExpires", 
+      "lastChangePasswordAt",
+      "forgotPasswordResetExpires",
       "forgotPasswordResetToken",
       "termsAccepted"
     ) VALUES (
-      $1, 
-      'Super Admin', 
-      'admin@example.org', 
-      $2, 
+      $1,
+      'Super Admin',
+      'superadmin@example.org',
+      $2,
       $3,
-      $4, 
-      $4, 
-      $4, 
+      $4,
+      $4,
+      $4,
       'superadmin',
-      $5::date, 
-      null, 
-      null, 
+      $5::date,
+      null,
+      null,
       $4
     );`,
     [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
   );
   await client.end();
 }
+
+
+export async function useEncryptedOrga() {
+  const client = new pg.Client(postgresqlUrl);
+  await client.connect();
+
+  const orgId = uuidv4();
+  const userId = uuidv4();
+
+  const date = "2021-01-01";
+
+  await client.query(
+    `delete from mano."Organisation" where name='Encrypted orga'`
+  );
+  await client.query(
+    `INSERT INTO mano."Organisation" (
+      _id,
+      name,
+      "createdAt",
+      "updatedAt",
+      categories,
+      "encryptionEnabled",
+      "encryptionLastUpdateAt",
+      "encryptedVerificationKey"
+    ) VALUES (
+      $1,
+      'Encrypted orga',
+      $2,
+      $2,
+      null,
+      true,
+      $2,
+      'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0='
+    );`,
+    [orgId, date]
+  );
+
+  await client.query(`delete from mano."User" where name='Encrypted Orga Admin'`);
+  await client.query(
+    `INSERT INTO mano."User" (
+      _id,
+      name,
+      email,
+      password,
+      organisation,
+      "lastLoginAt",
+      "createdAt",
+      "updatedAt",
+      role,
+      "lastChangePasswordAt",
+      "forgotPasswordResetExpires",
+      "forgotPasswordResetToken",
+      "termsAccepted"
+    ) VALUES (
+      $1,
+      'Encrypted Orga Admin',
+      'adminencrypted@example.org',
+      $2,
+      $3,
+      $4,
+      $4,
+      $4,
+      'admin',
+      $5::date,
+      null,
+      null,
+      $4
+    );`,
+    [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
+  );
+  await client.end();
+}
+
