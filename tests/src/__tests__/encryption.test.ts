@@ -19,4 +19,12 @@ describe("Encryption", () => {
     await new Promise((resolve) => setTimeout(resolve, 3000));
     await expect(page).toMatch("Encrypted orga");
   });
+
+  it("should allow an admin to change the encryption key", async () => {
+    await useEncryptedOrga();
+    await connectWith("adminEncrypted@example.org", "secret", "plouf")
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await expect(page).toMatch("Encrypted orga");
+
+  });
 });

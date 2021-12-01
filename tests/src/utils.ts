@@ -116,13 +116,14 @@ export async function useSuperAdminAndOrga() {
   await client.end();
 }
 
-
 export async function useEncryptedOrga() {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();
 
   const orgId = uuidv4();
   const userId = uuidv4();
+  const teamId = uuidv4();
+  const relUserTeamId = uuidv4();
 
   const date = "2021-01-01";
 
@@ -185,6 +186,42 @@ export async function useEncryptedOrga() {
     );`,
     [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
   );
+
+  await client.query(`delete from mano."Team" where name='Encrypted Orga Team'`);
+  await client.query(
+    `INSERT INTO mano."Team" (
+      _id,
+      name,
+      organisation,
+      "createdAt",
+      "updatedAt"
+    ) VALUES (
+      $1,
+      'Encrypted Orga Team',
+      $2,
+      $3,
+      $3
+    );`,
+    [teamId, orgId, date]
+  );
+
+  await client.query(
+    `INSERT INTO mano."RelUserTeam" (
+      _id,
+      "user",
+      "team",
+      "createdAt",
+      "updatedAt"
+    ) VALUES (
+      $1,
+      $2,
+      $3,
+      $4,
+      $4
+    );`,
+    [relUserTeamId, userId, teamId, date]
+  );
+
   await client.end();
 }
 
