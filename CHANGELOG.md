@@ -1,3 +1,10 @@
+## [1.29.6](https://github.com/SocialGouv/mano/compare/v1.29.5...v1.29.6) (2021-12-01)
+
+
+### Bug Fixes
+
+* **dashboard:** can edit choices in multi-choices field ([#175](https://github.com/SocialGouv/mano/issues/175)) ([136e65a](https://github.com/SocialGouv/mano/commit/136e65a9431a84b21c9b386b00ed9079dc089cd0))
+
 ## [1.29.5](https://github.com/SocialGouv/mano/compare/v1.29.4...v1.29.5) (2021-11-29)
 
 
