@@ -18,6 +18,8 @@ import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
+import ExportData from '../data-import-export/ExportData';
+import ImportData from '../data-import-export/ImportData';
 
 const View = () => {
   const { organisation, setOrganisation } = useAuth();
@@ -53,13 +55,13 @@ const View = () => {
                     </FormGroup>
                   </Col>
                 </Row>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
+                  <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} width={200} />
                   <DeleteOrganisation />
-                  <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
                 </div>
                 <hr />
                 <Title>Encryption</Title>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
                   <EncryptionKey />
                 </div>
                 <hr />
@@ -163,6 +165,12 @@ const View = () => {
                     </>
                   )}
                 </>
+                <hr />
+                <Title>Import/Export</Title>
+                <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
+                  <ImportData />
+                  <ExportData />
+                </div>
               </>
             );
           }}

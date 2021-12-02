@@ -2,13 +2,11 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
-import XLSX from 'xlsx';
 import moment from 'moment';
 
 import Header from '../../components/header';
 
 import Loading from '../../components/loading';
-import ButtonCustom from '../../components/ButtonCustom';
 import {
   consumptionsOptions,
   healthInsuranceOptions,
@@ -29,13 +27,11 @@ import { CustomResponsiveBar, CustomResponsivePie } from '../../components/chart
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
 import { useAuth } from '../../recoil/auth';
-import { commentsState } from '../../recoil/comments';
 import { actionsState, useActions } from '../../recoil/actions';
-import { placesState } from '../../recoil/places';
 import { reportsState } from '../../recoil/reports';
-import { territoriesState } from '../../recoil/territory';
 import { useRefresh } from '../../recoil/refresh';
 import { useRecoilValue } from 'recoil';
+import ExportData from '../data-import-export/ExportData';
 moment.locale('fr');
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
@@ -46,54 +42,6 @@ const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
   return data.filter((item) => moment(item.createdAt).isBefore(endDate) && moment(item.createdAt).isAfter(startDate));
 };
 
-const createSheet = (data) => {
-  /*
-  [
-    [the, first, array, is, the, header],
-    [then, its, the, data],
-  ]
-   */
-
-  const encryptionFields = ['encryptedEntityKey', 'entityKey'];
-
-  const header = [
-    ...data
-      .reduce((columns, item) => {
-        for (let key of Object.keys(item)) {
-          if (!columns.find((col) => col === key)) columns.push(key);
-        }
-        return columns;
-      }, [])
-      .filter((column) => !encryptionFields.includes(column)),
-    ...encryptionFields,
-  ];
-
-  const sheet = data.reduce(
-    (xlsxData, item, index) => {
-      const row = [];
-      for (let column of header) {
-        const value = item[column];
-        if (!value) {
-          row.push(null);
-          continue;
-        }
-        if (typeof value === 'string') {
-          row.push(value);
-          continue;
-        }
-        if (typeof value[0] === 'string') {
-          row.push(value.join(', '));
-          continue;
-        }
-        row.push(JSON.stringify(value));
-      }
-      return [...xlsxData, row];
-    },
-    [header]
-  );
-  return XLSX.utils.aoa_to_sheet(sheet);
-};
-
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
 
 const Stats = () => {
@@ -102,14 +50,11 @@ const Stats = () => {
   const allPersons = useRecoilValue(personsState);
   const { loading: actionsLoading } = useActions();
   const allActions = useRecoilValue(actionsState);
-  const comments = useRecoilValue(commentsState);
   const allreports = useRecoilValue(reportsState);
-  const territories = useRecoilValue(territoriesState);
   const allObservations = useRecoilValue(territoryObservationsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const places = useRecoilValue(placesState);
   const { refresh } = useRefresh();
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
@@ -137,20 +82,6 @@ const Stats = () => {
   const reports = getDataForPeriod(allreports, period);
   const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
 
-  const onExportToCSV = () => {
-    const workbook = XLSX.utils.book_new();
-    // actions
-    XLSX.utils.book_append_sheet(workbook, createSheet(allActions), 'actions');
-    XLSX.utils.book_append_sheet(workbook, createSheet(allPersons), 'personnes suivies');
-    XLSX.utils.book_append_sheet(workbook, createSheet(comments), 'comments');
-    XLSX.utils.book_append_sheet(workbook, createSheet(territories), 'territoires');
-    XLSX.utils.book_append_sheet(workbook, createSheet(allObservations), 'observations de territoires');
-    XLSX.utils.book_append_sheet(workbook, createSheet(places), 'lieux fréquentés');
-    XLSX.utils.book_append_sheet(workbook, createSheet(teams), 'équipes');
-    XLSX.utils.book_append_sheet(workbook, createSheet(allreports), 'comptes rendus');
-    XLSX.writeFile(workbook, 'data.xlsx');
-  };
-
   return (
     <Container>
       <Header title="Statistiques" onRefresh={() => setLoading(true)} />
@@ -161,7 +92,7 @@ const Stats = () => {
         </Col>
         {['admin'].includes(user.role) && (
           <Col md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <ButtonCustom color="primary" onClick={onExportToCSV} title="Exporter les données en .xlsx" padding="12px 24px" />
+            <ExportData />
           </Col>
         )}
       </Row>

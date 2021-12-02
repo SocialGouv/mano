@@ -11,6 +11,27 @@ const RelPersonTeam = require("../models/relPersonTeam");
 const encryptedTransaction = require("../utils/encryptedTransaction");
 const { ENCRYPTED_FIELDS_ONLY } = require("../config");
 
+router.post(
+  "/import",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res) => {
+    const persons = req.body.persons.map((p) => ({
+      ...p,
+      organisation: req.user.organisation,
+      user: req.user._id,
+    }));
+
+    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
+      const data = await Person.bulkCreate(persons, { returning: true, transaction: tx });
+
+      if (ENCRYPTED_FIELDS_ONLY) return data;
+
+      return data.toJSON().map((p) => ({ ...p, assignedTeams: [] }));
+    });
+    return res.status(status).send({ ok, data, error });
+  })
+);
+
 //@checked
 router.post(
   "/",

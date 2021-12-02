@@ -1,0 +1,91 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+import React, { useRef } from 'react';
+import XLSX from 'xlsx';
+
+import ButtonCustom from '../../components/ButtonCustom';
+import { encryptedFields as personFields, personsState } from '../../recoil/persons';
+import { useAuth } from '../../recoil/auth';
+import { useRecoilValue } from 'recoil';
+import { toastr } from 'react-redux-toastr';
+
+const importableFields = personFields.filter((f) => !['user', '_id', 'organisation', 'team', 'assignedTeams'].includes(f));
+
+const ImportData = () => {
+  const { user } = useAuth();
+  const fileDialogRef = useRef(null);
+  const allPersons = useRecoilValue(personsState);
+
+  const onImportData = async (event) => {
+    try {
+      // if the user imports the same file twice, nothing happens
+      if (!event.target?.files?.length) return; // probably cancel button
+      const file = event.target.files[0];
+      const data = await file.arrayBuffer();
+      const workbook = XLSX.read(data);
+      const { SheetNames, Sheets } = workbook;
+      const personsSheetName = SheetNames.find((name) => name.includes('person'));
+      const personsSheet = Sheets[personsSheetName];
+      console.log({ personsSheet });
+      /*
+      something like that:
+      !margins: {left: 1, right: 1, top: 1, bottom: 1, header: 0.25, …}
+      !ref: "A1:AE569"
+      A1: {t: 's', v: '_id', r: '<t>_id</t>', h: '_id', w: '_id'}
+      A2: {t: 's', v: '49d536d7-4e7f-437e-ae09-5d429d52473d', r: '<t>49d536d7-4e7f-437e-ae09-5d429d52473d</t>', h: '49d536d7-4e7f-437e-ae09-5d429d52473d', w: '49d536d7-4e7f-437e-ae09-5d429d52473d'}
+      A3: {t: 's', v: '98973577-4efb-44ad-92e1-61dc0bb792c0', r: '<t>98973577-4efb-44ad-92e1-61dc0bb792c0</t>', h: '98973577-4efb-44ad-92e1-61dc0bb792c0', w: '98973577-4efb-44ad-92e1-61dc0bb792c0'}
+      A4: {t: 's', v: '15d01afe-e93c-4a69-8322-3c26124fc5be', r: '<t>15d01afe-e93c-4a69-8322-3c26124fc5be</t>', h: '15d01afe-e93c-4a69-8322-3c26124fc5be', w: '15d01afe-e93c-4a69-8322-3c26124fc5be'}
+      A5: {t: 's', v: '5f723256-111f-470f-b297-4cbf81355569', r: '<t>5f723256-111f-470f-b297-4cbf81355569</t>', h: '5f723256-111f-470f-b297-4cbf81355569', w: '5f723256-111f-470f-b297-4cbf81355569'}
+      A6: {t: 's', v: '9f419305-a49a-481c-b4dd-9e1e5623e718', r: '<t>9f419305-a49a-481c-b4dd-9e1e5623e718</t>', h: '9f419305-a49a-481c-b4dd-9e1e5623e718', w: '9f419305-a49a-481c-b4dd-9e1e5623e718'}
+      A7: {t: 's', v: 'a462c3ec-fb9c-47db-9386-8b5e08fec7d3', r: '<t>a462c3ec-fb9c-47db-9386-8b5e08fec7d3</t>', h: 'a462c3ec-fb9c-47db-9386-8b5e08fec7d3', w: 'a462c3ec-fb9c-47db-9386-8b5e08fec7d3'}
+
+      */
+      const sheetCells = Object.keys(personsSheet);
+      const headerCells = sheetCells
+        .filter((cell) => cell.replace(/\D+/g, '') === '1') // ['A1', 'B1'...]
+        .filter((headerKey) => importableFields.includes(personsSheet[headerKey].v));
+
+      const headerColumnsAndFieldname = headerCells.map((cell) => [cell.replace('1', ''), personsSheet[cell].v]); // [['C', 'name], ['D', birthdate]]
+
+      // .replace(/[^a-zA-Z]+/g, '')
+      const lastRow = parseInt(personsSheet['!ref'].split(':')[1].replace(/\D+/g, ''), 10);
+
+      const persons = [];
+      for (let i = 2; i <= lastRow; i++) {
+        const person = {};
+        for (const [column, fieldname] of headerColumnsAndFieldname) {
+          person[fieldname] = personsSheet[`${column}${i}`]?.v;
+        }
+        persons.push(person);
+      }
+
+      console.log({ persons });
+    } catch (e) {
+      console.log(e);
+      toastr.error("Désolé, nous n'avons pas pu lire votre fichier.", 'Mais vous pouvez réssayer !');
+    }
+  };
+
+  if (!['admin'].includes(user.role)) return null;
+
+  return (
+    <>
+      <ButtonCustom
+        onClick={() => fileDialogRef.current.click()}
+        color="primary"
+        title="Importer des données (personnes suivies) en .xlsx"
+        padding="12px 24px"
+        disabled={!!allPersons.length}
+      />
+      <input
+        ref={fileDialogRef}
+        type="file"
+        id="fileDialog"
+        accept="csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        style={{ display: 'none' }}
+        onChange={onImportData}
+      />
+    </>
+  );
+};
+
+export default ImportData;

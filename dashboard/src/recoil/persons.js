@@ -163,7 +163,7 @@ Utils
 
 */
 
-const encryptedFields = [
+export const encryptedFields = [
   'user',
   'name',
   'otherNames',
