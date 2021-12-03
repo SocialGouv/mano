@@ -29,11 +29,14 @@ const InputLabelled = React.forwardRef(
     ref
   ) => {
     if (!editable) {
+      const value = String(props.value || '')
+        .split('\\n')
+        .join('\u000A');
       return (
         <FieldContainer noMargin={noMargin}>
           {!!label && <InlineLabel bold>{`${label} : `}</InlineLabel>}
           <Row>
-            <Content ref={ref}>{`${props.value?.split('\\n').join('\u000A')}`}</Content>
+            <Content ref={ref}>{value}</Content>
             <Spacer grow />
             {!!buttonCaption && (
               <Button
@@ -51,7 +54,7 @@ const InputLabelled = React.forwardRef(
     return (
       <InputContainer>
         {label && <Label label={label} />}
-        {multiline ? <InputMultilineAutoAdjust ref={ref} {...props} /> : <Input ref={ref} {...props} />}
+        {multiline ? <InputMultilineAutoAdjust ref={ref} {...props} /> : <Input ref={ref} {...props} value={String(props.value)} />}
         {Boolean(EndIcon) && Boolean(props?.value?.length) && (
           <TouchableWithoutFeedback onPress={onEndIconPress}>
             <IconWrapper>
