@@ -1,3 +1,24 @@
+## [1.29.7](https://github.com/SocialGouv/mano/compare/v1.29.6...v1.29.7) (2021-12-03)
+
+
+### Bug Fixes
+
+* **api,dashboard:** change sentry url ([#180](https://github.com/SocialGouv/mano/issues/180)) ([41dce39](https://github.com/SocialGouv/mano/commit/41dce39d3cb4cf0b295a34b82cec72f18b694d38))
+
+## [1.29.6](https://github.com/SocialGouv/mano/compare/v1.29.5...v1.29.6) (2021-12-01)
+
+
+### Bug Fixes
+
+* **dashboard:** can edit choices in multi-choices field ([#175](https://github.com/SocialGouv/mano/issues/175)) ([136e65a](https://github.com/SocialGouv/mano/commit/136e65a9431a84b21c9b386b00ed9079dc089cd0))
+
+## [1.29.5](https://github.com/SocialGouv/mano/compare/v1.29.4...v1.29.5) (2021-11-29)
+
+
+### Bug Fixes
+
+* **dashboard:** actions in reception ([#172](https://github.com/SocialGouv/mano/issues/172)) ([038575f](https://github.com/SocialGouv/mano/commit/038575f90be5cec31e5b369d5e2f01ec750586ac))
+
 ## [1.29.4](https://github.com/SocialGouv/mano/compare/v1.29.3...v1.29.4) (2021-11-26)
 
 

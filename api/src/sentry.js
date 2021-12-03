@@ -10,7 +10,7 @@ const { VERSION, ENVIRONMENT } = require("./config");
 
 if (ENVIRONMENT !== "development" && ENVIRONMENT !== "test") {
   Sentry.init({
-    dsn: "https://7b294e89e98e4ffdaeeb74102f050567@o548798.ingest.sentry.io/5833236",
+    dsn: "https://d5bde308505f4860b199e7031dcd17d6@o348403.ingest.sentry.io/5384501",
     environment: `api-${ENVIRONMENT}`,
     release: VERSION,
     // Set tracesSampleRate to 1.0 to capture 100%

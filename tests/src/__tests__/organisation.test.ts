@@ -18,7 +18,7 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to create organisation", async () => {
-    await connectWith("admin@example.org", "secret");
+    await connectWith("superadmin@example.org", "secret");
     await expect(page).toMatch("Support");
     await expect(page).toClick("button[type=submit]");
     await expect(page).toMatch(
@@ -47,7 +47,7 @@ describe("Organisation CRUD", () => {
     await connectWith("test+firstorga@example.org", "secret");
     await expect(page).toMatch("Charte des Utilisateurs de Mano");
     await page.evaluate(async (_) => {
-      return await new Promise((resolve) => {
+      return new Promise((resolve) => {
         setTimeout(() => {
           document?.querySelector(".main > div")?.scrollBy(0, 3000000);
           resolve("ok");

@@ -196,10 +196,10 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                     <Col md={6}>
                       {!!['enum', 'multi-choice'].includes(field.type) && (
                         <FormGroup>
-                          <Label>Type</Label>
+                          <Label>Choix</Label>
                           <SelectCustom
                             creatable
-                            options={[...(field.options || []) /* Do not mutate immutable property thanks to spread operator. */]
+                            options={[...(editingField.options || [])]
                               .sort((c1, c2) => c1.localeCompare(c2))
                               .map((opt) => ({ value: opt, label: opt }))}
                             value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}
