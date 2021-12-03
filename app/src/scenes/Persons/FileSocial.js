@@ -14,8 +14,26 @@ import InputLabelled from '../../components/InputLabelled';
 import EmploymentSituationSelect from '../../components/Selects/EmploymentSituationSelect';
 import AddressDetailSelect, { isFreeFieldAddressDetail } from '../../components/Selects/AddressDetailSelect';
 import colors from '../../utils/colors';
+import CustomFieldInput from '../../components/CustomFieldInput';
+import { compose } from 'recompose';
+import withContext from '../../contexts/withContext';
+import PersonsContext from '../../contexts/persons';
+import { findNodeHandle } from 'react-native';
 
 class FileSocial extends React.Component {
+  _scrollToInput = (ref) => {
+    if (!ref) return;
+    setTimeout(() => {
+      ref.measureLayout(
+        findNodeHandle(this.scrollView),
+        (x, y, width, height) => {
+          this.scrollView.scrollTo({ y: y - 100, animated: true });
+        },
+        (error) => console.log('error scrolling', error)
+      );
+    }, 250);
+  };
+
   render() {
     const {
       editable,
@@ -40,7 +58,7 @@ class FileSocial extends React.Component {
     return (
       <>
         <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Dossier social" />
-        <ScrollContainer backgroundColor={backgroundColor || colors.app.color}>
+        <ScrollContainer ref={(r) => (this.scrollView = r)} backgroundColor={backgroundColor || colors.app.color}>
           <PersonalSituationSelect value={personalSituation} onSelect={(personalSituation) => onChange({ personalSituation })} editable={editable} />
           <InputLabelled
             label="Structure de suivi social"
@@ -73,9 +91,25 @@ class FileSocial extends React.Component {
           <RessourcesMultiCheckBoxes values={resources} onChange={(resources) => onChange({ resources })} editable={editable} />
           <WhyHomelessMultiCheckBoxes values={reasons} onChange={(reasons) => onChange({ reasons })} editable={editable} />
           {!editable && <Spacer />}
+          {(this.props.context.customFieldsPersonsSocial || [])
+            .filter((f) => f.enabled)
+            .map((field) => {
+              const { label, name } = field;
+              return (
+                <CustomFieldInput
+                  label={label}
+                  field={field}
+                  value={this.props[name]}
+                  handleChange={(newValue) => onChange({ [name]: newValue })}
+                  editable={editable}
+                  ref={(r) => (this[`${name}-ref`] = r)}
+                  onFocus={() => this._scrollToInput(this[`${name}-ref`])}
+                />
+              );
+            })}
           <ButtonsContainer>
             <Button
-              caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+              caption={editable ? 'Mettre à jour' : 'Modifier'}
               onPress={editable ? onUpdatePerson : onEdit}
               disabled={editable ? isUpdateDisabled() : false}
               loading={updating}
@@ -87,4 +121,4 @@ class FileSocial extends React.Component {
   }
 }
 
-export default FileSocial;
+export default compose(withContext(PersonsContext))(FileSocial);

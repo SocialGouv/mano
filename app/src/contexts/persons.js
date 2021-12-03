@@ -1,9 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import ActionsContext from './actions';
+import AuthContext from './auth';
 import CommentsContext from './comments';
 import RelsPersonPlaceContext from './relPersonPlace';
 
@@ -16,6 +16,17 @@ export const PersonsProvider = ({ children }) => {
 
   const [state, setState] = useState({ personKey: 0, persons: [], loading: false, lastRefresh: undefined });
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-persons', 0);
+
+  const { organisation } = useContext(AuthContext);
+
+  let customFieldsPersonsMedical;
+  if (Array.isArray(organisation.customFieldsPersonsMedical)) customFieldsPersonsMedical = organisation.customFieldsPersonsMedical;
+  else customFieldsPersonsMedical = defaultMedicalCustomFields;
+
+  let customFieldsPersonsSocial;
+  if (Array.isArray(organisation.customFieldsPersonsSocial)) customFieldsPersonsSocial = organisation.customFieldsPersonsSocial;
+  else customFieldsPersonsSocial = [];
+
   const setPersons = (newPersons) => {
     if (newPersons) {
       setState(({ personKey }) => ({
@@ -79,7 +90,10 @@ export const PersonsProvider = ({ children }) => {
     try {
       const existingPerson = state.persons.find((p) => p.name === person.name);
       if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
-      const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
+      const response = await API.post({
+        path: '/person',
+        body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(person),
+      });
       if (response.ok) {
         setState(({ persons, personKey, ...s }) => ({
           ...s,
@@ -98,7 +112,7 @@ export const PersonsProvider = ({ children }) => {
       const oldPerson = state.persons.find((a) => a._id === person._id);
       const response = await API.put({
         path: `/person/${person._id}`,
-        body: preparePersonForEncryption(person),
+        body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(person),
       });
       if (response.ok) {
         const newPerson = response.decryptedData;
@@ -131,6 +145,8 @@ export const PersonsProvider = ({ children }) => {
     <PersonsContext.Provider
       value={{
         ...state,
+        customFieldsPersonsMedical,
+        customFieldsPersonsSocial,
         refreshPersons,
         deletePerson,
         addPerson,
@@ -175,9 +191,10 @@ const encryptedFields = [
   'assignedTeams',
 ];
 
-export const preparePersonForEncryption = (person) => {
+export const preparePersonForEncryption = (customFieldsSocial, customFieldsMedical) => (person) => {
+  const encryptedFieldsIncludingCustom = [...customFieldsSocial.map((f) => f.name), ...customFieldsMedical.map((f) => f.name), ...encryptedFields];
   const decrypted = {};
-  for (let field of encryptedFields) {
+  for (let field of encryptedFieldsIncludingCustom) {
     decrypted[field] = person[field];
   }
   return {
@@ -347,6 +364,27 @@ export const outOfActiveListReasonOptions = [
   'Perdu de vue',
   'Hospitalisation',
   'Reconduite à la frontière',
+];
+
+export const defaultMedicalCustomFields = [
+  {
+    name: 'consumptions',
+    label: 'Consommations',
+    type: 'multi-choice',
+    options: consumptionsOptions,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'vulnerabilities',
+    label: 'Vulnérabilités',
+    type: 'multi-choice',
+    options: vulnerabilitiesOptions,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
 ];
 
 export const filterPersonsBase = [

@@ -174,8 +174,6 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
         <ModalBody>
           <Formik key={open} initialValues={editingField || newField()} onSubmit={onSaveField}>
             {({ values: field, handleChange, handleSubmit, isSubmitting }) => {
-              console.log('field', field);
-
               return (
                 <React.Fragment>
                   <Row>
