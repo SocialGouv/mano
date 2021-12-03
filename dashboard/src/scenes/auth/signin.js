@@ -144,7 +144,7 @@ const SignIn = () => {
             if (token) API.setToken(token);
             setOrganisation(organisation);
             if (!!values.orgEncryptionKey) {
-              const encryptionIsValid = await API.setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation.encryptedVerificationKey);
+              const encryptionIsValid = await API.setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
               if (!encryptionIsValid) return;
             }
             const teamResponse = await API.get({ path: '/team' });

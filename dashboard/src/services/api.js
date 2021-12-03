@@ -210,7 +210,7 @@ const useApiService = ({
     return item;
   };
 
-  const setOrgEncryptionKey = async (orgEncryptionKey, encryptedVerificationKey) => {
+  const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
     const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
     if (!!encryptedVerificationKey) {
       const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
@@ -218,7 +218,7 @@ const useApiService = ({
         handleWrongKey?.();
         return false;
       }
-      capture(`Pour orga ${organisation.name} ${organisation._id}: ${orgEncryptionKey}`);
+      capture(`Pour orga ${name} ${_id}: ${orgEncryptionKey}`);
     }
     hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
     enableEncrypt = true;
