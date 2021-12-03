@@ -1,3 +1,10 @@
+## [1.29.7](https://github.com/SocialGouv/mano/compare/v1.29.6...v1.29.7) (2021-12-03)
+
+
+### Bug Fixes
+
+* **api,dashboard:** change sentry url ([#180](https://github.com/SocialGouv/mano/issues/180)) ([41dce39](https://github.com/SocialGouv/mano/commit/41dce39d3cb4cf0b295a34b82cec72f18b694d38))
+
 ## [1.29.6](https://github.com/SocialGouv/mano/compare/v1.29.5...v1.29.6) (2021-12-01)
 
 
