@@ -21,7 +21,6 @@ import {
   usePersons,
   addressDetails,
   addressDetailsFixedFields,
-  consumptionsOptions,
   employmentOptions,
   genderOptions,
   healthInsuranceOptions,
@@ -29,7 +28,6 @@ import {
   personalSituationOptions,
   reasonsOptions,
   ressourcesOptions,
-  vulnerabilitiesOptions,
   yesNoOptions,
 } from '../../recoil/persons';
 import { useActions } from '../../recoil/actions';
