@@ -70,19 +70,14 @@ const TableCustomFields = ({ data, customFields }) => {
   const handleSubmit = async (newData) => {
     if (!newData) newData = mutableData.filter((field) => !!field.label.length);
     setIsSubmitting(true);
-    try {
-      const response = await API.put({
-        path: `/organisation/${organisation._id}`,
-        body: { [customFields]: newData },
-      });
-      if (response.ok) {
-        toastr.success('Mise à jour !');
-        setOrganisation(response.data);
-        setMutableData(response.data[customFields]);
-      }
-    } catch (orgUpdateError) {
-      console.log('error in updating organisation', orgUpdateError);
-      toastr.error('Erreur!', orgUpdateError.message);
+    const response = await API.put({
+      path: `/organisation/${organisation._id}`,
+      body: { [customFields]: newData },
+    });
+    if (response.ok) {
+      toastr.success('Mise à jour !');
+      setOrganisation(response.data);
+      setMutableData(response.data[customFields]);
     }
     setIsSubmitting(false);
   };

@@ -2,7 +2,6 @@ import { atom, useRecoilState } from 'recoil';
 import { useRelsPerson } from '../recoil/relPersonPlace';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 
 const sortPlaces = (p1, p2) => p1.name.localeCompare(p2.name);
 
@@ -48,7 +47,6 @@ export const usePlaces = () => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setLoading(false);
       return false;
     }
@@ -66,43 +64,33 @@ export const usePlaces = () => {
   };
 
   const addPlace = async (place) => {
-    try {
-      setLoading(true);
-      const res = await API.post({ path: '/place', body: preparePlaceForEncryption(place) });
-      if (res.ok) {
-        setPlaces((places) => [res.decryptedData, ...places].sort(sortPlaces));
-      }
-      setLoading(false);
-      return res;
-    } catch (error) {
-      capture('error in creating place' + error, { extra: { error, place } });
-      return { ok: false, error: error.message };
+    setLoading(true);
+    const res = await API.post({ path: '/place', body: preparePlaceForEncryption(place) });
+    if (res.ok) {
+      setPlaces((places) => [res.decryptedData, ...places].sort(sortPlaces));
     }
+    setLoading(false);
+    return res;
   };
 
   const updatePlace = async (place) => {
-    try {
-      setLoading(true);
-      const res = await API.put({
-        path: `/place/${place._id}`,
-        body: preparePlaceForEncryption(place),
-      });
-      if (res.ok) {
-        setPlaces((places) =>
-          places
-            .map((p) => {
-              if (p._id === place._id) return res.decryptedData;
-              return p;
-            })
-            .sort(sortPlaces)
-        );
-      }
-      setLoading(false);
-      return res;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating place', place } });
-      return { ok: false, error: error.message };
+    setLoading(true);
+    const res = await API.put({
+      path: `/place/${place._id}`,
+      body: preparePlaceForEncryption(place),
+    });
+    if (res.ok) {
+      setPlaces((places) =>
+        places
+          .map((p) => {
+            if (p._id === place._id) return res.decryptedData;
+            return p;
+          })
+          .sort(sortPlaces)
+      );
     }
+    setLoading(false);
+    return res;
   };
 
   return {

@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 import TerritoryObservationsContext from './territoryObservations';
 
 const TerritoryContext = React.createContext();
@@ -44,7 +43,6 @@ export const TerritoriesProvider = ({ children }) => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
     }
@@ -66,44 +64,34 @@ export const TerritoriesProvider = ({ children }) => {
   };
 
   const addTerritory = async (territory) => {
-    try {
-      const res = await API.post({ path: '/territory', body: prepareTerritoryForEncryption(territory) });
+    const res = await API.post({ path: '/territory', body: prepareTerritoryForEncryption(territory) });
 
-      if (res.ok) {
-        setState(({ territories, territoryKey, ...s }) => ({
-          ...s,
-          territoryKey: territoryKey + 1,
-          territories: [res.decryptedData, ...territories],
-        }));
-      }
-      return res;
-    } catch (error) {
-      capture('error in creating territory' + error, { extra: { error, territory } });
-      return { ok: false, error: error.message };
+    if (res.ok) {
+      setState(({ territories, territoryKey, ...s }) => ({
+        ...s,
+        territoryKey: territoryKey + 1,
+        territories: [res.decryptedData, ...territories],
+      }));
     }
+    return res;
   };
 
   const updateTerritory = async (territory) => {
-    try {
-      const res = await API.put({
-        path: `/territory/${territory._id}`,
-        body: prepareTerritoryForEncryption(territory),
-      });
-      if (res.ok) {
-        setState(({ territories, territoryKey, ...s }) => ({
-          ...s,
-          territoryKey: territoryKey + 1,
-          territories: territories.map((a) => {
-            if (a._id === territory._id) return res.decryptedData;
-            return a;
-          }),
-        }));
-      }
-      return res;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating territory', territory } });
-      return { ok: false, error: error.message };
+    const res = await API.put({
+      path: `/territory/${territory._id}`,
+      body: prepareTerritoryForEncryption(territory),
+    });
+    if (res.ok) {
+      setState(({ territories, territoryKey, ...s }) => ({
+        ...s,
+        territoryKey: territoryKey + 1,
+        territories: territories.map((a) => {
+          if (a._id === territory._id) return res.decryptedData;
+          return a;
+        }),
+      }));
     }
+    return res;
   };
 
   return (

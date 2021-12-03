@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 import AuthContext from './auth';
 import CommentsContext from './comments';
 
@@ -46,7 +45,6 @@ export const ActionsProvider = ({ children }) => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
     }
@@ -79,7 +77,6 @@ export const ActionsProvider = ({ children }) => {
       }
       return response;
     } catch (error) {
-      capture('error in creating action' + error, { extra: { error, action } });
       return { ok: false, error: error.message };
     }
   };
@@ -111,9 +108,6 @@ export const ActionsProvider = ({ children }) => {
         }));
       }
       return response;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating action', action } });
-      return { ok: false, error: error.message };
     } finally {
       if (response.ok) {
         const newAction = response.decryptedData;
@@ -125,12 +119,7 @@ export const ActionsProvider = ({ children }) => {
             action: oldAction._id,
             team: oldAction.team,
           };
-          const response = await addComment(comment);
-          if (!response.ok) {
-            capture(response.error, {
-              extra: { message: 'error in creating comment for action update', action, comment },
-            });
-          }
+          await addComment(comment);
         }
       }
     }

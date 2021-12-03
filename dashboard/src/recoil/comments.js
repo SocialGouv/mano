@@ -3,7 +3,6 @@ import { atom, useRecoilState } from 'recoil';
 import { useAuth } from '../recoil/auth';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 
 export const commentsState = atom({
   key: 'commentsState',
@@ -47,7 +46,6 @@ export const useComments = () => {
       return true;
     } catch (e) {
       setLoading(false);
-      capture(e.message, { extra: { response: e.response } });
       return false;
     }
   };
@@ -59,37 +57,27 @@ export const useComments = () => {
   };
 
   const addComment = async (body) => {
-    try {
-      if (!body.user) body.user = user._id;
-      if (!body.team) body.team = currentTeam._id;
-      if (!body.organisation) body.organisation = organisation._id;
-      const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
-      if (response.ok) setComments((comments) => [response.decryptedData, ...comments]);
-      return response;
-    } catch (error) {
-      capture('error in creating comment' + error, { extra: { error, body } });
-      return { ok: false, error: error.message };
-    }
+    if (!body.user) body.user = user._id;
+    if (!body.team) body.team = currentTeam._id;
+    if (!body.organisation) body.organisation = organisation._id;
+    const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+    if (response.ok) setComments((comments) => [response.decryptedData, ...comments]);
+    return response;
   };
   const updateComment = async (comment) => {
-    try {
-      const response = await API.put({
-        path: `/comment/${comment._id}`,
-        body: prepareCommentForEncryption(comment),
-      });
-      if (response.ok) {
-        setComments((comments) =>
-          comments.map((c) => {
-            if (c._id === comment._id) return response.decryptedData;
-            return c;
-          })
-        );
-      }
-      return response;
-    } catch (error) {
-      console.error('error in updating comment', error);
-      return { ok: false, error: error.message };
+    const response = await API.put({
+      path: `/comment/${comment._id}`,
+      body: prepareCommentForEncryption(comment),
+    });
+    if (response.ok) {
+      setComments((comments) =>
+        comments.map((c) => {
+          if (c._id === comment._id) return response.decryptedData;
+          return c;
+        })
+      );
     }
+    return response;
   };
 
   return {

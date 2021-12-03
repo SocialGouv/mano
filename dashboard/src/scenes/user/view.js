@@ -49,20 +49,15 @@ const View = () => {
         <Formik
           initialValues={localUser}
           onSubmit={async (body, actions) => {
-            try {
-              body.organisation = organisation._id;
-              const res = await API.put({ path: `/user/${id}`, body });
-              if (!res.ok) return actions.setSubmitting(false);
-              if (user._id === id) {
-                const { data } = await API.get({ path: `/user/${id}` });
-                setUser(data);
-              }
-              actions.setSubmitting(false);
-              toastr.success('Mis à jour !');
-            } catch (errorUpdatingUser) {
-              console.log('error in updating user', errorUpdatingUser);
-              toastr.error('Erreur!', errorUpdatingUser.message);
+            body.organisation = organisation._id;
+            const res = await API.put({ path: `/user/${id}`, body });
+            if (!res.ok) return actions.setSubmitting(false);
+            if (user._id === id) {
+              const { data } = await API.get({ path: `/user/${id}` });
+              setUser(data);
             }
+            actions.setSubmitting(false);
+            toastr.success('Mis à jour !');
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (
             <React.Fragment>

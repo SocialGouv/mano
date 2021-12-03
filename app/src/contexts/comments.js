@@ -1,8 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 import AuthContext from './auth';
 
 const CommentsContext = React.createContext();
@@ -45,7 +43,6 @@ export const CommentsProvider = ({ children }) => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
     }
@@ -78,31 +75,25 @@ export const CommentsProvider = ({ children }) => {
       }
       return response;
     } catch (error) {
-      capture('error in creating comment' + error, { extra: { error, body } });
       return { ok: false, error: error.message };
     }
   };
   const updateComment = async (comment) => {
-    try {
-      const response = await API.put({
-        path: `/comment/${comment._id}`,
-        body: prepareCommentForEncryption(comment),
-      });
-      if (response.ok) {
-        setState(({ comments, commentKey, ...s }) => ({
-          ...s,
-          commentKey: commentKey + 1,
-          comments: comments.map((c) => {
-            if (c._id === comment._id) return response.decryptedData;
-            return c;
-          }),
-        }));
-      }
-      return response;
-    } catch (error) {
-      console.error('error in updating comment', error);
-      return { ok: false, error: error.message };
+    const response = await API.put({
+      path: `/comment/${comment._id}`,
+      body: prepareCommentForEncryption(comment),
+    });
+    if (response.ok) {
+      setState(({ comments, commentKey, ...s }) => ({
+        ...s,
+        commentKey: commentKey + 1,
+        comments: comments.map((c) => {
+          if (c._id === comment._id) return response.decryptedData;
+          return c;
+        }),
+      }));
     }
+    return response;
   };
 
   return (

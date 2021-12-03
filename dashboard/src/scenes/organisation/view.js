@@ -29,15 +29,10 @@ const View = () => {
         <Formik
           initialValues={{ ...organisation, receptionEnabled: organisation.receptionEnabled || false }}
           onSubmit={async (body) => {
-            try {
-              const response = await API.put({ path: `/organisation/${organisation._id}`, body });
-              if (response.ok) {
-                toastr.success('Mise à jour !');
-                setOrganisation(response.data);
-              }
-            } catch (orgUpdateError) {
-              console.log('error in updating organisation', orgUpdateError);
-              toastr.error('Erreur!', orgUpdateError.message);
+            const response = await API.put({ path: `/organisation/${organisation._id}`, body });
+            if (response.ok) {
+              toastr.success('Mise à jour !');
+              setOrganisation(response.data);
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => {

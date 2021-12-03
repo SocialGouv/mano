@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 import RelsPersonPlaceContext from './relPersonPlace';
 
 const PlacesContext = React.createContext();
@@ -46,7 +45,6 @@ export const PlacesProvider = ({ children }) => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
     }
@@ -68,45 +66,35 @@ export const PlacesProvider = ({ children }) => {
   };
 
   const addPlace = async (place) => {
-    try {
-      const res = await API.post({ path: '/place', body: preparePlaceForEncryption(place) });
-      if (res.ok) {
-        setState(({ places, placeKey, ...s }) => ({
-          ...s,
-          placeKey: placeKey + 1,
-          places: [res.decryptedData, ...places].sort(sortPlaces),
-        }));
-      }
-      return res;
-    } catch (error) {
-      capture('error in creating place' + error, { extra: { error, place } });
-      return { ok: false, error: error.message };
+    const res = await API.post({ path: '/place', body: preparePlaceForEncryption(place) });
+    if (res.ok) {
+      setState(({ places, placeKey, ...s }) => ({
+        ...s,
+        placeKey: placeKey + 1,
+        places: [res.decryptedData, ...places].sort(sortPlaces),
+      }));
     }
+    return res;
   };
 
   const updatePlace = async (place) => {
-    try {
-      const res = await API.put({
-        path: `/place/${place._id}`,
-        body: preparePlaceForEncryption(place),
-      });
-      if (res.ok) {
-        setState(({ places, placeKey, ...s }) => ({
-          ...s,
-          placeKey: placeKey + 1,
-          places: places
-            .map((p) => {
-              if (p._id === place._id) return res.decryptedData;
-              return p;
-            })
-            .sort(sortPlaces),
-        }));
-      }
-      return res;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating place', place } });
-      return { ok: false, error: error.message };
+    const res = await API.put({
+      path: `/place/${place._id}`,
+      body: preparePlaceForEncryption(place),
+    });
+    if (res.ok) {
+      setState(({ places, placeKey, ...s }) => ({
+        ...s,
+        placeKey: placeKey + 1,
+        places: places
+          .map((p) => {
+            if (p._id === place._id) return res.decryptedData;
+            return p;
+          })
+          .sort(sortPlaces),
+      }));
     }
+    return res;
   };
 
   return (

@@ -49,22 +49,17 @@ const View = () => {
         <Formik
           initialValues={team}
           onSubmit={async (body) => {
-            try {
-              const response = await API.put({ path: `/team/${team._id}`, body });
-              if (response.ok) {
-                toastr.success('Mise à jour !');
-                setTeams(
-                  teams.map((t) => {
-                    if (t._id !== id) return t;
-                    return response.data;
-                  })
-                );
-                console.log(teams, response.data);
-                if (currentTeam._id === id) setCurrentTeam(response.data);
-              }
-            } catch (errorUpdatingTeam) {
-              console.log('error in updating team', errorUpdatingTeam);
-              toastr.error('Erreur!', errorUpdatingTeam.message);
+            const response = await API.put({ path: `/team/${team._id}`, body });
+            if (response.ok) {
+              toastr.success('Mise à jour !');
+              setTeams(
+                teams.map((t) => {
+                  if (t._id !== id) return t;
+                  return response.data;
+                })
+              );
+              console.log(teams, response.data);
+              if (currentTeam._id === id) setCurrentTeam(response.data);
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (

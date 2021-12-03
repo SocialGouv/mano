@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
@@ -48,7 +47,6 @@ export const PersonsProvider = ({ children }) => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
     }
@@ -76,55 +74,38 @@ export const PersonsProvider = ({ children }) => {
   };
 
   const addPerson = async (person) => {
-    try {
-      const existingPerson = state.persons.find((p) => p.name === person.name);
-      if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
-      const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
-      if (response.ok) {
-        setState(({ persons, personKey, ...s }) => ({
-          ...s,
-          personKey: personKey + 1,
-          persons: [response.decryptedData, ...persons].sort(sortPersons),
-        }));
-      }
-      return response;
-    } catch (error) {
-      capture('error in creating person' + error, { extra: { error, person } });
-      return { ok: false, error: error.message };
+    const existingPerson = state.persons.find((p) => p.name === person.name);
+    if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
+    const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
+    if (response.ok) {
+      setState(({ persons, personKey, ...s }) => ({
+        ...s,
+        personKey: personKey + 1,
+        persons: [response.decryptedData, ...persons].sort(sortPersons),
+      }));
     }
+    return response;
   };
   const updatePerson = async (person) => {
-    try {
-      const oldPerson = state.persons.find((a) => a._id === person._id);
-      const response = await API.put({
-        path: `/person/${person._id}`,
-        body: preparePersonForEncryption(person),
-      });
-      if (response.ok) {
-        const newPerson = response.decryptedData;
-        setState(({ persons, personKey, ...s }) => ({
-          ...s,
-          personKey: personKey + 1,
-          persons: persons.map((p) => {
-            if (p._id === person._id) return newPerson;
-            return p;
-          }),
-        }));
-        const comment = commentForUpdatePerson({ newPerson, oldPerson });
-        if (comment) {
-          const response = await addComment(comment);
-          if (!response.ok) {
-            capture(response.error, {
-              extra: { message: 'error in creating comment for person update', newPerson, comment },
-            });
-          }
-        }
-      }
-      return response;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating person', person } });
-      return { ok: false, error: error.message };
+    const oldPerson = state.persons.find((a) => a._id === person._id);
+    const response = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(person),
+    });
+    if (response.ok) {
+      const newPerson = response.decryptedData;
+      setState(({ persons, personKey, ...s }) => ({
+        ...s,
+        personKey: personKey + 1,
+        persons: persons.map((p) => {
+          if (p._id === person._id) return newPerson;
+          return p;
+        }),
+      }));
+      const comment = commentForUpdatePerson({ newPerson, oldPerson });
+      if (comment) await addComment(comment);
     }
+    return response;
   };
 
   return (

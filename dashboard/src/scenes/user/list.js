@@ -85,18 +85,13 @@ const Create = ({ onChange }) => {
           <Formik
             initialValues={{ name: '', email: '', password: generatePassword() }}
             onSubmit={async (body, actions) => {
-              try {
-                body.organisation = organisation._id;
-                const res = await API.post({ path: '/user', body });
-                actions.setSubmitting(false);
-                if (!res.ok) return;
-                toastr.success('Création réussie !');
-                onChange();
-                setOpen(false);
-              } catch (errorCreatingUser) {
-                console.log('error in creating user', errorCreatingUser);
-                toastr.error('Erreur!', errorCreatingUser.message);
-              }
+              body.organisation = organisation._id;
+              const res = await API.post({ path: '/user', body });
+              actions.setSubmitting(false);
+              if (!res.ok) return;
+              toastr.success('Création réussie !');
+              onChange();
+              setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>

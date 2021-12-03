@@ -51,7 +51,6 @@ export const usePersons = () => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setLoading(false);
       return false;
     }
@@ -75,49 +74,32 @@ export const usePersons = () => {
   };
 
   const addPerson = async (person) => {
-    try {
-      const existingPerson = persons.find((p) => p.name === person.name);
-      if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
-      const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
-      if (response.ok) {
-        setPersons((persons) => [response.decryptedData, ...persons].sort(sortPersons));
-      }
-      return response;
-    } catch (error) {
-      capture('error in creating person' + error, { extra: { error, person } });
-      return { ok: false, error: error.message };
+    const existingPerson = persons.find((p) => p.name === person.name);
+    if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
+    const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
+    if (response.ok) {
+      setPersons((persons) => [response.decryptedData, ...persons].sort(sortPersons));
     }
+    return response;
   };
   const updatePerson = async (person) => {
-    try {
-      const oldPerson = persons.find((a) => a._id === person._id);
-      const response = await API.put({
-        path: `/person/${person._id}`,
-        body: preparePersonForEncryption(person),
-      });
-      if (response.ok) {
-        const newPerson = response.decryptedData;
-        setPersons((persons) =>
-          persons.map((p) => {
-            if (p._id === person._id) return newPerson;
-            return p;
-          })
-        );
-        const comment = commentForUpdatePerson({ newPerson, oldPerson });
-        if (comment) {
-          const response = await addComment(comment);
-          if (!response.ok) {
-            capture(response.error, {
-              extra: { message: 'error in creating comment for person update', newPerson, comment },
-            });
-          }
-        }
-      }
-      return response;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating person', person } });
-      return { ok: false, error: error.message };
+    const oldPerson = persons.find((a) => a._id === person._id);
+    const response = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(person),
+    });
+    if (response.ok) {
+      const newPerson = response.decryptedData;
+      setPersons((persons) =>
+        persons.map((p) => {
+          if (p._id === person._id) return newPerson;
+          return p;
+        })
+      );
+      const comment = commentForUpdatePerson({ newPerson, oldPerson });
+      if (comment) await addComment(comment);
     }
+    return response;
   };
 
   return {

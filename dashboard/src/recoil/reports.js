@@ -2,7 +2,6 @@ import { atom, useRecoilState } from 'recoil';
 import { useComments } from '../recoil/comments';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 
 export const reportsState = atom({
   key: 'reportsState',
@@ -45,7 +44,6 @@ export const useReports = () => {
       setReportsFullState(data);
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setLoading(false);
       return false;
     }
@@ -58,33 +56,23 @@ export const useReports = () => {
   };
 
   const updateReport = async (report) => {
-    try {
-      const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(report) });
-      if (res.ok) {
-        setReports((reports) =>
-          reports.map((a) => {
-            if (a._id === report._id) return res.decryptedData;
-            return a;
-          })
-        );
-      }
-      return res;
-    } catch (error) {
-      capture('error in updating report' + error, { extra: { error, report } });
-      return { ok: false, error: error.message };
+    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(report) });
+    if (res.ok) {
+      setReports((reports) =>
+        reports.map((a) => {
+          if (a._id === report._id) return res.decryptedData;
+          return a;
+        })
+      );
     }
+    return res;
   };
 
   const addReport = async (date, team) => {
-    try {
-      const res = await API.post({ path: '/report', body: { team, date } });
-      if (!res.ok) return res;
-      setReports((reports) => [res.decryptedData, ...reports]);
-      return res;
-    } catch (error) {
-      capture('error in creating report' + error, { extra: { error, date, team } });
-      return { ok: false, error: error.message };
-    }
+    const res = await API.post({ path: '/report', body: { team, date } });
+    if (!res.ok) return res;
+    setReports((reports) => [res.decryptedData, ...reports]);
+    return res;
   };
 
   const incrementPassage = async (report, { persons = [], onSuccess = null, newValue = null } = {}) => {

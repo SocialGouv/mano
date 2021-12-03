@@ -1,7 +1,6 @@
 import { atom, useRecoilState } from 'recoil';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 
 export const relsPersonPlaceState = atom({
   key: 'relsPersonPlaceState',
@@ -44,7 +43,6 @@ export const useRelsPerson = () => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setLoading(false);
       return false;
     }
@@ -59,16 +57,11 @@ export const useRelsPerson = () => {
   };
 
   const addRelation = async (place) => {
-    try {
-      const res = await API.post({ path: '/relPersonPlace', body: prepareRelPersonPlaceForEncryption(place) });
-      if (res.ok) {
-        setRelsPersonPlace((relsPersonPlace) => [res.decryptedData, ...relsPersonPlace]);
-      }
-      return res;
-    } catch (error) {
-      capture('error in creating relPersonPlace' + error, { extra: { error, place } });
-      return { ok: false, error: error.message };
+    const res = await API.post({ path: '/relPersonPlace', body: prepareRelPersonPlaceForEncryption(place) });
+    if (res.ok) {
+      setRelsPersonPlace((relsPersonPlace) => [res.decryptedData, ...relsPersonPlace]);
     }
+    return res;
   };
 
   return {

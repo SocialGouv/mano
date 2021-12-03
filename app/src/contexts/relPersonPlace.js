@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 
 const RelsPersonPlaceContext = React.createContext();
 
@@ -41,7 +40,6 @@ export const RelsPersonPlaceProvider = ({ children }) => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
     }
@@ -60,19 +58,14 @@ export const RelsPersonPlaceProvider = ({ children }) => {
   };
 
   const addRelation = async (place) => {
-    try {
-      const res = await API.post({ path: '/relPersonPlace', body: prepareRelPersonPlaceForEncryption(place) });
-      if (res.ok) {
-        setState(({ relsPersonPlace, relsKey }) => ({
-          relsKey: relsKey + 1,
-          relsPersonPlace: [res.decryptedData, ...relsPersonPlace],
-        }));
-      }
-      return res;
-    } catch (error) {
-      capture('error in creating relPersonPlace' + error, { extra: { error, place } });
-      return { ok: false, error: error.message };
+    const res = await API.post({ path: '/relPersonPlace', body: prepareRelPersonPlaceForEncryption(place) });
+    if (res.ok) {
+      setState(({ relsPersonPlace, relsKey }) => ({
+        relsKey: relsKey + 1,
+        relsPersonPlace: [res.decryptedData, ...relsPersonPlace],
+      }));
     }
+    return res;
   };
 
   return (

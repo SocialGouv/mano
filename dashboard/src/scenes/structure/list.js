@@ -87,17 +87,12 @@ const Create = ({ onChange }) => {
           <Formik
             initialValues={{ name: '' }}
             onSubmit={async (body, actions) => {
-              try {
-                const res = await API.post({ path: '/structure', body });
-                actions.setSubmitting(false);
-                if (res.ok) {
-                  toastr.success('Création réussie !');
-                  onChange();
-                  setOpen(false);
-                }
-              } catch (errorCreatingStructure) {
-                console.log('error in creating structure', errorCreatingStructure);
-                toastr.error('Erreur!', errorCreatingStructure.message);
+              const res = await API.post({ path: '/structure', body });
+              actions.setSubmitting(false);
+              if (res.ok) {
+                toastr.success('Création réussie !');
+                onChange();
+                setOpen(false);
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (

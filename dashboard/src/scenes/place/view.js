@@ -43,14 +43,9 @@ const View = () => {
         <Formik
           initialValues={place}
           onSubmit={async (body) => {
-            try {
-              const res = await updatePlace(body);
-              if (res.ok) {
-                toastr.success('Mise à jour !');
-              }
-            } catch (placeUpdateError) {
-              console.log('error in updating place', placeUpdateError);
-              toastr.error('Erreur!', placeUpdateError.message);
+            const res = await updatePlace(body);
+            if (res.ok) {
+              toastr.success('Mise à jour !');
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (

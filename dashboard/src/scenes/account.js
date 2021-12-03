@@ -23,16 +23,11 @@ const Account = () => {
         <Formik
           initialValues={user}
           onSubmit={async (body) => {
-            try {
-              const response = await API.put({ path: '/user', body });
-              if (response.ok) {
-                toastr.success('Mis à jour !');
-                const { user } = await API.get({ path: '/user/me' });
-                setUser(user);
-              }
-            } catch (userUpdateError) {
-              console.log('error in user update', userUpdateError);
-              toastr.error('Erreur!', userUpdateError.message);
+            const response = await API.put({ path: '/user', body });
+            if (response.ok) {
+              toastr.success('Mis à jour !');
+              const { user } = await API.get({ path: '/user/me' });
+              setUser(user);
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (

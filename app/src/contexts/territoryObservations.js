@@ -1,7 +1,6 @@
 import React, { useContext, useState } from 'react';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 import AuthContext from './auth';
 
 const TerritoryObservationsContext = React.createContext();
@@ -52,7 +51,6 @@ export const TerritoryObservationsProvider = ({ children }) => {
       }
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setState((state) => ({ ...state, loading: false }));
       return false;
     }
@@ -71,40 +69,30 @@ export const TerritoryObservationsProvider = ({ children }) => {
   };
 
   const addTerritoryObs = async (obs) => {
-    try {
-      const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
-      if (res.ok) {
-        setState(({ territoryObservations, obsKey, ...s }) => ({
-          ...s,
-          obsKey: obsKey + 1,
-          territoryObservations: [res.decryptedData, ...territoryObservations],
-        }));
-      }
-      return res;
-    } catch (error) {
-      capture('error in creating obs' + error, { extra: { error, obs } });
-      return { ok: false, error: error.message };
+    const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
+    if (res.ok) {
+      setState(({ territoryObservations, obsKey, ...s }) => ({
+        ...s,
+        obsKey: obsKey + 1,
+        territoryObservations: [res.decryptedData, ...territoryObservations],
+      }));
     }
+    return res;
   };
 
   const updateTerritoryObs = async (obs) => {
-    try {
-      const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
-      if (res.ok) {
-        setState(({ territoryObservations, obsKey, ...s }) => ({
-          ...s,
-          obsKey: obsKey + 1,
-          territoryObservations: territoryObservations.map((a) => {
-            if (a._id === obs._id) return res.decryptedData;
-            return a;
-          }),
-        }));
-      }
-      return res;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in creating obs', obs } });
-      return { ok: false, error: error.message };
+    const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
+    if (res.ok) {
+      setState(({ territoryObservations, obsKey, ...s }) => ({
+        ...s,
+        obsKey: obsKey + 1,
+        territoryObservations: territoryObservations.map((a) => {
+          if (a._id === obs._id) return res.decryptedData;
+          return a;
+        }),
+      }));
     }
+    return res;
   };
 
   return (

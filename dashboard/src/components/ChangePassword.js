@@ -60,29 +60,24 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
     <Formik
       initialValues={{ password: '', newPassword: '', verifyPassword: '' }}
       onSubmit={async (body, actions) => {
-        try {
-          if (checkErrorPassword(body.newPassword.trim())) {
-            return toastr.error(codesToErrors[checkErrorPassword(body.newPassword)]);
-          }
-          if (body.newPassword.trim() !== body.verifyPassword.trim()) {
-            return toastr.error('Les mots de passe ne sont pas identiques !');
-          }
-          onFinished({
-            body: {
-              newPassword: body.newPassword.trim(),
-              verifyPassword: body.verifyPassword.trim(),
-              password: body.password.trim(),
-            },
-          });
-          const res = await onSubmit(body);
-          actions.setSubmitting(false);
-          if (res.ok) {
-            toastr.success('Mot de passe mis à jour!');
-            onFinished(true);
-          }
-        } catch (errorUpdatePassword) {
-          console.log('error in updating password', errorUpdatePassword);
-          toastr.error('Erreur', errorUpdatePassword);
+        if (checkErrorPassword(body.newPassword.trim())) {
+          return toastr.error(codesToErrors[checkErrorPassword(body.newPassword)]);
+        }
+        if (body.newPassword.trim() !== body.verifyPassword.trim()) {
+          return toastr.error('Les mots de passe ne sont pas identiques !');
+        }
+        onFinished({
+          body: {
+            newPassword: body.newPassword.trim(),
+            verifyPassword: body.verifyPassword.trim(),
+            password: body.password.trim(),
+          },
+        });
+        const res = await onSubmit(body);
+        actions.setSubmitting(false);
+        if (res.ok) {
+          toastr.success('Mot de passe mis à jour!');
+          onFinished(true);
         }
       }}>
       {({ values, isSubmitting, handleChange, handleSubmit }) => {

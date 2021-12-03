@@ -2,7 +2,6 @@ import { atom, useRecoilState } from 'recoil';
 import { useAuth } from '../recoil/auth';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 import { useComments } from './comments';
 
 export const actionsState = atom({
@@ -48,7 +47,6 @@ export const useActions = () => {
       );
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setLoading(false);
       return false;
     }
@@ -66,14 +64,9 @@ export const useActions = () => {
   };
 
   const addAction = async (action) => {
-    try {
-      const response = await API.post({ path: '/action', body: prepareActionForEncryption(action) });
-      if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
-      return response;
-    } catch (error) {
-      capture('error in creating action' + error, { extra: { error, action } });
-      return { ok: false, error: error.message };
-    }
+    const response = await API.post({ path: '/action', body: prepareActionForEncryption(action) });
+    if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
+    return response;
   };
 
   const updateAction = async (action, { oldAction = null } = {}) => {
@@ -101,9 +94,6 @@ export const useActions = () => {
         );
       }
       return response;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating action', action } });
-      return { ok: false, error: error.message };
     } finally {
       if (response.ok) {
         const newAction = response.decryptedData;
@@ -115,12 +105,7 @@ export const useActions = () => {
             action: oldAction._id,
             team: oldAction.team,
           };
-          const response = await addComment(comment);
-          if (!response.ok) {
-            capture(response.error, {
-              extra: { message: 'error in creating comment for action update', action, comment },
-            });
-          }
+          await addComment(comment);
         }
       }
     }

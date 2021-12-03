@@ -127,21 +127,16 @@ const Create = ({ onChange }) => {
           <Formik
             initialValues={{ orgName: '', name: '', email: '', password: generatePassword() }}
             onSubmit={async (body, actions) => {
-              try {
-                if (!body.orgName) return toastr.error("Veuillez saisir un nom pour l'organisation");
-                if (!body.name) return toastr.error("Veuillez saisir un nom pour l'administrateur");
-                if (!body.email) return toastr.error("Veuillez saisir un email pour l'administrateur");
-                if (!body.password) return toastr.error("Veuillez saisir un mot de passe pour l'administrateur");
-                const orgRes = await API.post({ path: '/organisation', skipEncryption: '/organisation', body });
-                actions.setSubmitting(false);
-                if (!orgRes.ok) return;
-                toastr.success('Création réussie !');
-                onChange();
-                setOpen(false);
-              } catch (orgCreationError) {
-                console.log('error in creating organisation', orgCreationError);
-                toastr.error('Erreur!', orgCreationError.message);
-              }
+              if (!body.orgName) return toastr.error("Veuillez saisir un nom pour l'organisation");
+              if (!body.name) return toastr.error("Veuillez saisir un nom pour l'administrateur");
+              if (!body.email) return toastr.error("Veuillez saisir un email pour l'administrateur");
+              if (!body.password) return toastr.error("Veuillez saisir un mot de passe pour l'administrateur");
+              const orgRes = await API.post({ path: '/organisation', skipEncryption: '/organisation', body });
+              actions.setSubmitting(false);
+              if (!orgRes.ok) return;
+              toastr.success('Création réussie !');
+              onChange();
+              setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>

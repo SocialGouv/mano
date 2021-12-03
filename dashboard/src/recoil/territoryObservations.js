@@ -1,7 +1,6 @@
 import { organisationState } from './auth';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
 import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 
 export const territoryObservationsState = atom({
@@ -57,7 +56,6 @@ export const useTerritoryObservations = () => {
       setTerritoryObsFullState(data);
       return true;
     } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
       setLoading(false);
       return false;
     }
@@ -72,34 +70,24 @@ export const useTerritoryObservations = () => {
   };
 
   const addTerritoryObs = async (obs) => {
-    try {
-      const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
-      if (res.ok) {
-        setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
-      }
-      return res;
-    } catch (error) {
-      capture('error in creating obs' + error, { extra: { error, obs } });
-      return { ok: false, error: error.message };
+    const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
+    if (res.ok) {
+      setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
     }
+    return res;
   };
 
   const updateTerritoryObs = async (obs) => {
-    try {
-      const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
-      if (res.ok) {
-        setTerritoryObs((territoryObservations) =>
-          territoryObservations.map((a) => {
-            if (a._id === obs._id) return res.decryptedData;
-            return a;
-          })
-        );
-      }
-      return res;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in creating obs', obs } });
-      return { ok: false, error: error.message };
+    const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
+    if (res.ok) {
+      setTerritoryObs((territoryObservations) =>
+        territoryObservations.map((a) => {
+          if (a._id === obs._id) return res.decryptedData;
+          return a;
+        })
+      );
     }
+    return res;
   };
 
   return {
