@@ -243,6 +243,27 @@ export const outOfActiveListReasonOptions = [
   'Reconduite à la frontière',
 ];
 
+export const defaultMedicalCustomFields = [
+  {
+    name: 'consumptions',
+    label: 'Consommations',
+    type: 'multi-choice',
+    options: consumptionsOptions,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'vulnerabilities',
+    label: 'Vulnérabilités',
+    type: 'multi-choice',
+    options: vulnerabilitiesOptions,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+];
+
 /*
 
 Utils
