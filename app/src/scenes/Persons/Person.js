@@ -19,9 +19,22 @@ import colors from '../../utils/colors';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
+const cleanValue = (value) => {
+  if (typeof value === 'string') return (value || '').trim();
+  return value;
+};
+
 class Person extends React.Component {
-  castToPerson = (person = {}) => {
+  castToPerson = (person = {}, customFieldsPersonsMedical = [], customFieldsPersonsSocial = []) => {
+    const toReturn = {};
+    for (const field of customFieldsPersonsMedical) {
+      toReturn[field.name] = cleanValue(person[field.name]);
+    }
+    for (const field of customFieldsPersonsSocial) {
+      toReturn[field.name] = cleanValue(person[field.name]);
+    }
     return {
+      ...toReturn,
       name: person.name || '',
       otherNames: person.otherNames || '',
       birthdate: person.birthdate || null,
@@ -54,7 +67,7 @@ class Person extends React.Component {
   state = {
     person: {},
     // person model
-    ...this.castToPerson(this.props.route?.params),
+    ...this.castToPerson(this.props.route?.params, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial),
     // otherdata connected to person
     places: null,
     writingComment: '',
@@ -90,8 +103,12 @@ class Person extends React.Component {
 
   setPerson = (personDB) => {
     this.setState({
-      person: Object.assign({}, this.castToPerson(personDB), { _id: personDB._id }),
-      ...this.castToPerson(personDB),
+      person: Object.assign(
+        {},
+        this.castToPerson(personDB, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial),
+        { _id: personDB._id }
+      ),
+      ...this.castToPerson(personDB, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial),
       loading: false,
     });
   };
@@ -113,7 +130,11 @@ class Person extends React.Component {
     this.setState({ updating: true });
     const { person } = this.state;
     const { updatePerson } = this.props.context;
-    const response = await updatePerson(Object.assign({}, this.castToPerson(this.state), { _id: person._id }));
+    const response = await updatePerson(
+      Object.assign({}, this.castToPerson(this.state, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial), {
+        _id: person._id,
+      })
+    );
     if (response.error) {
       Alert.alert(response.error);
       this.setState({ updating: false });
@@ -121,7 +142,7 @@ class Person extends React.Component {
     }
     if (response.ok) {
       if (alert) Alert.alert('Personne mise à jour !');
-      this.setPerson(response.data);
+      this.setPerson(response.decryptedData);
       this.setState({ updating: false, editable: false });
       return true;
     }
@@ -156,7 +177,10 @@ class Person extends React.Component {
 
   isUpdateDisabled = () => {
     const { person } = this.state;
-    const newPerson = { ...person, ...this.castToPerson(this.state) };
+    const newPerson = {
+      ...person,
+      ...this.castToPerson(this.state, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial),
+    };
     if (JSON.stringify(person) !== JSON.stringify(newPerson)) return false;
     return true;
   };

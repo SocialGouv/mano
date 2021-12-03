@@ -41,6 +41,8 @@ create table if not exists "mano"."Organisation"
     services                   text[],
     collaborations             text[],
     "customFieldsObs"          jsonb,
+    "customFieldsPersonsSocial"          jsonb,
+    "customFieldsPersonsMedical"          jsonb,
     "encryptedVerificationKey" text
 );
 

@@ -13,6 +13,7 @@ import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories } from '../../recoil/actions';
+import { defaultMedicalCustomFields } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { useAuth } from '../../recoil/auth';
@@ -109,26 +110,50 @@ const View = () => {
                   <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
                 </div>
                 <hr />
-                <Title>Réglage des Observations de Territoires</Title>
+
                 {/* this custom fields is only working if encryption is enabled */}
                 <>
                   {organisation.encryptionEnabled ? (
-                    <Row>
-                      <TableCustomFields
-                        customFields="customFieldsObs"
-                        data={(() => {
-                          if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
-                          return defaultCustomFields;
-                        })()}
-                      />
-                    </Row>
+                    <>
+                      <Title>Réglage des champs personnalisés des territoires</Title>
+                      <Row>
+                        <TableCustomFields
+                          customFields="customFieldsObs"
+                          data={(() => {
+                            if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
+                            return defaultCustomFields;
+                          })()}
+                        />
+                      </Row>
+                      <Title>Réglage des champs personnalisés des personnes suivies (dossier social)</Title>
+                      <Row>
+                        <TableCustomFields
+                          customFields="customFieldsPersonsSocial"
+                          data={(() => {
+                            if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
+                            return [];
+                          })()}
+                        />
+                      </Row>
+                      <Title>Réglage des champs personnalisés des personnes suivies (dossier médical)</Title>
+                      <Row>
+                        <TableCustomFields
+                          customFields="customFieldsPersonsMedical"
+                          data={(() => {
+                            if (Array.isArray(organisation.customFieldsPersonsMedical)) return organisation.customFieldsPersonsMedical;
+                            return defaultMedicalCustomFields;
+                          })()}
+                        />
+                      </Row>
+                    </>
                   ) : (
                     <>
+                      <Title>Réglage des champs personnalisés des territoires</Title>
                       <Row>
                         <Col md={10}>
                           <p>
-                            Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les observations de territoires,
-                            n'existe que pour les organisations chiffrées.
+                            Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les observations de territoires et
+                            les personnes suivies n'existe que pour les organisations chiffrées.
                           </p>
                         </Col>
                       </Row>

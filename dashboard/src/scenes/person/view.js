@@ -7,7 +7,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
-
+import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -21,7 +21,6 @@ import {
   usePersons,
   addressDetails,
   addressDetailsFixedFields,
-  consumptionsOptions,
   employmentOptions,
   genderOptions,
   healthInsuranceOptions,
@@ -29,7 +28,6 @@ import {
   personalSituationOptions,
   reasonsOptions,
   ressourcesOptions,
-  vulnerabilitiesOptions,
   yesNoOptions,
 } from '../../recoil/persons';
 import { useActions } from '../../recoil/actions';
@@ -115,7 +113,7 @@ const View = () => {
 
 const Summary = ({ person }) => {
   const history = useHistory();
-  const { updatePerson, deletePerson } = usePersons();
+  const { updatePerson, deletePerson, customFieldsPersonsMedical, customFieldsPersonsSocial } = usePersons();
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
@@ -300,7 +298,13 @@ const Summary = ({ person }) => {
                 <Col md={4}>
                   <Reasons value={values.reasons} onChange={handleChange} />
                 </Col>
+                {customFieldsPersonsSocial
+                  .filter((f) => f.enabled)
+                  .map((field) => (
+                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                  ))}
               </Row>
+
               <hr />
               <Title>Dossier médical</Title>
               <Row>
@@ -319,13 +323,13 @@ const Summary = ({ person }) => {
                     <Input name="structureMedical" value={values.structureMedical} onChange={handleChange} />
                   </FormGroup>
                 </Col>
-                <Col md={4}>
-                  <Vunerabilities value={values.vulnerabilities} onChange={handleChange} />
-                </Col>
-                <Col md={4}>
-                  <Consommations value={values.consumptions} onChange={handleChange} />
-                </Col>
+                {customFieldsPersonsMedical
+                  .filter((f) => f.enabled)
+                  .map((field) => (
+                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                  ))}
               </Row>
+
               <hr />
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -476,22 +480,6 @@ const Reasons = ({ value, onChange }) => (
   </FormGroup>
 );
 
-const Vunerabilities = ({ value, onChange }) => (
-  <FormGroup>
-    <Label>Vulnérabilités</Label>
-    <SelectCustom
-      options={vulnerabilitiesOptions}
-      name="vulnerabilities"
-      onChange={(v) => onChange({ currentTarget: { value: v, name: 'vulnerabilities' } })}
-      isClearable={false}
-      isMulti
-      value={value}
-      getOptionValue={(i) => i}
-      getOptionLabel={(i) => i}
-    />
-  </FormGroup>
-);
-
 const Ressources = ({ value, onChange }) => (
   <FormGroup>
     <Label>Ressources</Label>
@@ -499,22 +487,6 @@ const Ressources = ({ value, onChange }) => (
       options={ressourcesOptions}
       name="resources"
       onChange={(v) => onChange({ currentTarget: { value: v, name: 'resources' } })}
-      isClearable={false}
-      isMulti
-      value={value}
-      getOptionValue={(i) => i}
-      getOptionLabel={(i) => i}
-    />
-  </FormGroup>
-);
-
-const Consommations = ({ value, onChange }) => (
-  <FormGroup>
-    <Label>Consommations</Label>
-    <SelectCustom
-      options={consumptionsOptions}
-      name="consumptions"
-      onChange={(v) => onChange({ currentTarget: { value: v, name: 'consumptions' } })}
       isClearable={false}
       isMulti
       value={value}

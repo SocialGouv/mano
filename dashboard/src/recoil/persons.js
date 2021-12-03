@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, useRecoilState } from 'recoil';
+import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 import { useComments } from '../recoil/comments';
 import useApi from '../services/api-interface-with-dashboard';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useActions } from './actions';
+import { organisationState } from './auth';
 import { useRelsPerson } from './relPersonPlace';
 
 export const personsState = atom({
@@ -17,11 +18,32 @@ export const personsLoadingState = atom({
   default: true,
 });
 
+export const customFieldsPersonsMedicalSelector = selector({
+  key: 'customFieldsPersonsMedicalSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (Array.isArray(organisation.customFieldsPersonsMedical)) return organisation.customFieldsPersonsMedical;
+    return defaultMedicalCustomFields;
+  },
+});
+
+export const customFieldsPersonsSocialSelector = selector({
+  key: 'customFieldsPersonsSocialSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
+    return [];
+  },
+});
+
 export const usePersons = () => {
   const { comments, addComment, deleteComment } = useComments();
   const { deleteAction, actions } = useActions();
   const { relsPersonPlace, deleteRelation } = useRelsPerson();
   const API = useApi();
+
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [loading, setLoading] = useRecoilState(personsLoadingState);
@@ -78,7 +100,10 @@ export const usePersons = () => {
     try {
       const existingPerson = persons.find((p) => p.name === person.name);
       if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
-      const response = await API.post({ path: '/person', body: preparePersonForEncryption(person) });
+      const response = await API.post({
+        path: '/person',
+        body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(person),
+      });
       if (response.ok) {
         setPersons((persons) => [response.decryptedData, ...persons].sort(sortPersons));
       }
@@ -93,7 +118,7 @@ export const usePersons = () => {
       const oldPerson = persons.find((a) => a._id === person._id);
       const response = await API.put({
         path: `/person/${person._id}`,
-        body: preparePersonForEncryption(person),
+        body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(person),
       });
       if (response.ok) {
         const newPerson = response.decryptedData;
@@ -123,6 +148,8 @@ export const usePersons = () => {
   return {
     persons,
     loading,
+    customFieldsPersonsSocial,
+    customFieldsPersonsMedical,
     refreshPersons,
     deletePerson,
     addPerson,
@@ -162,9 +189,10 @@ const encryptedFields = [
   'assignedTeams',
 ];
 
-export const preparePersonForEncryption = (person) => {
+export const preparePersonForEncryption = (customFieldsMedical, customFieldsSocial) => (person) => {
+  const encryptedFieldsIncludingCustom = [...customFieldsSocial.map((f) => f.name), ...customFieldsMedical.map((f) => f.name), ...encryptedFields];
   const decrypted = {};
-  for (let field of encryptedFields) {
+  for (let field of encryptedFieldsIncludingCustom) {
     decrypted[field] = person[field];
   }
   return {
@@ -334,6 +362,27 @@ export const outOfActiveListReasonOptions = [
   'Perdu de vue',
   'Hospitalisation',
   'Reconduite à la frontière',
+];
+
+export const defaultMedicalCustomFields = [
+  {
+    name: 'consumptions',
+    label: 'Consommations',
+    type: 'multi-choice',
+    options: consumptionsOptions,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'vulnerabilities',
+    label: 'Vulnérabilités',
+    type: 'multi-choice',
+    options: vulnerabilitiesOptions,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
 ];
 
 export const filterPersonsBase = [
