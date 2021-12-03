@@ -199,7 +199,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                           <Label>Choix</Label>
                           <SelectCustom
                             creatable
-                            options={[...(editingField.options || [])]
+                            options={[...((editingField || field).options || [])]
                               .sort((c1, c2) => c1.localeCompare(c2))
                               .map((opt) => ({ value: opt, label: opt }))}
                             value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}
