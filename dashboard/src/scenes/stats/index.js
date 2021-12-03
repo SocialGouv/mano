@@ -20,8 +20,6 @@ import {
   filterPersonsBase,
   personsState,
   usePersons,
-  customFieldsPersonsSocial,
-  customFieldsPersonsMedical,
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
 } from '../../recoil/persons';

@@ -403,11 +403,6 @@ const StyledContainer = styled(Container)`
   }
 `;
 
-const Item = styled.span`
-  display: inline-block;
-  ${(props) => props.fieldIsEmpty && 'opacity: 0.25;'}
-`;
-
 const StyledTable = styled(Table)`
   table tr {
     height: 40px;
@@ -487,22 +482,6 @@ const Reasons = ({ value, onChange }) => (
   </FormGroup>
 );
 
-const Vunerabilities = ({ value, onChange }) => (
-  <FormGroup>
-    <Label>Vulnérabilités</Label>
-    <SelectCustom
-      options={vulnerabilitiesOptions}
-      name="vulnerabilities"
-      onChange={(v) => onChange({ currentTarget: { value: v, name: 'vulnerabilities' } })}
-      isClearable={false}
-      isMulti
-      value={value}
-      getOptionValue={(i) => i}
-      getOptionLabel={(i) => i}
-    />
-  </FormGroup>
-);
-
 const Ressources = ({ value, onChange }) => (
   <FormGroup>
     <Label>Ressources</Label>
@@ -510,22 +489,6 @@ const Ressources = ({ value, onChange }) => (
       options={ressourcesOptions}
       name="resources"
       onChange={(v) => onChange({ currentTarget: { value: v, name: 'resources' } })}
-      isClearable={false}
-      isMulti
-      value={value}
-      getOptionValue={(i) => i}
-      getOptionLabel={(i) => i}
-    />
-  </FormGroup>
-);
-
-const Consommations = ({ value, onChange }) => (
-  <FormGroup>
-    <Label>Consommations</Label>
-    <SelectCustom
-      options={consumptionsOptions}
-      name="consumptions"
-      onChange={(v) => onChange({ currentTarget: { value: v, name: 'consumptions' } })}
       isClearable={false}
       isMulti
       value={value}
