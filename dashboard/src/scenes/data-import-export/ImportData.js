@@ -5,7 +5,7 @@ import XLSX from 'xlsx';
 import ButtonCustom from '../../components/ButtonCustom';
 import { personFields, personsState, preparePersonForEncryption } from '../../recoil/persons';
 import { useAuth } from '../../recoil/auth';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { toastr } from 'react-redux-toastr';
 import { toFrenchDate } from '../../utils';
 import useApi from '../../services/api-interface-with-dashboard';
@@ -15,7 +15,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 const ImportData = () => {
   const { user } = useAuth();
   const fileDialogRef = useRef(null);
-  const [allPersons, setAllPersons] = useRecoilState(personsState);
+  const setAllPersons = useSetRecoilState(personsState);
   const API = useApi();
 
   const [showImportSummary, setShowImpotSummary] = useState(false);
@@ -104,13 +104,7 @@ const ImportData = () => {
 
   return (
     <>
-      <ButtonCustom
-        onClick={() => fileDialogRef.current.click()}
-        color="primary"
-        title="Importer des données (personnes suivies) en .xlsx"
-        padding="12px 24px"
-        disabled={!!allPersons.length}
-      />
+      <ButtonCustom onClick={() => fileDialogRef.current.click()} color="primary" title="Importer un fichier .xlsx" padding="12px 24px" />
       <input
         ref={fileDialogRef}
         type="file"
@@ -145,7 +139,7 @@ const ImportData = () => {
               </ul>
             </li>
           </ul>
-          <ButtonCustom onClick={onImportData} color="primary" title="Importer" padding="12px 24px" disabled={!!allPersons.length} />
+          <ButtonCustom onClick={onImportData} color="primary" title="Importer" padding="12px 24px" />
         </ModalBody>
       </Modal>
     </>

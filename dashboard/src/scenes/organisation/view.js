@@ -22,13 +22,9 @@ import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import { personFields } from '../../recoil/persons';
 
-console.log(personFields);
-
 const View = () => {
   const { organisation, setOrganisation } = useAuth();
   const API = useApi();
-
-  console.log(personFields.filter((f) => f.importable));
 
   return (
     <Container style={{ padding: '40px 0', margin: '0 -40px' }}>
@@ -181,10 +177,12 @@ const View = () => {
                   <ExportData />
                 </div>
                 <hr />
-                <Title>Importer des données</Title>
+                <Title>Importer des personnes suivies</Title>
                 <Row>
                   <Col md={10}>
-                    <p>Vous pouvez importer une liste de personnes depuis un fichier Excel. Ce fichier doit avoir quelques caractéristiques:</p>
+                    <p>
+                      Vous pouvez importer une liste de personnes suivies depuis un fichier Excel. Ce fichier doit avoir quelques caractéristiques:
+                    </p>
                     <ul>
                       <li>
                         avoir un onglet dont le nom contient <code>personne</code>
