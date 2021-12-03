@@ -1,3 +1,10 @@
+## [1.30.1](https://github.com/SocialGouv/mano/compare/v1.30.0...v1.30.1) (2021-12-03)
+
+
+### Bug Fixes
+
+* **dashboard:** debug encryption ([#182](https://github.com/SocialGouv/mano/issues/182)) ([a999891](https://github.com/SocialGouv/mano/commit/a999891b416f798d2fed5c45694fca46270a8125))
+
 # [1.30.0](https://github.com/SocialGouv/mano/compare/v1.29.7...v1.30.0) (2021-12-03)
 
 
