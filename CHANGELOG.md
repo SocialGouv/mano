@@ -1,3 +1,10 @@
+## [1.32.1](https://github.com/SocialGouv/mano/compare/v1.32.0...v1.32.1) (2021-12-03)
+
+
+### Bug Fixes
+
+* **api:** stop creating multiple reports ([#183](https://github.com/SocialGouv/mano/issues/183)) ([da6d27a](https://github.com/SocialGouv/mano/commit/da6d27aae2382508c4d0dda54a733c0da9eb297c))
+
 # [1.32.0](https://github.com/SocialGouv/mano/compare/v1.31.0...v1.32.0) (2021-12-03)
 
 
