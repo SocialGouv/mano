@@ -51,6 +51,9 @@ router.post(
       return res.send(403).send({ ok: false, error: "not permission creating report" });
     }
 
+    const existingReport = await Report.findOne({ where: { team, date, organisation: req.user.organisation } });
+    if (existingReport) return res.status(200).send({ ok: true, data: existingReport });
+
     const data = await Report.create({ team, date, organisation: req.user.organisation });
     return res.status(200).send({ ok: true, data });
   })
