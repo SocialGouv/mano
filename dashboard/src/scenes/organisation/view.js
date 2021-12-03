@@ -21,6 +21,7 @@ import useApi from '../../services/api-interface-with-dashboard';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import { personFields } from '../../recoil/persons';
+import DownloadExample from '../data-import-export/DownloadExample';
 
 const View = () => {
   const { organisation, setOrganisation } = useAuth();
@@ -215,7 +216,8 @@ const View = () => {
                     </ul>
                   </Col>
                 </Row>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                  <DownloadExample />
                   <ImportData />
                 </div>
               </>
