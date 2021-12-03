@@ -1,3 +1,10 @@
+## [1.32.2](https://github.com/SocialGouv/mano/compare/v1.32.1...v1.32.2) (2021-12-03)
+
+
+### Bug Fixes
+
+* **api:** migration on reports ([#184](https://github.com/SocialGouv/mano/issues/184)) ([f32db49](https://github.com/SocialGouv/mano/commit/f32db494f5119739079cadbd1fd95e0ddfa13dee))
+
 ## [1.32.1](https://github.com/SocialGouv/mano/compare/v1.32.0...v1.32.1) (2021-12-03)
 
 
