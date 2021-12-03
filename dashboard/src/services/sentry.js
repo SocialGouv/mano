@@ -8,7 +8,7 @@ const { ENV, VERSION } = require('../config');
 
 if (ENV === 'production') {
   Sentry.init({
-    dsn: 'https://7b294e89e98e4ffdaeeb74102f050567@o548798.ingest.sentry.io/5833236',
+    dsn: 'https://d5bde308505f4860b199e7031dcd17d6@o348403.ingest.sentry.io/5384501',
     environment: 'dashboard',
     release: VERSION,
     integrations: [new Integrations.BrowserTracing()],
@@ -17,6 +17,7 @@ if (ENV === 'production') {
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: 1.0,
+    ignoreErrors: ['Network request failed', 'Failed to fetch', 'NetworkError', 'withrealtime/messaging'],
   });
 }
 
