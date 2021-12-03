@@ -15,7 +15,7 @@ router.post(
   "/import",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    const persons = req.body.persons.map((p) => ({
+    const persons = req.body.map((p) => ({
       ...p,
       organisation: req.user.organisation,
       user: req.user._id,
@@ -26,7 +26,7 @@ router.post(
 
       if (ENCRYPTED_FIELDS_ONLY) return data;
 
-      return data.toJSON().map((p) => ({ ...p, assignedTeams: [] }));
+      return data.map((p) => ({ ...p.toJSON(), assignedTeams: [] }));
     });
     return res.status(status).send({ ok, data, error });
   })

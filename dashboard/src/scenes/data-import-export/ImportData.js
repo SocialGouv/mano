@@ -1,21 +1,32 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import XLSX from 'xlsx';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import { encryptedFields as personFields, personsState } from '../../recoil/persons';
+import { personFields, personsState, preparePersonForEncryption } from '../../recoil/persons';
 import { useAuth } from '../../recoil/auth';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { toastr } from 'react-redux-toastr';
-
-const importableFields = personFields.filter((f) => !['user', '_id', 'organisation', 'team', 'assignedTeams'].includes(f));
+import { toFrenchDate } from '../../utils';
+import useApi from '../../services/api-interface-with-dashboard';
+import { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
+import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 
 const ImportData = () => {
   const { user } = useAuth();
   const fileDialogRef = useRef(null);
-  const allPersons = useRecoilValue(personsState);
+  const [allPersons, setAllPersons] = useRecoilState(personsState);
+  const API = useApi();
 
-  const onImportData = async (event) => {
+  const [showImportSummary, setShowImpotSummary] = useState(false);
+  const [dataToImport, setDataToImport] = useState([]);
+  const [importedFields, setImportedFields] = useState([]);
+  const [ignoredFields, setIgnoredFields] = useState([]);
+
+  const importableFields = personFields.filter((f) => f.importable);
+  const importableLabels = importableFields.map((f) => f.label);
+
+  const onParseData = async (event) => {
     try {
       // if the user imports the same file twice, nothing happens
       if (!event.target?.files?.length) return; // probably cancel button
@@ -23,9 +34,8 @@ const ImportData = () => {
       const data = await file.arrayBuffer();
       const workbook = XLSX.read(data);
       const { SheetNames, Sheets } = workbook;
-      const personsSheetName = SheetNames.find((name) => name.includes('person'));
+      const personsSheetName = SheetNames.find((name) => name.toLocaleLowerCase().includes('person'));
       const personsSheet = Sheets[personsSheetName];
-      console.log({ personsSheet });
       /*
       something like that:
       !margins: {left: 1, right: 1, top: 1, bottom: 1, header: 0.25, …}
@@ -40,11 +50,20 @@ const ImportData = () => {
 
       */
       const sheetCells = Object.keys(personsSheet);
-      const headerCells = sheetCells
-        .filter((cell) => cell.replace(/\D+/g, '') === '1') // ['A1', 'B1'...]
-        .filter((headerKey) => importableFields.includes(personsSheet[headerKey].v));
+      const headerCells = sheetCells.filter((cell) => cell.replace(/\D+/g, '') === '1'); // ['A1', 'B1'...]
 
-      const headerColumnsAndFieldname = headerCells.map((cell) => [cell.replace('1', ''), personsSheet[cell].v]); // [['C', 'name], ['D', birthdate]]
+      const fieldsToIgnore = headerCells
+        .filter((headerKey) => !importableLabels.includes(personsSheet[headerKey].v))
+        .map((headerKey) => personsSheet[headerKey].v?.trim()); // ['Un champ bidon', 'Un autre']
+      setIgnoredFields(fieldsToIgnore);
+
+      const headersCellsToImport = headerCells.filter((headerKey) => importableLabels.includes(personsSheet[headerKey].v?.trim()));
+      const headerColumnsAndFieldname = headersCellsToImport.map((cell) => {
+        const column = cell.replace('1', '');
+        const fieldname = importableFields.find((f) => f.label === personsSheet[cell].v?.trim()).name;
+        return [column, fieldname];
+      }); // [['C', 'name], ['D', birthdate]]
+      setImportedFields(headersCellsToImport.map((headerKey) => personsSheet[headerKey].v?.trim()));
 
       // .replace(/[^a-zA-Z]+/g, '')
       const lastRow = parseInt(personsSheet['!ref'].split(':')[1].replace(/\D+/g, ''), 10);
@@ -55,13 +74,29 @@ const ImportData = () => {
         for (const [column, fieldname] of headerColumnsAndFieldname) {
           person[fieldname] = personsSheet[`${column}${i}`]?.v;
         }
+        person.description = `Données importées le ${toFrenchDate(new Date())}\n${person.description || ''}`;
         persons.push(person);
       }
 
-      console.log({ persons });
+      if (hashedOrgEncryptionKey) {
+        const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+        setDataToImport(encryptedPersons);
+      } else {
+        setDataToImport(persons.map(preparePersonForEncryption));
+      }
+      setShowImpotSummary(true);
     } catch (e) {
       console.log(e);
       toastr.error("Désolé, nous n'avons pas pu lire votre fichier.", 'Mais vous pouvez réssayer !');
+    }
+  };
+
+  const onImportData = async () => {
+    if (window.confirm(`Voulez-vous vraiment importer ${dataToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
+      const response = await API.post({ path: '/person/import', body: dataToImport });
+      if (response.ok) toastr.info('Importation réussie !');
+      setAllPersons(response.data);
+      setShowImpotSummary(false);
     }
   };
 
@@ -82,8 +117,37 @@ const ImportData = () => {
         id="fileDialog"
         accept="csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
         style={{ display: 'none' }}
-        onChange={onImportData}
+        onChange={onParseData}
       />
+      <Modal isOpen={showImportSummary} toggle={() => setShowImpotSummary(false)} size="lg">
+        <ModalHeader toggle={() => setShowImpotSummary(false)}>Résumé</ModalHeader>
+        <ModalBody>
+          <ul style={{ overflow: 'auto', maxHeight: '62vh' }}>
+            <li>Nombre de personnes à importer: {dataToImport.length}</li>
+            <li>
+              Champs importés ({importedFields.length}):
+              <ul>
+                {importedFields.map((label) => (
+                  <li key={label}>
+                    <code>{label}</code>
+                  </li>
+                ))}
+              </ul>
+            </li>
+            <li>
+              Champs ignorés ({ignoredFields.length}):
+              <ul>
+                {ignoredFields.map((label) => (
+                  <li key={label}>
+                    <code>{label}</code>
+                  </li>
+                ))}
+              </ul>
+            </li>
+          </ul>
+          <ButtonCustom onClick={onImportData} color="primary" title="Importer" padding="12px 24px" disabled={!!allPersons.length} />
+        </ModalBody>
+      </Modal>
     </>
   );
 };
