@@ -1,3 +1,10 @@
+# [1.31.0](https://github.com/SocialGouv/mano/compare/v1.30.1...v1.31.0) (2021-12-03)
+
+
+### Features
+
+* custom fields on persons ([#171](https://github.com/SocialGouv/mano/issues/171)) ([71c06d4](https://github.com/SocialGouv/mano/commit/71c06d4204cd45c99a5d51d1a6a0725a43cb77bb))
+
 ## [1.30.1](https://github.com/SocialGouv/mano/compare/v1.30.0...v1.30.1) (2021-12-03)
 
 
