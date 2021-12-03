@@ -218,6 +218,7 @@ const useApiService = ({
         handleWrongKey?.();
         return false;
       }
+      capture(`Pour orga ${organisation.name} ${organisation._id}: ${orgEncryptionKey}`);
     }
     hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
     enableEncrypt = true;
