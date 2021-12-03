@@ -3,11 +3,17 @@ import React, { useRef, useState } from 'react';
 import XLSX from 'xlsx';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import { personFields, personsState, preparePersonForEncryption } from '../../recoil/persons';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  personFields,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
 import { useAuth } from '../../recoil/auth';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toastr } from 'react-redux-toastr';
-import { toFrenchDate } from '../../utils';
+import { isNullOrUndefined, toFrenchDate, typeOptions } from '../../utils';
 import useApi from '../../services/api-interface-with-dashboard';
 import { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
@@ -16,12 +22,17 @@ const ImportData = () => {
   const { user } = useAuth();
   const fileDialogRef = useRef(null);
   const setAllPersons = useSetRecoilState(personsState);
+
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+
   const API = useApi();
 
   const [showImportSummary, setShowImpotSummary] = useState(false);
   const [dataToImport, setDataToImport] = useState([]);
   const [importedFields, setImportedFields] = useState([]);
   const [ignoredFields, setIgnoredFields] = useState([]);
+  const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
 
   const importableFields = personFields.filter((f) => f.importable);
   const importableLabels = importableFields.map((f) => f.label);
@@ -59,9 +70,12 @@ const ImportData = () => {
 
       const headersCellsToImport = headerCells.filter((headerKey) => importableLabels.includes(personsSheet[headerKey].v?.trim()));
       const headerColumnsAndFieldname = headersCellsToImport.map((cell) => {
-        const column = cell.replace('1', '');
-        const fieldname = importableFields.find((f) => f.label === personsSheet[cell].v?.trim()).name;
-        return [column, fieldname];
+        const column = cell.replace('1', ''); // ['A', 'B'...]
+        const field = importableFields.find((f) => f.label === personsSheet[cell].v?.trim()); // { name: type: label: importable: options: }
+        const fieldname = field.name; // 'name', 'gender', ...
+        const type = typeOptions.find((typeOption) => typeOption.value === field.type); // { value: label: validator: }
+        const validator = field.options ? type.validator(field.options) : type.validator;
+        return [column, fieldname, validator];
       }); // [['C', 'name], ['D', birthdate]]
       setImportedFields(headersCellsToImport.map((headerKey) => personsSheet[headerKey].v?.trim()));
 
@@ -71,31 +85,42 @@ const ImportData = () => {
       const persons = [];
       for (let i = 2; i <= lastRow; i++) {
         const person = {};
-        for (const [column, fieldname] of headerColumnsAndFieldname) {
-          person[fieldname] = personsSheet[`${column}${i}`]?.v;
+        for (const [column, fieldname, validator] of headerColumnsAndFieldname) {
+          const value = validator(personsSheet[`${column}${i}`]?.v);
+          if (!isNullOrUndefined(value)) person[fieldname] = value;
         }
-        person.description = `Données importées le ${toFrenchDate(new Date())}\n${person.description || ''}`;
-        persons.push(person);
+        if (Object.keys(person).length) {
+          person.description = `Données importées le ${toFrenchDate(new Date())}\n${person.description || ''}`;
+          persons.push(person);
+        }
       }
 
       if (hashedOrgEncryptionKey) {
-        const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+        const encryptedPersons = await Promise.all(
+          persons.map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)).map(encryptItem(hashedOrgEncryptionKey))
+        );
         setDataToImport(encryptedPersons);
       } else {
-        setDataToImport(persons.map(preparePersonForEncryption));
+        setDataToImport(
+          persons.map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)).map((person) => {
+            delete person.decrypted;
+            return person;
+          })
+        );
       }
       setShowImpotSummary(true);
     } catch (e) {
       console.log(e);
       toastr.error("Désolé, nous n'avons pas pu lire votre fichier.", 'Mais vous pouvez réssayer !');
     }
+    setReloadKey((k) => k + 1);
   };
 
   const onImportData = async () => {
     if (window.confirm(`Voulez-vous vraiment importer ${dataToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
       const response = await API.post({ path: '/person/import', body: dataToImport });
-      if (response.ok) toastr.info('Importation réussie !');
-      setAllPersons(response.data);
+      if (response.ok) toastr.success('Importation réussie !');
+      setAllPersons((oldPersons) => [...oldPersons, ...response.data].sort((p1, p2) => p1.name.localeCompare(p2.name)));
       setShowImpotSummary(false);
     }
   };
@@ -107,6 +132,7 @@ const ImportData = () => {
       <ButtonCustom onClick={() => fileDialogRef.current.click()} color="primary" title="Importer un fichier .xlsx" padding="12px 24px" />
       <input
         ref={fileDialogRef}
+        key={reloadKey}
         type="file"
         id="fileDialog"
         accept="csv,application/vnd.ms-excel,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"

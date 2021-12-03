@@ -21,7 +21,10 @@ export let tokenCached = null;
 export const encryptItem =
   (hashedOrgEncryptionKey, enableEncrypt = true) =>
   async (item) => {
-    if (!enableEncrypt) return item;
+    if (!enableEncrypt) {
+      delete item.decrypted;
+      return item;
+    }
     if (item.decrypted) {
       if (!item.entityKey) item.entityKey = await generateEntityKey();
       const { encryptedContent, encryptedEntityKey } = await encrypt(JSON.stringify(item.decrypted), item.entityKey, hashedOrgEncryptionKey);
