@@ -158,127 +158,6 @@ export const usePersons = () => {
 };
 
 /*
-
-Utils
-
-*/
-
-const encryptedFields = [
-  'user',
-  'name',
-  'otherNames',
-  'gender',
-  'birthdate',
-  'description',
-  'alertness',
-  'wanderingAt',
-  'personalSituation',
-  'nationalitySituation',
-  'hasAnimal',
-  'structureSocial',
-  'structureMedical',
-  'employment',
-  'address',
-  'addressDetail',
-  'resources',
-  'reasons',
-  'healthInsurance',
-  'vulnerabilities',
-  'consumptions',
-  'phone',
-  'assignedTeams',
-];
-
-export const preparePersonForEncryption = (customFieldsMedical, customFieldsSocial) => (person) => {
-  const encryptedFieldsIncludingCustom = [...customFieldsSocial.map((f) => f.name), ...customFieldsMedical.map((f) => f.name), ...encryptedFields];
-  const decrypted = {};
-  for (let field of encryptedFieldsIncludingCustom) {
-    decrypted[field] = person[field];
-  }
-  return {
-    _id: person._id,
-    organisation: person.organisation,
-    createdAt: person.createdAt,
-    updatedAt: person.updatedAt,
-
-    decrypted,
-    entityKey: person.entityKey,
-    ...person,
-  };
-};
-
-const sortPersons = (p1, p2) => p1.name.localeCompare(p2.name);
-
-const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
-  try {
-    const commentbody = {
-      type: 'person',
-      item: newPerson._id,
-      person: newPerson._id,
-    };
-    const notifyChange = (field, before, now) => `Changement ${field}:
-    Avant: ${before || 'Non renseigné'}
-    Désormais: ${now}`;
-
-    const fieldChanged = (field, stringifyForCheck = false) => {
-      const next = stringifyForCheck ? JSON.stringify(newPerson[field]) : newPerson[field];
-      const prev = stringifyForCheck ? JSON.stringify(oldPerson[field]) : oldPerson[field];
-      if (!next && !prev) return false;
-      if (!next && !prev) return false;
-      if (!next && !!prev) return true;
-      if (!!next && !prev) return true;
-      if (next === prev) return false;
-      return true;
-    };
-
-    let comment = [];
-
-    if (fieldChanged('personalSituation')) {
-      comment.push(notifyChange('de situation personnelle', oldPerson.personalSituation, newPerson.personalSituation));
-    }
-    if (fieldChanged('nationalitySituation')) {
-      comment.push(notifyChange('de nationalité', oldPerson.nationalitySituation, newPerson.nationalitySituation));
-    }
-    if (fieldChanged('structureSocial')) {
-      comment.push(notifyChange('de structure de suivi social', oldPerson.structureSocial, newPerson.structureSocial));
-    }
-    if (fieldChanged('structureMedical')) {
-      comment.push(notifyChange('de structure de suivi médical', oldPerson.structureMedical, newPerson.structureMedical));
-    }
-    if (fieldChanged('employment')) {
-      comment.push(notifyChange("d'emploi", oldPerson.employment, newPerson.employment));
-    }
-    if (fieldChanged('address') || fieldChanged('addressDetail')) {
-      const prev = oldPerson.address === 'Oui' ? oldPerson.addressDetail : oldPerson.address;
-      const next = newPerson.address === 'Oui' ? newPerson.addressDetail : newPerson.address;
-      comment.push(notifyChange("d'hébergement", prev, next));
-    }
-    if (fieldChanged('resources', true)) {
-      comment.push(notifyChange('de ressources', (oldPerson.resources || []).join(', '), (newPerson.resources || []).join(', ')));
-    }
-    if (fieldChanged('healthInsurance')) {
-      comment.push(notifyChange('de couverture médicale', oldPerson.healthInsurance, newPerson.healthInsurance));
-    }
-
-    if (comment.length) {
-      return {
-        ...commentbody,
-        comment: comment.join('\n'),
-      };
-    }
-  } catch (error) {
-    capture(error, {
-      extra: {
-        message: 'error in formatting comment for update person',
-        newPerson,
-        oldPerson,
-      },
-    });
-  }
-  return null;
-};
-
-/*
 Choices on selects
 */
 
@@ -385,70 +264,140 @@ export const defaultMedicalCustomFields = [
   },
 ];
 
-export const filterPersonsBase = [
+/*
+
+Utils
+
+*/
+
+export const personFields = [
+  { name: 'user', type: 'text', label: '', encrypted: true, importable: false },
+  { name: 'name', type: 'text', label: 'Nom prénom ou Pseudonyme', encrypted: true, importable: true },
+  { name: 'otherNames', type: 'text', label: 'Autres pseudos', encrypted: true, importable: true },
+  { name: 'gender', type: 'enum', label: 'Genre', encrypted: true, importable: true, options: genderOptions },
+  { name: 'birthdate', type: 'date', label: 'Date de naissance', encrypted: true, importable: true },
+  { name: 'description', type: 'textarea', label: 'Description', encrypted: true, importable: true },
+  { name: 'alertness', type: 'boolean', label: 'Personne très vulnérable', encrypted: true, importable: true },
+  { name: 'wanderingAt', type: 'date', label: 'En rue depuis le', encrypted: true, importable: true },
+  { name: 'personalSituation', type: 'enum', label: 'Situation personnelle', encrypted: true, importable: true, options: personalSituationOptions },
+  { name: 'nationalitySituation', type: 'enum', label: 'Nationalité', encrypted: true, importable: true, options: nationalitySituationOptions },
+  { name: 'hasAnimal', type: 'yes-no', label: 'Avec animaux', encrypted: true, importable: true, options: yesNoOptions },
+  { name: 'structureSocial', type: 'text', label: 'Structure de suivi social', encrypted: true, importable: true },
+  { name: 'structureMedical', type: 'text', label: 'Structure de suivi médical', encrypted: true, importable: true },
+  { name: 'employment', type: 'enum', label: 'Emploi', encrypted: true, importable: true, options: employmentOptions },
+  { name: 'address', type: 'yes-no', label: 'Hébergement', encrypted: true, importable: true, options: yesNoOptions },
+  { name: 'addressDetail', type: 'text', label: "Type d'hébergement", encrypted: true, importable: true },
+  { name: 'resources', type: 'multi-choice', label: 'Ressources', encrypted: true, importable: true, options: ressourcesOptions },
+  { name: 'reasons', type: 'multi-choice', label: 'Motif de la situation en rue', encrypted: true, importable: true, options: reasonsOptions },
+  { name: 'healthInsurance', type: 'enum', label: 'Couverture médicale', encrypted: true, importable: true, options: healthInsuranceOptions },
+  { name: 'vulnerabilities', type: 'multi-choice', label: 'Vulnérabilités', encrypted: true, importable: true, options: vulnerabilitiesOptions },
+  { name: 'consumptions', type: 'multi-choice', label: 'Consommations', encrypted: true, importable: true, options: consumptionsOptions },
+  { name: 'phone', type: 'text', label: 'Téléphone', encrypted: true, importable: true },
+  { name: 'assignedTeams', label: '', encrypted: true, importable: false },
+  { name: '_id', label: '', encrypted: false, importable: false },
+  { name: 'organisation', label: '', encrypted: false, importable: false },
+  { name: 'createdAt', type: 'date', label: 'Suivi(e) depuis le / Créé le', encrypted: false, importable: true },
+  { name: 'updatedAt', type: 'date', label: '', encrypted: false, importable: false },
+  { name: 'outOfActiveList', type: 'yes-no', label: 'Sortie de file active', encrypted: false, importable: false, options: yesNoOptions },
   {
-    label: 'Genre',
-    field: 'gender',
-    options: genderOptions,
-  },
-  {
-    label: 'Consommations',
-    field: 'consumptions',
-    options: consumptionsOptions,
-  },
-  {
-    label: 'Couverture médicale',
-    field: 'healthInsurance',
-    options: healthInsuranceOptions,
-  },
-  {
-    label: 'Nationalité',
-    field: 'nationalitySituation',
-    options: nationalitySituationOptions,
-  },
-  {
-    label: 'Situation personnelle',
-    field: 'personalSituation',
-    options: personalSituationOptions,
-  },
-  {
-    label: 'Ressources',
-    field: 'resources',
-    options: ressourcesOptions,
-  },
-  {
-    label: 'Motifs de la situation de rue',
-    field: 'reasons',
-    options: reasonsOptions,
-  },
-  {
-    label: 'Emploi',
-    field: 'employment',
-    options: employmentOptions,
-  },
-  {
-    label: 'Vulnérabilités',
-    field: 'vulnerabilities',
-    options: vulnerabilitiesOptions,
-  },
-  {
-    label: 'Hébergement',
-    field: 'address',
-    options: yesNoOptions,
-  },
-  {
-    label: 'Avec animaux',
-    field: 'hasAnimal',
-    options: yesNoOptions,
-  },
-  {
-    label: 'Sortie de file active',
-    field: 'outOfActiveList',
-    options: yesNoOptions,
-  },
-  {
+    name: 'outOfActiveListReason',
+    type: 'enum',
     label: 'Motif de sortie de file active',
-    field: 'outOfActiveListReason',
+    encrypted: true,
+    importable: false,
     options: outOfActiveListReasonOptions,
   },
 ];
+
+export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
+export const preparePersonForEncryption = (customFieldsMedical, customFieldsSocial) => (person) => {
+  const encryptedFieldsIncludingCustom = [...customFieldsSocial.map((f) => f.name), ...customFieldsMedical.map((f) => f.name), ...encryptedFields];
+  const decrypted = {};
+  for (let field of encryptedFieldsIncludingCustom) {
+    decrypted[field] = person[field];
+  }
+  return {
+    _id: person._id,
+    organisation: person.organisation,
+    createdAt: person.createdAt,
+    updatedAt: person.updatedAt,
+    outOfActiveList: person.outOfActiveList,
+
+    decrypted,
+    entityKey: person.entityKey,
+    ...person,
+  };
+};
+
+const sortPersons = (p1, p2) => p1.name.localeCompare(p2.name);
+
+const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
+  try {
+    const commentbody = {
+      type: 'person',
+      item: newPerson._id,
+      person: newPerson._id,
+    };
+    const notifyChange = (field, before, now) => `Changement ${field}:
+    Avant: ${before || 'Non renseigné'}
+    Désormais: ${now}`;
+
+    const fieldChanged = (field, stringifyForCheck = false) => {
+      const next = stringifyForCheck ? JSON.stringify(newPerson[field]) : newPerson[field];
+      const prev = stringifyForCheck ? JSON.stringify(oldPerson[field]) : oldPerson[field];
+      if (!next && !prev) return false;
+      if (!next && !prev) return false;
+      if (!next && !!prev) return true;
+      if (!!next && !prev) return true;
+      if (next === prev) return false;
+      return true;
+    };
+
+    let comment = [];
+
+    if (fieldChanged('personalSituation')) {
+      comment.push(notifyChange('de situation personnelle', oldPerson.personalSituation, newPerson.personalSituation));
+    }
+    if (fieldChanged('nationalitySituation')) {
+      comment.push(notifyChange('de nationalité', oldPerson.nationalitySituation, newPerson.nationalitySituation));
+    }
+    if (fieldChanged('structureSocial')) {
+      comment.push(notifyChange('de structure de suivi social', oldPerson.structureSocial, newPerson.structureSocial));
+    }
+    if (fieldChanged('structureMedical')) {
+      comment.push(notifyChange('de structure de suivi médical', oldPerson.structureMedical, newPerson.structureMedical));
+    }
+    if (fieldChanged('employment')) {
+      comment.push(notifyChange("d'emploi", oldPerson.employment, newPerson.employment));
+    }
+    if (fieldChanged('address') || fieldChanged('addressDetail')) {
+      const prev = oldPerson.address === 'Oui' ? oldPerson.addressDetail : oldPerson.address;
+      const next = newPerson.address === 'Oui' ? newPerson.addressDetail : newPerson.address;
+      comment.push(notifyChange("d'hébergement", prev, next));
+    }
+    if (fieldChanged('resources', true)) {
+      comment.push(notifyChange('de ressources', (oldPerson.resources || []).join(', '), (newPerson.resources || []).join(', ')));
+    }
+    if (fieldChanged('healthInsurance')) {
+      comment.push(notifyChange('de couverture médicale', oldPerson.healthInsurance, newPerson.healthInsurance));
+    }
+
+    if (comment.length) {
+      return {
+        ...commentbody,
+        comment: comment.join('\n'),
+      };
+    }
+  } catch (error) {
+    capture(error, {
+      extra: {
+        message: 'error in formatting comment for update person',
+        newPerson,
+        oldPerson,
+      },
+    });
+  }
+  return null;
+};
+
+export const filterPersonsBase = personFields.map(({ label, name, options }) => ({ label, field: name, options }));

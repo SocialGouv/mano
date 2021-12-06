@@ -20,7 +20,7 @@ const DeleteOrganisation = () => {
 
   return (
     <>
-      <ButtonCustom style={{ marginRight: 'auto' }} title="Supprimer l'organisation" color="danger" onClick={() => setOpen(true)} />
+      <ButtonCustom title="Supprimer l'organisation" color="danger" onClick={() => setOpen(true)} />
       <StyledModal isOpen={open} toggle={() => setOpen(false)} size="lg" centered>
         <ModalHeader toggle={() => setOpen(false)} color="danger">
           <span style={{ color: theme.redDark, textAlign: 'center', display: 'block' }}>Voulez-vous vraiment supprimer l'organisation ?</span>

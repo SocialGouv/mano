@@ -5,21 +5,10 @@ import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from
 import styled from 'styled-components';
 import { useAuth } from '../recoil/auth';
 import useApi from '../services/api-interface-with-dashboard';
+import { typeOptions } from '../utils';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import Table from './table';
-
-const typeOptions = [
-  { value: 'text', label: 'Texte' },
-  { value: 'textarea', label: 'Zone de texte multi-lignes' },
-  { value: 'number', label: 'Nombre' },
-  { value: 'date', label: 'Date sans heure' },
-  { value: 'date-with-time', label: 'Date avec heure' },
-  { value: 'yes-no', label: 'Oui/Non' },
-  { value: 'enum', label: 'Choix dans une liste' },
-  { value: 'multi-choice', label: 'Choix multiple dans une liste' },
-  { value: 'boolean', label: 'Case à cocher' },
-];
 
 const newField = () => ({
   name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,

@@ -18,6 +18,10 @@ import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
+import ExportData from '../data-import-export/ExportData';
+import ImportData from '../data-import-export/ImportData';
+import { personFields } from '../../recoil/persons';
+import DownloadExample from '../data-import-export/DownloadExample';
 
 const View = () => {
   const { organisation, setOrganisation } = useAuth();
@@ -53,13 +57,13 @@ const View = () => {
                     </FormGroup>
                   </Col>
                 </Row>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
+                  <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} width={200} />
                   <DeleteOrganisation />
-                  <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
                 </div>
                 <hr />
                 <Title>Encryption</Title>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
                   <EncryptionKey />
                 </div>
                 <hr />
@@ -163,6 +167,59 @@ const View = () => {
                     </>
                   )}
                 </>
+                <hr />
+                <Title>Exporter des données</Title>
+                <Row>
+                  <Col md={10}>
+                    <p>Vous pouvez exporter l'ensemble de vos données dans un fichier Excel.</p>
+                  </Col>
+                </Row>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                  <ExportData />
+                </div>
+                <hr />
+                <Title>Importer des personnes suivies</Title>
+                <Row>
+                  <Col md={10}>
+                    <p>
+                      Vous pouvez importer une liste de personnes suivies depuis un fichier Excel. Ce fichier doit avoir quelques caractéristiques:
+                    </p>
+                    <ul>
+                      <li>
+                        avoir un onglet dont le nom contient <code>personne</code>
+                      </li>
+                      <li>avoir en première ligne de cet onglet des têtes de colonnes</li>
+                      <li>
+                        les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne sera pas
+                        prise en compte - certaines colonnes ont des valeurs imposées :
+                        <ul>
+                          {personFields
+                            .filter((f) => f.importable)
+                            .map((f) => {
+                              return (
+                                <li key={f.label}>
+                                  {f.label}
+                                  {f.options?.length && ' : '}
+                                  {f.options?.map((option, index) => (
+                                    <span key={option}>
+                                      <code>
+                                        {option}
+                                        {index !== f.options.length - 1 && ', '}
+                                      </code>
+                                    </span>
+                                  ))}
+                                </li>
+                              );
+                            })}
+                        </ul>
+                      </li>
+                    </ul>
+                  </Col>
+                </Row>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                  <DownloadExample />
+                  <ImportData />
+                </div>
               </>
             );
           }}
