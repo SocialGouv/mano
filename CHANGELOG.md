@@ -1,3 +1,10 @@
+# [1.33.0](https://github.com/SocialGouv/mano/compare/v1.32.2...v1.33.0) (2021-12-06)
+
+
+### Features
+
+* **dashboard,api:** import xlsx ([#178](https://github.com/SocialGouv/mano/issues/178)) ([0c8cb4a](https://github.com/SocialGouv/mano/commit/0c8cb4a9911b68517b8f76fbfa2e708010080a78))
+
 ## [1.32.2](https://github.com/SocialGouv/mano/compare/v1.32.1...v1.32.2) (2021-12-03)
 
 
