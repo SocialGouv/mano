@@ -355,6 +355,26 @@ export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française'];
 
 export const yesNoOptions = ['Oui', 'Non'];
 
+export const caseHistoryTypesOptions = [
+  'Psychiatrie',
+  'Neurologie',
+  'Dermatologie',
+  'Pulmonaire',
+  'Gastro-enterologie',
+  'Rhumatologie',
+  'Cardio-vasculaire',
+  'Ophtalmologie',
+  'ORL',
+  'Dentaire',
+  'Traumatologie',
+  'Endocrinologie',
+  'Uro-gynéco',
+  'Cancer',
+  'Addiction alcool',
+  'Addiction autres',
+  'Hospitalisation',
+];
+
 export const outOfActiveListReasonOptions = [
   'Relai vers autre structure',
   'Hébergée',
@@ -381,6 +401,24 @@ export const defaultMedicalCustomFields = [
     label: 'Vulnérabilités',
     type: 'multi-choice',
     options: vulnerabilitiesOptions,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'caseHistoryTypes',
+    label: "Catégorie d'antécédents",
+    type: 'multi-choice',
+    options: caseHistoryTypesOptions,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'caseHistoryDescription',
+    label: 'Informations complémentaires (antécédents)',
+    type: 'textarea',
+    options: null,
     enabled: true,
     required: false,
     showInStats: true,
