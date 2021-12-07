@@ -54,7 +54,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
         </Row>
         {filters.map(({ field, value }, index) => {
           const filterFields = base.map((filter) => filter.field);
-          const filterValues = !!field ? [...base.find((filter) => filter.field === field)?.options, 'Non renseigné'] : [];
+          const filterValues = !!field ? [...(base.find((filter) => filter.field === field)?.options || []), 'Non renseigné'] : [];
 
           const onChangeField = (newField) => onChange(filters.map((f, i) => (i === index ? { field: newField, value: null } : f)));
           const onChangeValue = (newValue) => onChange(filters.map((f, i) => (i === index ? { field, value: newValue } : f)));
