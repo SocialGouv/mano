@@ -1,3 +1,10 @@
+# [1.34.0](https://github.com/SocialGouv/mano/compare/v1.33.1...v1.34.0) (2021-12-07)
+
+
+### Features
+
+* add new medical default fields ([#186](https://github.com/SocialGouv/mano/issues/186)) ([ffac343](https://github.com/SocialGouv/mano/commit/ffac34324557ff1336f4119245815f0bf99711e5))
+
 ## [1.33.1](https://github.com/SocialGouv/mano/compare/v1.33.0...v1.33.1) (2021-12-07)
 
 
