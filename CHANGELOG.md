@@ -1,3 +1,10 @@
+## [1.33.1](https://github.com/SocialGouv/mano/compare/v1.33.0...v1.33.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* **dashboard:** invalid attempt to spread non-iterable instance ([eb983b0](https://github.com/SocialGouv/mano/commit/eb983b056f152a1e70487c3ece0f0dd2d0f3609b))
+
 # [1.33.0](https://github.com/SocialGouv/mano/compare/v1.32.2...v1.33.0) (2021-12-06)
 
 
