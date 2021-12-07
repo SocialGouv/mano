@@ -145,9 +145,26 @@ export const usePersons = () => {
     }
   };
 
+  const personFieldsIncludingCustomFields = (person) => {
+    return [
+      ...personFields,
+      ...[...customFieldsPersonsMedical, ...customFieldsPersonsSocial].map((f) => {
+        return {
+          name: f.name,
+          type: f.type,
+          label: f.label,
+          encrypted: true,
+          importable: true,
+          options: f.options || null,
+        };
+      }),
+    ];
+  };
+
   return {
     persons,
     loading,
+    personFieldsIncludingCustomFields,
     customFieldsPersonsSocial,
     customFieldsPersonsMedical,
     refreshPersons,

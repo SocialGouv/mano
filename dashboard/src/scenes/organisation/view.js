@@ -20,11 +20,12 @@ import { useAuth } from '../../recoil/auth';
 import useApi from '../../services/api-interface-with-dashboard';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
-import { personFields } from '../../recoil/persons';
+import { usePersons } from '../../recoil/persons';
 import DownloadExample from '../data-import-export/DownloadExample';
 
 const View = () => {
   const { organisation, setOrganisation } = useAuth();
+  const { personFieldsIncludingCustomFields } = usePersons();
   const API = useApi();
 
   return (
@@ -193,7 +194,7 @@ const View = () => {
                         les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne sera pas
                         prise en compte - certaines colonnes ont des valeurs imposées :
                         <ul>
-                          {personFields
+                          {personFieldsIncludingCustomFields()
                             .filter((f) => f.importable)
                             .map((f) => {
                               return (
