@@ -9,6 +9,12 @@ import { ResponsiveBar } from '@nivo/bar';
 
 export const CustomResponsivePie = ({ data, title, onAddFilter, field }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
+
+  const onClick = ({ id }) => {
+    if (!onAddFilter) return;
+    onAddFilter({ value: id, field });
+  };
+
   return (
     <CardWrapper>
       <Col md={12}>
@@ -50,7 +56,7 @@ export const CustomResponsivePie = ({ data, title, onAddFilter, field }) => {
             arcLinkLabelsSkipAngle={8}
             arcLabelsSkipAngle={8}
             enableArcLinkLabels
-            onClick={({ id }) => onAddFilter({ value: id, field })}
+            onClick={onClick}
             sliceLabelsTextColor="#333333"
             valueFormat={(value) => `${value} (${Math.round((value / total) * 1000) / 10}%)`}
           />
