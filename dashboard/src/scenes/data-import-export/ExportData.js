@@ -5,7 +5,7 @@ import XLSX from 'xlsx';
 import ButtonCustom from '../../components/ButtonCustom';
 import { personsState } from '../../recoil/persons';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
-import { useAuth } from '../../recoil/auth';
+import { teamsState, usersState, userState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
 import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
@@ -62,7 +62,10 @@ const createSheet = (data) => {
 };
 
 const ExportData = () => {
-  const { teams, users, user } = useAuth();
+  const teams = useRecoilValue(teamsState);
+  const users = useRecoilValue(usersState);
+  const user = useRecoilValue(userState);
+
   const allPersons = useRecoilValue(personsState);
   const allActions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);

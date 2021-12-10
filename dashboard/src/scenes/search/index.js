@@ -17,7 +17,7 @@ import UserName from '../../components/UserName';
 import PaginationContext, { PaginationProvider } from '../../contexts/pagination';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
-import { useAuth } from '../../recoil/auth';
+import { teamsState } from '../../recoil/auth';
 import { useActions } from '../../recoil/actions';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
@@ -167,7 +167,7 @@ const Alertness = styled.span`
 
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { teams } = useAuth();
+  const teams = useRecoilValue(teamsState);
 
   const data = useRecoilValue(personsSearchSelector({ search }));
 

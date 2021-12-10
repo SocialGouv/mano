@@ -9,13 +9,13 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import styled from 'styled-components';
 import { getMonths, isOnSameDay } from '../../services/date';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState } from '../../recoil/auth';
 import { reportsState, useReports } from '../../recoil/reports';
 import { useRefresh } from '../../recoil/refresh';
 import { useRecoilValue } from 'recoil';
 
 const List = () => {
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
   const allReports = useRecoilValue(reportsState);
   const { reportsRefresher, loading } = useRefresh();
 

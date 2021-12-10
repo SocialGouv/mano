@@ -28,7 +28,7 @@ import CreateObservation from '../../components/CreateObservation';
 import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionName from '../../components/ActionName';
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { useComments } from '../../recoil/comments';
 import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';
@@ -53,7 +53,10 @@ const getPeriodTitle = (date, nightSession) => {
 
 const View = () => {
   const { id } = useParams();
-  const { user, organisation, currentTeam } = useAuth();
+  const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
   const { reports, deleteReport } = useReports();
   const location = useLocation();
   const history = useHistory();
@@ -208,7 +211,7 @@ const View = () => {
 };
 
 const Reception = ({ report }) => {
-  const { organisation } = useAuth();
+  const organisation = useRecoilValue(organisationState);
   const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: report.date }));
   const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: report.date }));
 
@@ -248,7 +251,7 @@ const Reception = ({ report }) => {
 const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const history = useHistory();
   const { actions: allActions } = useActions();
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
 
   const data = allActions
     ?.filter((a) => a.team === currentTeam._id)
@@ -313,7 +316,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
   const { actions } = useActions();
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
 
   const data = actions
     ?.filter((a) => a.team === currentTeam._id)
@@ -372,7 +375,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const { comments } = useComments();
   const { persons } = usePersons();
   const { actions } = useActions();
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
 
   const data = comments
     .filter((c) => c.team === currentTeam._id)
@@ -574,7 +577,7 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
 
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
   const territories = useRecoilValue(territoriesState);
   const territoryObservations = useRecoilValue(territoryObservationsState);
 

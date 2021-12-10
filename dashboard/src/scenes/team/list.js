@@ -12,12 +12,12 @@ import Table from '../../components/table';
 
 import { toFrenchDate } from '../../utils';
 import NightSessionModale from '../../components/NightSessionModale';
-import { currentTeamState, organisationState, teamsState, useAuth, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
 
 const List = () => {
-  const { teams } = useAuth();
+  const teams = useRecoilValue(teamsState);
   const history = useHistory();
 
   return (

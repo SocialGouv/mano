@@ -18,11 +18,11 @@ import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesFullSearchSelector } from '../../recoil/selectors';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState, organisationState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 
 const List = () => {
-  const { organisation } = useAuth();
+  const organisation = useRecoilValue(organisationState);
   const history = useHistory();
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
@@ -69,7 +69,7 @@ const List = () => {
 const CreateTerritory = () => {
   const [open, setOpen] = useState(false);
   const history = useHistory();
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
   const { addTerritory } = useTerritories();
   const { territoriesRefresher, loading } = useRefresh();
 

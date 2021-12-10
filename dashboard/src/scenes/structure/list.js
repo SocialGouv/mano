@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 
 import Header from '../../components/header';
 import Page from '../../components/pagination';
@@ -13,7 +14,7 @@ import { toastr } from 'react-redux-toastr';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
 import { toFrenchDate } from '../../utils';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState } from '../../recoil/auth';
 import useApi from '../../services/api';
 
 const List = () => {
@@ -69,7 +70,7 @@ const List = () => {
 
 const Create = ({ onChange }) => {
   const [open, setOpen] = useState(false);
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
   const API = useApi();
 
   return (

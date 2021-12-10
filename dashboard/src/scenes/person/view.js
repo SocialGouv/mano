@@ -7,6 +7,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
+import { useRecoilValue } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import Header from '../../components/header';
@@ -38,7 +39,7 @@ import Places from '../../components/Places';
 import { toFrenchDate } from '../../utils';
 import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
-import { useAuth } from '../../recoil/auth';
+import { organisationState } from '../../recoil/auth';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
 
@@ -47,7 +48,7 @@ const View = () => {
   const location = useLocation();
   const history = useHistory();
   const { persons } = usePersons();
-  const { organisation } = useAuth();
+  const organisation = useRecoilValue(organisationState);
   const [tabsContents, setTabsContents] = useState(initTabs);
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(

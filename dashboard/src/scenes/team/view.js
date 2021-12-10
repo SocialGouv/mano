@@ -12,14 +12,18 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
 import BackButton from '../../components/backButton';
 import NightSessionModale from '../../components/NightSessionModale';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState, teamsState } from '../../recoil/auth';
 import useApi from '../../services/api';
+import { useRecoilState } from 'recoil';
 
 const View = () => {
   const [team, setTeam] = useState(null);
   const { id } = useParams();
   const history = useHistory();
-  const { teams, setTeams, currentTeam, setCurrentTeam } = useAuth();
+
+  const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
+  const [teams, setTeams] = useRecoilState(teamsState);
+
   const API = useApi();
 
   useEffect(() => {

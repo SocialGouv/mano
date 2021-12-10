@@ -1,6 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useRef, useState } from 'react';
 import XLSX from 'xlsx';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { toastr } from 'react-redux-toastr';
+import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import {
@@ -10,15 +13,12 @@ import {
   preparePersonForEncryption,
   usePersons,
 } from '../../recoil/persons';
-import { useAuth } from '../../recoil/auth';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { toastr } from 'react-redux-toastr';
-import { Modal, ModalBody, ModalHeader } from 'reactstrap';
+import { userState } from '../../recoil/auth';
 import { isNullOrUndefined, toFrenchDate, typeOptions } from '../../utils';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 
 const ImportData = () => {
-  const { user } = useAuth();
+  const user = useRecoilValue(userState);
   const { personFieldsIncludingCustomFields } = usePersons();
   const fileDialogRef = useRef(null);
   const setAllPersons = useSetRecoilState(personsState);
