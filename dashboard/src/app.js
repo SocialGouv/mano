@@ -31,8 +31,7 @@ import 'react-datepicker/dist/react-datepicker.css';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { useAuth } from './recoil/auth';
-import useApi from './services/api';
-import { tokenCached } from './services/api';
+import useApi, { tokenCached } from './services/api';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -102,7 +101,7 @@ export default function ContextedApp() {
   // https://github.com/facebookexperimental/Recoil/issues/758#issuecomment-737471220
   const [recoilKey, setRecoilKey] = useState(0);
   return (
-    <RecoilRoot key={recoilKey}>
+    <RecoilRoot>
       <Provider store={store}>
         <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
         <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
