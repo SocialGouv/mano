@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect } from 'react';
-import { RecoilRoot } from 'recoil';
+import React, { useEffect, useState } from 'react';
+import { RecoilRoot, useRecoilValue } from 'recoil';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
@@ -32,14 +32,19 @@ import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { useAuth } from './recoil/auth';
 import useApi from './services/api-interface-with-dashboard';
-import { tokenCached } from './services/api';
+import { recoilResetKeyState, tokenCached } from './services/api';
 
 const store = createStore(combineReducers({ toastr }));
 
 registerLocale('fr', fr);
 
-const App = () => {
+const App = ({ resetRecoil }) => {
   const API = useApi();
+
+  const recoilResetKey = useRecoilValue(recoilResetKeyState);
+  useEffect(() => {
+    if (!!recoilResetKey) resetRecoil();
+  }, [recoilResetKey]);
 
   const onWindowFocus = (e) => {
     if (tokenCached && e.newState === 'active') API.get({ path: '/check-auth' }); // will force logout if session is expired
@@ -94,10 +99,12 @@ const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
 };
 
 export default function ContextedApp() {
+  // https://github.com/facebookexperimental/Recoil/issues/758#issuecomment-737471220
+  const [recoilKey, setRecoilKey] = useState(0);
   return (
-    <RecoilRoot>
+    <RecoilRoot key={recoilKey}>
       <Provider store={store}>
-        <App />
+        <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
         <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
         <Loader />
       </Provider>

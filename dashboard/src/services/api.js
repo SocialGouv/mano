@@ -1,8 +1,8 @@
-import { useRecoilValue, useResetRecoilState } from 'recoil';
+import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
-import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
+import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
 import { capture } from './sentry';
 
@@ -37,6 +37,7 @@ export const encryptItem =
     return item;
   };
 
+export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0 });
 const useApiService = ({
   handleError,
   handleBlockEncrypt,
@@ -49,10 +50,7 @@ const useApiService = ({
   fetch,
 }) => {
   const organisation = useRecoilValue(organisationState);
-  const resetOrganisation = useResetRecoilState(organisationState);
-  const resetUserState = useResetRecoilState(userState);
-  const resetTeamsState = useResetRecoilState(teamsState);
-  const resetCurrentTeamState = useResetRecoilState(currentTeamState);
+  const setRecoilResetKey = useSetRecoilState(recoilResetKeyState);
 
   const reset = () => {
     hashedOrgEncryptionKey = null;
@@ -62,10 +60,7 @@ const useApiService = ({
     sendCaptureError = 0;
     wrongKeyWarned = false;
     blockEncrypt = false;
-    resetOrganisation();
-    resetUserState();
-    resetTeamsState();
-    resetCurrentTeamState();
+    setRecoilResetKey((k) => k + 1);
   };
 
   const logout = async (status) => {
