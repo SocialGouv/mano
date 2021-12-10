@@ -68,24 +68,29 @@ router.post(
     email = (email || "").trim().toLowerCase();
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
+    try {
+      const { password: expectedPassword } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
 
-    const { password: expectedPassword } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
+      const match = await comparePassword(password, expectedPassword);
+      if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
+      user.lastLoginAt = new Date();
 
-    const match = await comparePassword(password, expectedPassword);
-    if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
-    user.lastLoginAt = new Date();
+      await user.save();
 
-    await user.save();
+      const organisation = await user.getOrganisation();
+      const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
+      const userTeams = await RelUserTeam.findAll({ where: { user: user._id, team: { [Op.in]: orgTeams.map((t) => t._id) } } });
+      const teams = userTeams.map((rel) => orgTeams.find((t) => t._id === rel.team));
 
-    const organisation = await user.getOrganisation();
-    const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
-    const userTeams = await RelUserTeam.findAll({ where: { user: user._id, team: { [Op.in]: orgTeams.map((t) => t._id) } } });
-    const teams = userTeams.map((rel) => orgTeams.find((t) => t._id === rel.team));
+      const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
+      res.cookie("jwt", token, cookieOptions());
 
-    const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
-    res.cookie("jwt", token, cookieOptions());
-
-    return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
+      return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
+    } catch (e) {
+      // https://sentry.io/organizations/selego/issues/2842608094/?project=5384501&referrer=slack
+      capture(e, { user });
+      return res.status(500).send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+    }
   })
 );
 
