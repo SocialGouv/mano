@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Document, Page } from 'react-pdf';
+import { useRecoilState } from 'recoil';
 import ButtonCustom from '../../components/ButtonCustom';
 import charte from '../../assets/charte.pdf';
 import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
-import { useRecoilState } from 'recoil';
 
 const Charte = () => {
   const [loading, setLoading] = useState(false);

@@ -3,6 +3,7 @@ import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } 
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -13,7 +14,6 @@ import { toFrenchDate } from '../../utils';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, organisationState, teamsState, useAuth, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { AppSentry } from '../../services/sentry';
 
 const List = () => {

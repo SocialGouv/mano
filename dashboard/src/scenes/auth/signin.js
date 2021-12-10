@@ -6,16 +6,15 @@ import validator from 'validator';
 import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import useApi, { setOrgEncryptionKey } from '../../services/api';
+import useApi, { setOrgEncryptionKey, hashedOrgEncryptionKey } from '../../services/api';
 import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { hashedOrgEncryptionKey } from '../../services/api';
 import { AppSentry, capture } from '../../services/sentry';
 
 /*
