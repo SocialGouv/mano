@@ -2,7 +2,7 @@
 import React, { useContext, useState } from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-
+import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 
 import { toFrenchDate } from '../../utils';
@@ -21,9 +21,8 @@ import Filters from '../../components/Filters';
 import { displayBirthDate } from '../../services/date';
 import { personsFullSearchSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-import { useAuth } from '../../recoil/auth';
+import { organisationState, teamsState } from '../../recoil/auth';
 import { usePlaces } from '../../recoil/places';
-import { useRecoilValue } from 'recoil';
 
 const List = () => {
   const [filters, setFilters] = useState([]);
@@ -42,7 +41,10 @@ const List = () => {
   const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
 
   const personsFiltered = useRecoilValue(personsFullSearchSelector({ search, filterTeams, filters, alertness }));
-  const { organisation, teams } = useAuth();
+
+  const teams = useRecoilValue(teamsState);
+  const organisation = useRecoilValue(organisationState);
+
   const history = useHistory();
 
   const limit = 20;

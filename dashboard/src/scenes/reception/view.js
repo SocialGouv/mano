@@ -23,14 +23,16 @@ import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectStatus from '../../components/SelectStatus';
 import { TODO } from '../../recoil/actions';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState, organisationState } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';
 import { useRecoilValue } from 'recoil';
 import { useComments } from '../../recoil/comments';
 
 const Reception = () => {
-  const { currentTeam, organisation } = useAuth();
+  const organisation = useRecoilValue(organisationState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
   const { loading: reportsLoading, addReport, updateReport } = useReports();
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));

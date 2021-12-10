@@ -1,5 +1,5 @@
 import { atom, useRecoilState } from 'recoil';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';

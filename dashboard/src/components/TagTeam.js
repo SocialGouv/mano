@@ -1,9 +1,10 @@
 import React from 'react';
+import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-import { useAuth } from '../recoil/auth';
+import { teamsState } from '../recoil/auth';
 
 const TagTeam = ({ teamId }) => {
-  const { teams } = useAuth();
+  const teams = useRecoilValue(teamsState);
   const teamIndex = teams?.findIndex((t) => t._id === teamId);
   const team = teams?.find((t) => t._id === teamId);
   return (

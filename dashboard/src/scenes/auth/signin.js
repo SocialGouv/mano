@@ -6,17 +6,16 @@ import validator from 'validator';
 import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi, { setOrgEncryptionKey, hashedOrgEncryptionKey } from '../../services/api';
 import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { hashedOrgEncryptionKey } from '../../services/api';
-import { capture } from '../../services/sentry';
+import { AppSentry, capture } from '../../services/sentry';
 
 /*
 TODO:
@@ -146,7 +145,7 @@ const SignIn = () => {
             if (token) API.setToken(token);
             setOrganisation(organisation);
             if (!!values.orgEncryptionKey) {
-              const encryptionIsValid = await API.setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
+              const encryptionIsValid = await setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
               if (!encryptionIsValid) return;
             }
             const teamResponse = await API.get({ path: '/team' });
@@ -156,6 +155,7 @@ const SignIn = () => {
             setTeams(teams);
             setUsers(users);
             setUser(user);
+            AppSentry.setUser(user);
             actions.setSubmitting(false);
             if (['superadmin'].includes(user.role)) {
               history.push('/organisation');

@@ -22,12 +22,16 @@ import SelectStatus from '../../components/SelectStatus';
 import SelectCustom from '../../components/SelectCustom';
 import SelectTeam from '../../components/SelectTeam';
 
-import { useAuth } from '../../recoil/auth';
+import { organisationState, teamsState, userState } from '../../recoil/auth';
 import { useActions, CANCEL, DONE } from '../../recoil/actions';
+import { useRecoilValue } from 'recoil';
 
 const View = () => {
   const { id } = useParams();
-  const { organisation, user, teams } = useAuth();
+  const teams = useRecoilValue(teamsState);
+  const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
+
   const { deleteAction, updateAction, actions, refreshActions } = useActions();
   const history = useHistory();
 

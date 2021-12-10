@@ -1,22 +1,49 @@
 import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
 import URI from 'urijs';
+import { toastr } from 'react-redux-toastr';
+import { useHistory } from 'react-router';
+import fetchRetry from 'fetch-retry';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
-import { capture } from './sentry';
+import { AppSentry, capture } from './sentry';
+const fetch = fetchRetry(window.fetch);
 
 const getUrl = (path, query) => {
   return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
 };
 
+/* encryption */
 export let hashedOrgEncryptionKey = null;
+let orgEncryptionKeyCacheForDebug = null; // TO BE REMOVED WHEN WE ARE HAPPY WITH ENCRYPTION
 let enableEncrypt = false;
-let orgEncryptionKeyCache = null;
-let sendCaptureError = 0;
-let wrongKeyWarned = false;
 let blockEncrypt = false;
+let sendCaptureError = 0; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryptionVerificationKey`
+let wrongKeyWarned = false; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryptionVerificationKey`
+
+/* auth */
 export let tokenCached = null;
+
+/* methods */
+export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
+  const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
+  if (!!encryptedVerificationKey) {
+    const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
+    if (!encryptionKeyIsValid) {
+      toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+      return false;
+    }
+    capture(`Pour orga ${name} ${_id}: ${orgEncryptionKey}`);
+  }
+  hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
+  enableEncrypt = true;
+  orgEncryptionKeyCacheForDebug = orgEncryptionKey; // for debug only
+  sendCaptureError = 0;
+  wrongKeyWarned = false;
+  blockEncrypt = false;
+  return newHashedOrgEncryptionKey;
+};
 
 export const encryptItem =
   (hashedOrgEncryptionKey, enableEncrypt = true) =>
@@ -37,30 +64,90 @@ export const encryptItem =
     return item;
   };
 
+const decryptDBItem = async (item, { logout, debug = false, encryptedVerificationKey = null } = {}) => {
+  if (wrongKeyWarned) return item;
+  if (!enableEncrypt) return item;
+  if (!item.encrypted) return item;
+  if (!item.encryptedEntityKey) return item;
+  try {
+    const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, hashedOrgEncryptionKey);
+
+    delete item.encrypted;
+
+    try {
+      JSON.parse(content);
+    } catch (errorDecryptParsing) {
+      toastr.error(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
+      console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
+    }
+
+    const decryptedItem = {
+      ...item,
+      ...JSON.parse(content),
+      entityKey,
+    };
+    return decryptedItem;
+  } catch (errorDecrypt) {
+    if (sendCaptureError < 5) {
+      capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
+        extra: {
+          message: 'ERROR DECRYPTING ITEM',
+          item,
+          orgEncryptionKeyCacheForDebug,
+          hashedOrgEncryptionKey,
+        },
+      });
+      sendCaptureError++;
+    }
+    if (!!encryptedVerificationKey) {
+      toastr.error(
+        "Désolé, un élément n'a pas pu être déchiffré",
+        "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
+      );
+      return item;
+    }
+    if (!wrongKeyWarned) {
+      wrongKeyWarned = true;
+      toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+      logout();
+    }
+    // prevent false admin with bad key to be able to change the key
+    blockEncrypt = enableEncrypt && errorDecrypt.message.includes('FAILURE');
+  }
+  return item;
+};
+
+const handleApiError = (res) => {
+  if (res?.error?.message) {
+    toastr?.error('Erreur !', res?.error?.message);
+  } else if (res?.error) {
+    toastr?.error('Erreur !', res?.error);
+  } else if (res?.code) {
+    toastr?.error('Erreur !', res?.code);
+  } else {
+    capture('api error unhandled', { extra: { res } });
+  }
+};
+
 export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0 });
-const useApiService = ({
-  handleError,
-  handleBlockEncrypt,
-  handleLogoutError,
-  onLogout,
-  handleNewVersion,
-  handleApiError,
-  handleWrongKey,
-  platform,
-  fetch,
-}) => {
+const useApi = () => {
   const organisation = useRecoilValue(organisationState);
   const setRecoilResetKey = useSetRecoilState(recoilResetKeyState);
+  const history = useHistory();
+
+  const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey } = organisation;
 
   const reset = () => {
     hashedOrgEncryptionKey = null;
     enableEncrypt = false;
-    orgEncryptionKeyCache = null;
+    orgEncryptionKeyCacheForDebug = null;
     tokenCached = null;
     sendCaptureError = 0;
     wrongKeyWarned = false;
     blockEncrypt = false;
     setRecoilResetKey((k) => k + 1);
+    AppSentry.setUser({});
+    AppSentry.setContext('currentTeam', {});
   };
 
   const logout = async (status) => {
@@ -69,7 +156,14 @@ const useApiService = ({
       skipEncryption: '/user/logout',
     });
     reset();
-    onLogout(status);
+    if (window.location.pathname !== '/auth') {
+      if (history) {
+        history.push('/auth');
+        if (status === '401') toastr.error('Votre session a expiré, veuillez vous reconnecter');
+      } else {
+        window.location.replace('/auth');
+      }
+    }
   };
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
@@ -79,24 +173,20 @@ const useApiService = ({
         method,
         mode: 'cors',
         credentials: 'include',
-        headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform, version },
+        headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: 'dashboard', version },
       };
+
       if (body) {
-        if (!skipEncryption) {
-          options.body = JSON.stringify(await encryptItem(hashedOrgEncryptionKey, enableEncrypt)(body));
-        } else {
-          options.body = JSON.stringify(body);
-        }
+        options.body = JSON.stringify(await encryptItem(hashedOrgEncryptionKey, enableEncrypt)(body));
       }
 
       if (['PUT', 'POST', 'DELETE'].includes(method) && enableEncrypt) {
         if (blockEncrypt && !skipEncryption) {
-          handleBlockEncrypt?.();
           return { ok: false, error: "Vous ne pouvez pas modifier le contenu. La clé de chiffrement n'est pas la bonne" };
         }
         query = {
-          encryptionLastUpdateAt: organisation?.encryptionLastUpdateAt,
-          encryptionEnabled: organisation?.encryptionEnabled,
+          encryptionLastUpdateAt,
+          encryptionEnabled,
           ...query,
         };
       }
@@ -108,21 +198,17 @@ const useApiService = ({
       const response = await fetch(url, options);
 
       if (!response.ok && response.status === 401) {
-        handleLogoutError?.();
         if (!['/user/logout', '/user/signin-token'].includes(path)) logout();
         return response;
       }
 
       try {
         const res = await response.json();
-        if (!response.ok) handleApiError?.(res);
-        if (res?.message && res.message === 'Veuillez mettre à jour votre application!') {
-          if (handleNewVersion) return handleNewVersion?.(res.message);
-        }
+        if (!response.ok) handleApiError(res);
         if (!!res.data && Array.isArray(res.data)) {
           const decryptedData = [];
           for (const item of res.data) {
-            const decryptedItem = await decryptDBItem(item, { debug });
+            const decryptedItem = await decryptDBItem(item, { debug, logout, encryptedVerificationKey });
             if (wrongKeyWarned) {
               return { ok: false, data: [] };
             }
@@ -130,12 +216,12 @@ const useApiService = ({
           }
           res.decryptedData = decryptedData;
           return res;
-        }
-        if (res.data) {
-          res.decryptedData = await decryptDBItem(res.data, { debug });
+        } else if (res.data) {
+          res.decryptedData = await decryptDBItem(res.data, { debug, logout, encryptedVerificationKey });
+          return res;
+        } else {
           return res;
         }
-        return res;
       } catch (errorFromJson) {
         capture(errorFromJson, { extra: { message: 'error parsing response', response } });
         return { ok: false, error: "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !" };
@@ -150,81 +236,9 @@ const useApiService = ({
           headers,
         },
       });
-      handleError?.(errorExecuteApi, 'Désolé une erreur est survenue');
+      toastr.error(errorExecuteApi, 'Désolé une erreur est survenue');
       throw errorExecuteApi;
     }
-  };
-
-  const decryptDBItem = async (item, { debug = false } = {}) => {
-    if (wrongKeyWarned) return item;
-    if (!enableEncrypt) return item;
-    if (!item.encrypted) return item;
-    if (!item.encryptedEntityKey) return item;
-    try {
-      const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, hashedOrgEncryptionKey);
-
-      delete item.encrypted;
-
-      try {
-        JSON.parse(content);
-      } catch (errorDecryptParsing) {
-        handleError?.(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
-        console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
-      }
-
-      const decryptedItem = {
-        ...item,
-        ...JSON.parse(content),
-        entityKey,
-      };
-      return decryptedItem;
-    } catch (errorDecrypt) {
-      if (sendCaptureError < 5) {
-        capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
-          extra: {
-            message: 'ERROR DECRYPTING ITEM',
-            item,
-            orgEncryptionKeyCache,
-            hashedOrgEncryptionKey,
-          },
-        });
-        sendCaptureError++;
-      }
-      if (!!organisation.encryptedVerificationKey) {
-        handleError?.(
-          "Désolé, un élément n'a pas pu être déchiffré",
-          "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
-        );
-        return item;
-      }
-      if (!wrongKeyWarned) {
-        wrongKeyWarned = true;
-        handleWrongKey?.();
-      }
-      if (debug) handleError?.(errorDecrypt, 'ERROR DECRYPTING ITEM');
-      // prevent false admin with bad key to be able to change the key
-      blockEncrypt = enableEncrypt && errorDecrypt.message.includes('FAILURE');
-    }
-    return item;
-  };
-
-  const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
-    const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
-    if (!!encryptedVerificationKey) {
-      const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
-      if (!encryptionKeyIsValid) {
-        handleWrongKey?.();
-        return false;
-      }
-      capture(`Pour orga ${name} ${_id}: ${orgEncryptionKey}`);
-    }
-    hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
-    enableEncrypt = true;
-    orgEncryptionKeyCache = orgEncryptionKey; // for debug only
-    sendCaptureError = 0;
-    wrongKeyWarned = false;
-    blockEncrypt = false;
-    return newHashedOrgEncryptionKey;
   };
 
   const get = async (args) => {
@@ -260,12 +274,10 @@ const useApiService = ({
   const put = (args) => execute({ method: 'PUT', ...args });
 
   return {
-    setOrgEncryptionKey,
     setToken: (newToken) => (tokenCached = newToken),
     // token,
     get,
     reset,
-    decryptDBItem,
     logout,
     post,
     put,
@@ -273,4 +285,4 @@ const useApiService = ({
   };
 };
 
-export default useApiService;
+export default useApi;

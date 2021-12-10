@@ -5,6 +5,7 @@ import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -13,14 +14,16 @@ import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectCustom from '../../components/SelectCustom';
-import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import { organisationState, userState } from '../../recoil/auth';
+import useApi from '../../services/api';
+import { AppSentry } from '../../services/sentry';
 
 const View = () => {
   const [localUser, setLocalUser] = useState(null);
   const { id } = useParams();
   const history = useHistory();
-  const { setUser, organisation, user } = useAuth();
+  const [user, setUser] = useRecoilState(userState);
+  const organisation = useRecoilValue(organisationState);
   const API = useApi();
 
   useEffect(() => {
@@ -56,6 +59,7 @@ const View = () => {
               if (user._id === id) {
                 const { data } = await API.get({ path: `/user/${id}` });
                 setUser(data);
+                AppSentry.setUser(data);
               }
               actions.setSubmitting(false);
               toastr.success('Mis à jour !');

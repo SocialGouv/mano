@@ -10,7 +10,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
 import { generatePassword, toFrenchDate } from '../../utils';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 
 const List = () => {
   const [organisations, setOrganisation] = useState(null);

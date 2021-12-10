@@ -9,7 +9,7 @@ import './index.scss';
 import 'moment/min/locales.min';
 import App from './app';
 import './services/sentry';
-import './services/api-interface-with-dashboard';
+import './services/api';
 
 ReactDOM.render(<App />, document.getElementById('root'));
 

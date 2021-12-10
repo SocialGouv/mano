@@ -1,8 +1,9 @@
 import React from 'react';
-import { useAuth } from '../recoil/auth';
+import { useRecoilValue } from 'recoil';
+import { usersState } from '../recoil/auth';
 
 const UserName = ({ id, wrapper = (name) => name }) => {
-  const { users } = useAuth();
+  const users = useRecoilValue(usersState);
 
   const user = users.find((u) => u._id === id);
 

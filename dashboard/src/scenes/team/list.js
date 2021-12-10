@@ -3,6 +3,7 @@ import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } 
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -11,12 +12,12 @@ import Table from '../../components/table';
 
 import { toFrenchDate } from '../../utils';
 import NightSessionModale from '../../components/NightSessionModale';
-import { currentTeamState, organisationState, teamsState, useAuth, userState } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import useApi from '../../services/api';
+import { AppSentry } from '../../services/sentry';
 
 const List = () => {
-  const { teams } = useAuth();
+  const teams = useRecoilValue(teamsState);
   const history = useHistory();
 
   return (
@@ -77,6 +78,7 @@ const Create = () => {
                 if (!userPutRes.ok) return actions.setSubmitting(false);
                 const meResponse = await API.get({ path: '/user/me' });
                 setUser(meResponse.user);
+                AppSentry.setUser(meResponse.user);
                 setCurrentTeam(meResponse.user.teams[0]);
                 toastr.success('Création réussie !', `Vous êtes dans l'équipe ${newTeamRes.data.name}`);
               } else {

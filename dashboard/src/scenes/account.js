@@ -2,16 +2,18 @@ import React, { useState } from 'react';
 import { Container, FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
+import { useRecoilState } from 'recoil';
 
 import Header from '../components/header';
 import Loading from '../components/loading';
 import ButtonCustom from '../components/ButtonCustom';
 import ChangePassword from '../components/ChangePassword';
-import { useAuth } from '../recoil/auth';
-import useApi from '../services/api-interface-with-dashboard';
+import { userState } from '../recoil/auth';
+import useApi from '../services/api';
+import { AppSentry } from '../services/sentry';
 
 const Account = () => {
-  const { user, setUser } = useAuth();
+  const [user, setUser] = useRecoilState(userState);
   const API = useApi();
 
   if (!user) return <Loading />;
@@ -29,6 +31,7 @@ const Account = () => {
                 toastr.success('Mis à jour !');
                 const { user } = await API.get({ path: '/user/me' });
                 setUser(user);
+                AppSentry.setUser(user);
               }
             } catch (userUpdateError) {
               console.log('error in user update', userUpdateError);

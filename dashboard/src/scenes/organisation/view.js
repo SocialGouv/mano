@@ -4,6 +4,7 @@ import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
+import { useRecoilState } from 'recoil';
 
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -13,18 +14,17 @@ import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories } from '../../recoil/actions';
-import { defaultMedicalCustomFields } from '../../recoil/persons';
+import { defaultMedicalCustomFields, usePersons } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
-import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import { organisationState } from '../../recoil/auth';
+import useApi from '../../services/api';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
-import { usePersons } from '../../recoil/persons';
 import DownloadExample from '../data-import-export/DownloadExample';
 
 const View = () => {
-  const { organisation, setOrganisation } = useAuth();
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
   const { personFieldsIncludingCustomFields } = usePersons();
   const API = useApi();
 

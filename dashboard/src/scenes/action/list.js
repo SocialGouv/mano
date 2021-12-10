@@ -21,14 +21,16 @@ import { actionsFullSearchSelector } from '../../recoil/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
-import { useAuth } from '../../recoil/auth';
-import { useRecoilValue } from 'recoil';
+import { currentTeamState, teamsState, userState } from '../../recoil/auth';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ActionPersonName from '../../components/ActionPersonName';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
-  const { user, teams, currentTeam, setCurrentTeam } = useAuth();
+  const teams = useRecoilValue(teamsState);
+  const user = useRecoilValue(userState);
+  const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
 
   const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
   const history = useHistory();

@@ -1,6 +1,6 @@
-import { atom, useRecoilState } from 'recoil';
-import { useAuth } from '../recoil/auth';
-import useApi from '../services/api-interface-with-dashboard';
+import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import { userState } from '../recoil/auth';
+import useApi from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useComments } from './comments';
@@ -17,7 +17,7 @@ export const actionsLoadingState = atom({
 
 export const useActions = () => {
   const { comments, addComment, deleteComment } = useComments();
-  const { user } = useAuth();
+  const user = useRecoilValue(userState);
   const API = useApi();
 
   const [actions, setActions] = useRecoilState(actionsState);

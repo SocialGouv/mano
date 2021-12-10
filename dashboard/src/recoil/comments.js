@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, useRecoilState } from 'recoil';
-import { useAuth } from '../recoil/auth';
-import useApi from '../services/api-interface-with-dashboard';
+import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import { currentTeamState, organisationState, userState } from '../recoil/auth';
+import useApi from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
@@ -16,7 +16,9 @@ export const commentsLoadingState = atom({
 });
 
 export const useComments = () => {
-  const { currentTeam, organisation, user } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
   const API = useApi();
 
   const [comments, setComments] = useRecoilState(commentsState);

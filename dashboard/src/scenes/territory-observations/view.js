@@ -2,10 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { Button as CloseButton } from 'reactstrap';
+import { useRecoilValue } from 'recoil';
 import UserName from '../../components/UserName';
 import { useTerritoryObservations } from '../../recoil/territoryObservations';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
-import { useAuth } from '../../recoil/auth';
+import { teamsState } from '../../recoil/auth';
 
 const fieldIsEmpty = (value) => {
   if (value === null) return true;
@@ -16,7 +17,7 @@ const fieldIsEmpty = (value) => {
 };
 
 const View = ({ obs, onDelete, onClick, noBorder }) => {
-  const { teams } = useAuth();
+  const teams = useRecoilValue(teamsState);
   const { customFieldsObs } = useTerritoryObservations();
 
   return (

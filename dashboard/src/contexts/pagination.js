@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useHistory, useLocation } from 'react-router-dom';
-import { useAuth } from '../recoil/auth';
+import { currentTeamState } from '../recoil/auth';
 import { TODO } from '../recoil/actions';
+import { useRecoilValue } from 'recoil';
 
 const PaginationContext = React.createContext();
 
 export const PaginationProvider = ({ children }) => {
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
 
   const history = useHistory();
   const location = useLocation();

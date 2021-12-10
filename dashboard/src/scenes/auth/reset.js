@@ -4,7 +4,7 @@ import { Redirect } from 'react-router-dom';
 import styled from 'styled-components';
 
 import ChangePassword from '../../components/ChangePassword';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 
 const Reset = ({ location }) => {
   const [redirect, setRedirect] = useState(false);

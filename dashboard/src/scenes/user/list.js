@@ -5,6 +5,7 @@ import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
+import { useRecoilValue } from 'recoil';
 
 import { generatePassword, toFrenchDate } from '../../utils';
 import Header from '../../components/header';
@@ -15,14 +16,14 @@ import Table from '../../components/table';
 import CreateWrapper from '../../components/createWrapper';
 import SelectCustom from '../../components/SelectCustom';
 import TagTeam from '../../components/TagTeam';
-import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import { organisationState, userState } from '../../recoil/auth';
+import useApi from '../../services/api';
 
 const List = () => {
   const [users, setUsers] = useState(null);
   const history = useHistory();
   const [refresh, setRefresh] = useState(false);
-  const { user } = useAuth();
+  const user = useRecoilValue(userState);
   const API = useApi();
 
   useEffect(() => {
@@ -73,7 +74,7 @@ const TeamWrapper = styled.div`
 
 const Create = ({ onChange }) => {
   const [open, setOpen] = useState(false);
-  const { organisation } = useAuth();
+  const organisation = useRecoilValue(organisationState);
   const API = useApi();
 
   return (

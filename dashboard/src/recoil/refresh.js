@@ -1,16 +1,16 @@
+import { atom, useRecoilState, useRecoilValue } from 'recoil';
 import { useActions } from './actions';
-import { useAuth } from './auth';
+import { organisationState } from './auth';
 import { useComments } from './comments';
 import { usePersons } from './persons';
 import { usePlaces } from './places';
 import { useRelsPerson } from './relPersonPlace';
 import { useReports } from './reports';
 import { useTerritories } from './territory';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi from '../services/api';
 import { useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';
-import { atom, useRecoilState } from 'recoil';
 
 const loadingState = atom({
   key: 'loadingState',
@@ -42,7 +42,8 @@ export const useRefresh = () => {
   const { refreshPlaces } = usePlaces();
   const { refreshRelsPersonPlace } = useRelsPerson();
   const { refreshReports } = useReports();
-  const { organisationId } = useAuth();
+  const organisation = useRecoilValue(organisationState);
+  const organisationId = organisation?._id;
 
   const reset = async () => {
     await new Promise((res) => setTimeout(res, 150));

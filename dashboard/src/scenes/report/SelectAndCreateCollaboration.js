@@ -1,8 +1,9 @@
 import React from 'react';
 import { toastr } from 'react-redux-toastr';
+import { useRecoilState } from 'recoil';
 import SelectCustom from '../../components/SelectCustom';
-import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import { organisationState } from '../../recoil/auth';
+import useApi from '../../services/api';
 
 const NoOptionsMessage = () => (
   <span style={{ fontSize: 14, textAlign: 'center', color: '#808080', width: '100%', display: 'block' }}>
@@ -11,7 +12,7 @@ const NoOptionsMessage = () => (
 );
 
 const SelectAndCreateCollaboration = ({ values, onChange }) => {
-  const { organisation, setOrganisation } = useAuth();
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
   const API = useApi();
 
   const onChangeRequest = (newCollabs) => {

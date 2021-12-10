@@ -4,10 +4,11 @@ import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
-import { useAuth } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState, preparePersonForEncryption } from '../recoil/persons';
 import { actionsState, prepareActionForEncryption } from '../recoil/actions';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
@@ -18,10 +19,8 @@ import { placesState, preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
-import useApi from '../services/api-interface-with-dashboard';
+import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
 import { useRefresh } from '../recoil/refresh';
-import { useRecoilValue } from 'recoil';
-import { encryptItem } from '../services/api';
 
 const EncryptionKey = () => {
   const [open, setOpen] = useState(false);
@@ -30,7 +29,9 @@ const EncryptionKey = () => {
   const [encryptingProgress, setEncryptingProgress] = useState(0);
   const [cancellingEncryption, setCancellingEncryption] = useState(false);
 
-  const { user, organisation, setOrganisation } = useAuth();
+  const user = useRecoilValue(userState);
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
+
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
@@ -65,7 +66,7 @@ const EncryptionKey = () => {
       if (!values.encryptionKeyConfirm) return toastr.error('Erreur!', 'La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
       setEncryptionKey(values.encryptionKey.trim());
-      const hashedOrgEncryptionKey = await API.setOrgEncryptionKey(values.encryptionKey.trim());
+      const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
       capture('debug: setting encryption key', {
         extra: { orgEncryptionKey: values.encryptionKey.trim(), hashedOrgEncryptionKey, organisation },
         user,

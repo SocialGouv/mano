@@ -6,6 +6,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useRecoilValue } from 'recoil';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
 import SelectTeam from '../../components/SelectTeam';
@@ -14,13 +15,15 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { toFrenchDate } from '../../utils';
 import { DONE, TODO, useActions } from '../../recoil/actions';
 import SelectStatus from '../../components/SelectStatus';
-import { useAuth } from '../../recoil/auth';
+import { teamsState, userState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
 
-  const { user, teams } = useAuth();
+  const teams = useRecoilValue(teamsState);
+  const user = useRecoilValue(userState);
+
   const { addAction } = useActions();
   const { loading, actionsRefresher } = useRefresh();
   const history = useHistory();

@@ -14,11 +14,12 @@ import PaginationContext from '../../contexts/pagination';
 import Page from '../../components/pagination';
 import { filterBySearch } from '../search/utils';
 import { toFrenchDate } from '../../utils';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState, organisationState } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';
 import { useRefresh } from '../../recoil/refresh';
+import { useRecoilValue } from 'recoil';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -31,7 +32,7 @@ const List = () => {
   const { places } = usePlaces();
   const { relsPersonPlace } = useRelsPerson();
   const { persons } = usePersons();
-  const { organisation } = useAuth();
+  const organisation = useRecoilValue(organisationState);
   const history = useHistory();
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
@@ -86,7 +87,7 @@ const List = () => {
 
 const Create = () => {
   const [open, setOpen] = useState(false);
-  const { currentTeam } = useAuth();
+  const currentTeam = useRecoilValue(currentTeamState);
   const { addPlace, loading } = usePlaces();
   const { placesAndRelationsRefresher } = useRefresh();
   return (

@@ -11,7 +11,7 @@ import SelectTeam from './SelectTeam';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import CustomFieldInput from './CustomFieldInput';
-import { useAuth } from '../recoil/auth';
+import { userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
 import { useRecoilValue } from 'recoil';
 export const policeSelect = ['Oui', 'Non'];
@@ -24,7 +24,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
     if (forceOpen > 0) setOpen(true);
   }, [forceOpen]);
 
-  const { user } = useAuth();
+  const user = useRecoilValue(userState);
   const { addTerritoryObs, updateTerritoryObs, customFieldsObs } = useTerritoryObservations();
   const territories = useRecoilValue(territoriesState);
 

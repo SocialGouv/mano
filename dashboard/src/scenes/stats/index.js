@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import moment from 'moment';
+import { useRecoilValue } from 'recoil';
 
 import Header from '../../components/header';
 
@@ -26,11 +27,10 @@ import DateRangePickerWithPresets from '../../components/DateRangePickerWithPres
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
-import { useAuth } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { actionsState, useActions } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { useRefresh } from '../../recoil/refresh';
-import { useRecoilValue } from 'recoil';
 import ExportData from '../data-import-export/ExportData';
 moment.locale('fr');
 
@@ -45,7 +45,11 @@ const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
 
 const Stats = () => {
-  const { teams, organisation, user, currentTeam } = useAuth();
+  const teams = useRecoilValue(teamsState);
+  const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
   const { loading: personsLoading } = usePersons();
   const allPersons = useRecoilValue(personsState);
   const { loading: actionsLoading } = useActions();

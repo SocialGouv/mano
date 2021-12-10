@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Document, Page } from 'react-pdf';
+import { useRecoilState } from 'recoil';
 import ButtonCustom from '../../components/ButtonCustom';
 import charte from '../../assets/charte.pdf';
-import { useAuth } from '../../recoil/auth';
-import useApi from '../../services/api-interface-with-dashboard';
+import { userState } from '../../recoil/auth';
+import useApi from '../../services/api';
+import { AppSentry } from '../../services/sentry';
 
 const Charte = () => {
   const [loading, setLoading] = useState(false);
-  const { setUser, user } = useAuth();
+  const [user, setUser] = useRecoilState(userState);
   const API = useApi();
 
   const onSigninValidated = async () => {
@@ -17,6 +19,7 @@ const Charte = () => {
     const response = await API.put({ path: '/user', body: { termsAccepted } });
     if (!response.ok) return;
     setUser({ ...user, termsAccepted });
+    AppSentry.setUser({ ...user, termsAccepted });
   };
 
   return (

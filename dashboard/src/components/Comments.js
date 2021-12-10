@@ -14,7 +14,7 @@ import SelectUser from './SelectUser';
 import { theme } from '../config';
 import Loading from './loading';
 import { Formik } from 'formik';
-import { useAuth } from '../recoil/auth';
+import { userState } from '../recoil/auth';
 import { useComments } from '../recoil/comments';
 import { useRecoilValue } from 'recoil';
 import { commentsFilteredSelector } from '../recoil/selectors';
@@ -118,7 +118,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
 };
 
 const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment, forPassages }) => {
-  const { user } = useAuth();
+  const user = useRecoilValue(userState);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
