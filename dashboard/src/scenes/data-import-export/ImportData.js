@@ -6,9 +6,9 @@ import ButtonCustom from '../../components/ButtonCustom';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
-  personFields,
   personsState,
   preparePersonForEncryption,
+  usePersons,
 } from '../../recoil/persons';
 import { useAuth } from '../../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -20,6 +20,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 
 const ImportData = () => {
   const { user } = useAuth();
+  const { personFieldsIncludingCustomFields } = usePersons();
   const fileDialogRef = useRef(null);
   const setAllPersons = useSetRecoilState(personsState);
 
@@ -34,7 +35,7 @@ const ImportData = () => {
   const [ignoredFields, setIgnoredFields] = useState([]);
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
 
-  const importableFields = personFields.filter((f) => f.importable);
+  const importableFields = personFieldsIncludingCustomFields().filter((f) => f.importable);
   const importableLabels = importableFields.map((f) => f.label);
 
   const onParseData = async (event) => {
