@@ -7,7 +7,7 @@ import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
-import { capture } from './sentry';
+import { AppSentry, capture } from './sentry';
 const fetch = fetchRetry(window.fetch);
 
 const getUrl = (path, query) => {
@@ -146,6 +146,8 @@ const useApi = () => {
     wrongKeyWarned = false;
     blockEncrypt = false;
     setRecoilResetKey((k) => k + 1);
+    AppSentry.setUser({});
+    AppSentry.setContext('currentTeam', {});
   };
 
   const logout = async (status) => {

@@ -30,16 +30,11 @@ export const currentTeamState = atom({
 });
 
 export const useAuth = () => {
-  const [user, setUser] = useRecoilState(userState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const [teams, setTeams] = useRecoilState(teamsState);
   const [users, setUsers] = useRecoilState(usersState);
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
   const [organisationId, setOrganisationId] = useStorage('orgnisation-id', null);
-
-  useEffect(() => {
-    AppSentry.setUser(user || {});
-  }, [user]);
 
   useEffect(() => {
     AppSentry.setContext('currentTeam', currentTeam || {});
@@ -53,5 +48,5 @@ export const useAuth = () => {
     }
   }, [organisation?._id]);
 
-  return { user, organisation, currentTeam, teams, users, setUsers, setUser, setOrganisation, setTeams, setCurrentTeam, organisationId };
+  return { organisation, currentTeam, teams, users, setUsers, setOrganisation, setTeams, setCurrentTeam, organisationId };
 };

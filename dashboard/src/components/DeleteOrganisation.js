@@ -4,16 +4,19 @@ import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import 'react-datepicker/dist/react-datepicker.css';
+import { useRecoilValue } from 'recoil';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
 import useApi from '../services/api';
-import { useAuth } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 
 const DeleteOrganisation = () => {
   const [open, setOpen] = useState(false);
 
-  const { user, organisation } = useAuth();
+  const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
+
   const API = useApi();
 
   if (!['admin'].includes(user.role)) return null;

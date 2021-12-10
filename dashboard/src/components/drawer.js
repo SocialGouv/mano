@@ -11,12 +11,16 @@ import { theme } from '../config';
 import legal from '../assets/legal.pdf';
 import privacy from '../assets/privacy.pdf';
 import charte from '../assets/charte.pdf';
-import { useAuth } from '../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import useApi from '../services/api';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 const Drawer = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const { user, organisation, teams, currentTeam, setCurrentTeam } = useAuth();
+  const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
+  const teams = useRecoilValue(teamsState);
+  const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
   const API = useApi();
 
   const onboardingForTeams = !teams.length;

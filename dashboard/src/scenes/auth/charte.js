@@ -3,12 +3,14 @@ import styled from 'styled-components';
 import { Document, Page } from 'react-pdf';
 import ButtonCustom from '../../components/ButtonCustom';
 import charte from '../../assets/charte.pdf';
-import { useAuth } from '../../recoil/auth';
+import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
+import { AppSentry } from '../../services/sentry';
+import { useRecoilState } from 'recoil';
 
 const Charte = () => {
   const [loading, setLoading] = useState(false);
-  const { setUser, user } = useAuth();
+  const [user, setUser] = useRecoilState(userState);
   const API = useApi();
 
   const onSigninValidated = async () => {
@@ -17,6 +19,7 @@ const Charte = () => {
     const response = await API.put({ path: '/user', body: { termsAccepted } });
     if (!response.ok) return;
     setUser({ ...user, termsAccepted });
+    AppSentry.setUser({ ...user, termsAccepted });
   };
 
   return (

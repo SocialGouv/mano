@@ -5,6 +5,7 @@ import { Col, FormGroup, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import { useHistory } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 
 import Box from './Box';
 import ButtonCustom from './ButtonCustom';
@@ -12,7 +13,7 @@ import { usePlaces } from '../recoil/places';
 import Table from './table';
 import { toFrenchDate } from '../utils';
 import SelectCustom from './SelectCustom';
-import { useAuth } from '../recoil/auth';
+import { currentTeamState } from '../recoil/auth';
 import { useRelsPerson } from '../recoil/relPersonPlace';
 
 const Places = ({ personId = '', onUpdateResults }) => {
@@ -61,7 +62,9 @@ const Title = styled.h1`
 
 const AddPlace = ({ personId }) => {
   const [open, setOpen] = useState(false);
-  const { currentTeam } = useAuth();
+
+  const currentTeam = useRecoilValue(currentTeamState);
+
   const { places } = usePlaces();
   const { addRelation } = useRelsPerson();
 

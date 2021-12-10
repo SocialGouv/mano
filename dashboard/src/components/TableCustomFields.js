@@ -1,9 +1,10 @@
 import { Formik } from 'formik';
 import React, { useState } from 'react';
 import { toastr } from 'react-redux-toastr';
+import { useRecoilState } from 'recoil';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
-import { useAuth } from '../recoil/auth';
+import { organisationState } from '../recoil/auth';
 import { typeOptions } from '../utils';
 import useApi from '../services/api';
 import ButtonCustom from './ButtonCustom';
@@ -26,7 +27,7 @@ const TableCustomFields = ({ data, customFields }) => {
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
   const [isNewField, setIsNewField] = useState(null);
-  const { organisation, setOrganisation } = useAuth();
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
   const API = useApi();
 
   const onEnabledChange = (fieldToUpdate) => (event) => {

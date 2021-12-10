@@ -30,7 +30,7 @@ import Loader from './components/Loader';
 import 'react-datepicker/dist/react-datepicker.css';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
-import { useAuth } from './recoil/auth';
+import { userState } from './recoil/auth';
 import useApi, { recoilResetKeyState, tokenCached } from './services/api';
 
 const store = createStore(combineReducers({ toastr }));
@@ -85,7 +85,7 @@ const App = ({ resetRecoil }) => {
 };
 
 const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
-  const { user } = useAuth();
+  const user = useRecoilValue(userState);
   if (!!user && !user?.termsAccepted) return <Route {...rest} path="/auth" component={Charte} />;
   return (
     <>

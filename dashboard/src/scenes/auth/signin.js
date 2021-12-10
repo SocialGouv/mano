@@ -16,7 +16,7 @@ import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { hashedOrgEncryptionKey } from '../../services/api';
-import { capture } from '../../services/sentry';
+import { AppSentry, capture } from '../../services/sentry';
 
 /*
 TODO:
@@ -156,6 +156,7 @@ const SignIn = () => {
             setTeams(teams);
             setUsers(users);
             setUser(user);
+            AppSentry.setUser(user);
             actions.setSubmitting(false);
             if (['superadmin'].includes(user.role)) {
               history.push('/organisation');

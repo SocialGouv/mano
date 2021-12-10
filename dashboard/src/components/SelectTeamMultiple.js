@@ -1,10 +1,11 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
-import { useAuth } from '../recoil/auth';
+import { useRecoilValue } from 'recoil';
+import { teamsState } from '../recoil/auth';
 import SelectCustom from './SelectCustom';
 
 const SelectTeamMultiple = ({ onChange, value = [] }) => {
-  const { teams } = useAuth();
+  const teams = useRecoilValue(teamsState);
   return (
     <SelectCustom
       options={teams.map(({ _id }) => _id)}
