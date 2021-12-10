@@ -1,3 +1,10 @@
+## [1.36.3](https://github.com/SocialGouv/mano/compare/v1.36.2...v1.36.3) (2021-12-10)
+
+
+### Bug Fixes
+
+* **api:** remove migration script for passages ([#195](https://github.com/SocialGouv/mano/issues/195)) ([c346215](https://github.com/SocialGouv/mano/commit/c346215bd08c5a7860de22141a2b28c4baad1101))
+
 ## [1.36.2](https://github.com/SocialGouv/mano/compare/v1.36.1...v1.36.2) (2021-12-10)
 
 
