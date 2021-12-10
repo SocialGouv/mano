@@ -16,6 +16,7 @@ import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { hashedOrgEncryptionKey } from '../../services/api';
+import { capture } from '../../services/sentry';
 
 /*
 TODO:
@@ -48,7 +49,8 @@ const SignIn = () => {
   // temporary migration : until all organisations have an `encryptedVerificationKey`
   const setEncryptionVerificationKey = async (organisation, user) => {
     if (!organisation.encryptionEnabled) return;
-    if (!organisation.encryptedVerificationKey && ['admin'].includes(user.role)) {
+    if (!organisation.encryptedVerificationKey) {
+      capture('setting encryptedVerificationKey :', organisation.name);
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
       const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
       if (orgRes.ok) setOrganisation(orgRes.data);
