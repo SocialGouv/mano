@@ -18,7 +18,7 @@ import { placesState, preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
-import useApi from '../services/api';
+import useApi, { setOrgEncryptionKey } from '../services/api';
 import { useRefresh } from '../recoil/refresh';
 import { useRecoilValue } from 'recoil';
 import { encryptItem } from '../services/api';
@@ -65,7 +65,7 @@ const EncryptionKey = () => {
       if (!values.encryptionKeyConfirm) return toastr.error('Erreur!', 'La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
       setEncryptionKey(values.encryptionKey.trim());
-      const hashedOrgEncryptionKey = await API.setOrgEncryptionKey(values.encryptionKey.trim());
+      const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
       capture('debug: setting encryption key', {
         extra: { orgEncryptionKey: values.encryptionKey.trim(), hashedOrgEncryptionKey, organisation },
         user,

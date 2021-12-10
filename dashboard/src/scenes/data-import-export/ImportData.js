@@ -14,7 +14,7 @@ import { useAuth } from '../../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toastr } from 'react-redux-toastr';
 import { isNullOrUndefined, toFrenchDate, typeOptions } from '../../utils';
-import useApi from '../../services/api-interface-with-dashboard';
+import useApi from '../../services/api';
 import { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 

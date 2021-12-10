@@ -25,6 +25,26 @@ let wrongKeyWarned = false; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryp
 /* auth */
 export let tokenCached = null;
 
+/* methods */
+export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
+  const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
+  if (!!encryptedVerificationKey) {
+    const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
+    if (!encryptionKeyIsValid) {
+      toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+      return false;
+    }
+    capture(`Pour orga ${name} ${_id}: ${orgEncryptionKey}`);
+  }
+  hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
+  enableEncrypt = true;
+  orgEncryptionKeyCacheForDebug = orgEncryptionKey; // for debug only
+  sendCaptureError = 0;
+  wrongKeyWarned = false;
+  blockEncrypt = false;
+  return newHashedOrgEncryptionKey;
+};
+
 export const encryptItem =
   (hashedOrgEncryptionKey, enableEncrypt = true) =>
   async (item) => {
@@ -219,25 +239,6 @@ const useApi = () => {
     }
   };
 
-  const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
-    const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
-    if (!!encryptedVerificationKey) {
-      const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
-      if (!encryptionKeyIsValid) {
-        toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
-        return false;
-      }
-      capture(`Pour orga ${name} ${_id}: ${orgEncryptionKey}`);
-    }
-    hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
-    enableEncrypt = true;
-    orgEncryptionKeyCacheForDebug = orgEncryptionKey; // for debug only
-    sendCaptureError = 0;
-    wrongKeyWarned = false;
-    blockEncrypt = false;
-    return newHashedOrgEncryptionKey;
-  };
-
   const get = async (args) => {
     if (args.batch) {
       let hasMore = true;
@@ -271,7 +272,6 @@ const useApi = () => {
   const put = (args) => execute({ method: 'PUT', ...args });
 
   return {
-    setOrgEncryptionKey,
     setToken: (newToken) => (tokenCached = newToken),
     // token,
     get,

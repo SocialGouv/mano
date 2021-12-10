@@ -11,7 +11,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import useApi, { setOrgEncryptionKey } from '../../services/api';
 import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
 import { useRecoilState, useSetRecoilState } from 'recoil';
@@ -146,7 +146,7 @@ const SignIn = () => {
             if (token) API.setToken(token);
             setOrganisation(organisation);
             if (!!values.orgEncryptionKey) {
-              const encryptionIsValid = await API.setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
+              const encryptionIsValid = await setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
               if (!encryptionIsValid) return;
             }
             const teamResponse = await API.get({ path: '/team' });
