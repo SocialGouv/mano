@@ -1,3 +1,10 @@
+## [1.36.1](https://github.com/SocialGouv/mano/compare/v1.36.0...v1.36.1) (2021-12-10)
+
+
+### Bug Fixes
+
+* **dashboard:** organisationEncryptionKey can also be setup by non-admin ([#191](https://github.com/SocialGouv/mano/issues/191)) ([e71cfec](https://github.com/SocialGouv/mano/commit/e71cfece5d57068d1b0e052088fd9b971a76d763))
+
 # [1.36.0](https://github.com/SocialGouv/mano/compare/v1.35.0...v1.36.0) (2021-12-10)
 
 
