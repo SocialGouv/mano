@@ -1,3 +1,10 @@
+# [1.35.0](https://github.com/SocialGouv/mano/compare/v1.34.2...v1.35.0) (2021-12-10)
+
+
+### Features
+
+* **dashboard:** import custom fields ([#187](https://github.com/SocialGouv/mano/issues/187)) ([cbaccc6](https://github.com/SocialGouv/mano/commit/cbaccc6d8d0a6738001d748ccecdc3bfb60a9a23))
+
 ## [1.34.2](https://github.com/SocialGouv/mano/compare/v1.34.1...v1.34.2) (2021-12-10)
 
 
