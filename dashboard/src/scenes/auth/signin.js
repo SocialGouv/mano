@@ -82,9 +82,9 @@ const SignIn = () => {
       });
       if (ok && token && user) {
         setAuthViaCookie(true);
-        setUserName(user.name);
         const { organisation } = user;
         setOrganisation(organisation);
+        setUserName(user.name);
         if (!!organisation.encryptionEnabled) setShowEncryption(true);
       }
 
