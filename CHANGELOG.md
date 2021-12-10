@@ -1,3 +1,10 @@
+## [1.36.4](https://github.com/SocialGouv/mano/compare/v1.36.3...v1.36.4) (2021-12-10)
+
+
+### Bug Fixes
+
+* **dashboard:** clean api in dashboard ([#173](https://github.com/SocialGouv/mano/issues/173)) ([fb724e6](https://github.com/SocialGouv/mano/commit/fb724e61b8afc5f23d9b6af6a02fa7ff8fe783ca))
+
 ## [1.36.3](https://github.com/SocialGouv/mano/compare/v1.36.2...v1.36.3) (2021-12-10)
 
 
