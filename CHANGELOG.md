@@ -1,3 +1,10 @@
+## [1.34.2](https://github.com/SocialGouv/mano/compare/v1.34.1...v1.34.2) (2021-12-10)
+
+
+### Bug Fixes
+
+* **dashboard:** on chart click do nothing when nothing to do ([#192](https://github.com/SocialGouv/mano/issues/192)) ([9ef8d0f](https://github.com/SocialGouv/mano/commit/9ef8d0f28551f3b0ecac497ddf4ddb944e9bf579))
+
 ## [1.34.1](https://github.com/SocialGouv/mano/compare/v1.34.0...v1.34.1) (2021-12-10)
 
 
