@@ -1,3 +1,10 @@
+## [1.36.2](https://github.com/SocialGouv/mano/compare/v1.36.1...v1.36.2) (2021-12-10)
+
+
+### Bug Fixes
+
+* **dashboard:** passages ([#177](https://github.com/SocialGouv/mano/issues/177)) ([c0bb89d](https://github.com/SocialGouv/mano/commit/c0bb89dccc25edce2b05e8d60c73627437612653))
+
 ## [1.36.1](https://github.com/SocialGouv/mano/compare/v1.36.0...v1.36.1) (2021-12-10)
 
 
