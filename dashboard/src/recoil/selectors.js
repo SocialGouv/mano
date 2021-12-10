@@ -7,7 +7,7 @@ import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
 import { territoriesState } from './territory';
-import { isOnSameDay, today } from '../services/date';
+import { getIsDayWithinHoursOffsetOfDay, isOnSameDay, today } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { filterData } from '../components/Filters';
@@ -37,6 +37,16 @@ export const lastReportSelector = selector({
     const todays = get(todaysReportSelector);
     return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
   },
+});
+
+export const reportPerDateSelector = selectorFamily({
+  key: 'reportPerDateSelector',
+  get:
+    ({ date }) =>
+    ({ get }) => {
+      const teamsReports = get(currentTeamReportsSelector);
+      return teamsReports.find((rep) => isOnSameDay(new Date(rep.date), new Date(date)));
+    },
 });
 
 export const personsWithPlacesSelector = selector({
@@ -275,5 +285,48 @@ export const territoriesFullSearchSelector = selectorFamily({
 
       const territoriesIdsFilterBySearch = [...new Set([...territoriesIdsByTerritoriesSearch, ...territoriesIdsFilteredByObsSearch])];
       return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id));
+    },
+});
+
+export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
+  key: 'passagesNonAnonymousPerDatePerTeamSelector',
+  get:
+    ({ date }) =>
+    ({ get }) => {
+      const currentTeam = get(currentTeamState);
+      const comments = get(commentsState);
+      const persons = get(personsState);
+      return comments
+        .filter((c) => c.team === currentTeam._id)
+        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .filter((c) => !!c.comment.includes('Passage enregistré'))
+        .map((passage) => {
+          const commentPopulated = { ...passage };
+          if (passage.person) {
+            commentPopulated.person = persons.find((p) => p._id === passage?.person);
+            commentPopulated.type = 'person';
+          }
+          return commentPopulated;
+        });
+    },
+});
+
+export const numberOfPassagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
+  key: 'numberOfPassagesNonAnonymousPerDatePerTeamSelector',
+  get:
+    ({ date }) =>
+    ({ get }) => {
+      const nonAnonymousPassages = get(passagesNonAnonymousPerDatePerTeamSelector({ date }));
+      return nonAnonymousPassages?.length || 0;
+    },
+});
+
+export const numberOfPassagesAnonymousPerDatePerTeamSelector = selectorFamily({
+  key: 'numberOfPassagesAnonymousPerDatePerTeamSelector',
+  get:
+    ({ date }) =>
+    ({ get }) => {
+      const todaysReports = get(reportPerDateSelector({ date }));
+      return todaysReports?.passages || 0;
     },
 });
