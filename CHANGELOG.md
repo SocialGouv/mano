@@ -1,3 +1,10 @@
+# [1.36.0](https://github.com/SocialGouv/mano/compare/v1.35.0...v1.36.0) (2021-12-10)
+
+
+### Features
+
+* **dashboard:** reset recoil on organisation change ([#194](https://github.com/SocialGouv/mano/issues/194)) ([507549d](https://github.com/SocialGouv/mano/commit/507549df8a9b15a5b24b85fa5d121d387d02dfe6))
+
 # [1.35.0](https://github.com/SocialGouv/mano/compare/v1.34.2...v1.35.0) (2021-12-10)
 
 
