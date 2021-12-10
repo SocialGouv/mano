@@ -55,4 +55,5 @@ const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHours) =>
       await report.save();
     }
   }
+  capture("DONE PASSAGES MIGRATION");
 })();
