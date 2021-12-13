@@ -845,7 +845,7 @@
     "@nodelib/fs.scandir" "2.1.3"
     fastq "^1.6.0"
 
-"@sindresorhus/is@^4.1.0":
+"@sindresorhus/is@^4.2.0":
   version "4.2.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-4.2.0.tgz#667bfc6186ae7c9e0b45a08960c551437176e1ca"
   integrity sha512-VkE3KLBmJwcCaVARtQpfuKcKv8gcBmUubrfHGF84dXuuW6jgsRYxPtzcIhPyK9WAPpRt2/xY6zkD9MnRaJzSyw==
@@ -864,16 +864,26 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
-"@socialgouv/kosko-charts@9.5.7":
-  version "9.5.7"
-  resolved "https://registry.yarnpkg.com/@socialgouv/kosko-charts/-/kosko-charts-9.5.7.tgz#0eb9c56899d98fa71f48bd461fa589f74b015274"
-  integrity sha512-vfK077vRLr8lqvmqcT5N6iLkUnFBWoLTrLdvmO8phF/B1UumdC3fJ2QP61TJHy6qtIhpj5c9p79l45YpxvLn2Q==
+"@socialgouv/env-slug@^1.2.2":
+  version "1.2.2"
+  resolved "https://registry.yarnpkg.com/@socialgouv/env-slug/-/env-slug-1.2.2.tgz#0da85ff9886dc55bfb618eadc50d0fd51e33c636"
+  integrity sha512-j7sejvJrahjrEeTcHeaT+GPGjIqmC1+qf5KYUQDEjMAj/SY5/BkPnA3CfPrKpZ7Z9V53TzACbhtpG7wMWXumYg==
+  dependencies:
+    commander "^8.3.0"
+    slugify "^1.6.3"
+    tslib "^2.3.1"
+
+"@socialgouv/kosko-charts@^9.8.17":
+  version "9.8.17"
+  resolved "https://registry.yarnpkg.com/@socialgouv/kosko-charts/-/kosko-charts-9.8.17.tgz#4d499bde105f8c70f3d56efec6e482ef6fb7baf7"
+  integrity sha512-vgBv4GuvllzF98tv1UZDwuFFp0zsmG1+IhzmZzUt1cSAQKGO0GuemfjiE81BezRZLBWpknI8zccs91gZfYZscQ==
   dependencies:
     "@kubernetes-models/sealed-secrets" "^2.0.2"
-    "@sindresorhus/is" "^4.1.0"
+    "@sindresorhus/is" "^4.2.0"
+    "@socialgouv/env-slug" "^1.2.2"
     fs-extra "^10.0.0"
     kubernetes-models "^2.0.2"
-    slugify "^1.6.0"
+    slugify "^1.6.3"
 
 "@tsconfig/node10@^1.0.7":
   version "1.0.8"
@@ -1498,6 +1508,11 @@ combined-stream@^1.0.6, combined-stream@~1.0.6:
   integrity sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==
   dependencies:
     delayed-stream "~1.0.0"
+
+commander@^8.3.0:
+  version "8.3.0"
+  resolved "https://registry.yarnpkg.com/commander/-/commander-8.3.0.tgz#4837ea1b2da67b9c616a67afbb0fafee567bca66"
+  integrity sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww==
 
 component-emitter@^1.2.1:
   version "1.3.0"
@@ -3877,10 +3892,10 @@ slash@^3.0.0:
   resolved "https://registry.yarnpkg.com/slash/-/slash-3.0.0.tgz#6539be870c165adbd5240220dbe361f1bc4d4634"
   integrity sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==
 
-slugify@^1.6.0:
-  version "1.6.0"
-  resolved "https://registry.yarnpkg.com/slugify/-/slugify-1.6.0.tgz#6bdf8ed01dabfdc46425b67e3320b698832ff893"
-  integrity sha512-FkMq+MQc5hzYgM86nLuHI98Acwi3p4wX+a5BO9Hhw4JdK4L7WueIiZ4tXEobImPqBz2sVcV0+Mu3GRB30IGang==
+slugify@^1.6.3:
+  version "1.6.3"
+  resolved "https://registry.yarnpkg.com/slugify/-/slugify-1.6.3.tgz#325aec50871acfb17976f2d3cb09ee1e7ab563be"
+  integrity sha512-1MPyqnIhgiq+/0iDJyqSJHENdnH5MMIlgJIBxmkRMzTNKlS/QsN5dXsB+MdDq4E6w0g9jFA4XOTRkVDjDae/2w==
 
 snapdragon-node@^2.0.1:
   version "2.1.1"
@@ -4223,7 +4238,7 @@ tslib@^2.1.0:
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.1.0.tgz#da60860f1c2ecaa5703ab7d39bc05b6bf988b97a"
   integrity sha512-hcVC3wYEziELGGmEEXue7D75zbwIIVUMWAVbHItGPx0ziyXxrOMQx4rQEVEV45Ut/1IotuEvwqPopzIOkDMf0A==
 
-tslib@^2.2.0, tslib@^2.3.0:
+tslib@^2.2.0, tslib@^2.3.0, tslib@^2.3.1:
   version "2.3.1"
   resolved "https://registry.yarnpkg.com/tslib/-/tslib-2.3.1.tgz#e8a335add5ceae51aa261d32a490158ef042ef01"
   integrity sha512-77EbyPPpMz+FRFRuAFlWMtmgUWGe9UOG2Z25NqCwiIjRhOf5iKGuzSe5P2w1laq+FkRy4p+PCuVkJSGkzTEKVw==
