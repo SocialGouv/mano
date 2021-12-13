@@ -16,12 +16,11 @@ import DateBloc from '../../components/DateBloc';
 import { toFrenchDate } from '../../utils';
 import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
-import SelectTeam from '../../components/SelectTeam';
 import { actionsFullSearchSelector } from '../../recoil/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
-import { currentTeamState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState } from '../../recoil/auth';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import ActionPersonName from '../../components/ActionPersonName';
 
