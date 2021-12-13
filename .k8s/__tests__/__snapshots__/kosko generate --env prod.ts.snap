@@ -554,6 +554,27 @@ spec:
         - metabase-mano.fabrique.social.gouv.fr
       secretName: metabase-crt
 ---
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: netpol-mano
+  namespace: mano
+spec:
+  ingress:
+    - from:
+        - podSelector: {}
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              network-policy/source: ingress-controller
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              network-policy/source: monitoring
+  podSelector: {}
+  policyTypes:
+    - Ingress
+---
 apiVersion: bitnami.com/v1alpha1
 kind: SealedSecret
 metadata:
