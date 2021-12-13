@@ -1,3 +1,10 @@
+## [1.36.7](https://github.com/SocialGouv/mano/compare/v1.36.6...v1.36.7) (2021-12-13)
+
+
+### Bug Fixes
+
+* **secu:** add k8s network policies and update snaps ([#188](https://github.com/SocialGouv/mano/issues/188)) ([413e043](https://github.com/SocialGouv/mano/commit/413e0431ae948c0eabb1e392df3ad5fc03652471))
+
 ## [1.36.6](https://github.com/SocialGouv/mano/compare/v1.36.5...v1.36.6) (2021-12-13)
 
 
