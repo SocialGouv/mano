@@ -37,7 +37,11 @@ function cookieOptions() {
 }
 
 function logoutCookieOptions() {
-  return { httpOnly: true, secure: true, sameSite: "None" };
+  if (config.ENVIRONMENT === "development" || config.ENVIRONMENT === "test") {
+    return { httpOnly: true, secure: true, sameSite: "None" };
+  } else {
+    return { httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
+  }
 }
 
 router.get(
