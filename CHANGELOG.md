@@ -1,3 +1,10 @@
+## [1.36.6](https://github.com/SocialGouv/mano/compare/v1.36.5...v1.36.6) (2021-12-13)
+
+
+### Bug Fixes
+
+* **api,dashboard:** setting encryptedVerificationKey for non admin ([#197](https://github.com/SocialGouv/mano/issues/197)) ([6406ada](https://github.com/SocialGouv/mano/commit/6406ada735983caf0c5c849914258426ef0ea77f))
+
 ## [1.36.5](https://github.com/SocialGouv/mano/compare/v1.36.4...v1.36.5) (2021-12-13)
 
 
