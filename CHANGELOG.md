@@ -1,3 +1,10 @@
+## [1.36.5](https://github.com/SocialGouv/mano/compare/v1.36.4...v1.36.5) (2021-12-13)
+
+
+### Bug Fixes
+
+* upgrade metabase ([#196](https://github.com/SocialGouv/mano/issues/196)) ([677fb6a](https://github.com/SocialGouv/mano/commit/677fb6acf3d5f4b108a39a0d20dd1bc1f89ee8aa))
+
 ## [1.36.4](https://github.com/SocialGouv/mano/compare/v1.36.3...v1.36.4) (2021-12-10)
 
 
