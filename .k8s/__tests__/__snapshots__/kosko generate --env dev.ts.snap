@@ -7,7 +7,7 @@ kind: Namespace
 metadata:
   annotations:
     socialgouv/creator: autodevops
-    janitor/ttl: 15d
+    janitor/ttl: 7d
     field.cattle.io/creatorId: gitlab
     field.cattle.io/projectId: ''
     git/branch: master
@@ -89,11 +89,11 @@ spec:
             timeoutSeconds: 1
           resources:
             limits:
-              cpu: 500m
-              memory: 512Mi
+              cpu: '1'
+              memory: 1Gi
             requests:
-              cpu: 100m
-              memory: 128Mi
+              cpu: 250m
+              memory: 256Mi
           startupProbe:
             failureThreshold: 12
             httpGet:
@@ -112,7 +112,7 @@ spec:
           envFrom:
             - secretRef:
                 name: azure-pg-user-master
-          image: ghcr.io/socialgouv/docker/wait-for-postgres:6.45.0
+          image: ghcr.io/socialgouv/docker/wait-for-postgres:6.56.1
           imagePullPolicy: Always
           name: wait-for-postgres
           resources:
@@ -267,11 +267,11 @@ spec:
             timeoutSeconds: 1
           resources:
             limits:
-              cpu: 200m
-              memory: 128Mi
+              cpu: 500m
+              memory: 256Mi
             requests:
-              cpu: 10m
-              memory: 64Mi
+              cpu: 100m
+              memory: 128Mi
           startupProbe:
             failureThreshold: 12
             httpGet:
@@ -385,7 +385,7 @@ spec:
         cert: wildcard
     spec:
       containers:
-        - image: metabase/metabase:v0.37.4
+        - image: metabase/metabase:v0.38.6
           livenessProbe:
             failureThreshold: 6
             httpGet:
@@ -584,7 +584,7 @@ spec:
           envFrom:
             - secretRef:
                 name: azure-pg-admin-user
-          image: ghcr.io/socialgouv/docker/azure-db:6.45.0
+          image: ghcr.io/socialgouv/docker/azure-db:6.56.1
           imagePullPolicy: IfNotPresent
           name: create-db-user
           resources:
