@@ -95,13 +95,16 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") return res.status(403).send({ ok: false, error: "Forbidden" });
-
     const query = { where: { _id: req.params._id } };
     const organisation = await Organisation.findOne(query);
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
 
     const updateOrg = {};
+    if (req.user.role !== "admin") {
+      if (req.body.hasOwnProperty("encryptedVerificationKey")) updateOrg.encryptedVerificationKey = req.body.encryptedVerificationKey;
+      await organisation.update(updateOrg);
+      return res.status(200).send({ ok: true, data: organisation });
+    }
 
     if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
     if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
