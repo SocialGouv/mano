@@ -115,9 +115,14 @@ const Reception = () => {
   return (
     <Container style={{ padding: 0 }}>
       <Header
-        title={`Accueil du ${new Date().toLocaleDateString('fr', { day: 'numeric', weekday: 'long', month: 'long', year: 'numeric' })} de l'équipe ${
-          currentTeam?.nightSession ? 'de nuit ' : ''
-        }${currentTeam?.name || ''}`}
+        titleStyle={{ fontWeight: '400' }}
+        title={
+          <span>
+            Accueil du <b>{new Date().toLocaleDateString('fr', { day: 'numeric', weekday: 'long', month: 'long', year: 'numeric' })}</b> de l'équipe{' '}
+            {currentTeam?.nightSession ? 'de nuit ' : ''}
+            <b>{currentTeam?.name || ''}</b>
+          </span>
+        }
       />
       <Row style={{ paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid #ddd' }}>
         <Col

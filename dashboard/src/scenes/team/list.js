@@ -21,8 +21,8 @@ const List = () => {
   const history = useHistory();
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title="Équipes" />
+    <Container>
+      <Header titleStyle={{ fontWeight: 400 }} title="Équipes" />
       <Create />
       <Table
         data={teams}

@@ -2,7 +2,7 @@
 import React from 'react';
 import SelectCustom from './SelectCustom';
 
-const SelectTeam = ({ onChange = () => null, teamId = null, teams = null }) => {
+const SelectTeam = ({ onChange = () => null, teamId = null, teams = null, style = null }) => {
   if (!teams) return <div />;
 
   return (
@@ -12,6 +12,7 @@ const SelectTeam = ({ onChange = () => null, teamId = null, teams = null }) => {
         flexDirection: 'column',
         width: '100%',
         borderRadius: '5px',
+        ...style,
       }}>
       <SelectCustom
         options={teams.map(({ _id }) => _id)}

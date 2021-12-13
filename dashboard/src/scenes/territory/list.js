@@ -37,8 +37,15 @@ const List = () => {
   const total = territories.length;
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title={`Territoires de l'organisation ${organisation.name}`} />
+    <Container>
+      <Header
+        titleStyle={{ fontWeight: 400 }}
+        title={
+          <>
+            Territoires de l'organisation <b>{organisation.name}</b>
+          </>
+        }
+      />
       <Row style={{ marginBottom: 40 }}>
         <Col>
           <CreateTerritory organisation={organisation} />

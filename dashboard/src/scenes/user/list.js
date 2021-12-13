@@ -35,8 +35,8 @@ const List = () => {
 
   if (!users) return <Loading />;
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title="Utilisateurs" />
+    <Container>
+      <Header titleStyle={{ fontWeight: 400 }} title="Utilisateurs" />
       {['superadmin', 'admin'].includes(user.role) && <Create onChange={() => setRefresh(true)} />}
       <Table
         data={users}

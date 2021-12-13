@@ -40,8 +40,8 @@ const List = () => {
 
   return (
     <div>
-      <Container style={{ padding: '40px 0' }}>
-        <Header title="Structures" />
+      <Container>
+        <Header titleStyle={{ fontWeight: 400 }} title="Structures" />
         <Row style={{ marginBottom: 20 }}>
           <Col>
             <Create onChange={() => setRefresh(true)} />

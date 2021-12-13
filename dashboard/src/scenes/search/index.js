@@ -98,8 +98,8 @@ const View = () => {
   };
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title="Rechercher" onRefresh={() => refresh()} />
+    <Container>
+      <Header titleStyle={{ fontWeight: '400' }} title="Rechercher" onRefresh={() => refresh()} />
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <Search placeholder="Par mot clé" value={search} onChange={setSearch} />

@@ -50,7 +50,7 @@ export const CustomResponsivePie = ({ data, title, onAddFilter, field }) => {
             innerRadius={0.5}
             padAngle={0.7}
             cornerRadius={3}
-            colors={{ scheme: 'nivo' }}
+            colors={{ scheme: 'set2' }}
             borderWidth={1}
             borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
             arcLinkLabelsSkipAngle={8}
@@ -102,7 +102,7 @@ export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisT
             padding={0.3}
             valueScale={{ type: 'linear' }}
             indexScale={{ type: 'band', round: true }}
-            colors={{ scheme: 'nivo' }}
+            colors={{ scheme: 'set2' }}
             borderColor={{ from: 'color', modifiers: [['darker', 1.6]] }}
             axisTop={null}
             axisRight={null}
@@ -169,10 +169,10 @@ const Data = styled.table`
   flex-basis: 25%;
   flex-shrink: 0;
   flex-grow: 0;
-  border: 1px solid #000;
+  border: 1px solid #aaa;
   /* font-size: 0.7em; */
   td {
-    border: 1px solid #000;
+    border: 1px solid #aaa;
     padding: 5px;
   }
 
