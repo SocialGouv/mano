@@ -7,13 +7,11 @@ import { useRecoilValue } from 'recoil';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
 import {
-  consumptionsOptions,
   healthInsuranceOptions,
   nationalitySituationOptions,
   personalSituationOptions,
   reasonsOptions,
   ressourcesOptions,
-  vulnerabilitiesOptions,
   filterPersonsBase,
   personsState,
   usePersons,
