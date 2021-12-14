@@ -1,3 +1,16 @@
+# [1.37.0](https://github.com/SocialGouv/mano/compare/v1.36.7...v1.37.0) (2021-12-14)
+
+
+### Bug Fixes
+
+* **api:** fix logout in production ([#200](https://github.com/SocialGouv/mano/issues/200)) ([fde016e](https://github.com/SocialGouv/mano/commit/fde016e094e8bf9e6e18a50b8708927ace818ac4))
+* **dashboard:** filterable fields person ([#199](https://github.com/SocialGouv/mano/issues/199)) ([f8116f1](https://github.com/SocialGouv/mano/commit/f8116f1224a2f2e2fdf0c4717cc6f519b0d3f2dc))
+
+
+### Features
+
+* **dashboard:** stats orga and team ([#198](https://github.com/SocialGouv/mano/issues/198)) ([cea0d1c](https://github.com/SocialGouv/mano/commit/cea0d1c571450d803f0f9fbfbd2777acd0581170))
+
 ## [1.36.7](https://github.com/SocialGouv/mano/compare/v1.36.6...v1.36.7) (2021-12-13)
 
 
