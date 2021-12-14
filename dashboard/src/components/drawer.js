@@ -29,12 +29,6 @@ const Drawer = () => {
     <>
       <Sidebar className="noprint" onboardingForTeams={onboardingForTeams}>
         <Nav>
-          <div style={{ marginBottom: 30, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            <Logo size={100} hide />
-            {!['superadmin'].includes(user.role) && (
-              <SelectTeam onChange={setCurrentTeam} teamId={currentTeam?._id} teams={user.role === 'admin' ? teams : user.teams} />
-            )}
-          </div>
           {!['superadmin'].includes(user.role) && (
             <>
               {!!organisation.receptionEnabled && (
@@ -57,13 +51,6 @@ const Drawer = () => {
             </>
           )}
           <hr />
-          {/* ["superadmin"].includes(user.role) && (
-          <li>
-            <NavLink to="/organisation" activeClassName="active">
-              Organisations
-            </NavLink>
-          </li>
-        ) */}
           {['admin'].includes(user.role) && (
             <li>
               <NavLink to={`/organisation/${organisation._id}`} activeClassName="active">
@@ -127,9 +114,21 @@ const Drawer = () => {
         </Nav>
       </Sidebar>
       <TopBar className="topBar">
-        <Organisation>{['superadmin'].includes(user.role) ? 'Support' : organisation?.name}</Organisation>
-        <Logo size={60} noMargin />
-        <div>
+        <TopBarOrganistionTeamBox>
+          <Organisation>{['superadmin'].includes(user.role) ? 'Support' : organisation?.name}</Organisation>
+          {!['superadmin'].includes(user.role) && (
+            <SelectTeam
+              style={{ maxWidth: '250px', fontSize: '13px' }}
+              onChange={setCurrentTeam}
+              teamId={currentTeam?._id}
+              teams={user.role === 'admin' ? teams : user.teams}
+            />
+          )}
+        </TopBarOrganistionTeamBox>
+        <TopBarLogo>
+          <Logo size={60} />
+        </TopBarLogo>
+        <TopBarAccount>
           <ButtonDropdown direction="left" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
             <DropdownToggleStyled>
               {user?.name}
@@ -175,21 +174,38 @@ const Drawer = () => {
               </DropdownItem>
             </DropdownMenu>
           </ButtonDropdown>
-        </div>
+        </TopBarAccount>
       </TopBar>
     </>
   );
 };
+
+const TopBarLogo = styled.div`
+  @media (max-width: 1024px) {
+    display: none;
+  }
+`;
+
+const TopBarAccount = styled.div`
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const TopBarOrganistionTeamBox = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+`;
 
 const Sidebar = styled.div`
   background-color: ${theme.white};
   height: 100%;
   max-width: 230px;
   width: 100%;
-  z-index: 10;
+  z-index: 9;
   position: fixed;
   left: 0;
-  top: 0;
+  top: 60px;
   padding: 18px;
   display: flex;
   flex-direction: column;
@@ -209,16 +225,17 @@ const Sidebar = styled.div`
 
 const TopBar = styled.div`
   background-color: ${theme.white};
-  z-index: 9;
+  z-index: 10;
   position: fixed;
-  left: 230px;
-  right: 0;
-  top: 0;
-  padding: 5px 18px;
+  width: 100%;
+  padding: 12px 18px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  > div {
+    flex: 1;
+  }
   @media print {
     left: 0;
     position: relative;
@@ -228,20 +245,20 @@ const TopBar = styled.div`
 const Logo = styled.div`
   width: ${(props) => props.size}px;
   height: ${(props) => (props.size * 2) / 3}px;
-  ${(props) => props.hide && 'display: none;'}
-  margin-bottom: 20px;
-  ${(props) => props.noMargin && 'margin: 0;'}
+  margin: 0 auto;
   background-image: url(${logo});
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
 `;
 
-const Organisation = styled.span`
+const Organisation = styled.div`
   font-weight: 600;
+  width: max-content;
   font-size: 14px;
   line-height: 22px;
-  text-align: center;
+  margin-right: 1rem;
+  text-align: left;
   letter-spacing: -0.01em;
 `;
 

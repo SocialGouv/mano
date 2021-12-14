@@ -4,9 +4,7 @@ import styled from 'styled-components';
 import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import moment from 'moment';
 import { useRecoilValue } from 'recoil';
-
 import Header from '../../components/header';
-
 import Loading from '../../components/loading';
 import {
   consumptionsOptions,
@@ -27,7 +25,7 @@ import DateRangePickerWithPresets from '../../components/DateRangePickerWithPres
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { actionsState, useActions } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { useRefresh } from '../../recoil/refresh';
@@ -45,7 +43,6 @@ const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
 
 const Stats = () => {
-  const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -63,6 +60,7 @@ const Stats = () => {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(false);
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
@@ -80,19 +78,55 @@ const Stats = () => {
 
   if (loading) return <Loading />;
 
-  const persons = getDataForPeriod(allPersons, period, filterPersons);
-  const actions = getDataForPeriod(allActions, period);
-  const observations = getDataForPeriod(allObservations, period);
-  const reports = getDataForPeriod(allreports, period);
+  const persons = getDataForPeriod(
+    allPersons.filter((e) => viewAllOrganisationData || (e.assignedTeams || []).includes(currentTeam._id)),
+    period,
+    filterPersons
+  );
+  const actions = getDataForPeriod(
+    allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
+    period
+  );
+  const observations = getDataForPeriod(
+    allObservations.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
+    period
+  );
+  const reports = getDataForPeriod(
+    allreports.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
+    period
+  );
   const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
 
   return (
     <Container>
-      <Header title="Statistiques" onRefresh={() => setLoading(true)} />
+      <Header
+        title={
+          <>
+            Statistiques{' '}
+            {viewAllOrganisationData ? (
+              <>
+                <b>globales</b> de <b>{organisation.name}</b>
+              </>
+            ) : (
+              <>
+                de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
+                <b>{currentTeam?.name || ''}</b>
+              </>
+            )}
+          </>
+        }
+        titleStyle={{ fontWeight: 400 }}
+        onRefresh={() => setLoading(true)}
+      />
       <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center' }}>
-        <Col md={8} style={{ display: 'flex' }}>
-          <span style={{ marginRight: 10, display: 'inline-flex', alignItems: 'center' }}>Choisissez une période :</span>
+        <Col md={4}>
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
+        </Col>
+        <Col md={4}>
+          <label>
+            <input type="checkbox" style={{ marginRight: '1rem' }} onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)} />
+            Statistiques de toute l'organisation
+          </label>
         </Col>
         {['admin'].includes(user.role) && (
           <Col md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -114,24 +148,12 @@ const Stats = () => {
       </Nav>
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0}>
-          <Title>Statistiques de l'organisation</Title>
+          <Title>Statistiques générales</Title>
           <Row style={{ marginBottom: '20px' }}>
             <Col md={2} />
             <Block data={persons} title="Nombre de personnes suivies" />
             <Block data={actions} title="Nombre d'actions" />
             <Col md={2} />
-          </Row>
-          <Title>Nombre de personnes suivies assignées par équipe</Title>
-          <Row style={{ marginBottom: '20px' }}>
-            {teams.map((team) => (
-              <Block key={team._id} title={team.name} data={persons.filter((p) => p.assignedTeams?.includes(team._id))} />
-            ))}
-          </Row>
-          <Title>Nombre d'actions par équipe</Title>
-          <Row style={{ marginBottom: '20px' }}>
-            {teams.map((team) => (
-              <Block key={team._id} title={team.name} data={actions.filter((a) => a.team === team._id)} />
-            ))}
           </Row>
         </TabPane>
         {!!organisation.receptionEnabled && (
@@ -154,18 +176,16 @@ const Stats = () => {
           <CustomResponsivePie
             title="Répartition des actions par catégorie"
             data={getPieData(
-              actions
-                .filter((a) => a.team === currentTeam._id)
-                .reduce((actionsSplitsByCategories, action) => {
-                  if (!!action.categories?.length) {
-                    for (const category of action.categories) {
-                      actionsSplitsByCategories.push({ ...action, category });
-                    }
-                  } else {
-                    actionsSplitsByCategories.push(action);
+              actions.reduce((actionsSplitsByCategories, action) => {
+                if (!!action.categories?.length) {
+                  for (const category of action.categories) {
+                    actionsSplitsByCategories.push({ ...action, category });
                   }
-                  return actionsSplitsByCategories;
-                }, []),
+                } else {
+                  actionsSplitsByCategories.push(action);
+                }
+                return actionsSplitsByCategories;
+              }, []),
               'category',
               { options: organisation.categories }
             )}
@@ -284,45 +304,43 @@ const Stats = () => {
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des observations de territoire</Title>
-          {customFieldsObs
-            .filter((f) => f.enabled)
-            .filter((f) => f.showInStats)
-            .filter((field) => ['number'].includes(field.type))
-            .map((field) => (
-              <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-                <BlockTotal title={field.label} data={observations} field={field.name} />
-              </Col>
-            ))}
-          {customFieldsObs
-            .filter((f) => f.enabled)
-            .filter((f) => f.showInStats)
-            .filter((field) => ['date', 'date-with-time'].includes(field.type))
-            .map((field) => (
-              <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-                <BlockDateWithTime data={observations} field={field} />
-              </Col>
-            ))}
-          {customFieldsObs
-            .filter((f) => f.enabled)
-            .filter((f) => f.showInStats)
-            .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
-            .map((field) => (
-              <CustomResponsivePie
-                title={field.label}
-                key={field.name}
-                data={getPieData(observations, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
-              />
-            ))}
+          <Row>
+            {customFieldsObs
+              .filter((f) => f.enabled)
+              .filter((f) => f.showInStats)
+              .filter((field) => ['number'].includes(field.type))
+              .map((field) => (
+                <Col md={4} style={{ marginBottom: '20px' }} key={field.name}>
+                  <BlockTotal title={field.label} data={observations} field={field.name} />
+                </Col>
+              ))}
+            {customFieldsObs
+              .filter((f) => f.enabled)
+              .filter((f) => f.showInStats)
+              .filter((field) => ['date', 'date-with-time'].includes(field.type))
+              .map((field) => (
+                <Col md={4} style={{ marginBottom: '20px' }} key={field.name}>
+                  <BlockDateWithTime data={observations} field={field} />
+                </Col>
+              ))}
+            {customFieldsObs
+              .filter((f) => f.enabled)
+              .filter((f) => f.showInStats)
+              .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
+              .map((field) => (
+                <CustomResponsivePie
+                  title={field.label}
+                  key={field.name}
+                  data={getPieData(observations, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+                />
+              ))}
+          </Row>
         </TabPane>
         <TabPane tabId={5}>
           <Title>Statistiques des comptes-rendus</Title>
           <CustomResponsivePie
             title="Répartition des comptes-rendus par collaboration"
-            data={getPieData(
-              reports.filter((r) => r.team === currentTeam._id),
-              'collaborations',
-              { options: organisation.collaborations || [] }
-            )}
+            data={getPieData(reports, 'collaborations', { options: organisation.collaborations || [] })}
           />
         </TabPane>
       </TabContent>
@@ -483,7 +501,7 @@ const StatsCreatedAtRangeBar = ({ persons }) => {
 
 const Block = ({ data, title = 'Nombre de personnes suivies' }) => (
   <Col md={4} style={{ marginBottom: 20 }}>
-    <Card title={title} count={!isNaN(data) ? data : data.length} />
+    <Card title={title} count={Array.isArray(data) ? String(data.length) : data} />
   </Col>
 );
 

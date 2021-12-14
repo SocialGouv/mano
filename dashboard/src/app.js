@@ -90,7 +90,7 @@ const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
   return (
     <>
       {user && <Drawer />}
-      <div className="main-content" style={{ marginLeft: user ? 230 : 0, marginTop: user ? 35 : 0 }}>
+      <div className="main-content" style={{ marginLeft: user ? 230 : 0, marginTop: user ? 65 : 0 }}>
         <Route {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
       </div>
     </>

@@ -16,21 +16,18 @@ import DateBloc from '../../components/DateBloc';
 import { toFrenchDate } from '../../utils';
 import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
-import SelectTeam from '../../components/SelectTeam';
 import { actionsFullSearchSelector } from '../../recoil/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
-import { currentTeamState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState } from '../../recoil/auth';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import ActionPersonName from '../../components/ActionPersonName';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
-  const teams = useRecoilValue(teamsState);
-  const user = useRecoilValue(userState);
-  const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
+  const [currentTeam] = useRecoilState(currentTeamState);
 
   const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
   const history = useHistory();
@@ -53,8 +50,15 @@ const List = () => {
   const total = actionsFiltered.length;
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title={`Actions de l'équipe ${currentTeam?.name || ''}`} />
+    <Container>
+      <Header
+        titleStyle={{ fontWeight: '400' }}
+        title={
+          <span>
+            Actions de l'équipe <b>{currentTeam?.name || ''}</b>
+          </span>
+        }
+      />
       <Row style={{ marginBottom: 40, justifyContent: 'center' }}>
         <Col>
           <CreateAction disabled={!currentTeam} isMulti refreshable />
@@ -64,12 +68,6 @@ const List = () => {
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
           <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
-        </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par équipe en charge :</span>
-          <div style={{ width: 300 }}>
-            <SelectTeam onChange={setCurrentTeam} teamId={currentTeam?._id} teams={user.role === 'admin' ? teams : user.teams} />
-          </div>
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par status : </span>

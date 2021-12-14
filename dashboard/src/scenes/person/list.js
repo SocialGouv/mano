@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -13,7 +13,6 @@ import Search from '../../components/search';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
 import CreatePerson from './CreatePerson';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { filterPersonsBase } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import PaginationContext from '../../contexts/pagination';
@@ -21,12 +20,23 @@ import Filters from '../../components/Filters';
 import { displayBirthDate } from '../../services/date';
 import { personsFullSearchSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-import { organisationState, teamsState } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
 import { usePlaces } from '../../recoil/places';
 
 const List = () => {
   const [filters, setFilters] = useState([]);
   const { places } = usePlaces();
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(true);
+  const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
+  const personsFiltered = useRecoilValue(personsFullSearchSelector({ search, filterTeams, filters, alertness }));
+  const teams = useRecoilValue(teamsState);
+  const organisation = useRecoilValue(organisationState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const history = useHistory();
+
+  useEffect(() => {
+    setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id]);
+  }, [viewAllOrganisationData, currentTeam]);
 
   // Add places in filters.
   const filterPersons = [
@@ -38,25 +48,31 @@ const List = () => {
     },
   ];
 
-  const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
-
-  const personsFiltered = useRecoilValue(personsFullSearchSelector({ search, filterTeams, filters, alertness }));
-
-  const teams = useRecoilValue(teamsState);
-  const organisation = useRecoilValue(organisationState);
-
-  const history = useHistory();
-
   const limit = 20;
-
   if (!personsFiltered) return <Loading />;
 
   const data = personsFiltered.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
   const total = personsFiltered.length;
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title={`Personnes suivies par l'organisation ${organisation.name}`} />
+    <Container>
+      <Header
+        title={
+          <>
+            Personnes suivies par{' '}
+            {viewAllOrganisationData ? (
+              <>
+                l'organisation <b>{organisation.name}</b>
+              </>
+            ) : (
+              <>
+                l'équipe <b>{currentTeam?.name || ''}</b>
+              </>
+            )}
+          </>
+        }
+        titleStyle={{ fontWeight: 400 }}
+      />
       <Row>
         <Col>
           <PersonsActionsStyled>
@@ -73,15 +89,19 @@ const List = () => {
             onChange={setSearch}
           />
         </Col>
-        <Col md={12} />
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par équipe en charge :</span>
-          <div style={{ width: 300 }}>
-            <SelectTeamMultiple onChange={setFilterTeams} value={filterTeams} colored />
-          </div>
+        <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
+          <label style={{ marginLeft: '270px' }}>
+            <input
+              type="checkbox"
+              style={{ marginRight: 10 }}
+              checked={viewAllOrganisationData}
+              onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+            />
+            Afficher les personnes de toute l'organisation
+          </label>
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
-          <label>
+          <label style={{ marginLeft: '270px' }}>
             <input type="checkbox" style={{ marginRight: 10 }} value={alertness} onChange={() => setFilterAlertness(!alertness)} />
             N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
           </label>

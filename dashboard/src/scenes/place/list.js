@@ -44,8 +44,15 @@ const List = () => {
   const { data, total } = filterPlaces(places, { page, limit, search });
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title={`Lieux fréquentés de l'organisation ${organisation.name}`} />
+    <Container>
+      <Header
+        titleStyle={{ fontWeight: 400 }}
+        title={
+          <>
+            Lieux fréquentés de l'organisation <b>{organisation.name}</b>
+          </>
+        }
+      />
       <Row style={{ marginBottom: 40 }}>
         <Col>
           <Create />
