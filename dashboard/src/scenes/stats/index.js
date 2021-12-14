@@ -7,13 +7,11 @@ import { useRecoilValue } from 'recoil';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
 import {
-  consumptionsOptions,
   healthInsuranceOptions,
   nationalitySituationOptions,
   personalSituationOptions,
   reasonsOptions,
   ressourcesOptions,
-  vulnerabilitiesOptions,
   filterPersonsBase,
   personsState,
   usePersons,
@@ -226,18 +224,6 @@ const Stats = () => {
           <AgeRangeBar persons={persons} />
           <StatsCreatedAtRangeBar persons={persons} />
           <CustomResponsivePie onAddFilter={addFilter} title="Type d'hébergement" data={getAdressPieData(persons)} />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Consommations"
-            field="consumptions"
-            data={getPieData(persons, 'consumptions', { options: consumptionsOptions })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Type de vulnérabilité"
-            field="vulnerabilities"
-            data={getPieData(persons, 'vulnerabilities', { options: vulnerabilitiesOptions })}
-          />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Couverture médicale des personnes"
