@@ -1,3 +1,10 @@
+## [1.37.1](https://github.com/SocialGouv/mano/compare/v1.37.0...v1.37.1) (2021-12-14)
+
+
+### Bug Fixes
+
+* **dashboard:** 2 stats repeated twice ([#201](https://github.com/SocialGouv/mano/issues/201)) ([7bcc3fd](https://github.com/SocialGouv/mano/commit/7bcc3fd6b7c908b1d49c172f813cffa6c872bf8c))
+
 # [1.37.0](https://github.com/SocialGouv/mano/compare/v1.36.7...v1.37.0) (2021-12-14)
 
 
