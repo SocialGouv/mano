@@ -228,18 +228,6 @@ const Stats = () => {
           <CustomResponsivePie onAddFilter={addFilter} title="Type d'hébergement" data={getAdressPieData(persons)} />
           <CustomResponsivePie
             onAddFilter={addFilter}
-            title="Consommations"
-            field="consumptions"
-            data={getPieData(persons, 'consumptions', { options: consumptionsOptions })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Type de vulnérabilité"
-            field="vulnerabilities"
-            data={getPieData(persons, 'vulnerabilities', { options: vulnerabilitiesOptions })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Couverture médicale des personnes"
             field="healthInsurance"
             data={getPieData(persons, 'healthInsurance', { options: healthInsuranceOptions })}
