@@ -10371,10 +10371,10 @@ react-portal@^4.2.0:
   dependencies:
     prop-types "^15.5.8"
 
-react-redux-toastr@^7.6.5:
-  version "7.6.5"
-  resolved "https://registry.yarnpkg.com/react-redux-toastr/-/react-redux-toastr-7.6.5.tgz#f2343b3d5f7c49193a9bc30cf76b6e39b3e06a9b"
-  integrity sha512-tbf8z18O85BGKXhDfYsgNmurbKlP9p7UXjtdBNS1wWqCAY0QNAyW1W5ulChPEFWoBWVzQywgMGIZ5j3an//srg==
+react-redux-toastr@^7.6.6:
+  version "7.6.6"
+  resolved "https://registry.yarnpkg.com/react-redux-toastr/-/react-redux-toastr-7.6.6.tgz#a992ac721d6e5cd44b156593d1ce4469a72c4b86"
+  integrity sha512-OgIJvvvprlICbcg99QRyK0qMpNbD6dWfNEfoYGxaGiRHi81Yd71tWbUycJ4pgH4DbyEk7GH1dQz6aUXQ+7GKGw==
   dependencies:
     classnames "^2.2.3"
     eventemitter3 "^3.1.0"
