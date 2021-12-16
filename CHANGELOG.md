@@ -1,3 +1,10 @@
+# [1.38.0](https://github.com/SocialGouv/mano/compare/v1.37.1...v1.38.0) (2021-12-16)
+
+
+### Features
+
+* **dashboard:** add custom fields in filters ([#202](https://github.com/SocialGouv/mano/issues/202)) ([7d83a3f](https://github.com/SocialGouv/mano/commit/7d83a3f18ab9284d1a0138c27e2242f57051dff3))
+
 ## [1.37.1](https://github.com/SocialGouv/mano/compare/v1.37.0...v1.37.1) (2021-12-14)
 
 
