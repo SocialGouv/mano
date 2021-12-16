@@ -95,6 +95,13 @@ const Stats = () => {
   );
   const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
 
+  // Add enabled custom fields in filters.
+  const filterPersonsWithAllFields = [
+    ...filterPersonsBase,
+    ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+    ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+  ];
+
   return (
     <Container>
       <Header
@@ -191,7 +198,7 @@ const Stats = () => {
         </TabPane>
         <TabPane tabId={3}>
           <Title>Statistiques des personnes suivies</Title>
-          <Filters base={filterPersonsBase} filters={filterPersons} onChange={setFilterPersons} />
+          <Filters base={filterPersonsWithAllFields} filters={filterPersons} onChange={setFilterPersons} />
           <Row>
             <Block data={persons} title="Nombre de personnes suivies" />
             <BlockCreatedAt persons={persons} />
