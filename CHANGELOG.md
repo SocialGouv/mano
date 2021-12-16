@@ -1,3 +1,10 @@
+## [1.38.1](https://github.com/SocialGouv/mano/compare/v1.38.0...v1.38.1) (2021-12-16)
+
+
+### Bug Fixes
+
+* select territory from search tab ([d6e4de1](https://github.com/SocialGouv/mano/commit/d6e4de124ff132e2af06fab6f0dccedc908dfe09))
+
 # [1.38.0](https://github.com/SocialGouv/mano/compare/v1.37.1...v1.38.0) (2021-12-16)
 
 
