@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
+import { Col, Container, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import moment from 'moment';
 import { useRecoilValue } from 'recoil';
 import Header from '../../components/header';
@@ -28,6 +28,8 @@ import { actionsState, useActions } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { useRefresh } from '../../recoil/refresh';
 import ExportData from '../data-import-export/ExportData';
+import SelectCustom from '../../components/SelectCustom';
+import { useTerritories } from '../../recoil/territory';
 moment.locale('fr');
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
@@ -54,8 +56,10 @@ const Stats = () => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const { territories } = useTerritories();
   const { refresh } = useRefresh();
   const [loading, setLoading] = useState(false);
+  const [territory, setTerritory] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(false);
@@ -86,7 +90,9 @@ const Stats = () => {
     period
   );
   const observations = getDataForPeriod(
-    allObservations.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
+    allObservations
+      .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
+      .filter((e) => !territory?._id || e.territory === territory._id),
     period
   );
   const reports = getDataForPeriod(
@@ -297,6 +303,20 @@ const Stats = () => {
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des observations de territoire</Title>
+          <div style={{ maxWidth: '350px', marginBottom: '2rem' }}>
+            <Label>Filter par territoire</Label>
+            <SelectCustom
+              options={territories}
+              name="place"
+              placeholder="Tous les territoires"
+              onChange={(t) => {
+                setTerritory(t);
+              }}
+              isClearable={true}
+              getOptionValue={(i) => i._id}
+              getOptionLabel={(i) => i.name}
+            />
+          </div>
           <Row>
             {customFieldsObs
               .filter((f) => f.enabled)
