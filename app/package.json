@@ -52,7 +52,7 @@
     "react": "16.13.1",
     "react-native": "0.63.4",
     "react-native-base64": "^0.2.1",
-    "react-native-bootsplash": "^3.2.0",
+    "react-native-bootsplash": "^3.2.6",
     "react-native-config": "^1.4.5",
     "react-native-country-picker-modal": "^2.0.0",
     "react-native-device-info": "^8.0.6",
