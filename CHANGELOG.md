@@ -1,3 +1,15 @@
+# [1.40.0](https://github.com/SocialGouv/mano/compare/v1.39.4...v1.40.0) (2021-12-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency react-icons to ^4.3.1 ([#222](https://github.com/SocialGouv/mano/issues/222)) ([0d64687](https://github.com/SocialGouv/mano/commit/0d646874c331bb13f1f8e4985734755bbd9bd34f))
+
+
+### Features
+
+* **dashboard:** filter by territory on stats ([#208](https://github.com/SocialGouv/mano/issues/208)) ([6d58054](https://github.com/SocialGouv/mano/commit/6d58054269b2085f2db43ccd0db1ba62d87a4f2d))
+
 ## [1.39.4](https://github.com/SocialGouv/mano/compare/v1.39.3...v1.39.4) (2021-12-16)
 
 
