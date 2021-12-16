@@ -32,7 +32,6 @@ const List = () => {
   useEffect(() => {
     const sortedDataAscendant = organisations?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
     setOrganisation(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
-    console.log(sortBy, sortOrder);
     setUpdateKey((k) => k + 1);
   }, [sortBy, sortOrder]);
 
