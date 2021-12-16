@@ -9,21 +9,19 @@ import { useRecoilValue } from 'recoil';
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
 import useApi from '../services/api';
-import { organisationState, userState } from '../recoil/auth';
+import { userState } from '../recoil/auth';
 
-const DeleteOrganisation = () => {
+const DeleteOrganisation = ({ organisation, buttonStyle = {}, buttonTitle = "Supprimer l'organisation", onSuccess = () => {} }) => {
   const [open, setOpen] = useState(false);
-
   const user = useRecoilValue(userState);
-  const organisation = useRecoilValue(organisationState);
 
   const API = useApi();
 
-  if (!['admin'].includes(user.role)) return null;
+  if (!['admin', 'superadmin'].includes(user.role)) return null;
 
   return (
     <>
-      <ButtonCustom title="Supprimer l'organisation" color="danger" onClick={() => setOpen(true)} />
+      <ButtonCustom title={buttonTitle} style={buttonStyle} color="danger" onClick={() => setOpen(true)} />
       <StyledModal isOpen={open} toggle={() => setOpen(false)} size="lg" centered>
         <ModalHeader toggle={() => setOpen(false)} color="danger">
           <span style={{ color: theme.redDark, textAlign: 'center', display: 'block' }}>Voulez-vous vraiment supprimer l'organisation ?</span>
@@ -46,7 +44,8 @@ const DeleteOrganisation = () => {
                 actions.setSubmitting(false);
                 if (res.ok) {
                   toastr.success('Organisation supprimée');
-                  API.logout();
+                  setOpen(false);
+                  onSuccess();
                 }
               } catch (organisationDeleteError) {
                 console.log('erreur in organisation delete', organisationDeleteError);

@@ -131,13 +131,14 @@ router.put(
   })
 );
 
-//@checked
+// @checked
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    if (req.user.organisation !== req.params._id) return res.status(403).send({ ok: false, error: "Forbidden" });
-    if (req.user.role !== "admin") return res.status(403).send({ ok: false, error: "Forbidden" });
+    // Super admin can delete any organisation. Admin can delete only their organisation.
+    const canDelete = req.user.role === "superadmin" || (req.user.role === "admin" && req.user.organisation === req.params._id);
+    if (!canDelete) return res.status(403).send({ ok: false, error: "Forbidden" });
 
     const result = await Organisation.destroy({ where: { _id: req.params._id } });
     if (result === 0) return res.status(404).send({ ok: false, error: "Not Found" });
