@@ -1,3 +1,10 @@
+## [1.39.2](https://github.com/SocialGouv/mano/compare/v1.39.1...v1.39.2) (2021-12-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to ^8.6.0 ([#218](https://github.com/SocialGouv/mano/issues/218)) ([12172ae](https://github.com/SocialGouv/mano/commit/12172ae878d14983d6394af648c0c9fed8916f9f))
+
 ## [1.39.1](https://github.com/SocialGouv/mano/compare/v1.39.0...v1.39.1) (2021-12-16)
 
 
