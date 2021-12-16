@@ -13,7 +13,7 @@ import Search from '../../components/search';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
 import CreatePerson from './CreatePerson';
-import { filterPersonsBase } from '../../recoil/persons';
+import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, filterPersonsBase } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import PaginationContext from '../../contexts/pagination';
 import Filters from '../../components/Filters';
@@ -30,6 +30,8 @@ const List = () => {
   const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
   const personsFiltered = useRecoilValue(personsFullSearchSelector({ search, filterTeams, filters, alertness }));
   const teams = useRecoilValue(teamsState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
   const history = useHistory();
@@ -38,9 +40,11 @@ const List = () => {
     setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id]);
   }, [viewAllOrganisationData, currentTeam]);
 
-  // Add places in filters.
-  const filterPersons = [
+  // Add places and enabled custom fields in filters.
+  const filterPersonsWithAllFields = [
     ...filterPersonsBase,
+    ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+    ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
     {
       label: 'Lieux fréquentés',
       field: 'places',
@@ -107,7 +111,7 @@ const List = () => {
           </label>
         </Col>
       </Row>
-      <Filters base={filterPersons} filters={filters} onChange={setFilters} title="Autres filtres : " />
+      <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " />
       <Table
         data={data}
         rowKey={'_id'}
