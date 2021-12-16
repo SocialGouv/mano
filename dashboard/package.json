@@ -16,7 +16,7 @@
     "bootstrap": "^4.6.1",
     "dayjs": "^1.10.7",
     "fetch-retry": "^5.0.1",
-    "formik": "^2.2.6",
+    "formik": "^2.2.9",
     "libsodium": "^0.7.9",
     "libsodium-wrappers": "^0.7.9",
     "moment": "^2.29.1",
