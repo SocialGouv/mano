@@ -1,3 +1,10 @@
+# [1.39.0](https://github.com/SocialGouv/mano/compare/v1.38.1...v1.39.0) (2021-12-16)
+
+
+### Features
+
+* **dashboard:** delete orga for superadmin ([#203](https://github.com/SocialGouv/mano/issues/203)) ([8327791](https://github.com/SocialGouv/mano/commit/832779191e1ae63e83ff08646837b7238b28a7ff))
+
 ## [1.38.1](https://github.com/SocialGouv/mano/compare/v1.38.0...v1.38.1) (2021-12-16)
 
 
