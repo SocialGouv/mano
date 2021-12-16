@@ -1,3 +1,10 @@
+## [1.39.3](https://github.com/SocialGouv/mano/compare/v1.39.2...v1.39.3) (2021-12-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency formik to ^2.2.9 ([#211](https://github.com/SocialGouv/mano/issues/211)) ([f46152e](https://github.com/SocialGouv/mano/commit/f46152e716d726526e26cf28958ccf286f295955))
+
 ## [1.39.2](https://github.com/SocialGouv/mano/compare/v1.39.1...v1.39.2) (2021-12-16)
 
 
