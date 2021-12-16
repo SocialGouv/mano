@@ -1,3 +1,11 @@
+## [1.40.3](https://github.com/SocialGouv/mano/compare/v1.40.2...v1.40.3) (2021-12-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency react-native-config to ^1.4.5 ([#224](https://github.com/SocialGouv/mano/issues/224)) ([15102ee](https://github.com/SocialGouv/mano/commit/15102ee6e13eadca925b6de6071c40dfc1292d29))
+* **deps:** update dependency react-native-svg to ^12.1.1 ([#225](https://github.com/SocialGouv/mano/issues/225)) ([e08266a](https://github.com/SocialGouv/mano/commit/e08266a21522650796dc9902ff5163310556e821))
+
 ## [1.40.2](https://github.com/SocialGouv/mano/compare/v1.40.1...v1.40.2) (2021-12-16)
 
 
