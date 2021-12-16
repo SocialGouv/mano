@@ -60,7 +60,7 @@ const View = () => {
                 </Row>
                 <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
                   <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} width={200} />
-                  <DeleteOrganisation />
+                  <DeleteOrganisation organisation={organisation} onSuccess={() => API.logout()} />
                 </div>
                 <hr />
                 <Title>Encryption</Title>

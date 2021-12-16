@@ -11,33 +11,34 @@ import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
 import { generatePassword, toFrenchDate } from '../../utils';
 import useApi from '../../services/api';
+import DeleteOrganisation from '../../components/DeleteOrganisation';
 
 const List = () => {
-  const [organisations, setOrganisation] = useState(null);
+  const [organisations, setOrganisations] = useState(null);
   const [updateKey, setUpdateKey] = useState(null);
   const [sortBy, setSortBy] = useState('createdAt');
   const [sortOrder, setSortOrder] = useState('ASC');
-  const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(true);
   const API = useApi();
 
   useEffect(() => {
     (async () => {
+      if (!refresh) return;
       const { data } = await API.get({ path: '/organisation', query: { withCounters: true } });
       const sortedDataAscendant = data?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-      setOrganisation(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
+      setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
       setUpdateKey((k) => k + 1);
+      setRefresh(false);
     })();
   }, [refresh]);
 
   useEffect(() => {
     const sortedDataAscendant = organisations?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-    setOrganisation(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
+    setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
     setUpdateKey((k) => k + 1);
   }, [sortBy, sortOrder]);
 
   if (!organisations?.length) return <Loading />;
-
-  console.log(updateKey);
   return (
     <Container style={{ padding: '40px 0' }}>
       <Create onChange={() => setRefresh(true)} />
@@ -97,6 +98,22 @@ const List = () => {
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             render: (o) => toFrenchDate(o.encryptionLastUpdateAt || ''),
+          },
+          {
+            title: 'Action',
+            dataKey: 'delete',
+            render: (o) => {
+              return (
+                <DeleteOrganisation
+                  buttonTitle="Supprimer"
+                  onSuccess={() => {
+                    setRefresh(true);
+                  }}
+                  buttonStyle={{ margin: 'auto' }}
+                  organisation={o}
+                />
+              );
+            },
           },
         ]}
         rowKey={'_id'}
