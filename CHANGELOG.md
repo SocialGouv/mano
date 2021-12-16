@@ -1,3 +1,10 @@
+## [1.40.1](https://github.com/SocialGouv/mano/compare/v1.40.0...v1.40.1) (2021-12-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency helmet to ^3.23.3 ([#219](https://github.com/SocialGouv/mano/issues/219)) ([ad75b75](https://github.com/SocialGouv/mano/commit/ad75b75eb47f80601f441c48bbaba130476f3310))
+
 # [1.40.0](https://github.com/SocialGouv/mano/compare/v1.39.4...v1.40.0) (2021-12-16)
 
 
