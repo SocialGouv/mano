@@ -1,3 +1,10 @@
+## [1.40.2](https://github.com/SocialGouv/mano/compare/v1.40.1...v1.40.2) (2021-12-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency react-redux to ^7.2.6 ([#226](https://github.com/SocialGouv/mano/issues/226)) ([ef29390](https://github.com/SocialGouv/mano/commit/ef2939059ce1a5537e159c104079070d9b7f483d))
+
 ## [1.40.1](https://github.com/SocialGouv/mano/compare/v1.40.0...v1.40.1) (2021-12-16)
 
 
