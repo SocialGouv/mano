@@ -1,3 +1,11 @@
+## [1.39.1](https://github.com/SocialGouv/mano/compare/v1.39.0...v1.39.1) (2021-12-16)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @headlessui/react to ^1.4.2 ([#206](https://github.com/SocialGouv/mano/issues/206)) ([235b054](https://github.com/SocialGouv/mano/commit/235b0549822f235efcebd26f84f7226363dec5d2))
+* **deps:** update dependency bootstrap to ^4.6.1 ([#207](https://github.com/SocialGouv/mano/issues/207)) ([d465daf](https://github.com/SocialGouv/mano/commit/d465daf08726a9b31ae7f70129187f5b7f5df9b1))
+
 # [1.39.0](https://github.com/SocialGouv/mano/compare/v1.38.1...v1.39.0) (2021-12-16)
 
 
