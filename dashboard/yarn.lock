@@ -10182,7 +10182,7 @@ react-date-picker@^8.1.0:
     react-fit "^1.0.3"
     update-input-width "^1.1.1"
 
-react-datepicker@^3.6.0:
+react-datepicker@^3.8.0:
   version "3.8.0"
   resolved "https://registry.yarnpkg.com/react-datepicker/-/react-datepicker-3.8.0.tgz#c3bccd3e3f47aa66864a2fa75651be097414430b"
   integrity sha512-iFVNEp8DJoX5yEvEiciM7sJKmLGrvE70U38KhpG13XrulNSijeHw1RZkhd/0UmuXR71dcZB/kdfjiidifstZjw==
