@@ -339,7 +339,7 @@ const Territories = ({ search, onUpdateResults }) => {
           title={`Territoire${moreThanOne ? 's' : ''} (${data.length})`}
           noData="Pas de territoire"
           data={data}
-          onRowClick={(obs) => history.push(`/territory/${obs.territory._id}`)}
+          onRowClick={(territory) => history.push(`/territory/${territory._id}`)}
           rowKey="_id"
           columns={[
             { title: 'Nom', dataKey: 'name' },
