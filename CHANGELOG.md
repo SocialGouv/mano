@@ -1,3 +1,10 @@
+# [1.41.0](https://github.com/SocialGouv/mano/compare/v1.40.6...v1.41.0) (2021-12-17)
+
+
+### Features
+
+* **dashboard:** all fields in create action modal ([#247](https://github.com/SocialGouv/mano/issues/247)) ([18766ea](https://github.com/SocialGouv/mano/commit/18766ea596cfcab712fd6a8f8c45877225a0a2a1))
+
 ## [1.40.6](https://github.com/SocialGouv/mano/compare/v1.40.5...v1.40.6) (2021-12-17)
 
 
