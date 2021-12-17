@@ -15,14 +15,16 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { toFrenchDate } from '../../utils';
 import { DONE, TODO, useActions } from '../../recoil/actions';
 import SelectStatus from '../../components/SelectStatus';
-import { teamsState, userState } from '../../recoil/auth';
+import { organisationState, teamsState, userState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
+import SelectCustom from '../../components/SelectCustom';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
 
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
 
   const { addAction } = useActions();
   const { loading, actionsRefresher } = useRefresh();
@@ -39,6 +41,8 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
   const Wrapper = buttonOnly ? React.Fragment : CreateStyle;
 
   const wrapperProps = buttonOnly ? {} : { className: 'noprint' };
+
+  const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
 
   return (
     <Wrapper {...wrapperProps}>
@@ -66,6 +70,8 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
               dueAt: !!completedAt ? new Date(completedAt) : new Date(),
               withTime: false,
               status: !!completedAt ? DONE : TODO,
+              categories: [],
+              description: '',
             }}
             onSubmit={async (values, actions) => {
               if (!values.name) return toastr.error('Erreur!', 'Le nom est obligatoire');
@@ -79,6 +85,8 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                 dueAt: values.dueAt,
                 withTime: values.withTime,
                 status: values.status,
+                categories: values.categories,
+                description: values.description,
               };
               if (typeof values.person === 'string') {
                 body.person = values.person;
@@ -137,7 +145,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                     <Label>Statut</Label>
                     <SelectStatus name="status" value={values.status || ''} onChange={handleChange} />
                   </Col>
-                  <Col md={6}>
+                  <Col lg={3} md={6}>
                     <FormGroup>
                       <Label>Échéance</Label>
                       <div>
@@ -153,13 +161,34 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                       </div>
                     </FormGroup>
                   </Col>
-                  <Col md={6}>
+                  <Col lg={3} md={6}>
                     <FormGroup>
                       <Label>Afficher l'heure</Label>
                       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                         <span>Montrer l'heure</span>
                         <Input type="checkbox" name="withTime" checked={values.withTime} onChange={handleChange} />
                       </div>
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label>Catégories</Label>
+                      <SelectCustom
+                        options={catsSelect}
+                        name="categories"
+                        onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                        isClearable={false}
+                        isMulti
+                        value={values.categories}
+                        getOptionValue={(i) => i}
+                        getOptionLabel={(i) => i}
+                      />
+                    </FormGroup>
+                  </Col>
+                  <Col lg={12} md={6}>
+                    <FormGroup>
+                      <Label>Description</Label>
+                      <Input type="textarea" name="description" value={values.description} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                 </Row>
