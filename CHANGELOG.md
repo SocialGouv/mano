@@ -1,3 +1,12 @@
+## [1.40.4](https://github.com/SocialGouv/mano/compare/v1.40.3...v1.40.4) (2021-12-17)
+
+
+### Bug Fixes
+
+* **deps:** update dependency @socialgouv/kosko-charts to ^9.8.21 ([#232](https://github.com/SocialGouv/mano/issues/232)) ([e15a270](https://github.com/SocialGouv/mano/commit/e15a270cdb12db03c994011d0b2e8b2099b1ba61))
+* **deps:** update dependency react-select to ^4.3.1 ([#229](https://github.com/SocialGouv/mano/issues/229)) ([457c60c](https://github.com/SocialGouv/mano/commit/457c60ce808d1793cffc52e4584d2371a013344c))
+* **deps:** update dependency recoil to ^0.5.2 ([#230](https://github.com/SocialGouv/mano/issues/230)) ([9dc91e8](https://github.com/SocialGouv/mano/commit/9dc91e8084bd510677217a05b5900414119be737))
+
 ## [1.40.3](https://github.com/SocialGouv/mano/compare/v1.40.2...v1.40.3) (2021-12-16)
 
 
