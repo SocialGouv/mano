@@ -4,9 +4,9 @@
   "private": true,
   "dependencies": {
     "@babel/runtime": "^7.14.5",
-    "@nivo/bar": "^0.74.0",
-    "@nivo/core": "^0.74.0",
-    "@nivo/pie": "^0.74.0",
+    "@nivo/bar": "^0.75.0",
+    "@nivo/core": "^0.75.0",
+    "@nivo/pie": "^0.75.0",
     "@sentry/browser": "^6.2.3",
     "@sentry/react": "^6.7.2",
     "@sentry/tracing": "^6.7.2",
