@@ -1,3 +1,10 @@
+## [1.40.6](https://github.com/SocialGouv/mano/compare/v1.40.5...v1.40.6) (2021-12-17)
+
+
+### Bug Fixes
+
+* **deps:** update react monorepo ([#244](https://github.com/SocialGouv/mano/issues/244)) ([11aea86](https://github.com/SocialGouv/mano/commit/11aea8673e1beafb5ad6240bc1c1bb1d29f8c9f2))
+
 ## [1.40.5](https://github.com/SocialGouv/mano/compare/v1.40.4...v1.40.5) (2021-12-17)
 
 
