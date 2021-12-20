@@ -1,3 +1,10 @@
+## [1.41.1](https://github.com/SocialGouv/mano/compare/v1.41.0...v1.41.1) (2021-12-20)
+
+
+### Bug Fixes
+
+* **dashboard:** at least one team for user ([#252](https://github.com/SocialGouv/mano/issues/252)) ([bd7e205](https://github.com/SocialGouv/mano/commit/bd7e205f401e0ae515071a37b6526a413b600a7e))
+
 # [1.41.0](https://github.com/SocialGouv/mano/compare/v1.40.6...v1.41.0) (2021-12-17)
 
 
