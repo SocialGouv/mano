@@ -6,6 +6,7 @@ import environments from "@socialgouv/kosko-charts/environments";
 import { create } from "@socialgouv/kosko-charts/components/app";
 import { addInitContainerCommand } from "@socialgouv/kosko-charts/utils";
 import { Volume, VolumeMount } from "kubernetes-models/v1";
+import { loadFile } from "@kosko/yaml";
 
 const tag = process.env.GITHUB_SHA;
 
@@ -61,7 +62,17 @@ export default async () => {
         },
       },
     })
-  ).concat(isDev ? [] : [persistentVolumeClaim, persistentVolume]);
+  ).concat(
+    isDev
+      ? []
+      : [
+          persistentVolumeClaim,
+          persistentVolume,
+          ...(await loadFile(
+            `environments/${env.env}/azure-mano-volume.sealed-secret.yml`
+          )()),
+        ]
+  );
 
   const getDeployment = (manifests: any[]) =>
     manifests.find((manifest) => manifest.kind === "Deployment") as Deployment;
