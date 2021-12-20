@@ -99,6 +99,9 @@ spec:
               path: /healthz
               port: http
             periodSeconds: 5
+          volumeMounts:
+            - mountPath: /mnt/files
+              name: files
           envFrom:
             - secretRef:
                 name: azure-pg-user
@@ -106,6 +109,10 @@ spec:
                 name: api
       imagePullSecrets:
         - name: regcred
+      volumes:
+        - name: files
+          persistentVolumeClaim:
+            claimName: files
       initContainers:
         - env:
             - name: WAIT_FOR_RETRIES
@@ -230,6 +237,60 @@ spec:
     - hosts:
         - preprod-mano.dev42.fabrique.social.gouv.fr
       secretName: wildcard-crt
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: files
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  labels:
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  namespace: mano-186-preprod-dev2
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  selector:
+    matchLabels:
+      usage: preprod-dev42-files
+  storageClassName: ''
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    usage: preprod-dev42-files
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: preprod-dev42-files
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  namespace: mano-186-preprod-dev2
+spec:
+  accessModes:
+    - ReadWriteMany
+  azureFile:
+    secretName: azure-mano-volume
+    secretNamespace: mano-186-preprod-dev2
+    shareName: files
+  capacity:
+    storage: 5Gi
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: ''
 ---
 apiVersion: apps/v1
 kind: Deployment

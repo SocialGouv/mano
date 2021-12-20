@@ -75,6 +75,9 @@ spec:
               path: /healthz
               port: http
             periodSeconds: 5
+          volumeMounts:
+            - mountPath: /mnt/files
+              name: files
           envFrom:
             - secretRef:
                 name: azure-pg-user
@@ -82,6 +85,10 @@ spec:
                 name: api
       imagePullSecrets:
         - name: regcred
+      volumes:
+        - name: files
+          persistentVolumeClaim:
+            claimName: files
       initContainers:
         - env:
             - name: WAIT_FOR_RETRIES
@@ -202,6 +209,58 @@ spec:
     - hosts:
         - mano.fabrique.social.gouv.fr
       secretName: api-crt
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: files
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: prod
+    app.gitlab.com/env.name: prod
+  labels:
+    application: mano
+    component: mano
+    owner: mano
+    team: mano
+  namespace: mano
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 5Gi
+  selector:
+    matchLabels:
+      usage: prod-files
+  storageClassName: ''
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    usage: prod-files
+    application: mano
+    component: mano
+    owner: mano
+    team: mano
+  name: prod-files
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: prod
+    app.gitlab.com/env.name: prod
+  namespace: mano
+spec:
+  accessModes:
+    - ReadWriteMany
+  azureFile:
+    secretName: azure-mano-volume
+    secretNamespace: mano
+    shareName: files
+  capacity:
+    storage: 5Gi
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: ''
 ---
 apiVersion: apps/v1
 kind: Deployment

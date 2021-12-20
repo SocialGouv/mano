@@ -100,11 +100,17 @@ spec:
               path: /healthz
               port: http
             periodSeconds: 5
+          volumeMounts:
+            - mountPath: /mnt/files
+              name: files
           envFrom:
             - secretRef:
                 name: azure-pg-user-master
       imagePullSecrets:
         - name: regcred
+      volumes:
+        - name: files
+          emptyDir: {}
       initContainers:
         - env:
             - name: WAIT_FOR_RETRIES
