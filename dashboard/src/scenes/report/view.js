@@ -533,7 +533,7 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
             {
               title: 'Type',
               dataKey: 'type',
-              render: (comment) => <span>Personne suivie</span>,
+              render: () => <span>Personne suivie</span>,
             },
             {
               title: 'Nom',
@@ -541,7 +541,7 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
               render: (comment) => (
                 <>
                   <b></b>
-                  <b>{comment.person.name}</b>
+                  <b>{comment.person?.name || ''}</b>
                 </>
               ),
             },
