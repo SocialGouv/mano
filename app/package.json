@@ -7,11 +7,7 @@
     "android": "npm run get-ip && react-native run-android",
     "ios": "npm run get-ip && react-native run-ios",
     "start": "react-native start --reset-cache",
-    "test": "jest --watch",
     "lint": "eslint .",
-    "detox-build": "rm -rf ios/build && detox build --configuration ios",
-    "detox-test": "echo -p \"please npm run start NOWWW\" && detox test ./e2e --reuse --configuration ios",
-    "detox-build-and-test": "npm run detox-build && npm run detox-test",
     "android-clean-start": "npm run clean:android && react-native run-android",
     "postinstall": "pod install --project-directory=ios/ && npx jetify",
     "clean:android": "cd android && ./gradlew clean && cd ../ && adb uninstall com.mano",
@@ -76,18 +72,8 @@
     "@babel/core": "^7.12.9",
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^2.0.0",
-    "babel-jest": "^26.6.3",
-    "detox": "^18.18.0",
     "eslint": "7.32.0",
-    "jest": "^27.0.4",
     "metro-react-native-babel-preset": "^0.64.0",
-    "react-test-renderer": "17.0.2",
     "semver": "^7.3.5"
-  },
-  "jest": {
-    "preset": "react-native",
-    "forceCoverageMatch": [
-      "**/*.test.js"
-    ]
   }
 }
