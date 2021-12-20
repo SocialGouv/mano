@@ -53,6 +53,7 @@ const View = () => {
           initialValues={localUser}
           onSubmit={async (body, actions) => {
             try {
+              if (!body.team?.length) return toastr.error('Erreur !', 'Au moins une équipe est obligatoire');
               body.organisation = organisation._id;
               const res = await API.put({ path: `/user/${id}`, body });
               if (!res.ok) return actions.setSubmitting(false);
@@ -92,6 +93,7 @@ const View = () => {
                         organisation={organisation._id}
                         value={values.team || []}
                         colored
+                        required
                       />
                     </div>
                   </FormGroup>
