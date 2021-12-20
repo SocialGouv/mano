@@ -1,3 +1,10 @@
+## [1.41.2](https://github.com/SocialGouv/mano/compare/v1.41.1...v1.41.2) (2021-12-20)
+
+
+### Bug Fixes
+
+* **dashboard:** comment.person can be empty ([9feb344](https://github.com/SocialGouv/mano/commit/9feb344fccc16d6be1c551fc868800fe865352a0))
+
 ## [1.41.1](https://github.com/SocialGouv/mano/compare/v1.41.0...v1.41.1) (2021-12-20)
 
 
