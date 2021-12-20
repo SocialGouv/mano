@@ -229,7 +229,7 @@ spec:
     - ReadWriteMany
   resources:
     requests:
-      storage: 5Gi
+      storage: 20Gi
   selector:
     matchLabels:
       usage: prod-files
@@ -258,7 +258,7 @@ spec:
     secretNamespace: mano
     shareName: files
   capacity:
-    storage: 5Gi
+    storage: 20Gi
   persistentVolumeReclaimPolicy: Delete
   storageClassName: ''
 ---

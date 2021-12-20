@@ -16,7 +16,7 @@ export default async () => {
   const [persistentVolumeClaim, persistentVolume] = azureProjectVolume(
     "files",
     {
-      storage: "5Gi",
+      storage: "20Gi",
     }
   );
 
