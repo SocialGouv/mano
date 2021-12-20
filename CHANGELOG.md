@@ -1,3 +1,10 @@
+## [1.41.3](https://github.com/SocialGouv/mano/compare/v1.41.2...v1.41.3) (2021-12-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency next to v12 ([#264](https://github.com/SocialGouv/mano/issues/264)) ([521ae70](https://github.com/SocialGouv/mano/commit/521ae70183f64062d4bacbb6c817a744ddda9ec7))
+
 ## [1.41.2](https://github.com/SocialGouv/mano/compare/v1.41.1...v1.41.2) (2021-12-20)
 
 
