@@ -1,3 +1,10 @@
+## [1.41.8](https://github.com/SocialGouv/mano/compare/v1.41.7...v1.41.8) (2021-12-21)
+
+
+### Bug Fixes
+
+* bump release ([8361d04](https://github.com/SocialGouv/mano/commit/8361d04965b538e2f2ee9d9d9951edd22664c29e))
+
 ## [1.41.7](https://github.com/SocialGouv/mano/compare/v1.41.6...v1.41.7) (2021-12-21)
 
 
