@@ -99,6 +99,9 @@ spec:
               path: /healthz
               port: http
             periodSeconds: 5
+          volumeMounts:
+            - mountPath: /mnt/files
+              name: files
           envFrom:
             - secretRef:
                 name: azure-pg-user
@@ -106,6 +109,10 @@ spec:
                 name: api
       imagePullSecrets:
         - name: regcred
+      volumes:
+        - name: files
+          persistentVolumeClaim:
+            claimName: files
       initContainers:
         - env:
             - name: WAIT_FOR_RETRIES
@@ -230,6 +237,80 @@ spec:
     - hosts:
         - preprod-mano.dev42.fabrique.social.gouv.fr
       secretName: wildcard-crt
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: files
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  labels:
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  namespace: mano-186-preprod-dev2
+spec:
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 20Gi
+  selector:
+    matchLabels:
+      usage: preprod-dev42-files
+  storageClassName: ''
+---
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  labels:
+    usage: preprod-dev42-files
+    application: v1-2-3-mano
+    component: v1-2-3-mano
+    owner: mano
+    team: mano
+    cert: wildcard
+  name: preprod-dev42-files
+  annotations:
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: preprod-dev42
+    app.gitlab.com/env.name: preprod-dev42
+  namespace: mano-186-preprod-dev2
+spec:
+  accessModes:
+    - ReadWriteMany
+  azureFile:
+    secretName: azure-mano-volume
+    secretNamespace: mano-186-preprod-dev2
+    shareName: files
+  capacity:
+    storage: 20Gi
+  persistentVolumeReclaimPolicy: Delete
+  storageClassName: ''
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations:
+    sealedsecrets.bitnami.com/cluster-wide: 'true'
+  name: azure-mano-volume
+  namespace: mano-preprod
+spec:
+  encryptedData:
+    azurestorageaccountkey: >-
+      AgB2d/mx4rdJz5WJawGd/Dh02k8UjyfcQoyrTaUCH7Kcb9gFPl61BIVsABCtUJDYsFIPmBPNq8u7ihmdD1cvzDbJrbd+fF+83YpGvzHJzrguTiP47ZDT7y3IV1pTP3fXyWnOE4W/cmzNimz7NIiezf3iR3DLavpdG8mw97+66TTeTxnmA9LxWDrIJ8gkna0GnO7TBBlUl/oAyAmG493zfY9DkKot7A1H7efDxqacKxgQDhxG89q/LyWE5ldQp4dBHnD0N6uEsr7/qKtmHvNfSCgJxVQtlYE1nwcgHZ4LHgSHZjHSD5GWqScv/Ft1FmMqomFLFeNUyWbAxGVu4ZNrNrGXOHevPyJKHVGJq8UMfpRZET6ChOUiheIqA6gaHJ7wZ0NnNHq3bydopl3kn/2Q0WnYLE1MrbklJQzXEpNDsu34LlPfmE2+MEzEroPJBa61EDPKT+YsH1M2cceQXha7lqcxWKFtYTPL2JM/DjXd+TFTgL28lGz/frEEIpFnqXR3Y3gjwU4i+JvmeRUGVqLXWVCt4gYwH8H+WeUGF8wjibRdkKc2tm0enA2njoV2mtGvvjr9MEPiL510pJ82o2NYgFIGI/biYUmxde9QYwdaayCHWTdk5ETZZsjqohywxMxjDjZzJ8kS7FTh2y1lKGSJderI8a9AaQrzCmR32ul3v+rZD6nMek7lfZupNQe3+CQkms2OfTwoAub2CNFid81Yn4ula0WaRN/CSFRKhCXwCwTFPco0LkjKRdDGv2KNhEeoHnUAhPS3kMQFSNRh8qmJDWZCaoIAvUPWv4sVnO0rlNuAFuANb3P6Yraz
+    azurestorageaccountname: >-
+      AgAgS5HrIt+10H9XXlzFDirVh8duoKldmVVEpvOfgDzCmjQawcYDcc0sZByBpZPLzm6SegBm2IKSdFIniq4CQT8lKuMpy0NJGArow7OJffAWkTZfRZRwmIr0bpbPTVnRh3ylXaGDSnLCIUAUPXz3YBwey8UMB0hpNac5UVcw929mTFKuc2xiKwGd7W1KSBLnIUB5KR7wn0MVzk2Vy14JlDDVlk5+vu4e51FhGGzpQLeyV5yBVYijuRR90ApI428qvjJWNGol1QApc/KnvPkbPt9M1gYTXXzfYKB/c+Zok01I1Hdq7CWlvPyh3scY5Uk0/fSwHnzY3LMlsys4Ee7gl9Pn9k+SLz7b3xBfYFUcpkPxSGcN0haBHzO7mp/uAMUZd3PeRu7oExGESdtj4dX4gmz4f7/VhTxwZsjm6xNpMxIYdR+s+lqDIAFOQbvuxzCO8ISkkNtGILuBBS9W2Oh5OUtROVS+xRlyJCxZsUKJqlCCAVd1bxj/LXIcnQNEyfgq0Ic8fvB0tQmZNr3nJsvw4pUTsTRG832cc4FU0M9hKb4k/jTB5kr2TpT14to6QRzQu1u47j+D/1RTDFUmWfyLOU8sCfM5h/uj3eGMgFIkeahNbrpBvArIXUNS16R/LgT6QDBu4A3jo/FTGaTg/ldlfK1SEWeamhfQZJIxkN5fnDp2hu9io9FrNIosSXx6pMXa2tjl9oNpBe79nVDK
+  template:
+    metadata:
+      annotations:
+        sealedsecrets.bitnami.com/cluster-wide: 'true'
+      name: azure-mano-volume
+    type: Opaque
 ---
 apiVersion: apps/v1
 kind: Deployment
