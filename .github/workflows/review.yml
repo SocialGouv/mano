@@ -9,7 +9,7 @@ on:
 
 concurrency:
   cancel-in-progress: true
-  group: ${{ github.ref }}
+  group: review-${{ github.ref }}
 
 jobs:
 
@@ -27,46 +27,14 @@ jobs:
         run: |
           echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
-      - name: Create image labels and tags
-        id: docker_meta
-        uses: "crazy-max/ghaction-docker-meta@2e1a5c7fa42123697f82d479b551a1bbdb1bef88"
+      - name: Use autodevops build and register
+        uses: SocialGouv/actions/autodevops-build-register@v1
         with:
-          images: ghcr.io/socialgouv/${{ env.project }}/website
-          labels: |
-            org.opencontainers.image.title=website
-            org.opencontainers.image.documentation=https://github.com/SocialGouv/${{ env.project }}/tree/${{ github.sha }}
-          tags: |
-            type=sha
-            type=ref,event=pr
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=raw,value=sha-${{ github.sha }}
-            type=semver,pattern={{major}}.{{minor}}
-
-      - name: Set up Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@master
-        with:
-          install: true
-
-      - name: Registry authentication
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Image build and register
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: "true"
-          cache-from: "type=gha"
-          cache-to: "type=gha,mode=max"
-          file: website/Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          tags: "${{ steps.docker_meta.outputs.tags }}"
-          labels: "${{ steps.docker_meta.outputs.labels }}"
+          project: ${{ env.project }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          imageName: ${{ env.project }}/website
+          dockerfile: website/Dockerfile
+          dockercontext: .
 
   ##############################################################################
   ## BUILD AND REGISTER DASHBOARD IMAGE
@@ -82,46 +50,14 @@ jobs:
         run: |
           echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
-      - name: Create image labels and tags
-        id: docker_meta
-        uses: "crazy-max/ghaction-docker-meta@2e1a5c7fa42123697f82d479b551a1bbdb1bef88"
+      - name: Use autodevops build and register
+        uses: SocialGouv/actions/autodevops-build-register@v1
         with:
-          images: ghcr.io/socialgouv/${{ env.project }}/dashboard
-          labels: |
-            org.opencontainers.image.title=dashboard
-            org.opencontainers.image.documentation=https://github.com/SocialGouv/${{ env.project }}/tree/${{ github.sha }}
-          tags: |
-            type=sha
-            type=ref,event=pr
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=raw,value=sha-${{ github.sha }}
-            type=semver,pattern={{major}}.{{minor}}
-
-      - name: Set up Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@master
-        with:
-          install: true
-
-      - name: Registry authentication
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Image build and register
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: "true"
-          cache-from: "type=gha"
-          cache-to: "type=gha,mode=max"
-          file: dashboard/Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          tags: "${{ steps.docker_meta.outputs.tags }}"
-          labels: "${{ steps.docker_meta.outputs.labels }}"
+          project: ${{ env.project }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          imageName: ${{ env.project }}/dashboard
+          dockerfile: dashboard/Dockerfile
+          dockercontext: .
 
   ##############################################################################
   ## BUILD AND REGISTER API IMAGE
@@ -137,46 +73,14 @@ jobs:
         run: |
           echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
-      - name: Create image labels and tags
-        id: docker_meta
-        uses: "crazy-max/ghaction-docker-meta@2e1a5c7fa42123697f82d479b551a1bbdb1bef88"
+      - name: Use autodevops build and register
+        uses: SocialGouv/actions/autodevops-build-register@v1
         with:
-          images: ghcr.io/socialgouv/${{ env.project }}/api
-          labels: |
-            org.opencontainers.image.title=api
-            org.opencontainers.image.documentation=https://github.com/SocialGouv/${{ env.project }}/tree/${{ github.sha }}
-          tags: |
-            type=sha
-            type=ref,event=pr
-            type=ref,event=branch
-            type=semver,pattern={{version}}
-            type=raw,value=sha-${{ github.sha }}
-            type=semver,pattern={{major}}.{{minor}}
-
-      - name: Set up Buildx
-        id: buildx
-        uses: docker/setup-buildx-action@master
-        with:
-          install: true
-
-      - name: Registry authentication
-        uses: docker/login-action@v1
-        with:
-          registry: ghcr.io
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Image build and register
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: "true"
-          cache-from: "type=gha"
-          cache-to: "type=gha,mode=max"
-          file: api/Dockerfile
-          builder: ${{ steps.buildx.outputs.name }}
-          tags: "${{ steps.docker_meta.outputs.tags }}"
-          labels: "${{ steps.docker_meta.outputs.labels }}"
+          project: ${{ env.project }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          imageName: ${{ env.project }}/api
+          dockerfile: api/Dockerfile
+          dockercontext: .
 
   ##############################################################################
   ## GENERATE KUBERNETES MANIFESTS
@@ -293,3 +197,10 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           deployment_id: ${{ steps.deployment.outputs.deployment_id }}
           env_url: https://app-${{ env.namespace }}.${{ env.SOCIALGOUV_BASE_DOMAIN }}
+
+      - uses: socialgouv/actions/k8s-manifests-debug@v1
+        with:
+          path: manifests.yml
+          token: ${{ secrets.GITHUB_TOKEN }}
+        env:
+          RANCHER_PROJECT_ID: ${{ secrets.RANCHER_PROJECT_ID }} # optional
