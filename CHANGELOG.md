@@ -1,3 +1,10 @@
+## [1.41.9](https://github.com/SocialGouv/mano/compare/v1.41.8...v1.41.9) (2021-12-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency urijs to v1.19.7 [security] ([#274](https://github.com/SocialGouv/mano/issues/274)) ([72a3e85](https://github.com/SocialGouv/mano/commit/72a3e85c89ae33b83f1194fdbbfd556013b14974))
+
 ## [1.41.8](https://github.com/SocialGouv/mano/compare/v1.41.7...v1.41.8) (2021-12-21)
 
 
