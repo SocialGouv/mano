@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 
 const postgresqlUrl = `${process.env.PGBASEURL}/${process.env.PGDATABASE}`;
 
-export async function connectWith(email: string, password: string, orgEncryptionKey: string = '') {
+export async function connectWith(
+  email: string,
+  password: string,
+  orgEncryptionKey: string = ""
+) {
   await page.goto("http://localhost:8090/auth");
   // Ensure not already connected
   try {
@@ -153,7 +157,9 @@ export async function useEncryptedOrga() {
     [orgId, date]
   );
 
-  await client.query(`delete from mano."User" where name='Encrypted Orga Admin'`);
+  await client.query(
+    `delete from mano."User" where name='Encrypted Orga Admin'`
+  );
   await client.query(
     `INSERT INTO mano."User" (
       _id,
@@ -187,7 +193,9 @@ export async function useEncryptedOrga() {
     [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
   );
 
-  await client.query(`delete from mano."Team" where name='Encrypted Orga Team'`);
+  await client.query(
+    `delete from mano."Team" where name='Encrypted Orga Team'`
+  );
   await client.query(
     `INSERT INTO mano."Team" (
       _id,
@@ -225,3 +233,24 @@ export async function useEncryptedOrga() {
   await client.end();
 }
 
+export async function scrollDown() {
+  return page.evaluate(async (_) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        document?.querySelector(".main > div")?.scrollBy(0, 3000000);
+        resolve("ok");
+      }, 500);
+    });
+  });
+}
+
+export async function scrollTop() {
+  return page.evaluate(async (_) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        document?.querySelector(".main > div")?.scrollBy(0, -3000000);
+        resolve("ok");
+      }, 500);
+    });
+  });
+}
