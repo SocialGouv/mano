@@ -1,3 +1,10 @@
+## [1.41.5](https://github.com/SocialGouv/mano/compare/v1.41.4...v1.41.5) (2021-12-21)
+
+
+### Bug Fixes
+
+* **deps:** update dependency npm to v8 ([#269](https://github.com/SocialGouv/mano/issues/269)) ([11c532f](https://github.com/SocialGouv/mano/commit/11c532fc2178182f2bd1ad2e7088229e785da518))
+
 ## [1.41.4](https://github.com/SocialGouv/mano/compare/v1.41.3...v1.41.4) (2021-12-20)
 
 
