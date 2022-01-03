@@ -41,7 +41,7 @@ import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
 import { organisationState } from '../../recoil/auth';
 
-const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
+const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
 const View = () => {
   const { id } = useParams();
@@ -107,8 +107,44 @@ const View = () => {
         <TabPane tabId={4}>
           <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Lieux (${total})`)} />
         </TabPane>
+        <TabPane tabId={5}>
+          <Documents person={person} onUpdateResults={(total) => updateTabContent(5, `Documents (${total})`)} />
+        </TabPane>
       </TabContent>
     </StyledContainer>
+  );
+};
+
+const Documents = ({ person, onUpdateResults }) => {
+  const [documents, setDocuments] = useState([]);
+
+  useEffect(() => {
+    setDocuments(person.documents || []);
+  }, [person.documents]);
+
+  useEffect(() => {
+    onUpdateResults(documents.length);
+  }, [documents, onUpdateResults]);
+
+  return (
+    <>
+      <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
+        <Col>
+          <Title>Documents</Title>
+        </Col>
+      </Row>
+      <Table
+        data={documents}
+        rowKey={'_id'}
+        onRowClick={() => {}}
+        columns={[
+          { title: 'Nom', render: (document) => document.name },
+          { title: 'Ajouté le', dataKey: 'createdAt', render: (document) => toFrenchDate(document.createdAt) },
+          { title: 'Ajouté par', dataKey: 'createdBy', render: (document) => <UserName id={document.createdBy} /> },
+        ]}
+      />
+      <ButtonCustom onClick={() => {}} color="primary" title="Ajouter un document" padding="12px 24px" />
+    </>
   );
 };
 
