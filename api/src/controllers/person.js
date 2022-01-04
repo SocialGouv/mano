@@ -2,14 +2,45 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
-
+const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
+const crypto = require("crypto");
 const { catchErrors } = require("../errors");
-
 const Person = require("../models/person");
 const Team = require("../models/team");
 const RelPersonTeam = require("../models/relPersonTeam");
 const encryptedTransaction = require("../utils/encryptedTransaction");
-const { ENCRYPTED_FIELDS_ONLY } = require("../config");
+const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
+
+const upload = multer({
+  storage: multer.diskStorage({
+    destination: (req, file, cb) => {
+      const dir = STORAGE_DIRECTORY
+        ? path.join(STORAGE_DIRECTORY, "uploads", `${req.user.organisation}`)
+        : path.join(__dirname, "../../uploads", `${req.user.organisation}`);
+      if (!fs.existsSync(dir)) {
+        fs.mkdirSync(dir, { recursive: true });
+      }
+      cb(null, dir);
+    },
+    filename: (req, file, cb) => {
+      return cb(null, crypto.randomBytes(30).toString("hex"));
+    },
+  }),
+});
+
+router.post(
+  "/:id/document",
+  passport.authenticate("user", { session: false }),
+  upload.single("file"),
+  catchErrors(async (req, res) => {
+    const { id } = req.params;
+    const { file } = req;
+    console.log(file, id);
+    res.send({ ok: true });
+  })
+);
 
 router.post(
   "/import",

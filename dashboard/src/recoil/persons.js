@@ -113,6 +113,25 @@ export const usePersons = () => {
       return { ok: false, error: error.message };
     }
   };
+  const uploadDocument = async (file, person) => {
+    try {
+      const response = await API.upload({
+        path: `/person/${person._id}/document`,
+        file: file,
+      });
+      if (response.ok) {
+        /*
+        setPersons((persons) =>
+          persons.map((p) => (p._id === person._id ? { ...p, documents: [...p.documents, response.decryptedData] } : p))
+        );
+        */
+      }
+      return response;
+    } catch (error) {
+      capture('error in uploading document: ' + error, { extra: { error, document } });
+      return { ok: false, error: error.message };
+    }
+  };
   const updatePerson = async (person) => {
     try {
       const oldPerson = persons.find((a) => a._id === person._id);
@@ -171,6 +190,7 @@ export const usePersons = () => {
     deletePerson,
     addPerson,
     updatePerson,
+    uploadDocument,
   };
 };
 
@@ -418,6 +438,7 @@ export const personFields = [
     importable: false,
     options: outOfActiveListReasonOptions,
   },
+  { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);

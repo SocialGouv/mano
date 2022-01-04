@@ -112,6 +112,19 @@ const encrypt = async (content, entityKey, masterKey) => {
   };
 };
 
+// Encrypt a file with the master key + entity key, and return the encrypted file and the entity key
+const encryptFile = async (file, masterKey) => {
+  const fileContent = new Uint8Array(await file.arrayBuffer());
+  const entityKey = await generateEntityKey();
+  const encryptedContent = await _encrypt_and_prepend_nonce(fileContent, entityKey);
+  const encryptedEntityKey = await _encrypt_and_prepend_nonce(file.name, masterKey);
+  const encryptedFile = new File([window.atob(encryptedContent)], file.name, { type: file.type });
+  return {
+    encryptedEntityKey,
+    encryptedFile,
+  };
+};
+
 const verificationPassphrase = 'Surprise !';
 const encryptVerificationKey = async (masterKey) => {
   const encryptedVerificationKey = await _encrypt_and_prepend_nonce(encodeContent(verificationPassphrase), masterKey);
@@ -131,4 +144,4 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   return false;
 };
 
-export { derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey };
+export { encryptFile, derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey };

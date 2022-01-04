@@ -6,7 +6,7 @@ import fetchRetry from 'fetch-retry';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
 const fetch = fetchRetry(window.fetch);
 
@@ -166,6 +166,36 @@ const useApi = () => {
     }
   };
 
+  const upload = async ({ file, path }) => {
+    console.log('eee');
+    const { encryptedEntityKey, encryptedFile } = await encryptFile(file, hashedOrgEncryptionKey);
+    console.log('dede');
+    const formData = new FormData();
+    console.log('poum');
+    formData.append('file', encryptedFile);
+
+    console.log('i');
+    const options = {
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'include',
+      body: formData,
+      headers: {
+        Authorization: `JWT ${tokenCached}`,
+        // 'Content-Type': 'application/json',
+        Accept: 'application/json',
+        platform: 'dashboard',
+        version,
+      },
+    };
+    console.log('r');
+    const url = getUrl(path, {});
+    console.log('darar');
+    const response = await fetch(url, options);
+    console.log('brigadoun');
+    return { ...response.json(), encryptedEntityKey };
+  };
+
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
     try {
       if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
@@ -281,6 +311,7 @@ const useApi = () => {
     logout,
     post,
     put,
+    upload,
     delete: (args) => execute({ method: 'DELETE', ...args }), // delete cannot be a method
   };
 };
