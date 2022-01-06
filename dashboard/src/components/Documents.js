@@ -17,8 +17,8 @@ const Documents = ({ person, onUpdateResults }) => {
   const user = useRecoilValue(userState);
 
   useEffect(() => {
-    if (!!onUpdateResults) onUpdateResults(person.documents.length);
-  }, [person.documents.length]);
+    if (!!onUpdateResults) onUpdateResults(person.documents?.length || 0);
+  }, [person.documents?.length]);
 
   return (
     <>
