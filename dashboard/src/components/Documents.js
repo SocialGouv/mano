@@ -48,7 +48,7 @@ const Documents = ({ person, onUpdateResults }) => {
                 name="file"
                 hidden
                 onChange={async (e) => {
-                  const { data: file } = await uploadDocument(e.target.files[0], person);
+                  const { data: file, encryptedEntityKey } = await uploadDocument(e.target.files[0], person);
                   console.log('fillll', file);
                   await updatePerson({
                     ...person,
@@ -57,6 +57,7 @@ const Documents = ({ person, onUpdateResults }) => {
                       {
                         name: e.target.files[0].name,
                         file,
+                        encryptedEntityKey,
                         createdAt: new Date(),
                         createdBy: user._id,
                       },
@@ -101,8 +102,9 @@ const Documents = ({ person, onUpdateResults }) => {
                     style={{ margin: 'auto' }}
                     onClick={async () => {
                       console.log(document);
-                      const doc = await downloadDocument(person, document.file.filename);
+                      const doc = await downloadDocument(person, document);
                       console.log(doc);
+
                       download(doc, document.name);
                     }}
                   />

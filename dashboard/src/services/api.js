@@ -6,7 +6,7 @@ import fetchRetry from 'fetch-retry';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
 const fetch = fetchRetry(window.fetch);
 
@@ -189,7 +189,7 @@ const useApi = () => {
     return { ...json, encryptedEntityKey };
   };
 
-  const download = async ({ path }) => {
+  const download = async ({ path, encryptedEntityKey }) => {
     const options = {
       method: 'GET',
       mode: 'cors',
@@ -206,7 +206,10 @@ const useApi = () => {
     console.log('response', response);
     const blob = await response.blob();
     console.log('blob', blob);
-    return blob;
+    console.log({ blob, encryptedEntityKey, hashedOrgEncryptionKey });
+    const decrypted = await decryptFile(blob, encryptedEntityKey, hashedOrgEncryptionKey);
+    console.log('decrypted', decrypted);
+    return decrypted;
   };
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {

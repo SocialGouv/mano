@@ -126,10 +126,11 @@ export const usePersons = () => {
       return { ok: false, error: error.message };
     }
   };
-  const downloadDocument = async (person, filename) => {
+  const downloadDocument = async (person, document) => {
     try {
       const file = await API.download({
-        path: `/person/${person._id}/document/${filename}`,
+        path: `/person/${person._id}/document/${document.file.filename}`,
+        encryptedEntityKey: document.encryptedEntityKey,
       });
       return file;
     } catch (error) {

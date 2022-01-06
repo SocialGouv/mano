@@ -52,6 +52,19 @@ const _decrypt_after_extracting_nonce = async (nonce_and_ciphertext_b64, key_uin
   return sodium.crypto_secretbox_open_easy(ciphertext_uint8array, nonce_uint8array, key_uint8array);
 };
 
+const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8array, key_uint8array) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+
+  if (nonce_and_cypher_uint8array.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
+    throw new Error('Short message');
+  }
+
+  const nonce_uint8array = nonce_and_cypher_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
+  const ciphertext_uint8array = nonce_and_cypher_uint8array.slice(sodium.crypto_secretbox_NONCEBYTES);
+  return sodium.crypto_secretbox_open_easy(ciphertext_uint8array, nonce_uint8array, key_uint8array);
+};
+
 const decrypt = async (encryptedContent, encryptedEntityKey, masterKey) => {
   try {
     const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
@@ -89,6 +102,16 @@ const _encrypt_and_prepend_nonce = async (message_string_or_uint8array, key_uint
   return sodium.to_base64(arrayBites, sodium.base64_variants.ORIGINAL);
 };
 
+const _encrypt_and_prepend_nonce_uint8array = async (message_string_or_uint8array, key_uint8array) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+
+  let nonce_uint8array = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  const crypto_secretbox_easy_uint8array = sodium.crypto_secretbox_easy(message_string_or_uint8array, nonce_uint8array, key_uint8array);
+  const arrayBites = _appendBuffer(nonce_uint8array, crypto_secretbox_easy_uint8array);
+  return arrayBites;
+};
+
 const encodeContent = (content) => {
   try {
     const purifiedContent = content
@@ -116,9 +139,11 @@ const encrypt = async (content, entityKey, masterKey) => {
 const encryptFile = async (file, masterKey) => {
   const fileContent = new Uint8Array(await file.arrayBuffer());
   const entityKey = await generateEntityKey();
-  const encryptedContent = await _encrypt_and_prepend_nonce(fileContent, entityKey);
-  const encryptedEntityKey = await _encrypt_and_prepend_nonce(file.name, masterKey);
-  const encryptedFile = new File([window.atob(encryptedContent)], file.name, { type: file.type });
+  const encryptedContent = await _encrypt_and_prepend_nonce_uint8array(fileContent, entityKey);
+  // const encryptedEntityKey = await _encrypt_and_prepend_nonce(file.name, masterKey);
+  // const encryptedFile = new File([window.atob(encryptedContent)], file.name, { type: file.type });
+  const encryptedEntityKey = await _encrypt_and_prepend_nonce(entityKey, masterKey);
+  const encryptedFile = new File([encryptedContent], file.name, { type: file.type });
   return {
     encryptedEntityKey,
     encryptedFile,
@@ -126,10 +151,15 @@ const encryptFile = async (file, masterKey) => {
 };
 
 const decryptFile = async (file, encryptedEntityKey, masterKey) => {
+  console.log('1 ---', file, encryptedEntityKey, masterKey);
   const fileContent = new Uint8Array(await file.arrayBuffer());
+  console.log('2 ---', fileContent);
   const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
-  const content_uint8array = await _decrypt_after_extracting_nonce(fileContent, entityKey_bytes_array);
-  const decryptedFile = new File([window.atob(content_uint8array)], file.name, { type: file.type });
+  console.log('3 ---', entityKey_bytes_array);
+  const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(fileContent, entityKey_bytes_array);
+  console.log('4 ---', content_uint8array);
+  const decryptedFile = new File([content_uint8array], file.name, { type: file.type });
+  console.log('5 ---', decryptedFile);
   return decryptedFile;
 };
 
