@@ -136,12 +136,11 @@ const encrypt = async (content, entityKey, masterKey) => {
 };
 
 // Encrypt a file with the master key + entity key, and return the encrypted file and the entity key
+// (file: File, masterKey: Uint8Array) => Promise<{encryptedFile: File, encryptedEntityKey: Uint8Array}>
 const encryptFile = async (file, masterKey) => {
   const fileContent = new Uint8Array(await file.arrayBuffer());
   const entityKey = await generateEntityKey();
   const encryptedContent = await _encrypt_and_prepend_nonce_uint8array(fileContent, entityKey);
-  // const encryptedEntityKey = await _encrypt_and_prepend_nonce(file.name, masterKey);
-  // const encryptedFile = new File([window.atob(encryptedContent)], file.name, { type: file.type });
   const encryptedEntityKey = await _encrypt_and_prepend_nonce(entityKey, masterKey);
   const encryptedFile = new File([encryptedContent], file.name, { type: file.type });
   return {
@@ -150,16 +149,13 @@ const encryptFile = async (file, masterKey) => {
   };
 };
 
+// Decrypt a file with the master key + entity key, and return the decrypted file
+// (file: File, masterKey: Uint8Array, entityKey: Uint8Array) => Promise<File>
 const decryptFile = async (file, encryptedEntityKey, masterKey) => {
-  console.log('1 ---', file, encryptedEntityKey, masterKey);
   const fileContent = new Uint8Array(await file.arrayBuffer());
-  console.log('2 ---', fileContent);
   const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
-  console.log('3 ---', entityKey_bytes_array);
   const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(fileContent, entityKey_bytes_array);
-  console.log('4 ---', content_uint8array);
   const decryptedFile = new File([content_uint8array], file.name, { type: file.type });
-  console.log('5 ---', decryptedFile);
   return decryptedFile;
 };
 

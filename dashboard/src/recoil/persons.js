@@ -119,7 +119,6 @@ export const usePersons = () => {
         path: `/person/${person._id}/document`,
         file: file,
       });
-      console.log(response);
       return response;
     } catch (error) {
       capture('error in uploading document: ' + error, { extra: { error, document } });
