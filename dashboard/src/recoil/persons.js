@@ -119,16 +119,21 @@ export const usePersons = () => {
         path: `/person/${person._id}/document`,
         file: file,
       });
-      if (response.ok) {
-        /*
-        setPersons((persons) =>
-          persons.map((p) => (p._id === person._id ? { ...p, documents: [...p.documents, response.decryptedData] } : p))
-        );
-        */
-      }
+      console.log(response);
       return response;
     } catch (error) {
       capture('error in uploading document: ' + error, { extra: { error, document } });
+      return { ok: false, error: error.message };
+    }
+  };
+  const downloadDocument = async (person, filename) => {
+    try {
+      const file = await API.download({
+        path: `/person/${person._id}/document/${filename}`,
+      });
+      return file;
+    } catch (error) {
+      capture('error in downloading document: ' + error, { extra: { error, document } });
       return { ok: false, error: error.message };
     }
   };
@@ -191,6 +196,7 @@ export const usePersons = () => {
     addPerson,
     updatePerson,
     uploadDocument,
+    downloadDocument,
   };
 };
 

@@ -125,6 +125,14 @@ const encryptFile = async (file, masterKey) => {
   };
 };
 
+const decryptFile = async (file, encryptedEntityKey, masterKey) => {
+  const fileContent = new Uint8Array(await file.arrayBuffer());
+  const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
+  const content_uint8array = await _decrypt_after_extracting_nonce(fileContent, entityKey_bytes_array);
+  const decryptedFile = new File([window.atob(content_uint8array)], file.name, { type: file.type });
+  return decryptedFile;
+};
+
 const verificationPassphrase = 'Surprise !';
 const encryptVerificationKey = async (masterKey) => {
   const encryptedVerificationKey = await _encrypt_and_prepend_nonce(encodeContent(verificationPassphrase), masterKey);
@@ -144,4 +152,4 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   return false;
 };
 
-export { encryptFile, derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey };
+export { encryptFile, decryptFile, derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey };

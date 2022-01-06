@@ -167,14 +167,10 @@ const useApi = () => {
   };
 
   const upload = async ({ file, path }) => {
-    console.log('eee');
     const { encryptedEntityKey, encryptedFile } = await encryptFile(file, hashedOrgEncryptionKey);
-    console.log('dede');
     const formData = new FormData();
-    console.log('poum');
     formData.append('file', encryptedFile);
 
-    console.log('i');
     const options = {
       method: 'POST',
       mode: 'cors',
@@ -182,18 +178,35 @@ const useApi = () => {
       body: formData,
       headers: {
         Authorization: `JWT ${tokenCached}`,
-        // 'Content-Type': 'application/json',
         Accept: 'application/json',
         platform: 'dashboard',
         version,
       },
     };
-    console.log('r');
     const url = getUrl(path, {});
-    console.log('darar');
     const response = await fetch(url, options);
-    console.log('brigadoun');
-    return { ...response.json(), encryptedEntityKey };
+    const json = await response.json();
+    return { ...json, encryptedEntityKey };
+  };
+
+  const download = async ({ path }) => {
+    const options = {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include',
+      headers: {
+        Authorization: `JWT ${tokenCached}`,
+        'Content-Type': 'application/json',
+        platform: 'dashboard',
+        version,
+      },
+    };
+    const url = getUrl(path, {});
+    const response = await fetch(url, options);
+    console.log('response', response);
+    const blob = await response.blob();
+    console.log('blob', blob);
+    return blob;
   };
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
@@ -312,6 +325,7 @@ const useApi = () => {
     post,
     put,
     upload,
+    download,
     delete: (args) => execute({ method: 'DELETE', ...args }), // delete cannot be a method
   };
 };

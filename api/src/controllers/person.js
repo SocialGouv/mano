@@ -13,32 +13,51 @@ const RelPersonTeam = require("../models/relPersonTeam");
 const encryptedTransaction = require("../utils/encryptedTransaction");
 const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
 
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req, file, cb) => {
-      const dir = STORAGE_DIRECTORY
-        ? path.join(STORAGE_DIRECTORY, "uploads", `${req.user.organisation}`)
-        : path.join(__dirname, "../../uploads", `${req.user.organisation}`);
-      if (!fs.existsSync(dir)) {
-        fs.mkdirSync(dir, { recursive: true });
-      }
-      cb(null, dir);
-    },
-    filename: (req, file, cb) => {
-      return cb(null, crypto.randomBytes(30).toString("hex"));
-    },
-  }),
-});
-
 router.post(
   "/:id/document",
   passport.authenticate("user", { session: false }),
-  upload.single("file"),
+  multer({
+    storage: multer.diskStorage({
+      destination: (req, file, cb) => {
+        const basedir = STORAGE_DIRECTORY ? path.join(STORAGE_DIRECTORY, "uploads") : path.join(__dirname, "../../uploads");
+        const dir = path.join(basedir, `${req.user.organisation}`, "persons", `${req.params.id}`);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
+      },
+      filename: (req, file, cb) => {
+        return cb(null, crypto.randomBytes(30).toString("hex"));
+      },
+    }),
+  }).single("file"),
   catchErrors(async (req, res) => {
-    const { id } = req.params;
     const { file } = req;
-    console.log(file, id);
-    res.send({ ok: true });
+    res.send({
+      ok: true,
+      data: {
+        originalname: file.originalname,
+        filename: file.filename,
+        size: file.size,
+        encoding: file.encoding,
+        mimetype: file.mimetype,
+      },
+    });
+  })
+);
+
+router.get(
+  "/:id/document/:filename",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res) => {
+    const basedir = STORAGE_DIRECTORY ? path.join(STORAGE_DIRECTORY, "uploads") : path.join(__dirname, "../../uploads");
+    const dir = path.join(basedir, `${req.user.organisation}`, "persons", `${req.params.id}`);
+    const file = path.join(dir, req.params.filename);
+    if (!fs.existsSync(file)) {
+      res.status(404).send({ ok: false, message: "File not found" });
+    } else {
+      res.sendFile(file);
+    }
   })
 );
 
