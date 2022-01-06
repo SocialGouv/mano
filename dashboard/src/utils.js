@@ -96,7 +96,23 @@ const typeOptions = [
   { value: 'boolean', label: 'Case à cocher', validator: validateBoolean },
 ];
 
+// Download a file in browser.
+function download(file, fileName) {
+  if (window.navigator.msSaveOrOpenBlob) {
+    //IE11 & Edge
+    window.navigator.msSaveOrOpenBlob(file, fileName);
+  } else {
+    //Other browsers
+    const a = document.createElement('a');
+    document.body.appendChild(a);
+    a.href = URL.createObjectURL(file);
+    a.download = fileName;
+    a.click();
+  }
+}
+
 export {
+  download,
   toFrenchDate,
   generatePassword,
   typeOptions,

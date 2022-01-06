@@ -166,7 +166,9 @@ const useApi = () => {
     }
   };
 
+  // Upload a file to a path.
   const upload = async ({ file, path }) => {
+    // Prepare file.
     const { encryptedEntityKey, encryptedFile } = await encryptFile(file, hashedOrgEncryptionKey);
     const formData = new FormData();
     formData.append('file', encryptedFile);
@@ -176,12 +178,7 @@ const useApi = () => {
       mode: 'cors',
       credentials: 'include',
       body: formData,
-      headers: {
-        Authorization: `JWT ${tokenCached}`,
-        Accept: 'application/json',
-        platform: 'dashboard',
-        version,
-      },
+      headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path, {});
     const response = await fetch(url, options);
@@ -189,27 +186,31 @@ const useApi = () => {
     return { ...json, encryptedEntityKey };
   };
 
+  // Download a file from a path.
   const download = async ({ path, encryptedEntityKey }) => {
     const options = {
       method: 'GET',
       mode: 'cors',
       credentials: 'include',
-      headers: {
-        Authorization: `JWT ${tokenCached}`,
-        'Content-Type': 'application/json',
-        platform: 'dashboard',
-        version,
-      },
+      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path, {});
     const response = await fetch(url, options);
-    console.log('response', response);
     const blob = await response.blob();
-    console.log('blob', blob);
-    console.log({ blob, encryptedEntityKey, hashedOrgEncryptionKey });
     const decrypted = await decryptFile(blob, encryptedEntityKey, hashedOrgEncryptionKey);
-    console.log('decrypted', decrypted);
     return decrypted;
+  };
+
+  const deleteFile = async ({ path }) => {
+    const options = {
+      method: 'DELETE',
+      mode: 'cors',
+      credentials: 'include',
+      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+    };
+    const url = getUrl(path, {});
+    const response = await fetch(url, options);
+    return await response.json();
   };
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
@@ -329,6 +330,7 @@ const useApi = () => {
     put,
     upload,
     download,
+    deleteFile,
     delete: (args) => execute({ method: 'DELETE', ...args }), // delete cannot be a method
   };
 };

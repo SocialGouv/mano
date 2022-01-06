@@ -138,6 +138,17 @@ export const usePersons = () => {
       return { ok: false, error: error.message };
     }
   };
+  const deleteDocument = async (person, document) => {
+    try {
+      const response = await API.delete({
+        path: `/person/${person._id}/document/${document.file.filename}`,
+      });
+      return response;
+    } catch (error) {
+      capture('error in deleting document: ' + error, { extra: { error, document } });
+      return { ok: false, error: error.message };
+    }
+  };
   const updatePerson = async (person) => {
     try {
       const oldPerson = persons.find((a) => a._id === person._id);
@@ -198,6 +209,7 @@ export const usePersons = () => {
     updatePerson,
     uploadDocument,
     downloadDocument,
+    deleteDocument,
   };
 };
 
