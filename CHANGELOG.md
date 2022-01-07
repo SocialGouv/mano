@@ -1,3 +1,10 @@
+## [1.42.1](https://github.com/SocialGouv/mano/compare/v1.42.0...v1.42.1) (2022-01-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency react-datepicker to v4 ([#271](https://github.com/SocialGouv/mano/issues/271)) ([2e70b96](https://github.com/SocialGouv/mano/commit/2e70b96c8262a292a8ae4a396f51331bf8b4d4d4))
+
 # [1.42.0](https://github.com/SocialGouv/mano/compare/v1.41.9...v1.42.0) (2022-01-07)
 
 
