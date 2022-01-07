@@ -107,6 +107,9 @@ spec:
                 name: azure-pg-user
             - secretRef:
                 name: api
+          env:
+            - name: STORAGE_DIRECTORY
+              value: /mnt/files
       imagePullSecrets:
         - name: regcred
       volumes:

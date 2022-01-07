@@ -4,7 +4,10 @@ import { Deployment } from "kubernetes-models/apps/v1/Deployment";
 import { azureProjectVolume } from "@socialgouv/kosko-charts/components/azure-storage/azureProjectVolume";
 import environments from "@socialgouv/kosko-charts/environments";
 import { create } from "@socialgouv/kosko-charts/components/app";
-import { addInitContainerCommand } from "@socialgouv/kosko-charts/utils";
+import {
+  addEnvs,
+  addInitContainerCommand,
+} from "@socialgouv/kosko-charts/utils";
 import { Volume, VolumeMount } from "kubernetes-models/v1";
 import { loadFile } from "@kosko/yaml";
 
@@ -77,10 +80,18 @@ export default async () => {
   const getDeployment = (manifests: any[]) =>
     manifests.find((manifest) => manifest.kind === "Deployment") as Deployment;
 
+  const deployment = getDeployment(manifests);
+  ok(deployment);
+
+  addEnvs({
+    deployment,
+    data: {
+      STORAGE_DIRECTORY: "/mnt/files",
+    },
+  });
+
   // create an initContainer to init DB, only in dev (destructive)
   if (env.env === "dev") {
-    const deployment = getDeployment(manifests);
-    ok(deployment);
     const ciEnv = environments(process.env);
 
     addInitContainerCommand(deployment, {
