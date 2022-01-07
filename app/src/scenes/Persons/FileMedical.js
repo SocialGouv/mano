@@ -51,6 +51,7 @@ class FileMedical extends React.Component {
                 const { label, name } = field;
                 return (
                   <CustomFieldInput
+                    key={name}
                     label={label}
                     field={field}
                     value={this.props[name]}
