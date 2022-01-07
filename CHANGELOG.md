@@ -1,3 +1,10 @@
+# [1.42.0](https://github.com/SocialGouv/mano/compare/v1.41.9...v1.42.0) (2022-01-07)
+
+
+### Features
+
+* **dashboard:** upload docs ([#276](https://github.com/SocialGouv/mano/issues/276)) ([9f5d7b7](https://github.com/SocialGouv/mano/commit/9f5d7b7dd1e8d8202fdfeea793d8ea2a5606352f))
+
 ## [1.41.9](https://github.com/SocialGouv/mano/compare/v1.41.8...v1.41.9) (2021-12-21)
 
 
