@@ -18,6 +18,7 @@ const WEBSITE_URL = ENVIRONMENT === "development" ? "http://localhost:3000" : "h
 const WEBSITE_PREPROD_URL = ENVIRONMENT === "development" ? "http://localhost:3000" : "https://app-preprod-mano.dev.fabrique.social.gouv.fr/";
 const DASHBBOARD_DOMAIN = `/\.fabrique\.social\.gouv\.fr$/`;
 const DASHBBOARD_PREPROD_DOMAIN = `/\.dev\.fabrique\.social\.gouv\.fr$/`;
+const STORAGE_DIRECTORY = process.env.STORAGE_DIRECTORY;
 
 const X_TIPIMAIL_APIUSER = process.env.X_TIPIMAIL_APIUSER || "";
 const X_TIPIMAIL_APIKEY = process.env.X_TIPIMAIL_APIKEY || "";
@@ -43,4 +44,5 @@ module.exports = {
   ENCRYPTED_FIELDS_ONLY,
   X_TIPIMAIL_APIUSER,
   X_TIPIMAIL_APIKEY,
+  STORAGE_DIRECTORY,
 };

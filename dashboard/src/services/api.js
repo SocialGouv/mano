@@ -6,7 +6,7 @@ import fetchRetry from 'fetch-retry';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
 const fetch = fetchRetry(window.fetch);
 
@@ -166,6 +166,53 @@ const useApi = () => {
     }
   };
 
+  // Upload a file to a path.
+  const upload = async ({ file, path }) => {
+    // Prepare file.
+    const { encryptedEntityKey, encryptedFile } = await encryptFile(file, hashedOrgEncryptionKey);
+    const formData = new FormData();
+    formData.append('file', encryptedFile);
+
+    const options = {
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'include',
+      body: formData,
+      headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version },
+    };
+    const url = getUrl(path, {});
+    const response = await fetch(url, options);
+    const json = await response.json();
+    return { ...json, encryptedEntityKey };
+  };
+
+  // Download a file from a path.
+  const download = async ({ path, encryptedEntityKey }) => {
+    const options = {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include',
+      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+    };
+    const url = getUrl(path, {});
+    const response = await fetch(url, options);
+    const blob = await response.blob();
+    const decrypted = await decryptFile(blob, encryptedEntityKey, hashedOrgEncryptionKey);
+    return decrypted;
+  };
+
+  const deleteFile = async ({ path }) => {
+    const options = {
+      method: 'DELETE',
+      mode: 'cors',
+      credentials: 'include',
+      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+    };
+    const url = getUrl(path, {});
+    const response = await fetch(url, options);
+    return await response.json();
+  };
+
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
     try {
       if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
@@ -281,6 +328,9 @@ const useApi = () => {
     logout,
     post,
     put,
+    upload,
+    download,
+    deleteFile,
     delete: (args) => execute({ method: 'DELETE', ...args }), // delete cannot be a method
   };
 };

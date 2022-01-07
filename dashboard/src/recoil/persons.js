@@ -113,6 +113,41 @@ export const usePersons = () => {
       return { ok: false, error: error.message };
     }
   };
+  const uploadDocument = async (file, person) => {
+    try {
+      const response = await API.upload({
+        path: `/person/${person._id}/document`,
+        file: file,
+      });
+      return response;
+    } catch (error) {
+      capture('error in uploading document: ' + error, { extra: { error, document } });
+      return { ok: false, error: error.message };
+    }
+  };
+  const downloadDocument = async (person, document) => {
+    try {
+      const file = await API.download({
+        path: `/person/${person._id}/document/${document.file.filename}`,
+        encryptedEntityKey: document.encryptedEntityKey,
+      });
+      return file;
+    } catch (error) {
+      capture('error in downloading document: ' + error, { extra: { error, document } });
+      return { ok: false, error: error.message };
+    }
+  };
+  const deleteDocument = async (person, document) => {
+    try {
+      const response = await API.delete({
+        path: `/person/${person._id}/document/${document.file.filename}`,
+      });
+      return response;
+    } catch (error) {
+      capture('error in deleting document: ' + error, { extra: { error, document } });
+      return { ok: false, error: error.message };
+    }
+  };
   const updatePerson = async (person) => {
     try {
       const oldPerson = persons.find((a) => a._id === person._id);
@@ -171,6 +206,9 @@ export const usePersons = () => {
     deletePerson,
     addPerson,
     updatePerson,
+    uploadDocument,
+    downloadDocument,
+    deleteDocument,
   };
 };
 
@@ -418,6 +456,7 @@ export const personFields = [
     importable: false,
     options: outOfActiveListReasonOptions,
   },
+  { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
