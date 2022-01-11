@@ -9,13 +9,14 @@ import TeamsTags from '../../components/TeamsTags';
 import colors from '../../utils/colors';
 
 function PersonName({ person: { name, outOfActiveList, outOfActiveListReason } }) {
-  if (outOfActiveList)
+  if (outOfActiveList) {
     return (
       <View>
         <NameMuted>{name}</NameMuted>
         <ActiveListReasonText>Sortie de file active : {outOfActiveListReason}</ActiveListReasonText>
       </View>
     );
+  }
   return <Name>{name}</Name>;
 }
 
