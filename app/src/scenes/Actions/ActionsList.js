@@ -129,7 +129,7 @@ class ActionsList extends React.Component {
         onScroll={onScroll}
         refreshing={refreshing}
         onRefresh={this.onRefresh}
-        sections={actionsInSections}
+        sections={actionsInSections || []}
         extraData={actionKey}
         initialNumToRender={20}
         renderItem={this.renderActionRow}
