@@ -3,6 +3,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import Row from '../../components/Row';
 import FileSocial from './FileSocial';
 import FileMedical from './FileMedical';
+import Documents from './Documents';
 import ScrollContainer from '../../components/ScrollContainer';
 import Spacer from '../../components/Spacer';
 import colors from '../../utils/colors';
@@ -14,6 +15,7 @@ const FoldersNavigator = (props) => (
     <FoldersStack.Screen name="FoldersSummary">{(stackProps) => <FoldersSummary {...props} {...stackProps} />}</FoldersStack.Screen>
     <FoldersStack.Screen name="FileSocial">{(stackProps) => <FileSocial {...props} {...stackProps} />}</FoldersStack.Screen>
     <FoldersStack.Screen name="FileMedical">{(stackProps) => <FileMedical {...props} {...stackProps} />}</FoldersStack.Screen>
+    <FoldersStack.Screen name="Documents">{(stackProps) => <Documents {...props} {...stackProps} />}</FoldersStack.Screen>
   </FoldersStack.Navigator>
 );
 
@@ -24,6 +26,6 @@ const FoldersSummary = ({ navigation, backgroundColor }) => (
     <Spacer />
     <Row withNextButton caption="Dossier social" onPress={() => navigation.navigate('FileSocial')} />
     <Row withNextButton caption="Dossier médical" onPress={() => navigation.navigate('FileMedical')} />
-    <Row withNextButton caption="Démarches" onPress={() => console.log('Démarches')} />
+    <Row withNextButton caption="Documents" onPress={() => navigation.navigate('Documents')} />
   </ScrollContainer>
 );

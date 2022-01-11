@@ -61,6 +61,7 @@ class Person extends React.Component {
       entityKey: person.entityKey || '',
       outOfActiveList: person.outOfActiveList || false,
       outOfActiveListReason: person.outOfActiveListReason || '',
+      documents: person.documents || [],
     };
   };
 

@@ -1,11 +1,11 @@
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, decryptFile, encryptFile } from './encryption';
 import { capture } from './sentry';
 
 class ApiService {
-  getUrl = (path, query) => {
+  getUrl = (path, query = {}) => {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
   };
 
@@ -209,6 +209,56 @@ class ApiService {
       this.blockEncrypt = this.enableEncrypt && errorDecrypt.message.includes('FAILURE');
     }
     return item;
+  };
+
+  // Upload a file to a path.
+  upload = async ({ file, path }) => {
+    // Prepare file.
+    // const { encryptedEntityKey, encryptedFile } = await encryptFile(file, this.hashedOrgEncryptionKey);
+    const encryptedFile = file;
+    const encryptedEntityKey = 'lol';
+
+    const formData = new FormData();
+    formData.append('file', encryptedFile);
+
+    const options = {
+      method: 'POST',
+      mode: 'cors',
+      credentials: 'include',
+      body: formData,
+      headers: { Authorization: `JWT ${this.token}`, Accept: 'application/json', platform: 'app', version },
+    };
+    const url = this.getUrl(path);
+    const response = await fetch(url, options);
+    const json = await response.json();
+    return { ...json, encryptedEntityKey };
+  };
+
+  // Download a file from a path.
+  download = async ({ path, encryptedEntityKey }) => {
+    const options = {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include',
+      headers: { Authorization: `JWT ${this.token}`, 'Content-Type': 'application/json', platform: 'app', version },
+    };
+    const url = this.getUrl(path);
+    const response = await fetch(url, options);
+    const blob = await response.blob();
+    const decrypted = await decryptFile(blob, encryptedEntityKey, this.hashedOrgEncryptionKey);
+    return decrypted;
+  };
+
+  deleteFile = async ({ path }) => {
+    const options = {
+      method: 'DELETE',
+      mode: 'cors',
+      credentials: 'include',
+      headers: { Authorization: `JWT ${this.token}`, 'Content-Type': 'application/json', platform: 'app', version },
+    };
+    const url = this.getUrl(path);
+    const response = await fetch(url, options);
+    return response.json();
   };
 }
 

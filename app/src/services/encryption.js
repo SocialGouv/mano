@@ -36,6 +36,23 @@ const derivedMasterKey = async (password) => {
   return b64;
 };
 
+const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_ciphertext_uint8array, key_b64) => {
+  if (nonce_and_ciphertext_uint8array.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
+    throw new Error('NONONO Not good length ');
+  }
+
+  const nonce_uint8array = nonce_and_ciphertext_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
+  const ciphertext_uint8array = nonce_and_ciphertext_uint8array.slice(sodium.crypto_secretbox_NONCEBYTES);
+
+  const nonce_b64 = base64js.fromByteArray(nonce_uint8array);
+  const ciphertext_b64 = base64js.fromByteArray(ciphertext_uint8array);
+  // ciphertext: b64 string
+  // nonce: b64 string
+  // key: b64 string
+  const decrypted = await sodium.crypto_secretbox_open_easy(ciphertext_b64, nonce_b64, key_b64);
+  return decrypted;
+};
+
 /*
 
 Decrypt
@@ -116,11 +133,44 @@ const encrypt = async (content_stringified, entityKey_base64, masterKey_base64) 
   };
 };
 
+const _encrypt_and_prepend_nonce_uint8array = async (message_base64, key_base64) => {
+  const nonce_base64 = await sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  const crypted_base64 = await sodium.crypto_secretbox_easy(message_base64, nonce_base64, key_base64);
+  const nonce_uint8array = base64js.toByteArray(nonce_base64);
+  const crypted_uint8array = base64js.toByteArray(crypted_base64);
+  const crypted_and_append_uint8array = _appendBuffer(nonce_uint8array, crypted_uint8array);
+  return crypted_and_append_uint8array;
+};
+
 const verificationPassphrase = 'Surprise !';
 const encryptVerificationKey = async (masterKey_base64) => {
   const encryptedVerificationKey = await _encrypt_and_prepend_nonce(rnBase64.encode(encodeContent(verificationPassphrase)), masterKey_base64);
 
   return encryptedVerificationKey;
+};
+
+// Encrypt a file with the master key + entity key, and return the encrypted file and the entity key
+// (file: File, masterKey: Uint8Array) => Promise<{encryptedFile: File, encryptedEntityKey: Uint8Array}>
+const encryptFile = async (file, masterKey) => {
+  const fileContent = new Uint8Array(await file.arrayBuffer());
+  const entityKey = await generateEntityKey();
+  const encryptedContent = await _encrypt_and_prepend_nonce_uint8array(fileContent, entityKey);
+  const encryptedEntityKey = await _encrypt_and_prepend_nonce(entityKey, masterKey);
+  const encryptedFile = new File([encryptedContent], file.name, { type: file.type });
+  return {
+    encryptedEntityKey,
+    encryptedFile,
+  };
+};
+
+// Decrypt a file with the master key + entity key, and return the decrypted file
+// (file: File, masterKey: Uint8Array, entityKey: Uint8Array) => Promise<File>
+const decryptFile = async (file, encryptedEntityKey, masterKey) => {
+  const fileContent = new Uint8Array(await file.arrayBuffer());
+  const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
+  const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(fileContent, entityKey_bytes_array);
+  const decryptedFile = new File([content_uint8array], file.name, { type: file.type });
+  return decryptedFile;
 };
 
 const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey) => {
@@ -135,4 +185,4 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   return false;
 };
 
-export { derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey };
+export { derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey, encryptFile, decryptFile };

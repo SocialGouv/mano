@@ -189,6 +189,7 @@ const encryptedFields = [
   'consumptions',
   'phone',
   'assignedTeams',
+  'documents',
 ];
 
 export const preparePersonForEncryption = (customFieldsSocial, customFieldsMedical) => (person) => {

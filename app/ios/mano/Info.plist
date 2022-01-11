@@ -68,5 +68,9 @@
 	<string>Light</string>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Cette application a besoin d'accéder à vos photos pour ajouter des documents</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Cette application a besoin d'accéder à votre appareil photo pour ajouter des documents</string>
 </dict>
 </plist>
