@@ -7,6 +7,10 @@ import charte from '../../assets/charte.pdf';
 import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
+import * as pdfjsLib from 'pdfjs-dist/legacy/build/pdf';
+import PDFJSWorker from 'pdfjs-dist/legacy/build/pdf.worker.entry';
+
+pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJSWorker;
 
 const Charte = () => {
   const [loading, setLoading] = useState(false);
