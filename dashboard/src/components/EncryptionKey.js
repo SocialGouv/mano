@@ -240,6 +240,7 @@ const EncryptionKey = ({ isMain }) => {
             <Row style={{ justifyContent: 'center' }}>
               <ButtonCustom
                 color="secondary"
+                id="encrypt"
                 disabled={loading || isSubmitting}
                 onClick={() => !isSubmitting && handleSubmit()}
                 title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}

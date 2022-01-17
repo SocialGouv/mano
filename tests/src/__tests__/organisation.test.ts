@@ -7,7 +7,7 @@ import {
   navigateWithReactRouter,
 } from "../utils";
 
-jest.setTimeout(30000);
+jest.setTimeout(300000);
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {
@@ -21,17 +21,12 @@ describe("Organisation CRUD", () => {
     await connectWith("superadmin@example.org", "secret");
     await expect(page).toMatch("Support");
     await expect(page).toClick("button[type=submit]");
-    await expect(page).toMatch(
-      "Créer une nouvelle organisation et un administrateur"
-    );
+    await expect(page).toMatch("Créer une nouvelle organisation et un administrateur");
     await expect(page).toFill("input[name=orgName]", "My First Orga");
     await expect(page).toClick(".modal-body button[type=submit]");
     await expect(page).toMatch("Veuillez saisir un nom pour l'administrateur");
     await expect(page).toFill("input[name=name]", "Test First Orga");
-    await expect(page).toFill(
-      "input[name=email]",
-      "test+firstorga@example.org"
-    );
+    await expect(page).toFill("input[name=email]", "test+firstorga@example.org");
     await expect(page).toFill("input[name=password]", "secret");
     await expect(page).toClick(".modal-body button[type=submit]");
     await expect(page).toMatch("Création réussie !");
@@ -44,30 +39,36 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to connect as a new user", async () => {
-    await connectWith("test+firstorga@example.org", "secret");
-    await expect(page).toMatch("Charte des Utilisateurs de Mano");
-    await page.evaluate(async (_) => {
-      return new Promise((resolve) => {
-        setTimeout(() => {
-          document?.querySelector(".main > div")?.scrollBy(0, 3000000);
-          resolve("ok");
-        }, 500);
-      });
-    });
+    try {
+      await connectWith("test+firstorga@example.org", "secret");
+      await expect(page).toMatch("Charte des Utilisateurs de Mano");
+      // await page.evaluate(async (_) => {
+      //   return new Promise((resolve) => {
+      //     setTimeout(() => {
+      //       document?.querySelector(".main > div")?.scrollBy(0, 3000000);
+      //       resolve("ok");
+      //     }, 500);
+      //   });
+      // });
+      await expect(page).toMatch("Accepter et continuer");
+      await expect(page).toClick("button");
+      await expect(page).toMatch("My First Orga");
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await expect(page).toMatch("Bienvenue dans Mano !");
+      await expect(page).toFill("input[name=encryptionKey]", "plouf");
+      await expect(page).toFill("input[name=encryptionKeyConfirm]", "plouf");
+      await expect(page).toClick("#encrypt");
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await expect(page).toMatch("Dernière étape !");
+      await expect(page).toFill("input[name=name]", "my team");
+      await expect(page).toClick("#create-team");
 
-    await expect(page).toMatch("Accepter et continuer");
-    await expect(page).toClick("button[type=submit]", {
-      text: "Accepter et continuer",
-    });
-  });
-
-  it("should create a new team", async () => {
-    await expect(page).toMatch("Bienvenue dans Mano !", { timeout: 2000 });
-    await expect(page).toFill("input[name=name]", "my team");
-    await expect(page).toClick("#create-team");
-
-    await expect(page).toMatch("Création réussie !");
-    await expect(page).toMatch("Équipes");
+      await expect(page).toMatch("Création réussie !");
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await expect(page).toMatch("Équipes");
+    } catch (e) {
+      console.log("ERROR MAN", e);
+    }
   });
 
   it("should navigate", async () => {
