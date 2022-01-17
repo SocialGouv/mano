@@ -226,7 +226,7 @@ class ApiService {
       mode: 'cors',
       credentials: 'include',
       body: formData,
-      headers: { Authorization: `JWT ${this.token}`, Accept: 'application/json', platform: 'app', version },
+      headers: { 'Content-Type': 'multipart/form-data', Authorization: `JWT ${this.token}`, Accept: 'application/json', platform: 'app', version },
     };
     const url = this.getUrl(path);
     const response = await fetch(url, options);

@@ -25,6 +25,7 @@ router.post(
   passport.authenticate("user", { session: false }),
   // Use multer to handle the file upload.
   multer({
+    limits: { fieldSize: 25 * 1024 * 1024 },
     storage: multer.diskStorage({
       destination: (req, _file, cb) => {
         const dir = personDocumentBasedir(req.user.organisation, req.params.id);

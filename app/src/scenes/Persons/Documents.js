@@ -64,7 +64,7 @@ class FileSocial extends React.Component {
                 const asset = result.assets[0];
                 const img = {
                   uri: asset.uri,
-                  name: asset.filename,
+                  name: asset.fileName,
                   type: asset.type,
                 };
                 API.upload({
