@@ -23,11 +23,12 @@ const Drawer = () => {
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
   const API = useApi();
 
+  const onboardingForEncryption = !organisation.encryptionEnabled;
   const onboardingForTeams = !teams.length;
 
   return (
     <>
-      <Sidebar className="noprint" onboardingForTeams={onboardingForTeams}>
+      <Sidebar className="noprint" onboardingForTeams={onboardingForEncryption || onboardingForTeams}>
         <Nav>
           {!['superadmin'].includes(user.role) && (
             <>
@@ -52,14 +53,14 @@ const Drawer = () => {
           )}
           <hr />
           {['admin'].includes(user.role) && (
-            <li>
+            <li id="show-on-onboarding">
               <NavLink to={`/organisation/${organisation._id}`} activeClassName="active">
                 Organisation
               </NavLink>
             </li>
           )}
           {['admin'].includes(user.role) && (
-            <li id="teams">
+            <li id="show-on-onboarding">
               <NavLink to="/team" activeClassName="active">
                 Équipes
               </NavLink>
@@ -216,7 +217,7 @@ const Sidebar = styled.div`
   ${(p) =>
     p.onboardingForTeams &&
     `
-    li:not(#teams) {
+    li:not(#show-on-onboarding) {
       opacity: 0.2;
       pointer-events: none;
     }

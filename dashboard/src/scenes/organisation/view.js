@@ -65,7 +65,7 @@ const View = () => {
                 <hr />
                 <Title>Encryption</Title>
                 <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
-                  <EncryptionKey />
+                  <EncryptionKey isMain />
                 </div>
                 <hr />
                 <Title>Réglage des Actions</Title>
