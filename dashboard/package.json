@@ -20,7 +20,6 @@
     "libsodium": "^0.7.9",
     "libsodium-wrappers": "^0.7.9",
     "moment": "^2.29.1",
-    "node-sass": "^5.0.0",
     "page-lifecycle": "^0.1.2",
     "react": "^17.0.2",
     "react-datepicker": "^4.0.0",
@@ -78,5 +77,8 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "sass": "^1.48.0"
   }
 }
