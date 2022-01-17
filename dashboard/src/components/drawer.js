@@ -28,7 +28,7 @@ const Drawer = () => {
 
   return (
     <>
-      <Sidebar className="noprint" onboardingForTeams={onboardingForEncryption || onboardingForTeams}>
+      <Sidebar className="noprint" isOnboarding={onboardingForEncryption || onboardingForTeams}>
         <Nav>
           {!['superadmin'].includes(user.role) && (
             <>
@@ -215,7 +215,7 @@ const Sidebar = styled.div`
   border-right: 1px solid rgba(0, 0, 0, 0.1);
 
   ${(p) =>
-    p.onboardingForTeams &&
+    p.isOnboarding &&
     `
     li:not(#show-on-onboarding) {
       opacity: 0.2;

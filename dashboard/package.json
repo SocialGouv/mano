@@ -37,6 +37,7 @@
     "reactstrap": "^8.9.0",
     "recoil": "^0.5.2",
     "redux": "^4.0.5",
+    "sass": "^1.48.0",
     "styled-components": "^5.2.1",
     "urijs": "^1.19.6",
     "validator": "^13.7.0",
@@ -77,8 +78,5 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  },
-  "devDependencies": {
-    "sass": "^1.48.0"
   }
 }
