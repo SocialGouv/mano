@@ -15,11 +15,6 @@ router.post(
     const newTerritory = {};
 
     newTerritory.organisation = req.user.organisation;
-    newTerritory.user = req.user._id;
-    newTerritory.name = req.body.name;
-
-    if (req.body.hasOwnProperty("types")) newTerritory.types = req.body.types;
-    if (req.body.hasOwnProperty("perimeter")) newTerritory.perimeter = req.body.perimeter;
 
     if (req.body.hasOwnProperty("encrypted")) newTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
@@ -46,8 +41,6 @@ router.get(
 
     if (req.query.lastRefresh) {
       query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      const data = await Territory.findAll(query);
-      return res.status(200).send({ ok: true, data });
     }
 
     const total = await Territory.count(query);
@@ -71,9 +64,6 @@ router.put(
       },
     };
     const updateTerritory = {};
-    if (req.body.hasOwnProperty("name")) updateTerritory.name = req.body.name;
-    if (req.body.hasOwnProperty("types")) updateTerritory.types = req.body.types;
-    if (req.body.hasOwnProperty("perimeter")) updateTerritory.perimeter = req.body.perimeter;
 
     if (req.body.hasOwnProperty("encrypted")) updateTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateTerritory.encryptedEntityKey = req.body.encryptedEntityKey;

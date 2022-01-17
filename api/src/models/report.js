@@ -12,15 +12,6 @@ const schema = {
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
 
-if (!ENCRYPTED_FIELDS_ONLY) {
-  schema.date = DataTypes.DATE;
-  schema.team = { type: DataTypes.UUID, references: { model: "Team", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } };
-  schema.description = DataTypes.TEXT;
-  schema.collaborations = { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] };
-  schema.services = DataTypes.TEXT;
-  schema.passages = DataTypes.INTEGER;
-}
-
 Report.init(schema, { sequelize, modelName: "Report", freezeTableName: true });
 
 module.exports = Report;

@@ -9,7 +9,6 @@ const crypto = require("crypto");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
 const Team = require("../models/team");
-const RelPersonTeam = require("../models/relPersonTeam");
 const encryptedTransaction = require("../utils/encryptedTransaction");
 const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
 
@@ -98,9 +97,7 @@ router.post(
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       const data = await Person.bulkCreate(persons, { returning: true, transaction: tx });
 
-      if (ENCRYPTED_FIELDS_ONLY) return data;
-
-      return data.map((p) => ({ ...p.toJSON(), assignedTeams: [] }));
+      return data;
     });
     return res.status(status).send({ ok, data, error });
   })
@@ -124,25 +121,7 @@ router.post(
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       const data = await Person.create(newPerson, { returning: true, transaction: tx });
 
-      if (ENCRYPTED_FIELDS_ONLY) return data;
-
-      if (req.body.hasOwnProperty("assignedTeams")) {
-        await RelPersonTeam.bulkCreate(
-          req.body.assignedTeams.map((teamId) => ({ person: data._id, team: teamId })),
-          { transaction: tx }
-        );
-      }
-
-      const relTeamPerson = await RelPersonTeam.findAll({
-        where: {
-          person: data._id,
-        },
-      });
-
-      return {
-        ...data.toJSON(),
-        assignedTeams: relTeamPerson.map((rel) => rel.team),
-      };
+      return data;
     });
     return res.status(status).send({ ok, data, error });
   })
@@ -160,8 +139,6 @@ router.get(
 
     if (req.query.lastRefresh) {
       query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      // const data = await Person.findAll(query);
-      // return res.status(200).send({ ok: true, data });
     }
 
     const total = await Person.count(query);
@@ -172,24 +149,7 @@ router.get(
 
     const data = await Person.findAll(query);
 
-    if (ENCRYPTED_FIELDS_ONLY) return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
-
-    const teams = await Team.findAll(query);
-    const relTeamPersons = await RelPersonTeam.findAll({
-      where: {
-        team: { [Op.in]: teams.map((t) => t._id) },
-      },
-    });
-
-    return res.status(200).send({
-      ok: true,
-      hasMore: data.length === limit,
-      data: data.map((person) => ({
-        ...person.toJSON(),
-        assignedTeams: relTeamPersons.filter((rel) => rel.person === person._id).map((rel) => rel.team),
-      })),
-      total,
-    });
+    return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
   })
 );
 
@@ -208,12 +168,6 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    if (!person.user) req.body.user = req.user._id; // mitigate weird bug that puts no user for person creation
-
-    if (["Non", ""].includes(req.body.address)) {
-      req.body.addressDetail = "";
-    }
-
     if (req.body.createdAt) {
       person.changed("createdAt", true);
       req.body.createdAt = new Date(req.body.createdAt);
@@ -225,26 +179,7 @@ router.put(
       await Person.update(req.body, query, { silent: false, transaction: tx });
       const newPerson = await Person.findOne(query);
 
-      if (ENCRYPTED_FIELDS_ONLY) return person;
-
-      if (req.body.hasOwnProperty("assignedTeams")) {
-        await RelPersonTeam.destroy({ where: { person: req.params._id }, transaction: tx });
-        await RelPersonTeam.bulkCreate(
-          req.body.assignedTeams.map((teamId) => ({ person: req.params._id, team: teamId })),
-          { transaction: tx }
-        );
-      }
-
-      const relTeamPerson = await RelPersonTeam.findAll({
-        where: {
-          person: person._id,
-        },
-      });
-
-      return {
-        ...newPerson.toJSON(),
-        assignedTeams: relTeamPerson.map((rel) => rel.team),
-      };
+      return newPerson;
     });
 
     res.status(status).send({ ok, data, error });

@@ -12,12 +12,6 @@ const schema = {
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
 
-if (!ENCRYPTED_FIELDS_ONLY) {
-  schema.user = { type: DataTypes.UUID, references: { model: "User", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } };
-  schema.person = { type: DataTypes.UUID, references: { model: "Person", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } };
-  schema.place = { type: DataTypes.UUID, references: { model: "Place", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } };
-}
-
 RelPersonPlace.init(schema, { sequelize, modelName: "RelPersonPlace", freezeTableName: true });
 
 module.exports = RelPersonPlace;

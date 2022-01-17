@@ -14,17 +14,6 @@ router.post(
     const newComment = {};
 
     newComment.organisation = req.user.organisation;
-    newComment.user = req.user._id;
-    newComment.team = req.body.team;
-
-    if (!newComment.team) return res.status(400).send({ ok: false, error: "Team is required" });
-    if (!newComment.user) return res.status(400).send({ ok: false, error: "User is required" });
-
-    if (req.body.hasOwnProperty("comment")) newComment.comment = req.body.comment || null;
-    if (req.body.hasOwnProperty("type")) newComment.type = req.body.type || null;
-    if (req.body.hasOwnProperty("item")) newComment.item = req.body.item || null;
-    if (req.body.hasOwnProperty("person")) newComment.person = req.body.person || null;
-    if (req.body.hasOwnProperty("action")) newComment.action = req.body.action || null;
 
     if (req.body.hasOwnProperty("encrypted")) newComment.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newComment.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -73,9 +62,6 @@ router.put(
     if (!comment) return res.status(404).send({ ok: false, error: "Not Found" });
 
     const updateComment = {};
-
-    if (req.body.hasOwnProperty("comment")) updateComment.comment = req.body.comment || null;
-    if (req.body.hasOwnProperty("user")) updateComment.user = req.body.user || null;
 
     if (req.body.hasOwnProperty("encrypted")) updateComment.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {

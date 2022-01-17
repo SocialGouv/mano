@@ -23,7 +23,15 @@ export const useReports = () => {
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-reports', 0);
 
   const setReportsFullState = (newReports) => {
-    if (newReports) setReports(newReports);
+    if (newReports)
+      setReports(
+        [...newReports].sort((a, b) => {
+          if (!a.date) return 1;
+          if (!b.date) return -1;
+          if (a.date > b.date) return 1;
+          return -1;
+        })
+      );
     setLoading(false);
     setLastRefresh(Date.now());
   };
@@ -77,6 +85,8 @@ export const useReports = () => {
 
   const addReport = async (date, team) => {
     try {
+      const existingReport = reports.find((r) => r.date === date && r.team === team);
+      if (existingReport) return { ok: true, data: existingReport };
       const res = await API.post({ path: '/report', body: { team, date } });
       if (!res.ok) return res;
       setReports((reports) => [res.decryptedData, ...reports]);

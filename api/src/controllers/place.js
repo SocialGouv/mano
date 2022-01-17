@@ -17,9 +17,6 @@ router.post(
     const newPlace = {};
 
     newPlace.organisation = req.user.organisation;
-    newPlace.user = req.user._id;
-
-    if (req.body.hasOwnProperty("name")) newPlace.name = req.body.name || null;
 
     if (req.body.hasOwnProperty("encrypted")) newPlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -69,7 +66,6 @@ router.put(
     };
 
     const updatePlace = {};
-    if (req.body.hasOwnProperty("name")) updatePlace.name = req.body.name || null;
 
     if (req.body.hasOwnProperty("encrypted")) updatePlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatePlace.encryptedEntityKey = req.body.encryptedEntityKey || null;

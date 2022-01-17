@@ -12,11 +12,6 @@ const schema = {
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
 
-if (!ENCRYPTED_FIELDS_ONLY) {
-  schema.user = { type: DataTypes.UUID, references: { model: "User", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } };
-  schema.name = DataTypes.TEXT;
-}
-
 class Place extends Model {}
 
 Place.init(schema, { sequelize, modelName: "Place", freezeTableName: true });

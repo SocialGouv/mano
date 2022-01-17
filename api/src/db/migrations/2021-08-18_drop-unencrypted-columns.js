@@ -1,8 +1,7 @@
 const sequelize = require("../sequelize");
 const { ENCRYPTED_FIELDS_ONLY } = require("../../config");
 
-if (ENCRYPTED_FIELDS_ONLY) {
-  sequelize.query(`ALTER TABLE "mano"."Action"
+sequelize.query(`ALTER TABLE "mano"."Action"
   DROP COLUMN IF EXISTS "name",
   DROP COLUMN IF EXISTS "description",
   DROP COLUMN IF EXISTS "person",
@@ -78,4 +77,3 @@ if (ENCRYPTED_FIELDS_ONLY) {
   DROP COLUMN IF EXISTS "personsFemale";
   DROP TABLE IF EXISTS "mano"."RelPersonTeam";
   `);
-}

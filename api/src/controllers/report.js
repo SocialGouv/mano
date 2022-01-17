@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op, where, fn, col } = require("sequelize");
+const { ENCRYPTED_FIELDS_ONLY } = require("../config");
 
 const { catchErrors } = require("../errors");
 
@@ -17,7 +18,6 @@ router.get(
       where: {
         organisation: req.user.organisation,
       },
-      order: [["date", "DESC"]],
     };
 
     if (req.query.lastRefresh) {
@@ -42,20 +42,23 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    const { team, date } = req.body;
-
-    if (!team) return res.status(400).send({ ok: false, error: "Team is required" });
-    if (!date) return res.status(400).send({ ok: false, error: "Date is required" });
     if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
       capture("not permission creating report", { user: req.user });
       return res.send(403).send({ ok: false, error: "not permission creating report" });
     }
 
-    const existingReport = await Report.findOne({ where: { team, date, organisation: req.user.organisation } });
-    if (existingReport) return res.status(200).send({ ok: true, data: existingReport });
+    const newReport = { organisation: req.user.organisation };
 
-    const data = await Report.create({ team, date, organisation: req.user.organisation });
-    return res.status(200).send({ ok: true, data });
+    if (req.body.hasOwnProperty("encrypted")) newReport.encrypted = req.body.encrypted || null;
+    if (req.body.hasOwnProperty("encryptedEntityKey")) newReport.encryptedEntityKey = req.body.encryptedEntityKey || null;
+
+    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
+      const data = await Report.create(newReport, { returning: true, transaction: tx });
+
+      return data;
+    });
+
+    return res.status(status).send({ ok, data, error });
   })
 );
 
@@ -80,16 +83,11 @@ router.put(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     const where = { _id: req.params._id };
-    if (req.user.role !== "admin") where.team = req.user.teams.map((e) => e._id);
 
     const report = await Report.findOne({ where });
     if (!report) return res.status(404).send({ ok: false, error: "Not Found" });
 
     const updatedReport = {};
-    if (req.body.hasOwnProperty("description")) updatedReport.description = req.body.description || null;
-    if (req.body.hasOwnProperty("collaborations")) updatedReport.collaborations = req.body.collaborations || [];
-    if (req.body.hasOwnProperty("passages")) updatedReport.passages = req.body.passages || null;
-    if (req.body.hasOwnProperty("services")) updatedReport.services = req.body.services || null;
 
     if (req.body.hasOwnProperty("encrypted")) updatedReport.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatedReport.encryptedEntityKey = req.body.encryptedEntityKey || null;

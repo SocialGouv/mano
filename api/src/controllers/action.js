@@ -24,13 +24,9 @@ router.post(
       return res.send(403).send({ ok: false, error: "No team while creating action" });
     }
 
-    if (req.body.hasOwnProperty("name")) newAction.name = req.body.name || null;
-    if (req.body.hasOwnProperty("person")) newAction.person = req.body.person || null;
     if (req.body.hasOwnProperty("status")) newAction.status = req.body.status || null;
     if (req.body.hasOwnProperty("dueAt")) newAction.dueAt = req.body.dueAt || null;
-    if (req.body.hasOwnProperty("withTime")) newAction.withTime = req.body.withTime || null;
     if (req.body.hasOwnProperty("completedAt")) newAction.completedAt = req.body.completedAt || null;
-    if (req.body.hasOwnProperty("structure")) newAction.structure = req.body.structure || null;
 
     if (req.body.hasOwnProperty("encrypted")) newAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -67,8 +63,6 @@ router.get(
     if (!!req.query.limit) query.limit = limit;
     if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
 
-    // const data = await Comment.findAll(query);
-    // return res.status(200).send({ ok: true, data, hasMore: data.length === limit });
     if (req.query.lastRefresh) {
       query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
     }
@@ -107,16 +101,8 @@ router.put(
     const updateAction = {};
 
     if (req.body.hasOwnProperty("status")) updateAction.status = req.body.status || null;
-    if (req.body.hasOwnProperty("withTime")) updateAction.withTime = req.body.withTime || null;
     if (req.body.hasOwnProperty("dueAt")) updateAction.dueAt = req.body.dueAt || null;
     if (req.body.hasOwnProperty("completedAt")) updateAction.completedAt = req.body.completedAt || null;
-
-    if (req.body.hasOwnProperty("category")) updateAction.category = req.body.category || null;
-    if (req.body.hasOwnProperty("categories")) updateAction.categories = req.body.categories || null;
-    if (req.body.hasOwnProperty("person")) updateAction.person = req.body.person || null;
-    if (req.body.hasOwnProperty("structure")) updateAction.structure = req.body.structure || null;
-    if (req.body.hasOwnProperty("name")) updateAction.name = req.body.name || null;
-    if (req.body.hasOwnProperty("description")) updateAction.description = req.body.description || null;
 
     if (req.body.hasOwnProperty("encrypted")) updateAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
