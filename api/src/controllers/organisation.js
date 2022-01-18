@@ -23,7 +23,7 @@ router.post(
     if (!req.body.email) return res.status(400).send({ ok: false, error: "Missing admin email" });
     if (!req.body.password) return res.status(400).send({ ok: false, error: "Missing admin password" });
 
-    await User.create(
+    const adminUser = await User.create(
       {
         name: req.body.name,
         email: req.body.email.trim().toLowerCase(),
@@ -33,6 +33,27 @@ router.post(
       },
       { returning: true }
     );
+
+    const subject = "Bienvenue dans Mano";
+    const body = `Bonjour ${adminUser.name} !
+
+Un compte Mano pour votre organisation ${organisation.name} vient d'être créé.
+
+Vos identifiants pour vous connecter à Mano sont les suivants:
+📧 Email: ${adminUser.email}
+📧 Mot de passe: ${req.body.password}
+
+Vous pouvez dès maintenant paramétrer votre organisation et commencer à utiliser Mano en suivant ce lien:
+https://dashboard-mano.fabrique.social.gouv.fr/
+
+Toute l'équipe Mano vous souhaite la bienvenue !
+
+Si vous avez des questions n'hésitez pas à nous contacter:
+Nathan Fradin, chargé de déploiement: nathan.fradin.mano@gmail.com - +33 6 29 54 94 26
+Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96
+`;
+    await mailservice.sendEmail(adminUser.email, subject, body);
+
     return res.status(200).send({ ok: true });
   })
 );
