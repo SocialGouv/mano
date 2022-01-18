@@ -10,6 +10,7 @@ const Action = require("../models/action");
 const Person = require("../models/person");
 const Territory = require("../models/territory");
 const Report = require("../models/report");
+const mailservice = require("../utils/mailservice");
 
 //@checked
 router.post(
@@ -23,6 +24,8 @@ router.post(
     if (!req.body.email) return res.status(400).send({ ok: false, error: "Missing admin email" });
     if (!req.body.password) return res.status(400).send({ ok: false, error: "Missing admin password" });
 
+    const token = crypto.randomBytes(20).toString("hex");
+
     const adminUser = await User.create(
       {
         name: req.body.name,
@@ -30,6 +33,8 @@ router.post(
         password: req.body.password,
         role: "admin",
         organisation: organisation._id,
+        forgotPasswordResetToken: token,
+        forgotPasswordResetExpires: new Date(Date.now() + JWT_MAX_AGE * 1000),
       },
       { returning: true }
     );
@@ -39,11 +44,11 @@ router.post(
 
 Un compte Mano pour votre organisation ${organisation.name} vient d'être créé.
 
-Vos identifiants pour vous connecter à Mano sont les suivants:
-📧 Email: ${adminUser.email}
-📧 Mot de passe: ${req.body.password}
+Votre identifiant pour vous connecter à Mano est ${adminUser.email}.
+Vous pouvez dès à présent vous connecter pour choisir votre mot de passe ici:
+https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}
 
-Vous pouvez dès maintenant paramétrer votre organisation et commencer à utiliser Mano en suivant ce lien:
+Vous pourrez ensuite paramétrer votre organisation et commencer à utiliser Mano en suivant ce lien:
 https://dashboard-mano.fabrique.social.gouv.fr/
 
 Toute l'équipe Mano vous souhaite la bienvenue !

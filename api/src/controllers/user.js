@@ -179,6 +179,9 @@ router.post(
     newUser.password = req.body.password;
     newUser.organisation = req.body.organisation;
     newUser.role = req.body.role;
+    const token = crypto.randomBytes(20).toString("hex");
+    newUser.forgotPasswordResetToken = token;
+    newUser.forgotPasswordResetExpires = new Date(Date.now() + JWT_MAX_AGE * 1000);
 
     const prevUser = await User.findOne({ where: { email: newUser.email } });
     if (!!prevUser) return res.status(400).send({ ok: false, error: "A user already exists with this email" });
@@ -198,6 +201,24 @@ router.post(
       await tx.commit();
       await user.save({ transaction: tx });
     }
+
+    const subject = "Bienvenue dans Mano 👋";
+    const body = `Bonjour ${data.name} !
+
+Votre identifiant pour vous connecter à Mano est ${data.email}.
+Vous pouvez dès à présent vous connecter pour choisir votre mot de passe ici:
+https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}
+
+Vous pourrez ensuite commencer à utiliser Mano en suivant ce lien:
+https://dashboard-mano.fabrique.social.gouv.fr/
+
+Toute l'équipe Mano vous souhaite la bienvenue !
+
+Si vous avez des questions n'hésitez pas à nous contacter:
+Nathan Fradin, chargé de déploiement: nathan.fradin.mano@gmail.com - +33 6 29 54 94 26
+Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96
+`;
+    await mailservice.sendEmail(data.email, subject, body);
 
     return res.status(200).send({ ok: true, data });
   })
