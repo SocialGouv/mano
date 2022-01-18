@@ -9,8 +9,7 @@ const { catchErrors } = require("../errors");
 const { validatePassword } = require("../utils");
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
-const { comparePassword } = require("../utils");
-
+const { comparePassword, generatePassword } = require("../utils");
 const User = require("../models/user");
 const Action = require("../models/action");
 const Person = require("../models/person");
@@ -176,7 +175,7 @@ router.post(
     const newUser = {};
     newUser.name = req.body.name;
     newUser.email = req.body.email.trim().toLowerCase();
-    newUser.password = req.body.password;
+    newUser.password = generatePassword();
     newUser.organisation = req.body.organisation;
     newUser.role = req.body.role;
     const token = crypto.randomBytes(20).toString("hex");
@@ -215,6 +214,7 @@ https://dashboard-mano.fabrique.social.gouv.fr/
 Toute l'équipe Mano vous souhaite la bienvenue !
 
 Si vous avez des questions n'hésitez pas à nous contacter:
+
 Nathan Fradin, chargé de déploiement: nathan.fradin.mano@gmail.com - +33 6 29 54 94 26
 Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96
 `;

@@ -7,7 +7,7 @@ import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 
-import { generatePassword, toFrenchDate } from '../../utils';
+import { toFrenchDate } from '../../utils';
 import Header from '../../components/header';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import Loading from '../../components/loading';
@@ -84,7 +84,7 @@ const Create = ({ onChange }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouvel utilisateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', email: '', password: generatePassword() }}
+            initialValues={{ name: '', email: '' }}
             onSubmit={async (body, actions) => {
               try {
                 body.organisation = organisation._id;
@@ -112,12 +112,6 @@ const Create = ({ onChange }) => {
                     <FormGroup>
                       <Label>Email</Label>
                       <Input name="email" value={values.email} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Mot de passe</Label>
-                      <Input name="password" value={values.password} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                   <Col md={6}>

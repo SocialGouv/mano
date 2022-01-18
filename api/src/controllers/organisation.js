@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { fn } = require("sequelize");
+const crypto = require("crypto");
 
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
@@ -11,6 +12,9 @@ const Person = require("../models/person");
 const Territory = require("../models/territory");
 const Report = require("../models/report");
 const mailservice = require("../utils/mailservice");
+const { generatePassword } = require("../utils");
+
+const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
 //@checked
 router.post(
@@ -22,7 +26,6 @@ router.post(
     const organisation = await Organisation.create({ name: req.body.orgName }, { returning: true });
     if (!req.body.name) return res.status(400).send({ ok: false, error: "Missing admin name" });
     if (!req.body.email) return res.status(400).send({ ok: false, error: "Missing admin email" });
-    if (!req.body.password) return res.status(400).send({ ok: false, error: "Missing admin password" });
 
     const token = crypto.randomBytes(20).toString("hex");
 
@@ -30,7 +33,7 @@ router.post(
       {
         name: req.body.name,
         email: req.body.email.trim().toLowerCase(),
-        password: req.body.password,
+        password: generatePassword(),
         role: "admin",
         organisation: organisation._id,
         forgotPasswordResetToken: token,
@@ -39,7 +42,7 @@ router.post(
       { returning: true }
     );
 
-    const subject = "Bienvenue dans Mano";
+    const subject = "Bienvenue dans Mano 👋";
     const body = `Bonjour ${adminUser.name} !
 
 Un compte Mano pour votre organisation ${organisation.name} vient d'être créé.
@@ -54,6 +57,7 @@ https://dashboard-mano.fabrique.social.gouv.fr/
 Toute l'équipe Mano vous souhaite la bienvenue !
 
 Si vous avez des questions n'hésitez pas à nous contacter:
+
 Nathan Fradin, chargé de déploiement: nathan.fradin.mano@gmail.com - +33 6 29 54 94 26
 Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96
 `;
