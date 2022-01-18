@@ -15,6 +15,7 @@ import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
+import OnboardingEndModal from '../../components/OnboardingEndModal';
 
 const List = () => {
   const teams = useRecoilValue(teamsState);
@@ -56,6 +57,7 @@ const Create = () => {
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const [open, setOpen] = useState(!teams.length);
   const API = useApi();
+  const [onboardingEndModalOpen, setOnboardingEndModalOpen] = useState(false);
 
   const onboardingForTeams = !teams.length;
 
@@ -63,7 +65,7 @@ const Create = () => {
     <CreateWrapper>
       <ButtonCustom color="primary" onClick={() => setOpen(true)} title="Créer une nouvelle équipe" padding="12px 24px" />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop={onboardingForTeams ? 'static' : true}>
-        <ModalHeader close={onboardingForTeams ? () => <></> : null} toggle={() => setOpen(false)}>
+        <ModalHeader close={onboardingForTeams ? <></> : null} toggle={() => setOpen(false)}>
           {onboardingForTeams ? 'Dernière étape !' : 'Créer une nouvelle équipe'}
         </ModalHeader>
         <ModalBody>
@@ -91,6 +93,7 @@ const Create = () => {
                 AppSentry.setUser(meResponse.user);
                 setCurrentTeam(meResponse.user.teams[0]);
                 toastr.success('Création réussie !', `Vous êtes dans l'équipe ${newTeamRes.data.name}`);
+                setOnboardingEndModalOpen(true);
               } else {
                 toastr.success('Création réussie !');
               }
@@ -153,6 +156,7 @@ const Create = () => {
           </Formik>
         </ModalBody>
       </Modal>
+      <OnboardingEndModal open={onboardingEndModalOpen} setOpen={setOnboardingEndModalOpen} />
     </CreateWrapper>
   );
 };
