@@ -67,7 +67,7 @@ class TerritoriesList extends React.Component {
   render() {
     const { refreshing, search } = this.state;
     const { territories, loading, key } = this.props.context;
-    const data = territories.filter((p) => p.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
+    const data = search.length ? territories.filter((p) => p.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) : territories;
     return (
       <SceneContainer>
         <ScreenTitle title="Territoires" parentScroll={this.scrollY} />

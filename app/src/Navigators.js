@@ -191,7 +191,7 @@ class App extends React.Component {
 
   appState = AppState.currentState;
   onAppChange = (nextAppState) => {
-    if (this.appState.match(/inactive|background/) && nextAppState === 'active') {
+    if (this.appState?.match(/inactive|background/) && nextAppState === 'active') {
       if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
       logEvents.logAppVisit();
     } else {
