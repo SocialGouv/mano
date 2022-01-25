@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 
 const postgresqlUrl = `${process.env.PGBASEURL}/${process.env.PGDATABASE}`;
 
-export async function connectWith(email: string, password: string, orgEncryptionKey: string = '') {
+export async function connectWith(
+  email: string,
+  password: string,
+  orgEncryptionKey: string = ""
+) {
   await page.goto("http://localhost:8090/auth");
   // Ensure not already connected
   try {
@@ -37,6 +41,16 @@ export async function deleteUser(email: string) {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();
   await client.query(`DELETE FROM mano."User" WHERE email = $1`, [email]);
+  await client.end();
+}
+
+export async function updateUserPassword(email: string, password: string) {
+  const client = new pg.Client(postgresqlUrl);
+  await client.connect();
+  await client.query(`update mano."User" set password= $2 WHERE email = $1`, [
+    email,
+    bcrypt.hashSync(password),
+  ]);
   await client.end();
 }
 
@@ -153,7 +167,9 @@ export async function useEncryptedOrga() {
     [orgId, date]
   );
 
-  await client.query(`delete from mano."User" where name='Encrypted Orga Admin'`);
+  await client.query(
+    `delete from mano."User" where name='Encrypted Orga Admin'`
+  );
   await client.query(
     `INSERT INTO mano."User" (
       _id,
@@ -187,7 +203,9 @@ export async function useEncryptedOrga() {
     [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
   );
 
-  await client.query(`delete from mano."Team" where name='Encrypted Orga Team'`);
+  await client.query(
+    `delete from mano."Team" where name='Encrypted Orga Team'`
+  );
   await client.query(
     `INSERT INTO mano."Team" (
       _id,
@@ -224,4 +242,3 @@ export async function useEncryptedOrga() {
 
   await client.end();
 }
-
