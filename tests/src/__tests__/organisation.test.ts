@@ -34,7 +34,9 @@ describe("Organisation CRUD", () => {
       "test+firstorga@example.org"
     );
     await expect(page).toClick(".modal-body button[type=submit]");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await expect(page).toMatch("Création réussie !");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     // We have to update the password of the user.
     await updateUserPassword("test+firstorga@example.org", "secret");
   });
@@ -48,14 +50,15 @@ describe("Organisation CRUD", () => {
   it("should be able to connect as a new user", async () => {
     await connectWith("test+firstorga@example.org", "secret");
     await expect(page).toMatch("Charte des Utilisateurs de Mano");
-    // await page.evaluate(async (_) => {
-    //   return new Promise((resolve) => {
-    //     setTimeout(() => {
-    //       document?.querySelector(".main > div")?.scrollBy(0, 3000000);
-    //       resolve("ok");
-    //     }, 500);
-    //   });
-    // });
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await page.evaluate(async (_) => {
+      return new Promise((resolve) => {
+        setTimeout(() => {
+          document?.querySelector(".main > div")?.scrollBy(0, 3000000);
+          resolve("ok");
+        }, 500);
+      });
+    });
     await expect(page).toMatch("Accepter et continuer");
     await expect(page).toClick("button");
     await expect(page).toMatch("My First Orga");
