@@ -1,3 +1,10 @@
+## [1.42.2](https://github.com/SocialGouv/mano/compare/v1.42.1...v1.42.2) (2022-01-25)
+
+
+### Bug Fixes
+
+* **dashboad:** fix import custom fields ([5b1422b](https://github.com/SocialGouv/mano/commit/5b1422be960dd2f0244c485fdec69a0353c914a6))
+
 ## [1.42.1](https://github.com/SocialGouv/mano/compare/v1.42.0...v1.42.1) (2022-01-07)
 
 
