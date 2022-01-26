@@ -7,10 +7,10 @@ import { usePlaces } from './places';
 import { useRelsPerson } from './relPersonPlace';
 import { useReports } from './reports';
 import { useTerritories } from './territory';
-import useApi from '../services/api';
 import { useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';
+import API from '../services/api';
 
 const loadingState = atom({
   key: 'loadingState',
@@ -32,7 +32,6 @@ export const useRefresh = () => {
   const [loading, setLoading] = useRecoilState(loadingState);
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
-  const API = useApi();
 
   const { refreshActions } = useActions();
   const { refreshPersons } = usePersons();

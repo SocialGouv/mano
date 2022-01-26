@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Alert, findNodeHandle, TouchableWithoutFeedback, View } from 'react-native';
 import API from '../../services/api';
@@ -48,47 +48,40 @@ const codesToHints = {
   NO_SPECIAL: 'au moins un caractère spécial',
 };
 
-class ChangePasswordBody extends React.Component {
-  state = {
-    password: '',
-    newPassword: '',
-    verifyPassword: '',
-    loading: false,
-    hidden: !__DEV__,
-  };
+const ChangePasswordBody = ({ onOK, children }) => {
+  const [password, setPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [verifyPassword, setVerifyPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [hidden, setHidden] = useState(!__DEV__);
 
-  onModify = async () => {
-    const { newPassword, verifyPassword, password } = this.state;
-    const { onOK } = this.props;
+  const onModify = async () => {
     if (password.trim() === '') {
       Alert.alert('Mot de passe incorrect', 'Le mot de passe ne peut pas être vide');
-      this.password.focus();
+      passwordRef.current.focus();
       return;
     }
     if (checkErrorPassword(newPassword.trim())) {
       Alert.alert(codesToErrors[checkErrorPassword(newPassword)]);
-      this.newPassword.focus();
+      newPasswordRef.current.focus();
       return;
     }
     if (verifyPassword.trim() === '') {
       Alert.alert('Veuillez rentrer à nouveau le mot de passe pour vérification');
-      this.verifyPassword.focus();
+      verifyPasswordRef.current.focus();
       return;
     }
     if (password.trim() === newPassword.trim()) {
       Alert.alert("Le nouveau mot de passe doit être différent de l'ancien");
-      this.newPassword.focus();
+      newPasswordRef.current.focus();
       return;
     }
     if (newPassword.trim() !== verifyPassword.trim()) {
-      Alert.alert(
-        'Les nouveaux mots de passe sont différents',
-        "Vous pouvez cliquer sur 'Montrer les mots de passe' pour voir les différences"
-      );
-      this.verifyPassword.focus();
+      Alert.alert('Les nouveaux mots de passe sont différents', "Vous pouvez cliquer sur 'Montrer les mots de passe' pour voir les différences");
+      verifyPasswordRef.current.focus();
       return;
     }
-    this.setState({ loading: true });
+    setLoading(true);
     const response = await API.post({
       path: '/user/reset_password',
       body: { newPassword: newPassword.trim(), verifyPassword: verifyPassword.trim(), password: password.trim() },
@@ -96,103 +89,104 @@ class ChangePasswordBody extends React.Component {
     });
     if (response.error) {
       Alert.alert(response.error);
-      this.setState({ loading: false });
+      setLoading(false);
       return;
     }
     if (response.ok) {
-      this.setState({ loading: false });
+      setLoading(false);
       Alert.alert('Mot de passe modifié !');
       onOK();
     }
   };
 
-  _scrollToInput = (ref) => {
-    if (!ref) return;
+  const scrollViewRef = useRef(null);
+  const passwordRef = useRef(null);
+  const newPasswordRef = useRef(null);
+  const verifyPasswordRef = useRef(null);
+  const _scrollToInput = (ref) => {
+    if (!ref.current) return;
+    if (!scrollViewRef.current) return;
     setTimeout(() => {
-      ref.measureLayout(
-        findNodeHandle(this.scrollView),
+      ref.current.measureLayout(
+        findNodeHandle(scrollViewRef.current),
         (x, y, width, height) => {
-          this.scrollView.scrollTo({ y: y - 100, animated: true });
+          scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
         (error) => console.log('error scrolling', error)
       );
     }, 250);
   };
-
-  render() {
-    const { password, newPassword, verifyPassword, loading, hidden } = this.state;
-    return (
-      <ScrollContainer ref={(r) => (this.scrollView = r)}>
-        <View>
-          {this.props.children}
-          <InputLabelled
-            ref={(r) => (this.password = r)}
-            onChangeText={(password) => this.setState({ password })}
-            label="Saisissez votre mot de passe"
-            placeholder="Saisissez votre mot de passe"
-            onFocus={() => this._scrollToInput(this.password)}
-            value={password}
-            autoCompleteType="password"
-            autoCapitalize="none"
-            secureTextEntry={hidden}
-            returnKeyType="done"
-            onSubmitEditing={() => this.newPassword.focus()}
-            EndIcon={() => <EyeIcon strikedThrough={!hidden} />}
-            onEndIconPress={() => this.setState({ hidden: !hidden })}
-          />
-          <InputLabelled
-            ref={(r) => (this.newPassword = r)}
-            onChangeText={(newPassword) => this.setState({ newPassword: newPassword.trim() })}
-            label="Saisissez un nouveau mot de passe"
-            placeholder="Saisissez un nouveau mot de passe"
-            onFocus={() => this._scrollToInput(this.newPassword)}
-            value={newPassword}
-            autoCompleteType="password"
-            autoCapitalize="none"
-            secureTextEntry={hidden}
-            returnKeyType="done"
-            onSubmitEditing={() => this.verifyPassword.focus()}
-            EndIcon={() => <EyeIcon strikedThrough={!hidden} />}
-            onEndIconPress={() => this.setState({ hidden: !hidden })}
-          />
-          <PasswordHintContainer>
-            {Object.keys(codesToHints).map((check, index, array) => {
-              let caption = codesToHints[check];
-              if (index === 0) caption = caption?.capitalize();
-              if (index !== array.length - 1) caption = `${caption}, `;
-              return (
-                <PasswordHint key={caption} disabled={!checks[check](newPassword)}>
-                  {caption}
-                </PasswordHint>
-              );
-            })}
-          </PasswordHintContainer>
-          <InputLabelled
-            ref={(r) => (this.verifyPassword = r)}
-            onChangeText={(verifyPassword) => this.setState({ verifyPassword: verifyPassword.trim() })}
-            label="Confirmez le nouveau mot de passe"
-            placeholder="Confirmez le nouveau mot de passe"
-            onFocus={() => this._scrollToInput(this.verifyPassword)}
-            value={verifyPassword}
-            autoCompleteType="password"
-            autoCapitalize="none"
-            secureTextEntry={hidden}
-            returnKeyType="done"
-            onSubmitEditing={this.onModify}
-            EndIcon={() => <EyeIcon strikedThrough={!hidden} />}
-            onEndIconPress={() => this.setState({ hidden: !hidden })}
-          />
-          <TouchableWithoutFeedback onPress={() => this.setState({ hidden: !hidden })}>
-            <Hint>Montrer les mots de passe</Hint>
-          </TouchableWithoutFeedback>
-          <ButtonsContainer>
-            <Button caption="Modifier" onPress={this.onModify} loading={loading} disabled={loading} />
-          </ButtonsContainer>
-        </View>
-      </ScrollContainer>
-    );
-  }
-}
+  return (
+    <ScrollContainer ref={scrollViewRef}>
+      <View>
+        {children}
+        <InputLabelled
+          ref={passwordRef}
+          onChangeText={setPassword}
+          label="Saisissez votre mot de passe"
+          placeholder="Saisissez votre mot de passe"
+          onFocus={() => _scrollToInput(passwordRef)}
+          value={password}
+          autoCompleteType="password"
+          autoCapitalize="none"
+          secureTextEntry={hidden}
+          returnKeyType="done"
+          onSubmitEditing={() => newPasswordRef.current.focus()}
+          EndIcon={() => <EyeIcon strikedThrough={!hidden} />}
+          onEndIconPress={() => setHidden((h) => !h)}
+        />
+        <InputLabelled
+          ref={newPasswordRef}
+          onChangeText={setNewPassword}
+          label="Saisissez un nouveau mot de passe"
+          placeholder="Saisissez un nouveau mot de passe"
+          onFocus={() => _scrollToInput(newPasswordRef)}
+          value={newPassword}
+          autoCompleteType="password"
+          autoCapitalize="none"
+          secureTextEntry={hidden}
+          returnKeyType="done"
+          onSubmitEditing={() => verifyPasswordRef.current.focus()}
+          EndIcon={() => <EyeIcon strikedThrough={!hidden} />}
+          onEndIconPress={() => setHidden((h) => !h)}
+        />
+        <PasswordHintContainer>
+          {Object.keys(codesToHints).map((check, index, array) => {
+            let caption = codesToHints[check];
+            if (index === 0) caption = caption?.capitalize();
+            if (index !== array.length - 1) caption = `${caption}, `;
+            return (
+              <PasswordHint key={caption} disabled={!checks[check](newPassword)}>
+                {caption}
+              </PasswordHint>
+            );
+          })}
+        </PasswordHintContainer>
+        <InputLabelled
+          ref={verifyPasswordRef}
+          onChangeText={setVerifyPassword}
+          label="Confirmez le nouveau mot de passe"
+          placeholder="Confirmez le nouveau mot de passe"
+          onFocus={() => _scrollToInput(verifyPasswordRef)}
+          value={verifyPassword}
+          autoCompleteType="password"
+          autoCapitalize="none"
+          secureTextEntry={hidden}
+          returnKeyType="done"
+          onSubmitEditing={onModify}
+          EndIcon={() => <EyeIcon strikedThrough={!hidden} />}
+          onEndIconPress={() => setHidden((h) => !h)}
+        />
+        <TouchableWithoutFeedback onPress={() => setHidden((h) => !h)}>
+          <Hint>Montrer les mots de passe</Hint>
+        </TouchableWithoutFeedback>
+        <ButtonsContainer>
+          <Button caption="Modifier" onPress={onModify} loading={loading} disabled={loading} />
+        </ButtonsContainer>
+      </View>
+    </ScrollContainer>
+  );
+};
 
 const ChangePassword = ({ navigation }) => {
   return (

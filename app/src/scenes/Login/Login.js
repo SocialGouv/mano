@@ -1,9 +1,8 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Alert, findNodeHandle, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import AsyncStorage from '@react-native-community/async-storage';
-import { compose } from 'recompose';
 import { version } from '../../../package.json';
 import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';
@@ -16,33 +15,29 @@ import { MyText } from '../../components/MyText';
 import InputLabelled from '../../components/InputLabelled';
 import EyeIcon from '../../icons/EyeIcon';
 import Title, { SubTitle } from '../../components/Title';
-import AuthContext from '../../contexts/auth';
-import withContext from '../../contexts/withContext';
-import RefreshContext from '../../contexts/refresh';
 import { MANO_DOWNLOAD_URL } from '../../config';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
+import { useRefresh } from '../../recoil/refresh';
 
-const initState = {
-  email: '',
-  loading: false,
-  example: 'example@example.com',
-  password: '',
-  encryptionKey: '',
-  showPassword: false,
-  showEncryptionKeyInput: false,
-};
+const Login = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [isValid, setIsValid] = useState(false);
+  const [example, setExample] = useState('example@example.com');
+  const [password, setPassword] = useState('');
+  const [encryptionKey, setEncryptionKey] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showEncryptionKeyInput, setShowEncryptionKeyInput] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-class Login extends React.Component {
-  state = initState;
+  const setUser = useSetRecoilState(userState);
+  const setOrganisation = useSetRecoilState(organisationState);
+  const setTeams = useSetRecoilState(teamsState);
+  const setUsers = useSetRecoilState(usersState);
+  const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
+  const { refresh } = useRefresh();
 
-  componentDidMount() {
-    this.props.context.resetAuth();
-    setTimeout(() => {
-      RNBootSplash.hide({ duration: 250 });
-      this.checkVersion();
-    }, 500);
-  }
-
-  checkVersion = async () => {
+  const checkVersion = async () => {
     const response = await API.get({ path: '/version' });
     if (!response.ok) return;
     if (version !== response.data) {
@@ -58,68 +53,75 @@ class Login extends React.Component {
     }
   };
 
-  toggleShowPassword = () => this.setState(({ showPassword }) => ({ showPassword: !showPassword }));
+  useEffect(() => {
+    // this.props.context.resetAuth();
+    setTimeout(async () => {
+      RNBootSplash.hide({ duration: 250 });
+      checkVersion();
+    }, 500);
+  });
 
-  onChange = ({ email, isValid, example }) => this.setState({ email, isValid, example });
+  const toggleShowPassword = () => setShowPassword((show) => !show);
 
-  onPasswordChange = (password) => this.setState({ password });
+  const onEmailChange = ({ email, isValid, example }) => {
+    setEmail(email);
+    setIsValid(isValid);
+    setExample(example);
+  };
 
-  onForgetPassword = () => this.props.navigation.navigate('ForgetPassword');
-  onConnect = async () => {
-    const { email, isValid, example, password, showEncryptionKeyInput, encryptionKey } = this.state;
-    const { navigation, context } = this.props;
+  const onForgetPassword = () => navigation.navigate('ForgetPassword');
+  const onConnect = async () => {
     if (!isValid) {
       Alert.alert("L'email n'est pas valide.", `Il doit être de la forme ${example}`);
-      this.emailInput.focus();
+      emailRef.current.focus();
       return;
     }
     if (password === '') {
       Alert.alert('Mot de passe incorrect', 'Le mot de passe ne peut pas être vide');
-      this.passwordInput.focus();
+      passwordRef.current.focus();
       return;
     }
-    this.setState({ loading: true });
+    setLoading(true);
     const response = await API.post({ path: '/user/signin', body: { password, email }, skipEncryption: true });
     if (response.error) {
-      Alert.alert(response.error, null, [{ text: 'OK', onPress: () => this.passwordInput.focus() }], {
+      Alert.alert(response.error, null, [{ text: 'OK', onPress: () => passwordRef.current.focus() }], {
         cancelable: true,
-        onDismiss: () => this.passwordInput.focus(),
+        onDismiss: () => passwordRef.current.focus(),
       });
-      this.setState({ loading: false, password: '' });
+      setLoading(false);
+      setPassword('');
       return;
     }
     if (response.user.role === 'superadmin') {
       Alert.alert("Vous n'avez pas d'organisation dans Mano");
-      this.setState({ loading: false });
+      setLoading(false);
       return;
     }
     if (response.ok) {
       Keyboard.dismiss();
       API.token = response.token;
       API.showTokenExpiredError = true;
-      context.setAuth({
-        user: response.user,
-        organisation: response.user.organisation,
-      });
+      setUser(response.user);
+      setOrganisation(response.user.organisation);
       if (!!response.user.organisation?.encryptionEnabled && !showEncryptionKeyInput) {
-        return this.setState({ loading: false, showEncryptionKeyInput: true });
+        setLoading(false);
+        setShowEncryptionKeyInput(true);
+        return;
       }
       if (encryptionKey) {
         const keyIsValid = await API.setOrgEncryptionKey(encryptionKey);
         if (!keyIsValid) {
-          this.setState({ loading: false });
+          setLoading(false);
           return;
         }
       }
       await AsyncStorage.setItem('persistent_email', email);
       const { data: teams } = await API.get({ path: '/team' });
       const { data: users } = await API.get({ path: '/user', query: { minimal: true } });
-      context.setAuth({
-        user: response.user,
-        organisation: response.user.organisation,
-        teams,
-        users,
-      });
+      setUser(response.user);
+      setOrganisation(response.user.organisation);
+      setUsers(users);
+      setTeams(teams);
       API.navigation = navigation;
       // getting teams before going to team selection
       if (!__DEV__ && !response.user.lastChangePasswordAt) {
@@ -128,8 +130,8 @@ class Login extends React.Component {
         if (!response.user?.termsAccepted) {
           navigation.navigate('CharteAcceptance');
         } else if (response.user?.teams?.length === 1) {
-          context.setCurrentTeam(response.user.teams[0]);
-          this.props.context.refresh({ showFullScreen: true, initialLoad: true });
+          setCurrentTeam(response.user.teams[0]);
+          refresh({ showFullScreen: true, initialLoad: true });
           navigation.navigate('Home');
         } else {
           navigation.navigate('TeamSelection');
@@ -137,84 +139,101 @@ class Login extends React.Component {
       }
     }
     setTimeout(() => {
-      this.setState(initState);
+      // reset state
+      setEmail('');
+      setIsValid(false);
+      setExample('example@example.com');
+      setPassword('');
+      setEncryptionKey('');
+      setShowPassword(false);
+      setShowEncryptionKeyInput(false);
+      setLoading(false);
     }, 500);
   };
 
-  _scrollToInput = (ref) => {
-    if (!ref) return;
+  useEffect(() => {
+    if (currentTeam?._id) {
+      refresh({ showFullScreen: true, initialLoad: true });
+      navigation.navigate('Home');
+    }
+  }, [currentTeam?._id, refresh, navigation]);
+
+  const scrollViewRef = useRef(null);
+  const emailRef = useRef(null);
+  const passwordRef = useRef(null);
+  const encryptionKeyRef = useRef(null);
+  const _scrollToInput = (ref) => {
+    if (!ref.current) return;
+    if (!scrollViewRef.current) return;
     setTimeout(() => {
-      ref.measureLayout(
-        findNodeHandle(this.scrollView),
+      ref.current.measureLayout(
+        findNodeHandle(scrollViewRef.current),
         (x, y, width, height) => {
-          this.scrollView.scrollTo({ y: y - 100, animated: true });
+          scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
         (error) => console.log('error scrolling', error)
       );
     }, 250);
   };
 
-  render() {
-    const { password, loading, showPassword, encryptionKey, showEncryptionKeyInput } = this.state;
-    return (
-      <Background testID="login-screen">
-        <SceneContainer>
-          <ScrollContainer ref={(r) => (this.scrollView = r)} keyboardShouldPersistTaps="handled">
-            <View>
-              <StatusBar backgroundColor={colors.app.color} />
-              <Title heavy>Bienvenue !</Title>
-              <SubTitle>Veuillez saisir un e-mail enregistré auprès de votre administrateur</SubTitle>
-              <EmailInput
-                onChange={this.onChange}
-                ref={(r) => (this.emailInput = r)}
-                onFocus={() => this._scrollToInput(this.emailInput)}
-                onSubmitEditing={() => this.passwordInput.focus()}
-              />
+  return (
+    <Background testID="login-screen">
+      <SceneContainer>
+        <ScrollContainer ref={scrollViewRef} keyboardShouldPersistTaps="handled">
+          <View>
+            <StatusBar backgroundColor={colors.app.color} />
+            <Title heavy>Bienvenue !</Title>
+            <SubTitle>Veuillez saisir un e-mail enregistré auprès de votre administrateur</SubTitle>
+            <EmailInput
+              onChange={onEmailChange}
+              ref={emailRef}
+              onFocus={() => _scrollToInput(emailRef)}
+              onSubmitEditing={() => passwordRef.current.focus()}
+            />
+            <InputLabelled
+              ref={passwordRef}
+              onChangeText={setPassword}
+              label="Mot de passe"
+              placeholder="unSecret23!"
+              onFocus={() => _scrollToInput(passwordRef)}
+              value={password}
+              autoCompleteType="password"
+              autoCapitalize="none"
+              secureTextEntry={!showPassword}
+              returnKeyType="done"
+              onSubmitEditing={onConnect}
+              EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
+              onEndIconPress={toggleShowPassword}
+            />
+            {!!showEncryptionKeyInput && (
               <InputLabelled
-                ref={(r) => (this.passwordInput = r)}
-                onChangeText={(password) => this.setState({ password })}
-                label="Mot de passe"
+                ref={encryptionKeyRef}
+                onChangeText={setEncryptionKey}
+                label="Clé de chiffrement"
                 placeholder="unSecret23!"
-                onFocus={() => this._scrollToInput(this.passwordInput)}
-                value={password}
-                autoCompleteType="password"
+                onFocus={() => _scrollToInput(encryptionKeyRef)}
+                value={encryptionKey}
                 autoCapitalize="none"
                 secureTextEntry={!showPassword}
                 returnKeyType="done"
-                onSubmitEditing={this.onConnect}
+                onSubmitEditing={onConnect}
                 EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
-                onEndIconPress={this.toggleShowPassword}
+                onEndIconPress={toggleShowPassword}
               />
-              {!!showEncryptionKeyInput && (
-                <InputLabelled
-                  ref={(r) => (this.encryptionKey = r)}
-                  onChangeText={(encryptionKey) => this.setState({ encryptionKey })}
-                  label="Clé de chiffrement"
-                  placeholder="unSecret23!"
-                  onFocus={() => this._scrollToInput(this.encryptionKey)}
-                  value={encryptionKey}
-                  autoCapitalize="none"
-                  secureTextEntry={!showPassword}
-                  returnKeyType="done"
-                  onSubmitEditing={this.onConnect}
-                  EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
-                  onEndIconPress={this.toggleShowPassword}
-                />
-              )}
-              <TouchableWithoutFeedback onPress={this.onForgetPassword}>
-                <Hint>J'ai oublié mon mot de passe</Hint>
-              </TouchableWithoutFeedback>
-              <ButtonsContainer>
-                <Button caption="Connecter" onPress={this.onConnect} loading={loading} disabled={loading} />
-              </ButtonsContainer>
-              <Version>Mano v{version}</Version>
-            </View>
-          </ScrollContainer>
-        </SceneContainer>
-      </Background>
-    );
-  }
-}
+            )}
+            <TouchableWithoutFeedback onPress={onForgetPassword}>
+              <Hint>J'ai oublié mon mot de passe</Hint>
+            </TouchableWithoutFeedback>
+            <ButtonsContainer>
+              <Button caption="Connecter" onPress={onConnect} loading={loading} disabled={loading} />
+            </ButtonsContainer>
+            <Version>Mano v{version}</Version>
+          </View>
+        </ScrollContainer>
+      </SceneContainer>
+    </Background>
+  );
+};
 
 const Background = styled.View`
   flex: 1;
@@ -239,4 +258,4 @@ const Version = styled(MyText)`
   /* color: #ddd; */
 `;
 
-export default compose(withContext(AuthContext), withContext(RefreshContext))(Login);
+export default Login;
