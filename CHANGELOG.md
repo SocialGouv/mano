@@ -1,3 +1,10 @@
+## [1.43.2](https://github.com/SocialGouv/mano/compare/v1.43.1...v1.43.2) (2022-01-26)
+
+
+### Bug Fixes
+
+* **api:** no need password ([#297](https://github.com/SocialGouv/mano/issues/297)) ([e40b1ea](https://github.com/SocialGouv/mano/commit/e40b1ea13581f4180322b08cb9bf76e5e3348afd))
+
 ## [1.43.1](https://github.com/SocialGouv/mano/compare/v1.43.0...v1.43.1) (2022-01-26)
 
 
