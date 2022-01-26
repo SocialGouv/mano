@@ -1,21 +1,20 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { compose } from 'recompose';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { API } from '@sentry/core';
 import PersonSummary from './PersonSummary';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import { genders } from '../../components/Selects/GenderSelect';
 import FoldersNavigator from './FoldersNavigator';
 import Tabs from '../../components/Tabs';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import ActionsContext from '../../contexts/actions';
-import PersonsContext from '../../contexts/persons';
-import PlacesContext from '../../contexts/places';
-import CommentsContext from '../../contexts/comments';
 import colors from '../../utils/colors';
+import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState } from '../../recoil/persons';
+import { actionsState } from '../../recoil/actions';
+import { commentsState } from '../../recoil/comments';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -24,136 +23,124 @@ const cleanValue = (value) => {
   return value;
 };
 
-class Person extends React.Component {
-  castToPerson = (person = {}, customFieldsPersonsMedical = [], customFieldsPersonsSocial = []) => {
-    const toReturn = {};
-    for (const field of customFieldsPersonsMedical) {
-      toReturn[field.name] = cleanValue(person[field.name]);
-    }
-    for (const field of customFieldsPersonsSocial) {
-      toReturn[field.name] = cleanValue(person[field.name]);
-    }
-    return {
-      ...toReturn,
-      name: person.name || '',
-      otherNames: person.otherNames || '',
-      birthdate: person.birthdate || null,
-      alertness: person.alertness || false,
-      wanderingAt: person.wanderingAt || null,
-      createdAt: person.createdAt,
-      gender: person.gender || genders[0],
-      phone: person.phone?.trim() || '',
-      description: person.description?.trim() || '',
-      personalSituation: person.personalSituation?.trim() || '',
-      nationalitySituation: person.nationalitySituation?.trim() || '',
-      address: person.address?.trim() || '',
-      addressDetail: person.addressDetail?.trim() || '',
-      structureSocial: person.structureSocial?.trim() || '',
-      employment: person.employment?.trim() || '',
-      structureMedical: person.structureMedical?.trim() || '',
-      resources: person.resources || [],
-      reasons: person.reasons || [],
-      healthInsurance: person.healthInsurance?.trim() || '',
-      vulnerabilities: person.vulnerabilities || [],
-      consumptions: person.consumptions || [],
-      assignedTeams: person.assignedTeams || [],
-      hasAnimal: person.hasAnimal?.trim() || '',
-      entityKey: person.entityKey || '',
-      outOfActiveList: person.outOfActiveList || false,
-      outOfActiveListReason: person.outOfActiveListReason || '',
+const castToPerson = (person = {}, customFieldsPersonsMedical = [], customFieldsPersonsSocial = []) => {
+  const toReturn = {};
+  for (const field of customFieldsPersonsMedical) {
+    toReturn[field.name] = cleanValue(person[field.name]);
+  }
+  for (const field of customFieldsPersonsSocial) {
+    toReturn[field.name] = cleanValue(person[field.name]);
+  }
+  return {
+    ...toReturn,
+    name: person.name || '',
+    otherNames: person.otherNames || '',
+    birthdate: person.birthdate || null,
+    alertness: person.alertness || false,
+    wanderingAt: person.wanderingAt || null,
+    createdAt: person.createdAt,
+    gender: person.gender || genders[0],
+    phone: person.phone?.trim() || '',
+    description: person.description?.trim() || '',
+    personalSituation: person.personalSituation?.trim() || '',
+    nationalitySituation: person.nationalitySituation?.trim() || '',
+    address: person.address?.trim() || '',
+    addressDetail: person.addressDetail?.trim() || '',
+    structureSocial: person.structureSocial?.trim() || '',
+    employment: person.employment?.trim() || '',
+    structureMedical: person.structureMedical?.trim() || '',
+    resources: person.resources || [],
+    reasons: person.reasons || [],
+    healthInsurance: person.healthInsurance?.trim() || '',
+    vulnerabilities: person.vulnerabilities || [],
+    consumptions: person.consumptions || [],
+    assignedTeams: person.assignedTeams || [],
+    hasAnimal: person.hasAnimal?.trim() || '',
+    entityKey: person.entityKey || '',
+    outOfActiveList: person.outOfActiveList || false,
+    outOfActiveListReason: person.outOfActiveListReason || '',
+  };
+};
+
+const Person = ({ route, navigation }) => {
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+
+  const [persons, setPersons] = useRecoilState(personsState);
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [comments, setComments] = useRecoilState(commentsState);
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+
+  const personDB = useMemo(() => {
+    persons.find((p) => p._id === route.params?._id);
+  }, [persons, route.params?._id]);
+
+  const [person, setPerson] = useState(castToPerson(route?.params, customFieldsPersonsMedical, customFieldsPersonsSocial));
+  const [writingComment, setWritingComment] = useState('');
+  const [editable, setEditable] = useState(route?.params?.editable || false);
+  const [updating, setUpdating] = useState(false);
+
+  const backRequestHandledRef = useRef(null);
+  useEffect(() => {
+    const handleBeforeRemove = (e) => {
+      if (backRequestHandledRef.current) return;
+      e.preventDefault();
+      onGoBackRequested();
     };
-  };
 
-  state = {
-    person: {},
-    // person model
-    ...this.castToPerson(this.props.route?.params, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial),
-    // otherdata connected to person
-    places: null,
-    writingComment: '',
-    comments: null,
-    // component state
-    loading: false,
-    editable: this.props.route?.params?.editable || false,
-    updating: false,
-  };
+    const handleFocus = () => {
+      const newPerson = route?.params?.person;
+      if (newPerson) {
+        setPersons((persons) => [...persons.filter((p) => p !== newPerson), newPerson]);
+      }
+    };
+    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      focusListenerUnsubscribe();
+      beforeRemoveListenerUnsbscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation, route?.params?.person]);
 
-  componentDidMount() {
-    this.getPerson();
-    this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
-    this.props.navigation.addListener('focus', this.handleFocus);
-  }
+  const onEdit = () => setEditable((e) => !e);
 
-  componentWillUnmount() {
-    this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
-    this.props.navigation.removeListener('focus', this.handleFocus);
-  }
-
-  handleFocus = () => {
-    this.getPerson();
-  };
-
-  handleBeforeRemove = (e) => {
-    if (this.backRequestHandled) return;
-    e.preventDefault();
-    this.onGoBackRequested();
-  };
-
-  onEdit = () => this.setState(({ editable }) => ({ editable: !editable }));
-
-  setPerson = (personDB) => {
-    this.setState({
-      person: Object.assign(
-        {},
-        this.castToPerson(personDB, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial),
-        { _id: personDB._id }
-      ),
-      ...this.castToPerson(personDB, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial),
-      loading: false,
-    });
-  };
-
-  getPerson = async () => {
-    const { _id } = this.props.route.params;
-    this.setPerson(this.props.context.persons.find((p) => p._id === _id));
-  };
-
-  onChange = (newState, forceUpdate = false) => {
+  const onChange = (newPersonState, forceUpdate = false) => {
     if (forceUpdate) {
-      this.setState(newState, () => this.onUpdatePerson(false));
+      setPerson((p) => ({ ...p, ...newPersonState }));
+      onUpdatePerson(false);
     } else {
-      this.setState(newState);
+      setPerson((p) => ({ ...p, ...newPersonState }));
     }
   };
 
-  onUpdatePerson = async (alert = true) => {
-    this.setState({ updating: true });
-    const { person } = this.state;
-    const { updatePerson } = this.props.context;
+  const onUpdatePerson = async (alert = true) => {
+    setUpdating(true);
     const response = await updatePerson(
-      Object.assign({}, this.castToPerson(this.state, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial), {
-        _id: person._id,
+      Object.assign({}, this.castToPerson(person, customFieldsPersonsMedical, customFieldsPersonsSocial), {
+        _id: personDB._id,
       })
     );
     if (response.error) {
       Alert.alert(response.error);
-      this.setState({ updating: false });
+      setUpdating(false);
       return false;
     }
     if (response.ok) {
       if (alert) Alert.alert('Personne mise à jour !');
       this.setPerson(response.decryptedData);
-      this.setState({ updating: false, editable: false });
+      setUpdating(false);
+      setEditable(false);
       return true;
     }
   };
 
-  onDeleteRequest = () => {
+  const onDeleteRequest = () => {
     Alert.alert('Voulez-vous vraiment supprimer cette personne ?', 'Cette opération est irréversible.', [
       {
         text: 'Supprimer',
         style: 'destructive',
-        onPress: this.onDelete,
+        onPress: onDelete,
       },
       {
         text: 'Annuler',
@@ -162,38 +149,56 @@ class Person extends React.Component {
     ]);
   };
 
-  onDelete = async () => {
-    const { person } = this.state;
-    const response = await this.props.context.deletePerson(person._id);
-    if (response.error) {
-      Alert.alert(response.error);
+  const onDelete = async () => {
+    setUpdating(true);
+    const res = await API.delete({ path: `/person/${personDB._id}` });
+    if (res.error) {
+      Alert.alert(res.error);
       return;
     }
-    if (response.ok) {
-      Alert.alert('Personne supprimée !');
-      this.onBack();
+    for (const action of actions.filter((a) => a.person === personDB._id)) {
+      const actionRes = await API.delete({ path: `/action/${action._id}` });
+      if (actionRes.ok) {
+        setActions((actions) => actions.filter((a) => a._id !== action._id));
+        for (let comment of comments.filter((c) => c.action === action._id)) {
+          const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+          if (commentRes.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
+          return commentRes;
+        }
+      }
     }
+    for (let comment of comments.filter((c) => c.person === personDB._id)) {
+      const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+      if (commentRes.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
+      return commentRes;
+    }
+    for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === personDB._id)) {
+      const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+      if (res.ok) setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+    }
+    setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
+    Alert.alert('Personne supprimée !');
+    onBack();
   };
 
-  isUpdateDisabled = () => {
-    const { person } = this.state;
+  const isUpdateDisabled = useMemo(() => {
     const newPerson = {
-      ...person,
-      ...this.castToPerson(this.state, this.props.context.customFieldsPersonsMedical, this.props.context.customFieldsPersonsSocial),
+      ...personDB,
+      ...this.castToPerson(person, customFieldsPersonsMedical, customFieldsPersonsSocial),
     };
-    if (JSON.stringify(person) !== JSON.stringify(newPerson)) return false;
+    if (JSON.stringify(personDB) !== JSON.stringify(newPerson)) return false;
     return true;
-  };
+  }, [personDB, person, customFieldsPersonsMedical, customFieldsPersonsSocial]);
 
-  onBack = () => {
-    this.backRequestHandled = true;
+  const onBack = () => {
+    backRequestHandledRef.current = true;
     const { navigation, route } = this.props;
     Sentry.setContext('person', {});
     route.params?.fromRoute ? navigation.navigate(route.params.fromRoute) : navigation.goBack();
   };
 
-  onGoBackRequested = async () => {
-    if (this.state.writingComment.length) {
+  const onGoBackRequested = async () => {
+    if (writingComment.length) {
       const goToNextStep = await new Promise((res) =>
         Alert.alert("Vous êtes en train d'écrire un commentaire, n'oubliez pas de cliquer sur créer !", null, [
           {
@@ -214,19 +219,16 @@ class Person extends React.Component {
       );
       if (!goToNextStep) return;
     }
-    if (this.isUpdateDisabled()) {
-      this.onBack();
-      return;
-    }
+    if (isUpdateDisabled) return onBack();
     Alert.alert('Voulez-vous enregistrer les mises-à-jour sur cette personne ?', null, [
       {
         text: 'Enregistrer',
-        onPress: this.onUpdatePerson,
+        onPress: onUpdatePerson,
       },
       {
         text: 'Ne pas enregistrer',
         style: 'destructive',
-        onPress: this.onBack,
+        onPress: onBack,
       },
       {
         text: 'Annuler',
@@ -235,70 +237,61 @@ class Person extends React.Component {
     ]);
   };
 
-  render() {
-    const { name, updating, editable, person } = this.state;
-
-    return (
-      <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}>
-        <ScreenTitle
-          title={name}
-          onBack={this.onGoBackRequested}
-          onEdit={!editable ? this.onEdit : null}
-          onSave={!editable ? null : this.onUpdatePerson}
-          saving={updating}
-          backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-        />
-        <TabNavigator.Navigator
-          tabBar={(props) => (
-            <Tabs
-              numberOfTabs={2}
-              {...props}
-              backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
+  return (
+    <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}>
+      <ScreenTitle
+        title={person.name}
+        onBack={onGoBackRequested}
+        onEdit={!editable ? onEdit : null}
+        onSave={!editable ? null : onUpdatePerson}
+        saving={updating}
+        backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+      />
+      <TabNavigator.Navigator
+        tabBar={(props) => (
+          <Tabs
+            numberOfTabs={2}
+            {...props}
+            backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
+          />
+        )}
+        lazy
+        removeClippedSubviews={Platform.OS === 'android'}
+        swipeEnabled>
+        <TabNavigator.Screen name="Summary" options={{ tabBarLabel: 'Résumé' }}>
+          {() => (
+            <PersonSummary
+              person={person}
+              navigation={navigation}
+              route={route}
+              backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+              onChange={onChange}
+              onUpdatePerson={onUpdatePerson}
+              writeComment={setWritingComment}
+              onEdit={onEdit}
+              isUpdateDisabled={isUpdateDisabled}
+              onDeleteRequest={onDeleteRequest}
             />
           )}
-          lazy
-          removeClippedSubviews={Platform.OS === 'android'}
-          swipeEnabled>
-          <TabNavigator.Screen name="Summary" options={{ tabBarLabel: 'Résumé' }}>
-            {() => (
-              <PersonSummary
-                {...this.state}
-                {...this.props}
-                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-                onChange={this.onChange}
-                onUpdatePerson={this.onUpdatePerson}
-                writeComment={(writingComment) => this.setState({ writingComment })}
-                onEdit={this.onEdit}
-                isUpdateDisabled={this.isUpdateDisabled}
-                onDeleteRequest={this.onDeleteRequest}
-                onCommentDeleteRequest={this.onCommentDeleteRequest}
-              />
-            )}
-          </TabNavigator.Screen>
-          <TabNavigator.Screen name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
-            {() => (
-              <FoldersNavigator
-                {...this.state}
-                {...this.props}
-                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-                onChange={this.onChange}
-                onUpdatePerson={this.onUpdatePerson}
-                onEdit={this.onEdit}
-                isUpdateDisabled={this.isUpdateDisabled}
-                onDeleteRequest={this.onDeleteRequest}
-              />
-            )}
-          </TabNavigator.Screen>
-        </TabNavigator.Navigator>
-      </SceneContainer>
-    );
-  }
-}
+        </TabNavigator.Screen>
+        <TabNavigator.Screen name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
+          {() => (
+            <FoldersNavigator
+              person={person}
+              navigation={navigation}
+              route={route}
+              backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+              onChange={onChange}
+              onUpdatePerson={onUpdatePerson}
+              onEdit={onEdit}
+              isUpdateDisabled={isUpdateDisabled}
+              onDeleteRequest={onDeleteRequest}
+            />
+          )}
+        </TabNavigator.Screen>
+      </TabNavigator.Navigator>
+    </SceneContainer>
+  );
+};
 
-export default compose(
-  withContext(ActionsContext),
-  withContext(PersonsContext),
-  withContext(PlacesContext),
-  withContext(CommentsContext),
-  withContext(AuthContext)
-)(Person);
+export default Person;

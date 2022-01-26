@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import PersonRow from './PersonRow';
@@ -6,79 +6,63 @@ import Spinner from '../../components/Spinner';
 import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyContainer';
 import Search from '../../components/Search';
 import FlatListStyled from '../../components/FlatListStyled';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import { compose } from 'recompose';
-import PersonsContext from '../../contexts/persons';
-import RefreshContext from '../../contexts/refresh';
-import { capture } from '../../services/sentry';
+import { useRefresh } from '../../recoil/refresh';
+import { useRecoilValue } from 'recoil';
+import { personsFullSearchSelector } from '../../recoil/selectors';
 
-class PersonsSearch extends React.Component {
-  state = {
-    refreshing: false,
-    search: '',
+const PersonsSearch = ({ navigation, route }) => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState('');
+  const { loading, personsRefresher } = useRefresh();
+
+  const filteredPersons = useRecoilValue(personsFullSearchSelector({ search }));
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await personsRefresher();
+    setRefreshing(false);
   };
 
-  person = null;
-
-  onRefresh = () => {
-    this.setState({ refreshing: true }, this.refreshData);
-  };
-
-  refreshData = async () => {
-    await this.props.context.refreshPersons();
-    this.setState({ loading: false, refreshing: false });
-  };
-
-  onCreatePersonRequest = () => {
-    const { route, navigation } = this.props;
+  const onCreatePersonRequest = () => {
     navigation.push('NewPersonForm', {
       fromRoute: route.params.fromRoute,
       toRoute: route.params.fromRoute,
     });
   };
 
-  onSelectPerson = (person) => {
-    this.person = person;
-    this.onBack();
-  };
-
-  onBack = async () => {
-    const { navigation, route } = this.props;
+  const onSelectPerson = (person) => {
     navigation.navigate(route.params.fromRoute, {
-      person: this.person?._id,
+      person: person?._id,
     });
   };
 
-  keyExtractor = (person) => person._id;
-  ListFooterComponent = () => {
-    const { persons } = this.props.context;
-    if (!persons.length) return null;
+  const onBack = async () => {
+    navigation.navigate(route.params.fromRoute);
+  };
+
+  const keyExtractor = (person) => person._id;
+  const ListFooterComponent = () => {
+    if (!filteredPersons.length) return null;
     return <ListNoMorePersons />;
   };
-  renderPersonRow = ({ item: person }) => <PersonRow onPress={() => this.onSelectPerson(person)} person={person} buttonRight="+" />;
+  const renderPersonRow = ({ item: person }) => <PersonRow onPress={() => onSelectPerson(person)} person={person} buttonRight="+" />;
 
-  render() {
-    const { key, refreshing, loading, search } = this.state;
-    const { persons } = this.props.context;
-    const data = persons.filter((p) => p.name.toLocaleLowerCase().includes(search.toLocaleLowerCase()));
-    return (
-      <SceneContainer>
-        <ScreenTitle title="Choisissez une personne" onBack={this.onBack} onAdd={this.onCreatePersonRequest} />
-        <Search placeholder="Rechercher une personne..." onChange={(search) => this.setState({ search })} />
-        <FlatListStyled
-          refreshing={refreshing}
-          onRefresh={this.onRefresh}
-          data={data}
-          extraData={key}
-          renderItem={this.renderPersonRow}
-          keyExtractor={this.keyExtractor}
-          ListEmptyComponent={loading ? Spinner : ListEmptyPersons}
-          ListFooterComponent={this.ListFooterComponent}
-        />
-      </SceneContainer>
-    );
-  }
-}
+  return (
+    <SceneContainer>
+      <ScreenTitle title="Choisissez une personne" onBack={onBack} onAdd={onCreatePersonRequest} />
+      <Search placeholder="Rechercher une personne..." onChange={setSearch} />
+      <FlatListStyled
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        data={filteredPersons}
+        extraData={filteredPersons}
+        renderItem={renderPersonRow}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={loading ? Spinner : ListEmptyPersons}
+        ListFooterComponent={ListFooterComponent}
+      />
+    </SceneContainer>
+  );
+};
 
-export default compose(withContext(AuthContext), withContext(PersonsContext), withContext(RefreshContext))(PersonsSearch);
+export default PersonsSearch;

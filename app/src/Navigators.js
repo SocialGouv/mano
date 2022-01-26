@@ -3,17 +3,19 @@ import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AgendaIcon /*  StructuresIcon, PersonIcon, MenuIcon, TerritoryIcon */ } from './icons';
+import { AgendaIcon, PersonIcon /*  StructuresIcon,  MenuIcon, TerritoryIcon */ } from './icons';
 import { AppState } from 'react-native';
 import { RecoilRoot } from 'recoil';
 import logEvents from './services/logEvents';
 import Login from './scenes/Login/Login';
 import Action from './scenes/Actions/Action';
 import NewActionForm from './scenes/Actions/NewActionForm';
-// import PersonsList from './scenes/Persons/PersonsList';
-// import PersonsSearch from './scenes/Persons/PersonsSearch';
-// import NewPersonForm from './scenes/Persons/NewPersonForm';
-// import Person from './scenes/Persons/Person';
+import PersonsList from './scenes/Persons/PersonsList';
+import PersonsSearch from './scenes/Persons/PersonsSearch';
+import NewPersonForm from './scenes/Persons/NewPersonForm';
+import Person from './scenes/Persons/Person';
+import PersonsOutOfActiveListReason from './scenes/Persons/PersonsOutOfActiveListReason';
+import PersonsFilter from './scenes/Persons/PersonsFilter';
 // import StructuresList from './scenes/Structures/StructuresList';
 // import NewStructureForm from './scenes/Structures/NewStructureForm';
 // import Structure from './scenes/Structures/Structure';
@@ -33,7 +35,6 @@ import ForceChangePassword from './scenes/Login/ForceChangePassword';
 // import NewTerritoryForm from './scenes/Territories/NewTerritoryForm';
 // import Territory from './scenes/Territories/Territory';
 // import TerritoryObservation from './scenes/Territories/TerritoryObservation';
-// import PersonsFilter from './scenes/Persons/PersonsFilter';
 // import RootContextsProvider from './contexts/rootProvider';
 // import { StructuresProvider } from './contexts/structures';
 // import { ActionsByStatusProvider, PersonsSelectorsProvider } from './contexts/selectors';
@@ -41,7 +42,7 @@ import EnvironmentIndicator from './components/EnvironmentIndicator';
 import API from './services/api';
 // import Charte from './scenes/Menu/Charte';
 import CharteAcceptance from './scenes/Login/CharteAcceptance';
-// import PersonsOutOfActiveListReason from './scenes/Persons/PersonsOutOfActiveListReason';
+import Loader from './components/Loader';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -55,22 +56,22 @@ const ActionsNavigator = () => {
   );
 };
 
-// const PersonsStack = createStackNavigator();
-// const PersonsNavigator = () => {
-//   return (
-//     <PersonsStack.Navigator headerMode="none" initialRouteName="PersonsList">
-//       <PersonsStack.Screen name="PersonsList" component={PersonsList} />
-//       <PersonsStack.Screen name="Person" component={Person} />
-//       <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
-//       <PersonsStack.Screen name="NewPersonForm" component={NewPersonForm} />
-//       <PersonsStack.Screen name="PersonPlace" component={Place} />
-//       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
-//       <PersonsStack.Screen name="PersonComment" component={Comment} />
-//       <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
-//       <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
-//     </PersonsStack.Navigator>
-//   );
-// };
+const PersonsStack = createStackNavigator();
+const PersonsNavigator = () => {
+  return (
+    <PersonsStack.Navigator headerMode="none" initialRouteName="PersonsList">
+      <PersonsStack.Screen name="PersonsList" component={PersonsList} />
+      <PersonsStack.Screen name="Person" component={Person} />
+      <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
+      <PersonsStack.Screen name="NewPersonForm" component={NewPersonForm} />
+      <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
+      <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
+      {/* <PersonsStack.Screen name="PersonPlace" component={Place} /> */}
+      {/* <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} /> */}
+      <PersonsStack.Screen name="PersonComment" component={Comment} />
+    </PersonsStack.Navigator>
+  );
+};
 
 // const StructuresStack = createStackNavigator();
 // const StructuresNavigator = () => {
@@ -138,7 +139,7 @@ const TabNavigator = ({ navigation }) => (
         tabBarLabel: 'TERRITOIRES',
       }}
     /> */}
-    {/* <Tab.Screen
+    <Tab.Screen
       name="Persons"
       component={PersonsNavigator}
       options={{
@@ -146,7 +147,7 @@ const TabNavigator = ({ navigation }) => (
         tabBarLabel: 'USAGERS',
       }}
     />
-    <Tab.Screen
+    {/* <Tab.Screen
       name="Structures"
       component={StructuresNavigator}
       options={{
@@ -207,9 +208,10 @@ const App = () => {
           <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
             <AppStack.Screen name="LoginStack" component={LoginNavigator} />
             <AppStack.Screen name="Home" component={TabNavigator} />
-            {/* <AppStack.Screen name="Persons" component={PersonsNavigator} /> */}
+            <AppStack.Screen name="Persons" component={PersonsNavigator} />
             <AppStack.Screen name="Actions" component={ActionsNavigator} />
           </AppStack.Navigator>
+          <Loader />
           <EnvironmentIndicator />
         </NavigationContainer>
       </ActionSheetProvider>

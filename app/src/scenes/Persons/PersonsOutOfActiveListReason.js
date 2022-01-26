@@ -7,7 +7,7 @@ import ScrollContainer from '../../components/ScrollContainer';
 import OutOfActiveListReasonSelect from '../../components/Selects/OutOfActiveListReasonSelect';
 import PersonsContext from '../../contexts/persons';
 
-export default function PersonsOutOfActiveListReason({ navigation, route }) {
+const PersonsOutOfActiveListReason = ({ navigation, route }) => {
   const [reason, setReason] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const { updatePerson } = useContext(PersonsContext);
@@ -34,4 +34,6 @@ export default function PersonsOutOfActiveListReason({ navigation, route }) {
       </ScrollContainer>
     </SceneContainer>
   );
-}
+};
+
+export default PersonsOutOfActiveListReason;

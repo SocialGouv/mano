@@ -123,12 +123,15 @@ export const personsSearchSelector = selectorFamily({
 export const personsFullSearchSelector = selectorFamily({
   key: 'personsFullSearchSelector',
   get:
-    ({ search = '', filterTeams = [], filters = [], alertness = false }) =>
+    ({ search = '', filterTeams = [], filters = [], filterAlertness = false, filterOutOfActiveList = false }) =>
     ({ get }) => {
       const persons = get(personsWithPlacesSelector);
       let personsFiltered = persons;
       if (filters?.filter((f) => Boolean(f?.value)).length) personsFiltered = filterData(personsFiltered, filters);
-      if (alertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
+      if (filterOutOfActiveList) {
+        personsFiltered = personsFiltered.filter((p) => (filterOutOfActiveList === 'Oui' ? p.outOfActiveList : !p.outOfActiveList));
+      }
+      if (filterAlertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
       if (filterTeams.length) {
         personsFiltered = personsFiltered.filter((p) => {
           for (let assignedTeam of p.assignedTeams) {
