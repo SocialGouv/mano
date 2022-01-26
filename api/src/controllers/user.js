@@ -169,7 +169,6 @@ router.post(
     }
     if (!req.body.name) return res.status(403).send({ ok: false, error: "A name is required" });
     if (!req.body.email) return res.status(403).send({ ok: false, error: "An email is required" });
-    if (!req.body.password) return res.status(403).send({ ok: false, error: "A password is required" });
     if (!req.body.organisation) return res.status(403).send({ ok: false, error: "An organisation is required" });
     if (!req.body.role) return res.status(403).send({ ok: false, error: "A role is required" });
     const newUser = {};
