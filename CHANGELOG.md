@@ -1,3 +1,10 @@
+## [1.43.1](https://github.com/SocialGouv/mano/compare/v1.43.0...v1.43.1) (2022-01-26)
+
+
+### Bug Fixes
+
+* **app:** dont show undefined in terrotiry observations ([#288](https://github.com/SocialGouv/mano/issues/288)) ([0d2aade](https://github.com/SocialGouv/mano/commit/0d2aade7b2f7cbb41738f383360065aead392b97))
+
 # [1.43.0](https://github.com/SocialGouv/mano/compare/v1.42.2...v1.43.0) (2022-01-26)
 
 
