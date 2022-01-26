@@ -25,20 +25,20 @@ const isNullOrUndefined = (value) => {
   return false;
 };
 
-const validateString = (value) => {
+const validateString = ({ v: value }) => {
   if (!value) return null;
   if (typeof value === 'string') return value;
   if (typeof `${value}` === 'string') return `${value}`;
   return null;
 };
 
-const validateNumber = (value) => {
+const validateNumber = ({ v: value }) => {
   if (!isNaN(value)) return value;
   if (!isNaN(parseInt(value, 10))) return parseInt(value, 10);
   return null;
 };
 
-const validateDate = (value) => {
+const validateDate = ({ w: value }) => {
   // https://stackoverflow.com/a/643827/5225096
   if (typeof value?.getMonth === 'function') return value;
   if (!isNaN(new Date(value).getMonth())) return new Date(value);
@@ -47,7 +47,7 @@ const validateDate = (value) => {
 
 const validateYesNo =
   (possibleValues = ['Oui', 'Non']) =>
-  (value) => {
+  ({ v: value }) => {
     value = validateString(value);
     if (!value) return null;
     if (possibleValues.includes(value)) return value;
@@ -58,7 +58,7 @@ const validateYesNo =
 
 const validateEnum =
   (possibleValues = []) =>
-  (value) => {
+  ({ v: value }) => {
     value = validateString(value);
     if (!value) return null;
     if (possibleValues.includes(value)) return value;
@@ -67,7 +67,7 @@ const validateEnum =
 
 const validateMultiChoice =
   (possibleValues = []) =>
-  (value) => {
+  ({ v: value }) => {
     // value is either string or array
     if (!Array.isArray(value)) {
       value = validateString(value);
@@ -79,7 +79,7 @@ const validateMultiChoice =
     return null;
   };
 
-const validateBoolean = (value) => {
+const validateBoolean = ({ v: value }) => {
   if (typeof value === 'undefined') return null;
   return Boolean(value);
 };
