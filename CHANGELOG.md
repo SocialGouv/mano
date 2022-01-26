@@ -1,3 +1,10 @@
+## [1.43.3](https://github.com/SocialGouv/mano/compare/v1.43.2...v1.43.3) (2022-01-26)
+
+
+### Bug Fixes
+
+* **dashboard:** import data ([#298](https://github.com/SocialGouv/mano/issues/298)) ([8ef6e12](https://github.com/SocialGouv/mano/commit/8ef6e12fe7cf9080f56b30701d0489da74714fec))
+
 ## [1.43.2](https://github.com/SocialGouv/mano/compare/v1.43.1...v1.43.2) (2022-01-26)
 
 
