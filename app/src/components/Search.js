@@ -7,19 +7,13 @@ import { MyTextInput } from './MyText';
 import withContext from '../contexts/withContext';
 import AuthContext from '../contexts/auth';
 
-class Search extends React.Component {
-  state = {
-    search: '',
-  };
+const Search = ({ path, onSearchStart, onSearchClear, onChange, withOrg, context, onSearchComplete }) => {
+  const [search, setSearch] = useState('');
 
-  onSearchComplete = (results) => {
-    this.props.onSearchComplete(results);
-  };
-
-  onSearch = async (search) => {
+  const onSearch = async (search) => {
     const { path, onSearchStart, onSearchClear, onChange, withOrg, context } = this.props;
     if (onChange) {
-      this.setState({ search });
+      setSearch(search)
       return onChange(search);
     }
     onSearchStart(search);
@@ -45,6 +39,8 @@ class Search extends React.Component {
       }
     }, 300);
   };
+}
+
 
   render() {
     const { placeholder, style, onFocus, parentScroll } = this.props;

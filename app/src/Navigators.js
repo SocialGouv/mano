@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -177,52 +177,49 @@ const LoginNavigator = () => (
 
 const AppStack = createStackNavigator();
 
-class App extends React.Component {
-  async componentDidMount() {
-    await logEvents.initLogEvents();
-    logEvents.logAppVisit();
-    AppState.addEventListener('change', this.onAppChange);
-  }
-
-  componentWillUnmount() {
-    logEvents.logAppClose();
-    AppState.removeEventListener('focus', this.onAppChange);
-  }
-
-  appState = AppState.currentState;
-  onAppChange = (nextAppState) => {
-    if (this.appState?.match(/inactive|background/) && nextAppState === 'active') {
-      if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
+const App = () => {
+  const appState = useRef(AppState.currentState);
+  const appStateListener = useRef(null);
+  useEffect(() => {
+    logEvents.initLogEvents().then(() => {
       logEvents.logAppVisit();
-    } else {
+      appStateListener.current = AppState.addEventListener('change', (nextAppState) => {
+        if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+          if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
+          logEvents.logAppVisit();
+        } else {
+          logEvents.logAppClose();
+        }
+        appState.current = nextAppState;
+      });
+    });
+    return () => {
       logEvents.logAppClose();
-    }
-    this.appState = nextAppState;
-  };
+      appStateListener.current.remove();
+    };
+  }, []);
 
-  render() {
-    return (
-      <ActionSheetProvider>
-        <RootContextsProvider>
-          <ActionsByStatusProvider>
-            <StructuresProvider>
-              <PersonsSelectorsProvider>
-                <NavigationContainer ref={this.containerRef}>
-                  <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
-                    <AppStack.Screen name="LoginStack" component={LoginNavigator} />
-                    <AppStack.Screen name="Home" component={TabNavigator} />
-                    <AppStack.Screen name="Persons" component={PersonsNavigator} />
-                    <AppStack.Screen name="Actions" component={ActionsNavigator} />
-                  </AppStack.Navigator>
-                  <EnvironmentIndicator />
-                </NavigationContainer>
-              </PersonsSelectorsProvider>
-            </StructuresProvider>
-          </ActionsByStatusProvider>
-        </RootContextsProvider>
-      </ActionSheetProvider>
-    );
-  }
-}
+  return (
+    <ActionSheetProvider>
+      <RootContextsProvider>
+        <ActionsByStatusProvider>
+          <StructuresProvider>
+            <PersonsSelectorsProvider>
+              <NavigationContainer ref={this.containerRef}>
+                <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
+                  <AppStack.Screen name="LoginStack" component={LoginNavigator} />
+                  <AppStack.Screen name="Home" component={TabNavigator} />
+                  <AppStack.Screen name="Persons" component={PersonsNavigator} />
+                  <AppStack.Screen name="Actions" component={ActionsNavigator} />
+                </AppStack.Navigator>
+                <EnvironmentIndicator />
+              </NavigationContainer>
+            </PersonsSelectorsProvider>
+          </StructuresProvider>
+        </ActionsByStatusProvider>
+      </RootContextsProvider>
+    </ActionSheetProvider>
+  );
+};
 
 export default App;
