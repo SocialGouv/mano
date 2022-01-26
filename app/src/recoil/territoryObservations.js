@@ -1,5 +1,5 @@
 import { organisationState } from './auth';
-import useApi from '../services/api';
+import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
@@ -27,8 +27,6 @@ export const useTerritoryObservations = () => {
   const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
   const [loading, setLoading] = useRecoilState(territoriesObservationsLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
-
-  const API = useApi();
 
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 

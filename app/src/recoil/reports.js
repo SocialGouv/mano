@@ -1,6 +1,6 @@
 import { atom, useRecoilState } from 'recoil';
 import { useComments } from '../recoil/comments';
-import useApi from '../services/api';
+import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
@@ -16,7 +16,6 @@ export const reportsLoadingState = atom({
 
 export const useReports = () => {
   const { addComment } = useComments();
-  const API = useApi();
 
   const [reports, setReports] = useRecoilState(reportsState);
   const [loading, setLoading] = useRecoilState(reportsLoadingState);

@@ -34,7 +34,7 @@ const Login = ({ navigation }) => {
   const setOrganisation = useSetRecoilState(organisationState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
-  const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
+  const setCurrentTeam = useSetRecoilState(currentTeamState);
   const { refresh } = useRefresh();
 
   const checkVersion = async () => {
@@ -59,7 +59,7 @@ const Login = ({ navigation }) => {
       RNBootSplash.hide({ duration: 250 });
       checkVersion();
     }, 500);
-  });
+  }, []);
 
   const toggleShowPassword = () => setShowPassword((show) => !show);
 
@@ -101,6 +101,7 @@ const Login = ({ navigation }) => {
       Keyboard.dismiss();
       API.token = response.token;
       API.showTokenExpiredError = true;
+      API.organisation = response.user.organisation;
       setUser(response.user);
       setOrganisation(response.user.organisation);
       if (!!response.user.organisation?.encryptionEnabled && !showEncryptionKeyInput) {
@@ -131,7 +132,7 @@ const Login = ({ navigation }) => {
           navigation.navigate('CharteAcceptance');
         } else if (response.user?.teams?.length === 1) {
           setCurrentTeam(response.user.teams[0]);
-          refresh({ showFullScreen: true, initialLoad: true });
+          await refresh({ showFullScreen: true, initialLoad: true });
           navigation.navigate('Home');
         } else {
           navigation.navigate('TeamSelection');
@@ -150,13 +151,6 @@ const Login = ({ navigation }) => {
       setLoading(false);
     }, 500);
   };
-
-  useEffect(() => {
-    if (currentTeam?._id) {
-      refresh({ showFullScreen: true, initialLoad: true });
-      navigation.navigate('Home');
-    }
-  }, [currentTeam?._id, refresh, navigation]);
 
   const scrollViewRef = useRef(null);
   const emailRef = useRef(null);

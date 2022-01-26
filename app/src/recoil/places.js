@@ -1,6 +1,6 @@
 import { atom, useRecoilState } from 'recoil';
 import { useRelsPerson } from '../recoil/relPersonPlace';
-import useApi from '../services/api';
+import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
@@ -18,7 +18,6 @@ export const placesLoadingState = atom({
 
 export const usePlaces = () => {
   const { relsPersonPlace, deleteRelation } = useRelsPerson();
-  const API = useApi();
 
   const [places, setPlaces] = useRecoilState(placesState);
   const [loading, setLoading] = useRecoilState(placesLoadingState);

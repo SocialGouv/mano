@@ -6,7 +6,6 @@ import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
-import Spinner from '../../components/Spinner';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
 import InputFromSearchList from '../../components/InputFromSearchList';
@@ -17,12 +16,11 @@ import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
 import UserName from '../../components/UserName';
 import Spacer from '../../components/Spacer';
 import NewCommentInput from '../../scenes/Comments/NewCommentInput';
-import { CANCEL, TODO } from '../../contexts/actions';
 import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
 import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
-import { actionsState, DONE, prepareActionForEncryption } from '../../recoil/actions';
+import { actionsState, DONE, CANCEL, TODO, prepareActionForEncryption, mappedIdsToLabels } from '../../recoil/actions';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { personsState } from '../../recoil/persons';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
@@ -51,19 +49,22 @@ const Action = ({ navigation, route }) => {
   const [comments, setComments] = useRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const actionRef = useRef({});
-  const oldAction = actionRef?.current;
-  const [action, setAction] = useState(castToAction(route?.params));
-  const [loading, setLoading] = useState(false);
+  const actionDB = useMemo(() => {
+    const existingAction = actions.find((a) => a._id === route.params?._id);
+    if (!existingAction) return null;
+    return Object.assign({}, castToAction(existingAction), { _id: existingAction._id });
+  }, [actions, route.params]);
+
+  const [action, setAction] = useState(() => castToAction(actionDB));
   const [updating, setUpdating] = useState(false);
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
 
   const isUpdateDisabled = useMemo(() => {
-    const newAction = { ...oldAction, ...castToAction(action) };
-    if (JSON.stringify(oldAction) !== JSON.stringify(newAction)) return false;
+    const newAction = { ...actionDB, ...castToAction(action) };
+    if (JSON.stringify(actionDB) !== JSON.stringify(newAction)) return false;
     return true;
-  }, [oldAction, action]);
+  }, [actionDB, action]);
 
   const backRequestHandledRef = useRef(false);
   const onBack = () => {
@@ -147,29 +148,17 @@ const Action = ({ navigation, route }) => {
     }
   };
 
-  const focusListener = useRef(null);
-  const beforeRemoveListener = useRef(null);
   useEffect(() => {
-    const getAction = async () => {
-      const { _id } = route.params;
-      const actionDB = actions.find((a) => a._id === _id);
-      if (!actionDB) return onBack();
-      actionRef.current = Object.assign({}, castToAction(actionDB), { _id: actionDB._id });
-      setAction(castToAction(actionDB));
-      setLoading(false);
-    };
-    getAction();
-    focusListener.current = navigation.addListener('focus', handleFocus);
-    beforeRemoveListener.current = navigation.addListener('beforeRemove', handleBeforeRemove);
+    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
     return () => {
-      focusListener.current.remove();
-      beforeRemoveListener.current.remove();
+      focusListenerUnsubscribe();
+      beforeRemoveListenerUnsbscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const updateAction = async (action, { oldAction = null } = {}) => {
-    let response = null;
     if (!oldAction) oldAction = actions.find((a) => a._id === action._id);
     const statusChanged = action.status && oldAction.status !== action.status;
     try {
@@ -180,7 +169,7 @@ const Action = ({ navigation, route }) => {
           action.completedAt = null;
         }
       }
-      response = await API.put({
+      const response = await API.put({
         path: `/action/${action._id}`,
         body: prepareActionForEncryption(action),
       });
@@ -192,21 +181,21 @@ const Action = ({ navigation, route }) => {
           })
         );
       }
-      if (!response?.ok) return;
+      if (!response?.ok) return response;
       const newAction = response.decryptedData;
-      if (!statusChanged) return;
+      if (!statusChanged) return response;
       const comment = {
         comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
         type: 'action',
-        item: oldAction._id,
-        action: oldAction._id,
+        item: actionDB._id,
+        action: actionDB._id,
         team: currentTeam._id,
         user: user._id,
         organisation: organisation._id,
       };
       const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
       if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
-      return commentResponse;
+      return response;
     } catch (error) {
       capture(error, { extra: { message: 'error in updating action', action } });
       return { ok: false, error: error.message };
@@ -229,7 +218,7 @@ const Action = ({ navigation, route }) => {
           Object.assign(
             {},
             castToAction(action),
-            { completedAt: oldAction.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
+            { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
             { _id: a._id, person: a.person }
           )
         );
@@ -239,8 +228,8 @@ const Action = ({ navigation, route }) => {
         Object.assign(
           {},
           castToAction(action),
-          { completedAt: oldAction.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
-          { _id: oldAction._id }
+          { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
+          { _id: actionDB._id }
         )
       );
     }
@@ -252,7 +241,7 @@ const Action = ({ navigation, route }) => {
     }
     if (response.ok) {
       setUpdating(false);
-      if (oldAction.status !== CANCEL && action.status === CANCEL) {
+      if (actionDB.status !== CANCEL && action.status === CANCEL) {
         Alert.alert('Cette action est annulée, voulez-vous la dupliquer ?', 'Avec une date ultérieure par exemple', [
           { text: 'OK', onPress: onDuplicate },
           { text: 'Non merci !', onPress: onBack, style: 'cancel' },
@@ -329,7 +318,7 @@ const Action = ({ navigation, route }) => {
         response = await deleteAction(a._id);
       }
     } else {
-      response = await deleteAction(oldAction._id);
+      response = await deleteAction(actionDB._id);
     }
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
@@ -358,15 +347,15 @@ const Action = ({ navigation, route }) => {
   const persons = useMemo(() => {
     if (route?.params?.actions?.length > 1) {
       return route?.params?.actions?.map((a) => allPersons.find((p) => p._id === a.person));
-    } else if (oldAction.person) {
-      return [allPersons.find((p) => p._id === oldAction.person)];
+    } else if (actionDB.person) {
+      return [allPersons.find((p) => p._id === actionDB.person)];
     }
     return [];
-  }, [route?.params?.actions, allPersons]);
+  }, [route?.params?.actions, allPersons, actionDB?.person]);
 
   const canComment = !route?.params?.actions || route?.params?.actions?.length <= 1;
 
-  const { name, dueAt, withTime, description, categories, user, status } = action;
+  const { name, dueAt, withTime, description, categories, status } = action;
 
   return (
     <SceneContainer>
@@ -378,116 +367,110 @@ const Action = ({ navigation, route }) => {
         saving={updating}
       />
       <ScrollContainer ref={scrollViewRef}>
-        {loading ? (
-          <Spinner />
+        {!!action.user && <UserName metaCaption="Action ajoutée par" id={action.user?._id || action.user} />}
+        <InputLabelled
+          label="Nom de l’action"
+          onChangeText={(name) => setAction((a) => ({ ...a, name }))}
+          value={name}
+          placeholder="Nom de l’action"
+          editable={editable}
+        />
+        {persons.length < 2 ? (
+          <InputFromSearchList
+            label="Personne concernée"
+            value={persons[0]?.name || '-- Aucune --'}
+            onSearchRequest={onSearchPerson}
+            editable={editable}
+          />
         ) : (
           <>
-            {!!user && <UserName metaCaption="Action ajoutée par" id={user?._id || user} />}
-            <InputLabelled
-              label="Nom de l’action"
-              onChangeText={(name) => setAction((a) => ({ ...a, name }))}
-              value={name}
-              placeholder="Nom de l’action"
-              editable={editable}
+            <Label label="Personne(s) concerné(es)" />
+            <Tags
+              data={persons}
+              onChange={(persons) => setAction((a) => ({ ...a, persons }))}
+              onAddRequest={onSearchPerson}
+              renderTag={(person) => <MyText>{person?.name}</MyText>}
             />
-            {persons.length < 2 ? (
-              <InputFromSearchList
-                label="Personne concernée"
-                value={persons[0]?.name || '-- Aucune --'}
-                onSearchRequest={onSearchPerson}
-                editable={editable}
-              />
-            ) : (
-              <>
-                <Label label="Personne(s) concerné(es)" />
-                <Tags
-                  data={persons}
-                  onChange={(persons) => setAction((a) => ({ ...a, persons }))}
-                  onAddRequest={onSearchPerson}
-                  renderTag={(person) => <MyText>{person?.name}</MyText>}
-                />
-              </>
-            )}
-            <ActionStatusSelect
-              onSelect={(status) => setAction((a) => ({ ...a, status }))}
-              onSelectAndSave={(status) => {
-                setAction((a) => ({ ...a, status }));
-                onUpdateActionRequest();
-              }}
-              value={status}
-              editable={editable}
-            />
-            <DateAndTimeInput
-              label="Échéance"
-              setDate={(dueAt) => setAction((a) => ({ ...a, dueAt }))}
-              date={dueAt}
-              showTime
-              showDay
-              withTime={withTime}
-              setWithTime={(withTime) => setAction((a) => ({ ...a, withTime }))}
-              editable={editable}
-            />
-            <InputLabelled
-              label="Description"
-              onChangeText={(description) => setAction((a) => ({ ...a, description }))}
-              value={description}
-              placeholder="Description"
-              multiline
-              editable={editable}
-              ref={descriptionRef}
-              onFocus={() => _scrollToInput(descriptionRef)}
-            />
-            <ActionCategoriesMultiCheckboxes
-              onChange={(categories) => setAction((a) => ({ ...a, categories }))}
-              values={categories}
-              editable={editable}
-            />
-            {!editable && <Spacer />}
-            <ButtonsContainer>
-              <ButtonDelete onPress={onDeleteRequest} />
-              <Button
-                caption={editable ? 'Mettre-à-jour' : 'Modifier'}
-                onPress={editable ? onUpdateActionRequest : setEditable(true)}
-                disabled={editable ? isUpdateDisabled : false}
-                loading={updating}
-              />
-            </ButtonsContainer>
-            <SubList
-              label="Commentaires"
-              key={oldAction._id}
-              data={comments.filter((c) => c.action === oldAction._id)}
-              renderItem={(comment, index) => (
-                <CommentRow
-                  key={index}
-                  comment={comment.comment}
-                  id={comment._id}
-                  createdAt={comment.createdAt}
-                  user={comment.user}
-                  metaCaption="Commentaire de"
-                  onUpdate={
-                    comment.team
-                      ? () =>
-                          navigation.push('ActionComment', {
-                            ...comment,
-                            name,
-                            fromRoute: 'Action',
-                          })
-                      : null
-                  }
-                />
-              )}
-              ifEmpty="Pas encore de commentaire">
-              {!!canComment && (
-                <NewCommentInput
-                  forwardRef={newCommentRef}
-                  onFocus={() => _scrollToInput(newCommentRef)}
-                  action={oldAction._id}
-                  writeComment={setWritingComment}
-                />
-              )}
-            </SubList>
           </>
         )}
+        <ActionStatusSelect
+          onSelect={(status) => setAction((a) => ({ ...a, status }))}
+          onSelectAndSave={(status) => {
+            setAction((a) => ({ ...a, status }));
+            onUpdateActionRequest();
+          }}
+          value={status}
+          editable={editable}
+        />
+        <DateAndTimeInput
+          label="Échéance"
+          setDate={(dueAt) => setAction((a) => ({ ...a, dueAt }))}
+          date={dueAt}
+          showTime
+          showDay
+          withTime={withTime}
+          setWithTime={(withTime) => setAction((a) => ({ ...a, withTime }))}
+          editable={editable}
+        />
+        <InputLabelled
+          label="Description"
+          onChangeText={(description) => setAction((a) => ({ ...a, description }))}
+          value={description}
+          placeholder="Description"
+          multiline
+          editable={editable}
+          ref={descriptionRef}
+          onFocus={() => _scrollToInput(descriptionRef)}
+        />
+        <ActionCategoriesMultiCheckboxes
+          onChange={(categories) => setAction((a) => ({ ...a, categories }))}
+          values={categories}
+          editable={editable}
+        />
+        {!editable && <Spacer />}
+        <ButtonsContainer>
+          <ButtonDelete onPress={onDeleteRequest} />
+          <Button
+            caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+            onPress={editable ? onUpdateActionRequest : setEditable(true)}
+            disabled={editable ? isUpdateDisabled : false}
+            loading={updating}
+          />
+        </ButtonsContainer>
+        <SubList
+          label="Commentaires"
+          key={actionDB._id}
+          data={comments.filter((c) => c.action === actionDB._id)}
+          renderItem={(comment, index) => (
+            <CommentRow
+              key={index}
+              comment={comment.comment}
+              id={comment._id}
+              createdAt={comment.createdAt}
+              user={comment.user}
+              metaCaption="Commentaire de"
+              onUpdate={
+                comment.team
+                  ? () =>
+                      navigation.push('ActionComment', {
+                        ...comment,
+                        name,
+                        fromRoute: 'Action',
+                      })
+                  : null
+              }
+            />
+          )}
+          ifEmpty="Pas encore de commentaire">
+          {!!canComment && (
+            <NewCommentInput
+              forwardRef={newCommentRef}
+              onFocus={() => _scrollToInput(newCommentRef)}
+              action={actionDB._id}
+              writeComment={setWritingComment}
+            />
+          )}
+        </SubList>
       </ScrollContainer>
     </SceneContainer>
   );

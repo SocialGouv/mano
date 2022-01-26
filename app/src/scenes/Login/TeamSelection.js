@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { ActivityIndicator } from 'react-native';
 import colors from '../../utils/colors';
@@ -7,13 +7,15 @@ import ScrollContainer from '../../components/ScrollContainer';
 import { MyText } from '../../components/MyText';
 import Title from '../../components/Title';
 import ScreenTitle from '../../components/ScreenTitle';
-import AuthContext from '../../contexts/auth';
-import RefreshContext from '../../contexts/refresh';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { currentTeamState, usersState } from '../../recoil/auth';
+import { useRefresh } from '../../recoil/refresh';
 
 const TeamBody = ({ onSelect }) => {
   const [loading, setLoading] = useState(false);
-  const { user, setCurrentTeam } = useContext(AuthContext);
-  const { refresh } = useContext(RefreshContext);
+  const user = useRecoilValue(usersState);
+  const setCurrentTeam = useSetRecoilState(currentTeamState);
+  const { refresh } = useRefresh();
 
   const onTeamSelected = async (teamIndex) => {
     setLoading(teamIndex);

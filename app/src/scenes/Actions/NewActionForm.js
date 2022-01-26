@@ -1,7 +1,7 @@
-/* eslint-disable react/no-did-mount-set-state */
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -9,95 +9,85 @@ import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import InputFromSearchList from '../../components/InputFromSearchList';
 import DateAndTimeInput from '../../components/DateAndTimeInput';
-import { compose } from 'recompose';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import ActionsContext, { TODO } from '../../contexts/actions';
-import PersonsContext from '../../contexts/persons';
 import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
 import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
+import { actionsState, prepareActionForEncryption, TODO } from '../../recoil/actions';
+import { currentTeamState } from '../../recoil/auth';
+import { personsState } from '../../recoil/persons';
+import API from '../../services/api';
 
-class NewActionForm extends React.Component {
-  state = {
-    name: '',
-    dueAt: null,
-    withTime: false,
-    persons: [],
-    forCurrentPerson: false,
-    posting: false,
-    status: TODO,
-  };
+const NewActionForm = ({ route, navigation }) => {
+  const setActions = useSetRecoilState(actionsState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const allPersons = useRecoilValue(personsState);
+  const [name, setName] = useState('');
+  const [dueAt, setDueAt] = useState(null);
+  const [withTime, setWithTime] = useState(false);
+  const [persons, setPersons] = useState(route.params?.person ? [route.params?.person] : []);
+  const forCurrentPerson = !!route.params?.person;
+  const [posting, setPosting] = useState(false);
+  const [status, setStatus] = useState(TODO);
 
-  async componentDidMount() {
-    const { route } = this.props;
-    if (route.params?.person) {
-      this.setState({
-        persons: [route.params.person],
-        forCurrentPerson: true,
-      });
-    }
-    this.props.navigation.addListener('focus', this.handleFocus);
-    this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
-  }
+  const backRequestHandledRef = useRef(null);
 
-  componentWillUnmount() {
-    this.props.navigation.removeListener('focus', this.handleFocus);
-    this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
-  }
+  useEffect(() => {
+    const handleBeforeRemove = (e) => {
+      if (backRequestHandledRef.current) return;
+      e.preventDefault();
+      onGoBackRequested();
+    };
 
-  handleBeforeRemove = (e) => {
-    if (this.backRequestHandled) return;
-    e.preventDefault();
-    this.onGoBackRequested();
-  };
+    const handleFocus = () => {
+      const newPerson = route?.params?.person;
+      if (newPerson) {
+        setPersons((persons) => [...persons.filter((p) => p !== newPerson), newPerson]);
+      }
+    };
+    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      focusListenerUnsubscribe();
+      beforeRemoveListenerUnsbscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [navigation, route?.params?.person]);
 
-  handleFocus = () => {
-    const { route } = this.props;
-    const { persons } = this.state;
-    const newPerson = route?.params?.person;
-    if (newPerson) {
-      this.setState({
-        persons: [...persons.filter((p) => p !== newPerson), newPerson],
-      });
-    }
-  };
-
-  onSearchPerson = () => {
-    this.props.navigation.push('Persons', {
+  const onSearchPerson = () =>
+    navigation.push('Persons', {
       screen: 'PersonsSearch',
       params: { fromRoute: 'NewActionForm' },
     });
-  };
 
-  onCreateAction = async () => {
-    const { name, persons, dueAt, withTime, status } = this.state;
-    const { context } = this.props;
-    this.setState({ posting: true });
+  const onCreateAction = async () => {
+    setPosting(true);
     let newAction = null;
     const actions = [];
     for (const person of persons) {
-      const response = await context.addAction({
-        name,
-        person,
-        team: context.currentTeam._id,
-        dueAt,
-        withTime,
-        status,
-        completedAt: status !== TODO ? new Date().toISOString() : null,
+      const response = await API.post({
+        path: '/action',
+        body: prepareActionForEncryption({
+          name,
+          person,
+          team: currentTeam._id,
+          dueAt,
+          withTime,
+          status,
+          completedAt: status !== TODO ? new Date().toISOString() : null,
+        }),
       });
       if (!response.ok) {
-        this.setState({ posting: false });
+        setPosting(false);
         Alert.alert(response.error || response.code);
         return;
       }
       if (!newAction) newAction = response.data;
+      setActions((actions) => [response.decryptedData, ...actions]);
       actions.push(response.data);
     }
-    const { navigation, route } = this.props;
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
-    this.backRequestHandled = true;
+    backRequestHandledRef.current = true;
     Sentry.setContext('action', { _id: newAction._id });
     navigation.navigate('Action', {
       fromRoute: route.params.fromRoute,
@@ -105,45 +95,37 @@ class NewActionForm extends React.Component {
       ...newAction,
       editable: true,
     });
-    setTimeout(() => {
-      this.setState({ posting: false });
-    }, 250);
+    setTimeout(() => setPosting(false), 250);
   };
 
-  onBack = () => {
-    this.backRequestHandled = true;
-    const { navigation, route } = this.props;
+  const onBack = () => {
+    backRequestHandledRef.current = true;
     navigation.navigate(route.params.fromRoute);
   };
 
-  canGoBack = () => {
-    const { name, persons, dueAt, forCurrentPerson } = this.state;
+  const canGoBack = useMemo(() => {
     if (!name.length && (forCurrentPerson || !persons.length) && !dueAt) return true;
     return false;
-  };
+  }, [name, forCurrentPerson, persons, dueAt]);
 
-  isReadyToSave = () => {
-    const { name, dueAt, persons } = this.state;
+  const isReadyToSave = useMemo(() => {
     if (!name || !name.length || !name.trim().length) return false;
     if (!persons.length) return false;
     if (!dueAt) return false;
     return true;
-  };
+  }, [name, dueAt, persons]);
 
-  onGoBackRequested = () => {
-    if (this.canGoBack()) {
-      this.onBack();
-      return;
-    }
-    if (this.isReadyToSave()) {
+  const onGoBackRequested = () => {
+    if (canGoBack) return onBack();
+    if (isReadyToSave) {
       Alert.alert('Voulez-vous enregistrer cette action ?', null, [
         {
           text: 'Enregistrer',
-          onPress: this.onCreateAction,
+          onPress: onCreateAction,
         },
         {
           text: 'Ne pas enregistrer',
-          onPress: this.onBack,
+          onPress: onBack,
           style: 'destructive',
         },
         {
@@ -159,56 +141,44 @@ class NewActionForm extends React.Component {
       },
       {
         text: 'Abandonner',
-        onPress: this.onBack,
+        onPress: onBack,
         style: 'destructive',
       },
     ]);
   };
 
-  render() {
-    const { name, persons, dueAt, withTime, forCurrentPerson, posting, status } = this.state;
-    const { context } = this.props;
-    return (
-      <SceneContainer>
-        <ScreenTitle title="Nouvelle action" onBack={this.onGoBackRequested} />
-        <ScrollContainer keyboardShouldPersistTaps="handled">
-          <View>
-            <InputLabelled label="Nom de l’action" onChangeText={(name) => this.setState({ name })} value={name} placeholder="Rdv chez le dentiste" />
-            {forCurrentPerson ? (
-              <InputFromSearchList
-                label="Personne concernée"
-                value={context.persons.find((p) => p._id === persons[0])?.name || '-- Aucune --'}
-                onSearchRequest={this.onSearchPerson}
-                disabled
-              />
-            ) : (
-              <>
-                <Label label="Personne(s) concerné(es)" />
-                <Tags
-                  data={persons}
-                  onChange={(persons) => this.setState({ persons })}
-                  editable
-                  onAddRequest={this.onSearchPerson}
-                  renderTag={(person) => <MyText>{context.persons.find((p) => p._id === person)?.name}</MyText>}
-                />
-              </>
-            )}
-            <ActionStatusSelect onSelect={(status) => this.setState({ status })} value={status} editable />
-            <DateAndTimeInput
-              label="Échéance"
-              setDate={(dueAt) => this.setState({ dueAt })}
-              date={dueAt}
-              showTime
-              showDay
-              withTime={withTime}
-              setWithTime={(withTime) => this.setState({ withTime })}
+  return (
+    <SceneContainer>
+      <ScreenTitle title="Nouvelle action" onBack={onGoBackRequested} />
+      <ScrollContainer keyboardShouldPersistTaps="handled">
+        <View>
+          <InputLabelled label="Nom de l’action" onChangeText={setName} value={name} placeholder="Rdv chez le dentiste" />
+          {forCurrentPerson ? (
+            <InputFromSearchList
+              label="Personne concernée"
+              value={allPersons.find((p) => p._id === persons[0])?.name || '-- Aucune --'}
+              onSearchRequest={onSearchPerson}
+              disabled
             />
-            <Button caption="Créer" disabled={!this.isReadyToSave()} onPress={this.onCreateAction} loading={posting} />
-          </View>
-        </ScrollContainer>
-      </SceneContainer>
-    );
-  }
-}
+          ) : (
+            <>
+              <Label label="Personne(s) concerné(es)" />
+              <Tags
+                data={persons}
+                onChange={setPersons}
+                editable
+                onAddRequest={onSearchPerson}
+                renderTag={(person) => <MyText>{allPersons.find((p) => p._id === person)?.name}</MyText>}
+              />
+            </>
+          )}
+          <ActionStatusSelect onSelect={setStatus} value={status} editable />
+          <DateAndTimeInput label="Échéance" setDate={setDueAt} date={dueAt} showTime showDay withTime={withTime} setWithTime={setWithTime} />
+          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateAction} loading={posting} />
+        </View>
+      </ScrollContainer>
+    </SceneContainer>
+  );
+};
 
-export default compose(withContext(AuthContext), withContext(ActionsContext), withContext(PersonsContext))(NewActionForm);
+export default NewActionForm;

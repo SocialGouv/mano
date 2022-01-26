@@ -1,5 +1,5 @@
 import { atom, useRecoilState } from 'recoil';
-import useApi from '../services/api';
+import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';
@@ -16,7 +16,6 @@ export const territoriesLoadingState = atom({
 
 export const useTerritories = () => {
   const { territoryObservations, deleteTerritoryObs } = useTerritoryObservations();
-  const API = useApi();
 
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [loading, setLoading] = useRecoilState(territoriesLoadingState);

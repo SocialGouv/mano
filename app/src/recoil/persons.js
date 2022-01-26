@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 import { useComments } from '../recoil/comments';
-import useApi from '../services/api';
+import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useActions } from './actions';
@@ -40,7 +40,6 @@ export const usePersons = () => {
   const { comments, addComment, deleteComment } = useComments();
   const { deleteAction, actions } = useActions();
   const { relsPersonPlace, deleteRelation } = useRelsPerson();
-  const API = useApi();
 
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);

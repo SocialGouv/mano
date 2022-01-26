@@ -1,10 +1,11 @@
-import React, { useContext } from 'react';
+import React from 'react';
+import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-import AuthContext from '../contexts/auth';
+import { usersState } from '../recoil/auth';
 import { MyText } from './MyText';
 
 const UserName = ({ id, caption }) => {
-  const { users } = useContext(AuthContext);
+  const users = useRecoilValue(usersState);
 
   const user = users.find((u) => u._id === id);
 

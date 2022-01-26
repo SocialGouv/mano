@@ -51,7 +51,8 @@ export const useRefresh = () => {
     setFullScreen(false);
   };
 
-  const getTotal = async (initialLoad = false) => {
+  const getTotal = async (from) => {
+    console.log('getTotal', from);
     setLoading('Chargement...');
     const response = await API.get({
       path: '/public/stats',
@@ -121,9 +122,10 @@ export const useRefresh = () => {
   };
 
   const actionsRefresher = async (showFullScreen = false) => {
+    console.log('actionsRefresher');
     setFullScreen(showFullScreen);
 
-    const { actions, persons, comments } = await getTotal();
+    const { actions, persons, comments } = await getTotal('actionsRefresher');
     const total = (actions || 1) + (persons || 1) + (comments || 1);
 
     setLoading('Chargement des actions');
@@ -139,9 +141,10 @@ export const useRefresh = () => {
   };
 
   const personsRefresher = async (showFullScreen = false) => {
+    console.log('personsRefresher');
     setFullScreen(showFullScreen);
 
-    const { actions, persons, comments, places, relsPersonPlace } = await getTotal();
+    const { actions, persons, comments, places, relsPersonPlace } = await getTotal('personsRefresher');
     const total = actions + persons + comments + places + relsPersonPlace;
 
     setLoading('Chargement des personnes');

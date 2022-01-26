@@ -1,4 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
+import { selector, selectorFamily } from 'recoil';
 import { actionsState } from './actions';
 import { currentTeamState } from './auth';
 import { commentsState } from './comments';
@@ -9,9 +9,7 @@ import { reportsState } from './reports';
 import { territoriesState } from './territory';
 import { getIsDayWithinHoursOffsetOfDay, isOnSameDay, today } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
-import { selector, selectorFamily } from 'recoil';
-import { filterData } from '../components/Filters';
-import { filterBySearch } from '../scenes/search/utils';
+import { filterBySearch, filterData } from '../utils/search';
 
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
@@ -88,8 +86,8 @@ export const commentsFilteredSelector = selectorFamily({
       const comments = get(commentsState);
       return comments
         .filter((c) => {
-          if (!!personId) return c.person === personId;
-          if (!!actionId) return c.action === actionId;
+          if (personId) return c.person === personId;
+          if (actionId) return c.action === actionId;
           return false;
         })
         .filter((c) => {
@@ -129,8 +127,8 @@ export const personsFullSearchSelector = selectorFamily({
     ({ get }) => {
       const persons = get(personsWithPlacesSelector);
       let personsFiltered = persons;
-      if (!!filters?.filter((f) => Boolean(f?.value)).length) personsFiltered = filterData(personsFiltered, filters);
-      if (!!alertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
+      if (filters?.filter((f) => Boolean(f?.value)).length) personsFiltered = filterData(personsFiltered, filters);
+      if (alertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
       if (filterTeams.length) {
         personsFiltered = personsFiltered.filter((p) => {
           for (let assignedTeam of p.assignedTeams) {

@@ -1,5 +1,5 @@
 import { atom, useRecoilState } from 'recoil';
-import useApi from '../services/api';
+import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
@@ -17,8 +17,6 @@ export const useRelsPerson = () => {
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-rel-person-places', 0);
   const [loading, setLoading] = useRecoilState(relsPersonPlaceLoadingState);
-
-  const API = useApi();
 
   const setRelsPersonPlaceFullState = (relsPersonPlace) => {
     if (relsPersonPlace) setRelsPersonPlace(relsPersonPlace);

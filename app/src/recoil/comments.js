@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
 import { currentTeamState, organisationState, userState } from '../recoil/auth';
-import useApi from '../services/api';
+import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
@@ -19,7 +19,6 @@ export const useComments = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
-  const API = useApi();
 
   const [comments, setComments] = useRecoilState(commentsState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-comments', 0);
