@@ -5,10 +5,11 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import { useHistory } from 'react-router-dom';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
-import { organisationState, userState } from '../recoil/auth';
+import { organisationState, teamsState, userState } from '../recoil/auth';
 import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState, preparePersonForEncryption } from '../recoil/persons';
 import { actionsState, prepareActionForEncryption } from '../recoil/actions';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
@@ -22,15 +23,22 @@ import { capture } from '../services/sentry';
 import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
 import { useRefresh } from '../recoil/refresh';
 
-const EncryptionKey = () => {
-  const [open, setOpen] = useState(false);
+const EncryptionKey = ({ isMain }) => {
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const teams = useRecoilValue(teamsState);
+
+  const onboardingForEncryption = isMain && !organisation.encryptionEnabled;
+  const onboardingForTeams = !teams.length;
+
+  const history = useHistory();
+
+  const [open, setOpen] = useState(onboardingForEncryption);
   const [encryptionKey, setEncryptionKey] = useState('');
   const [encryptingStatus, setEncryptingStatus] = useState('');
   const [encryptingProgress, setEncryptingProgress] = useState(0);
   const [cancellingEncryption, setCancellingEncryption] = useState(false);
 
   const user = useRecoilValue(userState);
-  const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
@@ -121,8 +129,12 @@ const EncryptionKey = () => {
       if (res.ok) {
         setEncryptingProgress(totalDurationOnServer);
         setEncryptingStatus('Données chiffrées !');
-        toastr.success('Données chiffrées !', 'Veuillez noter la clé puis vous reconnecter');
         setOrganisation(res.data);
+        if (onboardingForTeams) {
+          history.push('/team');
+        } else {
+          toastr.success('Données chiffrées !', 'Veuillez noter la clé puis vous reconnecter');
+        }
       }
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);
@@ -186,11 +198,22 @@ const EncryptionKey = () => {
   const renderForm = () => (
     <ModalBody>
       <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-        Cette opération est irréversible, et entrainera la modification définitive de toutes les données chiffrées liées à l'organisation : personnes
-        suivies, actions, territoires, commentaires et observations, rapports...
+        {organisation.encryptionEnabled ? (
+          "Cette opération entrainera la modification définitive de toutes les données chiffrées liées à l'organisation : personnes suivies, actions, territoires, commentaires et observations, rapports... "
+        ) : (
+          <>
+            <b>Bienvenue dans Mano !</b>
+            <br />
+            <br />
+            Première étape: le chiffrement ! 🔐 Mano est un logiciel qui met la protection des données en priorité. <br />
+            Les données enregistrées concernant les personnes suivies, les actions, les territoires, etc. sont <br />
+            <b>chiffrées avec une clé que seule votre organisation connait</b>.
+          </>
+        )}
       </span>
       <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-        Si vous perdez cette clé, vos données seront perdues définitivement. Notez-la bien quelque part !
+        Si vous perdez cette clé, vos données seront perdues définitivement. <br />
+        Notez-la bien quelque part !
       </span>
       <Formik initialValues={{ encryptionKey: '', encryptionKeyConfirm: '' }} onSubmit={onEncrypt}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -217,6 +240,7 @@ const EncryptionKey = () => {
             <Row style={{ justifyContent: 'center' }}>
               <ButtonCustom
                 color="secondary"
+                id="encrypt"
                 disabled={loading || isSubmitting}
                 onClick={() => !isSubmitting && handleSubmit()}
                 title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
@@ -243,7 +267,7 @@ const EncryptionKey = () => {
         onClick={() => setOpen(true)}
       />
       <StyledModal
-        backdrop={!encryptionKey ? true : 'static'}
+        backdrop={!onboardingForEncryption ? true : 'static'}
         isOpen={open}
         toggle={() => setOpen(false)}
         onClosed={() => {
@@ -253,7 +277,7 @@ const EncryptionKey = () => {
         }}
         size="lg"
         centered>
-        <ModalHeader toggle={() => setOpen(false)} color="danger">
+        <ModalHeader close={onboardingForEncryption ? <></> : null} toggle={() => setOpen(false)} color="danger">
           <span style={{ color: theme.black, textAlign: 'center', display: 'block' }}>
             {organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
           </span>

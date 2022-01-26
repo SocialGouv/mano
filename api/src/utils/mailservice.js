@@ -4,6 +4,7 @@ const { X_TIPIMAIL_APIUSER, X_TIPIMAIL_APIKEY } = require("../config");
 
 const sendEmail = async (address, subject, text) => {
   if (process.env.NODE_ENV === "development" || process.env.NODE_ENV === "test") {
+    console.log(address);
     address = process.env.EMAIL_DEV || "arnaud@ambroselli.io";
   }
   return fetch("https://api.tipimail.com/v1/messages/send", {

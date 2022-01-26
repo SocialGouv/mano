@@ -5,6 +5,7 @@ import {
   useSuperAdminAndOrga,
   connectWith,
   navigateWithReactRouter,
+  updateUserPassword,
 } from "../utils";
 
 jest.setTimeout(30000);
@@ -32,9 +33,12 @@ describe("Organisation CRUD", () => {
       "input[name=email]",
       "test+firstorga@example.org"
     );
-    await expect(page).toFill("input[name=password]", "secret");
     await expect(page).toClick(".modal-body button[type=submit]");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await expect(page).toMatch("Création réussie !");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    // We have to update the password of the user.
+    await updateUserPassword("test+firstorga@example.org", "secret");
   });
 
   it("should be able to disconnect in order to connect the new user", async () => {
@@ -46,6 +50,7 @@ describe("Organisation CRUD", () => {
   it("should be able to connect as a new user", async () => {
     await connectWith("test+firstorga@example.org", "secret");
     await expect(page).toMatch("Charte des Utilisateurs de Mano");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
     await page.evaluate(async (_) => {
       return new Promise((resolve) => {
         setTimeout(() => {
@@ -54,19 +59,21 @@ describe("Organisation CRUD", () => {
         }, 500);
       });
     });
-
     await expect(page).toMatch("Accepter et continuer");
-    await expect(page).toClick("button[type=submit]", {
-      text: "Accepter et continuer",
-    });
-  });
-
-  it("should create a new team", async () => {
-    await expect(page).toMatch("Bienvenue dans Mano !", { timeout: 2000 });
+    await expect(page).toClick("button");
+    await expect(page).toMatch("My First Orga");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await expect(page).toMatch("Bienvenue dans Mano !");
+    await expect(page).toFill("input[name=encryptionKey]", "plouf");
+    await expect(page).toFill("input[name=encryptionKeyConfirm]", "plouf");
+    await expect(page).toClick("#encrypt");
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await expect(page).toMatch("Dernière étape !");
     await expect(page).toFill("input[name=name]", "my team");
     await expect(page).toClick("#create-team");
 
     await expect(page).toMatch("Création réussie !");
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await expect(page).toMatch("Équipes");
   });
 

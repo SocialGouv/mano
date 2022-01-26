@@ -86,7 +86,7 @@ const SignIn = () => {
         const { organisation } = user;
         setOrganisation(organisation);
         setUserName(user.name);
-        if (!!organisation.encryptionEnabled) setShowEncryption(true);
+        if (!!organisation.encryptionEnabled && !['superadmin'].includes(user.role)) setShowEncryption(true);
       }
 
       return setLoading(false);
@@ -138,7 +138,7 @@ const SignIn = () => {
                 });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;
-            if (!!organisation.encryptionEnabled && !showEncryption) {
+            if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
               setShowEncryption(true);
               return actions.setSubmitting(false);
             }
@@ -157,16 +157,28 @@ const SignIn = () => {
             setUser(user);
             AppSentry.setUser(user);
             actions.setSubmitting(false);
+            // now login !
+            // superadmin
             if (['superadmin'].includes(user.role)) {
               history.push('/organisation');
-            } else if (user.teams.length === 1) {
+              return;
+            }
+            // onboarding
+            if (!organisation.encryptionEnabled && ['admin'].includes(user.role)) {
+              history.push(`/organisation/${organisation._id}`);
+              return;
+            }
+            if (!teams.length) {
+              history.push('/team');
+              return;
+            }
+            // basic login
+            if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
               onSigninValidated(organisation, user);
-            } else if (!teams.length) {
-              history.push('/team');
-            } else {
-              setShowSelectTeam(true);
+              return;
             }
+            setShowSelectTeam(true);
           } catch (signinError) {
             console.log('error signin', signinError);
             toastr.error('Mauvais identifiants', signinError.message);
