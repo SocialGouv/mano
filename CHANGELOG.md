@@ -1,3 +1,10 @@
+# [1.43.0](https://github.com/SocialGouv/mano/compare/v1.42.2...v1.43.0) (2022-01-26)
+
+
+### Features
+
+* **dash:** onboarding with encryption ([#285](https://github.com/SocialGouv/mano/issues/285)) ([7e25424](https://github.com/SocialGouv/mano/commit/7e25424e579272b99f39d466703db784391f7bbe))
+
 ## [1.42.2](https://github.com/SocialGouv/mano/compare/v1.42.1...v1.42.2) (2022-01-25)
 
 
