@@ -16,7 +16,7 @@ router.post(
     if (!req.body.name) return res.status(400).send({ ok: false, error: "Name is required" });
     if (req.user.role !== "admin") return res.status(400).send({ ok: false, error: "Admin role is required" });
     let organisation = req.user.organisation;
-    const team = await Team.create({ organisation, name: req.body.name }, { returning: true });
+    const team = await Team.create({ organisation, name: req.body.name, nightSession: req.body.nightSession || false }, { returning: true });
     res.status(200).send({ ok: true, data: team });
   })
 );

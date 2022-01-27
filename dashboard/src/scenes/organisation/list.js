@@ -9,7 +9,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 
 import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
-import { generatePassword, toFrenchDate } from '../../utils';
+import { toFrenchDate } from '../../utils';
 import useApi from '../../services/api';
 import DeleteOrganisation from '../../components/DeleteOrganisation';
 
@@ -141,13 +141,12 @@ const Create = ({ onChange }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ orgName: '', name: '', email: '', password: generatePassword() }}
+            initialValues={{ orgName: '', name: '', email: '' }}
             onSubmit={async (body, actions) => {
               try {
                 if (!body.orgName) return toastr.error("Veuillez saisir un nom pour l'organisation");
                 if (!body.name) return toastr.error("Veuillez saisir un nom pour l'administrateur");
                 if (!body.email) return toastr.error("Veuillez saisir un email pour l'administrateur");
-                if (!body.password) return toastr.error("Veuillez saisir un mot de passe pour l'administrateur");
                 const orgRes = await API.post({ path: '/organisation', skipEncryption: '/organisation', body });
                 actions.setSubmitting(false);
                 if (!orgRes.ok) return;
@@ -189,12 +188,6 @@ const Create = ({ onChange }) => {
                     <FormGroup>
                       <Label>Email</Label>
                       <Input name="email" value={values.email} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Mot de passe</Label>
-                      <Input name="password" value={values.password} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                 </Row>

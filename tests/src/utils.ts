@@ -44,6 +44,16 @@ export async function deleteUser(email: string) {
   await client.end();
 }
 
+export async function updateUserPassword(email: string, password: string) {
+  const client = new pg.Client(postgresqlUrl);
+  await client.connect();
+  await client.query(`update mano."User" set password= $2 WHERE email = $1`, [
+    email,
+    bcrypt.hashSync(password),
+  ]);
+  await client.end();
+}
+
 export async function deleteOrganisation(orgaName: string) {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();

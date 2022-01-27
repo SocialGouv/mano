@@ -2,14 +2,88 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
-
+const path = require("path");
+const fs = require("fs");
+const multer = require("multer");
+const crypto = require("crypto");
 const { catchErrors } = require("../errors");
-
 const Person = require("../models/person");
 const Team = require("../models/team");
 const RelPersonTeam = require("../models/relPersonTeam");
 const encryptedTransaction = require("../utils/encryptedTransaction");
-const { ENCRYPTED_FIELDS_ONLY } = require("../config");
+const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
+
+// Return the basedir to store persons' documents.
+function personDocumentBasedir(userOrganisation, personId) {
+  const basedir = STORAGE_DIRECTORY ? path.join(STORAGE_DIRECTORY, "uploads") : path.join(__dirname, "../../uploads");
+  return path.join(basedir, `${userOrganisation}`, "persons", `${personId}`);
+}
+
+// Upload a document for a person.
+router.post(
+  "/:id/document",
+  passport.authenticate("user", { session: false }),
+  // Use multer to handle the file upload.
+  multer({
+    storage: multer.diskStorage({
+      destination: (req, _file, cb) => {
+        const dir = personDocumentBasedir(req.user.organisation, req.params.id);
+        if (!fs.existsSync(dir)) {
+          fs.mkdirSync(dir, { recursive: true });
+        }
+        cb(null, dir);
+      },
+      filename: (_req, _file, cb) => {
+        return cb(null, crypto.randomBytes(30).toString("hex"));
+      },
+    }),
+  }).single("file"),
+  catchErrors(async (req, res) => {
+    const { file } = req;
+    // Send back file information.
+    res.send({
+      ok: true,
+      data: {
+        originalname: file.originalname,
+        filename: file.filename,
+        size: file.size,
+        encoding: file.encoding,
+        mimetype: file.mimetype,
+      },
+    });
+  })
+);
+
+// Download a file for a person by its filename.
+router.get(
+  "/:id/document/:filename",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res) => {
+    const dir = personDocumentBasedir(req.user.organisation, req.params.id);
+    const file = path.join(dir, req.params.filename);
+    if (!fs.existsSync(file)) {
+      res.status(404).send({ ok: false, message: "File not found" });
+    } else {
+      res.sendFile(file);
+    }
+  })
+);
+
+// Delete a file for a person by its filename.
+router.delete(
+  "/:id/document/:filename",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res) => {
+    const dir = personDocumentBasedir(req.user.organisation, req.params.id);
+    const file = path.join(dir, req.params.filename);
+    if (!fs.existsSync(file)) {
+      res.status(404).send({ ok: false, message: "File not found" });
+    } else {
+      fs.unlinkSync(file);
+      res.send({ ok: true });
+    }
+  })
+);
 
 router.post(
   "/import",

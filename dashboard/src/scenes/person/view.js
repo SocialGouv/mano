@@ -40,8 +40,9 @@ import { toFrenchDate } from '../../utils';
 import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
 import { organisationState } from '../../recoil/auth';
+import Documents from '../../components/Documents';
 
-const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux'];
+const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
 const View = () => {
   const { id } = useParams();
@@ -107,6 +108,7 @@ const View = () => {
         <TabPane tabId={4}>
           <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Lieux (${total})`)} />
         </TabPane>
+        <TabPane tabId={5}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(5, `Documents (${total})`)} />}</TabPane>
       </TabContent>
     </StyledContainer>
   );

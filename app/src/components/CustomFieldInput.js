@@ -19,7 +19,7 @@ const CustomFieldInput = forwardRef(({ label, field, value, handleChange, ...pro
         <InputLabelled
           label={label}
           onChangeText={handleChange}
-          value={value}
+          value={value || ''}
           placeholder={label}
           keyboardType={field.type === 'number' ? 'number-pad' : 'default'}
           multiline={field.type === 'textarea'}

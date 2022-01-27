@@ -1,3 +1,59 @@
+## [1.43.4](https://github.com/SocialGouv/mano/compare/v1.43.3...v1.43.4) (2022-01-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency node-fetch to v2.6.7 [security] ([#296](https://github.com/SocialGouv/mano/issues/296)) ([bbf66e7](https://github.com/SocialGouv/mano/commit/bbf66e702bdc9010e12dd0cbfe057f608bbc1e0b))
+
+## [1.43.3](https://github.com/SocialGouv/mano/compare/v1.43.2...v1.43.3) (2022-01-26)
+
+
+### Bug Fixes
+
+* **dashboard:** import data ([#298](https://github.com/SocialGouv/mano/issues/298)) ([8ef6e12](https://github.com/SocialGouv/mano/commit/8ef6e12fe7cf9080f56b30701d0489da74714fec))
+
+## [1.43.2](https://github.com/SocialGouv/mano/compare/v1.43.1...v1.43.2) (2022-01-26)
+
+
+### Bug Fixes
+
+* **api:** no need password ([#297](https://github.com/SocialGouv/mano/issues/297)) ([e40b1ea](https://github.com/SocialGouv/mano/commit/e40b1ea13581f4180322b08cb9bf76e5e3348afd))
+
+## [1.43.1](https://github.com/SocialGouv/mano/compare/v1.43.0...v1.43.1) (2022-01-26)
+
+
+### Bug Fixes
+
+* **app:** dont show undefined in terrotiry observations ([#288](https://github.com/SocialGouv/mano/issues/288)) ([0d2aade](https://github.com/SocialGouv/mano/commit/0d2aade7b2f7cbb41738f383360065aead392b97))
+
+# [1.43.0](https://github.com/SocialGouv/mano/compare/v1.42.2...v1.43.0) (2022-01-26)
+
+
+### Features
+
+* **dash:** onboarding with encryption ([#285](https://github.com/SocialGouv/mano/issues/285)) ([7e25424](https://github.com/SocialGouv/mano/commit/7e25424e579272b99f39d466703db784391f7bbe))
+
+## [1.42.2](https://github.com/SocialGouv/mano/compare/v1.42.1...v1.42.2) (2022-01-25)
+
+
+### Bug Fixes
+
+* **dashboad:** fix import custom fields ([5b1422b](https://github.com/SocialGouv/mano/commit/5b1422be960dd2f0244c485fdec69a0353c914a6))
+
+## [1.42.1](https://github.com/SocialGouv/mano/compare/v1.42.0...v1.42.1) (2022-01-07)
+
+
+### Bug Fixes
+
+* **deps:** update dependency react-datepicker to v4 ([#271](https://github.com/SocialGouv/mano/issues/271)) ([2e70b96](https://github.com/SocialGouv/mano/commit/2e70b96c8262a292a8ae4a396f51331bf8b4d4d4))
+
+# [1.42.0](https://github.com/SocialGouv/mano/compare/v1.41.9...v1.42.0) (2022-01-07)
+
+
+### Features
+
+* **dashboard:** upload docs ([#276](https://github.com/SocialGouv/mano/issues/276)) ([9f5d7b7](https://github.com/SocialGouv/mano/commit/9f5d7b7dd1e8d8202fdfeea793d8ea2a5606352f))
+
 ## [1.41.9](https://github.com/SocialGouv/mano/compare/v1.41.8...v1.41.9) (2021-12-21)
 
 

@@ -86,7 +86,8 @@ const ImportData = () => {
       for (let i = 2; i <= lastRow; i++) {
         const person = {};
         for (const [column, fieldname, validator] of headerColumnsAndFieldname) {
-          const value = validator(personsSheet[`${column}${i}`]?.v);
+          if (!personsSheet[`${column}${i}`]) continue;
+          const value = validator(personsSheet[`${column}${i}`]);
           if (!isNullOrUndefined(value)) person[fieldname] = value;
         }
         if (Object.keys(person).length) {
@@ -120,7 +121,7 @@ const ImportData = () => {
     if (window.confirm(`Voulez-vous vraiment importer ${dataToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
       const response = await API.post({ path: '/person/import', body: dataToImport });
       if (response.ok) toastr.success('Importation réussie !');
-      setAllPersons((oldPersons) => [...oldPersons, ...response.data].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      setAllPersons((oldPersons) => [...oldPersons, ...response.decryptedData].sort((p1, p2) => p1.name.localeCompare(p2.name)));
       setShowImpotSummary(false);
     }
   };

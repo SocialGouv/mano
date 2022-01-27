@@ -8,3 +8,5 @@ node_modules/
 
 .scripts
 sql
+
+/uploads/

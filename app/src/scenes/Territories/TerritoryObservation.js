@@ -241,6 +241,7 @@ class TerritoryObservation extends React.Component {
                   const { label, name } = field;
                   return (
                     <CustomFieldInput
+                      key={label}
                       label={label}
                       field={field}
                       value={this.state[name]}
