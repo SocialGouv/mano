@@ -1,6 +1,6 @@
 import { atom, useRecoilState } from 'recoil';
 
-const structuresState = atom({
+export const structuresState = atom({
   key: 'structuresState',
   default: [],
 });

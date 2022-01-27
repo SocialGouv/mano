@@ -1,5 +1,5 @@
 import React from 'react';
-import { nationalitySituationOptions } from '../../contexts/persons';
+import { nationalitySituationOptions } from '../../recoil/persons';
 import SelectLabelled from './SelectLabelled';
 
 export const situations = ['-- Choisissez --', ...nationalitySituationOptions];

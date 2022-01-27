@@ -9,62 +9,30 @@ import { ListEmptyActions, ListNoMoreActions } from '../../components/ListEmptyC
 import FloatAddButton from '../../components/FloatAddButton';
 import { MyText } from '../../components/MyText';
 import FlatListStyled, { SectionListStyled } from '../../components/FlatListStyled';
-import { isComingInDays, isPassed, isToday, isTomorrow } from '../../services/date';
 import { DONE, TODO, CANCEL } from '../../recoil/actions';
 import API from '../../services/api';
-import { useRefresh } from '../../recoil/refresh';
-import { actionsByStatusSelector } from '../../recoil/selectors';
+import { loadingState, useRefresh } from '../../recoil/refresh';
+import { actionsDoneSelector, actionsTodoSelector, actionsCanceledSelector } from '../../recoil/selectors';
 import { personsState } from '../../recoil/persons';
 import { useNavigation } from '@react-navigation/native';
-
-const PASSED = 'Passées';
-const TODAY = "Aujourd'hui";
-const TOMORROW = 'Demain';
-const INCOMINGDAYS = 'À venir';
-const sections = [
-  {
-    title: PASSED,
-    data: [],
-  },
-  {
-    title: TODAY,
-    data: [],
-  },
-  {
-    title: TOMORROW,
-    data: [],
-  },
-  {
-    title: INCOMINGDAYS,
-    data: [],
-  },
-];
-
-const formatData = (data, status) => {
-  if (!data?.length) return null;
-  if ([DONE, CANCEL].includes(status)) return data;
-  console.log(status, data.length);
-  const dataInSections = data.reduce((actions, action) => {
-    let inSection = null;
-    if (isPassed(action.dueAt)) inSection = PASSED;
-    if (isToday(action.dueAt)) inSection = TODAY;
-    if (isTomorrow(action.dueAt)) inSection = TOMORROW;
-    if (isComingInDays(action.dueAt, 2)) inSection = INCOMINGDAYS;
-    return actions.map((section) => {
-      if (section.title !== inSection) return section;
-      return { ...section, data: [...section.data, action] };
-    });
-  }, sections);
-  return dataInSections;
-};
 
 const ActionsList = ({ status, onScroll, parentScroll }) => {
   const navigation = useNavigation();
 
   const [refreshing, setRefreshing] = useState(false);
-  const { loading, actionsRefresher } = useRefresh();
-  const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
+  const loading = useRecoilValue(loadingState);
+  const { actionsRefresher } = useRefresh();
+  const actionsDone = useRecoilValue(actionsDoneSelector);
+  const actionsTodo = useRecoilValue(actionsTodoSelector);
+  const actionsCanceled = useRecoilValue(actionsCanceledSelector);
   const persons = useRecoilValue(personsState);
+
+  const actionsByStatus = useMemo(() => {
+    if (status === DONE) return actionsDone;
+    if (status === TODO) return actionsTodo;
+    if (status === CANCEL) return actionsCanceled;
+    return [];
+  }, [actionsCanceled, actionsDone, actionsTodo, status]);
 
   useEffect(() => {
     API.navigation = navigation;
@@ -107,19 +75,13 @@ const ActionsList = ({ status, onScroll, parentScroll }) => {
     />
   );
 
-  const actionsInSections = useMemo(() => {
-    if (![TODO].includes(status)) return [];
-    return formatData(actionsByStatus, status);
-  }, [actionsByStatus, status]);
-
   const renderSectionsList = () => (
     <SectionListStyled
       onScroll={onScroll}
       refreshing={refreshing}
       onRefresh={onRefresh}
-      sections={actionsInSections || []}
-      extraData={loading}
-      initialNumToRender={20}
+      sections={actionsByStatus || []}
+      initialNumToRender={5}
       renderItem={renderActionRow}
       renderSectionHeader={renderSectionHeader}
       keyExtractor={keyExtractor}
@@ -129,19 +91,13 @@ const ActionsList = ({ status, onScroll, parentScroll }) => {
     />
   );
 
-  const actionsToShow = useMemo(() => {
-    if (![DONE, CANCEL].includes(status)) return [];
-    return actionsByStatus;
-  }, [actionsByStatus, status]);
-
   const renderFlatList = () => (
     <FlatListStyled
       refreshing={refreshing}
       onScroll={onScroll}
       onRefresh={onRefresh}
-      data={actionsToShow}
-      extraData={loading}
-      initialNumToRender={20}
+      data={actionsByStatus}
+      initialNumToRender={5}
       renderItem={renderActionRow}
       keyExtractor={keyExtractor}
       ListEmptyComponent={loading ? Spinner : ListEmptyActions}

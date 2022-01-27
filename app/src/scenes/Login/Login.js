@@ -132,7 +132,7 @@ const Login = ({ navigation }) => {
           navigation.navigate('CharteAcceptance');
         } else if (response.user?.teams?.length === 1) {
           setCurrentTeam(response.user.teams[0]);
-          await refresh({ showFullScreen: true, initialLoad: true });
+          refresh({ showFullScreen: true, initialLoad: true });
           navigation.navigate('Home');
         } else {
           navigation.navigate('TeamSelection');

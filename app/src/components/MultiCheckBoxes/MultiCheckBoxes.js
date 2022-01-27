@@ -6,19 +6,11 @@ import Label from '../Label';
 
 const MultiCheckBoxes = ({ label, source, values, onChange, editable, emptyValue }) => {
   if (!editable) {
-    return (
-      <InputLabelled
-        label={label}
-        value={values.length ? values.join(', ') : emptyValue}
-        editable={false}
-      />
-    );
+    return <InputLabelled label={label} value={values.length ? values.join(', ') : emptyValue} editable={false} />;
   }
 
   const onCheck = ({ _id: newValue }) => {
-    const newValues = values.includes(newValue)
-      ? values.filter((v) => v !== newValue)
-      : [...values, newValue];
+    const newValues = values.includes(newValue) ? values.filter((v) => v !== newValue) : [...values, newValue];
     onChange(newValues);
   };
 
@@ -28,12 +20,7 @@ const MultiCheckBoxes = ({ label, source, values, onChange, editable, emptyValue
       <RowsContainer>
         {source.map((value) => (
           <CheckBoxContainer key={value}>
-            <CheckboxLabelled
-              onPress={onCheck}
-              label={value}
-              value={values.includes(value)}
-              _id={value}
-            />
+            <CheckboxLabelled onPress={onCheck} label={value} value={values.includes(value)} _id={value} />
           </CheckBoxContainer>
         ))}
       </RowsContainer>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { vulnerabilitiesOptions } from '../../contexts/persons';
+import { vulnerabilitiesOptions } from '../../recoil/persons';
 import MultiCheckBoxes from './MultiCheckBoxes';
 
 const VulnerabilitiesMultiCheckBoxes = ({ values = [], onChange, editable }) => {

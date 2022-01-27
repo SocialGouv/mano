@@ -3,7 +3,7 @@ import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AgendaIcon, PersonIcon /*  StructuresIcon,  MenuIcon, TerritoryIcon */ } from './icons';
+import { AgendaIcon, PersonIcon, StructuresIcon, MenuIcon, TerritoryIcon } from './icons';
 import { AppState } from 'react-native';
 import { RecoilRoot } from 'recoil';
 import logEvents from './services/logEvents';
@@ -16,31 +16,28 @@ import NewPersonForm from './scenes/Persons/NewPersonForm';
 import Person from './scenes/Persons/Person';
 import PersonsOutOfActiveListReason from './scenes/Persons/PersonsOutOfActiveListReason';
 import PersonsFilter from './scenes/Persons/PersonsFilter';
-// import StructuresList from './scenes/Structures/StructuresList';
-// import NewStructureForm from './scenes/Structures/NewStructureForm';
-// import Structure from './scenes/Structures/Structure';
+import StructuresList from './scenes/Structures/StructuresList';
+import NewStructureForm from './scenes/Structures/NewStructureForm';
+import Structure from './scenes/Structures/Structure';
 import Comment from './scenes/Comments/Comment';
-// import Place from './scenes/Places/Place';
-// import NewPlaceForm from './scenes/Places/NewPlaceForm';
-// import Menu from './scenes/Menu/Menu';
-// import Legal from './scenes/Menu/Legal';
-// import Privacy from './scenes/Menu/Privacy';
+import Place from './scenes/Places/Place';
+import NewPlaceForm from './scenes/Places/NewPlaceForm';
+import Menu from './scenes/Menu/Menu';
+import Legal from './scenes/Menu/Legal';
+import Privacy from './scenes/Menu/Privacy';
 import colors from './utils/colors';
-import { TeamSelection /* ChangeTeam  */ } from './scenes/Login/TeamSelection';
+import { TeamSelection, ChangeTeam } from './scenes/Login/TeamSelection';
 import ActionsTabNavigator from './scenes/Actions/ActionsTabNavigator';
-// import ChangePassword from './scenes/Login/ChangePassword';
+import ChangePassword from './scenes/Login/ChangePassword';
 import ForgetPassword from './scenes/Login/ForgetPassword';
 import ForceChangePassword from './scenes/Login/ForceChangePassword';
-// import TerritoriesList from './scenes/Territories/TerritoriesList';
-// import NewTerritoryForm from './scenes/Territories/NewTerritoryForm';
-// import Territory from './scenes/Territories/Territory';
-// import TerritoryObservation from './scenes/Territories/TerritoryObservation';
-// import RootContextsProvider from './contexts/rootProvider';
-// import { StructuresProvider } from './contexts/structures';
-// import { ActionsByStatusProvider, PersonsSelectorsProvider } from './contexts/selectors';
+import TerritoriesList from './scenes/Territories/TerritoriesList';
+import NewTerritoryForm from './scenes/Territories/NewTerritoryForm';
+import Territory from './scenes/Territories/Territory';
+import TerritoryObservation from './scenes/Territories/TerritoryObservation';
 import EnvironmentIndicator from './components/EnvironmentIndicator';
 import API from './services/api';
-// import Charte from './scenes/Menu/Charte';
+import Charte from './scenes/Menu/Charte';
 import CharteAcceptance from './scenes/Login/CharteAcceptance';
 import Loader from './components/Loader';
 
@@ -66,49 +63,49 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
       <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
-      {/* <PersonsStack.Screen name="PersonPlace" component={Place} /> */}
-      {/* <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} /> */}
+      <PersonsStack.Screen name="PersonPlace" component={Place} />
+      <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
     </PersonsStack.Navigator>
   );
 };
 
-// const StructuresStack = createStackNavigator();
-// const StructuresNavigator = () => {
-//   return (
-//     <StructuresStack.Navigator headerMode="none" initialRouteName="StructuresList">
-//       <StructuresStack.Screen name="StructuresList" component={StructuresList} />
-//       <StructuresStack.Screen name="NewStructureForm" component={NewStructureForm} />
-//       <StructuresStack.Screen name="Structure" component={Structure} />
-//     </StructuresStack.Navigator>
-//   );
-// };
+const StructuresStack = createStackNavigator();
+const StructuresNavigator = () => {
+  return (
+    <StructuresStack.Navigator headerMode="none" initialRouteName="StructuresList">
+      <StructuresStack.Screen name="StructuresList" component={StructuresList} />
+      <StructuresStack.Screen name="NewStructureForm" component={NewStructureForm} />
+      <StructuresStack.Screen name="Structure" component={Structure} />
+    </StructuresStack.Navigator>
+  );
+};
 
-// const TerritoriesStack = createStackNavigator();
-// const TerritoriesNavigator = () => {
-//   return (
-//     <TerritoriesStack.Navigator headerMode="none" initialRouteName="TerritoriesList" screenOptions={{ gestureEnabled: false }}>
-//       <TerritoriesStack.Screen name="TerritoriesList" component={TerritoriesList} />
-//       <TerritoriesStack.Screen name="NewTerritoryForm" component={NewTerritoryForm} />
-//       <TerritoriesStack.Screen name="Territory" component={Territory} />
-//       <TerritoriesStack.Screen name="TerritoryObservation" component={TerritoryObservation} />
-//     </TerritoriesStack.Navigator>
-//   );
-// };
+const TerritoriesStack = createStackNavigator();
+const TerritoriesNavigator = () => {
+  return (
+    <TerritoriesStack.Navigator headerMode="none" initialRouteName="TerritoriesList" screenOptions={{ gestureEnabled: false }}>
+      <TerritoriesStack.Screen name="TerritoriesList" component={TerritoriesList} />
+      <TerritoriesStack.Screen name="NewTerritoryForm" component={NewTerritoryForm} />
+      <TerritoriesStack.Screen name="Territory" component={Territory} />
+      <TerritoriesStack.Screen name="TerritoryObservation" component={TerritoryObservation} />
+    </TerritoriesStack.Navigator>
+  );
+};
 
-// const MenuStack = createStackNavigator();
-// const MenuNavigator = () => {
-//   return (
-//     <MenuStack.Navigator headerMode="none" initialRouteName="Menu">
-//       <MenuStack.Screen name="Menu" component={Menu} />
-//       <MenuStack.Screen name="ChangePassword" component={ChangePassword} />
-//       <MenuStack.Screen name="ChangeTeam" component={ChangeTeam} />
-//       <MenuStack.Screen name="Legal" component={Legal} />
-//       <MenuStack.Screen name="Privacy" component={Privacy} />
-//       <MenuStack.Screen name="Charte" component={Charte} />
-//     </MenuStack.Navigator>
-//   );
-// };
+const MenuStack = createStackNavigator();
+const MenuNavigator = () => {
+  return (
+    <MenuStack.Navigator headerMode="none" initialRouteName="Menu">
+      <MenuStack.Screen name="Menu" component={Menu} />
+      <MenuStack.Screen name="ChangePassword" component={ChangePassword} />
+      <MenuStack.Screen name="ChangeTeam" component={ChangeTeam} />
+      <MenuStack.Screen name="Legal" component={Legal} />
+      <MenuStack.Screen name="Privacy" component={Privacy} />
+      <MenuStack.Screen name="Charte" component={Charte} />
+    </MenuStack.Navigator>
+  );
+};
 
 const Tab = createBottomTabNavigator();
 
@@ -131,14 +128,14 @@ const TabNavigator = ({ navigation }) => (
         tabBarLabel: 'AGENDA',
       }}
     />
-    {/* <Tab.Screen
+    <Tab.Screen
       name="Territories"
       component={TerritoriesNavigator}
       options={{
         tabBarIcon: ({ size, color }) => <TerritoryIcon size={size} color={color} />,
         tabBarLabel: 'TERRITOIRES',
       }}
-    /> */}
+    />
     <Tab.Screen
       name="Persons"
       component={PersonsNavigator}
@@ -147,7 +144,7 @@ const TabNavigator = ({ navigation }) => (
         tabBarLabel: 'USAGERS',
       }}
     />
-    {/* <Tab.Screen
+    <Tab.Screen
       name="Structures"
       component={StructuresNavigator}
       options={{
@@ -162,7 +159,7 @@ const TabNavigator = ({ navigation }) => (
         tabBarIcon: ({ size, color }) => <MenuIcon size={size} color={color} />,
         tabBarLabel: 'PROFIL',
       }}
-    /> */}
+    />
   </Tab.Navigator>
 );
 

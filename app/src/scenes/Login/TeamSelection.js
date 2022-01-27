@@ -8,12 +8,12 @@ import { MyText } from '../../components/MyText';
 import Title from '../../components/Title';
 import ScreenTitle from '../../components/ScreenTitle';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { currentTeamState, usersState } from '../../recoil/auth';
+import { currentTeamState, userState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 
 const TeamBody = ({ onSelect }) => {
   const [loading, setLoading] = useState(false);
-  const user = useRecoilValue(usersState);
+  const user = useRecoilValue(userState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const { refresh } = useRefresh();
 

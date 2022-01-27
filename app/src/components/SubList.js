@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import ButtonExpand from './ButtonExpand';
 import Spinner from './Spinner';
@@ -8,10 +8,10 @@ import Button from './Button';
 const initNumberToShow = 10;
 
 const SubList = ({ label, onAdd, data = [], renderItem, ifEmpty, children }) => {
-  const [expanded, setExpanded] = React.useState(false);
-  const [numberToShow, setNumberToShow] = React.useState(initNumberToShow);
+  const [expanded, setExpanded] = useState(false);
+  const [numberToShow, setNumberToShow] = useState(initNumberToShow);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setNumberToShow(initNumberToShow);
   }, [expanded]);
 

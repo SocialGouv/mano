@@ -1,13 +1,14 @@
 import React from 'react';
-import AuthContext from '../../contexts/auth';
-import withContext from '../../contexts/withContext';
+import { useRecoilValue } from 'recoil';
+import { teamsState } from '../../recoil/auth';
 import MultiCheckBoxes from './MultiCheckBoxes';
 
-const TeamsMultiCheckBoxes = ({ values = [], onChange, editable, context }) => {
+const TeamsMultiCheckBoxes = ({ values = [], onChange, editable }) => {
+  const teams = useRecoilValue(teamsState);
   return (
     <MultiCheckBoxes
       label="Assigner à une équipe"
-      source={context.teams.map((t) => t.name)}
+      source={teams.map((t) => t.name)}
       values={values}
       onChange={onChange}
       editable={editable}
@@ -16,4 +17,4 @@ const TeamsMultiCheckBoxes = ({ values = [], onChange, editable, context }) => {
   );
 };
 
-export default withContext(AuthContext)(TeamsMultiCheckBoxes);
+export default TeamsMultiCheckBoxes;

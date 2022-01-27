@@ -1,106 +1,103 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert } from 'react-native';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Button from '../../components/Button';
-import API from '../../services/api';
 import Search from '../../components/Search';
 import FlatListStyled from '../../components/FlatListStyled';
-import Spinner from '../../components/Spinner';
 import { ListEmptyPlaceWithName } from '../../components/ListEmptyContainer';
 import Row from '../../components/Row';
 import Spacer from '../../components/Spacer';
-import PlacesContext from '../../contexts/places';
-import withContext from '../../contexts/withContext';
-import { compose } from 'recompose';
-import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
-import RefreshContext from '../../contexts/refresh';
+import { placesState, preparePlaceForEncryption } from '../../recoil/places';
+import { useRefresh } from '../../recoil/refresh';
+import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
 
-class NewPlaceForm extends React.Component {
-  state = {
-    name: '',
-    posting: false,
-    place: '',
-    key: 0,
-    loading: false,
-  };
-  componentDidMount() {
-    this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
-  }
+const NewPlaceForm = ({ route, navigation }) => {
+  const [name, setName] = useState('');
+  const [posting, setPosting] = useState(false);
 
-  componentWillUnmount() {
-    this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
-  }
+  const [places, setPlaces] = useRecoilState(placesState);
+  const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
+  const data = useMemo(() => {
+    if (!name) return places;
+    return places.filter((p) => p.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()));
+  }, [name, places]);
 
-  handleBeforeRemove = (e) => {
-    if (this.backRequestHandled) return;
+  const { person } = route.params;
+
+  const { placesAndRelationsRefresher } = useRefresh();
+
+  const backRequestHandledRef = useRef(null);
+  const handleBeforeRemove = (e) => {
+    if (backRequestHandledRef.current === true) return;
     e.preventDefault();
-    this.onGoBackRequested();
+    onGoBackRequested();
   };
 
-  onCreatePlace = async () => {
-    this.setState({ posting: true });
-    const { name } = this.state;
-    const body = { name };
-    const response = await this.props.context.addPlace(body);
+  useEffect(() => {
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      beforeRemoveListenerUnsbscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onCreatePlace = async () => {
+    setPosting(true);
+    const response = await API.post({ path: '/place', body: preparePlaceForEncryption({ name }) });
     if (response.error) {
-      this.setState({ posting: false });
+      setPosting(false);
       Alert.alert(response.error);
       return;
     }
     if (response.ok) {
-      this.setState({ place: response.data }, this.onSubmit);
+      setPlaces((places) => [response.decryptedData, ...places].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+
+      onSubmit(response.decryptedData);
     }
   };
 
-  onSubmit = async () => {
-    this.setState({ posting: true });
-    const { place } = this.state;
-    const { route, context } = this.props;
-    const { person } = route.params;
+  const onSubmit = async (place) => {
+    setPosting(true);
 
-    const response = await context.addRelation({ place: place._id, person: person._id });
+    const response = await API.post({ path: '/relPersonPlace', body: prepareRelPersonPlaceForEncryption({ place: place._id, person: person._id }) });
     if (response.error) {
-      this.setState({ posting: false });
+      setPosting(false);
       Alert.alert(response.error);
       return;
     }
     if (response.ok) {
-      context.refreshPlacesAndRelations();
-      this.onBack();
+      setRelsPersonPlace((relsPersonPlace) => [response.decryptedData, ...relsPersonPlace]);
+      placesAndRelationsRefresher();
+      onBack();
     }
   };
 
-  onBack = () => {
-    this.backRequestHandled = true;
-    const { navigation, route } = this.props;
+  const onBack = () => {
+    backRequestHandledRef.current = true;
     navigation.navigate(route.params.fromRoute);
-    setTimeout(() => {
-      this.setState({ posting: false });
-    }, 250);
+    setTimeout(() => setPosting(false), 250);
   };
 
-  isReadyToSave = () => {
-    const { name } = this.state;
+  const isReadyToSave = () => {
     if (!name || !name.length || !name.trim().length) return false;
     return true;
   };
 
-  onGoBackRequested = () => {
-    if (!this.isReadyToSave()) {
-      this.onBack();
-      return;
-    }
+  const onGoBackRequested = () => {
+    if (!isReadyToSave) return onBack();
 
-    if (this.isReadyToSave()) {
+    if (isReadyToSave) {
       Alert.alert('Voulez-vous enregistrer ce lieu ?', null, [
         {
           text: 'Enregistrer',
-          onPress: this.onCreatePlace,
+          onPress: onCreatePlace,
         },
         {
           text: 'Ne pas enregistrer',
-          onPress: this.onBack,
+          onPress: onBack,
           style: 'destructive',
         },
         {
@@ -116,45 +113,32 @@ class NewPlaceForm extends React.Component {
       },
       {
         text: 'Abandonner',
-        onPress: this.onBack,
+        onPress: onBack,
         style: 'destructive',
       },
     ]);
   };
-  keyExtractor = (structure) => structure._id;
-  selectPlace = (place) => {
-    this.setState({ place }, this.onSubmit);
-  };
-  renderRow = ({ item: place }) => {
-    const { name } = place;
-    return <Row onPress={() => this.selectPlace(place)} caption={name} />;
-  };
+  const keyExtractor = (structure) => structure._id;
+  const renderRow = ({ item: place }) => <Row onPress={() => onSubmit(place)} caption={place.name} />;
 
-  render() {
-    const { name, loading, key, posting } = this.state;
-    const { person } = this.props.route.params;
-    const { places } = this.props.context;
-    const data = places.filter((p) => p.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()));
-    return (
-      <SceneContainer>
-        <ScreenTitle title={`Nouveau lieu - ${person.name}`} onBack={this.onGoBackRequested} />
-        <Search results={data} placeholder="Rechercher un lieu..." onChange={(name) => this.setState({ name })} />
-        <FlatListStyled
-          data={data}
-          ListHeaderComponent={() => (
-            <>
-              <Button caption="Créer" disabled={!this.isReadyToSave()} onPress={this.onCreatePlace} loading={posting} />
-              <Spacer height={15} />
-            </>
-          )}
-          extraData={key}
-          renderItem={this.renderRow}
-          keyExtractor={this.keyExtractor}
-          ListEmptyComponent={loading ? Spinner : name.length ? ListEmptyPlaceWithName(name) : null}
-        />
-      </SceneContainer>
-    );
-  }
-}
+  return (
+    <SceneContainer>
+      <ScreenTitle title={`Nouveau lieu - ${person.name}`} onBack={onGoBackRequested} />
+      <Search results={data} placeholder="Rechercher un lieu..." onChange={setName} />
+      <FlatListStyled
+        data={data}
+        ListHeaderComponent={() => (
+          <>
+            <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreatePlace} loading={posting} />
+            <Spacer height={15} />
+          </>
+        )}
+        renderItem={renderRow}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={name.length ? ListEmptyPlaceWithName(name) : null}
+      />
+    </SceneContainer>
+  );
+};
 
-export default compose(withContext(RelsPersonPlaceContext), withContext(PlacesContext), withContext(RefreshContext))(NewPlaceForm);
+export default NewPlaceForm;

@@ -7,6 +7,7 @@ import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import TeamsTags from '../../components/TeamsTags';
 import { personsState } from '../../recoil/persons';
+import { DONE } from '../../recoil/actions';
 
 const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName }) => {
   const persons = useRecoilValue(personsState);

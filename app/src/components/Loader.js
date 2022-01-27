@@ -6,7 +6,8 @@ import colors from '../utils/colors';
 import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
-import { useRefresh } from '../recoil/refresh';
+import { loaderFullScreenState, loadingState, progressState } from '../recoil/refresh';
+import { useRecoilValue } from 'recoil';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -14,8 +15,10 @@ function randomIntFromInterval(min, max) {
 }
 
 const Loader = () => {
-  const { loading, progress, fullScreen } = useRefresh();
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
+  const loading = useRecoilValue(loadingState);
+  const progress = useRecoilValue(progressState);
+  const fullScreen = useRecoilValue(loaderFullScreenState);
 
   useEffect(() => {
     setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);

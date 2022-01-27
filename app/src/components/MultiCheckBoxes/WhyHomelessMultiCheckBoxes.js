@@ -1,5 +1,5 @@
 import React from 'react';
-import { reasonsOptions } from '../../contexts/persons';
+import { reasonsOptions } from '../../recoil/persons';
 import MultiCheckBoxes from './MultiCheckBoxes';
 
 const WhyHomelessMultiCheckBoxes = ({ values = [], onChange, editable }) => {

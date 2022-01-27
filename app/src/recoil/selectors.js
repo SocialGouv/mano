@@ -1,5 +1,5 @@
 import { selector, selectorFamily } from 'recoil';
-import { actionsState } from './actions';
+import { actionsState, CANCEL, DONE, TODO } from './actions';
 import { currentTeamState } from './auth';
 import { commentsState } from './comments';
 import { personsState } from './persons';
@@ -7,7 +7,7 @@ import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
 import { territoriesState } from './territory';
-import { getIsDayWithinHoursOffsetOfDay, isOnSameDay, today } from '../services/date';
+import { getIsDayWithinHoursOffsetOfDay, isComingInDays, isOnSameDay, isPassed, isToday, isTomorrow, today } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { filterBySearch, filterData } from '../utils/search';
 
@@ -176,14 +176,67 @@ export const actionsForCurrentTeamSelector = selector({
   },
 });
 
-export const actionsByStatusSelector = selectorFamily({
-  key: 'actionsByStatusSelector',
-  get:
-    ({ status }) =>
-    ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
-      return actions.filter((a) => a.status === status);
-    },
+const PASSED = 'Passées';
+const TODAY = "Aujourd'hui";
+const TOMORROW = 'Demain';
+const INCOMINGDAYS = 'À venir';
+const sections = [
+  {
+    title: PASSED,
+    data: [],
+  },
+  {
+    title: TODAY,
+    data: [],
+  },
+  {
+    title: TOMORROW,
+    data: [],
+  },
+  {
+    title: INCOMINGDAYS,
+    data: [],
+  },
+];
+
+const formatData = (data) => {
+  if (!data?.length) return [];
+  const dataInSections = data.reduce((actions, action) => {
+    let inSection = null;
+    if (isPassed(action.dueAt)) inSection = PASSED;
+    if (isToday(action.dueAt)) inSection = TODAY;
+    if (isTomorrow(action.dueAt)) inSection = TOMORROW;
+    if (isComingInDays(action.dueAt, 2)) inSection = INCOMINGDAYS;
+    return actions.map((section) => {
+      if (section.title !== inSection) return section;
+      return { ...section, data: [...section.data, action] };
+    });
+  }, sections);
+  return dataInSections;
+};
+
+export const actionsDoneSelector = selector({
+  key: 'actionsDoneSelector',
+  get: ({ get }) => {
+    const actions = get(actionsForCurrentTeamSelector);
+    return actions.filter((a) => a.status === DONE);
+  },
+});
+
+export const actionsTodoSelector = selector({
+  key: 'actionsTodoSelector',
+  get: ({ get }) => {
+    const actions = get(actionsForCurrentTeamSelector);
+    return formatData(actions.filter((a) => a.status === TODO));
+  },
+});
+
+export const actionsCanceledSelector = selector({
+  key: 'actionsCanceledSelector',
+  get: ({ get }) => {
+    const actions = get(actionsForCurrentTeamSelector);
+    return actions.filter((a) => a.status === CANCEL);
+  },
 });
 
 export const actionsSearchSelector = selectorFamily({
@@ -266,7 +319,7 @@ export const territoriesSearchSelector = selectorFamily({
     ({ search = '' }) =>
     ({ get }) => {
       const territories = get(territoriesState);
-      if (!search?.length) return [];
+      if (!search?.length) return territories;
       return filterBySearch(search, territories);
     },
 });

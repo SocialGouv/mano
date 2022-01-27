@@ -1,81 +1,76 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
+import { useRecoilState } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
-import Spinner from '../../components/Spinner';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
-import PlacesContext from '../../contexts/places';
-import withContext from '../../contexts/withContext';
+import { placesState, preparePlaceForEncryption } from '../../recoil/places';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import API from '../../services/api';
 
-class Place extends React.Component {
-  state = {
-    placeDB: {},
-    comment: '',
-    loading: true,
-    updating: false,
-  };
-  componentDidMount() {
-    this.getPlace();
-    this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
-  }
+const Place = ({ navigation, route }) => {
+  const [name, setName] = useState(false);
+  const [updating, setUpdating] = useState(false);
 
-  componentWillUnmount() {
-    this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
-  }
+  const [places, setPlaces] = useRecoilState(placesState);
+  const placeDB = useMemo(() => places.find((p) => p._id === route.params._id), [places, route?.params?._id]);
 
-  handleBeforeRemove = (e) => {
-    if (this.backRequestHandled) return;
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+
+  const backRequestHandledRef = useRef(null);
+  const handleBeforeRemove = (e) => {
+    if (backRequestHandledRef.current === true) return;
     e.preventDefault();
-    this.onGoBackRequested();
+    onGoBackRequested();
   };
 
-  setPlace = (placeDB) => {
-    const { name, _id, entityKey } = placeDB;
-    const place = {
-      name: name || '',
-      entityKey: entityKey || '',
+  useEffect(() => {
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      beforeRemoveListenerUnsbscribe();
     };
-    this.setState({
-      placeDB: Object.assign({}, place, { _id }),
-      ...place,
-      loading: false,
-    });
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  getPlace = async () => {
-    const { _id } = this.props.route.params;
-    this.setPlace(this.props.context.places.find((p) => p._id === _id));
-  };
-
-  onUpdatePlace = async () => {
-    this.setState({ updating: true });
-    const { name, placeDB } = this.state;
-    const response = await this.props.context.updatePlace({
-      name: name.trim(),
-      _id: placeDB._id,
-      entityKey: placeDB.entityKey,
+  const onUpdatePlace = async () => {
+    setUpdating(true);
+    const response = await API.put({
+      path: `/place/${placeDB._id}`,
+      body: preparePlaceForEncryption({
+        name: name.trim(),
+        _id: placeDB._id,
+        entityKey: placeDB.entityKey,
+      }),
     });
     if (response.error) {
-      this.setState({ updating: false });
+      setUpdating(false);
       Alert.alert(response.error);
       return false;
     }
     if (response.ok) {
-      this.setState({ updating: false });
-      Alert.alert('Lieu mis-à-jour !', null, [{ text: 'OK', onPress: this.onBack }]);
+      setPlaces((places) =>
+        places
+          .map((p) => {
+            if (p._id === placeDB._id) return response.decryptedData;
+            return p;
+          })
+          .sort((p1, p2) => p1.name.localeCompare(p2.name))
+      );
+      setUpdating(false);
+      Alert.alert('Lieu mis-à-jour !', null, [{ text: 'OK', onPress: onBack }]);
     }
   };
 
-  onDeleteRequest = () => {
+  const onDeleteRequest = () => {
     Alert.alert('Voulez-vous vraiment supprimer ce lieu ?', 'Cette opération est irréversible.', [
       {
         text: 'Supprimer',
         style: 'destructive',
-        onPress: this.onDelete,
+        onPress: onDelete,
       },
       {
         text: 'Annuler',
@@ -84,41 +79,43 @@ class Place extends React.Component {
     ]);
   };
 
-  onDelete = async () => {
-    const { placeDB } = this.state;
-    const response = await this.props.context.deletePlace(placeDB._id);
-    if (response.error) return Alert.alert(response.error);
+  const onDelete = async () => {
+    setUpdating(true);
+    const response = await API.delete({ path: `/place/${placeDB._id}` });
+    if (response.error) {
+      setUpdating(false);
+      Alert.alert(response.error);
+      return;
+    }
     if (response.ok) {
+      setPlaces((places) => places.filter((p) => p._id !== placeDB._id));
+      for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === placeDB._id)) {
+        await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+      }
+      setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel.place !== placeDB._id));
+      setUpdating(false);
       Alert.alert('Lieu supprimé !');
-      this.onBack();
+      onBack();
     }
   };
 
-  isUpdateDisabled = () => {
-    const { name, placeDB } = this.state;
-    if (placeDB.name !== name) return false;
-    return true;
-  };
+  const isUpdateDisabled = useMemo(() => placeDB.name === name, [name, placeDB.name]);
 
-  onBack = () => {
-    this.backRequestHandled = true;
-    const { navigation, route } = this.props;
+  const onBack = () => {
+    backRequestHandledRef.current = true;
     navigation.navigate(route.params.fromRoute);
   };
 
-  onGoBackRequested = () => {
-    if (this.isUpdateDisabled()) {
-      this.onBack();
-      return;
-    }
+  const onGoBackRequested = () => {
+    if (isUpdateDisabled) return onBack();
     Alert.alert('Voulez-vous enregistrer ce lieu ?', null, [
       {
         text: 'Enregistrer',
-        onPress: this.onUpdatePlace,
+        onPress: onUpdatePlace,
       },
       {
         text: 'Ne pas enregistrer',
-        onPress: this.onBack,
+        onPress: onBack,
         style: 'destructive',
       },
       {
@@ -128,31 +125,20 @@ class Place extends React.Component {
     ]);
   };
 
-  render() {
-    const { name, loading, updating } = this.state;
-    const { params } = this.props.route;
-    if (loading) return <Spinner />;
-    return (
-      <SceneContainer>
-        <ScreenTitle title={`${params.personName} - Lieu`} onBack={this.onGoBackRequested} />
-        <ScrollContainer>
-          <View>
-            <InputLabelled
-              label="Nom du lieu"
-              onChangeText={(newName) => this.setState({ name: newName })}
-              value={name}
-              placeholder="Description"
-              multiline
-            />
-            <ButtonsContainer>
-              <ButtonDelete onPress={this.onDeleteRequest} />
-              <Button caption="Mettre-à-jour" onPress={this.onUpdatePlace} disabled={this.isUpdateDisabled()} loading={updating} />
-            </ButtonsContainer>
-          </View>
-        </ScrollContainer>
-      </SceneContainer>
-    );
-  }
-}
+  return (
+    <SceneContainer>
+      <ScreenTitle title={`${route.params.personName} - Lieu`} onBack={onGoBackRequested} />
+      <ScrollContainer>
+        <View>
+          <InputLabelled label="Nom du lieu" onChangeText={setName} value={name} placeholder="Description" multiline />
+          <ButtonsContainer>
+            <ButtonDelete onPress={onDeleteRequest} />
+            <Button caption="Mettre-à-jour" onPress={onUpdatePlace} disabled={isUpdateDisabled} loading={updating} />
+          </ButtonsContainer>
+        </View>
+      </ScrollContainer>
+    </SceneContainer>
+  );
+};
 
-export default withContext(PlacesContext)(Place);
+export default Place;

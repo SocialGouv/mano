@@ -3,7 +3,6 @@ import { Alert, Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { API } from '@sentry/core';
 import PersonSummary from './PersonSummary';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -22,6 +21,7 @@ import { actionsState } from '../../recoil/actions';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import API from '../../services/api';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -42,14 +42,7 @@ const Person = ({ route, navigation }) => {
   const organisation = useRecoilValue(organisationState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
 
-  const personDB = useMemo(() => {
-    persons.find((p) => p._id === route.params?._id);
-  }, [persons, route.params?._id]);
-
-  const [person, setPerson] = useState(castToPerson(route?.params));
-  const [writingComment, setWritingComment] = useState('');
-  const [editable, setEditable] = useState(route?.params?.editable || false);
-  const [updating, setUpdating] = useState(false);
+  const personDB = useMemo(() => persons.find((p) => p._id === route.params?._id), [persons, route.params?._id]);
 
   const castToPerson = useCallback(
     (person = {}) => {
@@ -93,6 +86,11 @@ const Person = ({ route, navigation }) => {
     [customFieldsPersonsMedical, customFieldsPersonsSocial]
   );
 
+  const [person, setPerson] = useState(castToPerson(route?.params));
+  const [writingComment, setWritingComment] = useState('');
+  const [editable, setEditable] = useState(route?.params?.editable || false);
+  const [updating, setUpdating] = useState(false);
+
   const backRequestHandledRef = useRef(null);
   useEffect(() => {
     const handleBeforeRemove = (e) => {
@@ -119,22 +117,18 @@ const Person = ({ route, navigation }) => {
   const onEdit = () => setEditable((e) => !e);
 
   const onChange = (newPersonState, forceUpdate = false) => {
-    if (forceUpdate) {
-      setPerson((p) => ({ ...p, ...newPersonState }));
-      onUpdatePerson(false);
-    } else {
-      setPerson((p) => ({ ...p, ...newPersonState }));
-    }
+    setPerson((p) => ({ ...p, ...newPersonState }));
+    if (forceUpdate) onUpdatePerson(false, newPersonState);
   };
 
-  const onUpdatePerson = async (alert = true) => {
+  const onUpdatePerson = async (alert = true, stateToMerge = {}) => {
     setUpdating(true);
-    const personToUpdate = Object.assign({}, castToPerson(person), {
+    const personToUpdate = Object.assign({}, castToPerson(person), stateToMerge, {
       _id: personDB._id,
     });
     const oldPerson = persons.find((a) => a._id === personDB._id);
     const response = await API.put({
-      path: `/person/${person._id}`,
+      path: `/person/${personDB._id}`,
       body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(personToUpdate),
     });
     if (response.error) {
@@ -145,7 +139,7 @@ const Person = ({ route, navigation }) => {
     const newPerson = response.decryptedData;
     setPersons((persons) =>
       persons.map((p) => {
-        if (p._id === personToUpdate._id) return newPerson;
+        if (p._id === personDB._id) return newPerson;
         return p;
       })
     );
@@ -215,9 +209,9 @@ const Person = ({ route, navigation }) => {
       ...personDB,
       ...castToPerson(person),
     };
-    if (JSON.stringify(personDB) !== JSON.stringify(newPerson)) return false;
+    if (JSON.stringify(castToPerson(personDB)) !== JSON.stringify(castToPerson(newPerson))) return false;
     return true;
-  }, [personDB, person]);
+  }, [personDB, castToPerson, person]);
 
   const onBack = () => {
     backRequestHandledRef.current = true;
@@ -271,7 +265,7 @@ const Person = ({ route, navigation }) => {
         title={person.name}
         onBack={onGoBackRequested}
         onEdit={!editable ? onEdit : null}
-        onSave={!editable ? null : onUpdatePerson}
+        onSave={!editable || isUpdateDisabled ? null : onUpdatePerson}
         saving={updating}
         backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
       />

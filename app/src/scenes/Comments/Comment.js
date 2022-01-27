@@ -8,7 +8,7 @@ import Button from '../../components/Button';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { commentsState } from '../../recoil/comments';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { currentTeamState } from '../../recoil/auth';
 import API from '../../services/api';
 
@@ -27,11 +27,14 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
 
   const onUpdateComment = async () => {
     setUpdating(true);
-    const response = await this.props.context.updateComment({
-      comment: comment.trim(),
-      team: currentTeam._id,
-      _id: commentDB._id,
-      entityKey: commentDB.entityKey,
+    const response = await API.put({
+      path: `/comment/${commentDB._id}`,
+      body: prepareCommentForEncryption({
+        comment: comment.trim(),
+        team: currentTeam._id,
+        _id: commentDB._id,
+        entityKey: commentDB.entityKey,
+      }),
     });
     if (response.error) {
       setUpdating(false);
@@ -39,9 +42,16 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
       return false;
     }
     if (response.ok) {
+      setComments((comments) =>
+        comments.map((c) => {
+          if (c._id === commentDB._id) return response.decryptedData;
+          return c;
+        })
+      );
       setUpdating(false);
-      Alert.alert('Commentaire mis-à-jour !', null, [{ text: 'OK', onPress: this.onBack }]);
+      Alert.alert('Commentaire mis-à-jour !', null, [{ text: 'OK', onPress: onBack }]);
     }
+    return response;
   };
 
   const onDelete = async () => {

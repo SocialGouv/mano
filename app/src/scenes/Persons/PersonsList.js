@@ -45,7 +45,7 @@ const PersonsList = ({ navigation, route }) => {
       toRoute: 'Person',
     });
 
-  const onFiltersPress = () => navigation.push('PersonsFilter', this.props.route.params);
+  const onFiltersPress = () => navigation.push('PersonsFilter', route.params);
 
   const keyExtractor = (person) => person._id;
   const ListFooterComponent = () => {

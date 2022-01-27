@@ -79,7 +79,7 @@ const NewPersonForm = ({ navigation, route }) => {
   const isReadyToSave = useMemo(() => {
     if (!name || !name.length || !name.trim().length) return false;
     return true;
-  }, []);
+  }, [name]);
 
   const onBack = () => {
     backRequestHandledRef.current = true;

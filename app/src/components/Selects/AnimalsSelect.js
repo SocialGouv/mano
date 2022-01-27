@@ -10,13 +10,7 @@ export const situations = [
 
 const AnimalsSelect = ({ value = situations[0], onSelect, editable }) => {
   return (
-    <SelectLabelled
-      label="Avec animaux"
-      values={situations}
-      value={value.length ? value : situations[0]}
-      onSelect={onSelect}
-      editable={editable}
-    />
+    <SelectLabelled label="Avec animaux" values={situations} value={value.length ? value : situations[0]} onSelect={onSelect} editable={editable} />
   );
 };
 

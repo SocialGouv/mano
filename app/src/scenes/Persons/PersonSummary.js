@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { Alert, findNodeHandle, Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
@@ -57,14 +57,14 @@ const PersonSummary = ({
         if (options[buttonIndex] === 'Modifier') {
           navigation.navigate('PersonPlace', {
             _id: relPersPlace.place,
-            personName: personDB.name,
+            personName: personDB?.name,
             fromRoute: 'Person',
           });
         }
         if (options[buttonIndex] === 'Retirer') {
-          const response = await API.delete({ path: `/relPersonPlace/${relPersPlace._id}` });
+          const response = await API.delete({ path: `/relPersonPlace/${relPersPlace?._id}` });
           if (response.ok) {
-            setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace._id));
+            setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id));
           }
           if (!response.ok) return Alert.alert(response.error);
         }
@@ -83,7 +83,7 @@ const PersonSummary = ({
   const onAddActionRequest = () => {
     navigation.push('Actions', {
       screen: 'NewActionForm',
-      params: { person: personDB._id, fromRoute: 'Person' },
+      params: { person: personDB?._id, fromRoute: 'Person' },
     });
   };
 
@@ -113,22 +113,22 @@ const PersonSummary = ({
 
   const allActions = useRecoilValue(actionsState);
   const actions = useMemo(
-    () => allActions.filter((a) => a.person === personDB._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)),
-    [allActions, personDB._id]
+    () => allActions.filter((a) => a.person === personDB?._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)),
+    [allActions, personDB?._id]
   );
 
   const allRelsPersonPlace = useRecoilValue(relsPersonPlaceState);
-  const relsPersonPlace = useMemo(() => allRelsPersonPlace.filter((rel) => rel.person === personDB._id), [allRelsPersonPlace, personDB._id]);
+  const relsPersonPlace = useMemo(() => allRelsPersonPlace.filter((rel) => rel.person === personDB?._id), [allRelsPersonPlace, personDB?._id]);
 
   const allPlaces = useRecoilValue(placesState);
 
   const places = useMemo(() => {
     const placesId = relsPersonPlace.map((rel) => rel.place);
-    allPlaces.filter((pl) => placesId.includes(pl._id));
+    return allPlaces.filter((pl) => placesId.includes(pl._id));
   }, [allPlaces, relsPersonPlace]);
 
   const allComments = useRecoilValue(commentsState);
-  const comments = useMemo(() => allComments.filter((c) => c.person === personDB._id), [allComments, personDB._id]);
+  const comments = useMemo(() => allComments.filter((c) => c.person === personDB?._id), [allComments, personDB?._id]);
 
   const teams = useRecoilValue(teamsState);
 
@@ -212,15 +212,15 @@ const PersonSummary = ({
           keyboardType="phone-pad"
           autoCorrect={false}
           editable={editable}
-          noMargin={editable || person.phone?.length}
+          noMargin={editable || !!personDB?.phone?.length}
         />
         <Spacer />
-        {!!personDB.phone.length && (
+        {!!personDB?.phone?.length && (
           <Button
             caption="Appeler"
             Icon={PhoneIcon}
             color={colors.app.secondary}
-            onPress={() => Linking.openURL('tel:' + personDB.phone?.split(' ').join(''))}
+            onPress={() => Linking.openURL('tel:' + personDB?.phone?.split(' ').join(''))}
             noBorder
           />
         )}
@@ -304,7 +304,12 @@ const PersonSummary = ({
           />
         )}
         ifEmpty="Pas encore de commentaire">
-        <NewCommentInput forwardRef={newCommentRef} onFocus={() => _scrollToInput(newCommentRef)} person={personDB._id} writeComment={writeComment} />
+        <NewCommentInput
+          forwardRef={newCommentRef}
+          onFocus={() => _scrollToInput(newCommentRef)}
+          person={personDB?._id}
+          writeComment={writeComment}
+        />
       </SubList>
       <SubList
         label="Lieux fréquentés"

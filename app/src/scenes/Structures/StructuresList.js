@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Alert } from 'react-native';
+import { useRecoilState } from 'recoil';
 import API from '../../services/api';
 import { PersonIcon } from '../../icons';
 import SceneContainer from '../../components/SceneContainer';
@@ -9,75 +10,57 @@ import Spinner from '../../components/Spinner';
 import { ListEmptyStructures } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
 import FlatListStyled from '../../components/FlatListStyled';
-import StructuresContext from '../../contexts/structures';
-import withContext from '../../contexts/withContext';
+import { structuresState } from '../../recoil/structures';
 
-class Structures extends React.Component {
-  state = {
-    refreshing: false,
-    loading: true,
-    search: '',
+const Structures = ({ navigation }) => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  const [structures, setStructures] = useRecoilState(structuresState);
+
+  const getStructures = async (refresh = true) => {
+    if (refresh) setRefreshing(true);
+    const response = await API.get({ path: '/structure' });
+    setRefreshing(false);
+    setLoading(false);
+    if (response.error) Alert.alert(response.error);
+    if (response.ok) setStructures(response.data);
   };
 
-  componentDidMount() {
-    this.getStructures(false);
-  }
+  useEffect(() => {
+    getStructures();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  componentWillUnmount() {
-    clearTimeout(this.searchTimeout);
-  }
+  const onCreateStructureRequest = () => navigation.navigate('NewStructureForm', { fromRoute: 'StructuresList' });
 
-  getStructures = async (refresh = true) => {
-    if (refresh) this.setState({ refreshing: true });
-    const response = await API.execute({ path: '/structure' });
-    if (response.error) {
-      Alert.alert(response.error);
-      this.setState({ refreshing: false });
-    }
-    if (response.ok) {
-      this.props.context.setStructures(response.data);
-      this.setState({ refreshing: false, loading: false });
-    }
-  };
-
-  onSearchStart = () => {
-    this.props.context.setStructures([]);
-    this.setState({ loading: true });
-  };
-  onSearchComplete = (structures) => {
-    this.props.context.setStructures(structures);
-    this.setState({ refreshing: false, loading: false });
-  };
-
-  onCreateStructureRequest = () => this.props.navigation.navigate('NewStructureForm', { fromRoute: 'StructuresList' });
-
-  keyExtractor = (structure) => structure._id;
-  renderRow = ({ item: structure }) => {
+  const keyExtractor = (structure) => structure._id;
+  const renderRow = ({ item: structure }) => {
     const { name } = structure;
-    const { push } = this.props.navigation;
-    return <Row withNextButton onPress={() => push('Structure', { ...structure, fromRoute: 'StructuresList' })} Icon={PersonIcon} caption={name} />;
-  };
-
-  render() {
-    const { refreshing, loading } = this.state;
-    const { structures, key } = this.props.context;
     return (
-      <SceneContainer>
-        <ScreenTitle title="Structures" />
-        <FlatListStyled
-          refreshing={refreshing}
-          onRefresh={this.getStructures}
-          data={loading ? [] : structures}
-          extraData={key}
-          renderItem={this.renderRow}
-          keyExtractor={this.keyExtractor}
-          ListEmptyComponent={loading ? Spinner : ListEmptyStructures}
-          defaultTop={0}
-        />
-        <FloatAddButton onPress={this.onCreateStructureRequest} />
-      </SceneContainer>
+      <Row
+        withNextButton
+        onPress={() => navigation.push('Structure', { ...structure, fromRoute: 'StructuresList' })}
+        Icon={PersonIcon}
+        caption={name}
+      />
     );
-  }
-}
+  };
+  return (
+    <SceneContainer>
+      <ScreenTitle title="Structures" />
+      <FlatListStyled
+        refreshing={refreshing}
+        onRefresh={getStructures}
+        data={structures}
+        renderItem={renderRow}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={loading ? Spinner : ListEmptyStructures}
+        defaultTop={0}
+      />
+      <FloatAddButton onPress={onCreateStructureRequest} />
+    </SceneContainer>
+  );
+};
 
-export default withContext(StructuresContext)(Structures);
+export default Structures;

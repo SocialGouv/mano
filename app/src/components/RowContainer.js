@@ -1,20 +1,11 @@
 import React from 'react';
 import { TouchableOpacity, StyleSheet, View } from 'react-native';
 
-const RowContainer = ({
-  Component = TouchableOpacity,
-  onPress,
-  disabled,
-  noPadding,
-  children,
-  center,
-}) => {
+const RowContainer = ({ Component = TouchableOpacity, onPress, disabled, noPadding, children, center }) => {
   return (
     <Component onPress={onPress} disabled={disabled}>
       <View style={styles.container}>
-        <View style={[styles.subContainer, noPadding && styles.noPadding, center && styles.center]}>
-          {children}
-        </View>
+        <View style={[styles.subContainer, noPadding && styles.noPadding, center && styles.center]}>{children}</View>
       </View>
     </Component>
   );

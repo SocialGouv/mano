@@ -8,7 +8,7 @@ import { MyText } from '../../components/MyText';
 import { currentTeamState, userState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 
-const ForceChangePassword = ({ navigation, context }) => {
+const ForceChangePassword = ({ navigation }) => {
   const user = useRecoilState(userState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const { refresh } = useRefresh();

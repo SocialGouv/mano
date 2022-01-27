@@ -2,16 +2,11 @@ import { organisationState } from './auth';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
+import { atom, selector, useRecoilState } from 'recoil';
 
 export const territoryObservationsState = atom({
   key: 'territoryObservationsState',
   default: [],
-});
-
-export const territoriesObservationsLoadingState = atom({
-  key: 'territoriesObservationsLoadingState',
-  default: true,
 });
 
 export const customFieldsObsSelector = selector({
@@ -25,23 +20,16 @@ export const customFieldsObsSelector = selector({
 
 export const useTerritoryObservations = () => {
   const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
-  const [loading, setLoading] = useRecoilState(territoriesObservationsLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
 
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-
   const setTerritoryObsFullState = (newTerritoryObservations) => {
-    if (newTerritoryObservations) {
-      setTerritoryObs(newTerritoryObservations);
-      setLoading(false);
-    }
+    if (newTerritoryObservations) setTerritoryObs(newTerritoryObservations);
     setLastRefresh(Date.now());
   };
 
   const setBatchData = (newObs) => setTerritoryObs((territoryObservations) => [...territoryObservations, ...newObs]);
 
   const refreshTerritoryObs = async (setProgress) => {
-    setLoading(true);
     try {
       const data = await getData({
         collectionName: 'territory-observation',
@@ -56,60 +44,11 @@ export const useTerritoryObservations = () => {
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });
-      setLoading(false);
       return false;
     }
   };
 
-  const deleteTerritoryObs = async (id) => {
-    const res = await API.delete({ path: `/territory-observation/${id}` });
-    if (res.ok) {
-      setTerritoryObs((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
-    }
-    return res;
-  };
-
-  const addTerritoryObs = async (obs) => {
-    try {
-      const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
-      if (res.ok) {
-        setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
-      }
-      return res;
-    } catch (error) {
-      capture('error in creating obs' + error, { extra: { error, obs } });
-      return { ok: false, error: error.message };
-    }
-  };
-
-  const updateTerritoryObs = async (obs) => {
-    try {
-      const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
-      if (res.ok) {
-        setTerritoryObs((territoryObservations) =>
-          territoryObservations.map((a) => {
-            if (a._id === obs._id) return res.decryptedData;
-            return a;
-          })
-        );
-      }
-      return res;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in creating obs', obs } });
-      return { ok: false, error: error.message };
-    }
-  };
-
-  return {
-    territoryObservations,
-    loading,
-    customFieldsObs,
-    refreshTerritoryObs,
-    setTerritoryObs,
-    deleteTerritoryObs,
-    addTerritoryObs,
-    updateTerritoryObs,
-  };
+  return refreshTerritoryObs;
 };
 
 export const defaultCustomFields = [

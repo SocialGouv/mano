@@ -20,7 +20,7 @@ const Search = ({ path, onSearchStart, onSearchClear, onChange, withOrg, onSearc
       return onChange(search);
     }
     onSearchStart(search);
-    this.setState({ search });
+    setSearch(search);
     clearTimeout(searchTimeout.current);
     clearTimeout(keyboardDimissTimeout.current);
     if (!search.length && onSearchClear) {

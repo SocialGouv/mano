@@ -1,46 +1,44 @@
-import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useActions } from './actions';
 import { organisationState } from './auth';
 import { useComments } from './comments';
 import { usePersons } from './persons';
 import { usePlaces } from './places';
 import { useRelsPerson } from './relPersonPlace';
-import { useReports } from './reports';
 import { useTerritories } from './territory';
 import { useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';
 import API from '../services/api';
 
-const loadingState = atom({
+export const loadingState = atom({
   key: 'loadingState',
   default: '',
 });
 
-const progressState = atom({
+export const progressState = atom({
   key: 'progressState',
   default: 0,
 });
 
-const loaderFullScreenState = atom({
+export const loaderFullScreenState = atom({
   key: 'loaderFullScreenState',
   default: false,
 });
 
 export const useRefresh = () => {
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh', 0);
-  const [loading, setLoading] = useRecoilState(loadingState);
-  const [progress, setProgress] = useRecoilState(progressState);
-  const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
+  const setLoading = useSetRecoilState(loadingState);
+  const setProgress = useSetRecoilState(progressState);
+  const setFullScreen = useSetRecoilState(loaderFullScreenState);
 
-  const { refreshActions } = useActions();
-  const { refreshPersons } = usePersons();
-  const { refreshComments } = useComments();
-  const { refreshTerritories } = useTerritories();
-  const { refreshTerritoryObs } = useTerritoryObservations();
-  const { refreshPlaces } = usePlaces();
-  const { refreshRelsPersonPlace } = useRelsPerson();
-  const { refreshReports } = useReports();
+  const refreshActions = useActions();
+  const refreshPersons = usePersons();
+  const refreshComments = useComments();
+  const refreshTerritories = useTerritories();
+  const refreshTerritoryObs = useTerritoryObservations();
+  const refreshPlaces = usePlaces();
+  const refreshRelsPersonPlace = useRelsPerson();
   const organisation = useRecoilValue(organisationState);
   const organisationId = organisation?._id;
 
@@ -94,6 +92,8 @@ export const useRefresh = () => {
       setLoading('Chargement des actions');
       await refreshActions((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
+      setFullScreen(false);
+
       setLoading('Chargement des territoires');
       await refreshTerritories((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
@@ -101,10 +101,8 @@ export const useRefresh = () => {
       await refreshPlaces((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
       await refreshRelsPersonPlace((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
-      setLoading('Chargement des comptes-rendus');
-      await refreshReports((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
-
-      setFullScreen(false);
+      // setLoading('Chargement des comptes-rendus');
+      // await refreshReports((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
 
       setLoading('Chargement des observations');
       await refreshTerritoryObs((batch) => setProgress((p) => (p * total + batch) / total), initialLoad);
@@ -188,26 +186,23 @@ export const useRefresh = () => {
     reset();
   };
 
-  const reportsRefresher = async (showFullScreen = false) => {
-    setFullScreen(showFullScreen);
+  // const reportsRefresher = async (showFullScreen = false) => {
+  //   setFullScreen(showFullScreen);
 
-    const { reports } = await getTotal();
-    const total = reports || 1;
+  //   const { reports } = await getTotal();
+  //   const total = reports || 1;
 
-    setLoading('Chargement des comptes-rendus');
-    await refreshReports((batch) => setProgress((p) => (p * total + batch) / total));
+  //   setLoading('Chargement des comptes-rendus');
+  //   await refreshReports((batch) => setProgress((p) => (p * total + batch) / total));
 
-    reset();
-  };
+  //   reset();
+  // };
 
   return {
-    loading,
-    progress,
-    fullScreen,
     refresh,
     actionsRefresher,
     personsRefresher,
-    reportsRefresher,
+    // reportsRefresher,
     territoriesRefresher,
     placesAndRelationsRefresher,
   };

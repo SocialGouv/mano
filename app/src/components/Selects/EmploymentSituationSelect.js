@@ -1,5 +1,5 @@
 import React from 'react';
-import { employmentOptions } from '../../contexts/persons';
+import { employmentOptions } from '../../recoil/persons';
 import SelectLabelled from './SelectLabelled';
 
 export const situations = ['-- Choisissez --', ...employmentOptions];

@@ -1,5 +1,5 @@
 import React from 'react';
-import { consumptionsOptions } from '../../contexts/persons';
+import { consumptionsOptions } from '../../recoil/persons';
 import MultiCheckBoxes from './MultiCheckBoxes';
 
 const ConsumptionsMultiCheckBoxes = ({ values = [], onChange, editable }) => {

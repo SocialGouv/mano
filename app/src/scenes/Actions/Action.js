@@ -25,7 +25,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { personsState } from '../../recoil/persons';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
-import { currentTeamState, organisationState, usersState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
 
 const castToAction = (action = {}) => ({
@@ -43,7 +43,7 @@ const castToAction = (action = {}) => ({
 
 const Action = ({ navigation, route }) => {
   const [actions, setActions] = useRecoilState(actionsState);
-  const user = useRecoilValue(usersState);
+  const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const allPersons = useRecoilValue(personsState);
   const [comments, setComments] = useRecoilState(commentsState);
@@ -156,7 +156,7 @@ const Action = ({ navigation, route }) => {
       beforeRemoveListenerUnsbscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [route?.params?.person]);
 
   const updateAction = async (action, { oldAction = null } = {}) => {
     if (!oldAction) oldAction = actions.find((a) => a._id === action._id);
@@ -170,7 +170,7 @@ const Action = ({ navigation, route }) => {
         }
       }
       const response = await API.put({
-        path: `/action/${action._id}`,
+        path: `/action/${oldAction._id}`,
         body: prepareActionForEncryption(action),
       });
       if (response.ok) {
@@ -269,7 +269,6 @@ const Action = ({ navigation, route }) => {
       }),
     });
     if (!response.ok) {
-      capture('error in creating action' + error, { extra: { error, action } });
       Alert.alert('Impossible de dupliquer !');
       return;
     }
@@ -347,11 +346,11 @@ const Action = ({ navigation, route }) => {
   const persons = useMemo(() => {
     if (route?.params?.actions?.length > 1) {
       return route?.params?.actions?.map((a) => allPersons.find((p) => p._id === a.person));
-    } else if (actionDB.person) {
-      return [allPersons.find((p) => p._id === actionDB.person)];
+    } else if (action.person) {
+      return [allPersons.find((p) => p._id === action.person)];
     }
     return [];
-  }, [route?.params?.actions, allPersons, actionDB?.person]);
+  }, [route?.params?.actions, allPersons, action?.person]);
 
   const canComment = !route?.params?.actions || route?.params?.actions?.length <= 1;
 
@@ -363,7 +362,7 @@ const Action = ({ navigation, route }) => {
         title={persons?.length && persons.length === 1 ? `${name} - ${persons[0].name}` : name}
         onBack={onGoBackRequested}
         onEdit={!editable ? setEditable(true) : null}
-        onSave={!editable ? null : onUpdateActionRequest}
+        onSave={!editable || isUpdateDisabled ? null : onUpdateActionRequest}
         saving={updating}
       />
       <ScrollContainer ref={scrollViewRef}>
