@@ -17,6 +17,7 @@ import { actionsState, prepareActionForEncryption, TODO } from '../../recoil/act
 import { currentTeamState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
 import API from '../../services/api';
+import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
 
 const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
@@ -26,7 +27,8 @@ const NewActionForm = ({ route, navigation }) => {
   const [dueAt, setDueAt] = useState(null);
   const [withTime, setWithTime] = useState(false);
   const [persons, setPersons] = useState(route.params?.person ? [route.params?.person] : []);
-  const forCurrentPerson = !!route.params?.person;
+  const [categories, setCategories] = useState([]);
+  const forCurrentPerson = useRef(!!route.params?.person).current;
   const [posting, setPosting] = useState(false);
   const [status, setStatus] = useState(TODO);
 
@@ -74,6 +76,7 @@ const NewActionForm = ({ route, navigation }) => {
           dueAt,
           withTime,
           status,
+          categories,
           completedAt: status !== TODO ? new Date().toISOString() : null,
         }),
       });
@@ -174,6 +177,7 @@ const NewActionForm = ({ route, navigation }) => {
           )}
           <ActionStatusSelect onSelect={setStatus} value={status} editable />
           <DateAndTimeInput label="Échéance" setDate={setDueAt} date={dueAt} showTime showDay withTime={withTime} setWithTime={setWithTime} />
+          <ActionCategoriesMultiCheckboxes onChange={setCategories} values={categories} editable />
           <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateAction} loading={posting} />
         </View>
       </ScrollContainer>
