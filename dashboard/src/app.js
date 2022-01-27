@@ -32,6 +32,7 @@ import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { userState } from './recoil/auth';
 import useApi, { recoilResetKeyState, tokenCached } from './services/api';
+import ScrollToTop from './components/ScrollToTop';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -60,6 +61,7 @@ const App = ({ resetRecoil }) => {
     <div className="main-container">
       <div className="main">
         <Router>
+          <ScrollToTop />
           <Switch>
             <Route path="/auth" component={Auth} />
             <RestrictedRoute path="/charte" component={Charte} />
