@@ -55,7 +55,9 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("td", {
       text: "Ma première personne",
     });
+    await page.waitForTimeout(1000);
     await scrollTop();
+    await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Commentaires" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
