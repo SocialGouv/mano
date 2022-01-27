@@ -1,3 +1,10 @@
+# [1.44.0](https://github.com/SocialGouv/mano/compare/v1.43.4...v1.44.0) (2022-01-27)
+
+
+### Features
+
+* **dashboard:** scroll to top on page change ([#287](https://github.com/SocialGouv/mano/issues/287)) ([f062519](https://github.com/SocialGouv/mano/commit/f062519b647c19943a59beedb5a89953db81c8e3))
+
 ## [1.43.4](https://github.com/SocialGouv/mano/compare/v1.43.3...v1.43.4) (2022-01-27)
 
 
