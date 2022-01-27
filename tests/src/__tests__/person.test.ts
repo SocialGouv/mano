@@ -50,20 +50,6 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Lieux" });
   });
 
-  it("should add comment", async () => {
-    await navigateWithReactRouter("/person");
-    await expect(page).toClick("td", {
-      text: "Ma première personne",
-    });
-    await scrollTop();
-    await expect(page).toClick("a", { text: "Commentaires" });
-    await scrollDown();
-    await expect(page).toClick("button", { text: "Ajouter un commentaire" });
-    await expect(page).toFill('textarea[name="comment"]', "Mon commentaire");
-    await expect(page).toClick("button", { text: "Sauvegarder" });
-    await expect(page).toMatch("Commentaire ajouté !");
-  });
-
   it("should add action", async () => {
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", {
