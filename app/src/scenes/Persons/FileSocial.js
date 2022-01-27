@@ -19,26 +19,7 @@ import colors from '../../utils/colors';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { customFieldsPersonsSocialSelector } from '../../recoil/persons';
 
-const FileSocial = ({
-  editable,
-  updating,
-  personalSituation,
-  structureSocial,
-  nationalitySituation,
-  employment,
-  hasAnimal,
-  resources,
-  reasons,
-  address,
-  addressDetail,
-  onChange,
-  navigation,
-  onUpdatePerson,
-  onEdit,
-  isUpdateDisabled,
-  backgroundColor,
-  ...props
-}) => {
+const FileSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, onEdit, isUpdateDisabled, backgroundColor, person }) => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
 
   const scrollViewRef = useRef(null);
@@ -61,37 +42,41 @@ const FileSocial = ({
     <>
       <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Dossier social" />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
-        <PersonalSituationSelect value={personalSituation} onSelect={(personalSituation) => onChange({ personalSituation })} editable={editable} />
+        <PersonalSituationSelect
+          value={person.personalSituation}
+          onSelect={(personalSituation) => onChange({ personalSituation })}
+          editable={editable}
+        />
         <InputLabelled
           label="Structure de suivi social"
           onChangeText={(structureSocial) => onChange({ structureSocial })}
-          value={structureSocial || (editable ? null : '-- Non renseignée --')}
+          value={person.structureSocial || (editable ? null : '-- Non renseignée --')}
           placeholder="Renseignez la structure sociale le cas échéant"
           editable={editable}
         />
-        <AnimalsSelect value={hasAnimal} onSelect={(hasAnimal) => onChange({ hasAnimal })} editable={editable} />
+        <AnimalsSelect value={person.hasAnimal} onSelect={(hasAnimal) => onChange({ hasAnimal })} editable={editable} />
         <NationalitySituationSelect
-          value={nationalitySituation}
+          value={person.nationalitySituation}
           onSelect={(nationalitySituation) => onChange({ nationalitySituation })}
           editable={editable}
         />
-        <EmploymentSituationSelect value={employment} onSelect={(employment) => onChange({ employment })} editable={editable} />
-        <YesNoSelect label="Hébergement" value={address} onSelect={(address) => onChange({ address })} editable={editable} />
-        {address === 'Oui' && (
+        <EmploymentSituationSelect value={person.employment} onSelect={(employment) => onChange({ employment })} editable={editable} />
+        <YesNoSelect label="Hébergement" value={person.address} onSelect={(address) => onChange({ address })} editable={editable} />
+        {person.address === 'Oui' && (
           <>
-            <AddressDetailSelect value={addressDetail} onSelect={(addressDetail) => onChange({ addressDetail })} editable={editable} />
-            {!!isFreeFieldAddressDetail(addressDetail) && !!editable && (
+            <AddressDetailSelect value={person.addressDetail} onSelect={(addressDetail) => onChange({ addressDetail })} editable={editable} />
+            {!!isFreeFieldAddressDetail(person.addressDetail) && !!editable && (
               <InputLabelled
                 onChangeText={(addressDetail) => onChange({ addressDetail: addressDetail || 'Autre' })}
-                value={addressDetail === 'Autre' ? '' : addressDetail}
+                value={person.addressDetail === 'Autre' ? '' : person.addressDetail}
                 placeholder="Renseignez le type d'hébergement particulier le cas échéant"
                 editable={editable}
               />
             )}
           </>
         )}
-        <RessourcesMultiCheckBoxes values={resources} onChange={(resources) => onChange({ resources })} editable={editable} />
-        <WhyHomelessMultiCheckBoxes values={reasons} onChange={(reasons) => onChange({ reasons })} editable={editable} />
+        <RessourcesMultiCheckBoxes values={person.resources} onChange={(resources) => onChange({ resources })} editable={editable} />
+        <WhyHomelessMultiCheckBoxes values={person.reasons} onChange={(reasons) => onChange({ reasons })} editable={editable} />
         {!editable && <Spacer />}
         {(customFieldsPersonsSocial || [])
           .filter((f) => f.enabled)
@@ -101,7 +86,7 @@ const FileSocial = ({
               <CustomFieldInput
                 label={label}
                 field={field}
-                value={props[name]}
+                value={person[name]}
                 handleChange={(newValue) => onChange({ [name]: newValue })}
                 editable={editable}
                 ref={(r) => (refs.current[`${name}-ref`] = r)}
@@ -113,7 +98,7 @@ const FileSocial = ({
           <Button
             caption={editable ? 'Mettre à jour' : 'Modifier'}
             onPress={editable ? onUpdatePerson : onEdit}
-            disabled={editable ? isUpdateDisabled() : false}
+            disabled={editable ? isUpdateDisabled : false}
             loading={updating}
           />
         </ButtonsContainer>

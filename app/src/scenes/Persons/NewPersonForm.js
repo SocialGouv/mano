@@ -1,14 +1,12 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+import { useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
-import withContext from '../../contexts/withContext';
-import PersonsContext from '../../contexts/persons';
-import { useRecoilValue } from 'recoil';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -86,7 +84,7 @@ const NewPersonForm = ({ navigation, route }) => {
   const onBack = () => {
     backRequestHandledRef.current = true;
     navigation.navigate(route.params.fromRoute);
-    setTimeout(() => setPosting(false);, 250);
+    setTimeout(() => setPosting(false), 250);
   };
 
   const onGoBackRequested = () => {

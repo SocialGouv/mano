@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
@@ -11,55 +11,23 @@ import { genders } from '../../components/Selects/GenderSelect';
 import FoldersNavigator from './FoldersNavigator';
 import Tabs from '../../components/Tabs';
 import colors from '../../utils/colors';
-import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState } from '../../recoil/persons';
+import {
+  commentForUpdatePerson,
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
 import { actionsState } from '../../recoil/actions';
-import { commentsState } from '../../recoil/comments';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
   return value;
-};
-
-const castToPerson = (person = {}, customFieldsPersonsMedical = [], customFieldsPersonsSocial = []) => {
-  const toReturn = {};
-  for (const field of customFieldsPersonsMedical) {
-    toReturn[field.name] = cleanValue(person[field.name]);
-  }
-  for (const field of customFieldsPersonsSocial) {
-    toReturn[field.name] = cleanValue(person[field.name]);
-  }
-  return {
-    ...toReturn,
-    name: person.name || '',
-    otherNames: person.otherNames || '',
-    birthdate: person.birthdate || null,
-    alertness: person.alertness || false,
-    wanderingAt: person.wanderingAt || null,
-    createdAt: person.createdAt,
-    gender: person.gender || genders[0],
-    phone: person.phone?.trim() || '',
-    description: person.description?.trim() || '',
-    personalSituation: person.personalSituation?.trim() || '',
-    nationalitySituation: person.nationalitySituation?.trim() || '',
-    address: person.address?.trim() || '',
-    addressDetail: person.addressDetail?.trim() || '',
-    structureSocial: person.structureSocial?.trim() || '',
-    employment: person.employment?.trim() || '',
-    structureMedical: person.structureMedical?.trim() || '',
-    resources: person.resources || [],
-    reasons: person.reasons || [],
-    healthInsurance: person.healthInsurance?.trim() || '',
-    vulnerabilities: person.vulnerabilities || [],
-    consumptions: person.consumptions || [],
-    assignedTeams: person.assignedTeams || [],
-    hasAnimal: person.hasAnimal?.trim() || '',
-    entityKey: person.entityKey || '',
-    outOfActiveList: person.outOfActiveList || false,
-    outOfActiveListReason: person.outOfActiveListReason || '',
-  };
 };
 
 const Person = ({ route, navigation }) => {
@@ -69,16 +37,61 @@ const Person = ({ route, navigation }) => {
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
   const [comments, setComments] = useRecoilState(commentsState);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
 
   const personDB = useMemo(() => {
     persons.find((p) => p._id === route.params?._id);
   }, [persons, route.params?._id]);
 
-  const [person, setPerson] = useState(castToPerson(route?.params, customFieldsPersonsMedical, customFieldsPersonsSocial));
+  const [person, setPerson] = useState(castToPerson(route?.params));
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
   const [updating, setUpdating] = useState(false);
+
+  const castToPerson = useCallback(
+    (person = {}) => {
+      const toReturn = {};
+      for (const field of customFieldsPersonsMedical || []) {
+        toReturn[field.name] = cleanValue(person[field.name]);
+      }
+      for (const field of customFieldsPersonsSocial || []) {
+        toReturn[field.name] = cleanValue(person[field.name]);
+      }
+      return {
+        ...toReturn,
+        name: person.name || '',
+        otherNames: person.otherNames || '',
+        birthdate: person.birthdate || null,
+        alertness: person.alertness || false,
+        wanderingAt: person.wanderingAt || null,
+        createdAt: person.createdAt,
+        gender: person.gender || genders[0],
+        phone: person.phone?.trim() || '',
+        description: person.description?.trim() || '',
+        personalSituation: person.personalSituation?.trim() || '',
+        nationalitySituation: person.nationalitySituation?.trim() || '',
+        address: person.address?.trim() || '',
+        addressDetail: person.addressDetail?.trim() || '',
+        structureSocial: person.structureSocial?.trim() || '',
+        employment: person.employment?.trim() || '',
+        structureMedical: person.structureMedical?.trim() || '',
+        resources: person.resources || [],
+        reasons: person.reasons || [],
+        healthInsurance: person.healthInsurance?.trim() || '',
+        vulnerabilities: person.vulnerabilities || [],
+        consumptions: person.consumptions || [],
+        assignedTeams: person.assignedTeams || [],
+        hasAnimal: person.hasAnimal?.trim() || '',
+        entityKey: person.entityKey || '',
+        outOfActiveList: person.outOfActiveList || false,
+        outOfActiveListReason: person.outOfActiveListReason || '',
+      };
+    },
+    [customFieldsPersonsMedical, customFieldsPersonsSocial]
+  );
 
   const backRequestHandledRef = useRef(null);
   useEffect(() => {
@@ -116,23 +129,39 @@ const Person = ({ route, navigation }) => {
 
   const onUpdatePerson = async (alert = true) => {
     setUpdating(true);
-    const response = await updatePerson(
-      Object.assign({}, this.castToPerson(person, customFieldsPersonsMedical, customFieldsPersonsSocial), {
-        _id: personDB._id,
-      })
-    );
+    const personToUpdate = Object.assign({}, castToPerson(person), {
+      _id: personDB._id,
+    });
+    const oldPerson = persons.find((a) => a._id === personDB._id);
+    const response = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(personToUpdate),
+    });
     if (response.error) {
       Alert.alert(response.error);
       setUpdating(false);
       return false;
     }
-    if (response.ok) {
-      if (alert) Alert.alert('Personne mise à jour !');
-      this.setPerson(response.decryptedData);
-      setUpdating(false);
-      setEditable(false);
-      return true;
+    const newPerson = response.decryptedData;
+    setPersons((persons) =>
+      persons.map((p) => {
+        if (p._id === personToUpdate._id) return newPerson;
+        return p;
+      })
+    );
+    setPerson(castToPerson(newPerson));
+    const comment = commentForUpdatePerson({ newPerson, oldPerson });
+    if (comment) {
+      comment.user = user._id;
+      comment.team = currentTeam._id;
+      comment.organisation = organisation._id;
+      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+      if (commentResponse.ok) setComments((comments) => [response.decryptedData, ...comments]);
     }
+    if (alert) Alert.alert('Personne mise à jour !');
+    setUpdating(false);
+    setEditable(false);
+    return true;
   };
 
   const onDeleteRequest = () => {
@@ -184,15 +213,14 @@ const Person = ({ route, navigation }) => {
   const isUpdateDisabled = useMemo(() => {
     const newPerson = {
       ...personDB,
-      ...this.castToPerson(person, customFieldsPersonsMedical, customFieldsPersonsSocial),
+      ...castToPerson(person),
     };
     if (JSON.stringify(personDB) !== JSON.stringify(newPerson)) return false;
     return true;
-  }, [personDB, person, customFieldsPersonsMedical, customFieldsPersonsSocial]);
+  }, [personDB, person]);
 
   const onBack = () => {
     backRequestHandledRef.current = true;
-    const { navigation, route } = this.props;
     Sentry.setContext('person', {});
     route.params?.fromRoute ? navigation.navigate(route.params.fromRoute) : navigation.goBack();
   };
@@ -261,9 +289,10 @@ const Person = ({ route, navigation }) => {
         <TabNavigator.Screen name="Summary" options={{ tabBarLabel: 'Résumé' }}>
           {() => (
             <PersonSummary
-              person={person}
               navigation={navigation}
               route={route}
+              person={person}
+              personDB={personDB}
               backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
               onChange={onChange}
               onUpdatePerson={onUpdatePerson}
@@ -271,21 +300,25 @@ const Person = ({ route, navigation }) => {
               onEdit={onEdit}
               isUpdateDisabled={isUpdateDisabled}
               onDeleteRequest={onDeleteRequest}
+              updating={updating}
+              editable={editable}
             />
           )}
         </TabNavigator.Screen>
         <TabNavigator.Screen name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
           {() => (
             <FoldersNavigator
-              person={person}
               navigation={navigation}
               route={route}
+              person={person}
               backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
               onChange={onChange}
               onUpdatePerson={onUpdatePerson}
               onEdit={onEdit}
               isUpdateDisabled={isUpdateDisabled}
               onDeleteRequest={onDeleteRequest}
+              editable={editable}
+              updating={updating}
             />
           )}
         </TabNavigator.Screen>

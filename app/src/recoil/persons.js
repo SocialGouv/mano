@@ -480,7 +480,7 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
 
 const sortPersons = (p1, p2) => p1.name.localeCompare(p2.name);
 
-const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
+export const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
   try {
     const commentbody = {
       type: 'person',

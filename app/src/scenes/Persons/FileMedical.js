@@ -12,19 +12,7 @@ import colors from '../../utils/colors';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { customFieldsPersonsMedicalSelector } from '../../recoil/persons';
 
-const FileMedical = ({
-  editable,
-  structureMedical,
-  healthInsurance,
-  onChange,
-  navigation,
-  onUpdatePerson,
-  onEdit,
-  isUpdateDisabled,
-  updating,
-  backgroundColor,
-  ...props
-}) => {
+const FileMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, isUpdateDisabled, updating, backgroundColor, person }) => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
 
   const scrollViewRef = useRef(null);
@@ -48,12 +36,12 @@ const FileMedical = ({
       <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Dossier médical" />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
         <View>
-          <HealthInsuranceSelect value={healthInsurance} onSelect={(healthInsurance) => onChange({ healthInsurance })} editable={editable} />
+          <HealthInsuranceSelect value={person.healthInsurance} onSelect={(healthInsurance) => onChange({ healthInsurance })} editable={editable} />
 
           <InputLabelled
             label="Structure de suivi médical"
             onChangeText={(structureMedical) => onChange({ structureMedical })}
-            value={structureMedical || (editable ? null : '-- Non renseignée --')}
+            value={person.structureMedical || (editable ? null : '-- Non renseignée --')}
             placeholder="Renseignez la structure médicale le cas échéant"
             editable={editable}
           />
@@ -66,7 +54,7 @@ const FileMedical = ({
                 <CustomFieldInput
                   label={label}
                   field={field}
-                  value={props[name]}
+                  value={person[name]}
                   handleChange={(newValue) => onChange({ [name]: newValue })}
                   editable={editable}
                   ref={(r) => (refs.current[`${name}-ref`] = r)}
@@ -78,7 +66,7 @@ const FileMedical = ({
             <Button
               caption={editable ? 'Mettre à jour' : 'Modifier'}
               onPress={editable ? onUpdatePerson : onEdit}
-              disabled={editable ? isUpdateDisabled() : false}
+              disabled={editable ? isUpdateDisabled : false}
               loading={updating}
             />
           </ButtonsContainer>

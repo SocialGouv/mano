@@ -1,5 +1,5 @@
 import React from 'react';
-import { yesNoOptions } from '../../contexts/persons';
+import { yesNoOptions } from '../../recoil/persons';
 import SelectLabelled from './SelectLabelled';
 
 export const options = ['', ...yesNoOptions];
