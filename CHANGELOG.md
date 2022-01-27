@@ -1,3 +1,10 @@
+## [1.43.4](https://github.com/SocialGouv/mano/compare/v1.43.3...v1.43.4) (2022-01-27)
+
+
+### Bug Fixes
+
+* **deps:** update dependency node-fetch to v2.6.7 [security] ([#296](https://github.com/SocialGouv/mano/issues/296)) ([bbf66e7](https://github.com/SocialGouv/mano/commit/bbf66e702bdc9010e12dd0cbfe057f608bbc1e0b))
+
 ## [1.43.3](https://github.com/SocialGouv/mano/compare/v1.43.2...v1.43.3) (2022-01-26)
 
 
