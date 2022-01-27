@@ -48,7 +48,7 @@ const validateDate = ({ w: value }) => {
 const validateYesNo =
   (possibleValues = ['Oui', 'Non']) =>
   ({ v: value }) => {
-    value = validateString(value);
+    value = validateString({ v: value });
     if (!value) return null;
     if (possibleValues.includes(value)) return value;
     if (value === 'No') return 'Non';
@@ -59,7 +59,7 @@ const validateYesNo =
 const validateEnum =
   (possibleValues = []) =>
   ({ v: value }) => {
-    value = validateString(value);
+    value = validateString({ v: value });
     if (!value) return null;
     if (possibleValues.includes(value)) return value;
     return null;
@@ -70,7 +70,7 @@ const validateMultiChoice =
   ({ v: value }) => {
     // value is either string or array
     if (!Array.isArray(value)) {
-      value = validateString(value);
+      value = validateString({ v: value });
       if (!value) return null;
       value = value.split(',');
     }
