@@ -1,3 +1,10 @@
+## [1.44.2](https://github.com/SocialGouv/mano/compare/v1.44.1...v1.44.2) (2022-01-28)
+
+
+### Bug Fixes
+
+* **app:** remove classes ([#308](https://github.com/SocialGouv/mano/issues/308)) ([bca118f](https://github.com/SocialGouv/mano/commit/bca118fd72f23d59abd4506ab51f5429ecc66bfb))
+
 ## [1.44.1](https://github.com/SocialGouv/mano/compare/v1.44.0...v1.44.1) (2022-01-27)
 
 
