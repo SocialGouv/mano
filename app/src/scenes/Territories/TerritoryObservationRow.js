@@ -6,6 +6,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
+import API from '../../services/api';
 import { userState } from '../../recoil/auth';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 
@@ -86,7 +87,11 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
     const response = await API.delete({ path: `/territory-observation/${observation._id}` });
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
-      setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obsDB._id));
+      setTerritoryObservations((territoryObservations) =>
+        territoryObservations.filter((p) => {
+          return p._id !== observation._id;
+        })
+      );
     }
   };
 

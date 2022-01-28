@@ -17,20 +17,12 @@ const useStructures = () => {
         return 0;
       })
     );
-  const updateStructure = (id) =>
-    setStructures((structures) =>
-      structures.map((a) => {
-        if (a._id === structure._id) return structure;
-        return a;
-      })
-    );
 
   return {
     structures,
     setStructures,
     deleteStructure,
     addStructure,
-    updateStructure,
   };
 };
 export default useStructures;
