@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -16,7 +16,7 @@ import {
 import API from '../../services/api';
 
 const NewPersonForm = ({ navigation, route }) => {
-  const [persons, setPersons] = useRecoilValue(personsState);
+  const [persons, setPersons] = useRecoilState(personsState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
 
