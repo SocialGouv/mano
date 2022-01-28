@@ -86,7 +86,7 @@ const Person = ({ route, navigation }) => {
     [customFieldsPersonsMedical, customFieldsPersonsSocial]
   );
 
-  const [person, setPerson] = useState(castToPerson(route?.params));
+  const [person, setPerson] = useState(castToPerson(personDB));
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
   const [updating, setUpdating] = useState(false);
@@ -100,10 +100,7 @@ const Person = ({ route, navigation }) => {
     };
 
     const handleFocus = () => {
-      const newPerson = route?.params?.person;
-      if (newPerson) {
-        setPersons((persons) => [...persons.filter((p) => p !== newPerson), newPerson]);
-      }
+      setPerson(castToPerson(personDB));
     };
     const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
     const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
@@ -149,7 +146,7 @@ const Person = ({ route, navigation }) => {
       comment.user = user._id;
       comment.team = currentTeam._id;
       comment.organisation = organisation._id;
-      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
       if (commentResponse.ok) setComments((comments) => [response.decryptedData, ...comments]);
     }
     if (alert) Alert.alert('Personne mise à jour !');

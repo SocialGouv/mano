@@ -107,8 +107,7 @@ const PersonSummary = ({
   const onRemoveFromActiveList = async () => navigation.push('PersonsOutOfActiveListReason', { person: personDB, fromRoute: 'Person' });
 
   const onGetBackToActiveList = async () => {
-    await onChange({ outOfActiveListReason: '', outOfActiveList: false });
-    await onUpdatePerson(false);
+    await onUpdatePerson(false, { outOfActiveListReason: '', outOfActiveList: false });
   };
 
   const allActions = useRecoilValue(actionsState);

@@ -69,7 +69,7 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
               setSubmitting(true);
               await updatePerson();
               setSubmitting(false);
-              navigation.goBack();
+              navigation.navigate('PersonsList');
             }}
           />
         </View>
