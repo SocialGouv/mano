@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Alert, findNodeHandle, View } from 'react-native';
 import API from '../../services/api';
@@ -9,28 +9,28 @@ import Button from '../../components/Button';
 import EmailInput from '../../services/EmailInput';
 import Title, { SubTitle } from '../../components/Title';
 
-class ForgetPassword extends React.Component {
-  state = {
-    email: '',
-    loading: false,
-    example: 'example@example.com',
+const ForgetPassword = ({ navigation }) => {
+  const [email, setEmail] = useState('');
+  const [isValid, setIsValid] = useState('');
+  const [example, setExample] = useState('example@example.com');
+  const [loading, setLoading] = useState(false);
+  const onChange = ({ email, isValid, example }) => {
+    setEmail(email);
+    setIsValid(isValid);
+    setExample(example);
   };
 
-  onChange = ({ email, isValid, example }) => this.setState({ email, isValid, example });
-
-  onSendLink = async () => {
-    const { email, isValid, example } = this.state;
-    const { navigation } = this.props;
+  const onSendLink = async () => {
     if (!isValid) {
       Alert.alert("L'email n'est pas valide.", `Il doit être de la forme ${example}`);
-      this.emailInput.focus();
+      emailRef.current.focus();
       return;
     }
-    this.setState({ loading: true });
+    setLoading(true);
     const response = await API.post({ path: '/user/forgot_password', body: { email }, skipEncryption: true });
     if (response.error) {
       Alert.alert(response.error);
-      this.setState({ loading: false });
+      setLoading(false);
       return;
     }
     if (response.ok) {
@@ -40,51 +40,45 @@ class ForgetPassword extends React.Component {
           onPress: () => navigation.goBack(),
         },
       ]);
-      this.setState({ loading: false });
+      setLoading(false);
     }
   };
 
-  _scrollToInput = (ref) => {
-    if (!ref) return;
+  const scrollViewRef = useRef(null);
+  const emailRef = useRef(null);
+  const _scrollToInput = (ref) => {
+    if (!ref.current) return;
+    if (!scrollViewRef.current) return;
     setTimeout(() => {
-      ref.measureLayout(
-        findNodeHandle(this.scrollView),
+      ref.current.measureLayout(
+        findNodeHandle(scrollViewRef.current),
         (x, y, width, height) => {
-          this.scrollView.scrollTo({ y: y - 100, animated: true });
+          scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
         (error) => console.log('error scrolling', error)
       );
     }, 250);
   };
-
-  render() {
-    const { loading } = this.state;
-    return (
-      <Background>
-        <SceneContainer>
-          <ScrollContainer ref={(r) => (this.scrollView = r)}>
-            <View>
-              <Title>Mot de passe oublié</Title>
-              <SubTitle>
-                Veuillez saisir un e-mail enregistré auprès de votre administrateur, nous vous enverrons un lien pour
-                récupérer votre mot de passe dans l'interface administrateur
-              </SubTitle>
-              <EmailInput
-                onChange={this.onChange}
-                ref={(r) => (this.emailInput = r)}
-                onFocus={() => this._scrollToInput(this.emailInput)}
-                onSubmitEditing={this.onSendLink}
-              />
-              <ButtonsContainer>
-                <Button caption="Envoyer un lien" onPress={this.onSendLink} loading={loading} disabled={loading} />
-              </ButtonsContainer>
-            </View>
-          </ScrollContainer>
-        </SceneContainer>
-      </Background>
-    );
-  }
-}
+  return (
+    <Background>
+      <SceneContainer>
+        <ScrollContainer ref={scrollViewRef}>
+          <View>
+            <Title>Mot de passe oublié</Title>
+            <SubTitle>
+              Veuillez saisir un e-mail enregistré auprès de votre administrateur, nous vous enverrons un lien pour récupérer votre mot de passe dans
+              l'interface administrateur
+            </SubTitle>
+            <EmailInput onChange={onChange} ref={emailRef} onFocus={() => _scrollToInput(emailRef)} onSubmitEditing={onSendLink} />
+            <ButtonsContainer>
+              <Button caption="Envoyer un lien" onPress={onSendLink} loading={loading} disabled={loading} />
+            </ButtonsContainer>
+          </View>
+        </ScrollContainer>
+      </SceneContainer>
+    </Background>
+  );
+};
 
 const Background = styled.View`
   flex: 1;

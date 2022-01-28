@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import { Platform } from 'react-native';
@@ -14,11 +14,11 @@ const createRange = (rangeLength) => {
 };
 
 const CodeInput = ({ hidden, codeLength, onComplete }) => {
-  const [code, setCode] = React.useState('');
-  const [loading, setLoading] = React.useState(false);
-  const range = React.useRef(createRange(codeLength));
+  const [code, setCode] = useState('');
+  const [loading, setLoading] = useState(false);
+  const range = useRef(createRange(codeLength));
 
-  React.useEffect(() => {
+  useEffect(() => {
     const sendCode = async () => {
       setLoading(true);
       const reset = await onComplete(code);
@@ -83,8 +83,7 @@ const CodeInputStyled = styled(MyTextInput)`
   padding-left: ${Platform.select({ android: 10, ios: 35.4 })}px;
   height: 55px;
   font-size: ${({ hidden }) => Platform.select({ android: hidden ? 30 : 25, ios: 25 })}px;
-  letter-spacing: ${({ hidden }) =>
-    Platform.select({ android: hidden ? 30 : 25, ios: hidden ? 24 : 26 })}px;
+  letter-spacing: ${({ hidden }) => Platform.select({ android: hidden ? 30 : 25, ios: hidden ? 24 : 26 })}px;
   width: ${({ codeLength }) => codeLength * 25 + (codeLength - 1) * 27}px;
   margin-left: ${Platform.select({ android: 15, ios: -10 })}px;
   ${Platform.OS === 'android' && 'font-family: consolas;'}

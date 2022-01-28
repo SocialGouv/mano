@@ -8,7 +8,7 @@ import RowContainer from '../../components/RowContainer';
 import TeamsTags from '../../components/TeamsTags';
 import colors from '../../utils/colors';
 
-function PersonName({ person: { name, outOfActiveList, outOfActiveListReason } }) {
+const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReason } }) => {
   if (outOfActiveList) {
     return (
       <View>
@@ -18,7 +18,7 @@ function PersonName({ person: { name, outOfActiveList, outOfActiveListReason } }
     );
   }
   return <Name>{name}</Name>;
-}
+};
 
 const PersonRow = ({ onPress, person, buttonRight = '>' }) => {
   const { outOfActiveList, birthdate, alertness } = person;

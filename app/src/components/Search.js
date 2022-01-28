@@ -1,65 +1,57 @@
-import React from 'react';
-import { Alert, Keyboard, StyleSheet, View, TouchableOpacity, Animated } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { Alert, Keyboard, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import API from '../services/api';
 import ButtonReset from './ButtonReset';
 import { Search as SearchIcon } from '../icons';
 import { MyTextInput } from './MyText';
-import withContext from '../contexts/withContext';
-import AuthContext from '../contexts/auth';
+import { useRecoilValue } from 'recoil';
+import { organisationState } from '../recoil/auth';
 
-class Search extends React.Component {
-  state = {
-    search: '',
-  };
+const Search = ({ path, onSearchStart, onSearchClear, onChange, withOrg, onSearchComplete, placeholder, style, onFocus, parentScroll }) => {
+  const [search, setSearch] = useState('');
+  const searchTimeout = useRef(null);
+  const keyboardDimissTimeout = useRef(null);
 
-  onSearchComplete = (results) => {
-    this.props.onSearchComplete(results);
-  };
+  const organisation = useRecoilValue(organisationState);
 
-  onSearch = async (search) => {
-    const { path, onSearchStart, onSearchClear, onChange, withOrg, context } = this.props;
+  const onSearch = async (search) => {
     if (onChange) {
-      this.setState({ search });
+      setSearch(search);
       return onChange(search);
     }
     onSearchStart(search);
-    this.setState({ search });
-    clearTimeout(this.searchTimeout);
-    clearTimeout(this.keyboardDimissTimeout);
+    setSearch(search);
+    clearTimeout(searchTimeout.current);
+    clearTimeout(keyboardDimissTimeout.current);
     if (!search.length && onSearchClear) {
       onSearchClear();
-      this.keyboardDimissTimeout = setTimeout(() => {
+      keyboardDimissTimeout.current = setTimeout(() => {
         Keyboard.dismiss();
       }, 1500);
     }
     const query = { search };
-    if (withOrg) query.organisation = context.organisation._id;
-    this.searchTimeout = setTimeout(async () => {
+    if (withOrg) query.organisation = organisation._id;
+    searchTimeout.current = setTimeout(async () => {
       const response = await API.execute({ path, query });
       if (response.error) {
         Alert.alert(response.error);
-        this.onSearchComplete([]);
+        onSearchComplete([]);
       }
       if (response.ok) {
-        this.onSearchComplete(response.data);
+        onSearchComplete(response.data);
       }
     }, 300);
   };
-
-  render() {
-    const { placeholder, style, onFocus, parentScroll } = this.props;
-    const { search } = this.state;
-    return (
-      <Animated.View style={[styles.inputContainer(parentScroll), style]}>
-        <TouchableOpacity style={styles.inputSubContainer}>
-          <SearchIcon size={16} color="#888" />
-          <MyTextInput onFocus={onFocus} placeholder={placeholder} onChangeText={this.onSearch} value={search} style={styles.input} />
-          {Boolean(search.length) && <ButtonReset onPress={() => this.onSearch('')} />}
-        </TouchableOpacity>
-      </Animated.View>
-    );
-  }
-}
+  return (
+    <Animated.View style={[styles.inputContainer(parentScroll), style]}>
+      <TouchableOpacity style={styles.inputSubContainer}>
+        <SearchIcon size={16} color="#888" />
+        <MyTextInput onFocus={onFocus} placeholder={placeholder} onChangeText={onSearch} value={search} style={styles.input} />
+        {Boolean(search.length) && <ButtonReset onPress={() => onSearch('')} />}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
 
 Search.defaultProps = {
   style: {},
@@ -108,4 +100,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default withContext(AuthContext)(Search);
+export default Search;

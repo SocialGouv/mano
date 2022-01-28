@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Animated } from 'react-native';
-import { compose } from 'recompose';
 import * as Sentry from '@sentry/react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -10,56 +9,64 @@ import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyC
 import FloatAddButton from '../../components/FloatAddButton';
 import FlatListStyled from '../../components/FlatListStyled';
 import Search from '../../components/Search';
-import withContext from '../../contexts/withContext';
-import PersonsContext from '../../contexts/persons';
-import RefreshContext from '../../contexts/refresh';
-import { PersonsSelectorsContext } from '../../contexts/selectors';
-import { filterBySearch } from '../../utils/search';
+import { useRefresh } from '../../recoil/refresh';
+import { personsFullSearchSelector } from '../../recoil/selectors';
+import { useRecoilValue } from 'recoil';
 
-class PersonsList extends React.Component {
-  state = {
-    refreshing: false,
-    search: '',
+const PersonsList = ({ navigation, route }) => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState('');
+  const { loading, personsRefresher } = useRefresh();
+  const params = route?.params?.filters || {};
+
+  const filterTeams = params?.filterTeams || [];
+  const filterAlertness = params?.filterAlertness || false;
+  const filterOutOfActiveList = params?.filterOutOfActiveList || '';
+  const numberOfFilters = Number(Boolean(filterAlertness)) + filterTeams.length + Number(['Oui', 'Non'].includes(filterOutOfActiveList));
+
+  const filteredPersons = useRecoilValue(
+    personsFullSearchSelector({
+      search,
+      filterTeams,
+      filterAlertness,
+      filterOutOfActiveList,
+    })
+  );
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await personsRefresher();
+    setRefreshing(false);
   };
 
-  onRefresh = () => {
-    this.setState({ refreshing: true }, this.refreshData);
-  };
-
-  refreshData = async () => {
-    await this.props.context.refreshPersons();
-    this.setState({ loading: false, refreshing: false });
-  };
-
-  onCreatePersonRequest = () =>
-    this.props.navigation.navigate('NewPersonForm', {
+  const onCreatePersonRequest = () =>
+    navigation.navigate('NewPersonForm', {
       fromRoute: 'PersonsList',
       toRoute: 'Person',
     });
 
-  onFiltersPress = () => this.props.navigation.push('PersonsFilter', this.props.route.params);
+  const onFiltersPress = () => navigation.push('PersonsFilter', route.params);
 
-  keyExtractor = (person) => person._id;
-  ListFooterComponent = () => {
-    const { persons } = this.props.context;
-    if (!persons.length) return null;
+  const keyExtractor = (person) => person._id;
+  const ListFooterComponent = () => {
+    if (!filteredPersons.length) return null;
     return <ListNoMorePersons />;
   };
-  renderPersonRow = ({ item: person }) => {
+  const renderPersonRow = ({ item: person }) => {
     const onPress = () => {
       Sentry.setContext('person', { _id: person._id });
-      this.props.navigation.push('Person', { ...person, fromRoute: 'PersonsList' });
+      navigation.push('Person', { ...person, fromRoute: 'PersonsList' });
     };
     return <PersonRow onPress={onPress} person={person} />;
   };
 
-  scrollY = new Animated.Value(0);
-  onScroll = Animated.event(
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const onScroll = Animated.event(
     [
       {
         nativeEvent: {
           contentOffset: {
-            y: this.scrollY,
+            y: scrollY,
           },
         },
       },
@@ -67,75 +74,35 @@ class PersonsList extends React.Component {
     { useNativeDriver: true }
   );
 
-  filterPersons = () => {
-    const { search } = this.state;
-    const { personsFullPopulated } = this.props.context;
-    const params = this.props.route?.params?.filters || {};
-    const filterTeams = params?.filterTeams || [];
-    const filterAlertness = params?.filterAlertness || false;
-    const filterOutOfActiveList = params?.filterOutOfActiveList || '';
+  const listref = useRef(null);
 
-    let persons = personsFullPopulated;
-    if (filterAlertness) persons = persons.filter((p) => Boolean(p.alertness));
-    if (filterOutOfActiveList) {
-      persons = persons.filter((p) => (filterOutOfActiveList === 'Oui' ? p.outOfActiveList : !p.outOfActiveList));
-    }
-    if (search?.length) persons = filterBySearch(search, persons);
-    if (filterTeams.length) {
-      persons = persons.filter((p) => {
-        for (let assignedTeam of p.assignedTeams) {
-          if (filterTeams.includes(assignedTeam)) return true;
-        }
-        return false;
-      });
-    }
-    return persons;
-  };
+  return (
+    <SceneContainer>
+      <ScreenTitle title="Personnes suivies" parentScroll={scrollY} customRight={`Filtres (${numberOfFilters})`} onPressRight={onFiltersPress} />
+      <Search
+        placeholder="Rechercher une personne..."
+        onFocus={() => listref?.current?.scrollToOffset({ offset: 100 })}
+        parentScroll={scrollY}
+        onChange={setSearch}
+      />
+      <FlatListStyled
+        ref={listref}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        onScroll={onScroll}
+        parentScroll={scrollY}
+        data={filteredPersons}
+        extraData={filteredPersons}
+        renderItem={renderPersonRow}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={loading ? Spinner : ListEmptyPersons}
+        initialNumToRender={10}
+        ListFooterComponent={ListFooterComponent}
+        defaultTop={0}
+      />
+      <FloatAddButton onPress={onCreatePersonRequest} />
+    </SceneContainer>
+  );
+};
 
-  render() {
-    const { refreshing, loading } = this.state;
-    const { personKey } = this.props.context;
-    const params = this.props.route?.params?.filters || {};
-    const filterTeams = params?.filterTeams || [];
-    const filterAlertness = params?.filterAlertness || false;
-    const filterOutOfActiveList = params?.filterOutOfActiveList || '';
-    const numberOfFilters = Number(Boolean(filterAlertness)) + filterTeams.length + Number(['Oui', 'Non'].includes(filterOutOfActiveList));
-
-    const data = this.filterPersons();
-
-    return (
-      <SceneContainer>
-        <ScreenTitle
-          title="Personnes suivies"
-          parentScroll={this.scrollY}
-          customRight={`Filtres (${numberOfFilters})`}
-          onPressRight={this.onFiltersPress}
-        />
-        <Search
-          placeholder="Rechercher une personne..."
-          onFocus={() => this.listRef.scrollToOffset({ offset: 100 })}
-          parentScroll={this.scrollY}
-          onChange={(search) => this.setState({ search })}
-        />
-        <FlatListStyled
-          ref={(r) => (this.listRef = r)}
-          refreshing={refreshing}
-          onRefresh={this.onRefresh}
-          onScroll={this.onScroll}
-          parentScroll={this.scrollY}
-          data={data}
-          extraData={personKey}
-          renderItem={this.renderPersonRow}
-          keyExtractor={this.keyExtractor}
-          ListEmptyComponent={loading ? Spinner : ListEmptyPersons}
-          initialNumToRender={10}
-          ListFooterComponent={this.ListFooterComponent}
-          defaultTop={0}
-        />
-        <FloatAddButton onPress={this.onCreatePersonRequest} />
-      </SceneContainer>
-    );
-  }
-}
-
-export default compose(withContext(PersonsContext), withContext(RefreshContext), withContext(PersonsSelectorsContext))(PersonsList);
+export default PersonsList;

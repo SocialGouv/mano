@@ -1,24 +1,24 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useRecoilValue } from 'recoil';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
-import AuthContext from '../contexts/auth';
-import withContext from '../contexts/withContext';
+import { teamsState } from '../recoil/auth';
 
 const teamsColors = ['#255c99', '#74776bff', '#00c6a5ff', '#ff4b64ff', '#ef798aff'];
 
-const TeamsTags = ({ teams = [], context }) => {
+const TeamsTags = ({ teams = [] }) => {
+  const allTeams = useRecoilValue(teamsState);
+
   if (!teams?.length) return null;
 
   return (
     <TeamsContainer>
       {teams?.map((teamId) => {
         if (!teamId) return;
-        const teamIndex = context.teams.findIndex((t) => t._id === teamId);
-        const team = context.teams[teamIndex];
-        const backgroundColor = context.teams.map((t) => t._id).includes(teamId)
-          ? teamsColors[teamIndex % context.teams.length]
-          : '#000';
+        const teamIndex = allTeams.findIndex((t) => t._id === teamId);
+        const team = allTeams[teamIndex];
+        const backgroundColor = allTeams.map((t) => t._id).includes(teamId) ? teamsColors[teamIndex % allTeams.length] : '#000';
         return (
           <Team key={team?._id} backgroundColor={backgroundColor}>
             {team?.name}
@@ -49,4 +49,4 @@ const Team = styled(MyText)`
   color: #fff;
 `;
 
-export default withContext(AuthContext)(TeamsTags);
+export default TeamsTags;

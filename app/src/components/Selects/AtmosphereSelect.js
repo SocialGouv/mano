@@ -11,13 +11,7 @@ export const atmospheres = [
 
 const AtmosphereSelect = ({ value = atmospheres[0], onSelect, editable }) => {
   return (
-    <SelectLabelled
-      label="Ambiance"
-      values={atmospheres}
-      value={value.length ? value : atmospheres[0]}
-      onSelect={onSelect}
-      editable={editable}
-    />
+    <SelectLabelled label="Ambiance" values={atmospheres} value={value.length ? value : atmospheres[0]} onSelect={onSelect} editable={editable} />
   );
 };
 

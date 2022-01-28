@@ -1,19 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import SceneContainer from '../../components/SceneContainer';
 import colors from '../../utils/colors';
 import { ChangePasswordBody } from './ChangePassword';
 import { MyText } from '../../components/MyText';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import { compose } from 'recompose';
-import RefreshContext from '../../contexts/refresh';
+import { currentTeamState, userState } from '../../recoil/auth';
+import { useRefresh } from '../../recoil/refresh';
 
-const ForceChangePassword = ({ navigation, context }) => {
+const ForceChangePassword = ({ navigation }) => {
+  const user = useRecoilState(userState);
+  const setCurrentTeam = useSetRecoilState(currentTeamState);
+  const { refresh } = useRefresh();
   const onOk = () => {
-    if (context.teams?.length === 1) {
-      context.refresh({ initialLoad: true });
-      context.setCurrentTeam(context?.teams[0]);
+    if (user.teams?.length === 1) {
+      refresh({ initialLoad: true });
+      setCurrentTeam(user.teams[0]);
       navigation.navigate('Home');
     } else {
       navigation.navigate('TeamSelection');
@@ -57,4 +59,4 @@ const SubTitle = styled(MyText)`
   text-align: center;
 `;
 
-export default compose(withContext(AuthContext), withContext(RefreshContext))(ForceChangePassword);
+export default ForceChangePassword;

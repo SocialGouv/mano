@@ -40,3 +40,36 @@ export const filterBySearch = (search, items = []) => {
 
   return [...firstItems, ...lastItems];
 };
+
+export const filterData = (data, filters) => {
+  if (filters?.filter((f) => Boolean(f?.value)).length) {
+    for (let filter of filters) {
+      if (!filter.field || !filter.value) continue;
+      data = data
+        .map((item) => {
+          const itemValue = item[filter.field];
+          if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
+          if (typeof itemValue === 'boolean') {
+            return itemValue === (filter.value === 'Oui') ? item : null;
+          }
+          if (typeof itemValue === 'string') {
+            if (itemValue === filter.value) return item;
+            return null;
+          }
+          // type is array
+          if (!itemValue.length && filter.value === 'Non renseigné') return item;
+          if (itemValue.includes(filter.value)) {
+            let newValues = itemValue.filter((value) => value !== filter.value);
+            if (!newValues.length) newValues = ['Uniquement'];
+            return {
+              ...item,
+              [filter.field]: newValues,
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+    }
+  }
+  return data;
+};

@@ -1,5 +1,4 @@
-import React from 'react';
-import { compose } from 'recompose';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, findNodeHandle } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -7,7 +6,6 @@ import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
-import Spinner from '../../components/Spinner';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
 import InputFromSearchList from '../../components/InputFromSearchList';
@@ -18,217 +16,59 @@ import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
 import UserName from '../../components/UserName';
 import Spacer from '../../components/Spacer';
 import NewCommentInput from '../../scenes/Comments/NewCommentInput';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import ActionsContext, { CANCEL, TODO } from '../../contexts/actions';
-import CommentsContext from '../../contexts/comments';
-import PersonsContext from '../../contexts/persons';
 import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
 import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
+import { actionsState, DONE, CANCEL, TODO, prepareActionForEncryption, mappedIdsToLabels } from '../../recoil/actions';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { personsState } from '../../recoil/persons';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import API from '../../services/api';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { capture } from '../../services/sentry';
 
-class Action extends React.Component {
-  castToAction = (action = {}) => ({
-    name: action.name?.trim() || '',
-    description: action.description?.trim()?.split('\\n').join('\u000A') || '',
-    person: action.person || null,
-    categories: action.categories || [],
-    user: action.user || null,
-    status: action.status || TODO,
-    dueAt: action.dueAt || null,
-    withTime: action.withTime || false,
-    completedAt: action.completedAt || null,
-    entityKey: action.entityKey || '',
-  });
+const castToAction = (action = {}) => ({
+  name: action.name?.trim() || '',
+  description: action.description?.trim()?.split('\\n').join('\u000A') || '',
+  person: action.person || null,
+  categories: action.categories || [],
+  user: action.user || null,
+  status: action.status || TODO,
+  dueAt: action.dueAt || null,
+  withTime: action.withTime || false,
+  completedAt: action.completedAt || null,
+  entityKey: action.entityKey || '',
+});
 
-  state = {
-    action: {},
-    ...this.castToAction(this.props.route?.params),
-    loading: false,
-    updating: false,
-    writingComment: '',
-    editable: this.props.route?.params?.editable || false,
-  };
+const Action = ({ navigation, route }) => {
+  const [actions, setActions] = useRecoilState(actionsState);
+  const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
+  const allPersons = useRecoilValue(personsState);
+  const [comments, setComments] = useRecoilState(commentsState);
+  const currentTeam = useRecoilValue(currentTeamState);
 
-  componentDidMount() {
-    this.getData();
-    this.props.navigation.addListener('focus', this.handleFocus);
-    this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
-  }
+  const actionDB = useMemo(() => {
+    const existingAction = actions.find((a) => a._id === route.params?._id);
+    if (!existingAction) return null;
+    return Object.assign({}, castToAction(existingAction), { _id: existingAction._id });
+  }, [actions, route.params]);
 
-  componentWillUnmount() {
-    this.props.navigation.removeListener('focus', this.handleFocus);
-    this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
-  }
+  const [action, setAction] = useState(() => castToAction(actionDB));
+  const [updating, setUpdating] = useState(false);
+  const [writingComment, setWritingComment] = useState('');
+  const [editable, setEditable] = useState(route?.params?.editable || false);
 
-  handleBeforeRemove = (e) => {
-    if (this.backRequestHandled) return;
-    e.preventDefault();
-    this.onGoBackRequested();
-  };
-
-  handleFocus = () => {
-    const { route } = this.props;
-    if (route.params?.person) {
-      this.setState({ person: route.params.person });
-    }
-  };
-
-  onEdit = () => this.setState({ editable: true });
-
-  getData = async () => {
-    await this.getAction();
-  };
-
-  onSearchPerson = () => {
-    this.props.navigation.push('Persons', {
-      screen: 'PersonsSearch',
-      params: { fromRoute: 'Action' },
-    });
-  };
-
-  setAction = (actionDB) => {
-    try {
-      if (!actionDB) {
-        this.onBack();
-        return;
-      }
-      this.setState({
-        action: Object.assign({}, this.castToAction(actionDB), { _id: actionDB._id }),
-        ...this.castToAction(actionDB),
-        loading: false,
-      });
-    } catch (e) {
-      console.log('error setting action', e);
-      console.log(actionDB);
-    }
-  };
-
-  getAction = async () => {
-    const { route, context } = this.props;
-    const { _id } = route.params;
-    this.setAction(context.actions.find((a) => a._id === _id));
-  };
-
-  onUpdateAction = async () => {
-    this.setState({ updating: true });
-    const { dueAt, action, status } = this.state;
-    const multipleActions = this.props.route?.params?.actions?.length > 1;
-    if (!dueAt) {
-      Alert.alert("Vous devez rentrer une date d'échéance");
-      this.setState({ updating: false });
-      return false;
-    }
-    let response;
-    if (multipleActions) {
-      // Update multiple actions.
-      for (const a of this.props.route?.params?.actions) {
-        response = await this.props.context.updateAction(
-          Object.assign(
-            {},
-            this.castToAction(this.state),
-            { completedAt: action.status === TODO && status !== TODO ? new Date().toISOString() : null },
-            { _id: a._id, person: a.person }
-          )
-        );
-      }
-    } else {
-      response = await this.props.context.updateAction(
-        Object.assign(
-          {},
-          this.castToAction(this.state),
-          { completedAt: action.status === TODO && status !== TODO ? new Date().toISOString() : null },
-          { _id: action._id }
-        )
-      );
-    }
-
-    if (response.error) {
-      Alert.alert(response.error);
-      this.setState({ updating: false });
-      return false;
-    }
-    if (response.ok) {
-      this.setState({ updating: false });
-      if (action.status !== CANCEL && status === CANCEL) {
-        Alert.alert('Cette action est annulée, voulez-vous la dupliquer ?', 'Avec une date ultérieure par exemple', [
-          { text: 'OK', onPress: this.onDuplicate },
-          { text: 'Non merci !', onPress: this.onBack, style: 'cancel' },
-        ]);
-      } else {
-        Alert.alert(multipleActions ? 'Actions mises à jour !' : 'Action mise à jour !', null, [{ text: 'OK', onPress: this.onBack }]);
-        return true;
-      }
-      return true;
-    }
-  };
-
-  onDuplicate = async () => {
-    this.setState({ updating: true });
-    const { name, person, dueAt, withTime } = this.state;
-    const { context, navigation } = this.props;
-    const { addAction, currentTeam } = context;
-    const response = await addAction({
-      name,
-      person,
-      team: currentTeam._id,
-      dueAt,
-      withTime,
-      status: TODO,
-    });
-    Sentry.setContext('action', { _id: response.data._id });
-    this.backRequestHandled = true;
-    navigation.replace('Action', {
-      ...response.data,
-      fromRoute: 'ActionsList',
-      editable: true,
-    });
-  };
-
-  onDeleteRequest = () => {
-    Alert.alert('Voulez-vous vraiment supprimer cette action ?', 'Cette opération est irréversible.', [
-      {
-        text: 'Supprimer',
-        style: 'destructive',
-        onPress: this.onDelete,
-      },
-      {
-        text: 'Annuler',
-        style: 'cancel',
-      },
-    ]);
-  };
-
-  onDelete = async () => {
-    const { action } = this.state;
-    const { deleteAction } = this.props.context;
-    const multipleActions = this.props.route?.params?.actions?.length > 1;
-    let response;
-    if (multipleActions) {
-      for (const a of this.props.route?.params?.actions) {
-        response = await deleteAction(a._id);
-      }
-    } else {
-      response = await deleteAction(action._id);
-    }
-    if (response.error) return Alert.alert(response.error);
-    if (response.ok) {
-      Alert.alert(multipleActions ? 'Actions supprimées !' : 'Action supprimée !');
-      this.onBack();
-    }
-  };
-
-  isUpdateDisabled = (calledFrom) => {
-    const { action } = this.state;
-    const newAction = { ...action, ...this.castToAction(this.state) };
-    if (JSON.stringify(action) !== JSON.stringify(newAction)) return false;
+  const isUpdateDisabled = useMemo(() => {
+    const newAction = { ...actionDB, ...castToAction(action) };
+    if (JSON.stringify(actionDB) !== JSON.stringify(newAction)) return false;
     return true;
-  };
+  }, [actionDB, action]);
 
-  onBack = () => {
-    this.backRequestHandled = true;
-    const { navigation, route } = this.props;
+  const backRequestHandledRef = useRef(false);
+  const onBack = () => {
+    backRequestHandledRef.current = true;
     const { routes } = navigation.dangerouslyGetState();
     Sentry.setContext('action', {});
     // FIXME there is no perfect solution yet to handle the navigation
@@ -238,15 +78,14 @@ class Action extends React.Component {
         ? routes[routes.length - 3].name // example [{ name: AcionsList },{ name: NewActionForm },{ name: Action }]
         : route.params.fromRoute
     );
-    this.setState({ updating: false });
+    setUpdating(false);
   };
 
-  onGoBackRequested = async () => {
-    const { dueAt, writingComment } = this.state;
-    if (!dueAt) {
+  const onGoBackRequested = async () => {
+    if (!action.dueAt) {
       Alert.alert("Vous devez rentrer une date d'échéance");
-      this.setState({ updating: false });
-      return false;
+      setUpdating(false);
+      setUpdating(false);
     }
 
     if (writingComment.length) {
@@ -270,18 +109,18 @@ class Action extends React.Component {
       );
       if (!goToNextStep) return;
     }
-    if (this.isUpdateDisabled()) {
-      this.onBack();
+    if (isUpdateDisabled) {
+      onBack();
       return true;
     }
     Alert.alert('Voulez-vous enregistrer cette action ?', null, [
       {
         text: 'Enregistrer',
-        onPress: this.onUpdateAction,
+        onPress: onUpdateActionRequest,
       },
       {
         text: 'Ne pas enregistrer',
-        onPress: this.onBack,
+        onPress: onBack,
         style: 'destructive',
       },
       {
@@ -291,155 +130,349 @@ class Action extends React.Component {
     ]);
   };
 
-  _scrollToInput = (ref) => {
-    if (!ref) return;
+  const onSearchPerson = () =>
+    navigation.push('Persons', {
+      screen: 'PersonsSearch',
+      params: { fromRoute: 'Action' },
+    });
+
+  const handleBeforeRemove = (e) => {
+    if (backRequestHandledRef.current === true) return;
+    e.preventDefault();
+    onGoBackRequested();
+  };
+
+  const handleFocus = () => {
+    if (route.params?.person) {
+      setAction((a) => ({ ...a, person: route.params.person }));
+    }
+  };
+
+  useEffect(() => {
+    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      focusListenerUnsubscribe();
+      beforeRemoveListenerUnsbscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [route?.params?.person]);
+
+  const updateAction = async (action, { oldAction = null } = {}) => {
+    if (!oldAction) oldAction = actions.find((a) => a._id === action._id);
+    const statusChanged = action.status && oldAction.status !== action.status;
+    try {
+      if (statusChanged) {
+        if ([DONE, CANCEL].includes(action.status)) {
+          action.completedAt = new Date().toISOString();
+        } else {
+          action.completedAt = null;
+        }
+      }
+      const response = await API.put({
+        path: `/action/${oldAction._id}`,
+        body: prepareActionForEncryption(action),
+      });
+      if (response.ok) {
+        setActions((actions) =>
+          actions.map((a) => {
+            if (a._id === response.decryptedData._id) return response.decryptedData;
+            return a;
+          })
+        );
+      }
+      if (!response?.ok) return response;
+      const newAction = response.decryptedData;
+      if (!statusChanged) return response;
+      const comment = {
+        comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
+        type: 'action',
+        item: actionDB._id,
+        action: actionDB._id,
+        team: currentTeam._id,
+        user: user._id,
+        organisation: organisation._id,
+      };
+      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+      if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
+      return response;
+    } catch (error) {
+      capture(error, { extra: { message: 'error in updating action', action } });
+      return { ok: false, error: error.message };
+    }
+  };
+
+  const onUpdateActionRequest = async () => {
+    setUpdating(true);
+    const multipleActions = route?.params?.actions?.length > 1;
+    if (!action.dueAt) {
+      Alert.alert("Vous devez rentrer une date d'échéance");
+      setUpdating(false);
+      return false;
+    }
+    let response;
+    if (multipleActions) {
+      // Update multiple actions.
+      for (const a of route?.params?.actions) {
+        response = await updateAction(
+          Object.assign(
+            {},
+            castToAction(action),
+            { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
+            { _id: a._id, person: a.person }
+          )
+        );
+      }
+    } else {
+      response = await updateAction(
+        Object.assign(
+          {},
+          castToAction(action),
+          { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
+          { _id: actionDB._id }
+        )
+      );
+    }
+
+    if (response.error) {
+      Alert.alert(response.error);
+      setUpdating(false);
+      return false;
+    }
+    if (response.ok) {
+      setUpdating(false);
+      if (actionDB.status !== CANCEL && action.status === CANCEL) {
+        Alert.alert('Cette action est annulée, voulez-vous la dupliquer ?', 'Avec une date ultérieure par exemple', [
+          { text: 'OK', onPress: onDuplicate },
+          { text: 'Non merci !', onPress: onBack, style: 'cancel' },
+        ]);
+      } else {
+        Alert.alert(multipleActions ? 'Actions mises à jour !' : 'Action mise à jour !', null, [{ text: 'OK', onPress: onBack }]);
+        return true;
+      }
+      return true;
+    }
+  };
+
+  const onDuplicate = async () => {
+    setUpdating(true);
+    const { name, person, dueAt, withTime } = action;
+    const response = await API.post({
+      path: '/action',
+      body: prepareActionForEncryption({
+        name,
+        person,
+        team: currentTeam._id,
+        dueAt,
+        withTime,
+        status: TODO,
+      }),
+    });
+    if (!response.ok) {
+      Alert.alert('Impossible de dupliquer !');
+      return;
+    }
+    setActions((actions) => [response.decryptedData, ...actions]);
+    Sentry.setContext('action', { _id: response.data._id });
+    backRequestHandledRef.current = true;
+    navigation.replace('Action', {
+      ...response.data,
+      fromRoute: 'ActionsList',
+      editable: true,
+    });
+  };
+
+  const onDeleteRequest = () => {
+    Alert.alert('Voulez-vous vraiment supprimer cette action ?', 'Cette opération est irréversible.', [
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: onDelete,
+      },
+      {
+        text: 'Annuler',
+        style: 'cancel',
+      },
+    ]);
+  };
+
+  const deleteAction = async (id) => {
+    const res = await API.delete({ path: `/action/${id}` });
+    if (res.ok) {
+      setActions((actions) => actions.filter((a) => a._id !== id));
+      for (let comment of comments.filter((c) => c.action === id)) {
+        const res = await API.delete({ path: `/comment/${comment._id}` });
+        if (res.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
+        return res;
+      }
+    }
+    return res;
+  };
+
+  const onDelete = async () => {
+    const multipleActions = route?.params?.actions?.length > 1;
+    let response;
+    if (multipleActions) {
+      for (const a of route?.params?.actions) {
+        response = await deleteAction(a._id);
+      }
+    } else {
+      response = await deleteAction(actionDB._id);
+    }
+    if (response.error) return Alert.alert(response.error);
+    if (response.ok) {
+      Alert.alert(multipleActions ? 'Actions supprimées !' : 'Action supprimée !');
+      onBack();
+    }
+  };
+
+  const scrollViewRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const newCommentRef = useRef(null);
+  const _scrollToInput = (ref) => {
+    if (!ref.current) return;
+    if (!scrollViewRef.current) return;
     setTimeout(() => {
-      ref.measureLayout(
-        findNodeHandle(this.scrollView),
+      ref.current.measureLayout(
+        findNodeHandle(scrollViewRef.current),
         (x, y, width, height) => {
-          this.scrollView.scrollTo({ y: y - 100, animated: true });
+          scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
         (error) => console.log('error scrolling', error)
       );
     }, 250);
   };
 
-  getPersons() {
-    const { action } = this.state;
-    const { context, route } = this.props;
+  const persons = useMemo(() => {
     if (route?.params?.actions?.length > 1) {
-      return route?.params?.actions?.map((a) => context.persons.find((p) => p._id === a.person));
+      return route?.params?.actions?.map((a) => allPersons.find((p) => p._id === a.person));
     } else if (action.person) {
-      return [context.persons.find((p) => p._id === action.person)];
+      return [allPersons.find((p) => p._id === action.person)];
     }
     return [];
-  }
+  }, [route?.params?.actions, allPersons, action?.person]);
 
-  render() {
-    const { loading, name, dueAt, withTime, description, categories, user, status, updating, editable, action } = this.state;
-    const { navigation, context, route } = this.props;
+  const canComment = !route?.params?.actions || route?.params?.actions?.length <= 1;
 
-    const persons = this.getPersons();
+  const { name, dueAt, withTime, description, categories, status } = action;
 
-    const canComment = !route?.params?.actions || route?.params?.actions?.length <= 1;
-
-    return (
-      <SceneContainer>
-        <ScreenTitle
-          title={persons?.length && persons.length === 1 ? `${name} - ${persons[0].name}` : name}
-          onBack={this.onGoBackRequested}
-          onEdit={!editable ? this.onEdit : null}
-          onSave={!editable ? null : this.onUpdateAction}
-          saving={updating}
+  return (
+    <SceneContainer>
+      <ScreenTitle
+        title={persons?.length && persons.length === 1 ? `${name} - ${persons[0].name}` : name}
+        onBack={onGoBackRequested}
+        onEdit={!editable ? setEditable(true) : null}
+        onSave={!editable || isUpdateDisabled ? null : onUpdateActionRequest}
+        saving={updating}
+      />
+      <ScrollContainer ref={scrollViewRef}>
+        {!!action.user && <UserName metaCaption="Action ajoutée par" id={action.user?._id || action.user} />}
+        <InputLabelled
+          label="Nom de l’action"
+          onChangeText={(name) => setAction((a) => ({ ...a, name }))}
+          value={name}
+          placeholder="Nom de l’action"
+          editable={editable}
         />
-        <ScrollContainer ref={(r) => (this.scrollView = r)}>
-          {loading ? (
-            <Spinner />
-          ) : (
-            <>
-              {!!user && <UserName metaCaption="Action ajoutée par" id={user?._id || user} />}
-              <InputLabelled
-                label="Nom de l’action"
-                onChangeText={(name) => this.setState({ name })}
-                value={name}
-                placeholder="Nom de l’action"
-                editable={editable}
-              />
-              {persons.length < 2 ? (
-                <InputFromSearchList
-                  label="Personne concernée"
-                  value={persons[0]?.name || '-- Aucune --'}
-                  onSearchRequest={this.onSearchPerson}
-                  editable={editable}
-                />
-              ) : (
-                <>
-                  <Label label="Personne(s) concerné(es)" />
-                  <Tags
-                    data={persons}
-                    onChange={(persons) => this.setState({ persons })}
-                    onAddRequest={this.onSearchPerson}
-                    renderTag={(person) => <MyText>{person?.name}</MyText>}
-                  />
-                </>
-              )}
-              <ActionStatusSelect
-                onSelect={(status) => this.setState({ status })}
-                onSelectAndSave={(status) => this.setState({ status }, this.onUpdateAction)}
-                value={status}
-                editable={editable}
-              />
-              <DateAndTimeInput
-                label="Échéance"
-                setDate={(dueAt) => this.setState({ dueAt })}
-                date={dueAt}
-                showTime
-                showDay
-                withTime={withTime}
-                setWithTime={(withTime) => this.setState({ withTime })}
-                editable={editable}
-              />
-              <InputLabelled
-                label="Description"
-                onChangeText={(description) => this.setState({ description })}
-                value={description}
-                placeholder="Description"
-                multiline
-                editable={editable}
-                ref={(r) => (this.descriptionRef = r)}
-                onFocus={() => this._scrollToInput(this.descriptionRef)}
-              />
-              <ActionCategoriesMultiCheckboxes onChange={(categories) => this.setState({ categories })} values={categories} editable={editable} />
-              {!editable && <Spacer />}
-              <ButtonsContainer>
-                <ButtonDelete onPress={this.onDeleteRequest} />
-                <Button
-                  caption={editable ? 'Mettre-à-jour' : 'Modifier'}
-                  onPress={editable ? this.onUpdateAction : this.onEdit}
-                  disabled={editable ? this.isUpdateDisabled('modifier') : false}
-                  loading={updating}
-                />
-              </ButtonsContainer>
-              <SubList
-                label="Commentaires"
-                key={action._id}
-                data={context.comments.filter((c) => c.action === action._id)}
-                renderItem={(comment, index) => (
-                  <CommentRow
-                    key={index}
-                    comment={comment.comment}
-                    id={comment._id}
-                    createdAt={comment.createdAt}
-                    user={comment.user}
-                    metaCaption="Commentaire de"
-                    onUpdate={
-                      comment.team
-                        ? () =>
-                            navigation.push('ActionComment', {
-                              ...comment,
-                              name,
-                              fromRoute: 'Action',
-                            })
-                        : null
-                    }
-                  />
-                )}
-                ifEmpty="Pas encore de commentaire">
-                {!!canComment && (
-                  <NewCommentInput
-                    forwardRef={(r) => (this.newCommentRef = r)}
-                    onFocus={() => this._scrollToInput(this.newCommentRef)}
-                    action={action._id}
-                    writeComment={(writingComment) => this.setState({ writingComment })}
-                  />
-                )}
-              </SubList>
-            </>
+        {persons.length < 2 ? (
+          <InputFromSearchList
+            label="Personne concernée"
+            value={persons[0]?.name || '-- Aucune --'}
+            onSearchRequest={onSearchPerson}
+            editable={editable}
+          />
+        ) : (
+          <>
+            <Label label="Personne(s) concerné(es)" />
+            <Tags
+              data={persons}
+              onChange={(persons) => setAction((a) => ({ ...a, persons }))}
+              onAddRequest={onSearchPerson}
+              renderTag={(person) => <MyText>{person?.name}</MyText>}
+            />
+          </>
+        )}
+        <ActionStatusSelect
+          onSelect={(status) => setAction((a) => ({ ...a, status }))}
+          onSelectAndSave={(status) => {
+            setAction((a) => ({ ...a, status }));
+            onUpdateActionRequest();
+          }}
+          value={status}
+          editable={editable}
+        />
+        <DateAndTimeInput
+          label="Échéance"
+          setDate={(dueAt) => setAction((a) => ({ ...a, dueAt }))}
+          date={dueAt}
+          showTime
+          showDay
+          withTime={withTime}
+          setWithTime={(withTime) => setAction((a) => ({ ...a, withTime }))}
+          editable={editable}
+        />
+        <InputLabelled
+          label="Description"
+          onChangeText={(description) => setAction((a) => ({ ...a, description }))}
+          value={description}
+          placeholder="Description"
+          multiline
+          editable={editable}
+          ref={descriptionRef}
+          onFocus={() => _scrollToInput(descriptionRef)}
+        />
+        <ActionCategoriesMultiCheckboxes
+          onChange={(categories) => setAction((a) => ({ ...a, categories }))}
+          values={categories}
+          editable={editable}
+        />
+        {!editable && <Spacer />}
+        <ButtonsContainer>
+          <ButtonDelete onPress={onDeleteRequest} />
+          <Button
+            caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+            onPress={editable ? onUpdateActionRequest : setEditable(true)}
+            disabled={editable ? isUpdateDisabled : false}
+            loading={updating}
+          />
+        </ButtonsContainer>
+        <SubList
+          label="Commentaires"
+          key={actionDB._id}
+          data={comments.filter((c) => c.action === actionDB._id)}
+          renderItem={(comment, index) => (
+            <CommentRow
+              key={index}
+              comment={comment.comment}
+              id={comment._id}
+              createdAt={comment.createdAt}
+              user={comment.user}
+              metaCaption="Commentaire de"
+              onUpdate={
+                comment.team
+                  ? () =>
+                      navigation.push('ActionComment', {
+                        ...comment,
+                        name,
+                        fromRoute: 'Action',
+                      })
+                  : null
+              }
+            />
           )}
-        </ScrollContainer>
-      </SceneContainer>
-    );
-  }
-}
+          ifEmpty="Pas encore de commentaire">
+          {!!canComment && (
+            <NewCommentInput
+              forwardRef={newCommentRef}
+              onFocus={() => _scrollToInput(newCommentRef)}
+              action={actionDB._id}
+              writeComment={setWritingComment}
+            />
+          )}
+        </SubList>
+      </ScrollContainer>
+    </SceneContainer>
+  );
+};
 
-export default compose(withContext(ActionsContext), withContext(PersonsContext), withContext(CommentsContext), withContext(AuthContext))(Action);
+export default Action;

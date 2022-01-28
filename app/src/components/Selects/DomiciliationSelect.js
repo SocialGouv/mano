@@ -10,13 +10,7 @@ export const situations = [
 
 const DomiciliationSelect = ({ value = situations[0], onSelect, editable }) => {
   return (
-    <SelectLabelled
-      label="Hébergement"
-      values={situations}
-      value={value.length ? value : situations[0]}
-      onSelect={onSelect}
-      editable={editable}
-    />
+    <SelectLabelled label="Hébergement" values={situations} value={value.length ? value : situations[0]} onSelect={onSelect} editable={editable} />
   );
 };
 

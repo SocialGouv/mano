@@ -1,17 +1,22 @@
 import React, { useState } from 'react';
-import { Linking, Alert, TouchableWithoutFeedback } from 'react-native';
+import { Linking, TouchableWithoutFeedback } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Row from '../../components/Row';
 import Spacer from '../../components/Spacer';
 import API from '../../services/api';
 import ScrollContainer from '../../components/ScrollContainer';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
 import { FRAMAFORM_MANO, MANO_DOWNLOAD_URL } from '../../config';
+import { useResetRecoilState } from 'recoil';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 
-const Menu = ({ navigation, context }) => {
+const Menu = ({ navigation }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const resetOrganisation = useResetRecoilState(organisationState);
+  const resetUser = useResetRecoilState(userState);
+  const resetTeams = useResetRecoilState(teamsState);
+  const resetCurrentTeam = useResetRecoilState(currentTeamState);
+
   return (
     <SceneContainer>
       <ScreenTitle title="Profil" />
@@ -33,7 +38,10 @@ const Menu = ({ navigation, context }) => {
           onPress={async () => {
             setIsLoggingOut(true);
             API.logout();
-            context.resetAuth();
+            resetOrganisation();
+            resetUser();
+            resetTeams();
+            resetCurrentTeam();
           }}
         />
       </ScrollContainer>
@@ -41,4 +49,4 @@ const Menu = ({ navigation, context }) => {
   );
 };
 
-export default withContext(AuthContext)(Menu);
+export default Menu;

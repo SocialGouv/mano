@@ -1,19 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
+import { useRecoilValue } from 'recoil';
 import ButtonRight from '../../components/ButtonRight';
 import RowContainer from '../../components/RowContainer';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import TeamsTags from '../../components/TeamsTags';
-import withContext from '../../contexts/withContext';
-import PersonsContext from '../../contexts/persons';
-import { DONE } from '../../contexts/actions';
+import { personsState } from '../../recoil/persons';
+import { DONE } from '../../recoil/actions';
 
-const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName, context }) => {
+const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName }) => {
+  const persons = useRecoilValue(personsState);
+
   const name = action?.name;
   const status = action?.status;
   const withTime = action?.withTime;
-  const pseudo = action?.personName || action?.person ? context.persons?.find((p) => p._id === action.person)?.name : null;
+  const pseudo = action?.personName || action?.person ? persons?.find((p) => p._id === action.person)?.name : null;
   const dueAt = action?.dueAt ? new Date(action?.dueAt) : null;
 
   return (
@@ -113,4 +115,4 @@ const DateNumber = styled(MyText)`
   margin-vertical: 5px;
 `;
 
-export default withContext(PersonsContext)(ActionRow);
+export default ActionRow;

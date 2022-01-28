@@ -1,23 +1,21 @@
-/* eslint-disable max-len */
 import React, { useState } from 'react';
 import styled from 'styled-components';
+import { View } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
-import { compose } from 'recompose';
-import AuthContext from '../../contexts/auth';
-import withContext from '../../contexts/withContext';
-import PersonsContext from '../../contexts/persons';
 import OutOfActiveListSelect from '../../components/Selects/OutOfActiveListSelect';
-import { View } from 'react-native';
+import { useRecoilValue } from 'recoil';
+import { teamsState } from '../../recoil/auth';
 
-const PersonsFilter = ({ route, context, navigation }) => {
+const PersonsFilter = ({ route, navigation }) => {
   const [filterAlertness, setFilterAlertness] = useState(route.params?.filters?.filterAlertness || false);
   const [filterTeams, setFilterByTeam] = useState(route.params?.filters?.filterTeams || []);
   const [filterOutOfActiveList, setFilterOutOfActiveList] = useState(route.params?.filters?.filterOutOfActiveList || '');
+  const teams = useRecoilValue(teamsState);
 
   const onBackRequested = () => {
     navigation.navigate('PersonsList', { filters: { filterAlertness, filterTeams, filterOutOfActiveList } });
@@ -33,7 +31,7 @@ const PersonsFilter = ({ route, context, navigation }) => {
           onPress={() => setFilterAlertness(!filterAlertness)}
         />
         <Category>Filtrer par équipe en charge</Category>
-        {context.teams.map(({ _id, name }, i) => {
+        {teams.map(({ _id, name }, i) => {
           const isSelected = filterTeams.includes(_id);
           return (
             <CheckboxLabelled
@@ -62,4 +60,4 @@ const Category = styled(MyText)`
   margin: 15px 0;
 `;
 
-export default compose(withContext(AuthContext), withContext(PersonsContext))(PersonsFilter);
+export default PersonsFilter;

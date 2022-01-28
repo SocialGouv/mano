@@ -1,5 +1,5 @@
 import React from 'react';
-import { healthInsuranceOptions } from '../../contexts/persons';
+import { healthInsuranceOptions } from '../../recoil/persons';
 import SelectLabelled from './SelectLabelled';
 
 // prettier-ignore

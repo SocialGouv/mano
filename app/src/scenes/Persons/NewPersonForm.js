@@ -1,38 +1,47 @@
-import React from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
-import withContext from '../../contexts/withContext';
-import PersonsContext from '../../contexts/persons';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
+import API from '../../services/api';
 
-class NewPersonForm extends React.Component {
-  state = {
-    name: '',
-    posting: false,
-  };
-  componentDidMount() {
-    this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
-  }
+const NewPersonForm = ({ navigation, route }) => {
+  const [persons, setPersons] = useRecoilState(personsState);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
 
-  componentWillUnmount() {
-    this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
-  }
+  const [name, setName] = useState('');
+  const [posting, setPosting] = useState(false);
 
-  handleBeforeRemove = (e) => {
-    if (this.backRequestHandled) return;
+  const backRequestHandledRef = useRef(null);
+  const handleBeforeRemove = (e) => {
+    if (backRequestHandledRef.current === true) return;
     e.preventDefault();
-    this.onGoBackRequested();
+    onGoBackRequested();
   };
 
-  onCreateUserRequest = async () => {
-    const response = await this.onCreateUser();
-    const { navigation, route } = this.props;
+  useEffect(() => {
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      beforeRemoveListenerUnsbscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onCreateUserRequest = async () => {
+    const response = await onCreateUser();
     if (response.ok) {
-      this.backRequestHandled = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
+      backRequestHandledRef.current = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
       Sentry.setContext('person', { _id: response.data._id });
       navigation.navigate(route.params.toRoute, {
         fromRoute: route.params.fromRoute,
@@ -40,19 +49,23 @@ class NewPersonForm extends React.Component {
         person: response.data,
         editable: true,
       });
-      setTimeout(() => {
-        this.setState({ posting: false });
-      }, 250);
+      setTimeout(() => setPosting(false), 250);
     }
   };
 
-  onCreateUser = async () => {
-    this.setState({ posting: true });
-    const { context } = this.props;
-    const { name } = this.state;
-    const response = await context.addPerson({ name: name.trim() });
+  const onCreateUser = async () => {
+    setPosting(true);
+    const existingPerson = persons.find((p) => p.name === name);
+    if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
+    const response = await API.post({
+      path: '/person',
+      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name }),
+    });
+    if (response.ok) {
+      setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    }
     if (!response.ok) {
-      this.setState({ posting: false });
+      setPosting(false);
       if (response.code === 'USER_ALREADY_EXIST') {
         Alert.alert('Une personne suivie existe déjà avec ce nom', 'Veuillez choisir un autre nom');
       } else {
@@ -63,37 +76,30 @@ class NewPersonForm extends React.Component {
     return response;
   };
 
-  isReadyToSave = () => {
-    const { name } = this.state;
+  const isReadyToSave = useMemo(() => {
     if (!name || !name.length || !name.trim().length) return false;
     return true;
-  };
+  }, [name]);
 
-  onBack = () => {
-    this.backRequestHandled = true;
-    const { navigation, route } = this.props;
+  const onBack = () => {
+    backRequestHandledRef.current = true;
     navigation.navigate(route.params.fromRoute);
-    setTimeout(() => {
-      this.setState({ posting: false });
-    }, 250);
+    setTimeout(() => setPosting(false), 250);
   };
 
-  onGoBackRequested = () => {
-    if (!this.isReadyToSave()) {
-      this.onBack();
-      return;
-    }
+  const onGoBackRequested = () => {
+    if (!isReadyToSave) return onBack();
     Alert.alert('Voulez-vous enregistrer cette personne ?', null, [
       {
         text: 'Enregistrer',
         onPress: async () => {
-          const response = await this.onCreateUser();
-          if (response.ok) this.onBack();
+          const response = await onCreateUser();
+          if (response.ok) onBack();
         },
       },
       {
         text: 'Ne pas enregistrer',
-        onPress: this.onBack,
+        onPress: onBack,
         style: 'destructive',
       },
       {
@@ -103,27 +109,17 @@ class NewPersonForm extends React.Component {
     ]);
   };
 
-  render() {
-    const { name, posting } = this.state;
+  return (
+    <SceneContainer>
+      <ScreenTitle title="Ajouter une personne" onBack={onGoBackRequested} />
+      <ScrollContainer keyboardShouldPersistTaps="handled">
+        <View>
+          <InputLabelled label="Pseudo" onChangeText={setName} value={name} placeholder="Monsieur X" autoCapitalize="words" />
+          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateUserRequest} loading={posting} />
+        </View>
+      </ScrollContainer>
+    </SceneContainer>
+  );
+};
 
-    return (
-      <SceneContainer>
-        <ScreenTitle title="Ajouter une personne" onBack={this.onGoBackRequested} />
-        <ScrollContainer keyboardShouldPersistTaps="handled">
-          <View>
-            <InputLabelled
-              label="Pseudo"
-              onChangeText={(name) => this.setState({ name })}
-              value={name}
-              placeholder="Monsieur X"
-              autoCapitalize="words"
-            />
-            <Button caption="Créer" disabled={!this.isReadyToSave()} onPress={this.onCreateUserRequest} loading={posting} />
-          </View>
-        </ScrollContainer>
-      </SceneContainer>
-    );
-  }
-}
-
-export default withContext(PersonsContext)(NewPersonForm);
+export default NewPersonForm;

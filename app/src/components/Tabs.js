@@ -19,6 +19,7 @@ const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs, back
       duration: 250,
       useNativeDriver: true,
     }).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.index]);
   const tabWidth = tabsWidth * ((1 / numberOfTabs) * 0.9);
   return (

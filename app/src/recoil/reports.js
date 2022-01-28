@@ -1,62 +1,58 @@
-import React, { useContext, useState } from 'react';
+import { atom, useRecoilState } from 'recoil';
+import { useComments } from '../recoil/comments';
 import API from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
-import CommentsContext from './comments';
 
-const ReportsContext = React.createContext();
+export const reportsState = atom({
+  key: 'reportsState',
+  default: [],
+});
 
-export const ReportsProvider = ({ children }) => {
-  const { addComment } = useContext(CommentsContext);
+export const reportsLoadingState = atom({
+  key: 'reportsLoadingState',
+  default: true,
+});
 
-  const [state, setState] = useState({ reports: [], reportsKey: 0, loading: true, lastRefresh: undefined });
+export const useReports = () => {
+  const { addComment } = useComments();
+
+  const [reports, setReports] = useRecoilState(reportsState);
+  const [loading, setLoading] = useRecoilState(reportsLoadingState);
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-reports', 0);
-  const setReports = (reports) => {
-    if (reports) {
-      setState(({ reportsKey }) => ({
-        reports,
-        reportsKey: reportsKey + 1,
-        loading: false,
-      }));
-    }
+
+  const setReportsFullState = (newReports) => {
+    if (newReports) setReports(newReports);
+    setLoading(false);
     setLastRefresh(Date.now());
   };
 
-  const setBatchData = (newReports) =>
-    setState(({ reports, ...oldState }) => ({
-      ...oldState,
-      reports: [...reports, ...newReports],
-    }));
+  const setBatchData = (newReports) => setReports((reports) => [...reports, ...newReports]);
 
   const refreshReports = async (setProgress, initialLoad) => {
-    setState((state) => ({ ...state, loading: true }));
+    setLoading(true);
     try {
       const data = await getData({
         collectionName: 'report',
-        data: state.reports,
+        data: reports,
         isInitialization: initialLoad,
         setProgress,
         lastRefresh,
         setBatchData,
+        API,
       });
-      setReports(data);
+      setReportsFullState(data);
       return true;
     } catch (e) {
       capture(e.message, { extra: { response: e.response } });
-      setState((state) => ({ ...state, loading: false }));
+      setLoading(false);
       return false;
     }
   };
 
   const deleteReport = async (id) => {
     const res = await API.delete({ path: `/report/${id}` });
-    if (res.ok) {
-      setState(({ reportsKey, reports, ...s }) => ({
-        ...s,
-        reportsKey: reportsKey + 1,
-        reports: reports.filter((p) => p._id !== id),
-      }));
-    }
+    if (res.ok) setReports((reports) => reports.filter((p) => p._id !== id));
     return res;
   };
 
@@ -64,14 +60,12 @@ export const ReportsProvider = ({ children }) => {
     try {
       const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(report) });
       if (res.ok) {
-        setState(({ reports, reportsKey, ...s }) => ({
-          ...s,
-          reportsKey: reportsKey + 1,
-          reports: reports.map((a) => {
+        setReports((reports) =>
+          reports.map((a) => {
             if (a._id === report._id) return res.decryptedData;
             return a;
-          }),
-        }));
+          })
+        );
       }
       return res;
     } catch (error) {
@@ -84,11 +78,7 @@ export const ReportsProvider = ({ children }) => {
     try {
       const res = await API.post({ path: '/report', body: { team, date } });
       if (!res.ok) return res;
-      setState(({ reports, reportsKey, ...s }) => ({
-        ...s,
-        reportsKey: reportsKey + 1,
-        reports: [res.decryptedData, ...reports],
-      }));
+      setReports((reports) => [res.decryptedData, ...reports]);
       return res;
     } catch (error) {
       capture('error in creating report' + error, { extra: { error, date, team } });
@@ -118,23 +108,17 @@ export const ReportsProvider = ({ children }) => {
     return res;
   };
 
-  return (
-    <ReportsContext.Provider
-      value={{
-        ...state,
-        refreshReports,
-        setReports,
-        updateReport,
-        incrementPassage,
-        addReport,
-        deleteReport,
-      }}>
-      {children}
-    </ReportsContext.Provider>
-  );
+  return {
+    reports,
+    loading,
+    refreshReports,
+    setReports,
+    updateReport,
+    incrementPassage,
+    addReport,
+    deleteReport,
+  };
 };
-
-export default ReportsContext;
 
 const encryptedFields = ['description', 'services', 'passages', 'team', 'date', 'collaborations'];
 

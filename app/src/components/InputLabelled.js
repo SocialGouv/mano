@@ -54,7 +54,7 @@ const InputLabelled = React.forwardRef(
     return (
       <InputContainer>
         {label && <Label label={label} />}
-        {multiline ? <InputMultilineAutoAdjust ref={ref} {...props} /> : <Input ref={ref} {...props} value={String(props.value)} />}
+        {multiline ? <InputMultilineAutoAdjust ref={ref} {...props} /> : <Input ref={ref} {...props} value={String(props.value || '')} />}
         {Boolean(EndIcon) && Boolean(props?.value?.length) && (
           <TouchableWithoutFeedback onPress={onEndIconPress}>
             <IconWrapper>

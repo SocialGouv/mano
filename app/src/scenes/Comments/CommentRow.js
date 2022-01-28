@@ -5,11 +5,11 @@ import ButtonRight from '../../components/ButtonRight';
 import { Alert } from 'react-native';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
-import { compose } from 'recompose';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import CommentsContext from '../../contexts/comments';
 import UserName from '../../components/UserName';
+import { useRecoilState, useSetRecoilState } from 'recoil';
+import { userState } from '../../recoil/auth';
+import API from '../../services/api';
+import { commentsState } from '../../recoil/comments';
 
 const hitSlop = {
   top: 20,
@@ -18,11 +18,14 @@ const hitSlop = {
   bottom: 20,
 };
 
-const CommentRow = ({ onArrowPress, onPress, onUpdate, comment, createdAt, user, context, showActionSheetWithOptions, id, metaCaption }) => {
+const CommentRow = ({ onArrowPress, onPress, onUpdate, comment, createdAt, user: commentUser, showActionSheetWithOptions, id, metaCaption }) => {
+  const user = useRecoilState(userState);
+  const setComments = useSetRecoilState(commentsState);
+
   const onPressRequest = async () => {
     if (onPress) return onPress();
     const options = ['Supprimer', 'Annuler'];
-    if (onUpdate && user === context.user._id) options.unshift('Modifier');
+    if (onUpdate && commentUser === user._id) options.unshift('Modifier');
     showActionSheetWithOptions(
       {
         options,
@@ -41,7 +44,7 @@ const CommentRow = ({ onArrowPress, onPress, onUpdate, comment, createdAt, user,
       {
         text: 'Supprimer',
         style: 'destructive',
-        onPress: () => onCommentDelete(),
+        onPress: onCommentDelete,
       },
       {
         text: 'Annuler',
@@ -51,10 +54,9 @@ const CommentRow = ({ onArrowPress, onPress, onUpdate, comment, createdAt, user,
   };
 
   const onCommentDelete = async () => {
-    const response = await context.deleteComment(commentDB._id);
-    if (!response.ok) {
-      return Alert.alert(response.error);
-    }
+    const response = await API.delete({ path: `/comment/${id}` });
+    if (!response.ok) return Alert.alert(response.error);
+    setComments((comments) => comments.filter((p) => p._id !== id));
   };
 
   return (
@@ -62,7 +64,7 @@ const CommentRow = ({ onArrowPress, onPress, onUpdate, comment, createdAt, user,
       <CaptionsContainer>
         <CommentStyled>{comment?.split('\\n')?.join('\u000A')}</CommentStyled>
         <CreationDate>
-          {!!user && <UserName caption={metaCaption} id={user?._id || user} />}
+          {!!commentUser && <UserName caption={metaCaption} id={commentUser?._id || commentUser} />}
           {'\u000A'}
           {new Date(createdAt).getLocaleDateAndTime('fr')}
         </CreationDate>
@@ -128,4 +130,4 @@ const Dot = styled.View`
   margin-right: 3px;
 `;
 
-export default compose(connectActionSheet, withContext(CommentsContext), withContext(AuthContext))(CommentRow);
+export default connectActionSheet(CommentRow);

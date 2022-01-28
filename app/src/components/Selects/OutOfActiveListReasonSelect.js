@@ -1,5 +1,5 @@
 import React from 'react';
-import { outOfActiveListReasonOptions } from '../../contexts/persons';
+import { outOfActiveListReasonOptions } from '../../recoil/persons';
 import SelectLabelled from './SelectLabelled';
 
 export const reasons = ['-- Choisissez une raison  --', ...outOfActiveListReasonOptions];

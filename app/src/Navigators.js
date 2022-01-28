@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AgendaIcon, StructuresIcon, PersonIcon, MenuIcon, TerritoryIcon } from './icons';
+import { AgendaIcon, PersonIcon, StructuresIcon, MenuIcon, TerritoryIcon } from './icons';
 import { AppState } from 'react-native';
+import { RecoilRoot } from 'recoil';
 import logEvents from './services/logEvents';
 import Login from './scenes/Login/Login';
 import Action from './scenes/Actions/Action';
@@ -13,6 +14,8 @@ import PersonsList from './scenes/Persons/PersonsList';
 import PersonsSearch from './scenes/Persons/PersonsSearch';
 import NewPersonForm from './scenes/Persons/NewPersonForm';
 import Person from './scenes/Persons/Person';
+import PersonsOutOfActiveListReason from './scenes/Persons/PersonsOutOfActiveListReason';
+import PersonsFilter from './scenes/Persons/PersonsFilter';
 import StructuresList from './scenes/Structures/StructuresList';
 import NewStructureForm from './scenes/Structures/NewStructureForm';
 import Structure from './scenes/Structures/Structure';
@@ -32,15 +35,11 @@ import TerritoriesList from './scenes/Territories/TerritoriesList';
 import NewTerritoryForm from './scenes/Territories/NewTerritoryForm';
 import Territory from './scenes/Territories/Territory';
 import TerritoryObservation from './scenes/Territories/TerritoryObservation';
-import PersonsFilter from './scenes/Persons/PersonsFilter';
-import RootContextsProvider from './contexts/rootProvider';
-import { StructuresProvider } from './contexts/structures';
-import { ActionsByStatusProvider, PersonsSelectorsProvider } from './contexts/selectors';
 import EnvironmentIndicator from './components/EnvironmentIndicator';
 import API from './services/api';
 import Charte from './scenes/Menu/Charte';
 import CharteAcceptance from './scenes/Login/CharteAcceptance';
-import PersonsOutOfActiveListReason from './scenes/Persons/PersonsOutOfActiveListReason';
+import Loader from './components/Loader';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -62,11 +61,11 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="Person" component={Person} />
       <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <PersonsStack.Screen name="NewPersonForm" component={NewPersonForm} />
+      <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
+      <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
       <PersonsStack.Screen name="PersonPlace" component={Place} />
       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
-      <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
-      <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
     </PersonsStack.Navigator>
   );
 };
@@ -122,7 +121,7 @@ const TabNavigator = ({ navigation }) => (
       gestureEnabled: false,
     }}>
     <Tab.Screen
-      name="Actions"
+      name="Agenda"
       component={ActionsNavigator}
       options={{
         tabBarIcon: ({ size, color }) => <AgendaIcon size={size} color={color} />,
@@ -177,52 +176,44 @@ const LoginNavigator = () => (
 
 const AppStack = createStackNavigator();
 
-class App extends React.Component {
-  async componentDidMount() {
-    await logEvents.initLogEvents();
-    logEvents.logAppVisit();
-    AppState.addEventListener('change', this.onAppChange);
-  }
-
-  componentWillUnmount() {
-    logEvents.logAppClose();
-    AppState.removeEventListener('focus', this.onAppChange);
-  }
-
-  appState = AppState.currentState;
-  onAppChange = (nextAppState) => {
-    if (this.appState?.match(/inactive|background/) && nextAppState === 'active') {
-      if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
+const App = () => {
+  const appState = useRef(AppState.currentState);
+  const appStateListener = useRef(null);
+  useEffect(() => {
+    logEvents.initLogEvents().then(() => {
       logEvents.logAppVisit();
-    } else {
+      appStateListener.current = AppState.addEventListener('change', (nextAppState) => {
+        if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
+          if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
+          logEvents.logAppVisit();
+        } else {
+          logEvents.logAppClose();
+        }
+        appState.current = nextAppState;
+      });
+    });
+    return () => {
       logEvents.logAppClose();
-    }
-    this.appState = nextAppState;
-  };
+      appStateListener.current.remove();
+    };
+  }, []);
 
-  render() {
-    return (
+  return (
+    <RecoilRoot>
       <ActionSheetProvider>
-        <RootContextsProvider>
-          <ActionsByStatusProvider>
-            <StructuresProvider>
-              <PersonsSelectorsProvider>
-                <NavigationContainer ref={this.containerRef}>
-                  <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
-                    <AppStack.Screen name="LoginStack" component={LoginNavigator} />
-                    <AppStack.Screen name="Home" component={TabNavigator} />
-                    <AppStack.Screen name="Persons" component={PersonsNavigator} />
-                    <AppStack.Screen name="Actions" component={ActionsNavigator} />
-                  </AppStack.Navigator>
-                  <EnvironmentIndicator />
-                </NavigationContainer>
-              </PersonsSelectorsProvider>
-            </StructuresProvider>
-          </ActionsByStatusProvider>
-        </RootContextsProvider>
+        <NavigationContainer>
+          <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
+            <AppStack.Screen name="LoginStack" component={LoginNavigator} />
+            <AppStack.Screen name="Home" component={TabNavigator} />
+            <AppStack.Screen name="Persons" component={PersonsNavigator} />
+            <AppStack.Screen name="Actions" component={ActionsNavigator} />
+          </AppStack.Navigator>
+          <Loader />
+          <EnvironmentIndicator />
+        </NavigationContainer>
       </ActionSheetProvider>
-    );
-  }
-}
+    </RecoilRoot>
+  );
+};
 
 export default App;

@@ -1,24 +1,25 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Alert, Keyboard } from 'react-native';
 import Button from '../../components/Button';
 import InputMultilineAutoAdjust from '../../components/InputMultilineAutoAdjust';
 import Spacer from '../../components/Spacer';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
-import withContext from '../../contexts/withContext';
-import CommentsContext from '../../contexts/comments';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import API from '../../services/api';
 
-const initState = {
-  comment: '',
-  posting: false,
-};
-class NewCommentInput extends React.Component {
-  state = initState;
+const NewCommentInput = ({ person, action, forwardRef, onFocus, writeComment: writeCommentProp }) => {
+  const [comment, setComment] = useState('');
+  const [posting, setPosting] = useState(false);
+  const setComments = useSetRecoilState(commentsState);
+  const organisation = useRecoilValue(organisationState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
 
-  onCreateComment = async () => {
-    this.setState({ posting: true });
-    const { comment } = this.state;
-    const { person, action, context } = this.props;
+  const onCreateComment = async () => {
+    setPosting(true);
 
     const body = {
       comment,
@@ -33,61 +34,59 @@ class NewCommentInput extends React.Component {
       body.item = action;
       body.type = 'action';
     }
-    const response = await context.addComment(body);
+    if (!body.user) body.user = user._id;
+    if (!body.team) body.team = currentTeam._id;
+    if (!body.organisation) body.organisation = organisation._id;
+    const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
     if (!response.ok) {
-      this.setState({ posting: false });
+      setPosting(false);
       Alert.alert(response.error || response.code);
       return;
     }
     if (response.ok) {
+      setComments((comments) => [response.decryptedData, ...comments]);
       Keyboard.dismiss();
-      this.setState(initState);
-      this.props.writeComment?.('');
+      setPosting(false);
+      setComment('');
+      writeCommentProp?.('');
     }
   };
 
-  onCancelRequest = () => {
+  const onCancelRequest = () => {
     Alert.alert('Voulez-vous abandonner la création de ce commentaire ?', null, [
       {
         text: 'Continuer la création',
       },
       {
         text: 'Abandonner',
-        onPress: () => this.setState(initState),
+        onPress: () => {
+          setPosting(false);
+          setComment('');
+        },
         style: 'destructive',
       },
     ]);
   };
 
-  writeComment = (newComment) => {
-    this.setState({ comment: newComment });
-    this.props.writeComment?.(newComment);
+  const writeComment = (newComment) => {
+    setComment(newComment);
+    writeCommentProp?.(newComment);
   };
 
-  render() {
-    const { comment, posting } = this.state;
-    const { forwardRef, onFocus } = this.props;
-    return (
-      <>
-        <InputMultilineAutoAdjust
-          onChangeText={this.writeComment}
-          value={comment}
-          placeholder="Ajouter un commentaire"
-          ref={forwardRef}
-          onFocus={onFocus}
-        />
-        {!!comment.length && (
-          <>
-            <Spacer />
-            <ButtonsContainer>
-              <ButtonDelete onPress={this.onCancelRequest} caption="Annuler" />
-              <Button caption="Créer" onPress={this.onCreateComment} loading={posting} />
-            </ButtonsContainer>
-          </>
-        )}
-      </>
-    );
-  }
-}
+  return (
+    <>
+      <InputMultilineAutoAdjust onChangeText={writeComment} value={comment} placeholder="Ajouter un commentaire" ref={forwardRef} onFocus={onFocus} />
+      {!!comment.length && (
+        <>
+          <Spacer />
+          <ButtonsContainer>
+            <ButtonDelete onPress={onCancelRequest} caption="Annuler" />
+            <Button caption="Créer" onPress={onCreateComment} loading={posting} />
+          </ButtonsContainer>
+        </>
+      )}
+    </>
+  );
+};
 
-export default withContext(CommentsContext)(NewCommentInput);
+export default NewCommentInput;

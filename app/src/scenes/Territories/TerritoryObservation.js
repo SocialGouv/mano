@@ -1,143 +1,149 @@
-import React from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, findNodeHandle, View } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Button from '../../components/Button';
-import Spinner from '../../components/Spinner';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
 import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
-import { compose } from 'recompose';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
 import CustomFieldInput from '../../components/CustomFieldInput';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import API from '../../services/api';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
   return value;
 };
 
-class TerritoryObservation extends React.Component {
-  castToTerritoryObservation = (territoryObservation = {}, customFieldsObs) => {
-    const toReturn = {};
-    for (const field of customFieldsObs) {
-      toReturn[field.name] = cleanValue(territoryObservation[field.name]);
-    }
-    return {
-      ...toReturn,
-      createdAt: territoryObservation.createdAt || null,
-      user: territoryObservation.user || {},
-      entityKey: territoryObservation.entityKey || '',
-    };
+const TerritoryObservation = ({ route, navigation }) => {
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
+  const obsDB = useMemo(() => allTerritoryOservations.find((obs) => obs._id === route.params?._id), [allTerritoryOservations, route.params?._id]);
+
+  const castToTerritoryObservation = useCallback(
+    (territoryObservation = {}) => {
+      const toReturn = {};
+      for (const field of customFieldsObs) {
+        toReturn[field.name] = cleanValue(territoryObservation[field.name]);
+      }
+      return {
+        ...toReturn,
+        createdAt: territoryObservation.createdAt || null,
+        user: territoryObservation.user || {},
+        entityKey: territoryObservation.entityKey || '',
+      };
+    },
+    [customFieldsObs]
+  );
+
+  const [updating, setUpdating] = useState(false);
+  const [editable, setEditable] = useState(route?.params?.editable || false);
+  const [obs, setObs] = useState(castToTerritoryObservation(route.params));
+  const onChange = (newProps) => setObs((o) => ({ ...o, ...newProps }));
+
+  const onBack = () => {
+    backRequestHandledRef.current = true;
+    navigation.goBack();
   };
 
-  state = {
-    territoryObservation: {},
-    ...this.castToTerritoryObservation(this.props.route?.params, this.props.context.customFieldsObs),
-
-    territory: this.props.route?.params.territory || {},
-    loading: false,
-    updating: false,
-    editable: this.props.route?.params?.editable || false,
-  };
-  componentDidMount() {
-    this.getTerritoryObservation();
-    this.props.navigation.addListener('beforeRemove', this.handleBeforeRemove);
-  }
-
-  componentWillUnmount() {
-    this.props.navigation.removeListener('beforeRemove', this.handleBeforeRemove);
-  }
-
-  handleBeforeRemove = (e) => {
-    if (this.backRequestHandled) return;
+  const backRequestHandledRef = useRef(null);
+  const handleBeforeRemove = (e) => {
+    if (backRequestHandledRef.current === true) return;
     e.preventDefault();
-    this.onGoBackRequested();
+    onGoBackRequested();
   };
 
-  onEdit = () => this.setState(({ editable }) => ({ editable: !editable }));
+  useEffect(() => {
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      beforeRemoveListenerUnsbscribe();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
-  setTerritoryObservation = (structureDB) => {
-    const { customFieldsObs } = this.props.context;
-    this.setState({
-      territoryObservation: Object.assign({}, this.castToTerritoryObservation(structureDB, customFieldsObs), {
-        _id: structureDB._id,
-      }),
-      ...this.castToTerritoryObservation(structureDB, customFieldsObs),
-      loading: false,
+  const onEdit = () => setEditable((e) => !e);
+
+  const onSaveObservation = async () => {
+    setUpdating(true);
+    if (obsDB?._id) return onUpdateTerritoryObservation();
+    return onCreateTerritoryObservation();
+  };
+
+  const onCreateTerritoryObservation = async () => {
+    setUpdating(true);
+    const response = await API.post({
+      path: '/territory-observation',
+      body: prepareObsForEncryption(customFieldsObs)(
+        Object.assign({}, castToTerritoryObservation(obs), {
+          territory: route.params.territory._id,
+          user: user._id,
+          team: currentTeam._id,
+          organisation: organisation._id,
+        })
+      ),
     });
-  };
-
-  getTerritoryObservation = async () => {
-    const { route, context } = this.props;
-    const { _id } = route.params;
-    if (!_id) return;
-    this.setTerritoryObservation(context.territoryObservations.find((obs) => obs._id === _id));
-  };
-
-  onSaveObservation = async () => {
-    this.setState({ updating: true });
-    const { territoryObservation } = this.state;
-    if (territoryObservation?._id) return this.onUpdateTerritoryObservation();
-    return this.onCreateTerritoryObservation();
-  };
-
-  onCreateTerritoryObservation = async () => {
-    this.setState({ updating: true });
-    const { territory } = this.state;
-    const { addTerritoryObs, currentTeam, user, customFieldsObs } = this.props.context;
-    const response = await addTerritoryObs(
-      Object.assign({}, this.castToTerritoryObservation(this.state, customFieldsObs), {
-        territory: territory._id,
-        user: user._id,
-        team: currentTeam._id,
-      })
-    );
     if (response.code || response.error) {
-      this.setState({ updating: false });
+      setUpdating(false);
       Alert.alert(response.error || response.code);
       return false;
     }
     if (response.ok) {
       Alert.alert('Nouvelle observation créée !');
-      this.setTerritoryObservation(response.data);
-
-      this.setState({ updating: false, editable: false });
-      return this.onBack();
+      setObs(castToTerritoryObservation(response.decryptedData));
+      setTerritoryObservations((territoryObservations) => [response.decryptedData, ...territoryObservations]);
+      setUpdating(false);
+      setEditable(false);
+      return onBack();
     }
   };
 
-  onUpdateTerritoryObservation = async () => {
-    const { customFieldsObs } = this.props.context;
-    this.setState({ updating: true });
-    const { territoryObservation } = this.state;
-    const response = await this.props.context.updateTerritoryObs(
-      Object.assign({}, this.castToTerritoryObservation(this.state, customFieldsObs), {
-        _id: territoryObservation._id,
-      })
-    );
+  const onUpdateTerritoryObservation = async () => {
+    setUpdating(true);
+    const response = await API.put({
+      path: `/territory-observation/${obsDB._id}`,
+      body: prepareObsForEncryption(customFieldsObs)(
+        Object.assign({}, castToTerritoryObservation(obs), {
+          _id: obsDB._id,
+          territory: route.params.territory._id,
+          user: user._id,
+          team: currentTeam._id,
+          organisation: organisation._id,
+        })
+      ),
+    });
     if (response.error) {
-      this.setState({ updating: false });
+      setUpdating(false);
       Alert.alert(response.error);
       return false;
     }
     if (response.ok) {
+      setObs(castToTerritoryObservation(response.decryptedData));
+      setTerritoryObservations((territoryObservations) =>
+        territoryObservations.map((a) => {
+          if (a._id === obsDB._id) return response.decryptedData;
+          return a;
+        })
+      );
       Alert.alert('Observation mise-à-jour !');
-      this.setTerritoryObservation(response.data);
-      this.setState({ updating: false, editable: false });
+      setUpdating(false);
+      setEditable(false);
       return true;
     }
   };
 
-  onDeleteRequest = () => {
+  const onDeleteRequest = () => {
     Alert.alert('Voulez-vous vraiment supprimer ce territoire ?', 'Cette opération est irréversible.', [
       {
         text: 'Supprimer',
         style: 'destructive',
-        onPress: this.onDelete,
+        onPress: onDelete,
       },
       {
         text: 'Annuler',
@@ -146,54 +152,40 @@ class TerritoryObservation extends React.Component {
     ]);
   };
 
-  onDelete = async () => {
-    const { territoryObservation } = this.state;
-    const response = await this.props.context.deleteTerritoryObs(territoryObservation._id);
+  const onDelete = async () => {
+    const response = await API.delete({ path: `/territory-observation/${obsDB._id}` });
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
+      setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obsDB._id));
       Alert.alert('Observation supprimée !');
-      this.onBack();
+      onBack();
     }
   };
 
-  isUpdateDisabled = () => {
-    const { territoryObservation } = this.state;
-    const { customFieldsObs } = this.props.context;
+  const isUpdateDisabled = useMemo(() => {
     const newTerritoryObservation = {
-      ...territoryObservation,
-      ...this.castToTerritoryObservation(this.state, customFieldsObs),
+      ...obsDB,
+      ...castToTerritoryObservation(obs),
     };
-    if (
-      JSON.stringify(this.castToTerritoryObservation(territoryObservation, customFieldsObs)) !==
-      JSON.stringify(this.castToTerritoryObservation(newTerritoryObservation, customFieldsObs))
-    ) {
+    if (JSON.stringify(castToTerritoryObservation(obsDB)) !== JSON.stringify(castToTerritoryObservation(newTerritoryObservation))) {
       return false;
     }
     return true;
-  };
+  }, [castToTerritoryObservation, obs, obsDB]);
 
-  onBack = () => {
-    this.backRequestHandled = true;
-    const { navigation } = this.props;
-    navigation.goBack();
-  };
-
-  onGoBackRequested = () => {
-    if (this.isUpdateDisabled()) {
-      this.onBack();
-      return;
-    }
+  const onGoBackRequested = () => {
+    if (isUpdateDisabled) return onBack();
     Alert.alert('Voulez-vous enregistrer cette observation ?', null, [
       {
         text: 'Enregistrer',
         onPress: async () => {
-          const ok = await this.onSaveObservation();
-          if (ok) this.onBack();
+          const ok = await onSaveObservation();
+          if (ok) onBack();
         },
       },
       {
         text: 'Ne pas enregistrer',
-        onPress: this.onBack,
+        onPress: onBack,
         style: 'destructive',
       },
       {
@@ -202,79 +194,72 @@ class TerritoryObservation extends React.Component {
       },
     ]);
   };
-
-  _scrollToInput = (ref) => {
+  const scrollViewRef = useRef(null);
+  const refs = useRef({});
+  const _scrollToInput = (ref) => {
     if (!ref) return;
+    if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.measureLayout(
-        findNodeHandle(this.scrollView),
+        findNodeHandle(scrollViewRef.current),
         (x, y, width, height) => {
-          this.scrollView.scrollTo({ y: y - 100, animated: true });
+          scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
         (error) => console.log('error scrolling', error)
       );
     }, 250);
   };
 
-  render() {
-    const { loading, territory, updating, editable, createdAt, territoryObservation } = this.state;
-    const { customFieldsObs } = this.props.context;
+  return (
+    <SceneContainer>
+      <ScreenTitle
+        title={`${route?.params?.territory?.name} - Observation`}
+        onBack={onGoBackRequested}
+        onEdit={!editable ? onEdit : null}
+        onSave={!editable || isUpdateDisabled ? null : onSaveObservation}
+        saving={updating}
+      />
+      <ScrollContainer ref={scrollViewRef}>
+        <View>
+          <CreatedAt>{new Date(obs?.createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
+          {customFieldsObs
+            .filter((f) => f.enabled)
+            .map((field) => {
+              const { label, name } = field;
+              return (
+                <CustomFieldInput
+                  key={label}
+                  label={label}
+                  field={field}
+                  value={obs[name]}
+                  handleChange={(newValue) => onChange({ [name]: newValue })}
+                  editable={editable}
+                  ref={(r) => (refs.current[`${name}-ref`] = r)}
+                  onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
+                />
+              );
+            })}
 
-    return (
-      <SceneContainer>
-        <ScreenTitle
-          title={`${territory?.name} - Observation`}
-          onBack={this.onGoBackRequested}
-          onEdit={!editable ? this.onEdit : null}
-          onSave={!editable ? null : this.onSaveObservation}
-          saving={updating}
-        />
-        <ScrollContainer ref={(r) => (this.scrollView = r)}>
-          {loading ? (
-            <Spinner />
-          ) : (
-            <View>
-              <CreatedAt>{new Date(createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
-              {customFieldsObs
-                .filter((f) => f.enabled)
-                .map((field) => {
-                  const { label, name } = field;
-                  return (
-                    <CustomFieldInput
-                      key={label}
-                      label={label}
-                      field={field}
-                      value={this.state[name]}
-                      handleChange={(newValue) => this.setState({ [name]: newValue })}
-                      editable={editable}
-                      ref={(r) => (this[`${name}-ref`] = r)}
-                      onFocus={() => this._scrollToInput(this[`${name}-ref`])}
-                    />
-                  );
-                })}
-
-              <ButtonsContainer>
-                {territoryObservation?._id ? (
-                  <>
-                    <ButtonDelete onPress={this.onDeleteRequest} />
-                    <Button
-                      caption={editable ? 'Mettre-à-jour' : 'Modifier'}
-                      onPress={editable ? this.onSaveObservation : this.onEdit}
-                      disabled={editable ? this.isUpdateDisabled() : false}
-                      loading={updating}
-                    />
-                  </>
-                ) : (
-                  <Button caption="Enregistrer" onPress={this.onSaveObservation} disabled={this.isUpdateDisabled()} loading={updating} />
-                )}
-              </ButtonsContainer>
-            </View>
-          )}
-        </ScrollContainer>
-      </SceneContainer>
-    );
-  }
-}
+          <ButtonsContainer>
+            {obsDB?._id ? (
+              <>
+                <ButtonDelete onPress={onDeleteRequest} />
+                <Button
+                  caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+                  onPress={editable ? onSaveObservation : onEdit}
+                  disabled={editable ? isUpdateDisabled : false}
+                  loading={updating}
+                />
+              </>
+            ) : (
+              <Button caption="Enregistrer" onPress={onSaveObservation} disabled={isUpdateDisabled} loading={updating} />
+            )}
+          </ButtonsContainer>
+        </View>
+      </ScrollContainer>
+    </SceneContainer>
+  );
+};
 
 const CreatedAt = styled(MyText)`
   font-style: italic;
@@ -283,4 +268,4 @@ const CreatedAt = styled(MyText)`
   margin-left: auto;
 `;
 
-export default compose(withContext(AuthContext), withContext(TerritoryObservationsContext))(TerritoryObservation);
+export default TerritoryObservation;

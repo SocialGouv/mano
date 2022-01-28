@@ -1,5 +1,5 @@
-import React from 'react';
-import { Alert, findNodeHandle, Linking, Text, View } from 'react-native';
+import React, { useMemo, useRef } from 'react';
+import { Alert, findNodeHandle, Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import * as Sentry from '@sentry/react-native';
@@ -10,31 +10,42 @@ import ButtonsContainer from '../../components/ButtonsContainer';
 import ActionRow from '../Actions/ActionRow';
 import CommentRow from '../Comments/CommentRow';
 import SubList from '../../components/SubList';
-import Spinner from '../../components/Spinner';
 import ButtonDelete from '../../components/ButtonDelete';
 import DateAndTimeInput, { displayBirthDate } from '../../components/DateAndTimeInput';
 import GenderSelect from '../../components/Selects/GenderSelect';
 import Spacer from '../../components/Spacer';
 import NewCommentInput from '../Comments/NewCommentInput';
-import { compose } from 'recompose';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
-import AuthContext from '../../contexts/auth';
-import ActionsContext from '../../contexts/actions';
-import PlacesContext from '../../contexts/places';
-import withContext from '../../contexts/withContext';
 import colors from '../../utils/colors';
 import PhoneIcon from '../../icons/PhoneIcon';
-import RelsPersonPlaceContext from '../../contexts/relPersonPlace';
+import API from '../../services/api';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import { actionsState } from '../../recoil/actions';
+import { placesState } from '../../recoil/places';
+import { commentsState } from '../../recoil/comments';
+import { teamsState } from '../../recoil/auth';
 
-class PersonSummary extends React.Component {
-  onAddPlaceRequest = () => {
-    const { navigation, person } = this.props;
-    navigation.push('NewPersonPlaceForm', { person, fromRoute: 'Person' });
-  };
+const PersonSummary = ({
+  navigation,
+  person,
+  personDB,
+  showActionSheetWithOptions,
+  onUpdatePerson,
+  onChange,
+  updating,
+  editable,
+  onEdit,
+  isUpdateDisabled,
+  onDeleteRequest,
+  backgroundColor,
+  writeComment,
+}) => {
+  const onAddPlaceRequest = () => navigation.push('NewPersonPlaceForm', { person: personDB, fromRoute: 'Person' });
 
-  onPlaceMore = async (rel) => {
-    const { showActionSheetWithOptions, context, navigation, person } = this.props;
+  const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
+  const onPlaceMore = async (relPersPlace) => {
     const options = ['Modifier', 'Retirer', 'Annuler'];
     showActionSheetWithOptions(
       {
@@ -45,313 +56,282 @@ class PersonSummary extends React.Component {
       async (buttonIndex) => {
         if (options[buttonIndex] === 'Modifier') {
           navigation.navigate('PersonPlace', {
-            _id: rel.place,
-            personName: person.name,
+            _id: relPersPlace.place,
+            personName: personDB?.name,
             fromRoute: 'Person',
           });
         }
         if (options[buttonIndex] === 'Retirer') {
-          const response = await context.deleteRelation(rel._id);
+          const response = await API.delete({ path: `/relPersonPlace/${relPersPlace?._id}` });
+          if (response.ok) {
+            setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id));
+          }
           if (!response.ok) return Alert.alert(response.error);
         }
       }
     );
   };
 
-  onCommentUpdate = (comment) => {
-    const { navigation, person } = this.props;
+  const onCommentUpdate = (comment) => {
     navigation.navigate('PersonComment', {
       ...comment,
-      name: person.name,
+      name: personDB.name,
       fromRoute: 'Person',
     });
   };
 
-  onAddActionRequest = () => {
-    const { navigation, person } = this.props;
+  const onAddActionRequest = () => {
     navigation.push('Actions', {
       screen: 'NewActionForm',
-      params: { person: person._id, fromRoute: 'Person' },
+      params: { person: personDB?._id, fromRoute: 'Person' },
     });
   };
 
-  _scrollToInput = (ref) => {
-    if (!ref) return;
+  const scrollViewRef = useRef(null);
+  const descriptionRef = useRef(null);
+  const newCommentRef = useRef(null);
+  const _scrollToInput = (ref) => {
+    if (!ref.current) return;
+    if (!scrollViewRef.current) return;
     setTimeout(() => {
-      ref.measureLayout(
-        findNodeHandle(this.scrollView),
+      ref.current.measureLayout(
+        findNodeHandle(scrollViewRef.current),
         (x, y, width, height) => {
-          this.scrollView.scrollTo({ y: y - 100, animated: true });
+          scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
         (error) => console.log('error scrolling', error)
       );
     }, 250);
   };
 
-  onRemoveFromActiveList = async () => {
-    const { navigation, person } = this.props;
-    navigation.push('PersonsOutOfActiveListReason', { person, fromRoute: 'Person' });
+  const onRemoveFromActiveList = async () => navigation.push('PersonsOutOfActiveListReason', { person: personDB, fromRoute: 'Person' });
+
+  const onGetBackToActiveList = async () => {
+    await onUpdatePerson(false, { outOfActiveListReason: '', outOfActiveList: false });
   };
 
-  onGetBackToActiveList = async () => {
-    const { onUpdatePerson, onChange } = this.props;
-    await onChange({ outOfActiveListReason: '', outOfActiveList: false });
-    await onUpdatePerson(false);
-  };
+  const allActions = useRecoilValue(actionsState);
+  const actions = useMemo(
+    () => allActions.filter((a) => a.person === personDB?._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)),
+    [allActions, personDB?._id]
+  );
 
-  // FIXME: it's a bad pattern to have passed {...this.state} and {...this.props} to the component PersonSummary
-  // we'll need to do some refacto there
-  getEditablePersonFromProps = () => {
-    const {
-      loading,
-      updating,
-      editable,
-      navigation,
-      onChange,
-      onUpdatePerson,
-      onEdit,
-      isUpdateDisabled,
-      onDeleteRequest,
-      context,
-      route,
-      phone,
-      backgroundColor,
-      writeComment,
-      writingComment,
-      person, // original person
-      ...editablePerson
-    } = this.props;
-    return editablePerson;
-  };
+  const allRelsPersonPlace = useRecoilValue(relsPersonPlaceState);
+  const relsPersonPlace = useMemo(() => allRelsPersonPlace.filter((rel) => rel.person === personDB?._id), [allRelsPersonPlace, personDB?._id]);
 
-  render() {
-    const {
-      loading,
-      updating,
-      editable,
-      navigation,
-      onChange,
-      onUpdatePerson,
-      onEdit,
-      isUpdateDisabled,
-      onDeleteRequest,
-      context,
-      phone,
-      backgroundColor,
-      // FIXME: wrong pattern
-      person: originalPerson,
-    } = this.props;
-    const person = this.getEditablePersonFromProps();
-    const { actions, places, relsPersonPlace, comments } = context;
+  const allPlaces = useRecoilValue(placesState);
 
-    return (
-      <>
-        {loading ? (
-          <Spinner />
-        ) : (
-          <ScrollContainer ref={(r) => (this.scrollView = r)} backgroundColor={backgroundColor || colors.app.color}>
-            {person.outOfActiveList && (
-              <AlterOutOfActiveList>
-                <Text style={{ color: colors.app.colorWhite }}>
-                  {person?.name} est en dehors de la file active, pour le motif suivant : {person.outOfActiveListReason}
-                </Text>
-              </AlterOutOfActiveList>
-            )}
-            <InputLabelled
-              label="Nom prénom ou Pseudonyme"
-              onChangeText={(name) => onChange({ name })}
-              value={person.name}
-              placeholder="Monsieur X"
-              editable={editable}
-            />
-            <InputLabelled
-              label="Autres pseudos"
-              onChangeText={(otherNames) => onChange({ otherNames })}
-              value={person.otherNames}
-              placeholder="Mister X, ..."
-              editable={editable}
-            />
-            <GenderSelect onSelect={(gender) => onChange({ gender })} value={person.gender} editable={editable} />
-            {editable ? (
-              <DateAndTimeInput
-                label="Date de naissance"
-                setDate={(birthdate) => onChange({ birthdate })}
-                date={person.birthdate}
-                editable={editable}
-                showYear
-              />
-            ) : (
-              <InputLabelled label="Âge" value={displayBirthDate(person.birthdate, { reverse: true })} placeholder="JJ-MM-AAAA" editable={false} />
-            )}
-            {editable ? (
-              <DateAndTimeInput
-                label="Suivi(e) depuis / Créé(e) le"
-                setDate={(createdAt) => onChange({ createdAt })}
-                date={person.createdAt}
-                editable={editable}
-                showYear
-              />
-            ) : (
-              <InputLabelled
-                label="Suivi(e) depuis / Créé(e) le"
-                value={displayBirthDate(person.createdAt, {
-                  reverse: true,
-                  roundHalf: true,
-                })}
-                placeholder="JJ-MM-AAAA"
-                editable={false}
-              />
-            )}
-            {editable ? (
-              <DateAndTimeInput
-                label="En rue depuis le"
-                setDate={(wanderingAt) => onChange({ wanderingAt })}
-                date={person.wanderingAt}
-                editable={editable}
-                showYear
-              />
-            ) : (
-              <InputLabelled
-                label="En rue depuis le"
-                value={displayBirthDate(person.wanderingAt, { reverse: true, roundHalf: true })}
-                placeholder="JJ-MM-AAAA"
-                editable={false}
-              />
-            )}
-            <Row>
-              <InputLabelled
-                label="Téléphone"
-                onChangeText={(phone) => onChange({ phone })}
-                value={phone}
-                placeholder="06 12 52 32 13"
-                textContentType="telephoneNumber"
-                keyboardType="phone-pad"
-                autoCorrect={false}
-                editable={editable}
-                noMargin={editable || phone?.length}
-              />
-              <Spacer />
-              {!!phone.length && (
-                <Button
-                  caption="Appeler"
-                  Icon={PhoneIcon}
-                  color={colors.app.secondary}
-                  onPress={() => Linking.openURL('tel:' + phone?.split(' ').join(''))}
-                  noBorder
-                />
-              )}
-            </Row>
-            <InputLabelled
-              label="Description"
-              onChangeText={(description) => onChange({ description })}
-              value={person.description}
-              placeholder="Description"
-              multiline
-              editable={editable}
-              ref={(r) => (this.descriptionRef = r)}
-              onFocus={() => this._scrollToInput(this.descriptionRef)}
-            />
-            <CheckboxLabelled
-              label="Personne vulnérable, ou ayant besoin d'une attention particulière"
-              alone
-              onPress={() => onChange({ alertness: !person.alertness }, true)}
-              value={person.alertness}
-            />
-            <TeamsMultiCheckBoxes
-              values={context.teams.filter((t) => person.assignedTeams.includes(t._id)).map((t) => t.name)}
-              onChange={(newAssignedTeams) =>
-                onChange({
-                  assignedTeams: newAssignedTeams.map((teamName) => context.teams.find((t) => t.name === teamName)?._id),
-                })
-              }
-              editable={editable}
-            />
-            {!editable && <Spacer />}
-            <ButtonsContainer>
-              <ButtonDelete onPress={onDeleteRequest} />
-              <Button
-                caption={editable ? 'Mettre à jour' : 'Modifier'}
-                onPress={editable ? onUpdatePerson : onEdit}
-                disabled={editable ? isUpdateDisabled() : false}
-                loading={updating}
-              />
-            </ButtonsContainer>
-            <ButtonsContainer>
-              <Button
-                caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
-                onPress={() => (person.outOfActiveList ? this.onGetBackToActiveList() : this.onRemoveFromActiveList())}
-                color={colors.warning.color}
-              />
-            </ButtonsContainer>
+  const places = useMemo(() => {
+    const placesId = relsPersonPlace.map((rel) => rel.place);
+    return allPlaces.filter((pl) => placesId.includes(pl._id));
+  }, [allPlaces, relsPersonPlace]);
 
-            <SubList
-              label="Actions"
-              onAdd={this.onAddActionRequest}
-              data={actions.filter((a) => a.person === originalPerson._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1))}
-              renderItem={(action, index) => (
-                <ActionRow
-                  key={index}
-                  action={action}
-                  showStatus
-                  withTeamName
-                  onActionPress={() => {
-                    Sentry.setContext('action', { _id: action._id });
-                    navigation.push('Actions', {
-                      screen: 'Action',
-                      params: { _id: action._id, fromRoute: 'Person' },
-                    });
-                  }}
-                />
-              )}
-              ifEmpty="Pas encore d'action"
-            />
-            <SubList
-              label="Commentaires"
-              data={comments.filter((c) => c.person === originalPerson._id)}
-              renderItem={(comment, index) => (
-                <CommentRow
-                  key={index}
-                  comment={comment.comment}
-                  id={comment._id}
-                  user={comment.user}
-                  createdAt={comment.createdAt}
-                  onUpdate={comment.team ? () => this.onCommentUpdate(comment) : null}
-                  metaCaption="Commentaire de"
-                />
-              )}
-              ifEmpty="Pas encore de commentaire">
-              <NewCommentInput
-                forwardRef={(r) => (this.newCommentRef = r)}
-                onFocus={() => this._scrollToInput(this.newCommentRef)}
-                person={originalPerson._id}
-                writeComment={this.props.writeComment}
-              />
-            </SubList>
-            <SubList
-              label="Lieux fréquentés"
-              onAdd={this.onAddPlaceRequest}
-              data={relsPersonPlace.filter((rel) => rel.person === originalPerson._id)}
-              renderItem={(rel, index) => {
-                const place = { ...places.find((pl) => pl._id === rel.place), ...rel };
-                return (
-                  <CommentRow
-                    key={index}
-                    comment={place.name}
-                    createdAt={place.createdAt}
-                    user={place.user}
-                    onPress={() => this.onPlaceMore(place)}
-                    metaCaption="Lieu ajouté par"
-                  />
-                );
-              }}
-              ifEmpty="Pas encore de lieu"
-            />
-          </ScrollContainer>
+  const allComments = useRecoilValue(commentsState);
+  const comments = useMemo(() => allComments.filter((c) => c.person === personDB?._id), [allComments, personDB?._id]);
+
+  const teams = useRecoilValue(teamsState);
+
+  return (
+    <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
+      {person.outOfActiveList && (
+        <AlterOutOfActiveList>
+          <Text style={{ color: colors.app.colorWhite }}>
+            {person?.name} est en dehors de la file active, pour le motif suivant : {person.outOfActiveListReason}
+          </Text>
+        </AlterOutOfActiveList>
+      )}
+      <InputLabelled
+        label="Nom prénom ou Pseudonyme"
+        onChangeText={(name) => onChange({ name })}
+        value={person.name}
+        placeholder="Monsieur X"
+        editable={editable}
+      />
+      <InputLabelled
+        label="Autres pseudos"
+        onChangeText={(otherNames) => onChange({ otherNames })}
+        value={person.otherNames}
+        placeholder="Mister X, ..."
+        editable={editable}
+      />
+      <GenderSelect onSelect={(gender) => onChange({ gender })} value={person.gender} editable={editable} />
+      {editable ? (
+        <DateAndTimeInput
+          label="Date de naissance"
+          setDate={(birthdate) => onChange({ birthdate })}
+          date={person.birthdate}
+          editable={editable}
+          showYear
+        />
+      ) : (
+        <InputLabelled label="Âge" value={displayBirthDate(person.birthdate, { reverse: true })} placeholder="JJ-MM-AAAA" editable={false} />
+      )}
+      {editable ? (
+        <DateAndTimeInput
+          label="Suivi(e) depuis / Créé(e) le"
+          setDate={(createdAt) => onChange({ createdAt })}
+          date={person.createdAt}
+          editable={editable}
+          showYear
+        />
+      ) : (
+        <InputLabelled
+          label="Suivi(e) depuis / Créé(e) le"
+          value={displayBirthDate(person.createdAt, {
+            reverse: true,
+            roundHalf: true,
+          })}
+          placeholder="JJ-MM-AAAA"
+          editable={false}
+        />
+      )}
+      {editable ? (
+        <DateAndTimeInput
+          label="En rue depuis le"
+          setDate={(wanderingAt) => onChange({ wanderingAt })}
+          date={person.wanderingAt}
+          editable={editable}
+          showYear
+        />
+      ) : (
+        <InputLabelled
+          label="En rue depuis le"
+          value={displayBirthDate(person.wanderingAt, { reverse: true, roundHalf: true })}
+          placeholder="JJ-MM-AAAA"
+          editable={false}
+        />
+      )}
+      <Row>
+        <InputLabelled
+          label="Téléphone"
+          onChangeText={(phone) => onChange({ phone })}
+          value={person.phone}
+          placeholder="06 12 52 32 13"
+          textContentType="telephoneNumber"
+          keyboardType="phone-pad"
+          autoCorrect={false}
+          editable={editable}
+          noMargin={editable || !!personDB?.phone?.length}
+        />
+        <Spacer />
+        {!!personDB?.phone?.length && (
+          <Button
+            caption="Appeler"
+            Icon={PhoneIcon}
+            color={colors.app.secondary}
+            onPress={() => Linking.openURL('tel:' + personDB?.phone?.split(' ').join(''))}
+            noBorder
+          />
         )}
-      </>
-    );
-  }
-}
+      </Row>
+      <InputLabelled
+        label="Description"
+        onChangeText={(description) => onChange({ description })}
+        value={person.description}
+        placeholder="Description"
+        multiline
+        editable={editable}
+        ref={descriptionRef}
+        onFocus={() => _scrollToInput(descriptionRef)}
+      />
+      <CheckboxLabelled
+        label="Personne vulnérable, ou ayant besoin d'une attention particulière"
+        alone
+        onPress={() => onChange({ alertness: !person.alertness }, true)}
+        value={person.alertness}
+      />
+      <TeamsMultiCheckBoxes
+        values={teams.filter((t) => person.assignedTeams.includes(t._id)).map((t) => t.name)}
+        onChange={(newAssignedTeams) =>
+          onChange({
+            assignedTeams: newAssignedTeams.map((teamName) => teams.find((t) => t.name === teamName)?._id),
+          })
+        }
+        editable={editable}
+      />
+      {!editable && <Spacer />}
+      <ButtonsContainer>
+        <ButtonDelete onPress={onDeleteRequest} />
+        <Button
+          caption={editable ? 'Mettre à jour' : 'Modifier'}
+          onPress={editable ? onUpdatePerson : onEdit}
+          disabled={editable ? isUpdateDisabled : false}
+          loading={updating}
+        />
+      </ButtonsContainer>
+      <ButtonsContainer>
+        <Button
+          caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
+          onPress={() => (person.outOfActiveList ? onGetBackToActiveList() : onRemoveFromActiveList())}
+          color={colors.warning.color}
+        />
+      </ButtonsContainer>
+
+      <SubList
+        label="Actions"
+        onAdd={onAddActionRequest}
+        data={actions}
+        renderItem={(action, index) => (
+          <ActionRow
+            key={index}
+            action={action}
+            showStatus
+            withTeamName
+            onActionPress={() => {
+              Sentry.setContext('action', { _id: action._id });
+              navigation.push('Actions', {
+                screen: 'Action',
+                params: { _id: action._id, fromRoute: 'Person' },
+              });
+            }}
+          />
+        )}
+        ifEmpty="Pas encore d'action"
+      />
+      <SubList
+        label="Commentaires"
+        data={comments}
+        renderItem={(comment, index) => (
+          <CommentRow
+            key={index}
+            comment={comment.comment}
+            id={comment._id}
+            user={comment.user}
+            createdAt={comment.createdAt}
+            onUpdate={comment.team ? () => onCommentUpdate(comment) : null}
+            metaCaption="Commentaire de"
+          />
+        )}
+        ifEmpty="Pas encore de commentaire">
+        <NewCommentInput
+          forwardRef={newCommentRef}
+          onFocus={() => _scrollToInput(newCommentRef)}
+          person={personDB?._id}
+          writeComment={writeComment}
+        />
+      </SubList>
+      <SubList
+        label="Lieux fréquentés"
+        onAdd={onAddPlaceRequest}
+        data={relsPersonPlace}
+        renderItem={(rel, index) => {
+          const place = { ...places.find((pl) => pl._id === rel.place), ...rel };
+          return (
+            <CommentRow
+              key={index}
+              comment={place.name}
+              createdAt={place.createdAt}
+              user={place.user}
+              onPress={() => onPlaceMore(place)}
+              metaCaption="Lieu ajouté par"
+            />
+          );
+        }}
+        ifEmpty="Pas encore de lieu"
+      />
+    </ScrollContainer>
+  );
+};
 
 const Row = styled.View`
   flex-direction: row;
@@ -366,10 +346,4 @@ const AlterOutOfActiveList = styled.View`
   padding: 10px;
 `;
 
-export default compose(
-  withContext(ActionsContext),
-  withContext(RelsPersonPlaceContext),
-  withContext(PlacesContext),
-  withContext(AuthContext),
-  connectActionSheet
-)(PersonSummary);
+export default connectActionSheet(PersonSummary);

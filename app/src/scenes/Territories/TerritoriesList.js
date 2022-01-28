@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Animated } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -9,93 +9,96 @@ import FlatListStyled from '../../components/FlatListStyled';
 import Search from '../../components/Search';
 import Row from '../../components/Row';
 import { TerritoryIcon } from '../../icons';
-import { compose } from 'recompose';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import TerritoryContext from '../../contexts/territory';
-import RefreshContext from '../../contexts/refresh';
+import { useRecoilValue } from 'recoil';
+import { territoriesSearchSelector } from '../../recoil/selectors';
+import API from '../../services/api';
+import { loadingState, useRefresh } from '../../recoil/refresh';
+import { useNavigation } from '@react-navigation/native';
 
-class TerritoriesList extends React.Component {
-  state = {
-    refreshing: false,
-    fromSearch: false,
-    search: '',
+const TerritoriesList = () => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState('');
+
+  const navigation = useNavigation();
+
+  const { territoriesRefresher } = useRefresh();
+  const loading = useRecoilValue(loadingState);
+  const territories = useRecoilValue(territoriesSearchSelector({ search }));
+
+  useEffect(() => {
+    API.navigation = navigation;
+  }, [navigation]);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await territoriesRefresher();
+    setRefreshing(false);
   };
 
-  onRefresh = () => {
-    this.setState({ refreshing: true }, this.refreshData);
-  };
-
-  refreshData = async () => {
-    await this.props.context.refreshTerritories();
-    this.setState({ refreshing: false });
-  };
-
-  onCreateTerritoryRequest = () =>
-    this.props.navigation.navigate('NewTerritoryForm', {
+  const onCreateTerritoryRequest = () =>
+    navigation.navigate('NewTerritoryForm', {
       fromRoute: 'TerritoriesList',
       toRoute: 'Territory',
     });
 
-  keyExtractor = (territory) => territory._id;
-  ListFooterComponent = () => {
-    const { territories } = this.props.context;
+  const keyExtractor = (territory) => territory._id;
+  const ListFooterComponent = () => {
     if (!territories.length) return null;
     return <ListNoMoreTerritories />;
   };
-  renderRow = ({ item: territory }) => {
+  const renderRow = ({ item: territory }) => {
     const { name } = territory;
-    const { push } = this.props.navigation;
     return (
-      <Row withNextButton onPress={() => push('Territory', { ...territory, fromRoute: 'TerritoriesList' })} Icon={TerritoryIcon} caption={name} />
+      <Row
+        withNextButton
+        onPress={() => navigation.push('Territory', { ...territory, fromRoute: 'TerritoriesList' })}
+        Icon={TerritoryIcon}
+        caption={name}
+      />
     );
   };
 
-  scrollY = new Animated.Value(0);
-  onScroll = Animated.event(
+  const listRef = useRef(null);
+  const scrollY = useRef(new Animated.Value(0)).current;
+  const onScroll = Animated.event(
     [
       {
         nativeEvent: {
           contentOffset: {
-            y: this.scrollY,
+            y: scrollY,
           },
         },
       },
     ],
     { useNativeDriver: true }
   );
-  render() {
-    const { refreshing, search } = this.state;
-    const { territories, loading, key } = this.props.context;
-    const data = search.length ? territories.filter((p) => p.name.toLocaleLowerCase().includes(search.toLocaleLowerCase())) : territories;
-    return (
-      <SceneContainer>
-        <ScreenTitle title="Territoires" parentScroll={this.scrollY} />
-        <Search
-          placeholder="Rechercher un territoire..."
-          onChange={(search) => this.setState({ search })}
-          onFocus={() => this.listRef.scrollToOffset({ offset: 100 })}
-          parentScroll={this.scrollY}
-        />
-        <FlatListStyled
-          ref={(r) => (this.listRef = r)}
-          refreshing={refreshing}
-          onRefresh={this.onRefresh}
-          onScroll={this.onScroll}
-          parentScroll={this.scrollY}
-          data={data}
-          extraData={key}
-          renderItem={this.renderRow}
-          keyExtractor={this.keyExtractor}
-          ListEmptyComponent={loading ? Spinner : ListEmptyTerritories}
-          initialNumToRender={10}
-          ListFooterComponent={this.ListFooterComponent}
-          defaultTop={0}
-        />
-        <FloatAddButton onPress={this.onCreateTerritoryRequest} />
-      </SceneContainer>
-    );
-  }
-}
 
-export default compose(withContext(AuthContext), withContext(TerritoryContext), withContext(RefreshContext))(TerritoriesList);
+  return (
+    <SceneContainer>
+      <ScreenTitle title="Territoires" parentScroll={scrollY} />
+      <Search
+        placeholder="Rechercher un territoire..."
+        onChange={setSearch}
+        onFocus={() => listRef.current.scrollToOffset({ offset: 100 })}
+        parentScroll={scrollY}
+      />
+      <FlatListStyled
+        ref={listRef}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
+        onScroll={onScroll}
+        parentScroll={scrollY}
+        data={territories}
+        renderItem={renderRow}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={loading ? Spinner : ListEmptyTerritories}
+        initialNumToRender={10}
+        ListFooterComponent={ListFooterComponent}
+        defaultTop={0}
+      />
+      <FloatAddButton onPress={onCreateTerritoryRequest} />
+    </SceneContainer>
+  );
+};
+
+export default TerritoriesList;

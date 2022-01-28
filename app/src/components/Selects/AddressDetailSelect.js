@@ -1,5 +1,5 @@
 import React from 'react';
-import { addressDetailsFixedFields } from '../../contexts/persons';
+import { addressDetailsFixedFields } from '../../recoil/persons';
 import SelectLabelled from './SelectLabelled';
 
 const addressDetailsFields = ['-- Choisissez --', ...addressDetailsFixedFields];

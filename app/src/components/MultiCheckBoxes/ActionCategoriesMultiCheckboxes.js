@@ -1,13 +1,14 @@
 import React from 'react';
-import AuthContext from '../../contexts/auth';
-import withContext from '../../contexts/withContext';
+import { useRecoilValue } from 'recoil';
+import { organisationState } from '../../recoil/auth';
 import MultiCheckBoxes from './MultiCheckBoxes';
 
-const ActionCategoriesMultiCheckboxes = ({ values = [], onChange, editable, context }) => {
-  const categories = (context.organisation.categories || []).sort((c1, c2) => c1.localeCompare(c2));
+const ActionCategoriesMultiCheckboxes = ({ values = [], onChange, editable }) => {
+  const organisation = useRecoilValue(organisationState);
+  const categories = organisation.categories || [];
   return (
     <MultiCheckBoxes label="Catégories" source={categories} values={values} onChange={onChange} editable={editable} emptyValue="-- Choisissez --" />
   );
 };
 
-export default withContext(AuthContext)(ActionCategoriesMultiCheckboxes);
+export default ActionCategoriesMultiCheckboxes;

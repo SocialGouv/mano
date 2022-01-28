@@ -2,13 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { Alert } from 'react-native';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
-import { compose } from 'recompose';
-import withContext from '../../contexts/withContext';
-import AuthContext from '../../contexts/auth';
-import TerritoryObservationsContext from '../../contexts/territoryObservations';
 import UserName from '../../components/UserName';
+import API from '../../services/api';
+import { userState } from '../../recoil/auth';
+import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 
 const hitSlop = {
   top: 20,
@@ -48,10 +48,14 @@ const computeCustomFieldDisplay = (field, value) => {
   return JSON.stringify(value);
 };
 
-const TerritoryObservationRow = ({ onUpdate, observation, context, showActionSheetWithOptions, id }) => {
+const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOptions, id }) => {
+  const user = useRecoilValue(userState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
+
   const onPressRequest = async () => {
     const options = ['Supprimer', 'Annuler'];
-    if (onUpdate && observation.user._id === context.user._id) options.unshift('Modifier');
+    if (onUpdate && observation.user._id === user._id) options.unshift('Modifier');
     showActionSheetWithOptions(
       {
         options,
@@ -80,14 +84,18 @@ const TerritoryObservationRow = ({ onUpdate, observation, context, showActionShe
   };
 
   const onObservationDelete = async () => {
-    const response = await context.deleteTerritoryObs(observation._id);
-    if (!response.ok) {
-      return Alert.alert(response.error);
+    const response = await API.delete({ path: `/territory-observation/${observation._id}` });
+    if (response.error) return Alert.alert(response.error);
+    if (response.ok) {
+      setTerritoryObservations((territoryObservations) =>
+        territoryObservations.filter((p) => {
+          return p._id !== observation._id;
+        })
+      );
     }
   };
 
-  const { user, createdAt } = observation;
-  const { customFieldsObs } = context;
+  const { createdAt } = observation;
 
   return (
     <Container>
@@ -103,7 +111,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, context, showActionShe
             );
           })}
         <CreationDate>
-          {!!user && <UserName caption="Observation faite par" id={user?._id || user} />}
+          {!!observation?.user && <UserName caption="Observation faite par" id={observation.user?._id || observation.user} />}
           {'\u000A'}
           {new Date(createdAt).getLocaleDateAndTime('fr')}
         </CreationDate>
@@ -167,4 +175,4 @@ const Dot = styled.View`
   margin-right: 3px;
 `;
 
-export default compose(connectActionSheet, withContext(TerritoryObservationsContext), withContext(AuthContext))(TerritoryObservationRow);
+export default connectActionSheet(TerritoryObservationRow);

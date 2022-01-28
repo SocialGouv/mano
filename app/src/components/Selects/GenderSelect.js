@@ -1,5 +1,5 @@
 import React from 'react';
-import { genderOptions } from '../../contexts/persons';
+import { genderOptions } from '../../recoil/persons';
 import SelectLabelled from './SelectLabelled';
 
 // prettier-ignore

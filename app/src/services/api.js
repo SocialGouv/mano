@@ -40,6 +40,7 @@ class ApiService {
       options.retryDelay = 1000;
 
       const url = this.getUrl(path, query);
+      console.log({ url });
       const response = await this.fetch(url, options);
 
       if (!response.ok && response.status === 401) {
