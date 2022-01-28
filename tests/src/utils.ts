@@ -242,3 +242,25 @@ export async function useEncryptedOrga() {
 
   await client.end();
 }
+
+export async function scrollDown() {
+  return page.evaluate(async (_) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        document?.querySelector(".main > div")?.scrollBy(0, 3000000);
+        resolve("ok");
+      }, 500);
+    });
+  });
+}
+
+export async function scrollTop() {
+  return page.evaluate(async (_) => {
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        document?.querySelector(".main > div")?.scrollBy(0, -3000000);
+        resolve("ok");
+      }, 500);
+    });
+  });
+}
