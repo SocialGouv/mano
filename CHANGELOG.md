@@ -1,3 +1,10 @@
+## [1.44.3](https://github.com/SocialGouv/mano/compare/v1.44.2...v1.44.3) (2022-01-29)
+
+
+### Bug Fixes
+
+* **deps:** update nivo monorepo ([#304](https://github.com/SocialGouv/mano/issues/304)) ([7ae10d9](https://github.com/SocialGouv/mano/commit/7ae10d99376fb3a1b5e13e069810597b1fa6f2eb))
+
 ## [1.44.2](https://github.com/SocialGouv/mano/compare/v1.44.1...v1.44.2) (2022-01-28)
 
 
