@@ -298,15 +298,17 @@ export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
       const persons = get(personsState);
       return comments
         .filter((c) => (filterCurrentTeam ? c.team === currentTeam._id : true))
-        .filter((c) =>
-          getIsDayWithinHoursOffsetOfPeriod(
-            c.createdAt,
-            {
-              referenceStartDay: startDate,
-              referenceEndDay: endDate,
-            },
-            currentTeam?.nightSession ? 12 : 0
-          )
+        .filter(
+          (c) =>
+            (startDate === null && endDate === null) ||
+            getIsDayWithinHoursOffsetOfPeriod(
+              c.createdAt,
+              {
+                referenceStartDay: startDate,
+                referenceEndDay: endDate,
+              },
+              currentTeam?.nightSession ? 12 : 0
+            )
         )
         .filter((c) => !!c.comment.includes('Passage enregistré'))
         .map((passage) => {
