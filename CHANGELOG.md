@@ -1,3 +1,10 @@
+## [1.45.3](https://github.com/SocialGouv/mano/compare/v1.45.2...v1.45.3) (2022-01-31)
+
+
+### Bug Fixes
+
+* **dashboard:** fix stats for passages ([d49ef27](https://github.com/SocialGouv/mano/commit/d49ef27d2e589dabddd5ca52122418bf7977c839))
+
 ## [1.45.2](https://github.com/SocialGouv/mano/compare/v1.45.1...v1.45.2) (2022-01-31)
 
 
