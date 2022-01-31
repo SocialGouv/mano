@@ -30,6 +30,7 @@ import { useRefresh } from '../../recoil/refresh';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { useTerritories } from '../../recoil/territory';
+import { passagesNonAnonymousPerDatePerTeamSelector } from '../../recoil/selectors';
 moment.locale('fr');
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
@@ -63,12 +64,20 @@ const Stats = () => {
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(false);
+  const [period, setPeriod] = useState({ startDate: null, endDate: null });
+  const nonAnonymousPassages = useRecoilValue(
+    passagesNonAnonymousPerDatePerTeamSelector({
+      filterCurrentTeam: !viewAllOrganisationData,
+      date: {
+        startDate: period.startDate,
+        endDate: period.endDate,
+      },
+    })
+  );
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
   };
-
-  const [period, setPeriod] = useState({ startDate: null, endDate: null });
 
   useEffect(() => {
     if (loading) refresh();
@@ -171,7 +180,10 @@ const Stats = () => {
           <TabPane tabId={1}>
             <Title>Statistiques de l'accueil</Title>
             <Row>
-              <Block data={reports.reduce((passages, rep) => passages + (rep.passages || 0), 0)} title="Nombre de passages" />
+              <Block
+                data={reports.reduce((passages, rep) => passages + (rep.passages || 0), 0) + (nonAnonymousPassages?.length || 0)}
+                title="Nombre de passages"
+              />
               {organisation.services?.map((service) => (
                 <Block
                   key={service}

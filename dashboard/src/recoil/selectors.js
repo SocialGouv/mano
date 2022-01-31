@@ -325,7 +325,11 @@ export const numberOfPassagesNonAnonymousPerDatePerTeamSelector = selectorFamily
   get:
     ({ date }) =>
     ({ get }) => {
-      const nonAnonymousPassages = get(passagesNonAnonymousPerDatePerTeamSelector({ date }));
+      const nonAnonymousPassages = get(
+        passagesNonAnonymousPerDatePerTeamSelector({
+          date: { startDate: date, endDate: date },
+        })
+      );
       return nonAnonymousPassages?.length || 0;
     },
 });
