@@ -1,9 +1,22 @@
+import { useRecoilValue } from 'recoil';
 import XLSX from 'xlsx';
 import ButtonCustom from '../../components/ButtonCustom';
+import { currentTeamState } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 
 export default function DownloadExample() {
   const { personFieldsIncludingCustomFields } = usePersons();
+  const currentTeam = useRecoilValue(currentTeamState);
+
+  function placeholder(f) {
+    if (f.options?.length) return f.options[0];
+    if (['birthdate', 'createdAt', 'updatedAt'].includes(f.name)) return '2021-01-01';
+    if (f.name === 'assignedTeams') {
+      return currentTeam.name;
+    }
+    return 'test';
+  }
+
   return (
     <ButtonCustom
       onClick={() => {
@@ -17,10 +30,4 @@ export default function DownloadExample() {
       padding="12px 24px"
     />
   );
-}
-
-function placeholder(f) {
-  if (f.options?.length) return f.options[0];
-  if (['birthdate', 'createdAt', 'updatedAt'].includes(f.name)) return '2021-01-01';
-  return 'test';
 }

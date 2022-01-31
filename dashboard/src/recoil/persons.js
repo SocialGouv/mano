@@ -417,7 +417,7 @@ export const personFields = [
   },
 
   { name: 'phone', type: 'text', label: 'Téléphone', encrypted: true, importable: true, filterable: true },
-  { name: 'assignedTeams', label: '', encrypted: true, importable: false, filterable: false },
+  { name: 'assignedTeams', type: 'multi-choice', label: 'Équipes en charge', encrypted: true, importable: true, filterable: false },
   { name: '_id', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'organisation', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'createdAt', type: 'date', label: 'Suivi(e) depuis le / Créé le', encrypted: false, importable: true, filterable: true },

@@ -13,7 +13,7 @@ import {
   preparePersonForEncryption,
   usePersons,
 } from '../../recoil/persons';
-import { userState } from '../../recoil/auth';
+import { teamsState, userState } from '../../recoil/auth';
 import { isNullOrUndefined, toFrenchDate, typeOptions } from '../../utils';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 
@@ -22,6 +22,7 @@ const ImportData = () => {
   const { personFieldsIncludingCustomFields } = usePersons();
   const fileDialogRef = useRef(null);
   const setAllPersons = useSetRecoilState(personsState);
+  const teams = useRecoilValue(teamsState);
 
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
@@ -74,6 +75,9 @@ const ImportData = () => {
         const field = importableFields.find((f) => f.label === personsSheet[cell].v?.trim()); // { name: type: label: importable: options: }
         const fieldname = field.name; // 'name', 'gender', ...
         const type = typeOptions.find((typeOption) => typeOption.value === field.type); // { value: label: validator: }
+        if (fieldname === 'assignedTeams') {
+          field.options = teams.map((team) => team.name);
+        }
         const validator = field.options ? type.validator(field.options) : type.validator;
         return [column, fieldname, validator];
       }); // [['C', 'name], ['D', birthdate]]
@@ -88,7 +92,12 @@ const ImportData = () => {
         for (const [column, fieldname, validator] of headerColumnsAndFieldname) {
           if (!personsSheet[`${column}${i}`]) continue;
           const value = validator(personsSheet[`${column}${i}`]);
-          if (!isNullOrUndefined(value)) person[fieldname] = value;
+          if (!isNullOrUndefined(value)) {
+            person[fieldname] = value;
+            if (fieldname === 'assignedTeams' && value.length > 0) {
+              person[fieldname] = value.map((teamName) => teams.find((team) => team.name === teamName)?._id).filter((a) => a);
+            }
+          }
         }
         if (Object.keys(person).length) {
           person.description = `Données importées le ${toFrenchDate(new Date())}\n${person.description || ''}`;
