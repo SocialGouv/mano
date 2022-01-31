@@ -1,3 +1,10 @@
+## [1.45.2](https://github.com/SocialGouv/mano/compare/v1.45.1...v1.45.2) (2022-01-31)
+
+
+### Bug Fixes
+
+* fix passages count in stat ([#314](https://github.com/SocialGouv/mano/issues/314)) ([8a31646](https://github.com/SocialGouv/mano/commit/8a31646d25b7955d9a3745d22686b2216b5bbdd1))
+
 ## [1.45.1](https://github.com/SocialGouv/mano/compare/v1.45.0...v1.45.1) (2022-01-31)
 
 
