@@ -133,7 +133,7 @@ export const personsFullSearchSelector = selectorFamily({
       if (!!alertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
       if (filterTeams.length) {
         personsFiltered = personsFiltered.filter((p) => {
-          for (let assignedTeam of p.assignedTeams) {
+          for (let assignedTeam of p.assignedTeams || []) {
             if (filterTeams.includes(assignedTeam)) return true;
           }
           return false;
