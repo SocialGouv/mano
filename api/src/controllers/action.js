@@ -150,8 +150,6 @@ router.delete(
 
     await action.destroy();
 
-    await action.destroy();
-
     res.status(200).send({ ok: true });
   })
 );
