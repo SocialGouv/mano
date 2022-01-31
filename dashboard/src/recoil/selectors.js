@@ -7,7 +7,7 @@ import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
 import { territoriesState } from './territory';
-import { getIsDayWithinHoursOffsetOfDay, isOnSameDay, today } from '../services/date';
+import { getIsDayWithinHoursOffsetOfPeriod, isOnSameDay, today } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { filterData } from '../components/Filters';
@@ -291,14 +291,23 @@ export const territoriesFullSearchSelector = selectorFamily({
 export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
   key: 'passagesNonAnonymousPerDatePerTeamSelector',
   get:
-    ({ date }) =>
+    ({ date: { startDate, endDate }, filterCurrentTeam = true }) =>
     ({ get }) => {
       const currentTeam = get(currentTeamState);
       const comments = get(commentsState);
       const persons = get(personsState);
       return comments
-        .filter((c) => c.team === currentTeam._id)
-        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .filter((c) => (filterCurrentTeam ? c.team === currentTeam._id : true))
+        .filter((c) =>
+          getIsDayWithinHoursOffsetOfPeriod(
+            c.createdAt,
+            {
+              referenceStartDay: startDate,
+              referenceEndDay: endDate,
+            },
+            currentTeam?.nightSession ? 12 : 0
+          )
+        )
         .filter((c) => !!c.comment.includes('Passage enregistré'))
         .map((passage) => {
           const commentPopulated = { ...passage };
@@ -316,7 +325,11 @@ export const numberOfPassagesNonAnonymousPerDatePerTeamSelector = selectorFamily
   get:
     ({ date }) =>
     ({ get }) => {
-      const nonAnonymousPassages = get(passagesNonAnonymousPerDatePerTeamSelector({ date }));
+      const nonAnonymousPassages = get(
+        passagesNonAnonymousPerDatePerTeamSelector({
+          date: { startDate: date, endDate: date },
+        })
+      );
       return nonAnonymousPassages?.length || 0;
     },
 });

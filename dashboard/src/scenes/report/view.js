@@ -481,7 +481,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
 const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
-  const nonAnonymousPassages = useRecoilValue(passagesNonAnonymousPerDatePerTeamSelector({ date }));
+  const nonAnonymousPassages = useRecoilValue(passagesNonAnonymousPerDatePerTeamSelector({ date: { startDate: date, endDate: date } }));
   const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date }));
   const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date }));
 

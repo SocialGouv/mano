@@ -1,4 +1,6 @@
 /* eslint-disable no-extend-native */
+
+// todo: remove prototype pollution.
 Date.prototype.getBirthDate = function (locale) {
   return new Date(this).toLocaleDateString(locale, {
     month: 'numeric',
@@ -73,13 +75,21 @@ export const getMonths = () => {
 };
 
 export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHours = -12, debug = false) => {
+  return getIsDayWithinHoursOffsetOfPeriod(dayToTest, { referenceStartDay: referenceDay, referenceEndDay: referenceDay }, offsetHours, debug);
+};
+
+export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay, referenceEndDay }, offsetHours = -12, debug = true) => {
   if (!dayToTest) return false;
-  referenceDay = new Date(referenceDay);
-  referenceDay.setHours(0, 0, 0, 0);
-  const startDate = new Date(referenceDay);
-  startDate.setHours(referenceDay.getHours() + offsetHours);
-  const endDate = new Date(startDate);
-  endDate.setHours(startDate.getHours() + 24);
+
+  referenceStartDay = new Date(referenceStartDay);
+  referenceStartDay.setHours(0, 0, 0, 0);
+  const startDate = new Date(referenceStartDay);
+  startDate.setHours(referenceStartDay.getHours() + offsetHours);
+
+  referenceEndDay = new Date(referenceEndDay);
+  referenceEndDay.setHours(0, 0, 0, 0);
+  const endDate = new Date(referenceEndDay);
+  endDate.setHours(referenceEndDay.getHours() + offsetHours + 24);
 
   dayToTest = new Date(dayToTest).toISOString();
 
