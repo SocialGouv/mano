@@ -1,3 +1,10 @@
+## [1.45.1](https://github.com/SocialGouv/mano/compare/v1.45.0...v1.45.1) (2022-01-31)
+
+
+### Bug Fixes
+
+* **deps:** update dependency recoil to ^0.6.0 ([#318](https://github.com/SocialGouv/mano/issues/318)) ([3afbc08](https://github.com/SocialGouv/mano/commit/3afbc089723452edefa1d25f664493ced021d530))
+
 # [1.45.0](https://github.com/SocialGouv/mano/compare/v1.44.3...v1.45.0) (2022-01-31)
 
 
