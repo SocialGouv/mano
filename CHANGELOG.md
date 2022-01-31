@@ -1,3 +1,10 @@
+# [1.45.0](https://github.com/SocialGouv/mano/compare/v1.44.3...v1.45.0) (2022-01-31)
+
+
+### Features
+
+* **dashboard:** import teams ([#312](https://github.com/SocialGouv/mano/issues/312)) ([f6d195d](https://github.com/SocialGouv/mano/commit/f6d195d44c8eae5a44500a77b9366b8676a90cfe))
+
 ## [1.44.3](https://github.com/SocialGouv/mano/compare/v1.44.2...v1.44.3) (2022-01-29)
 
 
