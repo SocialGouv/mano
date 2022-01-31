@@ -16,7 +16,6 @@ const { generatePassword } = require("../utils");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
-//@checked
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -67,7 +66,6 @@ Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 1
   })
 );
 
-//@checked
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
@@ -108,7 +106,6 @@ router.get(
   })
 );
 
-//@checked
 router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
@@ -120,7 +117,6 @@ router.get(
   })
 );
 
-//@checked
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
@@ -161,7 +157,6 @@ router.put(
   })
 );
 
-// @checked
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),

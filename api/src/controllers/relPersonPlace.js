@@ -19,6 +19,7 @@ router.post(
     newRelPersonPlace.organisation = req.user.organisation;
     newRelPersonPlace.user = req.user._id;
 
+    // Todo: ignore fields that are encrypted.
     newRelPersonPlace.person = req.body.person || null;
     newRelPersonPlace.place = req.body.place || null;
 
@@ -53,7 +54,20 @@ router.get(
     if (!!req.query.limit) query.limit = limit;
     if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
 
-    const data = await RelPersonPlace.findAll(query);
+    const data = await RelPersonPlace.findAll({
+      ...query,
+      attributes: [
+        // Generic fields
+        "_id",
+        "encrypted",
+        "encryptedEntityKey",
+        "organisation",
+        "createdAt",
+        "updatedAt",
+        // Not yet encrypted. Should it be?
+        "user",
+      ],
+    });
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
   })
 );

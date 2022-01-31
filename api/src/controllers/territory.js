@@ -7,7 +7,6 @@ const Territory = require("../models/territory");
 const encryptedTransaction = require("../utils/encryptedTransaction");
 const { Op } = require("sequelize");
 
-//checked
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -18,9 +17,9 @@ router.post(
     newTerritory.user = req.user._id;
     newTerritory.name = req.body.name;
 
+    // Todo: ignore fields that are encrypted.
     if (req.body.hasOwnProperty("types")) newTerritory.types = req.body.types;
     if (req.body.hasOwnProperty("perimeter")) newTerritory.perimeter = req.body.perimeter;
-
     if (req.body.hasOwnProperty("encrypted")) newTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
 
@@ -43,10 +42,19 @@ router.get(
       },
       order: [["createdAt", "DESC"]],
     };
+    const attributes = [
+      // Generic fields
+      "_id",
+      "encrypted",
+      "encryptedEntityKey",
+      "organisation",
+      "createdAt",
+      "updatedAt",
+    ];
 
     if (req.query.lastRefresh) {
       query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      const data = await Territory.findAll(query);
+      const data = await Territory.findAll({ ...query, attributes });
       return res.status(200).send({ ok: true, data });
     }
 
@@ -55,7 +63,7 @@ router.get(
     if (!!req.query.limit) query.limit = limit;
     if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
 
-    const data = await Territory.findAll(query);
+    const data = await Territory.findAll({ ...query, attributes });
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
   })
 );
@@ -71,10 +79,10 @@ router.put(
       },
     };
     const updateTerritory = {};
+    // Todo: ignore fields that are encrypted.
     if (req.body.hasOwnProperty("name")) updateTerritory.name = req.body.name;
     if (req.body.hasOwnProperty("types")) updateTerritory.types = req.body.types;
     if (req.body.hasOwnProperty("perimeter")) updateTerritory.perimeter = req.body.perimeter;
-
     if (req.body.hasOwnProperty("encrypted")) updateTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
 
