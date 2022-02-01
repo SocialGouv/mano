@@ -78,7 +78,7 @@ export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHo
   return getIsDayWithinHoursOffsetOfPeriod(dayToTest, { referenceStartDay: referenceDay, referenceEndDay: referenceDay }, offsetHours, debug);
 };
 
-export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay, referenceEndDay }, offsetHours = -12, debug = true) => {
+export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay, referenceEndDay }, offsetHours = -12, debug = false) => {
   if (!dayToTest) return false;
 
   referenceStartDay = new Date(referenceStartDay);
