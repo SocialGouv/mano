@@ -1,3 +1,10 @@
+## [1.46.1](https://github.com/SocialGouv/mano/compare/v1.46.0...v1.46.1) (2022-02-01)
+
+
+### Bug Fixes
+
+* **dashboard:** debug false ([ebf3f29](https://github.com/SocialGouv/mano/commit/ebf3f29594fad4021b5214eef06ee96d602731aa))
+
 # [1.46.0](https://github.com/SocialGouv/mano/compare/v1.45.3...v1.46.0) (2022-02-01)
 
 
