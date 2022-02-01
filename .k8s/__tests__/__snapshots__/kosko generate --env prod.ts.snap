@@ -8,6 +8,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -29,6 +30,7 @@ spec:
       annotations:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
+        kapp.k14s.io/delete-strategy: orphan
         app.gitlab.com/app: socialgouv-mano
         app.gitlab.com/env: prod
         app.gitlab.com/env.name: prod
@@ -116,6 +118,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -139,6 +142,7 @@ spec:
       annotations:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
+        kapp.k14s.io/delete-strategy: orphan
         app.gitlab.com/app: socialgouv-mano
         app.gitlab.com/env: prod
         app.gitlab.com/env.name: prod
@@ -163,6 +167,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -185,6 +190,7 @@ metadata:
     kubernetes.io/tls-acme: 'true'
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -289,6 +295,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -310,6 +317,7 @@ spec:
       annotations:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
+        kapp.k14s.io/delete-strategy: orphan
         app.gitlab.com/app: socialgouv-mano
         app.gitlab.com/env: prod
         app.gitlab.com/env.name: prod
@@ -373,6 +381,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -395,6 +404,7 @@ metadata:
     kubernetes.io/tls-acme: 'true'
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -429,6 +439,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -450,6 +461,7 @@ spec:
       annotations:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
+        kapp.k14s.io/delete-strategy: orphan
         app.gitlab.com/app: socialgouv-mano
         app.gitlab.com/env: prod
         app.gitlab.com/env.name: prod
@@ -461,7 +473,7 @@ spec:
         team: mano
     spec:
       containers:
-        - image: metabase/metabase:v0.38.6
+        - image: metabase/metabase:v0.41.6
           livenessProbe:
             failureThreshold: 6
             httpGet:
@@ -485,11 +497,11 @@ spec:
             timeoutSeconds: 1
           resources:
             limits:
-              cpu: 500m
-              memory: 1024Mi
+              cpu: 1000m
+              memory: 2048Mi
             requests:
-              cpu: 100m
-              memory: 256Mi
+              cpu: 500m
+              memory: 512Mi
           startupProbe:
             failureThreshold: 12
             httpGet:
@@ -511,6 +523,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -532,6 +545,7 @@ spec:
       annotations:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
+        kapp.k14s.io/delete-strategy: orphan
         app.gitlab.com/app: socialgouv-mano
         app.gitlab.com/env: prod
         app.gitlab.com/env.name: prod
@@ -550,6 +564,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -584,6 +599,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -597,6 +613,156 @@ spec:
     app: metabase
   type: ClusterIP
 ---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: oauth2-proxy-configmap
+  namespace: mano
+data:
+  OAUTH2_PROXY_PROVIDER: github
+  OAUTH2_PROXY_GITHUB_ORG: SocialGouv
+  OAUTH2_PROXY_BANNER: Mano private access
+  OAUTH2_PROXY_FOOTER: SocialGouv auth
+  OAUTH2_PROXY_EMAIL_DOMAINS: '*'
+  OAUTH2_PROXY_COOKIE_SECURE: 'false'
+  OAUTH2_PROXY_CUSTOM_SIGN_IN_LOGO: https://socialgouv.github.io/support/_media/marianne.jpeg
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  annotations: {}
+  name: oauth2-proxy-sealed-secret
+  namespace: mano
+spec:
+  encryptedData:
+    OAUTH2_PROXY_COOKIE_SECRET: >-
+      AgB1qf8F7R3IWTJvseS0TzEq3u+kskw9+TR+96Nc2Vx5qb39Ys+tgVVHxXCTMCFOSmJDjxfzW/7cyiHsrBCCWWRoMntpa+fCKffS7TIBAiAdHsKnMbjqtU1u7jYj6pSC07liluksx15V9KTEtomkXG91lM+7HrZ07g2GNgMvllqp3yWqalExRCItvUzdwffd3/LacQGpke4dlAISgl7c1JLU79wa1+msXd4qI+zDJLIzA6yUMg38SpQ8bwIrbaQFptXbFElMF4PIJSESX/3+jyc158bBecM539kGlSFdDjnAHioAa2TwM599cNEGEPJ/GeybzpvBK3sIsnbbXo+sbtezho7i9uV0iByMyRlzVMDQ6v/MUwgtifPsQw1KoeZK8+CV956uSa+GhdovCy9680FADJFc6PfG8t6NGb+7Hq0kXiR972aUm+M4AsV6bc1tCuii6Gw87qb+0sbfI8SsdL46Gm6EFeP6Mde1j39UKCcH3Y+JpHpWdHZDqQZSD7LuLk4iDWzA+a4gPj2PmEJdCPHlr8MZBBXnvxgr0ueY8XiUt1YEnKTY2Fjwu/WEMtxRw78B1jXfDBeO6gscfkjDz9NdsS5ldZfMYbixU+QtaUxponhkVksNBH+PZx6PZM59qUMoy3c318CCPekOOjdjWJyPTqy6/xRYV7qq/TzR1vosSFhOk7OuzeXBG/qBy3QZ8+3jd1vVieNaAYOEVkIH0eSA7xQGLu+JZ5NF1giT9bk=
+    OAUTH2_PROXY_CLIENT_ID: >-
+      AgAOrXMo+pG2RfnJTuxlm0FAJfkPx0bhVClWR+fMrtLjnlC64DbufPx5kA3nuOPoMHAaOi6I4mY4bbNk48Kmm+4t6OkHqZhIEJSOmjQnwVZqy5r0mqnWAhWf6slNfcAKa2kMzSakAxjzPkaZ2EFJtiFXwSPEgNofK2xlkQY9vVOkHuHGTsz3udngTLfuxsbhPDEeVo/BpmyAK1LvjgNpYfBVdApT9OrNNYPv+jhXjXtI2p0eurZntvx0yaBheBvy1O39lPKnHe8xDwUKrkyOG1/YOfzVW0maqJA82mSqg/WUan+PQpGR03mEsa8mCFw2NPlidYSccOZecTfq75LGX4Cqvs8+BQm6jRniYzMt6EDTI58NfoQX5EgXhY5WnSJtTjMxEKMRfdt1JJM5KNUOsWPCDVEtj5+UoxYX2E/dWzkXjkgdAYBebn5s1CiT+NcABEKu9HahEn0fQFzG6JBHbYEqQAssnGUlI4HtpMf8vRxmfUa6859p24C2+E0b94R7urJJ4muS5WwG9SaqdkryYNnbFD6ZKeb/PCWuoa/b+bL8qRXRozJoKRIddQ5cH7E4Ezdp/qcxediCSaJE5CheILBpeZFtpZjFzSd+8/GrpQ+99SD4XFCCgGqUvh+9avkv69TIbWNUz3ZQX5ZlJd2mltGaExhLqCGxhJKt8yMWkcKHCU8x9Hi13VfXjBpUhjtEjQiz6JNEDVSeksqJHlmfsyRY7xLFOr0=
+    OAUTH2_PROXY_CLIENT_SECRET: >-
+      AgBxXsVDmZD3dxfn4uky5gF26mR6uN4PtQd24vFA7xRZhZU9UgxAxAMiF6iJKrh3A8zJADd38ulOMbL6v27zt1uZrC9ScG45PSqakpP4eLOc3u/Vmn+UK8fe+em//153wXovHSUshQ+nn4V7qHc2yV0IF/SLyvymqrM1T5yUwXo7akZbyXzsjn7III6am6Qv7zp5kw8Wj9vDlOh+V7NnSgmmVizLmoc4m7cU3+Hyiux5GaVPWoa6E3ICA+z7V91uiy7rlJvgFDze/PSiKGvMMlM4bw5AZQSehC7FIjFH+6TUyj/jbb9/JyvzUn6qQb5xfNOJ54OLujwcmHN+3Z8w5HV3gSC2x57fsmzgJRXDqliU63K6INchTi5d/sBHGnSwKQsw2VY3iIm0FXI/+o82X/bH9Hv2Y/EzMyjBiDDUiwXqWuwItsgpKUD+eYZepKPUVu+UiutadXp8R/RFV+dwaAWLk4Y0Wxump9mYV9pTJYEuU/NKLf13ouTarF6UgMs+CAJztg4BJp5ngHSTbTXTBlOWg47PqwzlVKFsYBsAXQUfOfJBSSgKOo51Vait4PUjjb7JQ+LGo0tWVRMM1isMimH2B4Oxhc+4nNI6+ee8Dj6w6JpeOhnsLvFqxhHC6X4GiwglJeFPQh338U67WsRjPiAL4LDeyKbEzxQq73jMMMhOB+aPK9a9MgJq4GaL2NRKwqZyT19uFp8p8eAKE4V5fxNN1us9hdYb5Z6vgHYFHiyCJTpyFhZOsGNF
+  template:
+    metadata:
+      annotations: {}
+      name: oauth2-proxy-sealed-secret
+    type: Opaque
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: prod
+    app.gitlab.com/env.name: prod
+  labels:
+    app: proxy
+    application: mano
+    component: mano
+    owner: mano
+    team: mano
+  name: proxy
+  namespace: mano
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: proxy
+  template:
+    metadata:
+      annotations:
+        kapp.k14s.io/disable-default-ownership-label-rules: ''
+        kapp.k14s.io/disable-default-label-scoping-rules: ''
+        kapp.k14s.io/delete-strategy: orphan
+        app.gitlab.com/app: socialgouv-mano
+        app.gitlab.com/env: prod
+        app.gitlab.com/env.name: prod
+      labels:
+        app: proxy
+        application: mano
+        component: mano
+        owner: mano
+        team: mano
+    spec:
+      containers:
+        - image: quay.io/oauth2-proxy/oauth2-proxy:v7.2.0
+          livenessProbe:
+            failureThreshold: 6
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          name: proxy
+          ports:
+            - containerPort: 4180
+              name: http
+          readinessProbe:
+            failureThreshold: 15
+            httpGet:
+              path: /ping
+              port: http
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            successThreshold: 1
+            timeoutSeconds: 1
+          resources:
+            limits:
+              cpu: 500m
+              memory: 128Mi
+            requests:
+              cpu: 5m
+              memory: 16Mi
+          startupProbe:
+            failureThreshold: 12
+            httpGet:
+              path: /ping
+              port: http
+            periodSeconds: 5
+          args:
+            - '--upstream'
+            - http://metabase:80
+          env:
+            - name: OAUTH2_PROXY_HTTP_ADDRESS
+              value: 0.0.0.0:4180
+            - name: OAUTH2_PROXY_REDIRECT_URL
+              value: https://metabase-mano.fabrique.social.gouv.fr/oauth2/callback
+          envFrom:
+            - configMapRef:
+                name: oauth2-proxy-configmap
+            - secretRef:
+                name: oauth2-proxy-sealed-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: proxy
+    application: mano
+    component: mano
+    owner: mano
+    team: mano
+  name: proxy
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: prod
+    app.gitlab.com/env.name: prod
+  namespace: mano
+spec:
+  ports:
+    - name: http
+      port: 80
+      targetPort: 4180
+  selector:
+    app: proxy
+  type: ClusterIP
+---
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -606,16 +772,17 @@ metadata:
     kubernetes.io/tls-acme: 'true'
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
   labels:
-    app: metabase
+    app: proxy
     application: mano
     component: mano
     owner: mano
     team: mano
-  name: metabase
+  name: proxy
   namespace: mano
 spec:
   rules:
@@ -624,7 +791,7 @@ spec:
         paths:
           - backend:
               service:
-                name: metabase
+                name: proxy
                 port:
                   name: http
             path: /
@@ -632,7 +799,7 @@ spec:
   tls:
     - hosts:
         - metabase-mano.fabrique.social.gouv.fr
-      secretName: metabase-crt
+      secretName: proxy-crt
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
@@ -709,6 +876,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -730,6 +898,7 @@ spec:
       annotations:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
+        kapp.k14s.io/delete-strategy: orphan
         app.gitlab.com/app: socialgouv-mano
         app.gitlab.com/env: prod
         app.gitlab.com/env.name: prod
@@ -792,6 +961,7 @@ metadata:
   annotations:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
@@ -814,6 +984,7 @@ metadata:
     kubernetes.io/tls-acme: 'true'
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
     app.gitlab.com/app: socialgouv-mano
     app.gitlab.com/env: prod
     app.gitlab.com/env.name: prod
