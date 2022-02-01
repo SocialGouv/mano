@@ -7,7 +7,7 @@ import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
 import { territoriesState } from './territory';
-import { getIsDayWithinHoursOffsetOfPeriod, isOnSameDay, isToday, today } from '../services/date';
+import { getIsDayWithinHoursOffsetOfPeriod, isOnSameDay, isToday } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { filterData } from '../components/Filters';

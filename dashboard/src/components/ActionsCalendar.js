@@ -4,6 +4,7 @@ import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 import {
   addOneDay,
+  dayjsInstance,
   formatCalendarDate,
   formatDateTimeWithNameOfDay,
   formatDateWithFullMonth,
@@ -40,7 +41,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
-    searchParams.set('calendarDate', currentDate.toISOString().split('T')[0]);
+    searchParams.set('calendarDate', dayjsInstance(currentDate).format('YYYY-MM-DD'));
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   }, [currentDate]);
 
