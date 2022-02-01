@@ -1,3 +1,10 @@
+## [1.46.2](https://github.com/SocialGouv/mano/compare/v1.46.1...v1.46.2) (2022-02-01)
+
+
+### Bug Fixes
+
+* **ci:** fix proxy secrets ([#332](https://github.com/SocialGouv/mano/issues/332)) ([6df6793](https://github.com/SocialGouv/mano/commit/6df67937330b78684f78e40a431ab948ff279090))
+
 ## [1.46.1](https://github.com/SocialGouv/mano/compare/v1.46.0...v1.46.1) (2022-02-01)
 
 
