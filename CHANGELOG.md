@@ -1,3 +1,10 @@
+# [1.46.0](https://github.com/SocialGouv/mano/compare/v1.45.3...v1.46.0) (2022-02-01)
+
+
+### Features
+
+* **metabase:** add github auth proxy ([#293](https://github.com/SocialGouv/mano/issues/293)) ([87e9edb](https://github.com/SocialGouv/mano/commit/87e9edbce2891dd481c17190637b693908032906))
+
 ## [1.45.3](https://github.com/SocialGouv/mano/compare/v1.45.2...v1.45.3) (2022-01-31)
 
 
