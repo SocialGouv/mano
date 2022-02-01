@@ -9,13 +9,12 @@ import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
-
-import { toFrenchDate } from '../../utils';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
 import OnboardingEndModal from '../../components/OnboardingEndModal';
+import { formatDateWithFullMonth } from '../../services/date';
 
 const List = () => {
   const teams = useRecoilValue(teamsState);
@@ -31,7 +30,7 @@ const List = () => {
         rowKey={'_id'}
         columns={[
           { title: 'Nom', dataKey: 'name' },
-          { title: 'Créée le', dataKey: 'createdAt', render: (i) => toFrenchDate(i.createdAt) },
+          { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
           {
             title: (
               <>

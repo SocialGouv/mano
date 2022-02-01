@@ -1,14 +1,11 @@
 import React, { useState } from 'react';
 import { Container, Collapse } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-
 import Header from '../../components/header';
-
-import { toFrenchDate } from '../../utils';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import styled from 'styled-components';
-import { getMonths, isOnSameDay } from '../../services/date';
+import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday, isOnSameDay } from '../../services/date';
 import { currentTeamState } from '../../recoil/auth';
 import { reportsState, useReports } from '../../recoil/reports';
 import { useRefresh } from '../../recoil/refresh';
@@ -51,16 +48,16 @@ const HitMonth = ({ date, reports, team, debug }) => {
     history.push(`/report/${res.data._id}`);
   };
 
-  let newDate = new Date(date);
-  const days = [];
-  while (newDate.getMonth() === date.getMonth() && newDate < new Date()) {
-    days.push(new Date(newDate));
-    newDate.setDate(newDate.getDate() + 1);
-  }
+  const days = getDaysOfMonth(date).filter((day) => !isAfterToday(day));
 
   return (
     <div style={{ width: '100%' }}>
-      <MonthButton onClick={() => setIsOpen(!isOpen)} title={`${date.toLocaleString('default', { month: 'long' })} ${date.getFullYear()}`} />
+      <MonthButton
+        onClick={() => setIsOpen(!isOpen)}
+        title={`${date.toDate().toLocaleString('default', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })} ${date
+          .toDate()
+          .getFullYear()}`}
+      />
       <Collapse
         isOpen={isOpen}
         style={{
@@ -71,11 +68,11 @@ const HitMonth = ({ date, reports, team, debug }) => {
           width: '100%',
         }}>
         {days.map((day) => {
-          const report = reports.find((rep) => isOnSameDay(new Date(rep.date), day));
+          const report = reports.find((rep) => isOnSameDay(rep.date, day));
           if (report) {
-            return <FullButton onClick={() => history.push(`/report/${report._id}`)} key={day} title={`${toFrenchDate(day)} `} />;
+            return <FullButton onClick={() => history.push(`/report/${report._id}`)} key={day} title={`${formatDateWithFullMonth(day.toDate())} `} />;
           }
-          return <EmptyButton onClick={() => createReport(day)} key={day} title={`${toFrenchDate(day)} `} />;
+          return <EmptyButton onClick={() => createReport(day)} key={day} title={`${formatDateWithFullMonth(day.toDate())} `} />;
         })}
       </Collapse>
     </div>

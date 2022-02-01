@@ -6,8 +6,6 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
-
-import { toFrenchDate } from '../../utils';
 import Header from '../../components/header';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import Loading from '../../components/loading';
@@ -18,6 +16,7 @@ import SelectCustom from '../../components/SelectCustom';
 import TagTeam from '../../components/TagTeam';
 import { organisationState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
+import { formatDateWithFullMonth } from '../../services/date';
 
 const List = () => {
   const [users, setUsers] = useState(null);
@@ -58,8 +57,8 @@ const List = () => {
               );
             },
           },
-          { title: 'Créée le', dataKey: 'createdAt', render: (i) => toFrenchDate(i.createdAt) },
-          { title: 'Dernière connection le', dataKey: 'lastLoginAt', render: (i) => toFrenchDate(i.lastLoginAt) },
+          { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
+          { title: 'Dernière connection le', dataKey: 'lastLoginAt', render: (i) => formatDateWithFullMonth(i.lastLoginAt) },
         ]}
       />
     </Container>

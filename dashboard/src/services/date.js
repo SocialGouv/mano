@@ -1,106 +1,107 @@
-/* eslint-disable no-extend-native */
+import 'dayjs/locale/fr';
+import relativeTime from 'dayjs/plugin/relativeTime';
+import isBetween from 'dayjs/plugin/isBetween';
+import dayjs from 'dayjs';
 
-// todo: remove prototype pollution.
-Date.prototype.getBirthDate = function (locale) {
-  return new Date(this).toLocaleDateString(locale, {
-    month: 'numeric',
-    day: 'numeric',
-    year: 'numeric',
-  });
-};
+dayjs.locale('fr');
+dayjs.extend(relativeTime);
+dayjs.extend(isBetween);
 
-Date.prototype.getAge = function (locale, roundHalf) {
-  const now = new Date();
-  let years = now.getFullYear() - this.getFullYear();
-  let suffix = locale === 'fr' ? `an${years > 1 ? 's' : ''}` : 'yo';
-  const showHalf = roundHalf && now.getMonth() - this.getMonth() > -6 ? ',5' : '';
-  if (now.getMonth() > this.getMonth()) return `${years}${showHalf} ${suffix}`;
-  if (now.getMonth() < this.getMonth()) return `${years - 1}${showHalf} ${suffix}`;
-  if (now.getDate() < this.getDate()) return `${years - 1}${showHalf} ${suffix}`;
-  return `${years} ${suffix}`;
-};
+/** FORMAT DATES **/
 
-export const displayBirthDate = (date, { reverse = false, roundHalf = false } = {}) => {
-  try {
-    if (!date) return 'JJ-MM-AAAA';
-    const birthdate = new Date(date).getBirthDate('fr');
-    const age = new Date(date).getAge('fr', roundHalf);
-    if (reverse) return `${age} (${birthdate})`;
-    return `${birthdate} (${age})`;
-  } catch (errorBirthDate) {
-    console.log('cannot convert birth date', errorBirthDate);
-    console.log(date);
+export function formatDateWithFullMonth(date) {
+  return `${dayjs(date).format('D MMMM YYYY')}`;
+}
+
+export function formatTime(date) {
+  return dayjs(date).format('HH:mm');
+}
+
+export function formatDateWithNameOfDay(date) {
+  return dayjs(date).format('dddd D MMMM YYYY');
+}
+
+export function formatDateTimeWithNameOfDay(date) {
+  return dayjs(date).format('dddd D MMMM YYYY HH:mm');
+}
+
+export function formatBirthDate(date) {
+  const birthDate = dayjs(date);
+  return `${birthDate.format('DD/MM/YYYY')} (${birthDate.fromNow(true)})`;
+}
+
+export function formatCalendarDate(date) {
+  if (dayjs(date).isSame(dayjs(), 'day')) {
+    return "Aujourd'hui";
   }
-};
-
-export const isOnSameDay = (first, second) =>
-  first.getFullYear() === second.getFullYear() && first.getMonth() === second.getMonth() && first.getDate() === second.getDate();
-
-export const theSameDay = (date = new Date()) => {
-  date = new Date(date);
-  date.setUTCHours(0, 0, 0, 0);
-  return date;
-};
-
-export const theDayBefore = (date = new Date()) => {
-  date = new Date(date);
-  date.setDate(date.getDate() - 1);
-  date.setUTCHours(0, 0, 0, 0);
-  return date;
-};
-
-export const theDayAfter = (date = new Date()) => {
-  date = new Date(date);
-  date.setDate(date.getDate() + 1);
-  date.setUTCHours(0, 0, 0, 0);
-  return date;
-};
-
-export const today = () => {
-  const date = new Date();
-  date.setUTCHours(0, 0, 0, 0);
-  return date;
-};
-
-export const getMonths = () => {
-  const months = [];
-  let date = new Date();
-  date.setUTCHours(0, 0, 0, 0);
-  date.setDate(1);
-  for (let i = 0; i < 12; i++) {
-    months.push(new Date(date));
-    date.setMonth(date.getMonth() - 1);
+  if (dayjs(date).isSame(dayjs().subtract(1, 'day'), 'day')) {
+    return 'Hier';
   }
-  return months;
+  if (dayjs(date).isSame(dayjs().add(1, 'day'), 'day')) {
+    return 'Demain';
+  }
+  return dayjs(date).format('ddd D MMM');
+}
+
+/** MANIPULATION AND COMPARISON **/
+
+export function isOnSameDay(date1, date2) {
+  return dayjs(date1).isSame(dayjs(date2), 'day');
+}
+
+export function isToday(date) {
+  return dayjs(date).isSame(dayjs(), 'day');
+}
+
+export function addOneDay(date) {
+  return dayjs(date).add(1, 'day');
+}
+
+export function subtractOneDay(date) {
+  return dayjs(date).subtract(1, 'day');
+}
+
+export function startOfToday() {
+  dayjs().startOf('day');
+}
+
+export function now() {
+  return dayjs();
+}
+
+export function isAfterToday(date) {
+  return dayjs(date).isAfter(dayjs());
+}
+
+export function dateForDatePicker(date) {
+  return date ? dayjs(date).toDate() : null;
+}
+
+export function getMonths() {
+  const startOfThisMonth = dayjs().startOf('month');
+  return Array.from({ length: 12 }, (_, index) => startOfThisMonth.subtract(index, 'month'));
+}
+
+export function getDaysOfMonth(date) {
+  const days = [];
+  const firstDayOfTheMonth = dayjs(date).startOf('month');
+  for (let i = 0; i < dayjs(date).daysInMonth(); i++) {
+    days.push(firstDayOfTheMonth.add(i, 'day'));
+  }
+  return days;
+}
+
+export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHours = -12) => {
+  return getIsDayWithinHoursOffsetOfPeriod(dayToTest, { referenceStartDay: referenceDay, referenceEndDay: referenceDay }, offsetHours);
 };
 
-export const getIsDayWithinHoursOffsetOfDay = (dayToTest, referenceDay, offsetHours = -12, debug = false) => {
-  return getIsDayWithinHoursOffsetOfPeriod(dayToTest, { referenceStartDay: referenceDay, referenceEndDay: referenceDay }, offsetHours, debug);
-};
-
-export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay, referenceEndDay }, offsetHours = -12, debug = false) => {
+export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay, referenceEndDay }, offsetHours = -12) => {
   if (!dayToTest) return false;
 
-  referenceStartDay = new Date(referenceStartDay);
-  referenceStartDay.setHours(0, 0, 0, 0);
-  const startDate = new Date(referenceStartDay);
-  startDate.setHours(referenceStartDay.getHours() + offsetHours);
+  const startDate = dayjs(referenceStartDay).startOf('day').add(offsetHours, 'hour');
+  const endDate = dayjs(referenceEndDay).startOf('day').add(1, 'day').add(offsetHours, 'hour');
 
-  referenceEndDay = new Date(referenceEndDay);
-  referenceEndDay.setHours(0, 0, 0, 0);
-  const endDate = new Date(referenceEndDay);
-  endDate.setHours(referenceEndDay.getHours() + offsetHours + 24);
-
-  dayToTest = new Date(dayToTest).toISOString();
-
-  if (debug) {
-    console.log({
-      dayToTest,
-      startDate: startDate.toISOString(),
-      endDate: endDate.toISOString(),
-      test: dayToTest > startDate.toISOString() && dayToTest <= endDate.toISOString(),
-    });
-  }
-
-  return dayToTest > startDate.toISOString() && dayToTest <= endDate.toISOString();
+  return dayjs(dayToTest).isBetween(startDate, endDate);
 };
+
+export const dayjsInstance = dayjs;

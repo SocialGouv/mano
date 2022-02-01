@@ -11,10 +11,10 @@ import Box from './Box';
 import ButtonCustom from './ButtonCustom';
 import { usePlaces } from '../recoil/places';
 import Table from './table';
-import { toFrenchDate } from '../utils';
 import SelectCustom from './SelectCustom';
 import { currentTeamState } from '../recoil/auth';
 import { useRelsPerson } from '../recoil/relPersonPlace';
+import { formatDateWithFullMonth } from '../services/date';
 
 const Places = ({ personId = '', onUpdateResults }) => {
   const history = useHistory();
@@ -46,7 +46,7 @@ const Places = ({ personId = '', onUpdateResults }) => {
           onRowClick={(relation) => history.push(`/place/${relation?.place?._id}`)}
           columns={[
             { title: 'Nom', render: (relation) => relation?.place?.name },
-            { title: 'Ajouté le', dataKey: 'createdAt', render: (relation) => toFrenchDate(relation.createdAt) },
+            { title: 'Ajouté le', dataKey: 'createdAt', render: (relation) => formatDateWithFullMonth(relation.createdAt) },
           ]}
         />
         <AddPlace personId={personId} />

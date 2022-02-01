@@ -12,12 +12,12 @@ import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import SelectTeam from '../../components/SelectTeam';
 import SelectPerson from '../../components/SelectPerson';
 import ButtonCustom from '../../components/ButtonCustom';
-import { toFrenchDate } from '../../utils';
 import { DONE, TODO, useActions } from '../../recoil/actions';
 import SelectStatus from '../../components/SelectStatus';
 import { organisationState, teamsState, userState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 import SelectCustom from '../../components/SelectCustom';
+import { dateForDatePicker, formatDateWithFullMonth } from '../../services/date';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
@@ -30,7 +30,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
   const { loading, actionsRefresher } = useRefresh();
   const history = useHistory();
 
-  title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${toFrenchDate(completedAt)}` : '');
+  title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${formatDateWithFullMonth(completedAt)}` : '');
 
   const onAddAction = async (body) => {
     if (body.status !== TODO) body.completedAt = completedAt || Date.now();
@@ -152,7 +152,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          selected={new Date(values.dueAt)}
+                          selected={dateForDatePicker(values.dueAt)}
                           onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
                           timeInputLabel="Heure :"
                           dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}

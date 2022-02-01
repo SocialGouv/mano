@@ -2,10 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
-
-import { isOnSameDay, theDayAfter, theDayBefore, today } from '../services/date';
+import {
+  addOneDay,
+  formatCalendarDate,
+  formatDateTimeWithNameOfDay,
+  formatDateWithFullMonth,
+  formatTime,
+  isOnSameDay,
+  subtractOneDay,
+} from '../services/date';
 import Table from './table';
-import { toFrenchDate } from '../utils';
 import ActionStatus from './ActionStatus';
 import ActionName from './ActionName';
 import ActionPersonName from './ActionPersonName';
@@ -26,12 +32,10 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
 
   useEffect(() => {
     if (!currentDate || !actions?.length) return;
-    const theDayBeforeComputed = theDayBefore(currentDate).toISOString().slice(0, 10);
-    const theDayAfterComputed = theDayAfter(currentDate).toISOString().slice(0, 10);
-    const theCurrentDayComputed = currentDate.toISOString().slice(0, 10);
-    setTheDayBeforeActions(actions.filter((a) => a.dueAt?.slice(0, 10) === theDayBeforeComputed));
-    setTheDayAfterActions(actions.filter((a) => a.dueAt?.slice(0, 10) === theDayAfterComputed));
-    setTheCurrentDayActions(actions.filter((a) => a.dueAt?.slice(0, 10) === theCurrentDayComputed));
+    const filteredActions = actions.filter((a) => a.dueAt);
+    setTheDayBeforeActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, subtractOneDay(currentDate))));
+    setTheDayAfterActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, addOneDay(currentDate))));
+    setTheCurrentDayActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, currentDate)));
   }, [actions, currentDate]);
 
   useEffect(() => {
@@ -49,12 +53,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   const renderActionsTable = (actions, date) => (
     <Table
       className="Table"
-      noData={`Pas d'action à faire le ${new Date(date).toLocaleDateString('fr', {
-        day: 'numeric',
-        weekday: 'long',
-        month: 'long',
-        year: 'numeric',
-      })}`}
+      noData={`Pas d'action à faire le ${formatDateTimeWithNameOfDay(date)}`}
       data={actions}
       onRowClick={(action) => history.push(`/action/${action._id}`)}
       rowKey="_id"
@@ -64,10 +63,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           dataKey: '_id',
           render: (action) => {
             if (!action.dueAt || !action.withTime) return null;
-            return new Date(action.dueAt).toLocaleString('fr', {
-              hour: '2-digit',
-              minute: '2-digit',
-            });
+            return formatTime(action.dueAt);
           },
         },
         {
@@ -80,30 +76,27 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           dataKey: 'person',
           render: (action) => <ActionPersonName action={action} />,
         },
-        { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
+        { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
         { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
       ].filter((column) => columns.includes(column.title))}
     />
   );
 
   const renderDate = (date) => {
-    if (isOnSameDay(date, today())) return "Aujourd'hui";
-    if (isOnSameDay(date, theDayBefore(today()))) return 'Hier';
-    if (isOnSameDay(date, theDayAfter(today()))) return 'Demain';
-    return new Date(date).toLocaleDateString('fr', { day: 'numeric', weekday: 'short', month: 'short' });
+    return formatCalendarDate(date);
   };
 
   return (
     <>
       <Nav fill tabs style={{ marginBottom: 20 }}>
-        {['<', theDayBefore(currentDate), currentDate, theDayAfter(currentDate), '>'].map((tabCaption, index) => (
+        {['<', subtractOneDay(currentDate), currentDate, addOneDay(currentDate), '>'].map((tabCaption, index) => (
           <NavItem key={index} style={{ cursor: 'pointer' }}>
             <NavLink
               key={index}
               className={`${activeTab === index && 'active'}`}
               onClick={() => {
-                if (index === 0) return setCurrentDate(theDayBefore(currentDate));
-                if (index === 4) return setCurrentDate(theDayAfter(currentDate));
+                if (index === 0) return setCurrentDate(subtractOneDay(currentDate));
+                if (index === 4) return setCurrentDate(addOneDay(currentDate));
                 setActiveTab(index);
               }}>
               {['<', '>'].includes(tabCaption)
@@ -114,9 +107,9 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
         ))}
       </Nav>
       <TabContent activeTab={activeTab}>
-        <TabPane tabId={1}>{renderActionsTable(theDayBeforeActions, theDayBefore(currentDate))}</TabPane>
+        <TabPane tabId={1}>{renderActionsTable(theDayBeforeActions, subtractOneDay(currentDate))}</TabPane>
         <TabPane tabId={2}>{renderActionsTable(theCurrentDayActions, currentDate)}</TabPane>
-        <TabPane tabId={3}>{renderActionsTable(theDayAfterActions, theDayAfter(currentDate))}</TabPane>
+        <TabPane tabId={3}>{renderActionsTable(theDayAfterActions, addOneDay(currentDate))}</TabPane>
       </TabContent>
     </>
   );

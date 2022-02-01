@@ -1,8 +1,6 @@
-const toFrenchDate = (d) => {
-  if (!d) return '';
-  return new Date(d).toLocaleDateString('fr', { day: 'numeric', month: 'long', year: 'numeric' });
-};
+import { dayjsInstance } from './services/date';
 
+// This function should be replaced with secure crypto.
 const generatePassword = () => {
   let length = 6;
   let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -12,12 +10,6 @@ const generatePassword = () => {
   }
   return retVal;
 };
-/*
-
-CUSTOM FIELDS
-VALIDATION FIELDS
-
-*/
 
 const isNullOrUndefined = (value) => {
   if (typeof value === 'undefined') return true;
@@ -40,7 +32,7 @@ const validateNumber = ({ v: value }) => {
 
 const validateDate = ({ w: value }) => {
   // https://stackoverflow.com/a/643827/5225096
-  if (typeof value?.getMonth === 'function') return value;
+  if (typeof value?.getMonth === 'function' || value instanceof dayjsInstance) return value;
   if (!isNaN(new Date(value).getMonth())) return new Date(value);
   return null;
 };
@@ -113,7 +105,6 @@ function download(file, fileName) {
 
 export {
   download,
-  toFrenchDate,
   generatePassword,
   typeOptions,
   isNullOrUndefined,

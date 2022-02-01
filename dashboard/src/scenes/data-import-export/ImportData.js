@@ -14,8 +14,9 @@ import {
   usePersons,
 } from '../../recoil/persons';
 import { teamsState, userState } from '../../recoil/auth';
-import { isNullOrUndefined, toFrenchDate, typeOptions } from '../../utils';
+import { isNullOrUndefined, typeOptions } from '../../utils';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
+import { formatDateWithFullMonth, now } from '../../services/date';
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
@@ -100,7 +101,7 @@ const ImportData = () => {
           }
         }
         if (Object.keys(person).length) {
-          person.description = `Données importées le ${toFrenchDate(new Date())}\n${person.description || ''}`;
+          person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ''}`;
           persons.push(person);
         }
       }
