@@ -1,3 +1,10 @@
+## [1.46.3](https://github.com/SocialGouv/mano/compare/v1.46.2...v1.46.3) (2022-02-02)
+
+
+### Bug Fixes
+
+* **deps:** update dependency react-select to v5 ([#320](https://github.com/SocialGouv/mano/issues/320)) ([ce6722b](https://github.com/SocialGouv/mano/commit/ce6722bdb167971ca3c40c3f023fba94bc47c085))
+
 ## [1.46.2](https://github.com/SocialGouv/mano/compare/v1.46.1...v1.46.2) (2022-02-01)
 
 
