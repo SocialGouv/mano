@@ -62,7 +62,7 @@ export function subtractOneDay(date) {
 }
 
 export function startOfToday() {
-  dayjs().startOf('day');
+  return dayjs().startOf('day');
 }
 
 export function now() {
