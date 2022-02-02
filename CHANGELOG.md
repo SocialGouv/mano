@@ -1,3 +1,10 @@
+## [1.46.5](https://github.com/SocialGouv/mano/compare/v1.46.4...v1.46.5) (2022-02-02)
+
+
+### Bug Fixes
+
+* **deps:** update dependency reactstrap to v9 ([#321](https://github.com/SocialGouv/mano/issues/321)) ([c647abe](https://github.com/SocialGouv/mano/commit/c647abe350e12594baf828a5907327080fa63285))
+
 ## [1.46.4](https://github.com/SocialGouv/mano/compare/v1.46.3...v1.46.4) (2022-02-02)
 
 
