@@ -1,3 +1,10 @@
+## [1.46.6](https://github.com/SocialGouv/mano/compare/v1.46.5...v1.46.6) (2022-02-02)
+
+
+### Bug Fixes
+
+* **dashboard:** rollback reactselect and reactstrap ([#338](https://github.com/SocialGouv/mano/issues/338)) ([3152b65](https://github.com/SocialGouv/mano/commit/3152b65a0a5310d41c3a6075402e1786988a83fe))
+
 ## [1.46.5](https://github.com/SocialGouv/mano/compare/v1.46.4...v1.46.5) (2022-02-02)
 
 
