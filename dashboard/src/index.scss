@@ -187,4 +187,8 @@ $theme-colors: (
   background-color: #49c3a6 !important;
 }
 
+.visually-hidden {
+  visibility: hidden;
+}
+
 @import '~bootstrap/scss/bootstrap.scss';
