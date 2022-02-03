@@ -2,6 +2,7 @@ import { atom, useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth';
 import useApi from '../services/api';
 import { getData, useStorage } from '../services/dataManagement';
+import { now } from '../services/date';
 import { capture } from '../services/sentry';
 import { useComments } from './comments';
 
@@ -83,7 +84,7 @@ export const useActions = () => {
     try {
       if (statusChanged) {
         if ([DONE, CANCEL].includes(action.status)) {
-          action.completedAt = new Date().toISOString();
+          action.completedAt = now();
         } else {
           action.completedAt = null;
         }

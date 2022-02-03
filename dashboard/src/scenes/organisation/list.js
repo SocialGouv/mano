@@ -9,9 +9,9 @@ import ButtonCustom from '../../components/ButtonCustom';
 
 import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
-import { toFrenchDate } from '../../utils';
 import useApi from '../../services/api';
 import DeleteOrganisation from '../../components/DeleteOrganisation';
+import { formatDateWithFullMonth } from '../../services/date';
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -52,7 +52,7 @@ const List = () => {
           {
             title: 'Créée le',
             dataKey: 'createdAt',
-            render: (o) => toFrenchDate(o.createdAt || ''),
+            render: (o) => formatDateWithFullMonth(o.createdAt || ''),
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
             sortOrder,
@@ -97,7 +97,7 @@ const List = () => {
             sortOrder,
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
-            render: (o) => toFrenchDate(o.encryptionLastUpdateAt || ''),
+            render: (o) => formatDateWithFullMonth(o.encryptionLastUpdateAt || ''),
           },
           {
             title: 'Action',

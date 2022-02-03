@@ -36,11 +36,11 @@ import UserName from '../../components/UserName';
 import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
-import { toFrenchDate } from '../../utils';
 import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
 import { organisationState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
+import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -174,7 +174,7 @@ const Summary = ({ person }) => {
                       <DatePicker
                         locale="fr"
                         className="form-control"
-                        selected={values.birthdate ? new Date(values.birthdate) : null}
+                        selected={dateForDatePicker(values.birthdate)}
                         onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
                         dateFormat="dd/MM/yyyy"
                       />
@@ -188,7 +188,7 @@ const Summary = ({ person }) => {
                       <DatePicker
                         locale="fr"
                         className="form-control"
-                        selected={values.wanderingAt ? new Date(values.wanderingAt) : null}
+                        selected={dateForDatePicker(values.wanderingAt)}
                         onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
                         dateFormat="dd/MM/yyyy"
                       />
@@ -202,7 +202,7 @@ const Summary = ({ person }) => {
                       <DatePicker
                         locale="fr"
                         className="form-control"
-                        selected={values.createdAt ? new Date(values.createdAt) : null}
+                        selected={dateForDatePicker(values.createdAt)}
                         onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
                         dateFormat="dd/MM/yyyy"
                       />
@@ -374,16 +374,13 @@ const Actions = ({ person, onUpdateResults }) => {
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         columns={[
           { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
-          { title: 'À faire le', dataKey: 'dueAt', render: (action) => toFrenchDate(action.dueAt) },
+          { title: 'À faire le', dataKey: 'dueAt', render: (action) => formatDateWithFullMonth(action.dueAt) },
           {
             title: 'Heure',
             dataKey: '_id',
             render: (action) => {
               if (!action.dueAt || !action.withTime) return null;
-              return new Date(action.dueAt).toLocaleString('fr', {
-                hour: '2-digit',
-                minute: '2-digit',
-              });
+              return formatTime(action.dueAt);
             },
           },
           { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },

@@ -3,10 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
-
 import Header from '../../components/header';
-
-import { today } from '../../services/date';
+import { formatDateWithNameOfDay, now, startOfToday } from '../../services/date';
 import {
   actionsByStatusSelector,
   lastReportSelector,
@@ -40,8 +38,8 @@ const Reception = () => {
   const lastReport = useRecoilValue(lastReportSelector);
   const { addComment } = useComments();
 
-  const anonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: today() }));
-  const nonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: today() }));
+  const anonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
+  const nonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
 
   const { persons } = usePersons();
   const history = useHistory();
@@ -60,7 +58,7 @@ const Reception = () => {
     return params.map((id) => persons.find((p) => p._id === id));
   });
 
-  const createReport = () => addReport(today(), currentTeam._id);
+  const createReport = () => addReport(startOfToday(), currentTeam._id);
 
   useEffect(() => {
     if (!reportsLoading && !todaysReport && !!currentTeam?._id) createReport();
@@ -118,8 +116,7 @@ const Reception = () => {
         titleStyle={{ fontWeight: '400' }}
         title={
           <span>
-            Accueil du <b>{new Date().toLocaleDateString('fr', { day: 'numeric', weekday: 'long', month: 'long', year: 'numeric' })}</b> de l'équipe{' '}
-            {currentTeam?.nightSession ? 'de nuit ' : ''}
+            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
             <b>{currentTeam?.name || ''}</b>
           </span>
         }

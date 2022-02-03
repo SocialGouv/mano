@@ -5,9 +5,7 @@ import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
-
-import { toFrenchDate } from '../../utils';
-import { getIsDayWithinHoursOffsetOfDay, theDayAfter } from '../../services/date';
+import { addOneDay, formatDateWithFullMonth, formatTime, getIsDayWithinHoursOffsetOfDay, startOfToday } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -44,11 +42,9 @@ import {
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
 const getPeriodTitle = (date, nightSession) => {
-  if (!nightSession) return `Journée du ${toFrenchDate(date)}`;
-  date = new Date(date);
-  const endDate = theDayAfter(date);
-  if (endDate.getMonth() === date.getMonth()) return `Nuit du ${date.getDate()} au ${toFrenchDate(endDate)}`;
-  return `Nuit du ${toFrenchDate(date)} au ${toFrenchDate(endDate)}`;
+  if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
+  const nextDay = addOneDay(date);
+  return `Nuit du ${formatDateWithFullMonth(date)} au ${formatDateWithFullMonth(nextDay)}`;
 };
 
 const View = () => {
@@ -266,7 +262,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
 
   const moreThanOne = data.length > 1;
 
-  const completedAt = new Date(date).setHours(12, 0, 0, 0);
+  const completedAt = startOfToday().add(12, 'hours');
 
   return (
     <>
@@ -278,7 +274,9 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
         )}
         <Table
           className="Table"
-          title={`Action${moreThanOne ? 's' : ''} ${status === CANCEL ? 'annulée' : 'faite'}${moreThanOne ? 's' : ''} le ${toFrenchDate(date)}`}
+          title={`Action${moreThanOne ? 's' : ''} ${status === CANCEL ? 'annulée' : 'faite'}${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(
+            date
+          )}`}
           noData={`Pas d'action ${status === CANCEL ? 'annulée' : 'faite'} ce jour`}
           data={data}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
@@ -290,10 +288,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
               dataKey: '_id',
               render: (action) => {
                 if (!action.dueAt || !action.withTime) return null;
-                return new Date(action.dueAt).toLocaleString('fr', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                });
+                return formatTime(action.dueAt);
               },
             },
             { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
@@ -302,7 +297,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
               dataKey: 'person',
               render: (action) => <ActionPersonName action={action} />,
             },
-            { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
+            { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
         />
@@ -335,7 +330,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
       <StyledBox>
         <Table
           className="Table"
-          title={`Action${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${toFrenchDate(date)}`}
+          title={`Action${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'action créée ce jour"
           data={data}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
@@ -347,10 +342,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
               dataKey: '_id',
               render: (action) => {
                 if (!action.dueAt || !action.withTime) return null;
-                return new Date(action.dueAt).toLocaleString('fr', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                });
+                return formatTime(action.dueAt);
               },
             },
             { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
@@ -359,7 +351,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
               dataKey: 'person',
               render: (action) => <ActionPersonName action={action} />,
             },
-            { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt) },
+            { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt) },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
         />
@@ -406,7 +398,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
       <StyledBox>
         <Table
           className="Table"
-          title={`Commentaires' ajoutés le ${toFrenchDate(date)}`}
+          title={`Commentaires' ajoutés le ${formatDateWithFullMonth(date)}`}
           data={data}
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {
@@ -508,7 +500,7 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
         </Row>
         <Table
           className="Table"
-          title={`Passages non-anonymes ajoutés le ${toFrenchDate(date)}`}
+          title={`Passages non-anonymes ajoutés le ${formatDateWithFullMonth(date)}`}
           data={nonAnonymousPassages}
           noData="Pas de passage ce jour"
           onRowClick={(passage) => {
@@ -597,9 +589,9 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
       <StyledBox>
         <Table
           className="Table"
-          title={`Observation${moreThanOne ? 's' : ''} de territoire${moreThanOne ? 's' : ''} faite${moreThanOne ? 's' : ''} le ${toFrenchDate(
-            date
-          )}`}
+          title={`Observation${moreThanOne ? 's' : ''} de territoire${moreThanOne ? 's' : ''} faite${
+            moreThanOne ? 's' : ''
+          } le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'observation faite ce jour"
           data={data}
           onRowClick={(obs) => {

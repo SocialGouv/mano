@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import SelectAsInput from './SelectAsInput';
 import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
+import { dateForDatePicker } from '../services/date';
 
 const CustomFieldInput = ({ field, values, handleChange }) => (
   <Col md={6} key={field.name}>
@@ -21,7 +22,7 @@ const CustomFieldInput = ({ field, values, handleChange }) => (
           <DatePicker
             locale="fr"
             className="form-control"
-            selected={values[field.name] ? new Date(values[field.name]) : field.required ? new Date() : null}
+            selected={dateForDatePicker(values[field.name] ? values[field.name] : field.required ? new Date() : null)}
             onChange={(date) => handleChange({ target: { value: date, name: field.name } })}
             timeInputLabel="Heure :"
             dateFormat={`dd/MM/yyyy${field.type === 'date-with-time' ? ' HH:mm' : ''}`}

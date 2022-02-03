@@ -18,6 +18,7 @@ import { userState } from '../recoil/auth';
 import { useComments } from '../recoil/comments';
 import { useRecoilValue } from 'recoil';
 import { commentsFilteredSelector } from '../recoil/selectors';
+import { dateForDatePicker } from '../services/date';
 
 const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
@@ -167,7 +168,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment,
                             <DatePicker
                               locale="fr"
                               className="form-control"
-                              selected={values.createdAt ? new Date(values.createdAt) : new Date()}
+                              selected={dateForDatePicker(values.createdAt ?? new Date())}
                               onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
                               timeInputLabel="Heure :"
                               dateFormat="dd/MM/yyyy HH:mm"

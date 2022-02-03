@@ -13,7 +13,6 @@ import ActionStatus from '../../components/ActionStatus';
 
 import DateBloc from '../../components/DateBloc';
 
-import { toFrenchDate } from '../../utils';
 import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
 import { actionsFullSearchSelector } from '../../recoil/selectors';
@@ -23,6 +22,7 @@ import ActionName from '../../components/ActionName';
 import { currentTeamState } from '../../recoil/auth';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import ActionPersonName from '../../components/ActionPersonName';
+import { formatDateWithFullMonth, formatTime } from '../../services/date';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
@@ -92,6 +92,7 @@ const List = () => {
       </Row>
       {showAs === showAsOptions[0] && (
         <div style={{ minHeight: '100vh' }}>
+          {' '}
           <ActionsCalendar actions={actionsFiltered} />
         </div>
       )}
@@ -114,10 +115,7 @@ const List = () => {
                 dataKey: '_id',
                 render: (action) => {
                   if (!action.dueAt || !action.withTime) return null;
-                  return new Date(action.dueAt).toLocaleString('fr', {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  });
+                  return formatTime(action.dueAt);
                 },
               },
               {
@@ -130,7 +128,7 @@ const List = () => {
                 dataKey: 'person',
                 render: (action) => <ActionPersonName action={action} />,
               },
-              { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
+              { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
               { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
             ]}
           />

@@ -6,10 +6,8 @@ import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
 import { useRecoilValue } from 'recoil';
-
 import Header from '../../components/header';
 import Page from '../../components/pagination';
-import { toFrenchDate } from '../../utils';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -20,6 +18,7 @@ import SelectCustom from '../../components/SelectCustom';
 import { territoriesFullSearchSelector } from '../../recoil/selectors';
 import { currentTeamState, organisationState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
+import { formatDateWithFullMonth } from '../../services/date';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
@@ -65,7 +64,7 @@ const List = () => {
           { title: 'Nom', dataKey: 'name' },
           { title: 'Types', dataKey: 'types', render: ({ types }) => (types ? types.join(', ') : '') },
           { title: 'Périmètre', dataKey: 'perimeter' },
-          { title: 'Créé le', dataKey: 'createdAt', render: (territory) => toFrenchDate(territory.createdAt || '') },
+          { title: 'Créé le', dataKey: 'createdAt', render: (territory) => formatDateWithFullMonth(territory.createdAt || '') },
         ]}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />

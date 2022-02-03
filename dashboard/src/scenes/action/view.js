@@ -25,6 +25,7 @@ import SelectTeam from '../../components/SelectTeam';
 import { organisationState, teamsState, userState } from '../../recoil/auth';
 import { useActions, CANCEL, DONE } from '../../recoil/actions';
 import { useRecoilValue } from 'recoil';
+import { dateForDatePicker } from '../../services/date';
 
 const View = () => {
   const { id } = useParams();
@@ -99,7 +100,7 @@ const View = () => {
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          selected={values.dueAt ? new Date(values.dueAt) : new Date()}
+                          selected={dateForDatePicker(values.dueAt ?? new Date())}
                           onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
                           dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
                           showTimeInput={values.withTime}
@@ -132,7 +133,7 @@ const View = () => {
                           <DatePicker
                             locale="fr"
                             className="form-control"
-                            selected={values.completedAt ? new Date(values.completedAt) : new Date()}
+                            selected={dateForDatePicker(values.completedAt ?? new Date())}
                             onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
                             timeInputLabel="Heure :"
                             dateFormat="dd/MM/yyyy HH:mm"
