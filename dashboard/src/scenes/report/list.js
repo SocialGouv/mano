@@ -52,12 +52,7 @@ const HitMonth = ({ date, reports, team, debug }) => {
 
   return (
     <div style={{ width: '100%' }}>
-      <MonthButton
-        onClick={() => setIsOpen(!isOpen)}
-        title={`${date.toDate().toLocaleString('default', { month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric' })} ${date
-          .toDate()
-          .getFullYear()}`}
-      />
+      <MonthButton onClick={() => setIsOpen(!isOpen)} title={`${date.format('MMMM YYYY')}`} />
       <Collapse
         isOpen={isOpen}
         style={{
@@ -98,6 +93,7 @@ const FullButton = styled(EmptyButton)`
 
 const MonthButton = styled(EmptyButton)`
   border: 1px solid ${theme.main75};
+  text-transform: capitalize;
   width: 100%;
   max-width: 100%;
   color: ${theme.main};
