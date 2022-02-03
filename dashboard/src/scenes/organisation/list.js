@@ -12,6 +12,7 @@ import CreateWrapper from '../../components/createWrapper';
 import useApi from '../../services/api';
 import DeleteOrganisation from '../../components/DeleteOrganisation';
 import { formatDateWithFullMonth } from '../../services/date';
+import EncryptionKey from '../../components/EncryptionKey';
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -100,18 +101,27 @@ const List = () => {
             render: (o) => formatDateWithFullMonth(o.encryptionLastUpdateAt || ''),
           },
           {
-            title: 'Action',
-            dataKey: 'delete',
+            title: 'Actions',
+            dataKey: 'actions',
             render: (o) => {
               return (
-                <DeleteOrganisation
-                  buttonTitle="Supprimer"
-                  onSuccess={() => {
-                    setRefresh(true);
-                  }}
-                  buttonStyle={{ margin: 'auto' }}
-                  organisation={o}
-                />
+                <>
+                  <DeleteOrganisation
+                    buttonTitle="Supprimer"
+                    onSuccess={() => {
+                      setRefresh(true);
+                    }}
+                    buttonStyle={{ margin: 'auto' }}
+                    organisation={o}
+                  />
+                  <EncryptionKey
+                    organisation={o}
+                    setOrganisation={() => {
+                      setRefresh(true);
+                    }}
+                    reloadOnly={true}
+                  />
+                </>
               );
             },
           },

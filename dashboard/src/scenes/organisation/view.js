@@ -65,7 +65,7 @@ const View = () => {
                 <hr />
                 <Title>Encryption</Title>
                 <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
-                  <EncryptionKey isMain />
+                  <EncryptionKey isMain organisation={organisation} setOrganisation={setOrganisation} />
                 </div>
                 <hr />
                 <Title>Réglage des Actions</Title>
@@ -163,7 +163,7 @@ const View = () => {
                         </Col>
                       </Row>
                       <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                        <EncryptionKey />
+                        <EncryptionKey organisation={organisation} setOrganisation={setOrganisation} />
                       </div>
                     </>
                   )}

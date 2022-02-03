@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-
 const { catchErrors } = require("../errors");
-
 const Organisation = require("../models/organisation");
 const Person = require("../models/person");
 const Place = require("../models/place");
@@ -14,6 +12,7 @@ const Territory = require("../models/territory");
 const Report = require("../models/report");
 const TerritoryObservation = require("../models/territoryObservation");
 const encryptedTransaction = require("../utils/encryptedTransaction");
+const { capture } = require("../sentry");
 
 // this controller is required BECAUSE
 // if we encrypt one by one each of the actions, persons, comments, territories, observations, places, reports
@@ -43,9 +42,17 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") {
-      capture("Only an admin can change the encryption", { user: req.user });
-      return res.send(403).send({ ok: false, error: "Seul un admin peut modifier le chiffrement" });
+    if (req.user.role !== "admin" && req.user.role !== "superadmin") {
+      capture("Only an admin and superadmin can change the encryption", { user: req.user });
+      return res.status(403).send({ ok: false, error: "Seul un admin peut modifier le chiffrement" });
+    }
+
+    if (req.user.role === "superadmin") {
+      req.user.organisation = req.body.organisation;
+      if (!req.user.organisation) {
+        capture("Superadmin must specify an organisation", { user: req.user });
+        return res.status(400).send({ ok: false, error: "Superadmin doit spécifier une organisation" });
+      }
     }
 
     const { ok, error, status } = await encryptedTransaction(req)(async (tx) => {
@@ -96,7 +103,7 @@ router.post(
         console.log("error encrypting", e);
         throw e;
       }
-    });
+    }, req.user.organisation);
 
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
 

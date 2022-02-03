@@ -1,12 +1,12 @@
 const sequelize = require("../db/sequelize");
 const Organisation = require("../models/organisation");
 
-const encryptedTransaction = (req) => (dbOperation) =>
+const encryptedTransaction = (req) => (dbOperation, organisationId) =>
   sequelize.transaction(async (tx) => {
     const { encryptionEnabled, encryptionLastUpdateAt, changeMasterKey } = req.query;
 
     const checkIfCanChangeData = async () => {
-      const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+      const organisation = await Organisation.findOne({ where: { _id: organisationId } });
       if (encryptionEnabled !== "true" && organisation.encryptionEnabled) {
         return {
           ok: false,

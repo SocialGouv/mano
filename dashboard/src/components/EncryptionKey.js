@@ -4,12 +4,12 @@ import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
-import { organisationState, teamsState, userState } from '../recoil/auth';
+import { teamsState, userState } from '../recoil/auth';
 import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState, preparePersonForEncryption } from '../recoil/persons';
 import { actionsState, prepareActionForEncryption } from '../recoil/actions';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
@@ -18,13 +18,12 @@ import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import { prepareTerritoryForEncryption, territoriesState } from '../recoil/territory';
 import { placesState, preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
-import { encryptVerificationKey } from '../services/encryption';
+import { checkEncryptedVerificationKey, derivedMasterKey, encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
 import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
 import { useRefresh } from '../recoil/refresh';
 
-const EncryptionKey = ({ isMain }) => {
-  const [organisation, setOrganisation] = useRecoilState(organisationState);
+const EncryptionKey = ({ isMain, reloadOnly = false, organisation, setOrganisation }) => {
   const teams = useRecoilValue(teamsState);
 
   const onboardingForEncryption = isMain && !organisation.encryptionEnabled;
@@ -65,7 +64,7 @@ const EncryptionKey = ({ isMain }) => {
     reports.length;
   const totalDurationOnServer = totalToEncrypt * 0.032; // average 32 ms in server
 
-  if (!['admin'].includes(user.role)) return null;
+  if (!['admin', 'superadmin'].includes(user.role)) return null;
   if (API.blockEncrypt) return null;
 
   const onEncrypt = async (values) => {
@@ -73,8 +72,20 @@ const EncryptionKey = ({ isMain }) => {
       if (!values.encryptionKey) return toastr.error('Erreur!', 'La clé est obligatoire');
       if (!values.encryptionKeyConfirm) return toastr.error('Erreur!', 'La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
+
+      if (reloadOnly) {
+        const encryptedVerificationKey = organisation.encryptedVerificationKey;
+        const newHashedOrgEncryptionKey = await derivedMasterKey(values.encryptionKey.trim());
+        const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
+        if (!encryptionKeyIsValid) {
+          return toastr.error('Erreur!', 'La clé de vérification ne correspond pas à celle sauvegardée');
+        }
+      }
+
       setEncryptionKey(values.encryptionKey.trim());
-      const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
+      let hashedOrgEncryptionKey;
+      if (organisation._id === user.organisation._id) hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
+      else hashedOrgEncryptionKey = await derivedMasterKey(values.encryptionKey.trim());
       capture('debug: setting encryption key', {
         extra: { orgEncryptionKey: values.encryptionKey.trim(), hashedOrgEncryptionKey, organisation },
         user,
@@ -118,6 +129,7 @@ const EncryptionKey = ({ isMain }) => {
           relsPersonPlace: encryptedRelsPersonPlace,
           reports: encryptedReports,
           encryptedVerificationKey,
+          organisation: organisation._id,
         },
         query: {
           encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
@@ -243,7 +255,7 @@ const EncryptionKey = ({ isMain }) => {
                 id="encrypt"
                 disabled={loading || isSubmitting}
                 onClick={() => !isSubmitting && handleSubmit()}
-                title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
+                title={reloadOnly ? 'Valider' : organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
               />
             </Row>
           </React.Fragment>
@@ -254,18 +266,23 @@ const EncryptionKey = ({ isMain }) => {
 
   return (
     <>
-      {!!organisation.encryptionEnabled && (
+      {!reloadOnly && !!organisation.encryptionEnabled && (
         <LinkButton onClick={cancelEncryption} disabled={!!cancellingEncryption} color="link" style={{ marginRight: 10 }}>
           Retirer le chiffrement
         </LinkButton>
       )}
-      <ButtonCustom
-        title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
-        type="button"
-        color="secondary"
-        style={{ marginRight: 20 }}
-        onClick={() => setOpen(true)}
-      />
+      {!reloadOnly && (
+        <ButtonCustom
+          title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
+          type="button"
+          color="secondary"
+          style={{ marginRight: 20 }}
+          onClick={() => setOpen(true)}
+        />
+      )}
+      {reloadOnly && organisation.encryptionEnabled && (
+        <ButtonCustom title={'Recharger le chiffrement'} type="button" color="link" style={{ margin: 'auto' }} onClick={() => setOpen(true)} />
+      )}
       <StyledModal
         backdrop={!onboardingForEncryption ? true : 'static'}
         isOpen={open}
@@ -279,7 +296,7 @@ const EncryptionKey = ({ isMain }) => {
         centered>
         <ModalHeader close={onboardingForEncryption ? <></> : null} toggle={() => setOpen(false)} color="danger">
           <span style={{ color: theme.black, textAlign: 'center', display: 'block' }}>
-            {organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
+            {reloadOnly ? 'Recharger le chiffrement' : organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
           </span>
         </ModalHeader>
         {!encryptionKey ? renderForm() : renderEncrypting()}
