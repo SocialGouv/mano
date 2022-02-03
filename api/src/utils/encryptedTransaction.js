@@ -6,6 +6,7 @@ const encryptedTransaction = (req) => (dbOperation, organisationId) =>
     const { encryptionEnabled, encryptionLastUpdateAt, changeMasterKey } = req.query;
 
     const checkIfCanChangeData = async () => {
+      if (!organisationId) organisationId = req.user.organisation;
       const organisation = await Organisation.findOne({ where: { _id: organisationId } });
       if (encryptionEnabled !== "true" && organisation.encryptionEnabled) {
         return {
