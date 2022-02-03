@@ -1,3 +1,10 @@
+# [1.48.0](https://github.com/SocialGouv/mano/compare/v1.47.0...v1.48.0) (2022-02-03)
+
+
+### Features
+
+* **api,dashboard,app:** remove relPersonTeam usage ([#327](https://github.com/SocialGouv/mano/issues/327)) ([b34607d](https://github.com/SocialGouv/mano/commit/b34607d11a21bdfce4a6f11c9f07dfc1bd6c0fc8))
+
 # [1.47.0](https://github.com/SocialGouv/mano/compare/v1.46.6...v1.47.0) (2022-02-03)
 
 
