@@ -15,7 +15,6 @@ const Action = require("../models/action");
 const Comment = require("../models/comment");
 const Territory = require("../models/territory");
 const TerritoryObservation = require("../models/territoryObservation");
-const RelPersonTeam = require("../models/relPersonTeam");
 const { ENCRYPTED_FIELDS_ONLY } = require("../config");
 
 const generateForeignKey = (key) => ({ foreignKey: { type: DataTypes.UUID, name: key, field: key } });
@@ -44,8 +43,6 @@ Team.belongsToMany(User, { ...teamForeignKey, through: RelUserTeam });
 if (!ENCRYPTED_FIELDS_ONLY) {
   Person.belongsTo(User, userForeignKey);
   User.hasMany(Person, userForeignKey);
-  Person.belongsToMany(Team, { ...personForeignKey, through: RelPersonTeam });
-  Team.belongsToMany(Person, { ...teamForeignKey, through: RelPersonTeam });
 }
 
 // Territory

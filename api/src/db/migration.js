@@ -11,7 +11,6 @@ const Action = require("../models/action");
 const Comment = require("../models/comment");
 const Territory = require("../models/territory");
 const TerritoryObservation = require("../models/territoryObservation");
-const RelPersonTeam = require("../models/relPersonTeam");
 const Report = require("../models/report");
 const { capture } = require("../sentry");
 // here you can write any data migration, not schema migrations

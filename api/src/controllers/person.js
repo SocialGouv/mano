@@ -9,7 +9,6 @@ const crypto = require("crypto");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
 const Team = require("../models/team");
-const RelPersonTeam = require("../models/relPersonTeam");
 const encryptedTransaction = require("../utils/encryptedTransaction");
 const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
 
@@ -100,7 +99,7 @@ router.post(
 
       if (ENCRYPTED_FIELDS_ONLY) return data;
 
-      return data.map((p) => ({ ...p.toJSON(), assignedTeams: [] }));
+      return data.map((p) => p.toJSON());
     });
     return res.status(status).send({ ok, data, error });
   })
@@ -126,23 +125,7 @@ router.post(
 
       if (ENCRYPTED_FIELDS_ONLY) return data;
 
-      if (req.body.hasOwnProperty("assignedTeams")) {
-        await RelPersonTeam.bulkCreate(
-          req.body.assignedTeams.map((teamId) => ({ person: data._id, team: teamId })),
-          { transaction: tx }
-        );
-      }
-
-      const relTeamPerson = await RelPersonTeam.findAll({
-        where: {
-          person: data._id,
-        },
-      });
-
-      return {
-        ...data.toJSON(),
-        assignedTeams: relTeamPerson.map((rel) => rel.team),
-      };
+      return data.toJSON();
     });
     return res.status(status).send({ ok, data, error });
   })
@@ -175,19 +158,11 @@ router.get(
     if (ENCRYPTED_FIELDS_ONLY) return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
 
     const teams = await Team.findAll(query);
-    const relTeamPersons = await RelPersonTeam.findAll({
-      where: {
-        team: { [Op.in]: teams.map((t) => t._id) },
-      },
-    });
 
     return res.status(200).send({
       ok: true,
       hasMore: data.length === limit,
-      data: data.map((person) => ({
-        ...person.toJSON(),
-        assignedTeams: relTeamPersons.filter((rel) => rel.person === person._id).map((rel) => rel.team),
-      })),
+      data: data.map((person) => person.toJSON()),
       total,
     });
   })
@@ -227,24 +202,7 @@ router.put(
 
       if (ENCRYPTED_FIELDS_ONLY) return person;
 
-      if (req.body.hasOwnProperty("assignedTeams")) {
-        await RelPersonTeam.destroy({ where: { person: req.params._id }, transaction: tx });
-        await RelPersonTeam.bulkCreate(
-          req.body.assignedTeams.map((teamId) => ({ person: req.params._id, team: teamId })),
-          { transaction: tx }
-        );
-      }
-
-      const relTeamPerson = await RelPersonTeam.findAll({
-        where: {
-          person: person._id,
-        },
-      });
-
-      return {
-        ...newPerson.toJSON(),
-        assignedTeams: relTeamPerson.map((rel) => rel.team),
-      };
+      return newPerson.toJSON();
     });
 
     res.status(status).send({ ok, data, error });

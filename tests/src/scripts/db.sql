@@ -6,8 +6,6 @@ drop table if exists "mano"."RelPersonPlace";
 
 drop table if exists "mano"."Place";
 
-drop table if exists "mano"."RelPersonTeam";
-
 drop table if exists "mano"."Person";
 
 drop table if exists "mano"."RelUserTeam";
@@ -305,26 +303,6 @@ create table if not exists "mano"."RelPersonPlace"
     constraint "RelPersonPlace_person_place_key"
         unique (person, place)
 );
-
-create table if not exists "mano"."RelPersonTeam"
-(
-    _id         uuid                     not null
-        constraint "RelPersonTeam_pkey"
-            primary key,
-    person      uuid
-        constraint "RelPersonTeam_person_fkey"
-            references "mano"."Person"
-            on update cascade on delete cascade,
-    team        uuid
-        constraint "RelPersonTeam_team_fkey"
-            references "mano"."Team"
-            on update cascade on delete cascade,
-    "createdAt" timestamp with time zone not null,
-    "updatedAt" timestamp with time zone not null
-);
-
-create unique index if not exists "RelUserTeam_person_team_key"
-    on "mano"."RelPersonTeam" (person, team);
 
 create table if not exists "mano"."RelUserTeam"
 (
