@@ -1,3 +1,10 @@
+## [1.48.2](https://github.com/SocialGouv/mano/compare/v1.48.1...v1.48.2) (2022-02-03)
+
+
+### Bug Fixes
+
+* **dashboard:** dates with dayjs ([#334](https://github.com/SocialGouv/mano/issues/334)) ([4a4bfa4](https://github.com/SocialGouv/mano/commit/4a4bfa4aedbbd17a514455a84935e27c9148a465))
+
 ## [1.48.1](https://github.com/SocialGouv/mano/compare/v1.48.0...v1.48.1) (2022-02-03)
 
 
