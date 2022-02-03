@@ -1,3 +1,10 @@
+# [1.47.0](https://github.com/SocialGouv/mano/compare/v1.46.6...v1.47.0) (2022-02-03)
+
+
+### Features
+
+* **dahsboard,app:** add hotel ([fb41665](https://github.com/SocialGouv/mano/commit/fb41665984ef8ed3d46521ce3c0c4934b755ef41))
+
 ## [1.46.6](https://github.com/SocialGouv/mano/compare/v1.46.5...v1.46.6) (2022-02-02)
 
 
