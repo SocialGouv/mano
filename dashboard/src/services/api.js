@@ -213,7 +213,17 @@ const useApi = () => {
     return await response.json();
   };
 
-  const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
+  const execute = async ({
+    method,
+    path = '',
+    body = null,
+    query = {},
+    headers = {},
+    debug = false,
+    skipEncryption = false,
+    batch = null,
+    disableToastr = false,
+  } = {}) => {
     try {
       if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
       const options = {
@@ -251,7 +261,7 @@ const useApi = () => {
 
       try {
         const res = await response.json();
-        if (!response.ok) handleApiError(res);
+        if (!response.ok && !disableToastr) handleApiError(res);
         if (!!res.data && Array.isArray(res.data)) {
           const decryptedData = [];
           for (const item of res.data) {

@@ -84,13 +84,13 @@ export const usePersons = () => {
     if (res.ok) {
       setPersons((persons) => persons.filter((p) => p._id !== id));
       for (const action of actions.filter((a) => a.person === id)) {
-        await deleteAction(action._id);
+        await deleteAction(action._id, { ignoreError: true });
       }
       for (let comment of comments.filter((c) => c.person === id)) {
-        await deleteComment(comment._id);
+        await deleteComment(comment._id, { ignoreError: true });
       }
       for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === id)) {
-        await deleteRelation(relPersonPlace._id);
+        await deleteRelation(relPersonPlace._id, { ignoreError: true });
       }
     }
     return res;

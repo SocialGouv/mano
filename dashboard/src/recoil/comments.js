@@ -54,9 +54,13 @@ export const useComments = () => {
     }
   };
 
-  const deleteComment = async (id) => {
-    const res = await API.delete({ path: `/comment/${id}` });
-    if (res.ok) setComments((comments) => comments.filter((p) => p._id !== id));
+  const deleteComment = async (id, options) => {
+    // Since comments are *currently* automatically deleted by cascade thanks to SQL until we remove
+    // the column in Action or Person (since it's encrypted) we have to ignore error on deletion when comming
+    // from person or action deletion. So we use ignoreError flag to ignore the error, and we have to pass it to
+    // API functions too.
+    const res = await API.delete({ path: `/comment/${id}`, disableToastr: options?.ignoreError === true });
+    if (res.ok || options?.ignoreError) setComments((comments) => comments.filter((p) => p._id !== id));
     return res;
   };
 

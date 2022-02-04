@@ -50,9 +50,13 @@ export const useRelsPerson = () => {
     }
   };
 
-  const deleteRelation = async (id) => {
-    const res = await API.delete({ path: `/relPersonPlace/${id}` });
-    if (res.ok) {
+  const deleteRelation = async (id, options) => {
+    // Since relPersonPlace are *currently* automatically deleted by cascade thanks to SQL until we remove
+    // the column in Person (since it's encrypted) we have to ignore error on deletion when comming
+    // from person deletion. So we use ignoreError flag to ignore the error, and we have to pass it to
+    // API functions too.
+    const res = await API.delete({ path: `/relPersonPlace/${id}`, disableToastr: options?.ignoreError === true });
+    if (res.ok || options?.ignoreError) {
       setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== id));
     }
     return res;
