@@ -76,7 +76,7 @@ const Territory = ({ route, navigation }) => {
           return a;
         })
       );
-      Alert.alert('Territoire mise-à-jour !');
+      Alert.alert('Territoire mis à jour !');
       setUpdating(false);
       setEditable(false);
       return true;

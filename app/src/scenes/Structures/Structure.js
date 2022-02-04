@@ -110,7 +110,7 @@ const Structure = ({ navigation, route }) => {
       return false;
     }
     if (response.ok) {
-      Alert.alert('Structure mise-à-jour !');
+      Alert.alert('Structure mise à jour !');
       setStructures((structures) =>
         structures.map((s) => {
           if (s._id === response.data._id) return response.data;

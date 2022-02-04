@@ -53,7 +53,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
               actions.setSubmitting(false);
               if (res.ok) {
-                toastr.success(observation._id ? 'Observation mise-à-jour' : 'Création réussie !');
+                toastr.success(observation._id ? 'Observation mise à jour' : 'Création réussie !');
                 setOpen(false);
               }
             }}>
