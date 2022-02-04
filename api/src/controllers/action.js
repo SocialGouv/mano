@@ -146,7 +146,7 @@ router.delete(
 
     if (req.user.role !== "admin") query.where.team = req.user.teams.map((e) => e._id);
     let action = await Action.findOne(query);
-    if (!action) return res.status(404).send({ ok: false, error: "Not Found" });
+    if (!action) return res.status(200).send({ ok: true });
 
     await action.destroy();
 
