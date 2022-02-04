@@ -1,3 +1,10 @@
+## [1.48.3](https://github.com/SocialGouv/mano/compare/v1.48.2...v1.48.3) (2022-02-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency xlsx to ^0.18.0 ([#336](https://github.com/SocialGouv/mano/issues/336)) ([2e02a18](https://github.com/SocialGouv/mano/commit/2e02a18cdb38cacd99aebe85758c21043dd81172))
+
 ## [1.48.2](https://github.com/SocialGouv/mano/compare/v1.48.1...v1.48.2) (2022-02-03)
 
 
