@@ -133,7 +133,7 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
           <InputLabelled label="Commentaire" onChangeText={writeComment} value={comment} placeholder="Description" multiline />
           <ButtonsContainer>
             <ButtonDelete onPress={onDeleteRequest} />
-            <Button caption="Mettre-à-jour" onPress={onUpdateComment} disabled={isUpdateDisabled} loading={updating} />
+            <Button caption="Mettre à jour" onPress={onUpdateComment} disabled={isUpdateDisabled} loading={updating} />
           </ButtonsContainer>
         </View>
       </ScrollContainer>

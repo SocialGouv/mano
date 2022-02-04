@@ -133,7 +133,7 @@ const Place = ({ navigation, route }) => {
           <InputLabelled label="Nom du lieu" onChangeText={setName} value={name} placeholder="Description" multiline />
           <ButtonsContainer>
             <ButtonDelete onPress={onDeleteRequest} />
-            <Button caption="Mettre-à-jour" onPress={onUpdatePlace} disabled={isUpdateDisabled} loading={updating} />
+            <Button caption="Mettre à jour" onPress={onUpdatePlace} disabled={isUpdateDisabled} loading={updating} />
           </ButtonsContainer>
         </View>
       </ScrollContainer>
