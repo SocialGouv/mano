@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { Op } = require("sequelize");
+const { Op, literal } = require("sequelize");
 
 const { catchErrors } = require("../errors");
 
@@ -48,19 +48,11 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    const TODO = "A FAIRE";
-    const DONE = "FAIT";
-    const CANCEL = "ANNULEE";
-
     const query = {
       where: {
         organisation: req.user.organisation,
       },
-      order: [
-        ["status", "ASC"],
-        ["dueAt", "ASC"],
-        ["createdAt", "ASC"],
-      ],
+      order: [literal(`CASE status when 'ANNULEE' then 1 when 'A FAIRE' then 2 else 3 end`), ["dueAt", "ASC"], ["createdAt", "ASC"]],
     };
     const total = await Action.count(query);
     const limit = parseInt(req.query.limit, 10);
@@ -75,20 +67,7 @@ router.get(
 
     const actions = await Action.findAll(query);
 
-    const todo = actions.filter((a) => a.status === TODO);
-
-    const sortDoneOrCancel = (a, b) => {
-      if (!a.dueAt) return -1;
-      if (!b.dueAt) return 1;
-      if (a.dueAt > b.dueAt) return -1;
-      return 1;
-    };
-
-    const done = actions.filter((a) => a.status === DONE).sort(sortDoneOrCancel);
-
-    const cancel = actions.filter((a) => a.status === CANCEL).sort(sortDoneOrCancel);
-
-    const data = [...todo, ...done, ...cancel];
+    const data = actions;
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
   })
 );
