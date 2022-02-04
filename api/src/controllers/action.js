@@ -52,7 +52,7 @@ router.get(
       where: {
         organisation: req.user.organisation,
       },
-      order: [literal(`CASE status when 'ANNULEE' then 1 when 'A FAIRE' then 2 else 3 end`), ["dueAt", "ASC"], ["createdAt", "ASC"]],
+      order: [literal(`CASE status when 'A FAIRE' then 1 when 'FAIT' then 2 else 3 end`), ["dueAt", "ASC"], ["createdAt", "ASC"]],
     };
     const total = await Action.count(query);
     const limit = parseInt(req.query.limit, 10);
