@@ -10,7 +10,10 @@ export default function DownloadExample() {
 
   function placeholder(f) {
     if (f.options?.length) return f.options[0];
-    if (['birthdate', 'createdAt', 'updatedAt'].includes(f.name)) return '2021-01-01';
+    if (['date', 'date-with-time'].includes(f.type)) return '2021-01-01';
+    if (['boolean', 'yes-no'].includes(f.type)) {
+      return 'Oui';
+    }
     if (f.name === 'assignedTeams') {
       return currentTeam.name;
     }
