@@ -45,7 +45,9 @@ const ImportData = () => {
       if (!event.target?.files?.length) return; // probably cancel button
       const file = event.target.files[0];
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data);
+      // See: https://stackoverflow.com/a/57802737/978690
+      // I only took one part of the code, because we use "w" only.
+      const workbook = XLSX.read(data, { dateNF: 'yyyy-mm-dd' });
       const { SheetNames, Sheets } = workbook;
       const personsSheetName = SheetNames.find((name) => name.toLocaleLowerCase().includes('person'));
       const personsSheet = Sheets[personsSheetName];
@@ -92,6 +94,7 @@ const ImportData = () => {
         const person = {};
         for (const [column, fieldname, validator] of headerColumnsAndFieldname) {
           if (!personsSheet[`${column}${i}`]) continue;
+          console.log(personsSheet[`${column}${i}`], validator(personsSheet[`${column}${i}`]));
           const value = validator(personsSheet[`${column}${i}`]);
           if (!isNullOrUndefined(value)) {
             person[fieldname] = value;
@@ -119,6 +122,7 @@ const ImportData = () => {
           })
         );
       }
+      console.log(persons);
       setShowImpotSummary(true);
     } catch (e) {
       console.log(e);
