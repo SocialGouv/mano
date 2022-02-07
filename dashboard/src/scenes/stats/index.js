@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
 import {
@@ -31,6 +31,7 @@ import SelectCustom from '../../components/SelectCustom';
 import { useTerritories } from '../../recoil/territory';
 import { passagesNonAnonymousPerDatePerTeamSelector } from '../../recoil/selectors';
 import { dayjsInstance } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -57,7 +58,7 @@ const Stats = () => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const { territories } = useTerritories();
-  const { refresh } = useRefresh();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [loading, setLoading] = useState(false);
   const [territory, setTerritory] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
@@ -79,7 +80,13 @@ const Stats = () => {
   };
 
   useEffect(() => {
-    if (loading) refresh();
+    if (loading) {
+      setRefreshTrigger({
+        status: true,
+        method: 'refresh',
+        options: [],
+      });
+    }
   }, [loading]);
 
   useEffect(() => {
