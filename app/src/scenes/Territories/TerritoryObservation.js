@@ -131,7 +131,7 @@ const TerritoryObservation = ({ route, navigation }) => {
           return a;
         })
       );
-      Alert.alert('Observation mise-à-jour !');
+      Alert.alert('Observation mise à jour !');
       setUpdating(false);
       setEditable(false);
       return true;
