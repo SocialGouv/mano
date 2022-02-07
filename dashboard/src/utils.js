@@ -73,6 +73,11 @@ const validateMultiChoice =
 
 const validateBoolean = ({ v: value }) => {
   if (typeof value === 'undefined') return null;
+  // We have to handle the case where value is a string (cf: import XLSX users).
+  if (typeof value === 'string') {
+    if (['true', 'oui', 'yes'].includes(value.toLowerCase())) return true;
+    if (['false', 'non', 'no'].includes(value.toLowerCase())) return false;
+  }
   return Boolean(value);
 };
 
