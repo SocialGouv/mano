@@ -1,3 +1,11 @@
+## [1.49.1](https://github.com/SocialGouv/mano/compare/v1.49.0...v1.49.1) (2022-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** error deleting person due to casade ([#347](https://github.com/SocialGouv/mano/issues/347)) ([0e808a1](https://github.com/SocialGouv/mano/commit/0e808a1e228e0ee9145ea985302a09633ca72da5))
+* **dashboard:** old dates in import aka 1940 bug ([#345](https://github.com/SocialGouv/mano/issues/345)) ([0051651](https://github.com/SocialGouv/mano/commit/00516516a019c601287e5ba61270b43dbd96e9c9))
+
 # [1.49.0](https://github.com/SocialGouv/mano/compare/v1.48.5...v1.49.0) (2022-02-07)
 
 
