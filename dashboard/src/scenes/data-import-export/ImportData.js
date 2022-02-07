@@ -122,7 +122,6 @@ const ImportData = () => {
           })
         );
       }
-      console.log(persons);
       setShowImpotSummary(true);
     } catch (e) {
       console.log(e);
