@@ -17,7 +17,10 @@ router.get(
   catchErrors(async (req, res) => {
     const query = {};
     if (req.query.organisation) query.where = { organisation: req.query.organisation };
-    if (Number(req.query.lastRefresh)) query.where.updatedAt = { $gte: req.query.lastRefresh };
+    if (Number(req.query.lastRefresh)) {
+      if (!query.where) query.where = {};
+      query.where.updatedAt = { $gte: req.query.lastRefresh };
+    }
     const places = await Place.count(query);
     const relsPersonPlace = await RelPersonPlace.count(query);
     const actions = await Action.count(query);
