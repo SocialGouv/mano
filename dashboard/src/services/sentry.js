@@ -1,10 +1,6 @@
 import * as Sentry from '@sentry/react';
 import { Integrations } from '@sentry/tracing';
-// or use es6 import statements
-// import * as Sentry from '@sentry/node';
 const { ENV, VERSION } = require('../config');
-// or use es6 import statements
-// import * as Tracing from '@sentry/tracing';
 
 if (ENV === 'production') {
   Sentry.init({
@@ -17,7 +13,18 @@ if (ENV === 'production') {
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: 1.0,
-    ignoreErrors: ['Network request failed', 'Failed to fetch', 'NetworkError', 'withrealtime/messaging'],
+    ignoreErrors: [
+      'Network request failed',
+      'Failed to fetch',
+      'NetworkError',
+      // ???
+      'withrealtime/messaging',
+      // This error seems to happen only in firefox and to be ignorable.
+      // The "fetch" failed because user has navigated.
+      // Since other browsers don't have this problem, we don't care about it,
+      // it may be a false positive.
+      'AbortError: The operation was aborted',
+    ],
   });
 }
 
