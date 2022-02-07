@@ -289,7 +289,7 @@ const Structure = ({ navigation, route }) => {
         <ButtonsContainer>
           <ButtonDelete onPress={onDeleteRequest} />
           <Button
-            caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+            caption={editable ? 'Mettre à jour' : 'Modifier'}
             onPress={editable ? onUpdateStructure : onEdit}
             disabled={editable ? isUpdateDisabled : false}
             loading={updating}
