@@ -17,6 +17,8 @@ const isNullOrUndefined = (value) => {
   return false;
 };
 
+// These validators work only for Excel import.
+// Todo: move this out out of utils and explain their scope.
 const validateString = ({ v: value }) => {
   if (!value) return null;
   if (typeof value === 'string') return value;
