@@ -94,7 +94,6 @@ const ImportData = () => {
         const person = {};
         for (const [column, fieldname, validator] of headerColumnsAndFieldname) {
           if (!personsSheet[`${column}${i}`]) continue;
-          console.log(personsSheet[`${column}${i}`], validator(personsSheet[`${column}${i}`]));
           const value = validator(personsSheet[`${column}${i}`]);
           if (!isNullOrUndefined(value)) {
             person[fieldname] = value;
