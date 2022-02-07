@@ -1,3 +1,10 @@
+## [1.49.2](https://github.com/SocialGouv/mano/compare/v1.49.1...v1.49.2) (2022-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** display teams ([24a7ae1](https://github.com/SocialGouv/mano/commit/24a7ae14770a1c0a32a58ac1dca1a01d549e545a))
+
 ## [1.49.1](https://github.com/SocialGouv/mano/compare/v1.49.0...v1.49.1) (2022-02-07)
 
 
