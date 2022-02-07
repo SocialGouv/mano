@@ -1,3 +1,16 @@
+# [1.49.0](https://github.com/SocialGouv/mano/compare/v1.48.5...v1.49.0) (2022-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** import boolean ([#344](https://github.com/SocialGouv/mano/issues/344)) ([cf2e5b9](https://github.com/SocialGouv/mano/commit/cf2e5b9b2202e573132f3c40145ff16956709015))
+
+
+### Features
+
+* **dashboard:** more info in download example ([#343](https://github.com/SocialGouv/mano/issues/343)) ([8bd7f21](https://github.com/SocialGouv/mano/commit/8bd7f2144e11967a7c1d2100df89534e567ccc65))
+* **import:** improve description in import ([#342](https://github.com/SocialGouv/mano/issues/342)) ([065fc52](https://github.com/SocialGouv/mano/commit/065fc528c81546aad088b1db77004eabc13e3d63))
+
 ## [1.48.5](https://github.com/SocialGouv/mano/compare/v1.48.4...v1.48.5) (2022-02-07)
 
 
