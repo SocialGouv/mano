@@ -193,26 +193,26 @@ const View = () => {
                       <li>
                         les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne sera pas
                         prise en compte - certaines colonnes ont des valeurs imposées :
-                        <ul>
+                        <table className="table table-sm" style={{ fontSize: '14px', marginTop: '2rem' }}>
+                          <thead>
+                            <tr>
+                              <th>Colonne</th>
+                              <th>Valeur</th>
+                            </tr>
+                          </thead>
                           {personFieldsIncludingCustomFields()
                             .filter((f) => f.importable)
                             .map((f) => {
                               return (
-                                <li key={f.label}>
-                                  {f.label}
-                                  {f.options?.length && ' : '}
-                                  {f.options?.map((option, index) => (
-                                    <span key={option}>
-                                      <code>
-                                        {option}
-                                        {index !== f.options.length - 1 && ', '}
-                                      </code>
-                                    </span>
-                                  ))}
-                                </li>
+                                <tr key={f.label}>
+                                  <td>{f.label}</td>
+                                  <td>
+                                    <ImportFieldDetails field={f} />
+                                  </td>
+                                </tr>
                               );
                             })}
-                        </ul>
+                        </table>
                       </li>
                     </ul>
                   </Col>
@@ -229,6 +229,30 @@ const View = () => {
     </Container>
   );
 };
+
+function ImportFieldDetails({ field }) {
+  if (field.options?.length) {
+    return field.options?.map((option, index) => (
+      <span key={option}>
+        <code>
+          {option}
+          {index !== field.options.length - 1 && ', '}
+        </code>
+      </span>
+    ));
+  }
+  if (['date', 'date-with-time'].includes(field.type)) {
+    return (
+      <i style={{ color: '#666' }}>
+        Une date sous la forme AAAA-MM-JJ (exemple: <code>2021-01-01</code>)
+      </i>
+    );
+  }
+  if (['boolean', 'yes-no'].includes(field.type)) {
+    return <code>Oui, Non</code>;
+  }
+  return <i style={{ color: '#666' }}>Un texte</i>;
+}
 
 const Title = styled.h2`
   font-size: 20px;

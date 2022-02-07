@@ -14,8 +14,9 @@ import {
   usePersons,
 } from '../../recoil/persons';
 import { teamsState, userState } from '../../recoil/auth';
-import { isNullOrUndefined, toFrenchDate, typeOptions } from '../../utils';
+import { isNullOrUndefined, typeOptions } from '../../utils';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
+import { formatDateWithFullMonth, now } from '../../services/date';
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
@@ -44,7 +45,9 @@ const ImportData = () => {
       if (!event.target?.files?.length) return; // probably cancel button
       const file = event.target.files[0];
       const data = await file.arrayBuffer();
-      const workbook = XLSX.read(data);
+      // See: https://stackoverflow.com/a/57802737/978690
+      // I only took one part of the code, because we use "w" only.
+      const workbook = XLSX.read(data, { dateNF: 'yyyy-mm-dd' });
       const { SheetNames, Sheets } = workbook;
       const personsSheetName = SheetNames.find((name) => name.toLocaleLowerCase().includes('person'));
       const personsSheet = Sheets[personsSheetName];
@@ -100,7 +103,7 @@ const ImportData = () => {
           }
         }
         if (Object.keys(person).length) {
-          person.description = `Données importées le ${toFrenchDate(new Date())}\n${person.description || ''}`;
+          person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ''}`;
           persons.push(person);
         }
       }

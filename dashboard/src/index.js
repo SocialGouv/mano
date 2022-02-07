@@ -6,7 +6,6 @@ import 'react-dates/lib/css/_datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './datepicker.css';
 import './index.scss';
-import 'moment/min/locales.min';
 import App from './app';
 import './services/sentry';
 import './services/api';

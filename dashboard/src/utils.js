@@ -1,8 +1,6 @@
-const toFrenchDate = (d) => {
-  if (!d) return '';
-  return new Date(d).toLocaleDateString('fr', { day: 'numeric', month: 'long', year: 'numeric' });
-};
+import { dayjsInstance } from './services/date';
 
+// This function should be replaced with secure crypto.
 const generatePassword = () => {
   let length = 6;
   let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -12,12 +10,6 @@ const generatePassword = () => {
   }
   return retVal;
 };
-/*
-
-CUSTOM FIELDS
-VALIDATION FIELDS
-
-*/
 
 const isNullOrUndefined = (value) => {
   if (typeof value === 'undefined') return true;
@@ -25,6 +17,8 @@ const isNullOrUndefined = (value) => {
   return false;
 };
 
+// These validators work only for Excel import.
+// Todo: move this out out of utils and explain their scope.
 const validateString = ({ v: value }) => {
   if (!value) return null;
   if (typeof value === 'string') return value;
@@ -40,7 +34,7 @@ const validateNumber = ({ v: value }) => {
 
 const validateDate = ({ w: value }) => {
   // https://stackoverflow.com/a/643827/5225096
-  if (typeof value?.getMonth === 'function') return value;
+  if (typeof value?.getMonth === 'function' || value instanceof dayjsInstance) return value;
   if (!isNaN(new Date(value).getMonth())) return new Date(value);
   return null;
 };
@@ -81,6 +75,11 @@ const validateMultiChoice =
 
 const validateBoolean = ({ v: value }) => {
   if (typeof value === 'undefined') return null;
+  // We have to handle the case where value is a string (cf: import XLSX users).
+  if (typeof value === 'string') {
+    if (['true', 'oui', 'yes'].includes(value.toLowerCase())) return true;
+    if (['false', 'non', 'no'].includes(value.toLowerCase())) return false;
+  }
   return Boolean(value);
 };
 
@@ -113,7 +112,6 @@ function download(file, fileName) {
 
 export {
   download,
-  toFrenchDate,
   generatePassword,
   typeOptions,
   isNullOrUndefined,

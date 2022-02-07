@@ -131,7 +131,7 @@ const TerritoryObservation = ({ route, navigation }) => {
           return a;
         })
       );
-      Alert.alert('Observation mise-à-jour !');
+      Alert.alert('Observation mise à jour !');
       setUpdating(false);
       setEditable(false);
       return true;
@@ -245,7 +245,7 @@ const TerritoryObservation = ({ route, navigation }) => {
               <>
                 <ButtonDelete onPress={onDeleteRequest} />
                 <Button
-                  caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+                  caption={editable ? 'Mettre à jour' : 'Modifier'}
                   onPress={editable ? onSaveObservation : onEdit}
                   disabled={editable ? isUpdateDisabled : false}
                   loading={updating}

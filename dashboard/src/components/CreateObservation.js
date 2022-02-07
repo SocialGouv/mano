@@ -14,6 +14,7 @@ import CustomFieldInput from './CustomFieldInput';
 import { userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
 import { useRecoilValue } from 'recoil';
+import { dateForDatePicker } from '../services/date';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
 
@@ -52,7 +53,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
               actions.setSubmitting(false);
               if (res.ok) {
-                toastr.success(observation._id ? 'Observation mise-à-jour' : 'Création réussie !');
+                toastr.success(observation._id ? 'Observation mise à jour' : 'Création réussie !');
                 setOpen(false);
               }
             }}>
@@ -71,7 +72,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          selected={values.createdAt ? new Date(values.createdAt) : new Date()}
+                          selected={dateForDatePicker(values.createdAt ?? new Date())}
                           onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
                           timeInputLabel="Heure :"
                           dateFormat="dd/MM/yyyy hh:mm"

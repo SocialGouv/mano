@@ -7,7 +7,7 @@ import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
 import { territoriesState } from './territory';
-import { getIsDayWithinHoursOffsetOfPeriod, isOnSameDay, today } from '../services/date';
+import { getIsDayWithinHoursOffsetOfPeriod, isOnSameDay, isToday } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { filterData } from '../components/Filters';
@@ -26,7 +26,7 @@ export const todaysReportSelector = selector({
   key: 'todaysReportSelector',
   get: ({ get }) => {
     const teamsReports = get(currentTeamReportsSelector);
-    return teamsReports.find((rep) => isOnSameDay(new Date(rep.date), today()));
+    return teamsReports.find((rep) => isToday(rep.date));
   },
 });
 
@@ -45,7 +45,7 @@ export const reportPerDateSelector = selectorFamily({
     ({ date }) =>
     ({ get }) => {
       const teamsReports = get(currentTeamReportsSelector);
-      return teamsReports.find((rep) => isOnSameDay(new Date(rep.date), new Date(date)));
+      return teamsReports.find((rep) => isOnSameDay(rep.date, date));
     },
 });
 
@@ -133,7 +133,7 @@ export const personsFullSearchSelector = selectorFamily({
       if (!!alertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
       if (filterTeams.length) {
         personsFiltered = personsFiltered.filter((p) => {
-          for (let assignedTeam of p.assignedTeams) {
+          for (let assignedTeam of p.assignedTeams || []) {
             if (filterTeams.includes(assignedTeam)) return true;
           }
           return false;

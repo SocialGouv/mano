@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
-import moment from 'moment';
 import { useRecoilValue } from 'recoil';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -31,14 +30,14 @@ import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { useTerritories } from '../../recoil/territory';
 import { passagesNonAnonymousPerDatePerTeamSelector } from '../../recoil/selectors';
-moment.locale('fr');
+import { dayjsInstance } from '../../services/date';
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
   if (!startDate || !endDate) {
     return data;
   }
-  return data.filter((item) => moment(item.createdAt).isBefore(endDate) && moment(item.createdAt).isAfter(startDate));
+  return data.filter((item) => dayjsInstance(item.createdAt).isBetween(startDate, endDate));
 };
 
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];

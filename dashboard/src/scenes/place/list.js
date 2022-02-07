@@ -13,13 +13,13 @@ import Search from '../../components/search';
 import PaginationContext from '../../contexts/pagination';
 import Page from '../../components/pagination';
 import { filterBySearch } from '../search/utils';
-import { toFrenchDate } from '../../utils';
 import { currentTeamState, organisationState } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';
 import { useRefresh } from '../../recoil/refresh';
 import { useRecoilValue } from 'recoil';
+import { formatDateWithFullMonth } from '../../services/date';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -84,7 +84,7 @@ const List = () => {
               />
             ),
           },
-          { title: 'Créée le', dataKey: 'createdAt', render: (place) => toFrenchDate(place.createdAt) },
+          { title: 'Créée le', dataKey: 'createdAt', render: (place) => formatDateWithFullMonth(place.createdAt) },
         ]}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />

@@ -4,9 +4,6 @@ import { Col, Container, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-
-import { toFrenchDate } from '../../utils';
-
 import Header from '../../components/header';
 import Page from '../../components/pagination';
 import Search from '../../components/search';
@@ -17,7 +14,7 @@ import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, 
 import TagTeam from '../../components/TagTeam';
 import PaginationContext from '../../contexts/pagination';
 import Filters from '../../components/Filters';
-import { displayBirthDate } from '../../services/date';
+import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
 import { personsFullSearchSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
@@ -136,10 +133,10 @@ const List = () => {
             dataKey: '_id',
             render: (p) => {
               if (!p.birthdate) return '';
-              else if (p.outOfActiveList) return <i style={{ color: theme.black50 }}>{displayBirthDate(p.birthdate)}</i>;
+              else if (p.outOfActiveList) return <i style={{ color: theme.black50 }}>{formatBirthDate(p.birthdate)}</i>;
               return (
                 <span>
-                  <i>{displayBirthDate(p.birthdate)}</i>
+                  <i>{formatBirthDate(p.birthdate)}</i>
                 </span>
               );
             },
@@ -154,8 +151,8 @@ const List = () => {
             title: 'Suivi(e) depuis le',
             dataKey: 'createdAt',
             render: (p) => {
-              if (p.outOfActiveList) return <div style={{ color: theme.black50 }}>{toFrenchDate(p.createdAt || '')}</div>;
-              return toFrenchDate(p.createdAt || '');
+              if (p.outOfActiveList) return <div style={{ color: theme.black50 }}>{formatDateWithFullMonth(p.createdAt || '')}</div>;
+              return formatDateWithFullMonth(p.createdAt || '');
             },
           },
         ]}

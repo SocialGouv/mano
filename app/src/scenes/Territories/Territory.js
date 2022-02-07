@@ -76,7 +76,7 @@ const Territory = ({ route, navigation }) => {
           return a;
         })
       );
-      Alert.alert('Territoire mise-à-jour !');
+      Alert.alert('Territoire mis à jour !');
       setUpdating(false);
       setEditable(false);
       return true;
@@ -181,7 +181,7 @@ const Territory = ({ route, navigation }) => {
           <ButtonsContainer>
             <ButtonDelete onPress={onDeleteRequest} />
             <Button
-              caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+              caption={editable ? 'Mettre à jour' : 'Modifier'}
               onPress={editable ? onUpdateTerritory : onEdit}
               disabled={editable ? isUpdateDisabled : false}
               loading={updating}

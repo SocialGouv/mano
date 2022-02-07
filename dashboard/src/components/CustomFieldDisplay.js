@@ -1,5 +1,6 @@
 import React from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
+import { formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../services/date';
 
 const showBoolean = (value) => {
   if (value === null) return '';
@@ -22,19 +23,8 @@ const CustomFieldDisplay = ({ field, value }) => {
           ))}
         </p>
       )}
-      {!!['date-with-time'].includes(field.type) &&
-        !!value &&
-        new Date(value).toLocaleDateString('fr', {
-          day: 'numeric',
-          weekday: 'long',
-          month: 'long',
-          year: 'numeric',
-          hour: '2-digit',
-          minute: '2-digit',
-        })}
-      {!!['date'].includes(field.type) &&
-        !!value &&
-        new Date(value).toLocaleDateString('fr', { day: 'numeric', weekday: 'long', month: 'long', year: 'numeric' })}
+      {!!['date-with-time'].includes(field.type) && !!value && formatDateTimeWithNameOfDay(value)}
+      {!!['date'].includes(field.type) && !!value && formatDateWithNameOfDay(value)}
       {!!['boolean'].includes(field.type) && showBoolean(value)}
       {!!['yes-no'].includes(field.type) && value}
       {!!['enum'].includes(field.type) && value}

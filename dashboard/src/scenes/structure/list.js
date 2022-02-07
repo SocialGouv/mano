@@ -3,7 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-
 import Header from '../../components/header';
 import Page from '../../components/pagination';
 import Loading from '../../components/loading';
@@ -13,9 +12,9 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import { toFrenchDate } from '../../utils';
 import { currentTeamState } from '../../recoil/auth';
 import useApi from '../../services/api';
+import { formatDateWithFullMonth } from '../../services/date';
 
 const List = () => {
   const [structures, setStructures] = useState(null);
@@ -59,7 +58,7 @@ const List = () => {
           onRowClick={(i) => history.push(`/structure/${i._id}`)}
           columns={[
             { title: 'Nom', dataKey: 'name' },
-            { title: 'Créée le', dataKey: 'createdAt', render: (i) => toFrenchDate(i.createdAt) },
+            { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
           ]}
         />
         <Page {...pagination} onChange={getStructure} />

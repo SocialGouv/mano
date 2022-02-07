@@ -7,10 +7,11 @@ import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import Table from './table';
 import UserName from './UserName';
-import { toFrenchDate, download } from '../utils';
+import { download } from '../utils';
 import { usePersons } from '../recoil/persons';
 import { userState } from '../recoil/auth';
 import ButtonCustom from './ButtonCustom';
+import { formatDateWithFullMonth } from '../services/date';
 
 const Documents = ({ person, onUpdateResults }) => {
   const { updatePerson, uploadDocument, downloadDocument, deleteDocument } = usePersons();
@@ -65,7 +66,7 @@ const Documents = ({ person, onUpdateResults }) => {
         onRowClick={() => {}}
         columns={[
           { title: 'Nom', dataKey: 'name', render: (document) => <b>{document.name}</b> },
-          { title: 'Ajouté le', dataKey: 'createdAt', render: (document) => toFrenchDate(document.createdAt) },
+          { title: 'Ajouté le', dataKey: 'createdAt', render: (document) => formatDateWithFullMonth(document.createdAt) },
           { title: 'Ajouté par', dataKey: 'createdBy', render: (document) => <UserName id={document.createdBy} /> },
           {
             title: 'Action',

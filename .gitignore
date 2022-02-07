@@ -4,3 +4,4 @@ node_modules
 .vscode
 .env
 .cache_ggshield
+test-local.js

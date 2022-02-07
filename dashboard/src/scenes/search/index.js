@@ -3,8 +3,6 @@ import React, { useContext, useState, useEffect } from 'react';
 import { Container, Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
-
-import { toFrenchDate } from '../../utils';
 import DateBloc from '../../components/DateBloc';
 import Header from '../../components/header';
 import Box from '../../components/Box';
@@ -33,6 +31,7 @@ import {
   territoriesSearchSelector,
 } from '../../recoil/selectors';
 import ActionPersonName from '../../components/ActionPersonName';
+import { formatDateWithFullMonth, formatTime } from '../../services/date';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -140,15 +139,12 @@ const Actions = ({ search, onUpdateResults }) => {
               dataKey: '_id',
               render: (action) => {
                 if (!action.dueAt || !action.withTime) return null;
-                return new Date(action.dueAt).toLocaleString('fr', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                });
+                return formatTime(action.dueAt);
               },
             },
             { title: 'Nom', dataKey: 'name' },
             { title: 'Personne suivie', dataKey: 'person', render: (action) => <ActionPersonName action={action} /> },
-            { title: 'Créée le', dataKey: 'createdAt', render: (action) => toFrenchDate(action.createdAt || '') },
+            { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
         />
@@ -204,7 +200,7 @@ const Persons = ({ search, onUpdateResults }) => {
               render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
-            { title: 'Suivi(e) depuis le', dataKey: 'createdAt', render: (p) => toFrenchDate(p.createdAt || '') },
+            { title: 'Suivi(e) depuis le', dataKey: 'createdAt', render: (p) => formatDateWithFullMonth(p.createdAt || '') },
           ]}
         />
       </StyledBox>
@@ -345,7 +341,7 @@ const Territories = ({ search, onUpdateResults }) => {
             { title: 'Nom', dataKey: 'name' },
             { title: 'Types', dataKey: 'types', render: ({ types }) => (types ? types.join(', ') : '') },
             { title: 'Périmètre', dataKey: 'perimeter' },
-            { title: 'Créé le', dataKey: 'createdAt', render: (territory) => toFrenchDate(territory.createdAt || '') },
+            { title: 'Créé le', dataKey: 'createdAt', render: (territory) => formatDateWithFullMonth(territory.createdAt || '') },
           ]}
         />
       </StyledBox>
@@ -394,7 +390,7 @@ const Places = ({ search, onUpdateResults }) => {
                 />
               ),
             },
-            { title: 'Créée le', dataKey: 'createdAt', render: (place) => toFrenchDate(place.createdAt) },
+            { title: 'Créée le', dataKey: 'createdAt', render: (place) => formatDateWithFullMonth(place.createdAt) },
           ]}
         />
       </StyledBox>

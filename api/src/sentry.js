@@ -1,10 +1,5 @@
 const Sentry = require("@sentry/node");
-// or use es6 import statements
-// import * as Sentry from '@sentry/node';
-
 const Tracing = require("@sentry/tracing");
-// or use es6 import statements
-// import * as Tracing from '@sentry/tracing';
 
 const { VERSION, ENVIRONMENT } = require("./config");
 

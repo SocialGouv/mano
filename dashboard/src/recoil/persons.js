@@ -271,6 +271,7 @@ export const addressDetailsFixedFields = [
   'Logement accompagné',
   'Urgence',
   'Insertion',
+  'Hôtel',
 ];
 
 export const addressDetails = [...addressDetailsFixedFields, 'Autre'];

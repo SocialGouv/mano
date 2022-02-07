@@ -1,3 +1,81 @@
+## [1.49.1](https://github.com/SocialGouv/mano/compare/v1.49.0...v1.49.1) (2022-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** error deleting person due to casade ([#347](https://github.com/SocialGouv/mano/issues/347)) ([0e808a1](https://github.com/SocialGouv/mano/commit/0e808a1e228e0ee9145ea985302a09633ca72da5))
+* **dashboard:** old dates in import aka 1940 bug ([#345](https://github.com/SocialGouv/mano/issues/345)) ([0051651](https://github.com/SocialGouv/mano/commit/00516516a019c601287e5ba61270b43dbd96e9c9))
+
+# [1.49.0](https://github.com/SocialGouv/mano/compare/v1.48.5...v1.49.0) (2022-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** import boolean ([#344](https://github.com/SocialGouv/mano/issues/344)) ([cf2e5b9](https://github.com/SocialGouv/mano/commit/cf2e5b9b2202e573132f3c40145ff16956709015))
+
+
+### Features
+
+* **dashboard:** more info in download example ([#343](https://github.com/SocialGouv/mano/issues/343)) ([8bd7f21](https://github.com/SocialGouv/mano/commit/8bd7f2144e11967a7c1d2100df89534e567ccc65))
+* **import:** improve description in import ([#342](https://github.com/SocialGouv/mano/issues/342)) ([065fc52](https://github.com/SocialGouv/mano/commit/065fc528c81546aad088b1db77004eabc13e3d63))
+
+## [1.48.5](https://github.com/SocialGouv/mano/compare/v1.48.4...v1.48.5) (2022-02-07)
+
+
+### Bug Fixes
+
+* typo fr ([#348](https://github.com/SocialGouv/mano/issues/348)) ([6875c97](https://github.com/SocialGouv/mano/commit/6875c97feb01ea6af54e66d900ffe068015ace00))
+* **typo:** and mise a jour ([#349](https://github.com/SocialGouv/mano/issues/349)) ([29497aa](https://github.com/SocialGouv/mano/commit/29497aab2c228e86ba11b9e378317037a433bbd3))
+
+## [1.48.4](https://github.com/SocialGouv/mano/compare/v1.48.3...v1.48.4) (2022-02-07)
+
+
+### Bug Fixes
+
+* fix error ([b82a482](https://github.com/SocialGouv/mano/commit/b82a4828ecd2804f1e81e17fe4f333657fe6777e))
+
+## [1.48.3](https://github.com/SocialGouv/mano/compare/v1.48.2...v1.48.3) (2022-02-04)
+
+
+### Bug Fixes
+
+* **deps:** update dependency xlsx to ^0.18.0 ([#336](https://github.com/SocialGouv/mano/issues/336)) ([2e02a18](https://github.com/SocialGouv/mano/commit/2e02a18cdb38cacd99aebe85758c21043dd81172))
+
+## [1.48.2](https://github.com/SocialGouv/mano/compare/v1.48.1...v1.48.2) (2022-02-03)
+
+
+### Bug Fixes
+
+* **dashboard:** dates with dayjs ([#334](https://github.com/SocialGouv/mano/issues/334)) ([4a4bfa4](https://github.com/SocialGouv/mano/commit/4a4bfa4aedbbd17a514455a84935e27c9148a465))
+
+## [1.48.1](https://github.com/SocialGouv/mano/compare/v1.48.0...v1.48.1) (2022-02-03)
+
+
+### Bug Fixes
+
+* **deps:** update dependency dotenv to v16 ([#340](https://github.com/SocialGouv/mano/issues/340)) ([5009147](https://github.com/SocialGouv/mano/commit/5009147266fbd8ad95f742a29b275e0b6c1257f2))
+
+# [1.48.0](https://github.com/SocialGouv/mano/compare/v1.47.0...v1.48.0) (2022-02-03)
+
+
+### Features
+
+* **api,dashboard,app:** remove relPersonTeam usage ([#327](https://github.com/SocialGouv/mano/issues/327)) ([b34607d](https://github.com/SocialGouv/mano/commit/b34607d11a21bdfce4a6f11c9f07dfc1bd6c0fc8))
+
+# [1.47.0](https://github.com/SocialGouv/mano/compare/v1.46.6...v1.47.0) (2022-02-03)
+
+
+### Features
+
+* **dahsboard,app:** add hotel ([fb41665](https://github.com/SocialGouv/mano/commit/fb41665984ef8ed3d46521ce3c0c4934b755ef41))
+
+## [1.46.6](https://github.com/SocialGouv/mano/compare/v1.46.5...v1.46.6) (2022-02-02)
+
+
+### Bug Fixes
+
+* **dashboard:** rollback reactselect and reactstrap ([#338](https://github.com/SocialGouv/mano/issues/338)) ([3152b65](https://github.com/SocialGouv/mano/commit/3152b65a0a5310d41c3a6075402e1786988a83fe))
+
 ## [1.46.5](https://github.com/SocialGouv/mano/compare/v1.46.4...v1.46.5) (2022-02-02)
 
 

@@ -430,7 +430,7 @@ const Action = ({ navigation, route }) => {
         <ButtonsContainer>
           <ButtonDelete onPress={onDeleteRequest} />
           <Button
-            caption={editable ? 'Mettre-à-jour' : 'Modifier'}
+            caption={editable ? 'Mettre à jour' : 'Modifier'}
             onPress={editable ? onUpdateActionRequest : setEditable(true)}
             disabled={editable ? isUpdateDisabled : false}
             loading={updating}
