@@ -25,7 +25,6 @@ import Card from '../../components/Card';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { actionsState, useActions } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
-import { useRefresh } from '../../recoil/refresh';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { useTerritories } from '../../recoil/territory';
