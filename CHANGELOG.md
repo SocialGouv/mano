@@ -1,3 +1,11 @@
+## [1.48.5](https://github.com/SocialGouv/mano/compare/v1.48.4...v1.48.5) (2022-02-07)
+
+
+### Bug Fixes
+
+* typo fr ([#348](https://github.com/SocialGouv/mano/issues/348)) ([6875c97](https://github.com/SocialGouv/mano/commit/6875c97feb01ea6af54e66d900ffe068015ace00))
+* **typo:** and mise a jour ([#349](https://github.com/SocialGouv/mano/issues/349)) ([29497aa](https://github.com/SocialGouv/mano/commit/29497aab2c228e86ba11b9e378317037a433bbd3))
+
 ## [1.48.4](https://github.com/SocialGouv/mano/compare/v1.48.3...v1.48.4) (2022-02-07)
 
 
