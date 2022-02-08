@@ -1,3 +1,10 @@
+## [1.49.5](https://github.com/SocialGouv/mano/compare/v1.49.4...v1.49.5) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** categories can be empty ([a8ecbb1](https://github.com/SocialGouv/mano/commit/a8ecbb1d283f2e35f097272ba35803bfef94eaa6))
+
 ## [1.49.4](https://github.com/SocialGouv/mano/compare/v1.49.3...v1.49.4) (2022-02-08)
 
 
