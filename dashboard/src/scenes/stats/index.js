@@ -282,41 +282,45 @@ const Stats = () => {
               'outOfActiveListReason'
             )}
           />
-          {[customFieldsPersonsMedical, customFieldsPersonsSocial].map((customFields) => {
-            return (
-              <>
-                {customFields
-                  .filter((f) => f.enabled)
-                  .filter((f) => f.showInStats)
-                  .filter((field) => ['number'].includes(field.type))
-                  .map((field) => (
-                    <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-                      <BlockTotal title={field.label} data={persons} field={field.name} />
-                    </Col>
-                  ))}
-                {customFields
-                  .filter((f) => f.enabled)
-                  .filter((f) => f.showInStats)
-                  .filter((field) => ['date', 'date-with-time'].includes(field.type))
-                  .map((field) => (
-                    <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-                      <BlockDateWithTime data={persons} field={field} />
-                    </Col>
-                  ))}
-                {customFields
-                  .filter((f) => f.enabled)
-                  .filter((f) => f.showInStats)
-                  .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
-                  .map((field) => (
-                    <CustomResponsivePie
-                      title={field.label}
-                      key={field.name}
-                      data={getPieData(persons, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
-                    />
-                  ))}
-              </>
-            );
-          })}
+          {
+            // In this particular case, we can use index as a key since order is always the same.
+            //
+            [customFieldsPersonsMedical, customFieldsPersonsSocial].map((customFields, key) => {
+              return (
+                <React.Fragment key={key}>
+                  {customFields
+                    .filter((f) => f.enabled)
+                    .filter((f) => f.showInStats)
+                    .filter((field) => ['number'].includes(field.type))
+                    .map((field) => (
+                      <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+                        <BlockTotal title={field.label} data={persons} field={field.name} />
+                      </Col>
+                    ))}
+                  {customFields
+                    .filter((f) => f.enabled)
+                    .filter((f) => f.showInStats)
+                    .filter((field) => ['date', 'date-with-time'].includes(field.type))
+                    .map((field) => (
+                      <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+                        <BlockDateWithTime data={persons} field={field} />
+                      </Col>
+                    ))}
+                  {customFields
+                    .filter((f) => f.enabled)
+                    .filter((f) => f.showInStats)
+                    .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
+                    .map((field) => (
+                      <CustomResponsivePie
+                        title={field.label}
+                        key={field.name}
+                        data={getPieData(persons, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+                      />
+                    ))}
+                </React.Fragment>
+              );
+            })
+          }
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des observations de territoire</Title>
