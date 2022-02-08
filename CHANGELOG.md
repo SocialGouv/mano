@@ -1,3 +1,10 @@
+## [1.50.3](https://github.com/SocialGouv/mano/compare/v1.50.2...v1.50.3) (2022-02-08)
+
+
+### Bug Fixes
+
+* **app:** add user in new action form ([0743443](https://github.com/SocialGouv/mano/commit/074344372eb444bfdc0e54cc3b513098957fb8ea))
+
 ## [1.50.2](https://github.com/SocialGouv/mano/compare/v1.50.1...v1.50.2) (2022-02-08)
 
 
