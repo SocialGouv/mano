@@ -1,3 +1,66 @@
+## [1.50.1](https://github.com/SocialGouv/mano/compare/v1.50.0...v1.50.1) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** fix key issue ([7e5c893](https://github.com/SocialGouv/mano/commit/7e5c893c7d0e3eabef959b60c94733eeac28be6f))
+
+# [1.50.0](https://github.com/SocialGouv/mano/compare/v1.49.8...v1.50.0) (2022-02-08)
+
+
+### Features
+
+* **app:** update mobile version ([4e46264](https://github.com/SocialGouv/mano/commit/4e462640c17aaae2c58e7d0211f6b4f3c9de2c4d))
+
+## [1.49.8](https://github.com/SocialGouv/mano/compare/v1.49.7...v1.49.8) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** fix iedge error for scroll ([6345382](https://github.com/SocialGouv/mano/commit/63453823b7f915398e44a118c4aa7731f21f11d4))
+
+## [1.49.7](https://github.com/SocialGouv/mano/compare/v1.49.6...v1.49.7) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** fix refresher bugs ([#353](https://github.com/SocialGouv/mano/issues/353)) ([5831d61](https://github.com/SocialGouv/mano/commit/5831d614fb45379f42d988ecbc447472aabd1ef2))
+
+## [1.49.6](https://github.com/SocialGouv/mano/compare/v1.49.5...v1.49.6) (2022-02-08)
+
+
+### Bug Fixes
+
+* **app:** remove cache when changing organisation ([#354](https://github.com/SocialGouv/mano/issues/354)) ([4d37cbe](https://github.com/SocialGouv/mano/commit/4d37cbee461c90d988ddebdeb83d6552cc3c5190))
+
+## [1.49.5](https://github.com/SocialGouv/mano/compare/v1.49.4...v1.49.5) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** categories can be empty ([a8ecbb1](https://github.com/SocialGouv/mano/commit/a8ecbb1d283f2e35f097272ba35803bfef94eaa6))
+
+## [1.49.4](https://github.com/SocialGouv/mano/compare/v1.49.3...v1.49.4) (2022-02-08)
+
+
+### Bug Fixes
+
+* **app:** fix action on save ([2f32f25](https://github.com/SocialGouv/mano/commit/2f32f251a769674aa7384abd60785aab51e3bb1a))
+
+## [1.49.3](https://github.com/SocialGouv/mano/compare/v1.49.2...v1.49.3) (2022-02-07)
+
+
+### Bug Fixes
+
+* bump release ([8d0a49a](https://github.com/SocialGouv/mano/commit/8d0a49a6c3cc30f355a77e5d92fb139113961002))
+
+## [1.49.2](https://github.com/SocialGouv/mano/compare/v1.49.1...v1.49.2) (2022-02-07)
+
+
+### Bug Fixes
+
+* **dashboard:** display teams ([24a7ae1](https://github.com/SocialGouv/mano/commit/24a7ae14770a1c0a32a58ac1dca1a01d549e545a))
+
 ## [1.49.1](https://github.com/SocialGouv/mano/compare/v1.49.0...v1.49.1) (2022-02-07)
 
 

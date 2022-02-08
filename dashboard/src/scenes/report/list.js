@@ -9,12 +9,14 @@ import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday, isOnS
 import { currentTeamState } from '../../recoil/auth';
 import { reportsState, useReports } from '../../recoil/reports';
 import { useRefresh } from '../../recoil/refresh';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { refreshTriggerState } from '../../components/Loader';
 
 const List = () => {
   const currentTeam = useRecoilValue(currentTeamState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const allReports = useRecoilValue(reportsState);
-  const { reportsRefresher, loading } = useRefresh();
+  const { loading } = useRefresh();
 
   const reports = allReports.filter((r) => r.team === currentTeam._id);
 
@@ -22,7 +24,13 @@ const List = () => {
     <Container style={{ padding: '40px 0' }}>
       <Header
         title={`Comptes rendus de l'équipe ${currentTeam?.nightSession ? 'de nuit ' : ''}${currentTeam?.name || ''}`}
-        onRefresh={reportsRefresher}
+        onRefresh={() => {
+          setRefreshTrigger({
+            status: true,
+            method: 'reportsRefresher',
+            options: [],
+          });
+        }}
         loading={loading}
       />
       {getMonths().map((date, index) => (

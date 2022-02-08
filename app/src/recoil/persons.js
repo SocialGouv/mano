@@ -299,7 +299,7 @@ export const personFields = [
     name: 'outOfActiveList',
     type: 'yes-no',
     label: 'Sortie de file active',
-    encrypted: false,
+    encrypted: true,
     importable: false,
     options: yesNoOptions,
     filterable: true,

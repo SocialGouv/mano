@@ -39,6 +39,8 @@ const castToAction = (action = {}) => ({
   withTime: action.withTime || false,
   completedAt: action.completedAt || null,
   entityKey: action.entityKey || '',
+  team: action.team || null,
+  structure: action.structure || null,
 });
 
 const Action = ({ navigation, route }) => {
@@ -173,6 +175,7 @@ const Action = ({ navigation, route }) => {
         path: `/action/${oldAction._id}`,
         body: prepareActionForEncryption(action),
       });
+      console.log(response);
       if (response.ok) {
         setActions((actions) =>
           actions.map((a) => {
@@ -219,7 +222,7 @@ const Action = ({ navigation, route }) => {
             {},
             castToAction(action),
             { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
-            { _id: a._id, person: a.person }
+            { _id: a._id, person: a.person, team: currentTeam._id }
           )
         );
       }
@@ -229,7 +232,7 @@ const Action = ({ navigation, route }) => {
           {},
           castToAction(action),
           { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
-          { _id: actionDB._id }
+          { _id: actionDB._id, team: currentTeam._id }
         )
       );
     }

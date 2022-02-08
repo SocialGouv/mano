@@ -1,4 +1,3 @@
-import AsyncStorage from '@react-native-community/async-storage';
 import { Alert, Linking, Platform } from 'react-native';
 import { MANO_DOWNLOAD_URL } from '../config';
 import API from './api';
@@ -8,7 +7,6 @@ import fetchRetry from 'fetch-retry';
 API.fetch = fetchRetry(fetch);
 
 API.logout = async (from) => {
-  await AsyncStorage.removeItem('persistent_email');
   if (API.navigation) {
     API.navigation.reset({
       index: 1,

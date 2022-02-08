@@ -16,9 +16,10 @@ import InputLabelled from '../../components/InputLabelled';
 import EyeIcon from '../../icons/EyeIcon';
 import Title, { SubTitle } from '../../components/Title';
 import { MANO_DOWNLOAD_URL } from '../../config';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
+import { clearCache, useStorage } from '../../services/dataManagement';
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -29,12 +30,12 @@ const Login = ({ navigation }) => {
   const [showPassword, setShowPassword] = useState(false);
   const [showEncryptionKeyInput, setShowEncryptionKeyInput] = useState(false);
   const [loading, setLoading] = useState(false);
-
   const setUser = useSetRecoilState(userState);
   const setOrganisation = useSetRecoilState(organisationState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
+  const [storageOrganisationId, setStorageOrganisationId] = useStorage('organisationId', 0);
   const { refresh } = useRefresh();
 
   const checkVersion = async () => {
@@ -121,6 +122,11 @@ const Login = ({ navigation }) => {
       const { data: users } = await API.get({ path: '/user', query: { minimal: true } });
       setUser(response.user);
       setOrganisation(response.user.organisation);
+      // We need to reset cache if organisation has changed.
+      if (response.user.organisation._id !== storageOrganisationId) {
+        clearCache();
+      }
+      setStorageOrganisationId(response.user.organisation._id);
       setUsers(users);
       setTeams(teams);
       API.navigation = navigation;

@@ -42,7 +42,7 @@ export const useRelsPerson = () => {
   return refreshRelsPersonPlace;
 };
 
-const encryptedFields = ['place', 'person'];
+const encryptedFields = ['place', 'person', 'user'];
 
 export const prepareRelPersonPlaceForEncryption = (relPersonPlace) => {
   const decrypted = {};
