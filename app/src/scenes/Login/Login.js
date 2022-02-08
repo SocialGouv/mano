@@ -122,8 +122,8 @@ const Login = ({ navigation }) => {
       const { data: users } = await API.get({ path: '/user', query: { minimal: true } });
       setUser(response.user);
       setOrganisation(response.user.organisation);
-      // If a storageOrganisationId is set, we need to reset cache if organisation has changed.
-      if (storageOrganisationId && response.user.organisation._id !== storageOrganisationId) {
+      // We need to reset cache if organisation has changed.
+      if (response.user.organisation._id !== storageOrganisationId) {
         clearCache();
       }
       setStorageOrganisationId(response.user.organisation._id);
