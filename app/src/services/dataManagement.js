@@ -22,6 +22,11 @@ export const useStorage = (key, defaultValue) => {
   return [value, setValue];
 };
 
+export function clearCache() {
+  MMKV.clearStore();
+  MMKV.clearMemoryCache();
+}
+
 // Get data from cache or fetch from server.
 export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
   if (isInitialization) {
