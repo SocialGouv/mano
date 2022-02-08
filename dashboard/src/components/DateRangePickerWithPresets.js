@@ -4,6 +4,9 @@ import styled from 'styled-components';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { DateRangePicker } from 'react-dates';
 import { dayjsInstance } from '../services/date';
+import moment from 'moment';
+
+moment.locale('fr');
 
 const getOffsetFromToday = (value, unit, end) => {
   const a = dayjsInstance();
@@ -92,7 +95,10 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   };
 
   const setPeriodRequest = (period) => {
-    setPeriod(period);
+    setPeriod({
+      startDate: period.startDate ? dayjsInstance(period.startDate.toDate()) : null,
+      endDate: period.endDate ? dayjsInstance(period.endDate.toDate()) : null,
+    });
     setPreset(null);
   };
 
@@ -137,8 +143,8 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
               startDatePlaceholderText="Entre..."
               endDatePlaceholderText="et le..."
               phrases={{ closeDatePicker: 'Fermer', clearDates: 'Effacer' }}
-              startDate={period.startDate}
-              endDate={period.endDate}
+              startDate={period.startDate ? moment(period.startDate.toDate()) : null}
+              endDate={period.endDate ? moment(period.endDate.toDate()) : null}
               onDatesChange={setPeriodRequest}
               focusedInput={datePickerFocused}
               onFocusChange={setDatePickerFocused}
