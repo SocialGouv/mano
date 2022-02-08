@@ -1,9 +1,10 @@
 const Sentry = require("@sentry/node");
 const Tracing = require("@sentry/tracing");
-
 const { VERSION, ENVIRONMENT } = require("./config");
 
-if (ENVIRONMENT !== "development" && ENVIRONMENT !== "test") {
+const sentryEnabled = ENVIRONMENT !== "development" && ENVIRONMENT !== "test" && process.env.MANO_API_IS_PRODUCTION === "true";
+
+if (sentryEnabled) {
   Sentry.init({
     dsn: "https://d5bde308505f4860b199e7031dcd17d6@o348403.ingest.sentry.io/5384501",
     environment: `api-${ENVIRONMENT}`,
@@ -16,7 +17,11 @@ if (ENVIRONMENT !== "development" && ENVIRONMENT !== "test") {
 }
 
 function capture(err, context = {}) {
-  console.log("capture", err, JSON.stringify(context));
+  if (!sentryEnabled) {
+    console.log("capture", err, JSON.stringify(context));
+    return;
+  }
+
   if (typeof context === "string") {
     context = JSON.parse(context);
   } else {
@@ -37,14 +42,11 @@ function capture(err, context = {}) {
       Sentry.captureMessage(e, context);
     }
   }
-  if (ENVIRONMENT !== "development" && ENVIRONMENT !== "test") {
-    if (typeof err === "string") {
-      Sentry.captureMessage(err, context);
-    } else {
-      Sentry.captureException(err, context);
-    }
+
+  if (typeof err === "string") {
+    Sentry.captureMessage(err, context);
   } else {
-    console.log("capture", err, JSON.stringify(context));
+    Sentry.captureException(err, context);
   }
 }
 
