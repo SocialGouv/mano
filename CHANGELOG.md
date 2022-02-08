@@ -1,3 +1,10 @@
+## [1.50.4](https://github.com/SocialGouv/mano/compare/v1.50.3...v1.50.4) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** add user in territory ([d0411d7](https://github.com/SocialGouv/mano/commit/d0411d7d7a1e0d6def5e263131c489379dcf2547))
+
 ## [1.50.3](https://github.com/SocialGouv/mano/compare/v1.50.2...v1.50.3) (2022-02-08)
 
 
