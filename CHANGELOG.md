@@ -1,3 +1,10 @@
+## [1.49.6](https://github.com/SocialGouv/mano/compare/v1.49.5...v1.49.6) (2022-02-08)
+
+
+### Bug Fixes
+
+* **app:** remove cache when changing organisation ([#354](https://github.com/SocialGouv/mano/issues/354)) ([4d37cbe](https://github.com/SocialGouv/mano/commit/4d37cbee461c90d988ddebdeb83d6552cc3c5190))
+
 ## [1.49.5](https://github.com/SocialGouv/mano/compare/v1.49.4...v1.49.5) (2022-02-08)
 
 
