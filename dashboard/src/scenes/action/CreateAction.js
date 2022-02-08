@@ -97,6 +97,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                 status: values.status,
                 categories: values.categories,
                 description: values.description,
+                user: user._id,
               };
               if (typeof values.person === 'string') {
                 body.person = values.person;
