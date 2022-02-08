@@ -92,6 +92,11 @@ router.get(
         "dueAt",
         "completedAt",
         // All other fields are encrypted and should not be returned.
+
+        // WARNING!
+        // Temporary fix: we need to return the team and structure since it's currently not returned by mobile
+        "team",
+        "structure",
       ],
     });
     const todo = actions.filter((a) => a.status === TODO);
