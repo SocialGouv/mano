@@ -1,3 +1,10 @@
+## [1.50.2](https://github.com/SocialGouv/mano/compare/v1.50.1...v1.50.2) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** action needs a user ([0dca670](https://github.com/SocialGouv/mano/commit/0dca67055fe96561676377ded4682e3a589ee863))
+
 ## [1.50.1](https://github.com/SocialGouv/mano/compare/v1.50.0...v1.50.1) (2022-02-08)
 
 
