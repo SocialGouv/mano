@@ -1,3 +1,10 @@
+# [1.51.0](https://github.com/SocialGouv/mano/compare/v1.50.4...v1.51.0) (2022-02-08)
+
+
+### Features
+
+* **api:** do not return encrypted fields ([#326](https://github.com/SocialGouv/mano/issues/326)) ([ef6e275](https://github.com/SocialGouv/mano/commit/ef6e2751ce02f6f34933cf2472492b1d5cd028d6))
+
 ## [1.50.4](https://github.com/SocialGouv/mano/compare/v1.50.3...v1.50.4) (2022-02-08)
 
 
