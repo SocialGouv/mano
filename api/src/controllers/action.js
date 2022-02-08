@@ -94,9 +94,10 @@ router.get(
         // All other fields are encrypted and should not be returned.
 
         // WARNING!
-        // Temporary fix: we need to return the team and structure since it's currently not returned by mobile
+        // Temporary fix: we need to return the team, user and structure since it's currently not returned by mobile
         "team",
         "structure",
+        "user",
       ],
     });
     const todo = actions.filter((a) => a.status === TODO);
