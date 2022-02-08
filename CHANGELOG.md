@@ -1,3 +1,10 @@
+## [1.53.2](https://github.com/SocialGouv/mano/compare/v1.53.1...v1.53.2) (2022-02-08)
+
+
+### Bug Fixes
+
+* **api:** remove sentry in non-production env ([438f632](https://github.com/SocialGouv/mano/commit/438f632ebf0de61f2043df76d534bc4f21cfaa1b))
+
 ## [1.53.1](https://github.com/SocialGouv/mano/compare/v1.53.0...v1.53.1) (2022-02-08)
 
 
