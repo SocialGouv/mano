@@ -1,3 +1,10 @@
+## [1.49.4](https://github.com/SocialGouv/mano/compare/v1.49.3...v1.49.4) (2022-02-08)
+
+
+### Bug Fixes
+
+* **app:** fix action on save ([2f32f25](https://github.com/SocialGouv/mano/commit/2f32f251a769674aa7384abd60785aab51e3bb1a))
+
 ## [1.49.3](https://github.com/SocialGouv/mano/compare/v1.49.2...v1.49.3) (2022-02-07)
 
 
