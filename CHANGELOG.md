@@ -1,3 +1,10 @@
+## [1.49.8](https://github.com/SocialGouv/mano/compare/v1.49.7...v1.49.8) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** fix iedge error for scroll ([6345382](https://github.com/SocialGouv/mano/commit/63453823b7f915398e44a118c4aa7731f21f11d4))
+
 ## [1.49.7](https://github.com/SocialGouv/mano/compare/v1.49.6...v1.49.7) (2022-02-08)
 
 
