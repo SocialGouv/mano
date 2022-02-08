@@ -1,3 +1,10 @@
+## [1.50.1](https://github.com/SocialGouv/mano/compare/v1.50.0...v1.50.1) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** fix key issue ([7e5c893](https://github.com/SocialGouv/mano/commit/7e5c893c7d0e3eabef959b60c94733eeac28be6f))
+
 # [1.50.0](https://github.com/SocialGouv/mano/compare/v1.49.8...v1.50.0) (2022-02-08)
 
 
