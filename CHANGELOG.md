@@ -1,3 +1,10 @@
+## [1.53.1](https://github.com/SocialGouv/mano/compare/v1.53.0...v1.53.1) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** fix dates for date range picker ([98394bd](https://github.com/SocialGouv/mano/commit/98394bd1d3f6c9c5dbabbdb6ac4078881ce387b6))
+
 # [1.53.0](https://github.com/SocialGouv/mano/compare/v1.52.0...v1.53.0) (2022-02-08)
 
 
