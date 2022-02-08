@@ -85,6 +85,8 @@ spec:
                 name: azure-pg-user
             - secretRef:
                 name: api
+            - configMapRef:
+                name: api-configmap
           env:
             - name: STORAGE_DIRECTORY
               value: /mnt/files
@@ -153,6 +155,26 @@ spec:
         owner: mano
         team: mano
     type: Opaque
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: api-configmap
+  annotations:
+    kapp.k14s.io/disable-default-ownership-label-rules: ''
+    kapp.k14s.io/disable-default-label-scoping-rules: ''
+    kapp.k14s.io/delete-strategy: orphan
+    app.gitlab.com/app: socialgouv-mano
+    app.gitlab.com/env: prod
+    app.gitlab.com/env.name: prod
+  labels:
+    application: mano
+    component: mano
+    owner: mano
+    team: mano
+  namespace: mano
+data:
+  MANO_API_IS_PRODUCTION: 'true'
 ---
 apiVersion: v1
 kind: Service
