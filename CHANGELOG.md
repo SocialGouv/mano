@@ -1,3 +1,10 @@
+## [1.49.7](https://github.com/SocialGouv/mano/compare/v1.49.6...v1.49.7) (2022-02-08)
+
+
+### Bug Fixes
+
+* **dashboard:** fix refresher bugs ([#353](https://github.com/SocialGouv/mano/issues/353)) ([5831d61](https://github.com/SocialGouv/mano/commit/5831d614fb45379f42d988ecbc447472aabd1ef2))
+
 ## [1.49.6](https://github.com/SocialGouv/mano/compare/v1.49.5...v1.49.6) (2022-02-08)
 
 
