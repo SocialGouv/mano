@@ -1,3 +1,10 @@
+# [1.53.0](https://github.com/SocialGouv/mano/compare/v1.52.0...v1.53.0) (2022-02-08)
+
+
+### Features
+
+* **k8s:** add configmap for api production ([#355](https://github.com/SocialGouv/mano/issues/355)) ([8ce916c](https://github.com/SocialGouv/mano/commit/8ce916c4fcc6e566114549f0191fe2bc2c4095cd))
+
 # [1.52.0](https://github.com/SocialGouv/mano/compare/v1.51.0...v1.52.0) (2022-02-08)
 
 
