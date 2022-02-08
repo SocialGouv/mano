@@ -7,7 +7,6 @@ const { catchErrors } = require("../errors");
 const Place = require("../models/place");
 const encryptedTransaction = require("../utils/encryptedTransaction");
 
-//@todo
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -18,7 +17,7 @@ router.post(
 
     newPlace.organisation = req.user.organisation;
     newPlace.user = req.user._id;
-
+    // Todo: ignore fields that are encrypted.
     if (req.body.hasOwnProperty("name")) newPlace.name = req.body.name || null;
 
     if (req.body.hasOwnProperty("encrypted")) newPlace.encrypted = req.body.encrypted || null;
@@ -52,7 +51,18 @@ router.get(
     if (!!req.query.limit) query.limit = limit;
     if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
 
-    const data = await Place.findAll(query);
+    const data = await Place.findAll({
+      ...query,
+      attributes: [
+        // Generic fields
+        "_id",
+        "encrypted",
+        "encryptedEntityKey",
+        "organisation",
+        "createdAt",
+        "updatedAt",
+      ],
+    });
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
   })
 );
@@ -69,8 +79,8 @@ router.put(
     };
 
     const updatePlace = {};
+    // Todo: ignore fields that are encrypted.
     if (req.body.hasOwnProperty("name")) updatePlace.name = req.body.name || null;
-
     if (req.body.hasOwnProperty("encrypted")) updatePlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatePlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
 

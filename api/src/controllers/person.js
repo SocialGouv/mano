@@ -99,13 +99,13 @@ router.post(
 
       if (ENCRYPTED_FIELDS_ONLY) return data;
 
+      // Todo: check if assignedTeams is always needed in full encryption mode.
       return data.map((p) => p.toJSON());
     });
     return res.status(status).send({ ok, data, error });
   })
 );
 
-//@checked
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -116,7 +116,6 @@ router.post(
     newPerson.user = req.user._id;
 
     if (req.body.hasOwnProperty("name")) newPerson.name = req.body.name;
-
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -125,6 +124,7 @@ router.post(
 
       if (ENCRYPTED_FIELDS_ONLY) return data;
 
+      // Todo: check if assignedTeams is always needed in full encryption mode.
       return data.toJSON();
     });
     return res.status(status).send({ ok, data, error });
@@ -143,8 +143,6 @@ router.get(
 
     if (req.query.lastRefresh) {
       query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      // const data = await Person.findAll(query);
-      // return res.status(200).send({ ok: true, data });
     }
 
     const total = await Person.count(query);
@@ -153,10 +151,29 @@ router.get(
     if (!!req.query.limit) query.limit = limit;
     if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
 
-    const data = await Person.findAll(query);
+    const data = await Person.findAll({
+      ...query,
+      attributes: [
+        // Generic fields
+        "_id",
+        "encrypted",
+        "encryptedEntityKey",
+        "organisation",
+        "createdAt",
+        "updatedAt",
+        // These fields should be encrypted but it seems they are not for some reason.
+        // We have to keep them, then find a solution to re-encrypt them all then drop them.
+        // This will be hard to maintain.
+        "reason", // Maybe not used since we have "reasons" field.
+        "startTakingCareAt", // Seems to be not used.
+        "outOfActiveList", // Should have been stored in encrypted fields.
+        // "vulnerabilities" and "consumptions" were removed but should have been previously encrypted.
+      ],
+    });
 
     if (ENCRYPTED_FIELDS_ONLY) return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
 
+    // Todo: check if relTeamPerson is always needed in full encryption mode.
     const teams = await Team.findAll(query);
 
     return res.status(200).send({
@@ -168,7 +185,6 @@ router.get(
   })
 );
 
-//@checked
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
@@ -183,8 +199,10 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
+    // Maybe this is not needed anymore.
     if (!person.user) req.body.user = req.user._id; // mitigate weird bug that puts no user for person creation
 
+    // Maybe this is not needed anymore.
     if (["Non", ""].includes(req.body.address)) {
       req.body.addressDetail = "";
     }
@@ -209,7 +227,6 @@ router.put(
   })
 );
 
-//@checked
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),

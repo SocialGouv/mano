@@ -8,7 +8,6 @@ const TerritoryObservation = require("../models/territoryObservation");
 const encryptedTransaction = require("../utils/encryptedTransaction");
 const { Op } = require("sequelize");
 
-//checked
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -19,6 +18,7 @@ router.post(
 
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
 
+    // Todo: ignore fields that are encrypted.
     if (!organisation.encryptionEnabled) {
       newObs.user = req.user._id;
       newObs.team = req.body.team;
@@ -34,7 +34,6 @@ router.post(
     }
 
     if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
-
     if (req.body.hasOwnProperty("encrypted")) newObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -58,9 +57,20 @@ router.get(
       order: [["createdAt", "DESC"]],
     };
 
+    const attributes = [
+      // Generic fields
+      "_id",
+      "encrypted",
+      "encryptedEntityKey",
+      "organisation",
+      "createdAt",
+      "updatedAt",
+      // Old fields (that are now all custom fields, should have been already encrypted)
+    ];
+
     if (req.query.lastRefresh) {
       query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      const data = await TerritoryObservation.findAll(query);
+      const data = await TerritoryObservation.findAll({ ...query, attributes });
       return res.status(200).send({ ok: true, data });
     }
 
@@ -69,7 +79,7 @@ router.get(
     if (!!req.query.limit) query.limit = limit;
     if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
 
-    const data = await TerritoryObservation.findAll(query);
+    const data = await TerritoryObservation.findAll({ ...query, attributes });
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
   })
 );

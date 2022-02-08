@@ -108,7 +108,6 @@ router.get(
   })
 );
 
-//@todo
 router.post(
   "/forgot_password",
   catchErrors(async ({ body: { email } }, res, cta) => {
@@ -139,7 +138,6 @@ Si vous en êtes à l'origine, vous pouvez cliquer sur ce lien: ${link}`;
   })
 );
 
-//@todo
 router.post(
   "/forgot_password_reset",
   catchErrors(async ({ body: { token, password } }, res) => {
@@ -158,7 +156,6 @@ router.post(
   })
 );
 
-//@todo
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -252,7 +249,6 @@ router.post(
   })
 );
 
-//@checked
 router.get(
   "/:id",
   passport.authenticate("user", { session: false }),
@@ -267,7 +263,6 @@ router.get(
   })
 );
 
-//@checked
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
@@ -293,7 +288,6 @@ router.get(
   })
 );
 
-//@checked
 router.put(
   "/",
   passport.authenticate("user", { session: false }),
@@ -324,7 +318,6 @@ router.put(
   })
 );
 
-//@checked
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
@@ -361,7 +354,6 @@ router.put(
   })
 );
 
-//@checked
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
@@ -377,6 +369,7 @@ router.delete(
     await Comment.update({ user: null }, fkQuery);
     await Action.update({ user: null }, fkQuery);
     await Person.update({ user: null }, fkQuery);
+    // Todo: there are missing tables, such as territory observations.
 
     const query = { where: { _id: userId } };
     query.where.organisation = req.user.organisation;

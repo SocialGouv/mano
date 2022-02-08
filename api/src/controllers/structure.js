@@ -6,7 +6,6 @@ const { Op, where, fn, col } = require("sequelize");
 const { catchErrors } = require("../errors");
 const Structure = require("../models/structure");
 
-//checked
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -26,6 +25,8 @@ router.get(
     const search = req.query.search;
     let condition = "";
     if (search && search.length) {
+      // Todo: fix or explain this.
+      // Search should not be an SQL injection.
       condition = search
         .trim()
         .replace("/&/g", "")
@@ -37,7 +38,6 @@ router.get(
     }
 
     let query = { order: [["createdAt", "ASC"]] };
-
     if (condition) query.where = { name: where(fn("to_tsvector", fn("LOWER", col("name"))), "@@", fn("to_tsquery", condition)) };
 
     const data = await Structure.findAll(query);

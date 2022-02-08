@@ -6,9 +6,7 @@ const { catchErrors } = require("../errors");
 
 const Team = require("../models/team");
 const RelUserTeam = require("../models/relUserTeam");
-const User = require("../models/user");
 
-//@checked
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -21,7 +19,6 @@ router.post(
   })
 );
 
-//@checked
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
@@ -33,7 +30,6 @@ router.get(
   })
 );
 
-//@checked
 router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
@@ -46,7 +42,6 @@ router.get(
   })
 );
 
-//@checked
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
@@ -62,7 +57,6 @@ router.put(
   })
 );
 
-//@checked
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
