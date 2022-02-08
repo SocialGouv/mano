@@ -14,7 +14,7 @@ import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
 import { actionsState, prepareActionForEncryption, TODO } from '../../recoil/actions';
-import { currentTeamState } from '../../recoil/auth';
+import { currentTeamState, userState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
 import API from '../../services/api';
 import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
@@ -22,6 +22,7 @@ import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/Ac
 const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
   const allPersons = useRecoilValue(personsState);
   const [name, setName] = useState('');
   const [dueAt, setDueAt] = useState(null);
@@ -77,6 +78,7 @@ const NewActionForm = ({ route, navigation }) => {
           withTime,
           status,
           categories,
+          user: user._id,
           completedAt: status !== TODO ? new Date().toISOString() : null,
         }),
       });
