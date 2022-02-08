@@ -6,7 +6,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
 import SelectTeam from '../../components/SelectTeam';
@@ -18,16 +18,16 @@ import { organisationState, teamsState, userState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 import SelectCustom from '../../components/SelectCustom';
 import { dateForDatePicker, formatDateWithFullMonth } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
-
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
-
   const { addAction } = useActions();
-  const { loading, actionsRefresher } = useRefresh();
+  const { loading } = useRefresh();
   const history = useHistory();
 
   title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${formatDateWithFullMonth(completedAt)}` : '');
@@ -47,7 +47,17 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
   return (
     <Wrapper {...wrapperProps}>
       {!!refreshable && (
-        <LinkButton onClick={() => actionsRefresher()} disabled={!!loading} color="link" style={{ marginRight: 10 }}>
+        <LinkButton
+          onClick={() => {
+            setRefreshTrigger({
+              status: true,
+              method: 'actionsRefresher',
+              options: [],
+            });
+          }}
+          disabled={!!loading}
+          color="link"
+          style={{ marginRight: 10 }}>
           Rafraichir
         </LinkButton>
       )}

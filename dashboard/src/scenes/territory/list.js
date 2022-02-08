@@ -5,7 +5,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Header from '../../components/header';
 import Page from '../../components/pagination';
 import Loading from '../../components/loading';
@@ -19,6 +19,7 @@ import { territoriesFullSearchSelector } from '../../recoil/selectors';
 import { currentTeamState, organisationState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 import { formatDateWithFullMonth } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
@@ -74,14 +75,25 @@ const List = () => {
 
 const CreateTerritory = () => {
   const [open, setOpen] = useState(false);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
   const { addTerritory } = useTerritories();
-  const { territoriesRefresher, loading } = useRefresh();
+  const { loading } = useRefresh();
 
   return (
     <CreateStyle>
-      <LinkButton disabled={!!loading} onClick={() => territoriesRefresher()} color="link" style={{ marginRight: 10 }}>
+      <LinkButton
+        disabled={!!loading}
+        onClick={() => {
+          setRefreshTrigger({
+            status: true,
+            method: 'territoriesRefresher',
+            options: [],
+          });
+        }}
+        color="link"
+        style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
       <ButtonCustom

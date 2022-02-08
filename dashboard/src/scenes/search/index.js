@@ -20,8 +20,7 @@ import { useActions } from '../../recoil/actions';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
-import { useRefresh } from '../../recoil/refresh';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   actionsSearchSelector,
   commentsSearchSelector,
@@ -32,11 +31,12 @@ import {
 } from '../../recoil/selectors';
 import ActionPersonName from '../../components/ActionPersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
 const View = () => {
-  const { refresh } = useRefresh();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const { search, setSearch } = useContext(PaginationContext);
   const [tabsContents, setTabsContents] = useState(initTabs);
   const location = useLocation();
@@ -98,7 +98,17 @@ const View = () => {
 
   return (
     <Container>
-      <Header titleStyle={{ fontWeight: '400' }} title="Rechercher" onRefresh={() => refresh()} />
+      <Header
+        titleStyle={{ fontWeight: '400' }}
+        title="Rechercher"
+        onRefresh={() => {
+          setRefreshTrigger({
+            status: true,
+            method: 'refresh',
+            options: [],
+          });
+        }}
+      />
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <Search placeholder="Par mot clé" value={search} onChange={setSearch} />

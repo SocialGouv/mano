@@ -17,9 +17,9 @@ import { currentTeamState, organisationState } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';
-import { useRefresh } from '../../recoil/refresh';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateWithFullMonth } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -94,12 +94,22 @@ const List = () => {
 
 const Create = () => {
   const [open, setOpen] = useState(false);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
   const { addPlace, loading } = usePlaces();
-  const { placesAndRelationsRefresher } = useRefresh();
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
-      <LinkButton disabled={!!loading} onClick={() => placesAndRelationsRefresher()} color="link" style={{ marginRight: 10 }}>
+      <LinkButton
+        disabled={!!loading}
+        onClick={() => {
+          setRefreshTrigger({
+            status: true,
+            method: 'placesAndRelationsRefresher',
+            options: [],
+          });
+        }}
+        color="link"
+        style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
       <ButtonCustom

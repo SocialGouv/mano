@@ -5,19 +5,35 @@ import picture1 from '../assets/MANO_livraison_elements-07_green.png';
 import picture2 from '../assets/MANO_livraison_elements-08_green.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
 import { useRefresh } from '../recoil/refresh';
+import { atom, useRecoilState } from 'recoil';
 
 function randomIntFromInterval(min, max) {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+export const refreshTriggerState = atom({
+  key: 'refreshTriggerState',
+  default: {
+    status: false,
+    options: [],
+  },
+});
+
 const Loader = () => {
-  const { loading, progress, fullScreen } = useRefresh();
+  const { loading, progress, fullScreen, ...refreshers } = useRefresh();
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
 
   useEffect(() => {
     setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
   }, [fullScreen]);
+
+  useEffect(() => {
+    if (refreshTrigger.status === false) return;
+    if (refreshers[refreshTrigger.method]) refreshers[refreshTrigger.method](...refreshTrigger.options);
+    setRefreshTrigger({ status: false, options: [] });
+  }, [refreshTrigger, setRefreshTrigger, refreshers]);
 
   if (!loading)
     return (

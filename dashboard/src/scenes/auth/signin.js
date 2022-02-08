@@ -13,24 +13,13 @@ import { theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import useApi, { setOrgEncryptionKey, hashedOrgEncryptionKey } from '../../services/api';
-import { useRefresh } from '../../recoil/refresh';
 import { encryptVerificationKey } from '../../services/encryption';
 import { AppSentry, capture } from '../../services/sentry';
-
-/*
-TODO:
-index.js:1 Warning: Can't perform a React state update on an unmounted component. This is a no-op, but it indicates a memory leak in your application. To fix, cancel all subscriptions and asynchronous tasks in a useEffect cleanup function.
-    at SignIn (http://localhost:8083/static/js/main.chunk.js:19285:68)
-    at Route (http://localhost:8083/static/js/vendors~main.chunk.js:262392:29)
-    at Switch (http://localhost:8083/static/js/vendors~main.chunk.js:262594:29)
-    at Router
-    at Route (http://localhost:8083/static/js/vendors~main.chunk.js:262392:29)
-
-*/
+import { refreshTriggerState } from '../../components/Loader';
 
 const SignIn = () => {
-  const { refresh } = useRefresh();
   const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
@@ -57,7 +46,11 @@ const SignIn = () => {
   };
 
   const onSigninValidated = async (organisation, user) => {
-    refresh({ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation, user));
+    setRefreshTrigger({
+      status: true,
+      method: 'refresh',
+      options: [{ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation, user)],
+    });
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {

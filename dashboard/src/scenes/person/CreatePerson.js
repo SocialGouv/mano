@@ -10,19 +10,31 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useRefresh } from '../../recoil/refresh';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { refreshTriggerState } from '../../components/Loader';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
   const { addPerson, persons } = usePersons();
-  const { personsRefresher, loading } = useRefresh();
+  const { loading } = useRefresh();
 
   return (
     <>
       {!!refreshable && (
-        <LinkButton onClick={() => personsRefresher()} disabled={!!loading} color="link" style={{ marginRight: 10 }}>
+        <LinkButton
+          onClick={() => {
+            setRefreshTrigger({
+              status: true,
+              method: 'personsRefresher',
+              options: [],
+            });
+          }}
+          disabled={!!loading}
+          color="link"
+          style={{ marginRight: 10 }}>
           Rafraichir
         </LinkButton>
       )}
