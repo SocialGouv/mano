@@ -16,7 +16,7 @@ import { useTerritories, territoryTypes } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesFullSearchSelector } from '../../recoil/selectors';
-import { currentTeamState, organisationState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { useRefresh } from '../../recoil/refresh';
 import { formatDateWithFullMonth } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
@@ -78,6 +78,7 @@ const CreateTerritory = () => {
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
   const { addTerritory } = useTerritories();
   const { loading } = useRefresh();
 
@@ -109,7 +110,7 @@ const CreateTerritory = () => {
           <Formik
             initialValues={{ name: '', types: [], perimeter: '' }}
             onSubmit={async (body, actions) => {
-              const res = await addTerritory(body);
+              const res = await addTerritory({ ...body, user: user._id });
               actions.setSubmitting(false);
               if (res.ok) {
                 toastr.success('Création réussie !');
