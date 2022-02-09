@@ -150,7 +150,7 @@ const Reception = () => {
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
-            <ButtonCustom disabled={selectedPersons.length !== 1} onClick={onGoToFile} color="link" title="Accéder au dossier" padding="12px 24px" />
+            <ButtonCustom disabled={selectedPersons.length > 1} onClick={onGoToFile} color="link" title="Accéder au dossier" padding="12px 24px" />
           </div>
         </Col>
         <Col md={4}>
