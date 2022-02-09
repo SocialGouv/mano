@@ -1,3 +1,10 @@
+## [1.53.4](https://github.com/SocialGouv/mano/compare/v1.53.3...v1.53.4) (2022-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** create action ([6ba2af8](https://github.com/SocialGouv/mano/commit/6ba2af8e6bc1dcaa3e705f20fb009e7de3f799f7))
+
 ## [1.53.3](https://github.com/SocialGouv/mano/compare/v1.53.2...v1.53.3) (2022-02-09)
 
 
