@@ -1,3 +1,10 @@
+## [1.53.3](https://github.com/SocialGouv/mano/compare/v1.53.2...v1.53.3) (2022-02-09)
+
+
+### Bug Fixes
+
+* **dashboard:** selectedPersons length ([103db71](https://github.com/SocialGouv/mano/commit/103db711fd8e72aecf2d2c19cfd36ea500a11aa1))
+
 ## [1.53.2](https://github.com/SocialGouv/mano/compare/v1.53.1...v1.53.2) (2022-02-08)
 
 
