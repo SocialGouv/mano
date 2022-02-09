@@ -157,7 +157,7 @@ const View = () => {
                         onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
                         isClearable={false}
                         isMulti
-                        value={values.categories}
+                        value={values.categories || []}
                         getOptionValue={(i) => i}
                         getOptionLabel={(i) => i}
                       />
