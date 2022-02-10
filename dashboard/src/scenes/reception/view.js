@@ -107,8 +107,8 @@ const Reception = () => {
     setAddingPassage(false);
   };
 
-  const onGoToFile = () => history.push(`/person/${selectedPersons[0]._id}`);
-  const onGoToLastReport = () => history.push(`/report/${lastReport._id}`);
+  const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
+  const onGoToLastReport = () => history.push(lastReport?._id ? `/report/${lastReport._id}` : '/report');
 
   return (
     <Container style={{ padding: 0 }}>
@@ -150,7 +150,7 @@ const Reception = () => {
             />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
-            <ButtonCustom disabled={selectedPersons.length > 1} onClick={onGoToFile} color="link" title="Accéder au dossier" padding="12px 24px" />
+            <ButtonCustom disabled={selectedPersons.length !== 1} onClick={onGoToFile} color="link" title="Accéder au dossier" padding="12px 24px" />
           </div>
         </Col>
         <Col md={4}>
