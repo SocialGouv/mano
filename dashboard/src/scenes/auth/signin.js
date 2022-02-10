@@ -54,7 +54,7 @@ const SignIn = () => {
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
-      history.push('/');
+      history.push('/action');
     }
   };
 
