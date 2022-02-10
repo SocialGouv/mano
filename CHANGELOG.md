@@ -1,3 +1,10 @@
+## [1.53.6](https://github.com/SocialGouv/mano/compare/v1.53.5...v1.53.6) (2022-02-10)
+
+
+### Bug Fixes
+
+* **dashboard:** actions on connection ([3d58eee](https://github.com/SocialGouv/mano/commit/3d58eee5ec3a1e1cfcb75255beb08e2e5258f290))
+
 ## [1.53.5](https://github.com/SocialGouv/mano/compare/v1.53.4...v1.53.5) (2022-02-10)
 
 
