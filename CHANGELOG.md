@@ -1,3 +1,10 @@
+## [1.53.8](https://github.com/SocialGouv/mano/compare/v1.53.7...v1.53.8) (2022-02-11)
+
+
+### Bug Fixes
+
+* upgrade oauth2 ([#363](https://github.com/SocialGouv/mano/issues/363)) ([94fa8ec](https://github.com/SocialGouv/mano/commit/94fa8ec8bfd458d4f86ab0bbb98cca41b8cdad85))
+
 ## [1.53.7](https://github.com/SocialGouv/mano/compare/v1.53.6...v1.53.7) (2022-02-11)
 
 
