@@ -16,8 +16,8 @@
     "printWidth": 150
   },
   "dependencies": {
-    "@sentry/node": "^5.30.0",
-    "@sentry/tracing": "^6.7.2",
+    "@sentry/node": "^6.17.6",
+    "@sentry/tracing": "^6.17.6",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
