@@ -1,3 +1,10 @@
+## [1.53.7](https://github.com/SocialGouv/mano/compare/v1.53.6...v1.53.7) (2022-02-11)
+
+
+### Bug Fixes
+
+* **api:** update sentry ([#361](https://github.com/SocialGouv/mano/issues/361)) ([a1ffbec](https://github.com/SocialGouv/mano/commit/a1ffbec47afda63ec30ab14727de2ac1d7471ca2))
+
 ## [1.53.6](https://github.com/SocialGouv/mano/compare/v1.53.5...v1.53.6) (2022-02-10)
 
 
