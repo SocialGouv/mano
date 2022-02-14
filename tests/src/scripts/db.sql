@@ -217,9 +217,7 @@ create table if not exists "mano"."RelPersonPlace"
         constraint "RelPersonPlace_user_fkey"
             references "mano"."User",
     encrypted            text,
-    "encryptedEntityKey" text,
-    constraint "RelPersonPlace_person_place_key"
-        unique (person, place)
+    "encryptedEntityKey" text
 );
 
 create table if not exists "mano"."RelUserTeam"
