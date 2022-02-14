@@ -12,14 +12,7 @@ router.post(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     const newTerritory = {};
-
     newTerritory.organisation = req.user.organisation;
-    newTerritory.user = req.user._id;
-    newTerritory.name = req.body.name;
-
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("types")) newTerritory.types = req.body.types;
-    if (req.body.hasOwnProperty("perimeter")) newTerritory.perimeter = req.body.perimeter;
     if (req.body.hasOwnProperty("encrypted")) newTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
 
@@ -79,10 +72,6 @@ router.put(
       },
     };
     const updateTerritory = {};
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("name")) updateTerritory.name = req.body.name;
-    if (req.body.hasOwnProperty("types")) updateTerritory.types = req.body.types;
-    if (req.body.hasOwnProperty("perimeter")) updateTerritory.perimeter = req.body.perimeter;
     if (req.body.hasOwnProperty("encrypted")) updateTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
 

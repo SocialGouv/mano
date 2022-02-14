@@ -18,11 +18,6 @@ router.post(
 
     newRelPersonPlace.organisation = req.user.organisation;
     newRelPersonPlace.user = req.user._id;
-
-    // Todo: ignore fields that are encrypted.
-    newRelPersonPlace.person = req.body.person || null;
-    newRelPersonPlace.place = req.body.place || null;
-
     if (req.body.hasOwnProperty("encrypted")) newRelPersonPlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newRelPersonPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -64,7 +59,7 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
-        // Not yet encrypted. Should it be?
+        // Not yet encrypted. It should be!
         "user",
       ],
     });

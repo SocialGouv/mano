@@ -8,9 +8,8 @@ const multer = require("multer");
 const crypto = require("crypto");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
-const Team = require("../models/team");
 const encryptedTransaction = require("../utils/encryptedTransaction");
-const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
+const { STORAGE_DIRECTORY } = require("../config");
 
 // Return the basedir to store persons' documents.
 function personDocumentBasedir(userOrganisation, personId) {
@@ -96,10 +95,6 @@ router.post(
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       const data = await Person.bulkCreate(persons, { returning: true, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return data;
-
-      // Todo: check if assignedTeams is always needed in full encryption mode.
       return data.map((p) => p.toJSON());
     });
     return res.status(status).send({ ok, data, error });
@@ -113,18 +108,11 @@ router.post(
     const newPerson = {};
 
     newPerson.organisation = req.user.organisation;
-    newPerson.user = req.user._id;
-
-    if (req.body.hasOwnProperty("name")) newPerson.name = req.body.name;
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       const data = await Person.create(newPerson, { returning: true, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return data;
-
-      // Todo: check if assignedTeams is always needed in full encryption mode.
       return data.toJSON();
     });
     return res.status(status).send({ ok, data, error });
@@ -164,17 +152,10 @@ router.get(
         // These fields should be encrypted but it seems they are not for some reason.
         // We have to keep them, then find a solution to re-encrypt them all then drop them.
         // This will be hard to maintain.
-        "reason", // Maybe not used since we have "reasons" field.
-        "startTakingCareAt", // Seems to be not used.
         "outOfActiveList", // Should have been stored in encrypted fields.
         // "vulnerabilities" and "consumptions" were removed but should have been previously encrypted.
       ],
     });
-
-    if (ENCRYPTED_FIELDS_ONLY) return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
-
-    // Todo: check if relTeamPerson is always needed in full encryption mode.
-    const teams = await Team.findAll(query);
 
     return res.status(200).send({
       ok: true,
@@ -199,14 +180,7 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    // Maybe this is not needed anymore.
-    if (!person.user) req.body.user = req.user._id; // mitigate weird bug that puts no user for person creation
-
-    // Maybe this is not needed anymore.
-    if (["Non", ""].includes(req.body.address)) {
-      req.body.addressDetail = "";
-    }
-
+    // Todo: change this since createdAt should not be used for update.
     if (req.body.createdAt) {
       person.changed("createdAt", true);
       req.body.createdAt = new Date(req.body.createdAt);
@@ -216,12 +190,7 @@ router.put(
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       await Person.update(req.body, query, { silent: false, transaction: tx });
-      // According to this comment, we should use transaction here:
-      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
-      const newPerson = await Person.findOne({ ...query, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return person;
-
+      const newPerson = await Person.findOne(query);
       return newPerson.toJSON();
     });
 

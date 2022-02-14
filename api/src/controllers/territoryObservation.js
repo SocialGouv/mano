@@ -13,26 +13,9 @@ router.post(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     const newObs = {};
-
     newObs.organisation = req.user.organisation;
 
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-
-    // Todo: ignore fields that are encrypted.
-    if (!organisation.encryptionEnabled) {
-      newObs.user = req.user._id;
-      newObs.team = req.body.team;
-      if (!newObs.team) return res.status(400).send({ ok: false, error: "Team is required" });
-      if (req.body.hasOwnProperty("personsMale")) newObs.personsMale = req.body.personsMale || null;
-      if (req.body.hasOwnProperty("personsFemale")) newObs.personsFemale = req.body.personsFemale || null;
-      if (req.body.hasOwnProperty("police")) newObs.police = req.body.police || null;
-      if (req.body.hasOwnProperty("material")) newObs.material = req.body.material || null;
-      if (req.body.hasOwnProperty("atmosphere")) newObs.atmosphere = req.body.atmosphere || null;
-      if (req.body.hasOwnProperty("mediation")) newObs.mediation = req.body.mediation || null;
-      if (req.body.hasOwnProperty("comment")) newObs.comment = req.body.comment || null;
-      if (req.body.hasOwnProperty("territory")) newObs.territory = req.body.territory || null;
-    }
-
+    // This "createdAt" pattern should be avoided. createdAt should not be updated.
     if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
     if (req.body.hasOwnProperty("encrypted")) newObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -99,18 +82,7 @@ router.put(
     const observation = await TerritoryObservation.findOne(query);
     if (!observation) return res.status(404).send({ ok: false, error: "Not found" });
 
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-
-    if (!organisation.encryptionEnabled) {
-      if (req.body.hasOwnProperty("personsMale")) updateObs.personsMale = req.body.personsMale || null;
-      if (req.body.hasOwnProperty("personsFemale")) updateObs.personsFemale = req.body.personsFemale || null;
-      if (req.body.hasOwnProperty("police")) updateObs.police = req.body.police || null;
-      if (req.body.hasOwnProperty("material")) updateObs.material = req.body.material || null;
-      if (req.body.hasOwnProperty("atmosphere")) updateObs.atmosphere = req.body.atmosphere || null;
-      if (req.body.hasOwnProperty("mediation")) updateObs.mediation = req.body.mediation || null;
-      if (req.body.hasOwnProperty("comment")) updateObs.comment = req.body.comment || null;
-    }
-
+    // This "createdAt" pattern should be avoided. createdAt should not be updated.
     if (req.body.hasOwnProperty("createdAt")) {
       observation.changed("createdAt", true);
       updateObs.createdAt = req.body.createdAt || null;

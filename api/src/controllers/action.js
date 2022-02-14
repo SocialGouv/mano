@@ -2,9 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
-
 const { catchErrors } = require("../errors");
-
 const Action = require("../models/action");
 const encryptedTransaction = require("../utils/encryptedTransaction");
 
@@ -23,14 +21,13 @@ router.post(
       return res.send(403).send({ ok: false, error: "No team while creating action" });
     }
 
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("name")) newAction.name = req.body.name || null;
-    if (req.body.hasOwnProperty("person")) newAction.person = req.body.person || null;
+    // These fields are not encrypted
     if (req.body.hasOwnProperty("status")) newAction.status = req.body.status || null;
     if (req.body.hasOwnProperty("dueAt")) newAction.dueAt = req.body.dueAt || null;
-    if (req.body.hasOwnProperty("withTime")) newAction.withTime = req.body.withTime || null;
     if (req.body.hasOwnProperty("completedAt")) newAction.completedAt = req.body.completedAt || null;
     if (req.body.hasOwnProperty("structure")) newAction.structure = req.body.structure || null;
+    // Encrypted fields.
+    // Todo: they should be mandatory and throw error when missing.
     if (req.body.hasOwnProperty("encrypted")) newAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -122,17 +119,13 @@ router.put(
 
     const updateAction = {};
 
-    // Todo: ignore fields that are encrypted.
+    // These fields are not encrypted
     if (req.body.hasOwnProperty("status")) updateAction.status = req.body.status || null;
-    if (req.body.hasOwnProperty("withTime")) updateAction.withTime = req.body.withTime || null;
     if (req.body.hasOwnProperty("dueAt")) updateAction.dueAt = req.body.dueAt || null;
     if (req.body.hasOwnProperty("completedAt")) updateAction.completedAt = req.body.completedAt || null;
-    if (req.body.hasOwnProperty("category")) updateAction.category = req.body.category || null;
-    if (req.body.hasOwnProperty("categories")) updateAction.categories = req.body.categories || null;
-    if (req.body.hasOwnProperty("person")) updateAction.person = req.body.person || null;
     if (req.body.hasOwnProperty("structure")) updateAction.structure = req.body.structure || null;
-    if (req.body.hasOwnProperty("name")) updateAction.name = req.body.name || null;
-    if (req.body.hasOwnProperty("description")) updateAction.description = req.body.description || null;
+    // Encrypted fields.
+    // Todo: they should be mandatory and throw error when missing.
     if (req.body.hasOwnProperty("encrypted")) updateAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
