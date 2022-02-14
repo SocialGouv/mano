@@ -1,3 +1,10 @@
+## [1.53.9](https://github.com/SocialGouv/mano/compare/v1.53.8...v1.53.9) (2022-02-14)
+
+
+### Bug Fixes
+
+* fix recoil ([e60417f](https://github.com/SocialGouv/mano/commit/e60417f7ec4220fe973855d72a6db5ad4cdecf03))
+
 ## [1.53.8](https://github.com/SocialGouv/mano/compare/v1.53.7...v1.53.8) (2022-02-11)
 
 
