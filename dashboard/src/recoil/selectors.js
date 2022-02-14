@@ -310,7 +310,7 @@ export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
               currentTeam?.nightSession ? 12 : 0
             )
         )
-        .filter((c) => !!c.comment.includes('Passage enregistré'))
+        .filter((c) => !!(c.comment || '').includes('Passage enregistré'))
         .map((passage) => {
           const commentPopulated = { ...passage };
           if (passage.person) {

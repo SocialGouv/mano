@@ -354,7 +354,7 @@ export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
       return comments
         .filter((c) => c.team === currentTeam._id)
         .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-        .filter((c) => !!c.comment.includes('Passage enregistré'))
+        .filter((c) => !!(c.comment || '').includes('Passage enregistré'))
         .map((passage) => {
           const commentPopulated = { ...passage };
           if (passage.person) {
