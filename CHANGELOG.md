@@ -1,3 +1,10 @@
+## [1.53.11](https://github.com/SocialGouv/mano/compare/v1.53.10...v1.53.11) (2022-02-14)
+
+
+### Bug Fixes
+
+* get args in errors ([40e2b74](https://github.com/SocialGouv/mano/commit/40e2b74f394a530dafa4ec709deee6c3d0f6ee02))
+
 ## [1.53.10](https://github.com/SocialGouv/mano/compare/v1.53.9...v1.53.10) (2022-02-14)
 
 
