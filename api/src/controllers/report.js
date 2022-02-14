@@ -59,8 +59,8 @@ router.post(
     if (req.body.hasOwnProperty("encryptedEntityKey")) newReport.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Report.create(newReport, { returning: true, transaction: tx });
-      return data;
+      const reportData = await Report.create(newReport, { returning: true, transaction: tx });
+      return reportData;
     });
 
     return res.status(status).send({ ok, data, error });
