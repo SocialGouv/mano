@@ -90,6 +90,7 @@ router.put(
     if (req.body.hasOwnProperty("user")) updateComment.user = req.body.user || null;
     if (req.body.hasOwnProperty("encrypted")) updateComment.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
+      // FIXME: Bad pattern
       comment.changed("createdAt", true);
       updateComment.createdAt = new Date(req.body.createdAt);
     }
