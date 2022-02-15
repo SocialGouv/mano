@@ -1,3 +1,10 @@
+## [1.53.12](https://github.com/SocialGouv/mano/compare/v1.53.11...v1.53.12) (2022-02-15)
+
+
+### Bug Fixes
+
+* **api:** try to relaunch ([#372](https://github.com/SocialGouv/mano/issues/372)) ([17017cc](https://github.com/SocialGouv/mano/commit/17017cc55f4a09aa1d90fade8f61c4d2f6fbd357))
+
 ## [1.53.11](https://github.com/SocialGouv/mano/compare/v1.53.10...v1.53.11) (2022-02-14)
 
 
