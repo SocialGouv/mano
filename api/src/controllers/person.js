@@ -196,10 +196,13 @@ router.put(
     if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
       person.changed("createdAt", true);
       updatePerson.createdAt = new Date(req.body.createdAt);
+<<<<<<< HEAD
     }
 
     if (req.body.hasOwnProperty("outOfActiveList")) {
       updatePerson.outOfActiveList = req.body.outOfActiveList;
+=======
+>>>>>>> ea9c72b (a few cleans)
     }
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {

@@ -76,7 +76,7 @@ router.post(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const where = { _id: req.params._id };
 
     const report = await Report.findOne({ where });

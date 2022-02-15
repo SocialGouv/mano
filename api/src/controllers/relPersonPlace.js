@@ -65,8 +65,6 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
-        // Not yet encrypted. It should be!
-        "user",
       ],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
