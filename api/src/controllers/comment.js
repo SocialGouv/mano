@@ -10,14 +10,15 @@ const encryptedTransaction = require("../utils/encryptedTransaction");
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const newComment = {};
 
     newComment.organisation = req.user.organisation;
-    newComment.user = req.user._id;
-    newComment.team = req.body.team;
-    if (!newComment.team) return res.status(400).send({ ok: false, error: "Team is required" });
-    if (!newComment.user) return res.status(400).send({ ok: false, error: "User is required" });
+
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in comment creation");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
     if (req.body.hasOwnProperty("encrypted")) newComment.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newComment.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -68,7 +69,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     if (!req.body.comment) return res.status(400).send({ ok: false, error: "Comment is missing" });
 
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
@@ -77,11 +78,14 @@ router.put(
 
     const updateComment = {};
 
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in comment update");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
     if (req.body.hasOwnProperty("encrypted")) updateComment.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateComment.encryptedEntityKey = req.body.encryptedEntityKey || null;
-    // This pattern should be avoided. createdAt should be updated only when it is created.
+    // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
     if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
-      // FIXME: Bad pattern
       comment.changed("createdAt", true);
       updateComment.createdAt = new Date(req.body.createdAt);
     }

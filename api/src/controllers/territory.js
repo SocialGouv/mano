@@ -13,6 +13,11 @@ router.post(
   catchErrors(async (req, res) => {
     const newTerritory = {};
     newTerritory.organisation = req.user.organisation;
+
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in territory create");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
     if (req.body.hasOwnProperty("encrypted")) newTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
 
@@ -72,6 +77,11 @@ router.put(
       },
     };
     const updateTerritory = {};
+
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in territory create");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
     if (req.body.hasOwnProperty("encrypted")) updateTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
 

@@ -47,6 +47,7 @@ const sequelize = require("../sequelize");
       DROP COLUMN IF EXISTS "addressDetail",
       DROP COLUMN IF EXISTS "alertness",
       DROP COLUMN IF EXISTS "startTakingCareAt",
+      DROP COLUMN IF EXISTS "outOfActiveList",
       DROP COLUMN IF EXISTS "outOfActiveListReason",
       DROP COLUMN IF EXISTS "phone";`
   );

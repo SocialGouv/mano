@@ -104,10 +104,15 @@ router.post(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const newPerson = {};
 
     newPerson.organisation = req.user.organisation;
+
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in person create");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -149,11 +154,6 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
-        // These fields should be encrypted but it seems they are not for some reason.
-        // We have to keep them, then find a solution to re-encrypt them all then drop them.
-        // This will be hard to maintain.
-        "outOfActiveList", // Should have been stored in encrypted fields.
-        // "vulnerabilities" and "consumptions" were removed but should have been previously encrypted.
       ],
     });
 
@@ -169,7 +169,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const query = {
       where: {
         _id: req.params._id,
@@ -180,16 +180,22 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    // Todo: change this since createdAt should not be used for update.
-    if (req.body.createdAt) {
+    const updatePerson = {};
+
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in person update");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
+    if (req.body.hasOwnProperty("encrypted")) updatePerson.encrypted = req.body.encrypted || null;
+    if (req.body.hasOwnProperty("encryptedEntityKey")) updatePerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
+    // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
+    if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
       person.changed("createdAt", true);
-      req.body.createdAt = new Date(req.body.createdAt);
-    } else {
-      req.body.createdAt = person.createdAt;
+      updatePerson.createdAt = new Date(req.body.createdAt);
     }
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await Person.update(req.body, query, { silent: false, transaction: tx });
+      await Person.update(updatePerson, query, { silent: false, transaction: tx });
       const newPerson = await Person.findOne(query);
       return newPerson.toJSON();
     });

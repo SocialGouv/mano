@@ -15,10 +15,15 @@ router.post(
     const newObs = {};
     newObs.organisation = req.user.organisation;
 
-    // This "createdAt" pattern should be avoided. createdAt should not be updated.
-    if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in territoryObs create");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
+
     if (req.body.hasOwnProperty("encrypted")) newObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
+    // FIXME: This "createdAt" pattern should be avoided. createdAt should not be updated.
+    if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       const data = await TerritoryObservation.create(newObs, { returning: true, transaction: tx });
@@ -82,14 +87,19 @@ router.put(
     const observation = await TerritoryObservation.findOne(query);
     if (!observation) return res.status(404).send({ ok: false, error: "Not found" });
 
-    // This "createdAt" pattern should be avoided. createdAt should not be updated.
-    if (req.body.hasOwnProperty("createdAt")) {
-      observation.changed("createdAt", true);
-      updateObs.createdAt = req.body.createdAt || null;
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in territoryObs create");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
     }
 
     if (req.body.hasOwnProperty("encrypted")) updateObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
+
+    // FIXME: This "createdAt" pattern should be avoided. createdAt should not be updated.
+    if (req.body.hasOwnProperty("createdAt")) {
+      observation.changed("createdAt", true);
+      updateObs.createdAt = req.body.createdAt || null;
+    }
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       await TerritoryObservation.update(updateObs, query, { silent: false, transaction: tx });

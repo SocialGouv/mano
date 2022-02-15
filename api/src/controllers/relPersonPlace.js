@@ -10,14 +10,19 @@ const encryptedTransaction = require("../utils/encryptedTransaction");
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const { person, place } = req.body;
     if (!person || !place) return res.status(400).send({ ok: false, error: "Missing place or person" });
 
     const newRelPersonPlace = {};
 
     newRelPersonPlace.organisation = req.user.organisation;
-    newRelPersonPlace.user = req.user._id;
+
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in relPersonPlace create");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
+
     if (req.body.hasOwnProperty("encrypted")) newRelPersonPlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newRelPersonPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -59,8 +64,6 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
-        // Not yet encrypted. It should be!
-        "user",
       ],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });

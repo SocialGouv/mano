@@ -43,8 +43,6 @@ TerritoryObservation.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(TerritoryObservation, organisationForeignKey);
 
 // Place
-Place.belongsToMany(Person, { ...placeForeignKey, through: RelPersonPlace });
-Person.belongsToMany(Place, { ...personForeignKey, through: RelPersonPlace });
 Place.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(Place, organisationForeignKey);
 RelPersonPlace.belongsTo(Organisation, organisationForeignKey);

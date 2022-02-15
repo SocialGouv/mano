@@ -9,7 +9,7 @@ const encryptedTransaction = require("../utils/encryptedTransaction");
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const newAction = {};
 
     newAction.organisation = req.user.organisation;
@@ -27,7 +27,10 @@ router.post(
     if (req.body.hasOwnProperty("completedAt")) newAction.completedAt = req.body.completedAt || null;
     if (req.body.hasOwnProperty("structure")) newAction.structure = req.body.structure || null;
     // Encrypted fields.
-    // Todo: they should be mandatory and throw error when missing.
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in action creation");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
     if (req.body.hasOwnProperty("encrypted")) newAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -109,7 +112,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const where = { _id: req.params._id };
     where.organisation = req.user.organisation;
     if (req.user.role !== "admin") where.team = req.user.teams.map((e) => e._id);
@@ -125,7 +128,10 @@ router.put(
     if (req.body.hasOwnProperty("completedAt")) updateAction.completedAt = req.body.completedAt || null;
     if (req.body.hasOwnProperty("structure")) updateAction.structure = req.body.structure || null;
     // Encrypted fields.
-    // Todo: they should be mandatory and throw error when missing.
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      next("No encrypted field in action update");
+      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+    }
     if (req.body.hasOwnProperty("encrypted")) updateAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
