@@ -140,7 +140,7 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         versionCode 3
-        versionName "2.11.0"
+        versionName "2.11.2"
     }
     packagingOptions {
        pickFirst 'lib/x86/libc++_shared.so'

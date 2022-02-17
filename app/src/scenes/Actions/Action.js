@@ -62,6 +62,10 @@ const Action = ({ navigation, route }) => {
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
 
+  useEffect(() => {
+    if (route?.params?.duplicate) Alert.alert("L'action est dupliquée, vous pouvez la modifier !", "L'action originale est annulée");
+  }, []);
+
   const isUpdateDisabled = useMemo(() => {
     const newAction = { ...actionDB, ...castToAction(action) };
     if (JSON.stringify(actionDB) !== JSON.stringify(newAction)) return false;
@@ -291,6 +295,7 @@ const Action = ({ navigation, route }) => {
       ...response.data,
       fromRoute: 'ActionsList',
       editable: true,
+      duplicate: true,
     });
   };
 
@@ -315,7 +320,6 @@ const Action = ({ navigation, route }) => {
       for (let comment of comments.filter((c) => c.action === id)) {
         const res = await API.delete({ path: `/comment/${comment._id}` });
         if (res.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
-        return res;
       }
     }
     return res;
