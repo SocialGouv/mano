@@ -175,7 +175,6 @@ const Action = ({ navigation, route }) => {
         path: `/action/${oldAction._id}`,
         body: prepareActionForEncryption(action),
       });
-      console.log(response);
       if (response.ok) {
         setActions((actions) =>
           actions.map((a) => {
@@ -187,11 +186,12 @@ const Action = ({ navigation, route }) => {
       if (!response?.ok) return response;
       const newAction = response.decryptedData;
       if (!statusChanged) return response;
+
       const comment = {
         comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
         type: 'action',
-        item: actionDB._id,
-        action: actionDB._id,
+        item: actionDB?._id,
+        action: actionDB?._id,
         team: currentTeam._id,
         user: user._id,
         organisation: organisation._id,
@@ -232,7 +232,7 @@ const Action = ({ navigation, route }) => {
           {},
           castToAction(action),
           { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
-          { _id: actionDB._id, team: currentTeam._id }
+          { _id: actionDB?._id, team: currentTeam._id }
         )
       );
     }
@@ -257,9 +257,16 @@ const Action = ({ navigation, route }) => {
     }
   };
 
+  useEffect(() => {
+    if (!editable) {
+      if (action.status !== actionDB.status) onUpdateActionRequest();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editable, action.status]);
+
   const onDuplicate = async () => {
     setUpdating(true);
-    const { name, person, dueAt, withTime } = action;
+    const { name, person, dueAt, withTime, description, categories } = action;
     const response = await API.post({
       path: '/action',
       body: prepareActionForEncryption({
@@ -269,6 +276,8 @@ const Action = ({ navigation, route }) => {
         dueAt,
         withTime,
         status: TODO,
+        description,
+        categories,
       }),
     });
     if (!response.ok) {
@@ -364,7 +373,7 @@ const Action = ({ navigation, route }) => {
       <ScreenTitle
         title={persons?.length && persons.length === 1 ? `${name} - ${persons[0].name}` : name}
         onBack={onGoBackRequested}
-        onEdit={!editable ? setEditable(true) : null}
+        onEdit={!editable ? () => setEditable(true) : null}
         onSave={!editable || isUpdateDisabled ? null : onUpdateActionRequest}
         saving={updating}
       />
@@ -399,7 +408,6 @@ const Action = ({ navigation, route }) => {
           onSelect={(status) => setAction((a) => ({ ...a, status }))}
           onSelectAndSave={(status) => {
             setAction((a) => ({ ...a, status }));
-            onUpdateActionRequest();
           }}
           value={status}
           editable={editable}
@@ -434,15 +442,15 @@ const Action = ({ navigation, route }) => {
           <ButtonDelete onPress={onDeleteRequest} />
           <Button
             caption={editable ? 'Mettre à jour' : 'Modifier'}
-            onPress={editable ? onUpdateActionRequest : setEditable(true)}
+            onPress={editable ? onUpdateActionRequest : () => setEditable(true)}
             disabled={editable ? isUpdateDisabled : false}
             loading={updating}
           />
         </ButtonsContainer>
         <SubList
           label="Commentaires"
-          key={actionDB._id}
-          data={comments.filter((c) => c.action === actionDB._id)}
+          key={actionDB?._id}
+          data={comments.filter((c) => c.action === actionDB?._id)}
           renderItem={(comment, index) => (
             <CommentRow
               key={index}
@@ -468,7 +476,7 @@ const Action = ({ navigation, route }) => {
             <NewCommentInput
               forwardRef={newCommentRef}
               onFocus={() => _scrollToInput(newCommentRef)}
-              action={actionDB._id}
+              action={actionDB?._id}
               writeComment={setWritingComment}
             />
           )}
