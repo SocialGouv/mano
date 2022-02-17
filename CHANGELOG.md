@@ -1,3 +1,10 @@
+## [1.53.13](https://github.com/SocialGouv/mano/compare/v1.53.12...v1.53.13) (2022-02-17)
+
+
+### Bug Fixes
+
+* **app:** button done/cancel for action ([#373](https://github.com/SocialGouv/mano/issues/373)) ([6213681](https://github.com/SocialGouv/mano/commit/6213681bcf9174edc3a8b1c5763f2b09792c9079))
+
 ## [1.53.12](https://github.com/SocialGouv/mano/compare/v1.53.11...v1.53.12) (2022-02-15)
 
 
