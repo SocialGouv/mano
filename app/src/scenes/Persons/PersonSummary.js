@@ -35,6 +35,7 @@ const PersonSummary = ({
   onUpdatePerson,
   onChange,
   updating,
+  deleting,
   editable,
   onEdit,
   isUpdateDisabled,
@@ -251,11 +252,11 @@ const PersonSummary = ({
       />
       {!editable && <Spacer />}
       <ButtonsContainer>
-        <ButtonDelete onPress={onDeleteRequest} />
+        <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />
         <Button
           caption={editable ? 'Mettre à jour' : 'Modifier'}
           onPress={editable ? onUpdatePerson : onEdit}
-          disabled={editable ? isUpdateDisabled : false}
+          disabled={editable ? isUpdateDisabled : deleting}
           loading={updating}
         />
       </ButtonsContainer>
@@ -264,6 +265,7 @@ const PersonSummary = ({
           caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
           onPress={() => (person.outOfActiveList ? onGetBackToActiveList() : onRemoveFromActiveList())}
           color={colors.warning.color}
+          disabled={editable ? isUpdateDisabled : deleting}
         />
       </ButtonsContainer>
 

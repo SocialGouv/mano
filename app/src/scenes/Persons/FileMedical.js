@@ -53,6 +53,7 @@ const FileMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, i
               return (
                 <CustomFieldInput
                   label={label}
+                  key={label}
                   field={field}
                   value={person[name]}
                   handleChange={(newValue) => onChange({ [name]: newValue })}

@@ -90,6 +90,7 @@ const Person = ({ route, navigation }) => {
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
   const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const backRequestHandledRef = useRef(null);
   useEffect(() => {
@@ -170,11 +171,15 @@ const Person = ({ route, navigation }) => {
   };
 
   const onDelete = async () => {
-    setUpdating(true);
+    setDeleting(true);
     const res = await API.delete({ path: `/person/${personDB._id}` });
     if (res.error) {
-      Alert.alert(res.error);
-      return;
+      if (res.error === 'Not Found') {
+        setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
+      } else {
+        Alert.alert(res.error);
+        return;
+      }
     }
     for (const action of actions.filter((a) => a.person === personDB._id)) {
       const actionRes = await API.delete({ path: `/action/${action._id}` });
@@ -183,14 +188,12 @@ const Person = ({ route, navigation }) => {
         for (let comment of comments.filter((c) => c.action === action._id)) {
           const commentRes = await API.delete({ path: `/comment/${comment._id}` });
           if (commentRes.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
-          return commentRes;
         }
       }
     }
     for (let comment of comments.filter((c) => c.person === personDB._id)) {
       const commentRes = await API.delete({ path: `/comment/${comment._id}` });
       if (commentRes.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
-      return commentRes;
     }
     for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === personDB._id)) {
       const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
@@ -202,13 +205,14 @@ const Person = ({ route, navigation }) => {
   };
 
   const isUpdateDisabled = useMemo(() => {
+    if (deleting) return true;
     const newPerson = {
       ...personDB,
       ...castToPerson(person),
     };
     if (JSON.stringify(castToPerson(personDB)) !== JSON.stringify(castToPerson(newPerson))) return false;
     return true;
-  }, [personDB, castToPerson, person]);
+  }, [personDB, castToPerson, person, deleting]);
 
   const onBack = () => {
     backRequestHandledRef.current = true;
@@ -292,6 +296,7 @@ const Person = ({ route, navigation }) => {
               isUpdateDisabled={isUpdateDisabled}
               onDeleteRequest={onDeleteRequest}
               updating={updating}
+              deleting={deleting}
               editable={editable}
             />
           )}
@@ -310,6 +315,7 @@ const Person = ({ route, navigation }) => {
               onDeleteRequest={onDeleteRequest}
               editable={editable}
               updating={updating}
+              deleting={deleting}
             />
           )}
         </TabNavigator.Screen>

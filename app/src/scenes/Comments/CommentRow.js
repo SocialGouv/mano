@@ -6,7 +6,7 @@ import { Alert } from 'react-native';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { commentsState } from '../../recoil/comments';
@@ -19,7 +19,7 @@ const hitSlop = {
 };
 
 const CommentRow = ({ onArrowPress, onPress, onUpdate, comment, createdAt, user: commentUser, showActionSheetWithOptions, id, metaCaption }) => {
-  const user = useRecoilState(userState);
+  const user = useRecoilValue(userState);
   const setComments = useSetRecoilState(commentsState);
 
   const onPressRequest = async () => {

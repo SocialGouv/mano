@@ -34,7 +34,7 @@ const ActionStatusSelect = ({ value = CHOOSE, onSelect, onSelectAndSave, editabl
                 color="#fff"
                 backgroundColor="#00F"
                 onPress={() => onSelectAndSave(CANCEL)}
-                caption={CANCEL}
+                caption="ANNULER"
               />
               <Spacer />
             </>
