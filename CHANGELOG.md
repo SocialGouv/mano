@@ -1,3 +1,10 @@
+## [1.53.14](https://github.com/SocialGouv/mano/compare/v1.53.13...v1.53.14) (2022-02-17)
+
+
+### Bug Fixes
+
+* **app:** comment edit / person delete / action delete / popup on duplicate ([#374](https://github.com/SocialGouv/mano/issues/374)) ([9c65334](https://github.com/SocialGouv/mano/commit/9c65334bca9c89ecd7ccc4a6e8f53d6ef99ee58c))
+
 ## [1.53.13](https://github.com/SocialGouv/mano/compare/v1.53.12...v1.53.13) (2022-02-17)
 
 
