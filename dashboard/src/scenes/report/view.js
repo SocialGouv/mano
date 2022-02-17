@@ -38,6 +38,7 @@ import {
   numberOfPassagesNonAnonymousPerDatePerTeamSelector,
   passagesNonAnonymousPerDatePerTeamSelector,
 } from '../../recoil/selectors';
+import Incrementor from '../../components/Incrementor';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -211,7 +212,22 @@ const Reception = ({ report }) => {
   const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: report.date }));
   const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: report.date }));
 
+  const { updateReport } = useReports();
+
   const passages = numberOfNonAnonymousPassages + numberOfAnonymousPassages;
+
+  const services = report?.services?.length ? JSON.parse(report?.services) : {};
+
+  const onServiceUpdate = async (service, newCount) => {
+    const reportUpdate = {
+      ...report,
+      services: JSON.stringify({
+        ...services,
+        [service]: newCount,
+      }),
+    };
+    await updateReport(reportUpdate);
+  };
 
   if (!organisation.receptionEnabled) return null;
 
@@ -220,9 +236,9 @@ const Reception = ({ report }) => {
     const services = JSON.parse(report.services) || {};
     return (
       <>
-        {organisation.services.map((service) => (
+        {organisation?.services?.map((service) => (
           <Col md={4} key={service} style={{ marginBottom: 20 }}>
-            <Card title={service} count={services[service] || 0} />
+            <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
           </Col>
         ))}
       </>
