@@ -121,7 +121,9 @@ router.put(
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       await TerritoryObservation.update(updateObs, query, { silent: false, transaction: tx });
-      const newObservation = await TerritoryObservation.findOne(query);
+      // According to this comment, we should use transaction here:
+      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
+      const newObservation = await TerritoryObservation.findOne({ ...query, transaction: tx });
       return newObservation;
     });
 

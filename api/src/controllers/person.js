@@ -216,7 +216,9 @@ router.put(
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       await Person.update(req.body, query, { silent: false, transaction: tx });
-      const newPerson = await Person.findOne(query);
+      // According to this comment, we should use transaction here:
+      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
+      const newPerson = await Person.findOne({ ...query, transaction: tx });
 
       if (ENCRYPTED_FIELDS_ONLY) return person;
 

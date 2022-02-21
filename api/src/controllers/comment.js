@@ -98,7 +98,9 @@ router.put(
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       await Comment.update(updateComment, query, { silent: false, transaction: tx });
-      const newComment = await Comment.findOne(query);
+      // According to this comment, we should use transaction here:
+      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
+      const newComment = await Comment.findOne({ ...query, transaction: tx });
       return newComment;
     });
 
