@@ -12,6 +12,8 @@ import { usePersons } from '../recoil/persons';
 import { userState } from '../recoil/auth';
 import ButtonCustom from './ButtonCustom';
 import { formatDateWithFullMonth } from '../services/date';
+import { capture } from '../services/sentry';
+import { toastr } from 'react-redux-toastr';
 
 const Documents = ({ person, onUpdateResults }) => {
   const { updatePerson, uploadDocument, downloadDocument, deleteDocument } = usePersons();
@@ -39,7 +41,13 @@ const Documents = ({ person, onUpdateResults }) => {
                 name="file"
                 hidden
                 onChange={async (e) => {
-                  const { data: file, encryptedEntityKey } = await uploadDocument(e.target.files[0], person);
+                  const response = await uploadDocument(e.target.files[0], person);
+                  if (!response.ok || !response.data) {
+                    capture('Error uploading document', { extra: { response } });
+                    toastr.error('Erreur', "Une erreur est survenue lors de l'envoi du document");
+                    return;
+                  }
+                  const { data: file, encryptedEntityKey } = response;
                   await updatePerson({
                     ...person,
                     documents: [
