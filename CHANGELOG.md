@@ -1,3 +1,10 @@
+## [1.53.15](https://github.com/SocialGouv/mano/compare/v1.53.14...v1.53.15) (2022-02-21)
+
+
+### Bug Fixes
+
+* **api:** minimum mobile version ([a713b13](https://github.com/SocialGouv/mano/commit/a713b131f107f316d9df4796c292309952f7ab82))
+
 ## [1.53.14](https://github.com/SocialGouv/mano/compare/v1.53.13...v1.53.14) (2022-02-17)
 
 
