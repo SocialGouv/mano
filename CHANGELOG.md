@@ -1,3 +1,10 @@
+## [1.54.1](https://github.com/SocialGouv/mano/compare/v1.54.0...v1.54.1) (2022-02-21)
+
+
+### Bug Fixes
+
+* **app:** findIndex fail ([4549038](https://github.com/SocialGouv/mano/commit/4549038cd5a547b4d9e01a1349ca58beaaf9e58b))
+
 # [1.54.0](https://github.com/SocialGouv/mano/compare/v1.53.17...v1.54.0) (2022-02-21)
 
 
