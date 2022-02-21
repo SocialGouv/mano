@@ -17,6 +17,7 @@ router.post(
     const newRelPersonPlace = {};
 
     newRelPersonPlace.organisation = req.user.organisation;
+    newRelPersonPlace.user = req.user._id;
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
       next("No encrypted field in relPersonPlace create");
@@ -64,6 +65,8 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
+        // Not yet encrypted. It should be!
+        "user",
       ],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });

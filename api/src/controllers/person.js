@@ -154,6 +154,10 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
+        // This field should be encrypted but it has not been for some time.
+        // It should be kept to avoid breaking existing clients.
+        // It is not sensitive data, so we can keep it as is.
+        "outOfActiveList",
       ],
     });
 
@@ -192,6 +196,10 @@ router.put(
     if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
       person.changed("createdAt", true);
       updatePerson.createdAt = new Date(req.body.createdAt);
+    }
+
+    if (req.body.hasOwnProperty("outOfActiveList")) {
+      updatePerson.outOfActiveList = req.body.outOfActiveList;
     }
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
