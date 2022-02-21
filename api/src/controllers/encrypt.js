@@ -26,20 +26,6 @@ const encryptedTransaction = require("../utils/encryptedTransaction");
 // and to make sure everything is changed by using a transaction
 
 router.post(
-  "/cancel",
-  passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") {
-      capture("Only an admin can cancel the encryption", { user: req.user });
-      return res.send(403).send({ ok: false, error: "Seul un admin peut annuler le chiffrement" });
-    }
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-    organisation.set({ encryptionEnabled: false });
-    await organisation.save();
-    return res.status(200).send({ ok: true, data: organisation });
-  })
-);
-router.post(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {

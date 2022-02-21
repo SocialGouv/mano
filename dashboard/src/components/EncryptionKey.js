@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -36,7 +36,6 @@ const EncryptionKey = ({ isMain }) => {
   const [encryptionKey, setEncryptionKey] = useState('');
   const [encryptingStatus, setEncryptingStatus] = useState('');
   const [encryptingProgress, setEncryptingProgress] = useState(0);
-  const [cancellingEncryption, setCancellingEncryption] = useState(false);
 
   const user = useRecoilValue(userState);
 
@@ -186,15 +185,6 @@ const EncryptionKey = ({ isMain }) => {
     </ModalBody>
   );
 
-  const cancelEncryption = async () => {
-    setCancellingEncryption(true);
-    const res = await API.post({ path: '/encrypt/cancel' });
-    if (res.ok) {
-      toastr.success('Encryption retirée !', 'Veuillez vous reconnecter');
-      API.logout();
-    }
-  };
-
   const renderForm = () => (
     <ModalBody>
       <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
@@ -254,11 +244,6 @@ const EncryptionKey = ({ isMain }) => {
 
   return (
     <>
-      {!!organisation.encryptionEnabled && (
-        <LinkButton onClick={cancelEncryption} disabled={!!cancellingEncryption} color="link" style={{ marginRight: 10 }}>
-          Retirer le chiffrement
-        </LinkButton>
-      )}
       <ButtonCustom
         title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
         type="button"
