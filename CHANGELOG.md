@@ -1,3 +1,10 @@
+## [1.54.2](https://github.com/SocialGouv/mano/compare/v1.54.1...v1.54.2) (2022-02-21)
+
+
+### Bug Fixes
+
+* **api:** use transaction in find ([046714f](https://github.com/SocialGouv/mano/commit/046714fde43c9b2ae209ed470ecf1f2c724cf1fb))
+
 ## [1.54.1](https://github.com/SocialGouv/mano/compare/v1.54.0...v1.54.1) (2022-02-21)
 
 
