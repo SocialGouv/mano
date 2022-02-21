@@ -200,18 +200,20 @@ const View = () => {
                               <th>Valeur</th>
                             </tr>
                           </thead>
-                          {personFieldsIncludingCustomFields()
-                            .filter((f) => f.importable)
-                            .map((f) => {
-                              return (
-                                <tr key={f.label}>
-                                  <td>{f.label}</td>
-                                  <td>
-                                    <ImportFieldDetails field={f} />
-                                  </td>
-                                </tr>
-                              );
-                            })}
+                          <tbody>
+                            {personFieldsIncludingCustomFields()
+                              .filter((f) => f.importable)
+                              .map((f) => {
+                                return (
+                                  <tr key={f.label}>
+                                    <td>{f.label}</td>
+                                    <td>
+                                      <ImportFieldDetails field={f} />
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                          </tbody>
                         </table>
                       </li>
                     </ul>
