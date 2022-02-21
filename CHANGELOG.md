@@ -1,3 +1,10 @@
+## [1.53.16](https://github.com/SocialGouv/mano/compare/v1.53.15...v1.53.16) (2022-02-21)
+
+
+### Bug Fixes
+
+* **dashboard:** message and capture when upload doc fails ([#378](https://github.com/SocialGouv/mano/issues/378)) ([aa39dc5](https://github.com/SocialGouv/mano/commit/aa39dc5b4bbbda30ff12138e0abd5e1a39142eea))
+
 ## [1.53.15](https://github.com/SocialGouv/mano/compare/v1.53.14...v1.53.15) (2022-02-21)
 
 
