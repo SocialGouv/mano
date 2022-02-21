@@ -1,3 +1,10 @@
+# [1.54.0](https://github.com/SocialGouv/mano/compare/v1.53.17...v1.54.0) (2022-02-21)
+
+
+### Features
+
+* **dashboard:** remove cancel encryption ([1b047d3](https://github.com/SocialGouv/mano/commit/1b047d3e68d6a2b40c04c84e71d33f661b32bbd6))
+
 ## [1.53.17](https://github.com/SocialGouv/mano/compare/v1.53.16...v1.53.17) (2022-02-21)
 
 
