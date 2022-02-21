@@ -1,3 +1,10 @@
+## [1.53.17](https://github.com/SocialGouv/mano/compare/v1.53.16...v1.53.17) (2022-02-21)
+
+
+### Bug Fixes
+
+* **dashboard:** google translation ([15406a6](https://github.com/SocialGouv/mano/commit/15406a658ec3987210277e642d550e5b01dfddf3))
+
 ## [1.53.16](https://github.com/SocialGouv/mano/compare/v1.53.15...v1.53.16) (2022-02-21)
 
 
