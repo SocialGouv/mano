@@ -170,7 +170,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          id="create-action-dueAt"
+                          id="create-action-dueat"
                           selected={dateForDatePicker(values.dueAt)}
                           onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
                           timeInputLabel="Heure :"

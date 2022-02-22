@@ -10,7 +10,7 @@ import {
 } from "../utils";
 
 jest.setTimeout(30000);
-setDefaultOptions({ timeout: 5000 });
+setDefaultOptions({ timeout: 30000 });
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {
@@ -83,6 +83,7 @@ describe("Organisation CRUD", () => {
   */
 
   it("should add action", async () => {
+    await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Actions (0)" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Créer une nouvelle action" });
@@ -92,7 +93,12 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Encrypted Orga Admin");
     await expect(page).toMatch("Ma première personne");
     await expect(page).toMatch("À FAIRE");
-    const inputDueAt = await page.$("input#create-action-dueAt");
+    const dueAt = await page
+      .$("input#create-action-dueat")
+      .then((input) => input?.getProperty("value"))
+      .then((value) => value?.jsonValue());
+
+    expect(dueAt).toBe(dayjs().format("DD/MM/YYYY"));
     await expect(page).toFill(
       "textarea#create-action-description",
       "Une petite description pour la route"
