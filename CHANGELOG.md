@@ -1,3 +1,10 @@
+## [1.54.3](https://github.com/SocialGouv/mano/compare/v1.54.2...v1.54.3) (2022-02-22)
+
+
+### Bug Fixes
+
+* **dashboard:** can go to prev/next report + can change services in report ([#379](https://github.com/SocialGouv/mano/issues/379)) ([2765a47](https://github.com/SocialGouv/mano/commit/2765a47eac0bb3a79b73ac0ce1229f626e75ab56))
+
 ## [1.54.2](https://github.com/SocialGouv/mano/compare/v1.54.1...v1.54.2) (2022-02-21)
 
 
