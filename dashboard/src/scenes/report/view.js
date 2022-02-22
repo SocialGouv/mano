@@ -37,7 +37,9 @@ import {
   numberOfPassagesAnonymousPerDatePerTeamSelector,
   numberOfPassagesNonAnonymousPerDatePerTeamSelector,
   passagesNonAnonymousPerDatePerTeamSelector,
+  currentTeamReportsSelector,
 } from '../../recoil/selectors';
+import Incrementor from '../../components/Incrementor';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -52,27 +54,28 @@ const View = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
 
-  const { reports, deleteReport } = useReports();
+  const { deleteReport } = useReports();
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || !!organisation.receptionEnabled ? 0 : 1));
   const [tabsContents, setTabsContents] = useState(tabs);
 
-  const reportIndex = reports.findIndex((r) => r._id === id);
+  const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
 
-  const report = reports[reportIndex];
+  const report = currentTeamReports[reportIndex];
 
   const onPreviousReport = () => {
-    if (reportIndex === reports.length - 1) return;
-    const prevReport = reports[reportIndex + 1];
+    if (reportIndex === currentTeamReports.length - 1) return;
+    const prevReport = currentTeamReports[reportIndex + 1];
     if (!prevReport) return;
     history.push(`/report/${prevReport._id}`);
   };
   const onNextReport = () => {
     if (reportIndex === 0) return;
-    const nextReport = reports[reportIndex - 1];
+    const nextReport = currentTeamReports[reportIndex - 1];
     if (!nextReport) return;
     history.push(`/report/${nextReport._id}`);
   };
@@ -186,7 +189,7 @@ const View = () => {
                   color="link"
                   className="noprint"
                   title="Précédent"
-                  disabled={reportIndex === reports.length - 1}
+                  disabled={reportIndex === currentTeamReports.length - 1}
                   onClick={onPreviousReport}
                 />
                 <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onNextReport} />
@@ -211,18 +214,33 @@ const Reception = ({ report }) => {
   const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: report.date }));
   const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: report.date }));
 
+  const { updateReport } = useReports();
+
   const passages = numberOfNonAnonymousPassages + numberOfAnonymousPassages;
+
+  const services = report?.services?.length ? JSON.parse(report?.services) : {};
+
+  const onServiceUpdate = async (service, newCount) => {
+    const reportUpdate = {
+      ...report,
+      services: JSON.stringify({
+        ...services,
+        [service]: newCount,
+      }),
+    };
+    await updateReport(reportUpdate);
+  };
 
   if (!organisation.receptionEnabled) return null;
 
   const renderServices = () => {
-    if (!report.services) return null;
-    const services = JSON.parse(report.services) || {};
+    if (!organisation.services) return null;
+    const services = JSON.parse(report.services || '{}') || {};
     return (
       <>
-        {organisation.services.map((service) => (
+        {organisation?.services?.map((service) => (
           <Col md={4} key={service} style={{ marginBottom: 20 }}>
-            <Card title={service} count={services[service] || 0} />
+            <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
           </Col>
         ))}
       </>

@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { atom, useRecoilState } from 'recoil';
 import { useComments } from '../recoil/comments';
 import useApi from '../services/api';
@@ -23,7 +24,7 @@ export const useReports = () => {
   const [lastRefresh, setLastRefresh] = useStorage('last-refresh-reports', 0);
 
   const setReportsFullState = (newReports) => {
-    if (newReports) setReports(newReports);
+    if (newReports) setReports(newReports.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
     setLoading(false);
     setLastRefresh(Date.now());
   };
