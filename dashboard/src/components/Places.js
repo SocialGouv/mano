@@ -99,6 +99,8 @@ const AddPlace = ({ personId }) => {
                         value={values.place}
                         getOptionValue={(i) => i._id}
                         getOptionLabel={(i) => i.name}
+                        inputId="add-place-select-place"
+                        classNamePrefix="add-place-select-place"
                       />
                     </FormGroup>
                   </Col>
