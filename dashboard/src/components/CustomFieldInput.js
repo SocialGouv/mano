@@ -12,16 +12,32 @@ const CustomFieldInput = ({ field, values, handleChange }) => (
     <FormGroup>
       <Label>{field.label}</Label>
       {!!['text', 'number'].includes(field.type) && (
-        <Input name={field.name} type={field.type} required={field.required} value={values[field.name]} onChange={handleChange} />
+        <Input
+          name={field.name}
+          type={field.type}
+          required={field.required}
+          value={values[field.name]}
+          onChange={handleChange}
+          id={`person-custom-input-${field.name}`}
+        />
       )}
       {!!['textarea'].includes(field.type) && (
-        <Input name={field.name} type="textarea" rows={5} required={field.required} value={values[field.name]} onChange={handleChange} />
+        <Input
+          name={field.name}
+          type="textarea"
+          rows={5}
+          required={field.required}
+          value={values[field.name]}
+          onChange={handleChange}
+          id={`person-custom-textarea-${field.name}`}
+        />
       )}
       {!!['date-with-time', 'date'].includes(field.type) && (
         <div>
           <DatePicker
             locale="fr"
             className="form-control"
+            id={`person-custom-datepicker-${field.name}`}
             selected={dateForDatePicker(values[field.name] ? values[field.name] : field.required ? new Date() : null)}
             onChange={(date) => handleChange({ target: { value: date, name: field.name } })}
             timeInputLabel="Heure :"
@@ -33,14 +49,35 @@ const CustomFieldInput = ({ field, values, handleChange }) => (
       {!!['boolean'].includes(field.type) && (
         <CheckboxContainer>
           <span>{field.label}</span>
-          <Input type="checkbox" required={field.required} name={field.name} checked={values[field.name]} onChange={handleChange} />
+          <Input
+            type="checkbox"
+            id={`person-custom-checkbox-${field.name}`}
+            required={field.required}
+            name={field.name}
+            checked={values[field.name]}
+            onChange={handleChange}
+          />
         </CheckboxContainer>
       )}
       {!!['yes-no'].includes(field.type) && (
-        <SelectAsInput options={['Oui', 'Non']} name={field.name} value={values[field.name] || ''} onChange={handleChange} />
+        <SelectAsInput
+          options={['Oui', 'Non']}
+          name={field.name}
+          value={values[field.name] || ''}
+          onChange={handleChange}
+          inputId={`person-custom-select-${field.name}`}
+          classNamePrefix={`person-custom-select-${field.name}`}
+        />
       )}
       {!!['enum'].includes(field.type) && (
-        <SelectAsInput options={field.options} name={field.name} value={values[field.name] || ''} onChange={handleChange} />
+        <SelectAsInput
+          options={field.options}
+          name={field.name}
+          value={values[field.name] || ''}
+          onChange={handleChange}
+          inputId={`person-custom-select-${field.name}`}
+          classNamePrefix={`person-custom-select-${field.name}`}
+        />
       )}
       {!!['multi-choice'].includes(field.type) && (
         <SelectCustom
@@ -49,6 +86,8 @@ const CustomFieldInput = ({ field, values, handleChange }) => (
           onChange={(v) => handleChange({ currentTarget: { value: v, name: field.name } })}
           isClearable={false}
           isMulti
+          inputId={`person-custom-select-${field.name}`}
+          classNamePrefix={`person-custom-select-${field.name}`}
           value={values[field.name]}
           placeholder={' -- Choisir -- '}
           getOptionValue={(i) => i}

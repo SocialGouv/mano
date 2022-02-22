@@ -68,7 +68,10 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("div.person-select-reasons__option");
     await expect(page).toClick("input#person-select-healthInsurance");
     await expect(page).toClick("div.person-select-healthInsurance__option");
+    await expect(page).toClick("input#person-custom-select-consumptions");
+    await expect(page).toClick("div.person-custom-select-consumptions__option");
     await expect(page).toFill('input[name="structureMedical"]', "Une structure médicale");
+    await expect(page).toFill('textarea[name="caseHistoryDescription"]', "Mon historique médical");
     await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
@@ -119,7 +122,13 @@ describe("Organisation CRUD", () => {
       "Sortie d'hébergement"
     );
     expect(await getInnerText("div.person-select-healthInsurance__single-value")).toBe("Aucune");
+    expect(await getInnerText("div.person-custom-select-consumptions__multi-value__label")).toBe(
+      "Alcool"
+    );
     expect(await getInputValue('input[name="structureMedical"]')).toBe("Une structure médicale");
+    expect(await getInputValue('textarea[name="caseHistoryDescription"]')).toBe(
+      "Mon historique médical"
+    );
   });
 
   it("should be able to check tabs for this person", async () => {
@@ -306,7 +315,13 @@ describe("Organisation CRUD", () => {
       "Sortie d'hébergement"
     );
     expect(await getInnerText("div.person-select-healthInsurance__single-value")).toBe("Aucune");
+    expect(await getInnerText("div.person-custom-select-consumptions__multi-value__label")).toBe(
+      "Alcool"
+    );
     expect(await getInputValue('input[name="structureMedical"]')).toBe("Une structure médicale");
+    expect(await getInputValue('textarea[name="caseHistoryDescription"]')).toBe(
+      "Mon historique médical"
+    );
     /* Actions */
     await expect(page).toClick("a", { text: "Actions (1)" });
     await expect(page).toMatch("Mon action");
