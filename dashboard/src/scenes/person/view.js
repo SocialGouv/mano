@@ -341,7 +341,7 @@ const Summary = ({ person }) => {
                 {customFieldsPersonsSocial
                   .filter((f) => f.enabled)
                   .map((field) => (
-                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                   ))}
               </Row>
 
@@ -368,7 +368,7 @@ const Summary = ({ person }) => {
                 {customFieldsPersonsMedical
                   .filter((f) => f.enabled)
                   .map((field) => (
-                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                   ))}
               </Row>
 

@@ -34,6 +34,9 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Création réussie !");
     await expect(page).toClick("div.close-toastr");
     await expect(page).toMatch("Dossier de Ma première personne");
+  });
+
+  it("should update a person", async () => {
     await expect(page).toFill('input[name="otherNames"]', "autre nom");
     await expect(page).toClick("input#person-select-gender");
     await expect(page).toClick("div.person-select-gender__option:nth-of-type(2)");
@@ -378,4 +381,26 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Mise à jour réussie");
     await expect(page).toClick("div.close-toastr");
   });
+
+  // it("can delete person", async () => {
+  //   page.on("dialog", async (alert) => {
+  //     // alert should be close now
+  //     expect(alert.type()).toBe("confirm");
+  //     console.log("AND THERE");
+  //     expect(alert.message()).toBe("Êtes-vous sûr ?");
+  //     console.log("OKLA");
+  //     await alert.accept();
+  //     return;
+  //   });
+  //   await expect(page).toClick("button", { text: "Supprimer" });
+  // });
+
+  // it("should have deleted the person and the action", async () => {
+  //   try {
+  //     await expect(page).toMatch("Ma première personne");
+  //   } catch (e) {
+  //     console.log("NOT MATCH");
+  //     console.log(e);
+  //   }
+  // });
 });
