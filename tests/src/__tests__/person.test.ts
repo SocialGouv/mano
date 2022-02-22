@@ -340,4 +340,42 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Lieux (1)" });
     await expect(page).toMatch("Mon lieu fréquenté");
   });
+
+  it("should be able to put out of active list", async () => {
+    await expect(page).toClick("a", { text: "Résumé" });
+    await expect(page).toClick("button", { text: "Sortie de file active" });
+    await expect(page).toMatch("Veuillez préciser le motif de sortie");
+    await expect(page).toClick("input#person-select-outOfActiveListReason");
+    await expect(page).toClick("div.person-select-outOfActiveListReason__option");
+    await expect(page).toClick("button", { text: "Sauvegarder" });
+    await expect(page).toMatch("Mise à jour réussie");
+    await expect(page).toClick("div.close-toastr");
+    await expect(page).toMatch("Réintégrer dans la file active");
+    await scrollTop();
+    await expect(page).toMatch(
+      "Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure"
+    );
+    await expect(page).toClick("a", { text: "Retour" });
+    await expect(page).toMatch("Ma première personne");
+    await expect(page).toMatch("Sortie de file active : Relai vers autre structure");
+  });
+
+  it("should be able to put back in active list", async () => {
+    await page.goto("http://localhost:8090/auth");
+    await connectWith("adminEncrypted@example.org", "secret", "plouf");
+    await expect(page).toMatch("Encrypted Orga", { timeout: 4000 });
+    await navigateWithReactRouter("/person");
+    await expect(page).toMatch("Personnes suivies par l'organisation");
+    await page.waitForTimeout(1000);
+    await expect(page).toMatch("Ma première personne");
+    await navigateWithReactRouter("/person");
+    await expect(page).toClick("td", { text: "Ma première personne" });
+    await scrollTop();
+    await expect(page).toMatch(
+      "Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure"
+    );
+    await expect(page).toClick("button", { text: "Réintégrer dans la file active" });
+    await expect(page).toMatch("Mise à jour réussie");
+    await expect(page).toClick("div.close-toastr");
+  });
 });
