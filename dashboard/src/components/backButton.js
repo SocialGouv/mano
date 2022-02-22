@@ -3,7 +3,7 @@ import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-const BackButtonWrapperStyled = styled.div`
+const BackButtonWrapperStyled = styled.a`
   ${(props) => props.withArrow && `background: url(${require('../assets/back.svg')}) left center no-repeat;`}
 
   background-size: 20px;
