@@ -7,10 +7,12 @@ import {
   useEncryptedOrga,
   scrollDown,
   scrollTop,
+  getInputValue,
+  getInnerText,
 } from "../utils";
 
-jest.setTimeout(30000);
-setDefaultOptions({ timeout: 30000 });
+jest.setTimeout(60000);
+setDefaultOptions({ timeout: 10000 });
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {
@@ -28,10 +30,45 @@ describe("Organisation CRUD", () => {
     });
     await expect(page).toFill('input[name="name"]', "Ma première personne");
     await expect(page).toClick("button", { text: "Sauvegarder" });
-    await expect(page).toMatch("Dossier de Ma première personne");
-    await expect(page).toFill('input[name="otherNames"]', "autre nom");
+    await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");
     await expect(page).toClick("div.close-toastr");
+    await expect(page).toMatch("Dossier de Ma première personne");
+    await expect(page).toFill('input[name="otherNames"]', "autre nom");
+    await expect(page).toClick("input#person-select-gender");
+    await expect(page).toClick("div.person-select-gender__option:nth-of-type(2)");
+    await expect(page).toFill("input#person-birthdate", "26/05/1981");
+    await page.keyboard.press("Escape");
+    await expect(page).toFill("input#person-wanderingAt", "26/04/2005");
+    await page.keyboard.press("Escape");
+    await expect(page).toFill("input#person-createdAt", "20/04/2019");
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Escape");
+    await expect(page).toClick("input#person-select-assigned-team");
+    await expect(page).toClick("div.person-select-assigned-team__option");
+    await expect(page).toClick("input#person-alertness-checkbox");
+    await expect(page).toFill('input[name="phone"]', "0123456789");
+    await expect(page).toFill('textarea[name="description"]', "Une chic personne");
+    await expect(page).toClick("input#person-select-personalSituation");
+    await expect(page).toClick("div.person-select-personalSituation__option:nth-of-type(2)");
+    await expect(page).toFill('input[name="structureSocial"]', "Une structure sociale");
+    await expect(page).toClick("input#person-select-animals");
+    await expect(page).toClick("div.person-select-animals__option");
+    await expect(page).toClick("input#person-select-address");
+    await expect(page).toClick("div.person-select-address__option");
+    await expect(page).toClick("input#person-select-addressDetail");
+    await expect(page).toClick("div.person-select-addressDetail__option:nth-of-type(4)");
+    await expect(page).toClick("input#person-select-nationalitySituation");
+    await expect(page).toClick("div.person-select-nationalitySituation__option");
+    await expect(page).toClick("input#person-select-employment");
+    await expect(page).toClick("div.person-select-employment__option");
+    await expect(page).toClick("input#person-select-resources");
+    await expect(page).toClick("div.person-select-resources__option");
+    await expect(page).toClick("input#person-select-reasons");
+    await expect(page).toClick("div.person-select-reasons__option");
+    await expect(page).toClick("input#person-select-healthInsurance");
+    await expect(page).toClick("div.person-select-healthInsurance__option");
+    await expect(page).toFill('input[name="structureMedical"]', "Une structure médicale");
     await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
@@ -40,17 +77,89 @@ describe("Organisation CRUD", () => {
 
   it("should see created person", async () => {
     await navigateWithReactRouter("/person");
+    await page.waitForTimeout(1000);
     await expect(page).toMatch("Ma première personne");
+  });
+
+  it("should see created person all fields", async () => {
+    await navigateWithReactRouter("/person");
+    await expect(page).toClick("td", { text: "Ma première personne" });
+    expect(await getInputValue('input[name="name"]')).toBe("Ma première personne");
+    expect(await getInputValue('input[name="otherNames"]')).toBe("autre nom");
+    expect(await getInnerText("div.person-select-gender__single-value")).toBe("Homme");
+    expect(await getInputValue("input#person-birthdate")).toBe("26/05/1981");
+    expect(await getInputValue("input#person-wanderingAt")).toBe("26/04/2005");
+    expect(await getInputValue("input#person-createdAt")).toBe("20/04/2019");
+    expect(await getInnerText("div.person-select-assigned-team__multi-value__label")).toBe(
+      "Encrypted Orga Team"
+    );
+    expect(
+      await page
+        .$('input[name="alertness"]')
+        .then((input) => input?.getProperty("checked"))
+        .then((value) => value?.jsonValue())
+    ).toBe(true);
+    expect(await getInputValue('input[name="phone"]')).toBe("0123456789");
+    expect(await getInputValue('textarea[name="description"]')).toBe("Une chic personne");
+    expect(await getInnerText("div.person-select-personalSituation__single-value")).toBe(
+      "Homme isolé"
+    );
+    expect(await getInputValue('input[name="structureSocial"]')).toBe("Une structure sociale");
+    expect(await getInnerText("div.person-select-animals__single-value")).toBe("Oui");
+    expect(await getInnerText("div.person-select-address__single-value")).toBe("Oui");
+    expect(await getInnerText("div.person-select-addressDetail__single-value")).toBe(
+      "Mise à l'abri"
+    );
+    expect(await getInnerText("div.person-select-nationalitySituation__single-value")).toBe(
+      "Hors UE"
+    );
+    expect(await getInnerText("div.person-select-employment__single-value")).toBe("DPH");
+    expect(await getInnerText("div.person-select-resources__multi-value__label")).toBe("SANS");
+    expect(await getInnerText("div.person-select-reasons__multi-value__label")).toBe(
+      "Sortie d'hébergement"
+    );
+    expect(await getInnerText("div.person-select-healthInsurance__single-value")).toBe("Aucune");
+    expect(await getInputValue('input[name="structureMedical"]')).toBe("Une structure médicale");
   });
 
   it("should be able to check tabs for this person", async () => {
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
+    await page.waitForTimeout(1000);
     await scrollTop();
     await expect(page).toClick("a", { text: "Actions (0)" });
     await expect(page).toClick("a", { text: "Lieux (0)" });
-    await expect(page).toClick("a", { text: "Commentaires (0)" });
+    await expect(page).toClick("a", { text: "Commentaires (1)" });
     await expect(page).toClick("a", { text: "Documents (0)" });
+  });
+
+  it("should be able to see the comment for an updated person", async () => {
+    await page.waitForTimeout(1000);
+    await expect(page).toClick("a", { text: "Commentaires (1)" });
+    await expect(page).toMatch("Changement de situation personnelle:");
+    await expect(page).toMatch("Avant: Non renseigné");
+    await expect(page).toMatch("Désormais: Homme isolé");
+    await expect(page).toMatch("Changement de nationalité:");
+    await expect(page).toMatch("Avant: Non renseigné");
+    await expect(page).toMatch("Désormais: Hors UE");
+    await expect(page).toMatch("Changement de structure de suivi social:");
+    await expect(page).toMatch("Avant: Non renseigné");
+    await expect(page).toMatch("Désormais: Une structure sociale");
+    await expect(page).toMatch("Changement de structure de suivi médical:");
+    await expect(page).toMatch("Avant: Non renseigné");
+    await expect(page).toMatch("Désormais: Une structure médicale");
+    await expect(page).toMatch("Changement d'emploi:");
+    await expect(page).toMatch("Avant: Non renseigné");
+    await expect(page).toMatch("Désormais: DPH");
+    await expect(page).toMatch("Changement d'hébergement:");
+    await expect(page).toMatch("Avant: Non renseigné");
+    await expect(page).toMatch("Désormais: Mise à l'abri");
+    await expect(page).toMatch("Changement de ressources:");
+    await expect(page).toMatch("Avant: Non renseigné");
+    await expect(page).toMatch("Désormais: SANS");
+    await expect(page).toMatch("Changement de couverture médicale:");
+    await expect(page).toMatch("Avant: Non renseigné");
+    await expect(page).toMatch("Désormais: Aucune");
   });
 
   /*
@@ -58,9 +167,9 @@ describe("Organisation CRUD", () => {
   */
 
   it("should be able to create a comment for this person", async () => {
-    await expect(page).toClick("a", { text: "Commentaires (0)" });
+    await expect(page).toClick("a", { text: "Commentaires (1)" });
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
-    await expect(page).toMatch("Créér un commentaire", { timeout: 4000 });
+    await expect(page).toMatch("Créer un commentaire", { timeout: 4000 });
     await expect(page).toFill('textarea[name="comment"]', "Ceci est un commentaire");
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await expect(page).toClick("div.close-toastr");
@@ -68,9 +177,9 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to create another comment for this person", async () => {
-    await expect(page).toClick("a", { text: "Commentaires (1)" });
+    await expect(page).toClick("a", { text: "Commentaires (2)" });
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
-    await expect(page).toMatch("Créér un commentaire", { timeout: 4000 });
+    await expect(page).toMatch("Créer un commentaire", { timeout: 4000 });
     await expect(page).toFill('textarea[name="comment"]', "Ceci est un autre commentaire");
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await expect(page).toClick("div.close-toastr");
@@ -93,11 +202,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Encrypted Orga Admin");
     await expect(page).toMatch("Ma première personne");
     await expect(page).toMatch("À FAIRE");
-    const dueAt = await page
-      .$("input#create-action-dueat")
-      .then((input) => input?.getProperty("value"))
-      .then((value) => value?.jsonValue());
-
+    const dueAt = await getInputValue("input#create-action-dueat");
     expect(dueAt).toBe(dayjs().format("DD/MM/YYYY"));
     await expect(page).toFill(
       "textarea#create-action-description",
@@ -113,7 +218,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Une petite description pour la route");
     await expect(page).toClick("a", { text: "Retour" });
     await expect(page).toMatch("Dossier de Ma première personne");
-    await expect(page).toClick("a", { text: "Commentaires (2)" });
+    await expect(page).toClick("a", { text: "Commentaires (3)" });
     await expect(page).toClick("a", { text: "Actions (1)" });
     await expect(page).toClick("td", { text: "Mon action" });
     await expect(page).toClick("a", { text: "Retour" });
@@ -165,6 +270,44 @@ describe("Organisation CRUD", () => {
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     await scrollTop();
+    /* Summary */
+    expect(await getInputValue('input[name="name"]')).toBe("Ma première personne");
+    expect(await getInputValue('input[name="otherNames"]')).toBe("autre nom");
+    expect(await getInnerText("div.person-select-gender__single-value")).toBe("Homme");
+    expect(await getInputValue("input#person-birthdate")).toBe("26/05/1981");
+    expect(await getInputValue("input#person-wanderingAt")).toBe("26/04/2005");
+    expect(await getInputValue("input#person-createdAt")).toBe("20/04/2019");
+    expect(await getInnerText("div.person-select-assigned-team__multi-value__label")).toBe(
+      "Encrypted Orga Team"
+    );
+    expect(
+      await page
+        .$('input[name="alertness"]')
+        .then((input) => input?.getProperty("checked"))
+        .then((value) => value?.jsonValue())
+    ).toBe(true);
+    expect(await getInputValue('input[name="phone"]')).toBe("0123456789");
+    expect(await getInputValue('textarea[name="description"]')).toBe("Une chic personne");
+    expect(await getInnerText("div.person-select-personalSituation__single-value")).toBe(
+      "Homme isolé"
+    );
+    expect(await getInputValue('input[name="structureSocial"]')).toBe("Une structure sociale");
+    expect(await getInnerText("div.person-select-animals__single-value")).toBe("Oui");
+    expect(await getInnerText("div.person-select-address__single-value")).toBe("Oui");
+    expect(await getInnerText("div.person-select-addressDetail__single-value")).toBe(
+      "Mise à l'abri"
+    );
+    expect(await getInnerText("div.person-select-nationalitySituation__single-value")).toBe(
+      "Hors UE"
+    );
+    expect(await getInnerText("div.person-select-employment__single-value")).toBe("DPH");
+    expect(await getInnerText("div.person-select-resources__multi-value__label")).toBe("SANS");
+    expect(await getInnerText("div.person-select-reasons__multi-value__label")).toBe(
+      "Sortie d'hébergement"
+    );
+    expect(await getInnerText("div.person-select-healthInsurance__single-value")).toBe("Aucune");
+    expect(await getInputValue('input[name="structureMedical"]')).toBe("Une structure médicale");
+    /* Actions */
     await expect(page).toClick("a", { text: "Actions (1)" });
     await expect(page).toMatch("Mon action");
     await expect(page).toMatch("A FAIRE");
@@ -174,9 +317,11 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Une petite description pour la route");
     await expect(page).toClick("a", { text: "Retour" });
     await expect(page).toClick("a", { text: "Documents (0)" });
-    await expect(page).toClick("a", { text: "Commentaires (2)" });
+    /* Comments */
+    await expect(page).toClick("a", { text: "Commentaires (3)" });
     await expect(page).toMatch("Ceci est un commentaire");
     await expect(page).toMatch("Ceci est un autre commentaire");
+    /* Places */
     await expect(page).toClick("a", { text: "Lieux (1)" });
     await expect(page).toMatch("Mon lieu fréquenté");
   });
