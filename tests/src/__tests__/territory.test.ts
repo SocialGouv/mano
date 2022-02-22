@@ -63,18 +63,17 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");
     await expect(page).toClick("div.close-toastr");
-    expect(page).toMatch("Nombre de personnes non connues hommes rencontrées: 4");
-    expect(page).toMatch("Nombre de personnes non connues femmes rencontrées: 5");
-    expect(page).toMatch("Présence policière: Oui");
-    expect(page).toMatch("Nombre de matériel ramassé: 6");
-    expect(page).toMatch("Ambiance: Violences");
-    expect(page).toMatch("Nombre de médiations avec les riverains / les structures: 7");
-    expect(page).toMatch("Commentaire:");
-    expect(page).toMatch("No comment");
+    await expect(page).toMatch("Nombre de personnes non connues hommes rencontrées: 4");
+    await expect(page).toMatch("Nombre de personnes non connues femmes rencontrées: 5");
+    await expect(page).toMatch("Présence policière: Oui");
+    await expect(page).toMatch("Nombre de matériel ramassé: 6");
+    await expect(page).toMatch("Ambiance: Violences");
+    await expect(page).toMatch("Nombre de médiations avec les riverains / les structures: 7");
+    await expect(page).toMatch("Commentaire:");
+    await expect(page).toMatch("No comment");
   });
 
   it("should have all the created data showing on reload", async () => {
-    await page.goto("http://localhost:8090/auth");
     await connectWith("adminEncrypted@example.org", "secret", "plouf");
     await expect(page).toMatch("Encrypted Orga", { timeout: 4000 });
     await navigateWithReactRouter("/territory");
@@ -87,24 +86,15 @@ describe("Organisation CRUD", () => {
 
     expect(await getInputValue('input[name="name"]')).toBe("Mon premier territoire");
     expect(await getInputValue('input[name="perimeter"]')).toBe("Entre ici et là");
-    expect(await getInnerText("div.territory-select-types__multi-value__label")).toBe(
-      "Lieu de conso"
-    );
+    expect(page).toMatch("Lieu de conso");
 
-    // FIXME: test not working below
-
-    // await page.waitForTimeout(3000);
-
-    // await scrollDown();
-    // await page.waitForTimeout(3000);
-
-    // expect(page).toMatch("Nombre de personnes non connues hommes rencontrées: 4");
-    // expect(page).toMatch("Nombre de personnes non connues femmes rencontrées: 5");
-    // expect(page).toMatch("Présence policière: Oui");
-    // expect(page).toMatch("Nombre de matériel ramassé: 6");
-    // expect(page).toMatch("Ambiance: Violences");
-    // expect(page).toMatch("Nombre de médiations avec les riverains / les structures: 7");
-    // expect(page).toMatch("Commentaire:");
-    // expect(page).toMatch("No comment");
+    await expect(page).toMatch("Nombre de personnes non connues hommes rencontrées: 4");
+    await expect(page).toMatch("Nombre de personnes non connues femmes rencontrées: 5");
+    await expect(page).toMatch("Présence policière: Oui");
+    await expect(page).toMatch("Nombre de matériel ramassé: 6");
+    await expect(page).toMatch("Ambiance: Violences");
+    await expect(page).toMatch("Nombre de médiations avec les riverains / les structures: 7");
+    await expect(page).toMatch("Commentaire:");
+    await expect(page).toMatch("No comment");
   });
 });
