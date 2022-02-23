@@ -1,3 +1,10 @@
+# [1.55.0](https://github.com/SocialGouv/mano/compare/v1.54.3...v1.55.0) (2022-02-23)
+
+
+### Features
+
+* **dashboard:** tests persons/actions/territories ([#382](https://github.com/SocialGouv/mano/issues/382)) ([08b1857](https://github.com/SocialGouv/mano/commit/08b1857f95f76cabc5211a8a70f0c62231f5191c))
+
 ## [1.54.3](https://github.com/SocialGouv/mano/compare/v1.54.2...v1.54.3) (2022-02-22)
 
 
