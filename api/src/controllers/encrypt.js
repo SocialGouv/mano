@@ -28,18 +28,18 @@ router.post(
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") {
       capture("Only an admin can change the encryption", { user: req.user });
-      return res.send(403).send({ ok: false, error: "Seul un admin peut modifier le chiffrement" });
+      return res.status(403).send({ ok: false, error: "Seul un admin peut modifier le chiffrement" });
     }
 
     let organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     if (organisation.encrypting) {
-      return res.send(403).send({ ok: false, error: "L'organisation est déjà en cours de chiffrement" });
+      return res.status(403).send({ ok: false, error: "L'organisation est déjà en cours de chiffrement" });
     }
     organisation.set({ encrypting: true });
     await organisation.save();
 
     try {
-      sequelize.transaction(async (tx) => {
+      await sequelize.transaction(async (tx) => {
         const {
           actions = [],
           persons = [],
@@ -87,6 +87,13 @@ router.post(
         for (let { encrypted, encryptedEntityKey, _id } of reports) {
           await Report.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
+        organisation.set({
+          encryptionEnabled: "true",
+          encryptionLastUpdateAt: new Date(),
+          encrypting: false,
+          encryptedVerificationKey: req.body.encryptedVerificationKey,
+        });
+        await organisation.save();
       });
     } catch (e) {
       console.log("error encrypting", e);
@@ -94,14 +101,6 @@ router.post(
       await organisation.save();
       throw e;
     }
-
-    organisation.set({
-      encryptionEnabled: "true",
-      encryptionLastUpdateAt: new Date(),
-      encrypting: false,
-      encryptedVerificationKey: req.body.encryptedVerificationKey,
-    });
-    await organisation.save();
 
     return res.status(200).send({ ok: true, data: organisation });
   })
