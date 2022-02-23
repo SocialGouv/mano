@@ -85,7 +85,7 @@ router.put(
     if (!place) return res.status(404).send({ ok: false, error: "Not found" });
 
     place.set(updatePlace);
-    await place.save({ transaction: tx });
+    await place.save();
 
     return res.status(200).send({ ok: true, data: place });
   })

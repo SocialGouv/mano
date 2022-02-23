@@ -113,7 +113,7 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const data = await Person.create(newPerson, { returning: true, transaction: tx });
+    const data = await Person.create(newPerson, { returning: true });
     return res.status(200).send({ ok: true, data: data.toJSON() });
   })
 );

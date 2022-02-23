@@ -38,7 +38,7 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const data = await TerritoryObservation.create(newObs, { returning: true, transaction: tx });
+    const data = await TerritoryObservation.create(newObs, { returning: true });
 
     return res.status(status).send({ ok, data, error });
   })
@@ -118,8 +118,8 @@ router.put(
     if (req.body.hasOwnProperty("encrypted")) updateObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    await TerritoryObservation.update(updateObs, query, { silent: false, transaction: tx });
-    const newObservation = await TerritoryObservation.findOne({ ...query, transaction: tx });
+    await TerritoryObservation.update(updateObs, query, { silent: false });
+    const newObservation = await TerritoryObservation.findOne({ ...query });
 
     return res.status(200).send({ ok: true, data: newObservation });
   })
