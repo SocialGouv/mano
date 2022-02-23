@@ -134,7 +134,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                   <Col md={6}>
                     <FormGroup>
                       <Label>Nom de l'action</Label>
-                      <Input name="name" value={values.name} onChange={handleChange} />
+                      <Input id="create-action-name" name="name" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -144,17 +144,24 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                         teams={user.role === 'admin' ? teams : user.teams}
                         teamId={values.team}
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                        inputId="create-action-team-select"
                       />
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <SelectPerson value={values.person} onChange={handleChange} isMulti={isMulti} />
+                      <SelectPerson value={values.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <Label>Statut</Label>
-                    <SelectStatus name="status" value={values.status || ''} onChange={handleChange} />
+                    <SelectStatus
+                      name="status"
+                      value={values.status || ''}
+                      onChange={handleChange}
+                      inputId="new-action-select-status"
+                      classNamePrefix="new-action-select-status"
+                    />
                   </Col>
                   <Col lg={3} md={6}>
                     <FormGroup>
@@ -163,6 +170,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                         <DatePicker
                           locale="fr"
                           className="form-control"
+                          id="create-action-dueat"
                           selected={dateForDatePicker(values.dueAt)}
                           onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
                           timeInputLabel="Heure :"
@@ -199,7 +207,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                   <Col lg={12} md={6}>
                     <FormGroup>
                       <Label>Description</Label>
-                      <Input type="textarea" name="description" value={values.description} onChange={handleChange} />
+                      <Input id="create-action-description" type="textarea" name="description" value={values.description} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                 </Row>

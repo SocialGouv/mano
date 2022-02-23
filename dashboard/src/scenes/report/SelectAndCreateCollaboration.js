@@ -54,6 +54,8 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
         if (__isNew__) return <span>Créer "{collab}"</span>;
         return <span>{collab}</span>;
       }}
+      inputId="report-select-collaboration"
+      classNamePrefix="report-select-collaboration"
     />
   );
 };

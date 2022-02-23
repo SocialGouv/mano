@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-const Card = ({ title, count, unit, children, onChange }) => {
+const Card = ({ title, count, unit, children, onChange, countId }) => {
   const [localcount, setLocalcount] = useState(count);
 
   const changeTimeout = useRef(null);
@@ -24,9 +24,15 @@ const Card = ({ title, count, unit, children, onChange }) => {
       {!!title && <CardTitle dangerouslySetInnerHTML={{ __html: title }} />}
       <CardCount withChildren={!!children}>
         {!!onChange ? (
-          <InputStyled type="number" ref={inputRef} value={localcount} onChange={(e) => onChangeRequest(Number(e.currentTarget.value))} />
+          <InputStyled
+            id={countId}
+            type="number"
+            ref={inputRef}
+            value={localcount}
+            onChange={(e) => onChangeRequest(Number(e.currentTarget.value))}
+          />
         ) : (
-          <span>{count}</span>
+          <span id={countId}>{count}</span>
         )}
         {!!unit && <Unit>{unit}</Unit>}
       </CardCount>

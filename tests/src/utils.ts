@@ -4,11 +4,7 @@ import { v4 as uuidv4 } from "uuid";
 
 const postgresqlUrl = `${process.env.PGBASEURL}/${process.env.PGDATABASE}`;
 
-export async function connectWith(
-  email: string,
-  password: string,
-  orgEncryptionKey: string = ""
-) {
+export async function connectWith(email: string, password: string, orgEncryptionKey: string = "") {
   await page.goto("http://localhost:8090/auth");
   // Ensure not already connected
   try {
@@ -32,9 +28,21 @@ export async function connectWith(
 
 // React router seems broken for reason.
 export async function navigateWithReactRouter(path: string = "/search") {
-  return page.$eval("a[href='" + path + "']", (el) =>
-    (el as HTMLElement).click()
-  );
+  return page.$eval("a[href='" + path + "']", (el) => (el as HTMLElement).click());
+}
+
+export async function getInputValue(selector: string) {
+  return page
+    .$(selector)
+    .then((input) => input?.getProperty("value"))
+    .then((value) => value?.jsonValue());
+}
+
+export async function getInnerText(selector: string) {
+  return page
+    .$(selector)
+    .then((input) => input?.getProperty("innerText"))
+    .then((value) => value?.jsonValue());
 }
 
 export async function deleteUser(email: string) {
@@ -57,9 +65,7 @@ export async function updateUserPassword(email: string, password: string) {
 export async function deleteOrganisation(orgaName: string) {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();
-  await client.query(`DELETE FROM mano."Organisation" WHERE name = $1`, [
-    orgaName,
-  ]);
+  await client.query(`DELETE FROM mano."Organisation" WHERE name = $1`, [orgaName]);
   await client.end();
 }
 
@@ -72,9 +78,7 @@ export async function useSuperAdminAndOrga() {
 
   const date = "2021-01-01";
 
-  await client.query(
-    `delete from mano."Organisation" where name='Default orga'`
-  );
+  await client.query(`delete from mano."Organisation" where name='Default orga'`);
   await client.query(
     `INSERT INTO mano."Organisation" (
       _id,
@@ -134,6 +138,7 @@ export async function useEncryptedOrga() {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();
 
+  // return client.end();
   const orgId = uuidv4();
   const userId = uuidv4();
   const teamId = uuidv4();
@@ -141,9 +146,7 @@ export async function useEncryptedOrga() {
 
   const date = "2021-01-01";
 
-  await client.query(
-    `delete from mano."Organisation" where name='Encrypted orga'`
-  );
+  await client.query(`delete from mano."Organisation" where name='Encrypted orga'`);
   await client.query(
     `INSERT INTO mano."Organisation" (
       _id,
@@ -153,7 +156,10 @@ export async function useEncryptedOrga() {
       categories,
       "encryptionEnabled",
       "encryptionLastUpdateAt",
-      "encryptedVerificationKey"
+      "encryptedVerificationKey",
+      services,
+      "receptionEnabled",
+      collaborations
     ) VALUES (
       $1,
       'Encrypted orga',
@@ -162,14 +168,15 @@ export async function useEncryptedOrga() {
       null,
       true,
       $2,
-      'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0='
+      'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0=',
+      '{Café,Douche,Repas,Kit,"Don chaussures","Distribution seringue"}',
+      true,
+      '{"Ma première collab"}'
     );`,
     [orgId, date]
   );
 
-  await client.query(
-    `delete from mano."User" where name='Encrypted Orga Admin'`
-  );
+  await client.query(`delete from mano."User" where name='Encrypted Orga Admin'`);
   await client.query(
     `INSERT INTO mano."User" (
       _id,
@@ -203,9 +210,7 @@ export async function useEncryptedOrga() {
     [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
   );
 
-  await client.query(
-    `delete from mano."Team" where name='Encrypted Orga Team'`
-  );
+  await client.query(`delete from mano."Team" where name='Encrypted Orga Team'`);
   await client.query(
     `INSERT INTO mano."Team" (
       _id,
@@ -247,7 +252,7 @@ export async function scrollDown() {
   return page.evaluate(async (_) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        document?.querySelector(".main > div")?.scrollBy(0, 3000000);
+        document?.querySelector(".main")?.scrollBy(0, 3000000);
         resolve("ok");
       }, 500);
     });
@@ -258,7 +263,7 @@ export async function scrollTop() {
   return page.evaluate(async (_) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        document?.querySelector(".main > div")?.scrollBy(0, -3000000);
+        document?.querySelector(".main-content > div")?.scrollBy(0, -3000000);
         resolve("ok");
       }, 500);
     });

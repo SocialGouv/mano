@@ -6,6 +6,7 @@ import { theme } from '../config';
 
 const SelectCustom = ({ creatable, ...props }) => {
   const Component = creatable ? CreatableSelect : Select;
+
   return (
     <Component
       styles={filterStyles}

@@ -164,7 +164,14 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <Label>Genre</Label>
-                  <SelectAsInput options={genderOptions} name="gender" value={values.gender || ''} onChange={handleChange} />
+                  <SelectAsInput
+                    options={genderOptions}
+                    name="gender"
+                    value={values.gender || ''}
+                    onChange={handleChange}
+                    inputId="person-select-gender"
+                    classNamePrefix="person-select-gender"
+                  />
                 </Col>
 
                 <Col md={4}>
@@ -177,6 +184,7 @@ const Summary = ({ person }) => {
                         selected={dateForDatePicker(values.birthdate)}
                         onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
                         dateFormat="dd/MM/yyyy"
+                        id="person-birthdate"
                       />
                     </div>
                   </FormGroup>
@@ -191,6 +199,7 @@ const Summary = ({ person }) => {
                         selected={dateForDatePicker(values.wanderingAt)}
                         onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
                         dateFormat="dd/MM/yyyy"
+                        id="person-wanderingAt"
                       />
                     </div>
                   </FormGroup>
@@ -205,6 +214,7 @@ const Summary = ({ person }) => {
                         selected={dateForDatePicker(values.createdAt)}
                         onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
                         dateFormat="dd/MM/yyyy"
+                        id="person-createdAt"
                       />
                     </div>
                   </FormGroup>
@@ -217,6 +227,8 @@ const Summary = ({ person }) => {
                         onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
                         value={values.assignedTeams}
                         colored
+                        inputId="person-select-assigned-team"
+                        classNamePrefix="person-select-assigned-team"
                       />
                     </div>
                   </FormGroup>
@@ -226,7 +238,7 @@ const Summary = ({ person }) => {
                     <Label>Personne très vulnérable</Label>
                     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                       <span>Personne très vulnérable, ou ayant besoin d'une attention particulière</span>
-                      <Input type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
+                      <Input id="person-alertness-checkbox" type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
                     </div>
                   </FormGroup>
                 </Col>
@@ -253,6 +265,8 @@ const Summary = ({ person }) => {
                     name="personalSituation"
                     value={values.personalSituation || ''}
                     onChange={handleChange}
+                    inputId="person-select-personalSituation"
+                    classNamePrefix="person-select-personalSituation"
                   />
                 </Col>
                 <Col md={4}>
@@ -264,13 +278,27 @@ const Summary = ({ person }) => {
                 <Col md={4}>
                   <FormGroup>
                     <Label>Avec animaux</Label>
-                    <SelectAsInput options={yesNoOptions} name="hasAnimal" value={values.hasAnimal || ''} onChange={handleChange} />
+                    <SelectAsInput
+                      options={yesNoOptions}
+                      name="hasAnimal"
+                      value={values.hasAnimal || ''}
+                      onChange={handleChange}
+                      inputId="person-select-animals"
+                      classNamePrefix="person-select-animals"
+                    />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
                   <FormGroup>
                     <Label>Hébergement</Label>
-                    <SelectAsInput options={yesNoOptions} name="address" value={values.address || ''} onChange={handleChange} />
+                    <SelectAsInput
+                      options={yesNoOptions}
+                      name="address"
+                      value={values.address || ''}
+                      onChange={handleChange}
+                      inputId="person-select-address"
+                      classNamePrefix="person-select-address"
+                    />
                   </FormGroup>
                 </Col>
 
@@ -284,13 +312,22 @@ const Summary = ({ person }) => {
                       name="nationalitySituation"
                       value={values.nationalitySituation || ''}
                       onChange={handleChange}
+                      inputId="person-select-nationalitySituation"
+                      classNamePrefix="person-select-nationalitySituation"
                     />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
                   <FormGroup>
                     <Label>Emploi</Label>
-                    <SelectAsInput options={employmentOptions} name="employment" value={values.employment || ''} onChange={handleChange} />
+                    <SelectAsInput
+                      options={employmentOptions}
+                      name="employment"
+                      value={values.employment || ''}
+                      onChange={handleChange}
+                      inputId="person-select-employment"
+                      classNamePrefix="person-select-employment"
+                    />
                   </FormGroup>
                 </Col>
 
@@ -304,7 +341,7 @@ const Summary = ({ person }) => {
                 {customFieldsPersonsSocial
                   .filter((f) => f.enabled)
                   .map((field) => (
-                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                   ))}
               </Row>
 
@@ -318,6 +355,8 @@ const Summary = ({ person }) => {
                     name="healthInsurance"
                     value={values.healthInsurance || ''}
                     onChange={handleChange}
+                    inputId="person-select-healthInsurance"
+                    classNamePrefix="person-select-healthInsurance"
                   />
                 </Col>
                 <Col md={4}>
@@ -329,7 +368,7 @@ const Summary = ({ person }) => {
                 {customFieldsPersonsMedical
                   .filter((f) => f.enabled)
                   .map((field) => (
-                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                   ))}
               </Row>
 
@@ -449,6 +488,8 @@ const AddressDetails = ({ values, onChange }) => {
             value={computeValue(values.addressDetail)}
             options={addressDetails}
             onChange={onChange}
+            inputId="person-select-addressDetail"
+            classNamePrefix="person-select-addressDetail"
           />
         </FormGroup>{' '}
       </Col>
@@ -476,6 +517,8 @@ const Reasons = ({ value, onChange }) => (
       value={value}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
+      inputId="person-select-reasons"
+      classNamePrefix="person-select-reasons"
     />
   </FormGroup>
 );
@@ -492,6 +535,8 @@ const Ressources = ({ value, onChange }) => (
       value={value}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
+      inputId="person-select-resources"
+      classNamePrefix="person-select-resources"
     />
   </FormGroup>
 );

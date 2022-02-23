@@ -7,21 +7,37 @@ import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../services/date';
 
-const CustomFieldInput = ({ field, values, handleChange }) => (
+const CustomFieldInput = ({ field, values, handleChange, model }) => (
   <Col md={6} key={field.name}>
     <FormGroup>
       <Label>{field.label}</Label>
       {!!['text', 'number'].includes(field.type) && (
-        <Input name={field.name} type={field.type} required={field.required} value={values[field.name]} onChange={handleChange} />
+        <Input
+          name={field.name}
+          type={field.type}
+          required={field.required}
+          value={values[field.name]}
+          onChange={handleChange}
+          id={`${model}-custom-input-${field.name}`}
+        />
       )}
       {!!['textarea'].includes(field.type) && (
-        <Input name={field.name} type="textarea" rows={5} required={field.required} value={values[field.name]} onChange={handleChange} />
+        <Input
+          name={field.name}
+          type="textarea"
+          rows={5}
+          required={field.required}
+          value={values[field.name]}
+          onChange={handleChange}
+          id={`${model}-custom-textarea-${field.name}`}
+        />
       )}
       {!!['date-with-time', 'date'].includes(field.type) && (
         <div>
           <DatePicker
             locale="fr"
             className="form-control"
+            id={`${model}-custom-datepicker-${field.name}`}
             selected={dateForDatePicker(values[field.name] ? values[field.name] : field.required ? new Date() : null)}
             onChange={(date) => handleChange({ target: { value: date, name: field.name } })}
             timeInputLabel="Heure :"
@@ -33,14 +49,35 @@ const CustomFieldInput = ({ field, values, handleChange }) => (
       {!!['boolean'].includes(field.type) && (
         <CheckboxContainer>
           <span>{field.label}</span>
-          <Input type="checkbox" required={field.required} name={field.name} checked={values[field.name]} onChange={handleChange} />
+          <Input
+            type="checkbox"
+            id={`${model}-custom-checkbox-${field.name}`}
+            required={field.required}
+            name={field.name}
+            checked={values[field.name]}
+            onChange={handleChange}
+          />
         </CheckboxContainer>
       )}
       {!!['yes-no'].includes(field.type) && (
-        <SelectAsInput options={['Oui', 'Non']} name={field.name} value={values[field.name] || ''} onChange={handleChange} />
+        <SelectAsInput
+          options={['Oui', 'Non']}
+          name={field.name}
+          value={values[field.name] || ''}
+          onChange={handleChange}
+          inputId={`${model}-custom-select-${field.name}`}
+          classNamePrefix={`${model}-custom-select-${field.name}`}
+        />
       )}
       {!!['enum'].includes(field.type) && (
-        <SelectAsInput options={field.options} name={field.name} value={values[field.name] || ''} onChange={handleChange} />
+        <SelectAsInput
+          options={field.options}
+          name={field.name}
+          value={values[field.name] || ''}
+          onChange={handleChange}
+          inputId={`${model}-custom-select-${field.name}`}
+          classNamePrefix={`${model}-custom-select-${field.name}`}
+        />
       )}
       {!!['multi-choice'].includes(field.type) && (
         <SelectCustom
@@ -49,6 +86,8 @@ const CustomFieldInput = ({ field, values, handleChange }) => (
           onChange={(v) => handleChange({ currentTarget: { value: v, name: field.name } })}
           isClearable={false}
           isMulti
+          inputId={`${model}-custom-select-${field.name}`}
+          classNamePrefix={`${model}-custom-select-${field.name}`}
           value={values[field.name]}
           placeholder={' -- Choisir -- '}
           getOptionValue={(i) => i}

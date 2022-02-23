@@ -63,7 +63,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                   {customFieldsObs
                     .filter((f) => f.enabled)
                     .map((field) => (
-                      <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                      <CustomFieldInput model="observation" values={values} handleChange={handleChange} field={field} key={field.name} />
                     ))}
                   <Col md={6}>
                     <FormGroup>
@@ -77,6 +77,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                           timeInputLabel="Heure :"
                           dateFormat="dd/MM/yyyy hh:mm"
                           showTimeInput
+                          id="observation-createdat"
                         />
                       </div>
                     </FormGroup>
@@ -89,6 +90,8 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                         teamId={values.team}
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                         colored
+                        inputId="observation-select-team"
+                        classNamePrefix="observation-select-team"
                       />
                     </FormGroup>
                   </Col>
@@ -103,6 +106,8 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                         value={territories.find((i) => i._id === values.territory)}
                         getOptionValue={(i) => i._id}
                         getOptionLabel={(i) => i.name}
+                        inputId="observation-select-territory"
+                        classNamePrefix="observation-select-territory"
                       />
                     </FormGroup>
                   </Col>
