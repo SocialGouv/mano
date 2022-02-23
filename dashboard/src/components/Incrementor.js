@@ -22,14 +22,14 @@ const Incrementor = ({ service, count, onChange }) => {
     <Wrapper>
       <Name id={`${service}-title`}>{service}</Name>
       <IncContainer>
-        <ButtonRound type="button" onClick={() => onChangeRequest(localcount - 1)} disabled={localcount === 0}>
-          <span id={`${service}-add`}>-</span>
+        <ButtonRound type="button" onClick={() => onChangeRequest(localcount - 1)} disabled={localcount === 0} id={`${service}-remove`}>
+          <span>-</span>
         </ButtonRound>
         <CardWrapper>
           <input id={`${service}-count`} type="number" value={localcount} onChange={(e) => onChangeRequest(Number(e.currentTarget.value))} />
         </CardWrapper>
-        <ButtonRound type="button" onClick={() => onChangeRequest(localcount + 1)}>
-          <span id={`${service}-remove`}>+</span>
+        <ButtonRound type="button" onClick={() => onChangeRequest(localcount + 1)} id={`${service}-add`}>
+          <span>+</span>
         </ButtonRound>
       </IncContainer>
     </Wrapper>

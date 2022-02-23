@@ -253,7 +253,7 @@ const Reception = ({ report }) => {
       <Row style={{ marginBottom: 20, flexShrink: 0 }}>
         <Col md={4} />
         <Col md={4} style={{ marginBottom: 20 }}>
-          <Card title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
+          <Card countId="report-number-of-passages" title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
         </Col>
         <Col md={4} />
         {renderServices()}
@@ -506,10 +506,16 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
         <Row style={{ marginBottom: 20 }}>
           <Col md={2} />
           <Col md={4}>
-            <Card title="Nombre de passages anonymes" count={numberOfAnonymousPassages} unit={`passage${numberOfAnonymousPassages > 1 ? 's' : ''}`} />
+            <Card
+              countId="report-passages-anonymous-count"
+              title="Nombre de passages anonymes"
+              count={numberOfAnonymousPassages}
+              unit={`passage${numberOfAnonymousPassages > 1 ? 's' : ''}`}
+            />
           </Col>
           <Col md={4}>
             <Card
+              countId="report-passages-non-anonymous-count"
               title="Nombre de passages non-anonymes"
               count={numberOfNonAnonymousPassages}
               unit={`passage${numberOfNonAnonymousPassages > 1 ? 's' : ''}`}

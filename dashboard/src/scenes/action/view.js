@@ -81,7 +81,13 @@ const View = () => {
                   </Col>
                   <Col md={3}>
                     <Label>Statut</Label>
-                    <SelectStatus name="status" value={values.status || ''} onChange={handleChange} />
+                    <SelectStatus
+                      name="status"
+                      value={values.status || ''}
+                      onChange={handleChange}
+                      inputId="update-action-select-status"
+                      classNamePrefix="update-action-select-status"
+                    />
                   </Col>
                   <Col md={3}>
                     <FormGroup>

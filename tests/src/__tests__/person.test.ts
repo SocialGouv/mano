@@ -45,7 +45,7 @@ describe("Organisation CRUD", () => {
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     await page.waitForTimeout(1000);
-    await scrollTop();
+    // await scrollTop();
     await expect(page).toClick("a", { text: "Actions (0)" });
     await expect(page).toClick("a", { text: "Lieux (0)" });
     await expect(page).toClick("a", { text: "Commentaires (0)" });
@@ -135,7 +135,6 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("div.person-custom-select-consumptions__option");
     await expect(page).toFill('input[name="structureMedical"]', "Une structure médicale");
     await expect(page).toFill('textarea[name="caseHistoryDescription"]', "Mon historique médical");
-    await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
     await expect(page).toClick("div.close-toastr");
@@ -263,7 +262,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("div.close-toastr");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
-    await scrollTop();
+    // await scrollTop();
     await expect(page).toClick("a", { text: "Lieux (0)" });
     await expect(page).toClick("button", { text: "Ajouter un lieu" });
     await expect(page).toClick("input#add-place-select-place");
@@ -290,7 +289,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Ma première personne");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
-    await scrollTop();
+    // await scrollTop();
     /* Summary */
     expect(await getInputValue('input[name="name"]')).toBe("Ma première personne");
     expect(await getInputValue('input[name="otherNames"]')).toBe("autre nom");
@@ -363,7 +362,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Mise à jour réussie");
     await expect(page).toClick("div.close-toastr");
     await expect(page).toMatch("Réintégrer dans la file active");
-    await scrollTop();
+    // await scrollTop();
     await expect(page).toMatch(
       "Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure"
     );
@@ -381,7 +380,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Ma première personne");
     await expect(page).toClick("td", { text: "Ma première personne" });
-    await scrollTop();
+    // await scrollTop();
     await expect(page).toMatch(
       "Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure"
     );

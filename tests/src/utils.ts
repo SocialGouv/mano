@@ -138,6 +138,7 @@ export async function useEncryptedOrga() {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();
 
+  // return client.end();
   const orgId = uuidv4();
   const userId = uuidv4();
   const teamId = uuidv4();
@@ -249,7 +250,7 @@ export async function scrollDown() {
   return page.evaluate(async (_) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        document?.querySelector(".main > div")?.scrollBy(0, 3000000);
+        document?.querySelector(".main")?.scrollBy(0, 3000000);
         resolve("ok");
       }, 500);
     });
@@ -260,7 +261,7 @@ export async function scrollTop() {
   return page.evaluate(async (_) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        document?.querySelector(".main > div")?.scrollBy(0, -3000000);
+        document?.querySelector(".main-content > div")?.scrollBy(0, -3000000);
         resolve("ok");
       }, 500);
     });
