@@ -92,7 +92,7 @@ jobs:
           environment: "dev"
           rancherId: ${{ secrets.RANCHER_PROJECT_ID }}
           socialgouvBaseDomain: ${{ secrets.SOCIALGOUV_BASE_DOMAIN }}
-          pgSecretUserPrefix: pg-user
+          pgUserSecretPrefix: pg-user
 
       - name: Use autodevops deployment
         uses: SocialGouv/actions/autodevops-deploy@v1
