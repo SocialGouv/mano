@@ -9,8 +9,8 @@ const crypto = require("crypto");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
 const Team = require("../models/team");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 // Return the basedir to store persons' documents.
 function personDocumentBasedir(userOrganisation, personId) {
@@ -87,28 +87,22 @@ router.delete(
 router.post(
   "/import",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const persons = req.body.map((p) => ({
       ...p,
       organisation: req.user.organisation,
       user: req.user._id,
     }));
-
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Person.bulkCreate(persons, { returning: true, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return data;
-
-      // Todo: check if assignedTeams is always needed in full encryption mode.
-      return data.map((p) => p.toJSON());
-    });
-    return res.status(status).send({ ok, data, error });
+    const data = await Person.bulkCreate(persons, { returning: true });
+    return res.status(200).send({ ok: true, data: data.map((p) => p.toJSON()) });
   })
 );
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const newPerson = {};
 
@@ -119,15 +113,8 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Person.create(newPerson, { returning: true, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return data;
-
-      // Todo: check if assignedTeams is always needed in full encryption mode.
-      return data.toJSON();
-    });
-    return res.status(status).send({ ok, data, error });
+    const data = await Person.create(newPerson, { returning: true, transaction: tx });
+    return res.status(200).send({ ok: true, data: data.toJSON() });
   })
 );
 
@@ -214,18 +201,9 @@ router.put(
       req.body.createdAt = person.createdAt;
     }
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await Person.update(req.body, query, { silent: false, transaction: tx });
-      // According to this comment, we should use transaction here:
-      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
-      const newPerson = await Person.findOne({ ...query, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return person;
-
-      return newPerson.toJSON();
-    });
-
-    res.status(status).send({ ok, data, error });
+    await Person.update(req.body, query, { silent: false });
+    const newPerson = await Person.findOne({ ...query });
+    res.status(200).send({ ok: true, data: newPerson.toJSON() });
   })
 );
 

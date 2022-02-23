@@ -3,13 +3,13 @@ const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
-
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const Place = require("../models/place");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     if (!req.body.name) return res.status(400).send({ ok: false, error: "Name is needed" });
 
@@ -23,12 +23,8 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newPlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Place.create(newPlace, { returning: true, transaction: tx });
-      return data;
-    });
-
-    return res.status(status).send({ ok, data, error });
+    const data = await Place.create(newPlace, { returning: true });
+    return res.status(200).send({ ok: true, data });
   })
 );
 
@@ -70,6 +66,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const query = {
       where: {
@@ -86,13 +83,11 @@ router.put(
 
     const place = await Place.findOne(query);
     if (!place) return res.status(404).send({ ok: false, error: "Not found" });
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      place.set(updatePlace);
-      await place.save({ transaction: tx });
-      return place;
-    });
 
-    return res.status(status).send({ ok, data, error });
+    place.set(updatePlace);
+    await place.save({ transaction: tx });
+
+    return res.status(200).send({ ok: true, data: place });
   })
 );
 

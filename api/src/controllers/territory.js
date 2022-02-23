@@ -4,8 +4,8 @@ const passport = require("passport");
 
 const { catchErrors } = require("../errors");
 const Territory = require("../models/territory");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 const { Op } = require("sequelize");
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 router.post(
   "/",
@@ -23,12 +23,8 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newTerritory.encrypted = req.body.encrypted;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Territory.create(newTerritory, { returning: true, transaction: tx });
-      return data;
-    });
-
-    return res.status(status).send({ ok, data, error });
+    const data = await Territory.create(newTerritory, { returning: true });
+    return res.status(200).send({ ok: true, data });
   })
 );
 
@@ -71,6 +67,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const query = {
       where: {
@@ -88,13 +85,10 @@ router.put(
 
     const territory = await Territory.findOne(query);
     if (!territory) return res.status(404).send({ ok: false, error: "Not found" });
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      territory.set(updateTerritory);
-      await territory.save({ transaction: tx });
-      return territory;
-    });
+    territory.set(updateTerritory);
+    await territory.save();
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data: territory });
   })
 );
 

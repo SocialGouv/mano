@@ -2,15 +2,14 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
-
 const { catchErrors } = require("../errors");
-
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const Action = require("../models/action");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const newAction = {};
 
@@ -34,12 +33,8 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Action.create(newAction, { returning: true, transaction: tx });
-      return data;
-    });
-
-    return res.status(status).send({ ok, data, error });
+    const data = await Action.create(newAction, { returning: true });
+    return res.status(200).send({ ok: true, data });
   })
 );
 
@@ -112,6 +107,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const where = { _id: req.params._id };
     where.organisation = req.user.organisation;
@@ -136,15 +132,10 @@ router.put(
     if (req.body.hasOwnProperty("encrypted")) updateAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    await action.update(updateAction);
+    action.set(updateAction);
+    await action.save();
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      action.set(updateAction);
-      await action.save({ transaction: tx });
-      return action;
-    });
-
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data: action });
   })
 );
 

@@ -2,14 +2,14 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
-
 const { catchErrors } = require("../errors");
 const Comment = require("../models/comment");
-const encryptedTransaction = require("../utils/encryptedTransaction");
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const newComment = {};
 
@@ -29,12 +29,9 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newComment.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newComment.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Comment.create(newComment, { returning: true, transaction: tx });
-      return data;
-    });
+    const data = await Comment.create(newComment, { returning: true });
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data });
   })
 );
 
@@ -76,6 +73,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     if (!req.body.comment) return res.status(400).send({ ok: false, error: "Comment is missing" });
 
@@ -96,15 +94,10 @@ router.put(
     }
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateComment.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await Comment.update(updateComment, query, { silent: false, transaction: tx });
-      // According to this comment, we should use transaction here:
-      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
-      const newComment = await Comment.findOne({ ...query, transaction: tx });
-      return newComment;
-    });
+    await Comment.update(updateComment, query, { silent: false });
+    const newComment = await Comment.findOne(query);
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data: newComment });
   })
 );
 

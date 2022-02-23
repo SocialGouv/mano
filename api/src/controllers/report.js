@@ -4,9 +4,9 @@ const passport = require("passport");
 const { Op } = require("sequelize");
 
 const { catchErrors } = require("../errors");
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 const Report = require("../models/report");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 
 router.get(
   "/",
@@ -72,6 +72,7 @@ router.post(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const where = { _id: req.params._id };
     if (req.user.role !== "admin") where.team = req.user.teams.map((e) => e._id);
@@ -88,13 +89,9 @@ router.put(
     if (req.body.hasOwnProperty("encrypted")) updatedReport.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatedReport.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      report.set(updatedReport);
-      await report.save({ transaction: tx });
-      return report;
-    });
-
-    return res.status(status).send({ ok, data, error });
+    report.set(updatedReport);
+    await report.save();
+    return res.status(200).send({ ok: true, data: report });
   })
 );
 

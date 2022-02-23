@@ -5,12 +5,13 @@ const passport = require("passport");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const TerritoryObservation = require("../models/territoryObservation");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 const { Op } = require("sequelize");
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const newObs = {};
 
@@ -37,10 +38,7 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await TerritoryObservation.create(newObs, { returning: true, transaction: tx });
-      return data;
-    });
+    const data = await TerritoryObservation.create(newObs, { returning: true, transaction: tx });
 
     return res.status(status).send({ ok, data, error });
   })
@@ -87,6 +85,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const query = {
       where: {
@@ -119,15 +118,10 @@ router.put(
     if (req.body.hasOwnProperty("encrypted")) updateObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await TerritoryObservation.update(updateObs, query, { silent: false, transaction: tx });
-      // According to this comment, we should use transaction here:
-      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
-      const newObservation = await TerritoryObservation.findOne({ ...query, transaction: tx });
-      return newObservation;
-    });
+    await TerritoryObservation.update(updateObs, query, { silent: false, transaction: tx });
+    const newObservation = await TerritoryObservation.findOne({ ...query, transaction: tx });
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data: newObservation });
   })
 );
 
