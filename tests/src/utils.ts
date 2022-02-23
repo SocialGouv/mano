@@ -155,7 +155,9 @@ export async function useEncryptedOrga() {
       categories,
       "encryptionEnabled",
       "encryptionLastUpdateAt",
-      "encryptedVerificationKey"
+      "encryptedVerificationKey",
+      services,
+      "receptionEnabled"
     ) VALUES (
       $1,
       'Encrypted orga',
@@ -164,7 +166,9 @@ export async function useEncryptedOrga() {
       null,
       true,
       $2,
-      'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0='
+      'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0=',
+      '{Café,Douche,Repas,Kit,"Don chaussures","Distribution seringue"}',
+      true
     );`,
     [orgId, date]
   );

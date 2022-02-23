@@ -7,7 +7,6 @@ import {
   useEncryptedOrga,
   getInputValue,
   getInnerText,
-  scrollDown,
 } from "../utils";
 
 jest.setTimeout(60000);
