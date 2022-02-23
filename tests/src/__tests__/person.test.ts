@@ -389,7 +389,8 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("div.close-toastr");
   });
 
-  it.todo("can delete person", async () => {
+  // TODO
+  it.skip("can delete person", async () => {
     page.on("dialog", async (alert) => {
       // alert should be close now
       expect(alert.type()).toBe("confirm");
@@ -401,7 +402,8 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Supprimer" });
   });
 
-  it.todo("should have deleted the person and the action", async () => {
+  // TODO
+  it.skip("should have deleted the person and the action", async () => {
     try {
       await expect(page).toMatch("Ma première personne");
     } catch (e) {
