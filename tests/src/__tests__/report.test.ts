@@ -105,14 +105,36 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able go in the report", async () => {
-    await page.waitForTimeout(1000);
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
-    await expect(page).toClick("button", { text: dayjs().format("D MMMM YYYY") });
+    const today = dayjs().format("D MMMM YYYY");
+    console.log({ today });
+    await expect(page).toClick("button", { text: today });
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Compte rendu de l'équipe Encrypted Orga Team`);
-    await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
+    await expect(page).toMatch(`Journée du ${today}`);
+  });
+
+  it("should be able to go to previous report then next report", async () => {
+    const today = dayjs().format("D MMMM YYYY");
+    const yesterday = dayjs().add(-1, "day").format("D MMMM YYYY");
+    console.log({ today, yesterday });
+    await navigateWithReactRouter("/report");
+    await page.waitForTimeout(1000);
+    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
+    await page.waitForTimeout(500);
+    await expect(page).toClick("button", { text: yesterday });
+    await page.waitForTimeout(500);
+    await expect(page).toMatch(`Journée du ${yesterday}`);
+    await expect(page).toClick("button", { text: "Suivant" });
+    await page.waitForTimeout(500);
+    await expect(page).toMatch(`Journée du ${today}`);
+    await expect(page).toClick("button", { text: "Précédent" });
+    await page.waitForTimeout(500);
+    await expect(page).toMatch(`Journée du ${yesterday}`);
+    await expect(page).toClick("button", { text: "Suivant" });
+    await page.waitForTimeout(500);
   });
 
   it("should be able to modify services in the report", async () => {

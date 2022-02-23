@@ -73,9 +73,9 @@ const HitMonth = ({ date, reports, team, debug }) => {
         {days.map((day) => {
           const report = reports.find((rep) => isOnSameDay(rep.date, day));
           if (report) {
-            return <FullButton onClick={() => history.push(`/report/${report._id}`)} key={day} title={`${formatDateWithFullMonth(day.toDate())} `} />;
+            return <FullButton onClick={() => history.push(`/report/${report._id}`)} key={day} title={`${formatDateWithFullMonth(day.toDate())}`} />;
           }
-          return <EmptyButton onClick={() => createReport(day)} key={day} title={`${formatDateWithFullMonth(day.toDate())} `} />;
+          return <EmptyButton onClick={() => createReport(day)} key={day} title={`${formatDateWithFullMonth(day.toDate())}`} />;
         })}
       </Collapse>
     </div>

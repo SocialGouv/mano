@@ -67,13 +67,13 @@ const View = () => {
 
   const report = currentTeamReports[reportIndex];
 
-  const onPreviousReport = () => {
+  const onFirstLaterReport = () => {
     if (reportIndex === currentTeamReports.length - 1) return;
     const prevReport = currentTeamReports[reportIndex + 1];
     if (!prevReport) return;
     history.push(`/report/${prevReport._id}`);
   };
-  const onNextReport = () => {
+  const onFirstBeforeReport = () => {
     if (reportIndex === 0) return;
     const nextReport = currentTeamReports[reportIndex - 1];
     if (!nextReport) return;
@@ -185,14 +185,14 @@ const View = () => {
                 <BackButtonWrapper caption="Supprimer" onClick={deleteData} />
               </div>
               <div style={{ display: 'flex' }}>
+                <ButtonCustom color="link" className="noprint" title="Précédent" disabled={reportIndex === 0} onClick={onFirstBeforeReport} />
                 <ButtonCustom
                   color="link"
                   className="noprint"
-                  title="Précédent"
+                  title="Suivant"
                   disabled={reportIndex === currentTeamReports.length - 1}
-                  onClick={onPreviousReport}
+                  onClick={onFirstLaterReport}
                 />
-                <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onNextReport} />
               </div>
             </div>
             <div>
