@@ -45,7 +45,7 @@ describe("Organisation CRUD", () => {
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     await page.waitForTimeout(1000);
-    // await scrollTop();
+    await scrollTop();
     await expect(page).toClick("a", { text: "Actions (0)" });
     await expect(page).toClick("a", { text: "Lieux (0)" });
     await expect(page).toClick("a", { text: "Commentaires (0)" });
@@ -97,6 +97,7 @@ describe("Organisation CRUD", () => {
   */
 
   it("should update a person", async () => {
+    await expect(page).toClick("a", { text: "Résumé" });
     await expect(page).toFill('input[name="otherNames"]', "autre nom");
     await expect(page).toClick("input#person-select-gender");
     await expect(page).toClick("div.person-select-gender__option:nth-of-type(2)");
@@ -362,7 +363,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Mise à jour réussie");
     await expect(page).toClick("div.close-toastr");
     await expect(page).toMatch("Réintégrer dans la file active");
-    // await scrollTop();
+    await scrollTop();
     await expect(page).toMatch(
       "Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure"
     );
@@ -428,7 +429,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("input#person-select-and-create-reception");
     await expect(page).toClick("div.person-select-and-create-reception__option");
     expect(await getInnerText("div.person-select-and-create-reception__multi-value__label")).toBe(
-      "Ma première personne"
+      "!Ma première personne"
     );
     await expect(page).toClick("button", { text: "Ajouter un passage" });
     await page.waitForTimeout(1000);
