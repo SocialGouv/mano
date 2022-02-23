@@ -107,18 +107,21 @@ const View = () => {
 
   if (!report) return <Loading />;
 
-  const renderPrintOnly = () => (
-    <div className="printonly">
-      <Description report={report} />
-      <Reception report={report} />
-      <ActionCompletedAt date={report.date} status={DONE} />
-      <ActionCreatedAt date={report.date} />
-      <ActionCompletedAt date={report.date} status={CANCEL} />
-      <CommentCreatedAt date={report.date} />
-      <PassagesCreatedAt date={report.date} />
-      <TerritoryObservationsCreatedAt date={report.date} />
-    </div>
-  );
+  const renderPrintOnly = () => {
+    if (process.env.REACT_APP_TEST === 'true') return null;
+    return (
+      <div className="printonly">
+        <Description report={report} />
+        <Reception report={report} />
+        <ActionCompletedAt date={report.date} status={DONE} />
+        <ActionCreatedAt date={report.date} />
+        <ActionCompletedAt date={report.date} status={CANCEL} />
+        <CommentCreatedAt date={report.date} />
+        <PassagesCreatedAt date={report.date} />
+        <TerritoryObservationsCreatedAt date={report.date} />
+      </div>
+    );
+  };
 
   const renderScreenOnly = () => (
     <div className="noprint">
@@ -702,25 +705,27 @@ const Description = ({ report }) => {
           )}
         </Formik>
       </DescriptionBox>
-      <DescriptionBox className="printonly" report={report}>
-        {!!report?.collaborations?.length && (
-          <>
-            <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
-            <p>{report?.collaborations.join(', ')}</p>
-          </>
-        )}
-        <Title>Description</Title>
-        <p>
-          {!report?.description
-            ? 'Pas de description'
-            : report?.description?.split('\n').map((sentence, index) => (
-                <React.Fragment key={index}>
-                  {sentence}
-                  <br />
-                </React.Fragment>
-              ))}
-        </p>
-      </DescriptionBox>
+      {process.env.REACT_APP_TEST !== 'true' && (
+        <DescriptionBox className="printonly" report={report}>
+          {!!report?.collaborations?.length && (
+            <>
+              <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
+              <p>{report?.collaborations.join(', ')}</p>
+            </>
+          )}
+          <Title>Description</Title>
+          <p>
+            {!report?.description
+              ? 'Pas de description'
+              : report?.description?.split('\n').map((sentence, index) => (
+                  <React.Fragment key={index}>
+                    {sentence}
+                    <br />
+                  </React.Fragment>
+                ))}
+          </p>
+        </DescriptionBox>
+      )}
     </>
   );
 };

@@ -16,8 +16,8 @@ import {
 dayjs.extend(utc);
 dayjs.locale("fr");
 
-jest.setTimeout(10000);
-setDefaultOptions({ timeout: 5000 });
+jest.setTimeout(60000);
+setDefaultOptions({ timeout: 60000 });
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {
@@ -108,31 +108,26 @@ describe("Organisation CRUD", () => {
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
-    const today = dayjs().format("D MMMM YYYY");
-    console.log({ today });
-    await expect(page).toClick("button", { text: today });
+    await expect(page).toClick("button", { text: dayjs().format("D MMMM YYYY") });
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Compte rendu de l'équipe Encrypted Orga Team`);
-    await expect(page).toMatch(`Journée du ${today}`);
+    await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
   });
 
   it("should be able to go to previous report then next report", async () => {
-    const today = dayjs().format("D MMMM YYYY");
-    const yesterday = dayjs().add(-1, "day").format("D MMMM YYYY");
-    console.log({ today, yesterday });
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await page.waitForTimeout(500);
-    await expect(page).toClick("button", { text: yesterday });
+    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D MMMM YYYY") });
     await page.waitForTimeout(500);
-    await expect(page).toMatch(`Journée du ${yesterday}`);
+    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await expect(page).toClick("button", { text: "Suivant" });
     await page.waitForTimeout(500);
-    await expect(page).toMatch(`Journée du ${today}`);
+    await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await expect(page).toClick("button", { text: "Précédent" });
     await page.waitForTimeout(500);
-    await expect(page).toMatch(`Journée du ${yesterday}`);
+    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await expect(page).toClick("button", { text: "Suivant" });
     await page.waitForTimeout(500);
   });
@@ -141,17 +136,17 @@ describe("Organisation CRUD", () => {
     expect(await getInnerText("span#report-number-of-passages")).toBe("2");
     await scrollDown();
     await page.waitForTimeout(1000);
-    expect(await getInputValue(".noprint input#Café-count")).toBe("1");
+    expect(await getInputValue("input#Café-count")).toBe("1");
     await page.waitForTimeout(500);
-    await expect(page).toClick(".noprint button#Douche-add");
+    await expect(page).toClick("button#Douche-add");
     await page.waitForTimeout(500);
-    expect(await getInputValue(".noprint input#Douche-count")).toBe("1");
-    await expect(page).toClick(".noprint button#Douche-add");
+    expect(await getInputValue("input#Douche-count")).toBe("1");
+    await expect(page).toClick("button#Douche-add");
     await page.waitForTimeout(500);
-    expect(await getInputValue(".noprint input#Douche-count")).toBe("2");
-    await expect(page).toClick(".noprint button#Douche-remove");
+    expect(await getInputValue("input#Douche-count")).toBe("2");
+    await expect(page).toClick("button#Douche-remove");
     await page.waitForTimeout(500);
-    expect(await getInputValue(".noprint input#Douche-count")).toBe("1");
+    expect(await getInputValue("input#Douche-count")).toBe("1");
   });
 
   it("should be able to see passages in the report", async () => {
@@ -175,7 +170,7 @@ describe("Organisation CRUD", () => {
     await scrollDown();
     await page.waitForTimeout(500);
     await expect(page).toMatch("Mon action");
-    await expect(page).toClick(".noprint td", { text: "Mon action" });
+    await expect(page).toClick("td", { text: "Mon action" });
     await page.waitForTimeout(500);
     await expect(page).toClick("input#update-action-select-status");
     await expect(page).toClick("div.update-action-select-status__option:nth-of-type(2)");
@@ -195,7 +190,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Actions complétées (1)" });
     await page.waitForTimeout(500);
     await expect(page).toMatch("Mon action");
-    await expect(page).toClick(".noprint td", { text: "Mon action" });
+    await expect(page).toClick("td", { text: "Mon action" });
     await page.waitForTimeout(500);
     await expect(page).toClick("input#update-action-select-status");
     await expect(page).toClick("div.update-action-select-status__option:nth-of-type(3)");
@@ -217,5 +212,44 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Mon action");
     await expect(page).toMatch("Encrypted Orga Admin a changé le status de l'action: FAITE");
     await expect(page).toMatch("Encrypted Orga Admin a changé le status de l'action: ANNULÉE");
+  });
+
+  it("should be able to add a collaboration", async () => {
+    await expect(page).toMatch(`Compte rendu de l'équipe Encrypted Orga Team`);
+    await page.waitForTimeout(500);
+    await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
+    await page.waitForTimeout(500);
+    await expect(page).toFill("input#report-select-collaboration", "Ma deuxième collab");
+    await expect(page).toClick("div.report-select-collaboration__option");
+    await expect(page).toClick("button", { text: "Mettre à jour" });
+    await expect(page).toMatch("Mis à jour !");
+    await expect(page).toClick("div.close-toastr");
+    await expect(page).toMatch("Ma première collab");
+    await expect(page).toMatch("Ma deuxième collab");
+  });
+
+  it("should be able to use an added collaboration", async () => {
+    await navigateWithReactRouter("/report");
+    await page.waitForTimeout(1000);
+    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
+    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D MMMM YYYY") });
+    await page.waitForTimeout(500);
+    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
+    await page.waitForTimeout(500);
+    await expect(page).toClick("input#report-select-collaboration");
+    await expect(page).toClick("div.report-select-collaboration__option");
+    await expect(page).toClick("button", { text: "Mettre à jour" });
+    await expect(page).toMatch("Mis à jour !");
+    await expect(page).toClick("div.close-toastr");
+    await expect(page).toMatch("Ma deuxième collab");
+  });
+
+  it("should be able to use add a description", async () => {
+    await expect(page).toClick("button", { text: "Ajouter une description" });
+    await expect(page).toMatch("Description", { timeout: 4000 });
+    await expect(page).toFill('textarea[name="description"]', "Ceci est une description");
+    await expect(page).toClick("button", { text: "Enregistrer" });
+    await expect(page).toClick("div.close-toastr");
+    await expect(page).toMatch("Ceci est une description");
   });
 });

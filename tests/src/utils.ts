@@ -158,7 +158,8 @@ export async function useEncryptedOrga() {
       "encryptionLastUpdateAt",
       "encryptedVerificationKey",
       services,
-      "receptionEnabled"
+      "receptionEnabled",
+      collaborations
     ) VALUES (
       $1,
       'Encrypted orga',
@@ -169,7 +170,8 @@ export async function useEncryptedOrga() {
       $2,
       'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0=',
       '{Café,Douche,Repas,Kit,"Don chaussures","Distribution seringue"}',
-      true
+      true,
+      '{"Ma première collab"}'
     );`,
     [orgId, date]
   );
