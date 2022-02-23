@@ -1,0 +1,17 @@
+{
+  "testRunner": "jest",
+  "runnerConfig": "e2e/config.json",
+  "apps": {
+    "android.release": {
+      "type": "android.apk",
+      "binaryPath": "../app/android/app/build/outputs/apk/release/app-release.apk",
+      "build": "cd ../app/android && ./gradlew assembleRelease assembleTest -DtestBuildType=release && cd ../../tests"
+    }
+  },
+  "configurations": {
+    "android.emu.release": {
+      "device": "attached",
+      "app": "android.release"
+    }
+  }
+}

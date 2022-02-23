@@ -83,6 +83,7 @@ project.ext.react = [
 project.ext.envConfigFiles = [
     debug: ".env",
     release: ".env.production",
+    detox: ".env.test",
 ]
 apply from: "../../node_modules/react-native/react.gradle"
 apply from: "../../node_modules/@sentry/react-native/sentry.gradle"
@@ -141,6 +142,8 @@ android {
         multiDexEnabled true
         versionCode 3
         versionName "2.11.2"
+        testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     packagingOptions {
        pickFirst 'lib/x86/libc++_shared.so'
@@ -171,6 +174,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        detox {
+            storeFile file('debug.keystore')
+            storePassword 'android'
+            keyAlias 'androiddebugkey'
+            keyPassword 'android'
+        }
         preproduction {
             storeFile file('debug.keystore')
             storePassword 'android'
@@ -186,6 +195,13 @@ android {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.release
+            minifyEnabled enableProguardInReleaseBuilds
+            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+        }
+        detox {
+            // Caution! In production, you need to generate your own keystore file.
+            // see https://reactnative.dev/docs/signed-apk-android.
+            signingConfig signingConfigs.detox
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -223,6 +239,7 @@ dependencies {
     implementation "com.facebook.react:react-native:+"  // From node_modules
 
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.0.0"
+    androidTestImplementation('com.wix:detox:+')
 
     debugImplementation("com.facebook.flipper:flipper:${FLIPPER_VERSION}") {
       exclude group:'com.facebook.fbjni'
