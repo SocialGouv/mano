@@ -41,6 +41,6 @@ describe("Authentication page", () => {
     await expect(page).toFill("#email", "superadmin@example.org");
     await expect(page).toFill("#password", "secret");
     await expect(page).toClick("button[type=submit]");
-    await expect(page).toMatch("Support");
+    await expect(page).toMatch("Support", { timeout: 4000 });
   });
 });

@@ -138,7 +138,6 @@ export async function useEncryptedOrga() {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();
 
-  // return client.end();
   const orgId = uuidv4();
   const userId = uuidv4();
   const teamId = uuidv4();
