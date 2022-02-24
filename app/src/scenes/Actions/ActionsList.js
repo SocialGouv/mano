@@ -108,7 +108,7 @@ const ActionsList = ({ status, onScroll, parentScroll }) => {
   );
 
   return (
-    <SceneContainer>
+    <SceneContainer testID="actions-list">
       {[TODO].includes(status) && renderSectionsList()}
       {[DONE, CANCEL].includes(status) && renderFlatList()}
       <FloatAddButton onPress={onCreateAction} />

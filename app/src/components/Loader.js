@@ -26,7 +26,7 @@ const Loader = () => {
 
   if (!loading) return null;
   return (
-    <Container fullScreen={fullScreen}>
+    <Container fullScreen={fullScreen} testID="loader">
       {!!fullScreen && <ImageStyled source={picture} />}
       <Caption>{loading}</Caption>
       <ProgressContainer fullScreen={fullScreen}>
