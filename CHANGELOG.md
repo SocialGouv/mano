@@ -1,3 +1,10 @@
+## [1.56.3](https://github.com/SocialGouv/mano/compare/v1.56.2...v1.56.3) (2022-02-24)
+
+
+### Bug Fixes
+
+* **app:** cannot update aciton with no name ([#392](https://github.com/SocialGouv/mano/issues/392)) ([a01b2dc](https://github.com/SocialGouv/mano/commit/a01b2dcc7b512f49cc313a3eb77b41109b1d87f9))
+
 ## [1.56.2](https://github.com/SocialGouv/mano/compare/v1.56.1...v1.56.2) (2022-02-24)
 
 
