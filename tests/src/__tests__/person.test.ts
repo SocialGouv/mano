@@ -17,7 +17,7 @@ dayjs.extend(utc);
 dayjs.locale("fr");
 
 jest.setTimeout(60000);
-setDefaultOptions({ timeout: 10000 });
+setDefaultOptions({ timeout: 60000 });
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {

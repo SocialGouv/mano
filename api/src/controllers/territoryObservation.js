@@ -52,7 +52,6 @@ router.get(
       "organisation",
       "createdAt",
       "updatedAt",
-      // Old fields (that are now all custom fields, should have been already encrypted)
     ];
 
     if (req.query.lastRefresh) {

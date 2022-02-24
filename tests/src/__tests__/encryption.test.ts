@@ -1,7 +1,9 @@
 import "expect-puppeteer";
+import { setDefaultOptions } from "expect-puppeteer";
 import { connectWith, useEncryptedOrga } from "../utils";
 
-jest.setTimeout(20000);
+jest.setTimeout(60000);
+setDefaultOptions({ timeout: 60000 });
 
 describe("Encryption", () => {
   beforeEach(async () => {

@@ -12,10 +12,6 @@ const schema = {
   dueAt: DataTypes.DATE,
   completedAt: DataTypes.DATE,
 
-  team: { type: DataTypes.UUID, references: { model: "Team", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
-  user: { type: DataTypes.UUID, references: { model: "User", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
-  structure: { type: DataTypes.UUID, references: { model: "Structure", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
-
   encrypted: { type: DataTypes.TEXT },
   encryptedEntityKey: { type: DataTypes.TEXT },
 };

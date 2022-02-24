@@ -153,10 +153,6 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
-        // This field should be encrypted but it has not been for some time.
-        // It should be kept to avoid breaking existing clients.
-        // It is not sensitive data, so we can keep it as is.
-        "outOfActiveList",
       ],
     });
 
@@ -190,7 +186,6 @@ router.put(
     }
     if (req.body.hasOwnProperty("encrypted")) updatePerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatePerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
-    if (req.body.hasOwnProperty("outOfActiveList")) updatePerson.outOfActiveList = req.body.outOfActiveList;
     // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
     if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
       person.changed("createdAt", true);

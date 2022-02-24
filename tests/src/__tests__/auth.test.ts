@@ -1,5 +1,9 @@
 import "expect-puppeteer";
+import { setDefaultOptions } from "expect-puppeteer";
 import { useSuperAdminAndOrga } from "../utils";
+
+jest.setTimeout(100000);
+setDefaultOptions({ timeout: 60000 });
 
 describe("Authentication page", () => {
   beforeEach(async () => {

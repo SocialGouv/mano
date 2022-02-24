@@ -13,8 +13,6 @@ router.post(
     const newAction = {};
 
     newAction.organisation = req.user.organisation;
-    newAction.user = req.user._id;
-    newAction.team = req.body.team;
 
     if (!req.body.team) return res.status(400).send({ ok: false, error: "Team is required" });
     if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
@@ -25,7 +23,6 @@ router.post(
     if (req.body.hasOwnProperty("status")) newAction.status = req.body.status || null;
     if (req.body.hasOwnProperty("dueAt")) newAction.dueAt = req.body.dueAt || null;
     if (req.body.hasOwnProperty("completedAt")) newAction.completedAt = req.body.completedAt || null;
-    if (req.body.hasOwnProperty("structure")) newAction.structure = req.body.structure || null;
     // Encrypted fields.
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
       return next("No encrypted field in action creation");
@@ -91,12 +88,6 @@ router.get(
         "dueAt",
         "completedAt",
         // All other fields are encrypted and should not be returned.
-
-        // WARNING!
-        // Temporary fix: we need to return the team, user and structure since it's currently not returned by mobile
-        "team",
-        "structure",
-        "user",
       ],
     });
     const todo = actions.filter((a) => a.status === TODO);
@@ -125,7 +116,6 @@ router.put(
     if (req.body.hasOwnProperty("status")) updateAction.status = req.body.status || null;
     if (req.body.hasOwnProperty("dueAt")) updateAction.dueAt = req.body.dueAt || null;
     if (req.body.hasOwnProperty("completedAt")) updateAction.completedAt = req.body.completedAt || null;
-    if (req.body.hasOwnProperty("structure")) updateAction.structure = req.body.structure || null;
     // Encrypted fields.
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
       return next("No encrypted field in action update");
