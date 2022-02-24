@@ -9,7 +9,7 @@ metadata:
     socialgouv/creator: autodevops
     janitor/ttl: 7d
     field.cattle.io/creatorId: gitlab
-    field.cattle.io/projectId: ''
+    field.cattle.io/projectId: c-gjtkk:p-hb8lf
     git/branch: refs/heads/mybranch
     git/remote: socialgouv/mano
     app.github.com/job: '5678'

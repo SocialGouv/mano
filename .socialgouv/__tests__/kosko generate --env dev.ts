@@ -10,7 +10,7 @@ test("kosko generate --dev", async () => {
     await getEnvManifests("dev", "", {
       ...project("mano").dev,
       KUBE_NAMESPACE: "mano-186-master-dev2",
-      //RANCHER_PROJECT_ID: "c-bd7z2:p-dtlsm",
+      RANCHER_PROJECT_ID: "c-gjtkk:p-hb8lf",
     })
   ).toMatchSnapshot();
 });

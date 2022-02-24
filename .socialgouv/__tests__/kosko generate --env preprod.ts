@@ -10,7 +10,7 @@ test("kosko generate --preprod", async () => {
     await getEnvManifests("preprod", "", {
       ...project("mano").preprod,
       KUBE_NAMESPACE: "mano-186-preprod-dev2",
-      // RANCHER_PROJECT_ID: "c-bd7z2:p-dtlsm",
+      RANCHER_PROJECT_ID: "c-gjtkk:p-hb8lf",
     })
   ).toMatchSnapshot();
 });

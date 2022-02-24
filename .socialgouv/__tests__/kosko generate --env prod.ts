@@ -9,6 +9,7 @@ test("kosko generate --prod", async () => {
   expect(
     await getEnvManifests("prod", "", {
       ...project("mano").prod,
+      RANCHER_PROJECT_ID: "c-5rj5b:p-hht9x",
     })
   ).toMatchSnapshot();
 });

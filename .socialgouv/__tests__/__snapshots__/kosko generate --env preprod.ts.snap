@@ -8,7 +8,7 @@ metadata:
   annotations:
     socialgouv/creator: autodevops
     field.cattle.io/creatorId: gitlab
-    field.cattle.io/projectId: ''
+    field.cattle.io/projectId: c-gjtkk:p-hb8lf
     git/branch: refs/tags/v1.2.3
     git/remote: socialgouv/mano
     app.github.com/job: '5678'
