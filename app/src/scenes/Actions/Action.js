@@ -277,6 +277,7 @@ const Action = ({ navigation, route }) => {
         name,
         person,
         team: currentTeam._id,
+        user: user._id,
         dueAt,
         withTime,
         status: TODO,
