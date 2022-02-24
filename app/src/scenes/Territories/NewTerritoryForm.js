@@ -80,11 +80,11 @@ const NewTerritoryForm = ({ navigation, route }) => {
   };
 
   return (
-    <SceneContainer>
+    <SceneContainer testID="new-territory-form">
       <ScreenTitle title="Nouveau territoire" onBack={onGoBackRequested} />
       <ScrollContainer>
-        <InputLabelled label="Nom" onChangeText={setName} value={name} placeholder="Station Stalingrad" />
-        <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateTerritory} loading={posting} />
+        <InputLabelled label="Nom" onChangeText={setName} value={name} placeholder="Station Stalingrad" testID="new-territory-name" />
+        <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateTerritory} loading={posting} testID="new-territory-create" />
       </ScrollContainer>
     </SceneContainer>
   );

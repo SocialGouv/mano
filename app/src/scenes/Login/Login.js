@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Alert, findNodeHandle, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, findNodeHandle, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View, Text } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import AsyncStorage from '@react-native-community/async-storage';
 import { version } from '../../../package.json';
@@ -177,9 +177,9 @@ const Login = ({ navigation }) => {
   };
 
   return (
-    <Background testID="login-screen">
+    <Background>
       <SceneContainer>
-        <ScrollContainer ref={scrollViewRef} keyboardShouldPersistTaps="handled">
+        <ScrollContainer ref={scrollViewRef} keyboardShouldPersistTaps="handled" testID="login-screen">
           <View>
             <StatusBar backgroundColor={colors.app.color} />
             <Title heavy>Bienvenue !</Title>
@@ -189,6 +189,7 @@ const Login = ({ navigation }) => {
               ref={emailRef}
               onFocus={() => _scrollToInput(emailRef)}
               onSubmitEditing={() => passwordRef.current.focus()}
+              testID="login-email"
             />
             <InputLabelled
               ref={passwordRef}
@@ -204,6 +205,7 @@ const Login = ({ navigation }) => {
               onSubmitEditing={onConnect}
               EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
               onEndIconPress={toggleShowPassword}
+              testID="login-password"
             />
             {!!showEncryptionKeyInput && (
               <InputLabelled
@@ -219,13 +221,14 @@ const Login = ({ navigation }) => {
                 onSubmitEditing={onConnect}
                 EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
                 onEndIconPress={toggleShowPassword}
+                testID="login-encryption"
               />
             )}
             <TouchableWithoutFeedback onPress={onForgetPassword}>
               <Hint>J'ai oublié mon mot de passe</Hint>
             </TouchableWithoutFeedback>
             <ButtonsContainer>
-              <Button caption="Connecter" onPress={onConnect} loading={loading} disabled={loading} />
+              <Button caption="Connecter" onPress={onConnect} loading={loading} disabled={loading} testID="button-connect" />
             </ButtonsContainer>
             <Version>Mano v{version}</Version>
           </View>

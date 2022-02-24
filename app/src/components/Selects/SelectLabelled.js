@@ -37,8 +37,8 @@ const SelectLabelled = ({ editable = true, buttonCaption, buttonValue, buttonCol
 ]
 */
 
-const SelectAndroid = ({ label, value, values, onSelect, row, mappedIdsToLabels = null }) => (
-  <InputContainer row={row}>
+const SelectAndroid = ({ label, value, values, onSelect, row, mappedIdsToLabels = null, testID }) => (
+  <InputContainer row={row} testID={testID}>
     {Boolean(label) && (
       <Label bold row={row}>
         {label}
@@ -47,8 +47,8 @@ const SelectAndroid = ({ label, value, values, onSelect, row, mappedIdsToLabels 
     <PickerContainer row={row}>
       <Picker selectedValue={value} onValueChange={(newValue) => onSelect(newValue)}>
         {mappedIdsToLabels
-          ? mappedIdsToLabels.map((value, i) => <Picker.Item key={value._id + i} label={value.name} value={value._id} />)
-          : values.map((value, i) => <Picker.Item key={value} label={value} value={value} />)}
+          ? mappedIdsToLabels.map((value, i) => <Picker.Item key={value._id + i} label={value.name} value={value._id} testID={value.name} />)
+          : values.map((value, i) => <Picker.Item key={value} label={value} value={value} testID={value} />)}
       </Picker>
     </PickerContainer>
   </InputContainer>

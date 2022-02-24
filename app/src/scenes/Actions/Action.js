@@ -375,11 +375,12 @@ const Action = ({ navigation, route }) => {
   return (
     <SceneContainer>
       <ScreenTitle
-        title={persons?.length && persons.length === 1 ? `${name} - ${persons[0].name}` : name}
+        title={persons?.length && persons.length === 1 ? `${name} - ${persons[0]?.name}` : name}
         onBack={onGoBackRequested}
         onEdit={!editable ? () => setEditable(true) : null}
         onSave={!editable || isUpdateDisabled ? null : onUpdateActionRequest}
         saving={updating}
+        testID="action"
       />
       <ScrollContainer ref={scrollViewRef}>
         {!!action.user && <UserName metaCaption="Action ajoutée par" id={action.user?._id || action.user} />}
@@ -389,6 +390,7 @@ const Action = ({ navigation, route }) => {
           value={name}
           placeholder="Nom de l’action"
           editable={editable}
+          testID="action-name"
         />
         {persons.length < 2 ? (
           <InputFromSearchList

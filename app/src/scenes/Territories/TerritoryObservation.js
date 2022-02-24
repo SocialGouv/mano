@@ -218,8 +218,9 @@ const TerritoryObservation = ({ route, navigation }) => {
         onEdit={!editable ? onEdit : null}
         onSave={!editable || isUpdateDisabled ? null : onSaveObservation}
         saving={updating}
+        testID="observation"
       />
-      <ScrollContainer ref={scrollViewRef}>
+      <ScrollContainer ref={scrollViewRef} testID="observation">
         <View>
           <CreatedAt>{new Date(obs?.createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
           {customFieldsObs

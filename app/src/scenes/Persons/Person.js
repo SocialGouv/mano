@@ -261,7 +261,7 @@ const Person = ({ route, navigation }) => {
   };
 
   return (
-    <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}>
+    <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey} testID="person">
       <ScreenTitle
         title={person.name}
         onBack={onGoBackRequested}
@@ -269,6 +269,7 @@ const Person = ({ route, navigation }) => {
         onSave={!editable || isUpdateDisabled ? null : onUpdatePerson}
         saving={updating}
         backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+        testID="person"
       />
       <TabNavigator.Navigator
         tabBar={(props) => (

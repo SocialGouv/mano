@@ -126,6 +126,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <AgendaIcon size={size} color={color} />,
         tabBarLabel: 'AGENDA',
+        tabBarTestID: 'tab-bar-actions',
       }}
     />
     <Tab.Screen
@@ -134,6 +135,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <TerritoryIcon size={size} color={color} />,
         tabBarLabel: 'TERRITOIRES',
+        tabBarTestID: 'tab-bar-territories',
       }}
     />
     <Tab.Screen
@@ -142,6 +144,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <PersonIcon size={size} color={color} />,
         tabBarLabel: 'USAGERS',
+        tabBarTestID: 'tab-bar-persons',
       }}
     />
     <Tab.Screen
@@ -150,6 +153,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <StructuresIcon size={size} color={color} />,
         tabBarLabel: 'STRUCTURES',
+        tabBarTestID: 'tab-bar-structures',
       }}
     />
     <Tab.Screen
@@ -158,6 +162,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <MenuIcon size={size} color={color} />,
         tabBarLabel: 'PROFIL',
+        tabBarTestID: 'tab-bar-profil',
       }}
     />
   </Tab.Navigator>
