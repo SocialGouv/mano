@@ -1,3 +1,10 @@
+# [1.56.0](https://github.com/SocialGouv/mano/compare/v1.55.0...v1.56.0) (2022-02-24)
+
+
+### Features
+
+* **app:** test with detox ([#387](https://github.com/SocialGouv/mano/issues/387)) ([be86e19](https://github.com/SocialGouv/mano/commit/be86e19939407b4ebcb90c9126bd824bf307ca7b))
+
 # [1.55.0](https://github.com/SocialGouv/mano/compare/v1.54.3...v1.55.0) (2022-02-23)
 
 
