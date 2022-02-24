@@ -192,17 +192,11 @@ router.put(
     }
     if (req.body.hasOwnProperty("encrypted")) updatePerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatePerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
+    if (req.body.hasOwnProperty("outOfActiveList")) updatePerson.outOfActiveList = req.body.outOfActiveList;
     // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
     if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
       person.changed("createdAt", true);
       updatePerson.createdAt = new Date(req.body.createdAt);
-<<<<<<< HEAD
-    }
-
-    if (req.body.hasOwnProperty("outOfActiveList")) {
-      updatePerson.outOfActiveList = req.body.outOfActiveList;
-=======
->>>>>>> ea9c72b (a few cleans)
     }
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
