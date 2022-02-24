@@ -100,7 +100,7 @@ export default async () => {
       envFrom: [
         {
           secretRef: {
-            name: `azure-pg-user-${ciEnv.branchSlug}`,
+            name: `pg-user-${ciEnv.branchSlug}`,
           },
         },
       ],
