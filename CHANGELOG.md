@@ -1,3 +1,10 @@
+## [1.56.1](https://github.com/SocialGouv/mano/compare/v1.56.0...v1.56.1) (2022-02-24)
+
+
+### Bug Fixes
+
+* **app:** remove mano-tests from dependencies ([#388](https://github.com/SocialGouv/mano/issues/388)) ([d26373d](https://github.com/SocialGouv/mano/commit/d26373db8a3b127ac77f367ee354b58efd99dd5f))
+
 # [1.56.0](https://github.com/SocialGouv/mano/compare/v1.55.0...v1.56.0) (2022-02-24)
 
 
