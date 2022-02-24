@@ -1,3 +1,10 @@
+## [1.56.2](https://github.com/SocialGouv/mano/compare/v1.56.1...v1.56.2) (2022-02-24)
+
+
+### Bug Fixes
+
+* **app,dashboard:**  last fixes before encryption ([#391](https://github.com/SocialGouv/mano/issues/391)) ([06a3a8a](https://github.com/SocialGouv/mano/commit/06a3a8a286e1922c1d8e7f04eec924323e509543))
+
 ## [1.56.1](https://github.com/SocialGouv/mano/compare/v1.56.0...v1.56.1) (2022-02-24)
 
 
