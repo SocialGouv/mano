@@ -212,6 +212,11 @@ const Action = ({ navigation, route }) => {
   const onUpdateActionRequest = async () => {
     setUpdating(true);
     const multipleActions = route?.params?.actions?.length > 1;
+    if (!action.name.trim()) {
+      Alert.alert("Vous devez rentrer un nom d'action");
+      setUpdating(false);
+      return false;
+    }
     if (!action.dueAt) {
       Alert.alert("Vous devez rentrer une date d'échéance");
       setUpdating(false);
