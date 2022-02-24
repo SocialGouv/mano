@@ -9,9 +9,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: api
     application: mano
@@ -31,9 +33,11 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: prod
-        app.gitlab.com/env.name: prod
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       labels:
         app: api
         application: mano
@@ -42,7 +46,8 @@ spec:
         team: mano
     spec:
       containers:
-        - image: ghcr.io/socialgouv/mano/api:sha-undefined
+        - image: >-
+            ghcr.io/socialgouv/mano/api:sha-0123456789abcdefghijklmnopqrstuvwxyz0123
           livenessProbe:
             failureThreshold: 6
             httpGet:
@@ -121,9 +126,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   name: api
   namespace: mano
   labels:
@@ -145,9 +152,11 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: prod
-        app.gitlab.com/env.name: prod
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       name: api
       labels:
         application: mano
@@ -164,9 +173,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     application: mano
     component: mano
@@ -190,9 +201,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   namespace: mano
 spec:
   ports:
@@ -213,9 +226,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: api
     application: mano
@@ -246,9 +261,11 @@ kind: PersistentVolumeClaim
 metadata:
   name: files
   annotations:
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     application: mano
     component: mano
@@ -263,23 +280,25 @@ spec:
       storage: 20Gi
   selector:
     matchLabels:
-      usage: prod-files
+      usage: mano-files
   storageClassName: ''
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    usage: prod-files
+    usage: mano-files
     application: mano
     component: mano
     owner: mano
     team: mano
-  name: prod-files
+  name: mano-files
   annotations:
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   namespace: mano
 spec:
   accessModes:
@@ -318,9 +337,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: dashboard
     application: mano
@@ -340,9 +361,11 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: prod
-        app.gitlab.com/env.name: prod
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       labels:
         app: dashboard
         application: mano
@@ -351,7 +374,8 @@ spec:
         team: mano
     spec:
       containers:
-        - image: ghcr.io/socialgouv/mano/dashboard:sha-undefined
+        - image: >-
+            ghcr.io/socialgouv/mano/dashboard:sha-0123456789abcdefghijklmnopqrstuvwxyz0123
           livenessProbe:
             failureThreshold: 6
             httpGet:
@@ -404,9 +428,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   namespace: mano
 spec:
   ports:
@@ -427,9 +453,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: dashboard
     application: mano
@@ -462,9 +490,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: metabase
     application: mano
@@ -484,9 +514,11 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: prod
-        app.gitlab.com/env.name: prod
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       labels:
         app: metabase
         application: mano
@@ -546,9 +578,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   name: metabase-db-user
   namespace: mano
   labels:
@@ -568,9 +602,11 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: prod
-        app.gitlab.com/env.name: prod
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       name: metabase-db-user
       labels:
         application: mano
@@ -587,9 +623,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     application: mano
     component: mano
@@ -622,9 +660,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   namespace: mano
 spec:
   ports:
@@ -676,9 +716,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: oauth2-proxy
     application: mano
@@ -698,9 +740,11 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: prod
-        app.gitlab.com/env.name: prod
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       labels:
         app: oauth2-proxy
         application: mano
@@ -772,9 +816,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   namespace: mano
 spec:
   ports:
@@ -795,9 +841,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: oauth2-proxy
     application: mano
@@ -851,9 +899,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: www
     application: mano
@@ -873,9 +923,11 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: prod
-        app.gitlab.com/env.name: prod
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       labels:
         app: www
         application: mano
@@ -884,7 +936,8 @@ spec:
         team: mano
     spec:
       containers:
-        - image: ghcr.io/socialgouv/mano/website:sha-undefined
+        - image: >-
+            ghcr.io/socialgouv/mano/website:sha-0123456789abcdefghijklmnopqrstuvwxyz0123
           livenessProbe:
             failureThreshold: 6
             httpGet:
@@ -936,9 +989,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   namespace: mano
 spec:
   ports:
@@ -959,9 +1014,11 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: prod
-    app.gitlab.com/env.name: prod
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: www
     application: mano

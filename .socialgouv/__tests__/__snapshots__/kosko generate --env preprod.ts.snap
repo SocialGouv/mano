@@ -9,20 +9,21 @@ metadata:
     socialgouv/creator: autodevops
     field.cattle.io/creatorId: gitlab
     field.cattle.io/projectId: ''
-    git/branch: v1.2.3
-    git/remote: >-
-      https://gitlab-ci-token:[MASKED]@gitlab.factory.social.gouv.fr/SocialGouv/mano.git
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    git/branch: refs/tags/v1.2.3
+    git/remote: socialgouv/mano
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     azure-pg-admin-user: mano
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
-  name: mano-186-preprod-dev2
+  name: mano-preprod
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -31,18 +32,20 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: api
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
   name: api
-  namespace: mano-186-preprod-dev2
+  namespace: mano-preprod
 spec:
   replicas: 1
   selector:
@@ -54,19 +57,22 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: preprod-dev42
-        app.gitlab.com/env.name: preprod-dev42
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       labels:
         app: api
-        application: v1-2-3-mano
-        component: v1-2-3-mano
+        application: mano
+        component: mano
         owner: mano
         team: mano
         cert: wildcard
     spec:
       containers:
-        - image: ghcr.io/socialgouv/mano/api:sha-undefined
+        - image: >-
+            ghcr.io/socialgouv/mano/api:sha-0123456789abcdefghijklmnopqrstuvwxyz0123
           livenessProbe:
             failureThreshold: 6
             httpGet:
@@ -144,14 +150,16 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   name: api
-  namespace: mano-186-preprod-dev2
+  namespace: mano-preprod
   labels:
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
@@ -170,13 +178,15 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: preprod-dev42
-        app.gitlab.com/env.name: preprod-dev42
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       name: api
       labels:
-        application: v1-2-3-mano
-        component: v1-2-3-mano
+        application: mano
+        component: mano
         owner: mano
         team: mano
         cert: wildcard
@@ -187,8 +197,8 @@ kind: Service
 metadata:
   labels:
     app: api
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
@@ -197,10 +207,12 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
-  namespace: mano-186-preprod-dev2
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
+  namespace: mano-preprod
 spec:
   ports:
     - name: http
@@ -218,21 +230,23 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: api
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
   name: api
-  namespace: mano-186-preprod-dev2
+  namespace: mano-preprod
 spec:
   rules:
-    - host: preprod-mano.dev42.fabrique.social.gouv.fr
+    - host: mano-preprod.dev2.fabrique.social.gouv.fr
       http:
         paths:
           - backend:
@@ -244,7 +258,7 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - preprod-mano.dev42.fabrique.social.gouv.fr
+        - mano-preprod.dev2.fabrique.social.gouv.fr
       secretName: wildcard-crt
 ---
 apiVersion: v1
@@ -252,16 +266,18 @@ kind: PersistentVolumeClaim
 metadata:
   name: files
   annotations:
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
-  namespace: mano-186-preprod-dev2
+  namespace: mano-preprod
 spec:
   accessModes:
     - ReadWriteMany
@@ -270,31 +286,33 @@ spec:
       storage: 20Gi
   selector:
     matchLabels:
-      usage: preprod-dev42-files
+      usage: mano-files
   storageClassName: ''
 ---
 apiVersion: v1
 kind: PersistentVolume
 metadata:
   labels:
-    usage: preprod-dev42-files
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    usage: mano-files
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
-  name: preprod-dev42-files
+  name: mano-files
   annotations:
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
-  namespace: mano-186-preprod-dev2
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
+  namespace: mano-preprod
 spec:
   accessModes:
     - ReadWriteMany
   azureFile:
     secretName: azure-mano-volume
-    secretNamespace: mano-186-preprod-dev2
+    secretNamespace: mano-preprod
     shareName: files
   capacity:
     storage: 20Gi
@@ -328,18 +346,20 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: dashboard
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
   name: dashboard
-  namespace: mano-186-preprod-dev2
+  namespace: mano-preprod
 spec:
   replicas: 1
   selector:
@@ -351,19 +371,22 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: preprod-dev42
-        app.gitlab.com/env.name: preprod-dev42
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       labels:
         app: dashboard
-        application: v1-2-3-mano
-        component: v1-2-3-mano
+        application: mano
+        component: mano
         owner: mano
         team: mano
         cert: wildcard
     spec:
       containers:
-        - image: ghcr.io/socialgouv/mano/dashboard:sha-undefined
+        - image: >-
+            ghcr.io/socialgouv/mano/dashboard:sha-0123456789abcdefghijklmnopqrstuvwxyz0123
           livenessProbe:
             failureThreshold: 6
             httpGet:
@@ -407,8 +430,8 @@ kind: Service
 metadata:
   labels:
     app: dashboard
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
@@ -417,10 +440,12 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
-  namespace: mano-186-preprod-dev2
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
+  namespace: mano-preprod
 spec:
   ports:
     - name: http
@@ -438,21 +463,23 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: dashboard
-    application: v1-2-3-mano
-    component: v1-2-3-mano
+    application: mano
+    component: mano
     owner: mano
     team: mano
     cert: wildcard
   name: dashboard
-  namespace: mano-186-preprod-dev2
+  namespace: mano-preprod
 spec:
   rules:
-    - host: dashboard-preprod-mano.dev42.fabrique.social.gouv.fr
+    - host: dashboard-mano-preprod.dev2.fabrique.social.gouv.fr
       http:
         paths:
           - backend:
@@ -464,14 +491,14 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - dashboard-preprod-mano.dev42.fabrique.social.gouv.fr
+        - dashboard-mano-preprod.dev2.fabrique.social.gouv.fr
       secretName: wildcard-crt
 ---
 apiVersion: networking.k8s.io/v1
 kind: NetworkPolicy
 metadata:
-  name: netpol-mano-186-preprod-dev2
-  namespace: mano-186-preprod-dev2
+  name: netpol-mano-preprod
+  namespace: mano-preprod
 spec:
   ingress:
     - from:
@@ -495,18 +522,20 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: www
-    application: v1-2-3-mano
+    application: mano
     component: nginx
     owner: mano
     team: mano
     cert: wildcard
   name: www
-  namespace: mano-186-preprod-dev2
+  namespace: mano-preprod
 spec:
   replicas: 1
   selector:
@@ -518,19 +547,22 @@ spec:
         kapp.k14s.io/disable-default-ownership-label-rules: ''
         kapp.k14s.io/disable-default-label-scoping-rules: ''
         kapp.k14s.io/delete-strategy: orphan
-        app.gitlab.com/app: socialgouv-mano
-        app.gitlab.com/env: preprod-dev42
-        app.gitlab.com/env.name: preprod-dev42
+        app.github.com/job: '5678'
+        app.github.com/ref: refs/tags/v1.2.3
+        app.github.com/repo: socialgouv/mano
+        app.github.com/run: '1234'
+        app.github.com/sha: '0123456'
       labels:
         app: www
-        application: v1-2-3-mano
+        application: mano
         component: nginx
         owner: mano
         team: mano
         cert: wildcard
     spec:
       containers:
-        - image: ghcr.io/socialgouv/mano/website:sha-undefined
+        - image: >-
+            ghcr.io/socialgouv/mano/website:sha-0123456789abcdefghijklmnopqrstuvwxyz0123
           livenessProbe:
             failureThreshold: 6
             httpGet:
@@ -573,7 +605,7 @@ kind: Service
 metadata:
   labels:
     app: www
-    application: v1-2-3-mano
+    application: mano
     component: nginx
     owner: mano
     team: mano
@@ -583,10 +615,12 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
-  namespace: mano-186-preprod-dev2
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
+  namespace: mano-preprod
 spec:
   ports:
     - name: http
@@ -604,21 +638,23 @@ metadata:
     kapp.k14s.io/disable-default-ownership-label-rules: ''
     kapp.k14s.io/disable-default-label-scoping-rules: ''
     kapp.k14s.io/delete-strategy: orphan
-    app.gitlab.com/app: socialgouv-mano
-    app.gitlab.com/env: preprod-dev42
-    app.gitlab.com/env.name: preprod-dev42
+    app.github.com/job: '5678'
+    app.github.com/ref: refs/tags/v1.2.3
+    app.github.com/repo: socialgouv/mano
+    app.github.com/run: '1234'
+    app.github.com/sha: '0123456'
   labels:
     app: www
-    application: v1-2-3-mano
+    application: mano
     component: nginx
     owner: mano
     team: mano
     cert: wildcard
   name: www
-  namespace: mano-186-preprod-dev2
+  namespace: mano-preprod
 spec:
   rules:
-    - host: app-preprod-mano.dev42.fabrique.social.gouv.fr
+    - host: app-mano-preprod.dev2.fabrique.social.gouv.fr
       http:
         paths:
           - backend:
@@ -630,7 +666,7 @@ spec:
             pathType: Prefix
   tls:
     - hosts:
-        - app-preprod-mano.dev42.fabrique.social.gouv.fr
+        - app-mano-preprod.dev2.fabrique.social.gouv.fr
       secretName: wildcard-crt
 "
 `;
