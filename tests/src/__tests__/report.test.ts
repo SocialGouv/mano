@@ -16,7 +16,7 @@ import {
 dayjs.extend(utc);
 dayjs.locale("fr");
 
-jest.setTimeout(60000);
+jest.setTimeout(100000);
 setDefaultOptions({ timeout: 60000 });
 
 describe("Organisation CRUD", () => {
@@ -165,6 +165,7 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to see actions updated to DONE in the report", async () => {
+    await page.waitForTimeout(500);
     await expect(page).toClick("a", { text: "Actions créées (1)" });
     await page.waitForTimeout(500);
     await scrollDown();
@@ -183,10 +184,12 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(500);
     await expect(page).toClick("a", { text: "Actions annulées (0)" });
     await expect(page).toClick("a", { text: "Actions créées (0)" });
+    await page.waitForTimeout(500);
     await expect(page).toClick("a", { text: "Actions complétées (1)" });
   });
 
   it("should be able to see actions updated to CANCELED in the report", async () => {
+    await page.waitForTimeout(500);
     await expect(page).toClick("a", { text: "Actions complétées (1)" });
     await page.waitForTimeout(500);
     await expect(page).toMatch("Mon action");
