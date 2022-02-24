@@ -690,10 +690,10 @@
     slugify "^1.6.3"
     tslib "^2.3.1"
 
-"@socialgouv/kosko-charts@^9.17.7":
-  version "9.17.7"
-  resolved "https://registry.yarnpkg.com/@socialgouv/kosko-charts/-/kosko-charts-9.17.7.tgz#684f9abc8e08c200a285aeb0d6fb9e5180b2e947"
-  integrity sha512-ROOWWfHViCherY+jGxKPRTaF3iS/982CeZ3RvIGeUI2a+5mMATYOiwA4nzmPA+cVxskJrHgrHAp8piVowoGWEA==
+"@socialgouv/kosko-charts@^9.19.1":
+  version "9.19.1"
+  resolved "https://registry.yarnpkg.com/@socialgouv/kosko-charts/-/kosko-charts-9.19.1.tgz#c0f77e43f3ee06cf06d8642bbe7812be458640f2"
+  integrity sha512-ZvCYIi40aXGJBESUdF3itiJpQsSz3ZEK9fdSUBQCihYgBvLOQN17CThqt8lBW6hRhIwNJKKoMc+eYJzu1RIzNA==
   dependencies:
     "@kubernetes-models/sealed-secrets" "^2.0.2"
     "@sindresorhus/is" "^4.2.0"
