@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, Keyboard, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -39,6 +39,7 @@ const NewPersonForm = ({ navigation, route }) => {
   }, []);
 
   const onCreateUserRequest = async () => {
+    Keyboard.dismiss();
     const response = await onCreateUser();
     if (response.ok) {
       backRequestHandledRef.current = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
@@ -110,12 +111,19 @@ const NewPersonForm = ({ navigation, route }) => {
   };
 
   return (
-    <SceneContainer>
-      <ScreenTitle title="Ajouter une personne" onBack={onGoBackRequested} />
+    <SceneContainer testID="new-person-form">
+      <ScreenTitle title="Ajouter une personne" onBack={onGoBackRequested} testID="new-person" />
       <ScrollContainer keyboardShouldPersistTaps="handled">
         <View>
-          <InputLabelled label="Pseudo" onChangeText={setName} value={name} placeholder="Monsieur X" autoCapitalize="words" />
-          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateUserRequest} loading={posting} />
+          <InputLabelled
+            label="Pseudo"
+            onChangeText={setName}
+            value={name}
+            placeholder="Monsieur X"
+            autoCapitalize="words"
+            testID="new-person-pseudo"
+          />
+          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateUserRequest} loading={posting} testID="new-person-create" />
         </View>
       </ScrollContainer>
     </SceneContainer>

@@ -9,7 +9,7 @@ import TeamsTags from '../../components/TeamsTags';
 import { personsState } from '../../recoil/persons';
 import { DONE } from '../../recoil/actions';
 
-const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName }) => {
+const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName, testID = 'action' }) => {
   const persons = useRecoilValue(personsState);
 
   const name = action?.name;
@@ -19,7 +19,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
   const dueAt = action?.dueAt ? new Date(action?.dueAt) : null;
 
   return (
-    <RowContainer onPress={onActionPress}>
+    <RowContainer onPress={onActionPress} testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
       <DateContainer>
         {Boolean(dueAt) && (
           <>
@@ -39,7 +39,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
             <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>
           </StatusContainer>
         ) : pseudo ? (
-          <PseudoContainer onPress={onPseudoPress}>
+          <PseudoContainer onPress={onPseudoPress} testID={`${testID}-row-person-${pseudo?.split(' ').join('-').toLowerCase()}-button`}>
             <Pseudo>Pour {pseudo}</Pseudo>
           </PseudoContainer>
         ) : null}

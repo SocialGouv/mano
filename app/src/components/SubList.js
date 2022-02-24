@@ -7,7 +7,7 @@ import Button from './Button';
 
 const initNumberToShow = 10;
 
-const SubList = ({ label, onAdd, data = [], renderItem, ifEmpty, children }) => {
+const SubList = ({ label, onAdd, data = [], renderItem, ifEmpty, children, testID = 'list' }) => {
   const [expanded, setExpanded] = useState(false);
   const [numberToShow, setNumberToShow] = useState(initNumberToShow);
 
@@ -36,10 +36,10 @@ const SubList = ({ label, onAdd, data = [], renderItem, ifEmpty, children }) => 
 
   return (
     <>
-      <ListLabel>
-        <ButtonExpand onPress={() => setExpanded(!expanded)} expanded={expanded} />
+      <ListLabel testID={`${testID}-label`}>
+        <ButtonExpand onPress={() => setExpanded(!expanded)} expanded={expanded} testID={`${testID}-expand`} />
         <LabelStyled>{`${label}${data !== null ? ` (${data.length})` : ''}`}</LabelStyled>
-        {Boolean(onAdd) && <Button caption="Ajouter" onPress={onAdd} noBorder />}
+        {Boolean(onAdd) && <Button caption="Ajouter" onPress={onAdd} noBorder testID={`${testID}-add`} />}
       </ListLabel>
       {!!children && <ChildrenContainer>{children}</ChildrenContainer>}
       <List expanded={expanded}>{renderList()}</List>

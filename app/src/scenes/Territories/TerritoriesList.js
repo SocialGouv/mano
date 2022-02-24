@@ -54,6 +54,7 @@ const TerritoriesList = () => {
         onPress={() => navigation.push('Territory', { ...territory, fromRoute: 'TerritoriesList' })}
         Icon={TerritoryIcon}
         caption={name}
+        testID={`territory-row-${name?.split(' ').join('-').toLowerCase()}-button`}
       />
     );
   };
@@ -96,7 +97,7 @@ const TerritoriesList = () => {
         ListFooterComponent={ListFooterComponent}
         defaultTop={0}
       />
-      <FloatAddButton onPress={onCreateTerritoryRequest} />
+      <FloatAddButton onPress={onCreateTerritoryRequest} testID="add-territory-button" />
     </SceneContainer>
   );
 };

@@ -157,8 +157,9 @@ const Territory = ({ route, navigation }) => {
         onEdit={!editable ? onEdit : null}
         onSave={!editable || isUpdateDisabled ? null : onUpdateTerritory}
         saving={updating}
+        testID="territory"
       />
-      <ScrollContainer>
+      <ScrollContainer testID="territory">
         <View>
           {!!editable && (
             <InputLabelled
@@ -189,11 +190,12 @@ const Territory = ({ route, navigation }) => {
           </ButtonsContainer>
           <SubList
             label="Observations"
-            key={territoryDB._id}
+            testID="observations"
+            key={territoryDB?._id}
             data={territoryObservations}
             renderItem={(obs, index) => <TerritoryObservationRow key={index} observation={obs} onUpdate={onUpdateObservation} />}
             ifEmpty="Pas encore d'observation">
-            <Button caption="Nouvelle observation" onPress={onNewObservation} />
+            <Button caption="Nouvelle observation" onPress={onNewObservation} testID="observations-add" />
           </SubList>
         </View>
       </ScrollContainer>

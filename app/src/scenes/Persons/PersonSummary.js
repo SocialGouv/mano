@@ -133,7 +133,7 @@ const PersonSummary = ({
   const teams = useRecoilValue(teamsState);
 
   return (
-    <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
+    <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
       {person.outOfActiveList && (
         <AlterOutOfActiveList>
           <Text style={{ color: colors.app.colorWhite }}>
@@ -272,6 +272,7 @@ const PersonSummary = ({
       <SubList
         label="Actions"
         onAdd={onAddActionRequest}
+        testID="person-actions-list"
         data={actions}
         renderItem={(action, index) => (
           <ActionRow
@@ -279,6 +280,7 @@ const PersonSummary = ({
             action={action}
             showStatus
             withTeamName
+            testID="person-action"
             onActionPress={() => {
               Sentry.setContext('action', { _id: action._id });
               navigation.push('Actions', {

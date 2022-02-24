@@ -100,7 +100,7 @@ const PersonsList = ({ navigation, route }) => {
         ListFooterComponent={ListFooterComponent}
         defaultTop={0}
       />
-      <FloatAddButton onPress={onCreatePersonRequest} />
+      <FloatAddButton onPress={onCreatePersonRequest} testID="add-person-button" />
     </SceneContainer>
   );
 };

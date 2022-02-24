@@ -127,7 +127,7 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title={`${route?.params?.name} - Commentaire`} onBack={onGoBackRequested} />
+      <ScreenTitle title={`${route?.params?.name} - Commentaire`} onBack={onGoBackRequested} testID="comment" />
       <ScrollContainer>
         <View>
           <InputLabelled label="Commentaire" onChangeText={writeComment} value={comment} placeholder="Description" multiline />

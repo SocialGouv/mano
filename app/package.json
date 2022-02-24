@@ -81,7 +81,8 @@
     "jest": "^27.0.4",
     "jest-circus": "^27.5.1",
     "metro-react-native-babel-preset": "^0.64.0",
-    "semver": "^7.3.5"
+    "semver": "^7.3.5",
+    "mano-tests": "file:../tests"
   },
   "jest": {
     "preset": "react-native",
