@@ -419,7 +419,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
       <StyledBox>
         <Table
           className="Table"
-          title={`Commentaires' ajoutés le ${formatDateWithFullMonth(date)}`}
+          title={`Commentaires ajoutés le ${formatDateWithFullMonth(date)}`}
           data={data}
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {

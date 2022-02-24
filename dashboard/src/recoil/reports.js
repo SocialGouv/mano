@@ -78,7 +78,9 @@ export const useReports = () => {
 
   const addReport = async (date, team) => {
     try {
-      const res = await API.post({ path: '/report', body: { team, date } });
+      const existingReport = reports.find((r) => r.date === date && r.team === team);
+      if (existingReport) return { ok: true, data: existingReport };
+      const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team, date }) });
       if (!res.ok) return res;
       setReports((reports) => [res.decryptedData, ...reports]);
       return res;

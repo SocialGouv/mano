@@ -12,7 +12,7 @@ import ButtonCustom from './ButtonCustom';
 import { usePlaces } from '../recoil/places';
 import Table from './table';
 import SelectCustom from './SelectCustom';
-import { currentTeamState } from '../recoil/auth';
+import { currentTeamState, userState } from '../recoil/auth';
 import { useRelsPerson } from '../recoil/relPersonPlace';
 import { formatDateWithFullMonth } from '../services/date';
 
@@ -64,6 +64,7 @@ const AddPlace = ({ personId }) => {
   const [open, setOpen] = useState(false);
 
   const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
 
   const { places } = usePlaces();
   const { addRelation } = useRelsPerson();
@@ -78,7 +79,7 @@ const AddPlace = ({ personId }) => {
             initialValues={{ place: null }}
             onSubmit={async (body, actions) => {
               if (!body.place) return toastr.error('Veuillez sélectionner un lieu');
-              const res = await addRelation({ place: body.place._id, person: personId });
+              const res = await addRelation({ place: body.place._id, person: personId, user: user._id });
               actions.setSubmitting(false);
               if (res.ok) {
                 toastr.success('Lieu ajouté !');
