@@ -50,15 +50,13 @@ router.post(
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res, next) => {
     if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
-      next("not permission creating report");
-      return res.send(403).send({ ok: false, error: "not permission creating report" });
+      return next("not permission creating report");
     }
 
     const newReport = { organisation: req.user.organisation };
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in report create");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in report create");
     }
 
     if (req.body.hasOwnProperty("encrypted")) newReport.encrypted = req.body.encrypted || null;
@@ -84,8 +82,7 @@ router.put(
 
     const updatedReport = {};
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in report update");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in report update");
     }
 
     if (req.body.hasOwnProperty("encrypted")) updatedReport.encrypted = req.body.encrypted || null;

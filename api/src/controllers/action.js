@@ -28,8 +28,7 @@ router.post(
     if (req.body.hasOwnProperty("structure")) newAction.structure = req.body.structure || null;
     // Encrypted fields.
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in action creation");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in action creation");
     }
     if (req.body.hasOwnProperty("encrypted")) newAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -129,8 +128,7 @@ router.put(
     if (req.body.hasOwnProperty("structure")) updateAction.structure = req.body.structure || null;
     // Encrypted fields.
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in action update");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in action update");
     }
     if (req.body.hasOwnProperty("encrypted")) updateAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateAction.encryptedEntityKey = req.body.encryptedEntityKey || null;

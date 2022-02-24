@@ -16,8 +16,7 @@ router.post(
     newComment.organisation = req.user.organisation;
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in comment creation");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in comment creation");
     }
     if (req.body.hasOwnProperty("encrypted")) newComment.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newComment.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -79,8 +78,7 @@ router.put(
     const updateComment = {};
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in comment update");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in comment update");
     }
     if (req.body.hasOwnProperty("encrypted")) updateComment.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateComment.encryptedEntityKey = req.body.encryptedEntityKey || null;

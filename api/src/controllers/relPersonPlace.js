@@ -20,8 +20,7 @@ router.post(
     newRelPersonPlace.user = req.user._id;
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in relPersonPlace create");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in relPersonPlace create");
     }
 
     if (req.body.hasOwnProperty("encrypted")) newRelPersonPlace.encrypted = req.body.encrypted || null;

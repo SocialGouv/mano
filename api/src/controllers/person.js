@@ -110,8 +110,7 @@ router.post(
     newPerson.organisation = req.user.organisation;
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in person create");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in person create");
     }
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -187,8 +186,7 @@ router.put(
     const updatePerson = {};
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in person update");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in person update");
     }
     if (req.body.hasOwnProperty("encrypted")) updatePerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatePerson.encryptedEntityKey = req.body.encryptedEntityKey || null;

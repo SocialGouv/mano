@@ -18,8 +18,7 @@ router.post(
     newPlace.organisation = req.user.organisation;
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in place create");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in place create");
     }
     if (req.body.hasOwnProperty("encrypted")) newPlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -84,8 +83,7 @@ router.put(
 
     const updatePlace = {};
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      next("No encrypted field in place update");
-      return res.send(403).send({ ok: false, error: "Une erreur de chiffrement est survenue. L'équipe technique a été prévenue" });
+      return next("No encrypted field in place update");
     }
     if (req.body.hasOwnProperty("encrypted")) updatePlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatePlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
