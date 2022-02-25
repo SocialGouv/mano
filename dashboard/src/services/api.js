@@ -34,7 +34,6 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
       toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
       return false;
     }
-    capture(`Pour orga ${name} ${_id}: ${orgEncryptionKey}`);
   }
   hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
   enableEncrypt = true;
