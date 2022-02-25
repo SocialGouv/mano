@@ -1,3 +1,10 @@
+## [1.57.2](https://github.com/SocialGouv/mano/compare/v1.57.1...v1.57.2) (2022-02-25)
+
+
+### Bug Fixes
+
+* **app:** refactor refresher + fix clear cache when change organisation ([#394](https://github.com/SocialGouv/mano/issues/394)) ([4a1b151](https://github.com/SocialGouv/mano/commit/4a1b151cf069821f1fc45d1e28c47295a853f962))
+
 ## [1.57.1](https://github.com/SocialGouv/mano/compare/v1.57.0...v1.57.1) (2022-02-25)
 
 
