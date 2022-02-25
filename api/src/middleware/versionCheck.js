@@ -1,4 +1,4 @@
-const MINIMUM_MOBILE_APP_VERSION = [2, 11, 2];
+const MINIMUM_MOBILE_APP_VERSION = [2, 11, 5];
 
 module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "dashboard") return next();
