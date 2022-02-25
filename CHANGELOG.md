@@ -1,3 +1,15 @@
+## [1.58.1](https://github.com/SocialGouv/mano/compare/v1.58.0...v1.58.1) (2022-02-25)
+
+
+### Bug Fixes
+
+* bump ([5752399](https://github.com/SocialGouv/mano/commit/5752399ef0f267e7bffe2828ffa557309b814247))
+* up ([1c6bdd0](https://github.com/SocialGouv/mano/commit/1c6bdd01b8d7c2bbe0b65b5bbb7f52c35bf5f4f7))
+* **api:** action update ([a0e9b56](https://github.com/SocialGouv/mano/commit/a0e9b56fdbbf089ff911f879739906f6c7889958))
+* **api:** only admin can update org ([c3bce83](https://github.com/SocialGouv/mano/commit/c3bce83a47577d28a4270c1deadfd1c78d3cd0fb))
+* **api:** remove team check since it does not exist anymore on tables ([f147dff](https://github.com/SocialGouv/mano/commit/f147dff82d7a782caf0d6a9586a14d99de10493f))
+* **app:** text color on dark mode ([#395](https://github.com/SocialGouv/mano/issues/395)) ([8c0038c](https://github.com/SocialGouv/mano/commit/8c0038c5d999af1340863779a816048d025e7a01))
+
 # [1.58.0](https://github.com/SocialGouv/mano/compare/v1.57.2...v1.58.0) (2022-02-25)
 
 
