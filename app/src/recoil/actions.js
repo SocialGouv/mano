@@ -1,46 +1,9 @@
-import { atom, useRecoilState } from 'recoil';
-import API from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
+import { atom } from 'recoil';
 
 export const actionsState = atom({
   key: 'actionsState',
   default: [],
 });
-
-export const useActions = () => {
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-actions', 0);
-
-  const setActionsFullState = (newActions) => {
-    if (newActions) setActions(newActions);
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newActions) => setActions((actions) => [...actions, ...newActions]);
-
-  const refreshActions = async (setProgress, initialLoad) => {
-    try {
-      setActionsFullState(
-        await getData({
-          collectionName: 'action',
-          data: actions,
-          isInitialization: initialLoad,
-          setProgress,
-          lastRefresh,
-          setBatchData,
-          API,
-        })
-      );
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      return false;
-    }
-  };
-
-  return refreshActions;
-};
 
 const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user'];
 

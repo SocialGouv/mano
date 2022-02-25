@@ -1,7 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { atom, selector, useRecoilState } from 'recoil';
-import API from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
+import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
 
@@ -32,40 +29,6 @@ export const customFieldsPersonsSocialSelector = selector({
     return [];
   },
 });
-
-export const usePersons = () => {
-  const [persons, setPersons] = useRecoilState(personsState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-persons', 0);
-
-  const setPersonsFullState = (newPersons) => {
-    if (newPersons) setPersons(newPersons.sort(sortPersons));
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newPersons) => setPersons((persons) => [...persons, ...newPersons]);
-
-  const refreshPersons = async (setProgress, initialLoad = false) => {
-    try {
-      setPersonsFullState(
-        await getData({
-          collectionName: 'person',
-          data: persons,
-          isInitialization: initialLoad,
-          setProgress,
-          lastRefresh,
-          setBatchData,
-          API,
-        })
-      );
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      return false;
-    }
-  };
-
-  return refreshPersons;
-};
 
 /*
 Choices on selects

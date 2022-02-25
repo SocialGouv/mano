@@ -9,14 +9,14 @@ import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyC
 import FloatAddButton from '../../components/FloatAddButton';
 import FlatListStyled from '../../components/FlatListStyled';
 import Search from '../../components/Search';
-import { useRefresh } from '../../recoil/refresh';
 import { personsFullSearchSelector } from '../../recoil/selectors';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
 
 const PersonsList = ({ navigation, route }) => {
-  const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
-  const { loading, personsRefresher } = useRefresh();
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
+  const loading = useRecoilState(loadingState);
   const params = route?.params?.filters || {};
 
   const filterTeams = params?.filterTeams || [];
@@ -34,9 +34,7 @@ const PersonsList = ({ navigation, route }) => {
   );
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await personsRefresher();
-    setRefreshing(false);
+    setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   };
 
   const onCreatePersonRequest = () =>
@@ -87,7 +85,7 @@ const PersonsList = ({ navigation, route }) => {
       />
       <FlatListStyled
         ref={listref}
-        refreshing={refreshing}
+        refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
         onScroll={onScroll}
         parentScroll={scrollY}

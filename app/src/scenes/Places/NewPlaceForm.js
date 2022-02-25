@@ -11,9 +11,9 @@ import { ListEmptyPlaceWithName } from '../../components/ListEmptyContainer';
 import Row from '../../components/Row';
 import Spacer from '../../components/Spacer';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
-import { useRefresh } from '../../recoil/refresh';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { userState } from '../../recoil/auth';
+import { refreshTriggerState } from '../../components/Loader';
 
 const NewPlaceForm = ({ route, navigation }) => {
   const [name, setName] = useState('');
@@ -29,7 +29,7 @@ const NewPlaceForm = ({ route, navigation }) => {
 
   const { person } = route.params;
 
-  const { placesAndRelationsRefresher } = useRefresh();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const backRequestHandledRef = useRef(null);
   const handleBeforeRemove = (e) => {
@@ -75,7 +75,7 @@ const NewPlaceForm = ({ route, navigation }) => {
     }
     if (response.ok) {
       setRelsPersonPlace((relsPersonPlace) => [response.decryptedData, ...relsPersonPlace]);
-      placesAndRelationsRefresher();
+      setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
       onBack();
     }
   };
