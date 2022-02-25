@@ -27,6 +27,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
+import { MMKV } from '../../services/dataManagement';
 
 const castToAction = (action = {}) => ({
   name: action.name?.trim() || '',
@@ -325,9 +326,19 @@ const Action = ({ navigation, route }) => {
       setActions((actions) => actions.filter((a) => a._id !== id));
       for (let comment of comments.filter((c) => c.action === id)) {
         const res = await API.delete({ path: `/comment/${comment._id}` });
-        if (res.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
+        if (res.ok) {
+          setComments((comments) => comments.filter((p) => p._id !== comment._id));
+          await MMKV.setMapAsync(
+            'comment',
+            comments.filter((p) => p._id !== comment._id)
+          );
+        }
       }
     }
+    await MMKV.setMapAsync(
+      'action',
+      actions.filter((a) => a._id !== id)
+    );
     return res;
   };
 

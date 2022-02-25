@@ -26,6 +26,7 @@ import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
+import { MMKV } from '../../services/dataManagement';
 
 const PersonSummary = ({
   navigation,
@@ -66,6 +67,10 @@ const PersonSummary = ({
           const response = await API.delete({ path: `/relPersonPlace/${relPersPlace?._id}` });
           if (response.ok) {
             setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id));
+            await MMKV.setMapAsync(
+              'relPersonPlace',
+              relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id)
+            );
           }
           if (!response.ok) return Alert.alert(response.error);
         }

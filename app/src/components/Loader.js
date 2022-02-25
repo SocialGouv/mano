@@ -178,7 +178,7 @@ const Loader = () => {
     });
     if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
     /*
-    Get territories
+    Get observations territories
     */
     setLoading('Chargement des observations');
     const refreshedObs = await getData({
