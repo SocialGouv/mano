@@ -1,4 +1,5 @@
 // this file create the Schema and define foreign keys
+const { DataTypes } = require("sequelize");
 const Organisation = require("../models/organisation");
 const Team = require("../models/team");
 const Report = require("../models/report");
