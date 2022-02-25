@@ -14,11 +14,6 @@ router.post(
 
     newAction.organisation = req.user.organisation;
 
-    if (!req.body.team) return res.status(400).send({ ok: false, error: "Team is required" });
-    if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
-      return res.send(403).send({ ok: false, error: "No team while creating action" });
-    }
-
     // These fields are not encrypted
     if (req.body.hasOwnProperty("status")) newAction.status = req.body.status || null;
     if (req.body.hasOwnProperty("dueAt")) newAction.dueAt = req.body.dueAt || null;
@@ -146,7 +141,6 @@ router.delete(
       },
     };
 
-    if (req.user.role !== "admin") query.where.team = req.user.teams.map((e) => e._id);
     let action = await Action.findOne(query);
     if (!action) return res.status(200).send({ ok: true });
 

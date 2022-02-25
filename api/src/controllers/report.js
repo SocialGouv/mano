@@ -49,10 +49,6 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res, next) => {
-    if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
-      return next("not permission creating report");
-    }
-
     const newReport = { organisation: req.user.organisation };
 
     if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
