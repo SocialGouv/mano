@@ -1,8 +1,6 @@
 // this file create the Schema and define foreign keys
-const { DataTypes } = require("sequelize");
 const Organisation = require("../models/organisation");
 const Team = require("../models/team");
-const Person = require("../models/person");
 const Report = require("../models/report");
 const User = require("../models/user");
 const Place = require("../models/place");
@@ -19,10 +17,6 @@ const generateForeignKey = (key) => ({ foreignKey: { type: DataTypes.UUID, name:
 const organisationForeignKey = generateForeignKey("organisation");
 const teamForeignKey = generateForeignKey("team");
 const userForeignKey = generateForeignKey("user");
-const personForeignKey = generateForeignKey("person");
-const placeForeignKey = generateForeignKey("place");
-const structureForeignKey = generateForeignKey("structure");
-const territoryForeignKey = generateForeignKey("territory");
 
 // Team
 Team.belongsTo(Organisation, organisationForeignKey);

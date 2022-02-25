@@ -134,8 +134,7 @@ create table if not exists "mano"."Person"
     "createdAt"             timestamp with time zone not null,
     "updatedAt"             timestamp with time zone not null,
     encrypted               text,
-    "encryptedEntityKey"    text,
-    "outOfActiveList"       boolean default false
+    "encryptedEntityKey"    text
 );
 
 create table if not exists "mano"."Action"
@@ -146,25 +145,10 @@ create table if not exists "mano"."Action"
     status               text,
     "dueAt"              timestamp with time zone,
     "completedAt"        timestamp with time zone,
-    structure            uuid
-        constraint "Action_structure_fkey"
-            references "mano"."Structure"
-            on update cascade on delete set null
-            deferrable,
     organisation         uuid
         constraint "Action_organisation_fkey"
             references "mano"."Organisation"
             on update cascade on delete cascade
-            deferrable,
-    team                 uuid
-        constraint "Action_team_fkey"
-            references "mano"."Team"
-            on update cascade on delete cascade
-            deferrable,
-    "user"               uuid
-        constraint "Action_user_fkey"
-            references "mano"."User"
-            on update cascade on delete set null
             deferrable,
     "createdAt"          timestamp with time zone not null,
     "updatedAt"          timestamp with time zone not null,
@@ -213,9 +197,6 @@ create table if not exists "mano"."RelPersonPlace"
         constraint "RelPersonPlace_organisation_fkey"
             references "mano"."Organisation"
             on update cascade on delete cascade,
-    "user"               uuid
-        constraint "RelPersonPlace_user_fkey"
-            references "mano"."User",
     encrypted            text,
     "encryptedEntityKey" text
 );
