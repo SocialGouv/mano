@@ -17,7 +17,7 @@ dayjs.extend(utc);
 dayjs.locale("fr");
 
 jest.setTimeout(60000);
-setDefaultOptions({ timeout: 10000 });
+setDefaultOptions({ timeout: 60000 });
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {
@@ -89,7 +89,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Retour" });
     await expect(page).toMatch("Mon action");
     await expect(page).toMatch("A FAIRE");
-    await expect(page).toMatch("(créée par Encrypted Orga Admin)");
+    await expect(page).toMatch("Encrypted Orga Admin");
   });
 
   /*

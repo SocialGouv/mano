@@ -8,9 +8,8 @@ const multer = require("multer");
 const crypto = require("crypto");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
-const Team = require("../models/team");
 const encryptedTransaction = require("../utils/encryptedTransaction");
-const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
+const { STORAGE_DIRECTORY } = require("../config");
 
 // Return the basedir to store persons' documents.
 function personDocumentBasedir(userOrganisation, personId) {
@@ -96,10 +95,6 @@ router.post(
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       const data = await Person.bulkCreate(persons, { returning: true, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return data;
-
-      // Todo: check if assignedTeams is always needed in full encryption mode.
       return data.map((p) => p.toJSON());
     });
     return res.status(status).send({ ok, data, error });
@@ -109,22 +104,19 @@ router.post(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const newPerson = {};
 
     newPerson.organisation = req.user.organisation;
-    newPerson.user = req.user._id;
 
-    if (req.body.hasOwnProperty("name")) newPerson.name = req.body.name;
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in person create");
+    }
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       const data = await Person.create(newPerson, { returning: true, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return data;
-
-      // Todo: check if assignedTeams is always needed in full encryption mode.
       return data.toJSON();
     });
     return res.status(status).send({ ok, data, error });
@@ -161,20 +153,8 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
-        // These fields should be encrypted but it seems they are not for some reason.
-        // We have to keep them, then find a solution to re-encrypt them all then drop them.
-        // This will be hard to maintain.
-        "reason", // Maybe not used since we have "reasons" field.
-        "startTakingCareAt", // Seems to be not used.
-        "outOfActiveList", // Should have been stored in encrypted fields.
-        // "vulnerabilities" and "consumptions" were removed but should have been previously encrypted.
       ],
     });
-
-    if (ENCRYPTED_FIELDS_ONLY) return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
-
-    // Todo: check if relTeamPerson is always needed in full encryption mode.
-    const teams = await Team.findAll(query);
 
     return res.status(200).send({
       ok: true,
@@ -188,7 +168,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const query = {
       where: {
         _id: req.params._id,
@@ -199,29 +179,22 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    // Maybe this is not needed anymore.
-    if (!person.user) req.body.user = req.user._id; // mitigate weird bug that puts no user for person creation
+    const updatePerson = {};
 
-    // Maybe this is not needed anymore.
-    if (["Non", ""].includes(req.body.address)) {
-      req.body.addressDetail = "";
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in person update");
     }
-
-    if (req.body.createdAt) {
+    if (req.body.hasOwnProperty("encrypted")) updatePerson.encrypted = req.body.encrypted || null;
+    if (req.body.hasOwnProperty("encryptedEntityKey")) updatePerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
+    // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
+    if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
       person.changed("createdAt", true);
-      req.body.createdAt = new Date(req.body.createdAt);
-    } else {
-      req.body.createdAt = person.createdAt;
+      updatePerson.createdAt = new Date(req.body.createdAt);
     }
 
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await Person.update(req.body, query, { silent: false, transaction: tx });
-      // According to this comment, we should use transaction here:
-      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
-      const newPerson = await Person.findOne({ ...query, transaction: tx });
-
-      if (ENCRYPTED_FIELDS_ONLY) return person;
-
+      await Person.update(updatePerson, query, { silent: false, transaction: tx });
+      const newPerson = await Person.findOne(query);
       return newPerson.toJSON();
     });
 

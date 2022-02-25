@@ -10,16 +10,16 @@ const encryptedTransaction = require("../utils/encryptedTransaction");
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     if (!req.body.name) return res.status(400).send({ ok: false, error: "Name is needed" });
 
     const newPlace = {};
 
     newPlace.organisation = req.user.organisation;
-    newPlace.user = req.user._id;
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("name")) newPlace.name = req.body.name || null;
 
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in place create");
+    }
     if (req.body.hasOwnProperty("encrypted")) newPlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -70,7 +70,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const query = {
       where: {
         _id: req.params._id,
@@ -78,14 +78,15 @@ router.put(
       },
     };
 
-    const updatePlace = {};
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("name")) updatePlace.name = req.body.name || null;
-    if (req.body.hasOwnProperty("encrypted")) updatePlace.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) updatePlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
-
     const place = await Place.findOne(query);
     if (!place) return res.status(404).send({ ok: false, error: "Not found" });
+
+    const updatePlace = {};
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in place update");
+    }
+    if (req.body.hasOwnProperty("encrypted")) updatePlace.encrypted = req.body.encrypted || null;
+    if (req.body.hasOwnProperty("encryptedEntityKey")) updatePlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
     const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
       place.set(updatePlace);
       await place.save({ transaction: tx });
