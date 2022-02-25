@@ -1,3 +1,10 @@
+## [1.58.2](https://github.com/SocialGouv/mano/compare/v1.58.1...v1.58.2) (2022-02-25)
+
+
+### Bug Fixes
+
+* **api:** remove capture ([379c7fe](https://github.com/SocialGouv/mano/commit/379c7fe0bdc38d6a14dd880d048df174c8ad57a7))
+
 ## [1.58.1](https://github.com/SocialGouv/mano/compare/v1.58.0...v1.58.1) (2022-02-25)
 
 
