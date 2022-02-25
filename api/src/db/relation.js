@@ -61,11 +61,5 @@ Comment.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(Comment, organisationForeignKey);
 
 // Action
-Action.belongsTo(Structure, structureForeignKey);
-Structure.hasMany(Action, structureForeignKey);
-Action.belongsTo(Team, teamForeignKey);
-Team.hasMany(Action, teamForeignKey);
-Action.belongsTo(User, userForeignKey);
-User.hasMany(Action, userForeignKey);
 Action.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(Action, organisationForeignKey);
