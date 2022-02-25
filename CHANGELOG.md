@@ -1,3 +1,10 @@
+## [1.57.1](https://github.com/SocialGouv/mano/compare/v1.57.0...v1.57.1) (2022-02-25)
+
+
+### Bug Fixes
+
+* update yarn.lock ([fae2114](https://github.com/SocialGouv/mano/commit/fae21142614c7d757894b2456e08e7a9656657e0))
+
 # [1.57.0](https://github.com/SocialGouv/mano/compare/v1.56.3...v1.57.0) (2022-02-24)
 
 
