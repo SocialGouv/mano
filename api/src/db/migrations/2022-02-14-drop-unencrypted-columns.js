@@ -8,6 +8,9 @@ const sequelize = require("../sequelize");
       DROP COLUMN IF EXISTS "person",
       DROP COLUMN IF EXISTS "withTime",
       DROP COLUMN IF EXISTS "category",
+      DROP COLUMN IF EXISTS "team",
+      DROP COLUMN IF EXISTS "structure",
+      DROP COLUMN IF EXISTS "user",
       DROP COLUMN IF EXISTS "categories";`
   );
 
@@ -60,6 +63,7 @@ const sequelize = require("../sequelize");
   await sequelize.query(
     `ALTER TABLE "mano"."RelPersonPlace"
       DROP COLUMN IF EXISTS "person",
+      DROP COLUMN IF EXISTS "user",
       DROP COLUMN IF EXISTS "place";`
   );
 
