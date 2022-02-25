@@ -1,3 +1,10 @@
+# [1.58.0](https://github.com/SocialGouv/mano/compare/v1.57.2...v1.58.0) (2022-02-25)
+
+
+### Features
+
+* remove encrypted field from columns ([#364](https://github.com/SocialGouv/mano/issues/364)) ([d76fcc3](https://github.com/SocialGouv/mano/commit/d76fcc3502ef7a21e3f9ea67e7fdab25c0a96825))
+
 ## [1.57.2](https://github.com/SocialGouv/mano/compare/v1.57.1...v1.57.2) (2022-02-25)
 
 
