@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import SceneContainer from '../../components/SceneContainer';
 import ActionRow from './ActionRow';
 import Spinner from '../../components/Spinner';
@@ -11,17 +11,16 @@ import { MyText } from '../../components/MyText';
 import FlatListStyled, { SectionListStyled } from '../../components/FlatListStyled';
 import { DONE, TODO, CANCEL } from '../../recoil/actions';
 import API from '../../services/api';
-import { loadingState, useRefresh } from '../../recoil/refresh';
 import { actionsDoneSelector, actionsTodoSelector, actionsCanceledSelector } from '../../recoil/selectors';
 import { personsState } from '../../recoil/persons';
 import { useNavigation } from '@react-navigation/native';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
 
 const ActionsList = ({ status, onScroll, parentScroll }) => {
   const navigation = useNavigation();
 
-  const [refreshing, setRefreshing] = useState(false);
   const loading = useRecoilValue(loadingState);
-  const { actionsRefresher } = useRefresh();
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const actionsDone = useRecoilValue(actionsDoneSelector);
   const actionsTodo = useRecoilValue(actionsTodoSelector);
   const actionsCanceled = useRecoilValue(actionsCanceledSelector);
@@ -39,9 +38,7 @@ const ActionsList = ({ status, onScroll, parentScroll }) => {
   }, [navigation]);
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await actionsRefresher();
-    setRefreshing(false);
+    setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   };
 
   const onCreateAction = () => navigation.navigate('NewActionForm', { fromRoute: 'ActionsList' });
@@ -78,7 +75,7 @@ const ActionsList = ({ status, onScroll, parentScroll }) => {
   const renderSectionsList = () => (
     <SectionListStyled
       onScroll={onScroll}
-      refreshing={refreshing}
+      refreshing={refreshTrigger.status}
       onRefresh={onRefresh}
       sections={actionsByStatus || []}
       initialNumToRender={5}
@@ -93,7 +90,7 @@ const ActionsList = ({ status, onScroll, parentScroll }) => {
 
   const renderFlatList = () => (
     <FlatListStyled
-      refreshing={refreshing}
+      refreshing={refreshTrigger.status}
       onScroll={onScroll}
       onRefresh={onRefresh}
       data={actionsByStatus}

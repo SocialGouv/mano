@@ -2,7 +2,6 @@ import React from 'react';
 import { TouchableOpacity, StyleSheet, View } from 'react-native';
 
 const RowContainer = ({ Component = TouchableOpacity, onPress, disabled, noPadding, children, center, testID = '' }) => {
-  console.log({ testID });
   return (
     <Component onPress={onPress} disabled={disabled} testID={testID}>
       <View style={styles.container}>

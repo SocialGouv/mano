@@ -18,8 +18,8 @@ import Title, { SubTitle } from '../../components/Title';
 import { MANO_DOWNLOAD_URL } from '../../config';
 import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import { useRefresh } from '../../recoil/refresh';
 import { clearCache, useStorage } from '../../services/dataManagement';
+import { refreshTriggerState } from '../../components/Loader';
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -36,7 +36,7 @@ const Login = ({ navigation }) => {
   const setUsers = useSetRecoilState(usersState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const [storageOrganisationId, setStorageOrganisationId] = useStorage('organisationId', 0);
-  const { refresh } = useRefresh();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const checkVersion = async () => {
     const response = await API.get({ path: '/version' });
@@ -138,7 +138,7 @@ const Login = ({ navigation }) => {
           navigation.navigate('CharteAcceptance');
         } else if (response.user?.teams?.length === 1) {
           setCurrentTeam(response.user.teams[0]);
-          refresh({ showFullScreen: true, initialLoad: true });
+          setRefreshTrigger({ status: true, options: { showFullScreen: true, initialLoad: true } });
           navigation.navigate('Home');
         } else {
           navigation.navigate('TeamSelection');

@@ -1,24 +1,225 @@
 import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
+import API from '../services/api';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
 import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
-import { loaderFullScreenState, loadingState, progressState } from '../recoil/refresh';
-import { useRecoilValue } from 'recoil';
+import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import { getData, useStorage } from '../services/dataManagement';
+import { organisationState } from '../recoil/auth';
+import { actionsState } from '../recoil/actions';
+import { personsState } from '../recoil/persons';
+import { territoriesState } from '../recoil/territory';
+import { placesState } from '../recoil/places';
+import { relsPersonPlaceState } from '../recoil/relPersonPlace';
+import { territoryObservationsState } from '../recoil/territoryObservations';
+import { commentsState } from '../recoil/comments';
+import { capture } from '../services/sentry';
 
 function randomIntFromInterval(min, max) {
   // min and max included
   return Math.floor(Math.random() * (max - min + 1) + min);
 }
 
+export const loadingState = atom({
+  key: 'loadingState',
+  default: '',
+});
+
+const progressState = atom({
+  key: 'progressState',
+  default: 0,
+});
+
+const loaderFullScreenState = atom({
+  key: 'loaderFullScreenState',
+  default: false,
+});
+
+export const refreshTriggerState = atom({
+  key: 'refreshTriggerState',
+  default: {
+    status: false,
+    options: { showFullScreen: false, initialLoad: false },
+  },
+});
+
+const mergeItems = (oldItems, newItems) =>
+  [...oldItems, ...newItems].reduce((items, item) => {
+    if (items.find((i) => i?.id === item._id)) return items.map((i) => (i._id === item._id ? item : i));
+    return [...items, item];
+  }, []);
+
 const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  const loading = useRecoilValue(loadingState);
-  const progress = useRecoilValue(progressState);
-  const fullScreen = useRecoilValue(loaderFullScreenState);
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh', 0);
+  const [loading, setLoading] = useRecoilState(loadingState);
+  const [progress, setProgress] = useRecoilState(progressState);
+  const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
+  const organisation = useRecoilValue(organisationState);
+  const organisationId = organisation?._id;
+
+  const [persons, setPersons] = useRecoilState(personsState);
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [territories, setTerritories] = useRecoilState(territoriesState);
+  const [places, setPlaces] = useRecoilState(placesState);
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
+  const [comments, setComments] = useRecoilState(commentsState);
+
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
+  useEffect(() => {
+    if (refreshTrigger.status === true) {
+      refresh();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger.status]);
+
+  const refresh = async () => {
+    const { showFullScreen, initialLoad } = refreshTrigger.options;
+    setFullScreen(showFullScreen);
+    /*
+    Get number of data to download to show the appropriate loading progress bar
+    */
+    const response = await API.get({
+      path: '/public/stats',
+      query: { organisation: organisationId, lastRefresh },
+    });
+    if (!response.ok) {
+      capture('error getting stats', { extra: response });
+      setRefreshTrigger({
+        status: false,
+        options: { showFullScreen: false, initialLoad: false },
+      });
+      return;
+    }
+    const total =
+      (response.data.actions || 1) +
+      (response.data.persons || 1) +
+      (response.data.territories || 1) +
+      (response.data.territoryObservations || 1) +
+      (response.data.places || 1) +
+      (response.data.comments || 1) +
+      (response.data.reports || 1) +
+      (response.data.relsPersonPlace || 1);
+    /*
+    Get persons
+    */
+    setLoading('Chargement des personnes');
+    const refreshedPersons = await getData({
+      collectionName: 'person',
+      data: persons,
+      isInitialization: initialLoad,
+      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+      lastRefresh,
+      setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
+      API,
+    });
+    if (refreshedPersons) setPersons(refreshedPersons.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    /*
+    Get actions
+    */
+    setLoading('Chargement des actions');
+    const refreshedActions = await getData({
+      collectionName: 'action',
+      data: actions,
+      isInitialization: initialLoad,
+      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+      lastRefresh,
+      setBatchData: (newActions) => setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions))),
+      API,
+    });
+    if (refreshedActions) setActions(refreshedActions);
+    /*
+    Switch to not full screen
+    */
+    setFullScreen(false);
+    /*
+    Get territories
+    */
+    setLoading('Chargement des territoires');
+    const refreshedTerritories = await getData({
+      collectionName: 'territory',
+      data: territories,
+      isInitialization: initialLoad,
+      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+      lastRefresh,
+      setBatchData: (newTerritories) =>
+        setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
+      API,
+    });
+    if (refreshedTerritories) setTerritories(refreshedTerritories);
+    /*
+    Get places
+    */
+    setLoading('Chargement des lieux');
+    const refreshedPlaces = await getData({
+      collectionName: 'place',
+      data: places,
+      isInitialization: initialLoad,
+      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+      lastRefresh,
+      setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
+      API,
+    });
+    if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    const refreshedRelPersonPlaces = await getData({
+      collectionName: 'relPersonPlace',
+      data: relsPersonPlace,
+      isInitialization: initialLoad,
+      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+      lastRefresh,
+      setBatchData: (newRelPerPlace) =>
+        setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
+      API,
+    });
+    if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
+    /*
+    Get observations territories
+    */
+    setLoading('Chargement des observations');
+    const refreshedObs = await getData({
+      collectionName: 'territory-observation',
+      data: territoryObservations,
+      isInitialization: initialLoad,
+      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+      lastRefresh,
+      setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
+      API,
+    });
+    if (refreshedObs) setTerritoryObs(refreshedObs);
+    /*
+    Get comments
+    */
+    setLoading('Chargement des commentaires');
+    const refreshedComments = await getData({
+      collectionName: 'comment',
+      data: comments,
+      isInitialization: initialLoad,
+      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+      lastRefresh,
+      setBatchData: (newComments) =>
+        setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
+      API,
+    });
+    if (refreshedComments) setComments(refreshedComments);
+
+    /*
+    Reset refresh trigger
+    */
+    await new Promise((res) => setTimeout(res, 150));
+    setLastRefresh(Date.now());
+    setLoading('');
+    setProgress(0);
+    setFullScreen(false);
+    setRefreshTrigger({
+      status: false,
+      options: { showFullScreen: false, initialLoad: false },
+    });
+  };
 
   useEffect(() => {
     setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
