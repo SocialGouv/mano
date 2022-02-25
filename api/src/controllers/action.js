@@ -105,7 +105,7 @@ router.put(
   catchErrors(async (req, res, next) => {
     const where = { _id: req.params._id };
     where.organisation = req.user.organisation;
-    if (req.user.role !== "admin") where.team = req.user.teams.map((e) => e._id);
+    // Todo: check team before updating action for non-admin.
 
     let action = await Action.findOne({ where });
     if (!action) return res.status(404).send({ ok: false, error: "Not Found" });
