@@ -3,13 +3,13 @@ const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
-
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const RelPersonPlace = require("../models/relPersonPlace");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const { person, place } = req.body;
     if (!person || !place) return res.status(400).send({ ok: false, error: "Missing place or person" });
@@ -25,12 +25,9 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newRelPersonPlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newRelPersonPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await RelPersonPlace.create(newRelPersonPlace, { returning: true, transaction: tx });
-      return data;
-    });
+    const data = await RelPersonPlace.create(newRelPersonPlace, { returning: true });
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data });
   })
 );
 

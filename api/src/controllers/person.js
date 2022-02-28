@@ -8,8 +8,9 @@ const multer = require("multer");
 const crypto = require("crypto");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
-const encryptedTransaction = require("../utils/encryptedTransaction");
-const { STORAGE_DIRECTORY } = require("../config");
+const Team = require("../models/team");
+const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 // Return the basedir to store persons' documents.
 function personDocumentBasedir(userOrganisation, personId) {
@@ -86,24 +87,22 @@ router.delete(
 router.post(
   "/import",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const persons = req.body.map((p) => ({
       ...p,
       organisation: req.user.organisation,
       user: req.user._id,
     }));
-
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Person.bulkCreate(persons, { returning: true, transaction: tx });
-      return data.map((p) => p.toJSON());
-    });
-    return res.status(status).send({ ok, data, error });
+    const data = await Person.bulkCreate(persons, { returning: true });
+    return res.status(200).send({ ok: true, data: data.map((p) => p.toJSON()) });
   })
 );
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const newPerson = {};
 
@@ -115,11 +114,8 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Person.create(newPerson, { returning: true, transaction: tx });
-      return data.toJSON();
-    });
-    return res.status(status).send({ ok, data, error });
+    const data = await Person.create(newPerson, { returning: true });
+    return res.status(200).send({ ok: true, data: data.toJSON() });
   })
 );
 
@@ -168,6 +164,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const query = {
       where: {
@@ -191,14 +188,9 @@ router.put(
       person.changed("createdAt", true);
       updatePerson.createdAt = new Date(req.body.createdAt);
     }
-
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await Person.update(updatePerson, query, { silent: false, transaction: tx });
-      const newPerson = await Person.findOne(query);
-      return newPerson.toJSON();
-    });
-
-    res.status(status).send({ ok, data, error });
+    await Person.update(req.body, query, { silent: false });
+    const newPerson = await Person.findOne(query);
+    res.status(200).send({ ok: true, data: newPerson.toJSON() });
   })
 );
 

@@ -1,9 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-
 const { catchErrors } = require("../errors");
-
 const Organisation = require("../models/organisation");
 const Person = require("../models/person");
 const Place = require("../models/place");
@@ -13,7 +11,8 @@ const Comment = require("../models/comment");
 const Territory = require("../models/territory");
 const Report = require("../models/report");
 const TerritoryObservation = require("../models/territoryObservation");
-const encryptedTransaction = require("../utils/encryptedTransaction");
+const sequelize = require("../db/sequelize");
+const { capture } = require("../sentry");
 
 // this controller is required BECAUSE
 // if we encrypt one by one each of the actions, persons, comments, territories, observations, places, reports
@@ -22,20 +21,26 @@ const encryptedTransaction = require("../utils/encryptedTransaction");
 // we end up with a part of the data encrypted with one key, another with another key
 // so we lose a big part of the data
 
-// SO we need to send all the new encrypted data in one shot
+// So we need to send all the new encrypted data in one shot
 // and to make sure everything is changed by using a transaction
-
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
     if (req.user.role !== "admin") {
       capture("Only an admin can change the encryption", { user: req.user });
-      return res.send(403).send({ ok: false, error: "Seul un admin peut modifier le chiffrement" });
+      return res.status(403).send({ ok: false, error: "Seul un admin peut modifier le chiffrement" });
     }
 
-    const { ok, error, status } = await encryptedTransaction(req)(async (tx) => {
-      try {
+    let organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+    if (organisation.encrypting) {
+      return res.status(403).send({ ok: false, error: "L'organisation est déjà en cours de chiffrement" });
+    }
+    organisation.set({ encrypting: true });
+    await organisation.save();
+
+    try {
+      await sequelize.transaction(async (tx) => {
         const {
           actions = [],
           persons = [],
@@ -45,7 +50,12 @@ router.post(
           places = [],
           reports = [],
           relsPersonPlace = [],
+          encryptionLastUpdateAt,
         } = req.body;
+
+        if (Date.parse(new Date(encryptionLastUpdateAt)) < Date.parse(new Date(organisation.encryptionLastUpdateAt))) {
+          throw new Error("La clé de chiffrement a changé. Veuillez vous déconnecter et vous reconnecter avec la nouvelle clé.");
+        }
 
         for (let { encrypted, encryptedEntityKey, _id } of persons) {
           await Person.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
@@ -78,15 +88,22 @@ router.post(
         for (let { encrypted, encryptedEntityKey, _id } of reports) {
           await Report.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
-      } catch (e) {
-        console.log("error encrypting", e);
-        throw e;
-      }
-    });
+        organisation.set({
+          encryptionEnabled: "true",
+          encryptionLastUpdateAt: new Date(),
+          encrypting: false,
+          encryptedVerificationKey: req.body.encryptedVerificationKey,
+        });
+        await organisation.save({ transaction: tx });
+      });
+    } catch (e) {
+      capture("error encrypting", e);
+      organisation.set({ encrypting: false });
+      await organisation.save();
+      throw e;
+    }
 
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-
-    return res.status(status).send({ ok, error, data: organisation });
+    return res.status(200).send({ ok: true, data: organisation });
   })
 );
 

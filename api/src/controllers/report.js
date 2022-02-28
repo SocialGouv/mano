@@ -4,9 +4,9 @@ const passport = require("passport");
 const { Op } = require("sequelize");
 
 const { catchErrors } = require("../errors");
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 const Report = require("../models/report");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 
 router.get(
   "/",
@@ -48,6 +48,7 @@ router.get(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const newReport = { organisation: req.user.organisation };
 
@@ -58,18 +59,16 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newReport.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newReport.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const reportData = await Report.create(newReport, { returning: true, transaction: tx });
-      return reportData;
-    });
+    const reportData = await Report.create(newReport, { returning: true });
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data: reportData });
   })
 );
 
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const where = { _id: req.params._id };
 
@@ -84,13 +83,9 @@ router.put(
     if (req.body.hasOwnProperty("encrypted")) updatedReport.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatedReport.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      report.set(updatedReport);
-      await report.save({ transaction: tx });
-      return report;
-    });
-
-    return res.status(status).send({ ok, data, error });
+    report.set(updatedReport);
+    await report.save();
+    return res.status(200).send({ ok: true, data: report });
   })
 );
 

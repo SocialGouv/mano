@@ -12,6 +12,7 @@ Organisation.init(
     encryptionEnabled: { type: DataTypes.BOOLEAN },
     encryptionLastUpdateAt: DataTypes.DATE,
     encryptedVerificationKey: DataTypes.TEXT,
+    encrypting: { type: DataTypes.BOOLEAN, default: false },
     receptionEnabled: { type: DataTypes.BOOLEAN },
     services: DataTypes.ARRAY(DataTypes.TEXT),
     customFieldsObs: DataTypes.JSONB,

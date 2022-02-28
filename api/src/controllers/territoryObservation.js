@@ -5,12 +5,13 @@ const passport = require("passport");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const TerritoryObservation = require("../models/territoryObservation");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 const { Op } = require("sequelize");
+const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const newObs = {};
     newObs.organisation = req.user.organisation;
@@ -24,12 +25,9 @@ router.post(
     // FIXME: This "createdAt" pattern should be avoided. createdAt should not be updated.
     if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await TerritoryObservation.create(newObs, { returning: true, transaction: tx });
-      return data;
-    });
+    const data = await TerritoryObservation.create(newObs, { returning: true });
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data });
   })
 );
 
@@ -73,6 +71,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const query = {
       where: {
@@ -98,15 +97,10 @@ router.put(
       updateObs.createdAt = req.body.createdAt || null;
     }
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await TerritoryObservation.update(updateObs, query, { silent: false, transaction: tx });
-      // According to this comment, we should use transaction here:
-      // https://github.com/sequelize/sequelize/issues/10858#issuecomment-549817032
-      const newObservation = await TerritoryObservation.findOne({ ...query, transaction: tx });
-      return newObservation;
-    });
+    await TerritoryObservation.update(updateObs, query, { silent: false });
+    const newObservation = await TerritoryObservation.findOne(query);
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data: newObservation });
   })
 );
 
