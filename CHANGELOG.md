@@ -1,3 +1,10 @@
+# [1.61.0](https://github.com/SocialGouv/mano/compare/v1.60.0...v1.61.0) (2022-02-28)
+
+
+### Features
+
+* validate organisation encryption ([#383](https://github.com/SocialGouv/mano/issues/383)) ([ff82af7](https://github.com/SocialGouv/mano/commit/ff82af760f30a9f01f0d15d8b2a5ee90c83a6aa1))
+
 # [1.60.0](https://github.com/SocialGouv/mano/compare/v1.59.0...v1.60.0) (2022-02-28)
 
 
