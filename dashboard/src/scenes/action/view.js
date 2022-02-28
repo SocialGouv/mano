@@ -24,14 +24,16 @@ import SelectTeam from '../../components/SelectTeam';
 
 import { organisationState, teamsState, userState } from '../../recoil/auth';
 import { useActions, CANCEL, DONE } from '../../recoil/actions';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
 
 const View = () => {
   const { id } = useParams();
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const { deleteAction, updateAction, actions, refreshActions } = useActions();
   const history = useHistory();
@@ -54,7 +56,16 @@ const View = () => {
 
   return (
     <Container style={{ padding: '40px 0' }}>
-      <Header title={<BackButton />} />
+      <Header
+        title={<BackButton />}
+        onRefresh={() =>
+          setRefreshTrigger({
+            status: true,
+            method: 'actionsRefresher',
+            options: [],
+          })
+        }
+      />
       <Title>
         {`${action?.name}`}
         <UserName id={action.user} wrapper={(name) => ` (créée par ${name})`} />

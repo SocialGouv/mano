@@ -7,7 +7,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import Header from '../../components/header';
@@ -41,6 +41,7 @@ import OutOfActiveList from './OutOfActiveList';
 import { organisationState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
 import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -50,6 +51,7 @@ const View = () => {
   const history = useHistory();
   const { persons } = usePersons();
   const organisation = useRecoilValue(organisationState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [tabsContents, setTabsContents] = useState(initTabs);
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(
@@ -62,7 +64,16 @@ const View = () => {
 
   return (
     <StyledContainer style={{ padding: '40px 0' }}>
-      <Header title={<BackButton />} />
+      <Header
+        title={<BackButton />}
+        onRefresh={() =>
+          setRefreshTrigger({
+            status: true,
+            method: 'personsRefresher',
+            options: [],
+          })
+        }
+      />
       <Title>
         {`Dossier de ${person?.name}`}
         <UserName id={person.user} wrapper={(name) => ` (créée par ${name})`} />

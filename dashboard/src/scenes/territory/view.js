@@ -16,12 +16,15 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Observations from '../territory-observations/list';
 import SelectCustom from '../../components/SelectCustom';
 import { useTerritories, territoryTypes } from '../../recoil/territory';
+import { useSetRecoilState } from 'recoil';
+import { refreshTriggerState } from '../../components/Loader';
 
 const View = () => {
   const { id } = useParams();
   const history = useHistory();
   const { territories, deleteTerritory, updateTerritory } = useTerritories();
   const territory = territories.find((t) => t._id === id);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
@@ -37,7 +40,16 @@ const View = () => {
 
   return (
     <Container style={{ padding: '40px 0' }}>
-      <Header title={<BackButton />} />
+      <Header
+        title={<BackButton />}
+        onRefresh={() =>
+          setRefreshTrigger({
+            status: true,
+            method: 'territoriesRefresher',
+            options: [],
+          })
+        }
+      />
       <Box>
         <Formik
           initialValues={territory}
