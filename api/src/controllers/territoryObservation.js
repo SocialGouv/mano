@@ -27,7 +27,7 @@ router.post(
 
     const data = await TerritoryObservation.create(newObs, { returning: true });
 
-    return res.status(200).send({ ok, data });
+    return res.status(200).send({ ok: true, data });
   })
 );
 
