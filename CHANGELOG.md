@@ -1,3 +1,10 @@
+## [1.58.4](https://github.com/SocialGouv/mano/compare/v1.58.3...v1.58.4) (2022-02-28)
+
+
+### Bug Fixes
+
+* **dashboard:** create collaboration ([#401](https://github.com/SocialGouv/mano/issues/401)) ([7db8abd](https://github.com/SocialGouv/mano/commit/7db8abd5063f88cbba1d3d80dec2714f5ffbc5be))
+
 ## [1.58.3](https://github.com/SocialGouv/mano/compare/v1.58.2...v1.58.3) (2022-02-25)
 
 
