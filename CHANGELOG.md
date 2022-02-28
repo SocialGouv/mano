@@ -1,3 +1,10 @@
+# [1.62.0](https://github.com/SocialGouv/mano/compare/v1.61.0...v1.62.0) (2022-02-28)
+
+
+### Features
+
+* **dashboard:** remove organisation stats button when only one team ([#402](https://github.com/SocialGouv/mano/issues/402)) ([3f3b9b3](https://github.com/SocialGouv/mano/commit/3f3b9b33384bc88cc61eeb24172adffc24895f3f))
+
 # [1.61.0](https://github.com/SocialGouv/mano/compare/v1.60.0...v1.61.0) (2022-02-28)
 
 
