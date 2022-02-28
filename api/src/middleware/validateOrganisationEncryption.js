@@ -1,10 +1,12 @@
+const Organisation = require("../models/organisation");
+
 function dateForCompare(date) {
   return Date.parse(new Date(date));
 }
 
-function validateOrganisationEncryption(req, res, next) {
+async function validateOrganisationEncryption(req, res, next) {
   const { encryptionLastUpdateAt } = req.query;
-  const organisation = req.user.organisation;
+  const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
 
   if (!encryptionLastUpdateAt) {
     return res.status(400).send({ ok: false, status: 400, error: "encryptionLastUpdateAt is required" });

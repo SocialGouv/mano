@@ -48,6 +48,7 @@ router.get(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const newReport = { organisation: req.user.organisation };
 
@@ -58,12 +59,9 @@ router.post(
     if (req.body.hasOwnProperty("encrypted")) newReport.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newReport.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const reportData = await Report.create(newReport, { returning: true, transaction: tx });
-      return reportData;
-    });
+    const reportData = await Report.create(newReport, { returning: true });
 
-    return res.status(status).send({ ok, data, error });
+    return res.status(200).send({ ok: true, data: reportData });
   })
 );
 
