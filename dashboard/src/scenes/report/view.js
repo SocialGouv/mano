@@ -32,7 +32,7 @@ import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import ActionPersonName from '../../components/ActionPersonName';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   numberOfPassagesAnonymousPerDatePerTeamSelector,
   numberOfPassagesNonAnonymousPerDatePerTeamSelector,
@@ -40,6 +40,7 @@ import {
   currentTeamReportsSelector,
 } from '../../recoil/selectors';
 import Incrementor from '../../components/Incrementor';
+import { refreshTriggerState } from '../../components/Loader';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -55,6 +56,7 @@ const View = () => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const { deleteReport } = useReports();
   const location = useLocation();
@@ -188,6 +190,18 @@ const View = () => {
                 <BackButtonWrapper caption="Supprimer" onClick={deleteData} />
               </div>
               <div style={{ display: 'flex' }}>
+                <ButtonCustom
+                  color="link"
+                  className="noprint"
+                  title="Rafraichir"
+                  onClick={() =>
+                    setRefreshTrigger({
+                      status: true,
+                      method: 'reportsRefresher',
+                      options: [],
+                    })
+                  }
+                />
                 <ButtonCustom color="link" className="noprint" title="Précédent" disabled={reportIndex === 0} onClick={onFirstBeforeReport} />
                 <ButtonCustom
                   color="link"

@@ -14,6 +14,8 @@ import Box from '../../components/Box';
 import { usePersons } from '../../recoil/persons';
 import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';
+import { useSetRecoilState } from 'recoil';
+import { refreshTriggerState } from '../../components/Loader';
 
 const View = () => {
   const { id } = useParams();
@@ -21,6 +23,7 @@ const View = () => {
   const { places, updatePlace, deletePlace } = usePlaces();
   const { relsPersonPlace } = useRelsPerson();
   const { persons } = usePersons();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const place = places.find((p) => p._id === id);
 
@@ -38,7 +41,16 @@ const View = () => {
 
   return (
     <Container style={{ padding: '40px 0' }}>
-      <Header title={<BackButton />} />
+      <Header
+        title={<BackButton />}
+        onRefresh={() =>
+          setRefreshTrigger({
+            status: true,
+            method: 'placesAndRelationsRefresher',
+            options: [],
+          })
+        }
+      />
       <Box>
         <Formik
           initialValues={place}
