@@ -266,9 +266,14 @@ const Comments = ({ search, onUpdateResults }) => {
           rowKey="_id"
           columns={[
             {
-              title: 'Heure',
+              title: 'Date',
               dataKey: 'createdAt',
-              render: (comment) => <span>{dayjs(comment.createdAt).format('HH:mm')}</span>,
+              render: (comment) => (
+                <span>
+                  {dayjs(comment.createdAt).format('ddd DD/MM/YY')}
+                  <br />à {dayjs(comment.createdAt).format('HH:mm')}
+                </span>
+              ),
             },
             {
               title: 'Utilisateur',
@@ -437,9 +442,14 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
           rowKey="_id"
           columns={[
             {
-              title: 'Heure',
+              title: 'Date',
               dataKey: 'createdAt',
-              render: (obs) => <span>{dayjs(obs.createdAt).format('HH:mm')}</span>,
+              render: (obs) => (
+                <span>
+                  {dayjs(obs.createdAt).format('ddd DD/MM/YY')}
+                  <br />à {dayjs(obs.createdAt).format('HH:mm')}
+                </span>
+              ),
             },
             {
               title: 'Utilisateur',
