@@ -20,6 +20,9 @@ async function validateOrganisationEncryption(req, res, next) {
     });
   }
 
+  console.log(encryptionLastUpdateAt, organisation.encryptionLastUpdateAt);
+  console.log(dateForCompare(encryptionLastUpdateAt), dateForCompare(organisation.encryptionLastUpdateAt));
+  console.log(dateForCompare(encryptionLastUpdateAt) < dateForCompare(organisation.encryptionLastUpdateAt));
   if (dateForCompare(encryptionLastUpdateAt) < dateForCompare(organisation.encryptionLastUpdateAt)) {
     return res.status(403).send({
       ok: false,

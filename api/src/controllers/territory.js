@@ -10,6 +10,7 @@ const validateOrganisationEncryption = require("../middleware/validateOrganisati
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const newTerritory = {};
     newTerritory.organisation = req.user.organisation;
