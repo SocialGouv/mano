@@ -22,7 +22,7 @@ import DateRangePickerWithPresets from '../../components/DateRangePickerWithPres
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { actionsState, useActions } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
@@ -46,6 +46,7 @@ const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const teams = useRecoilValue(teamsState);
 
   const { loading: personsLoading } = usePersons();
   const allPersons = useRecoilValue(personsState);
@@ -62,7 +63,7 @@ const Stats = () => {
   const [territory, setTerritory] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(false);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
   const nonAnonymousPassages = useRecoilValue(
     passagesNonAnonymousPerDatePerTeamSelector({
@@ -148,10 +149,12 @@ const Stats = () => {
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
         </Col>
         <Col md={4}>
-          <label>
-            <input type="checkbox" style={{ marginRight: '1rem' }} onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)} />
-            Statistiques de toute l'organisation
-          </label>
+          {teams.length > 1 && (
+            <label>
+              <input type="checkbox" style={{ marginRight: '1rem' }} onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)} />
+              Statistiques de toute l'organisation
+            </label>
+          )}
         </Col>
         {['admin'].includes(user.role) && (
           <Col md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
