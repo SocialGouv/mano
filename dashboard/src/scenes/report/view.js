@@ -699,7 +699,13 @@ const Description = ({ report }) => {
                 </FormGroup>
               </Col>
               <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                <ButtonCustom
+                  title={'Mettre à jour'}
+                  loading={isSubmitting}
+                  disabled={JSON.stringify(report.collaborations) === JSON.stringify(values.collaborations)}
+                  onClick={handleSubmit}
+                  width={200}
+                />
               </Col>
             </Row>
           )}
