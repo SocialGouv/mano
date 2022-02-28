@@ -533,5 +533,4 @@ const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
   }
   return null;
 };
-
-export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ label, name, options }) => ({ label, field: name, options }));
+export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ name, ...rest }) => ({ field: name, ...rest }));

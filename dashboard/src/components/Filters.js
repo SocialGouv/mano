@@ -1,8 +1,9 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import styled from 'styled-components';
-import { Col, Row } from 'reactstrap';
+import { Col, Row, Input } from 'reactstrap';
 import SelectCustom from './SelectCustom';
+import DatePicker from 'react-datepicker';
 
 export const filterData = (data, filters) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) {
@@ -15,7 +16,16 @@ export const filterData = (data, filters) => {
           if (typeof itemValue === 'boolean') {
             return itemValue === (filter.value === 'Oui') ? item : null;
           }
+
           if (typeof itemValue === 'string') {
+            if (
+              filter.type === 'text' &&
+              (itemValue || '')
+                .trim()
+                .toLowerCase()
+                .includes((filter.value || '').trim().toLowerCase())
+            )
+              return item;
             if (itemValue === filter.value) return item;
             return null;
           }
@@ -34,6 +44,7 @@ export const filterData = (data, filters) => {
         .filter(Boolean);
     }
   }
+  console.log(data);
   return data;
 };
 
@@ -55,13 +66,14 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
         {filters.map(({ field, value }, index) => {
           const filterFields = base.map((filter) => filter.field);
           const filterValues = !!field ? [...(base.find((filter) => filter.field === field)?.options || []), 'Non renseigné'] : [];
+          const { type } = base.find((filter) => filter.field === field) || {};
 
-          const onChangeField = (newField) => onChange(filters.map((f, i) => (i === index ? { field: newField, value: null } : f)));
-          const onChangeValue = (newValue) => onChange(filters.map((f, i) => (i === index ? { field, value: newValue } : f)));
+          const onChangeField = (newField) => onChange(filters.map((f, i) => (i === index ? { field: newField, value: null, type } : f)));
+          const onChangeValue = (newValue) => onChange(filters.map((f, i) => (i === index ? { field, value: newValue, type } : f)));
           const onRemoveFilter = () => onChange(filters.filter((f, i) => i !== index));
 
           return (
-            <Row style={{ marginBottom: 10 }} key={field + value}>
+            <Row style={{ marginBottom: 10 }} key={field}>
               <Col md={4}>
                 <SelectCustom
                   options={filterFields}
@@ -74,16 +86,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
                 />
               </Col>
               <Col md={4}>
-                {!!field && (
-                  <SelectCustom
-                    options={filterValues}
-                    value={[value]}
-                    getOptionLabel={(f) => f}
-                    getOptionValue={(f) => f}
-                    onChange={onChangeValue}
-                    isClearable={!value}
-                  />
-                )}
+                <ValueSelector field={field} filterValues={filterValues} value={value} base={base} onChangeValue={onChangeValue} />
               </Col>
               <Col md={2}>{!!filters.filter((f) => Boolean(f.field)).length && <DeleteButton onClick={onRemoveFilter}>Retirer</DeleteButton>}</Col>
             </Row>
@@ -93,6 +96,49 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
     </Container>
   );
 };
+
+function ValueSelector({ field, filterValues, value, onChangeValue, base }) {
+  if (!field) return <></>;
+  const { type, field: name } = base.find((filter) => filter.field === field);
+
+  if (['text', 'number', 'textarea'].includes(type)) {
+    return (
+      <Input
+        name={name}
+        type={type === 'textarea' ? 'text' : type}
+        value={value || ''}
+        onChange={(e) => {
+          e.preventDefault();
+          onChangeValue(e.target.value);
+        }}
+      />
+    );
+  }
+
+  if (['date-with-time', 'date'].includes(type)) {
+    return (
+      <Row>
+        <Col sm={6}>
+          <SelectCustom options={['before', 'after']} getOptionLabel={(f) => f} getOptionValue={(f) => f} isClearable={!value} />
+        </Col>
+        <Col sm={6}>
+          <DatePicker className="form-control" name={name} selected={value} onChange={(date) => onChangeValue(date)} />
+        </Col>
+      </Row>
+    );
+  }
+
+  return (
+    <SelectCustom
+      options={filterValues}
+      value={[value]}
+      getOptionLabel={(f) => f}
+      getOptionValue={(f) => f}
+      onChange={onChangeValue}
+      isClearable={!value}
+    />
+  );
+}
 
 const Title = styled.span`
   display: block;
