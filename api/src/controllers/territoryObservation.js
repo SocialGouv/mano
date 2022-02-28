@@ -12,31 +12,18 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const newObs = {};
-
     newObs.organisation = req.user.organisation;
 
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-
-    // Todo: ignore fields that are encrypted.
-    if (!organisation.encryptionEnabled) {
-      newObs.user = req.user._id;
-      newObs.team = req.body.team;
-      if (!newObs.team) return res.status(400).send({ ok: false, error: "Team is required" });
-      if (req.body.hasOwnProperty("personsMale")) newObs.personsMale = req.body.personsMale || null;
-      if (req.body.hasOwnProperty("personsFemale")) newObs.personsFemale = req.body.personsFemale || null;
-      if (req.body.hasOwnProperty("police")) newObs.police = req.body.police || null;
-      if (req.body.hasOwnProperty("material")) newObs.material = req.body.material || null;
-      if (req.body.hasOwnProperty("atmosphere")) newObs.atmosphere = req.body.atmosphere || null;
-      if (req.body.hasOwnProperty("mediation")) newObs.mediation = req.body.mediation || null;
-      if (req.body.hasOwnProperty("comment")) newObs.comment = req.body.comment || null;
-      if (req.body.hasOwnProperty("territory")) newObs.territory = req.body.territory || null;
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in territoryObs create");
     }
 
-    if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
     if (req.body.hasOwnProperty("encrypted")) newObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
+    // FIXME: This "createdAt" pattern should be avoided. createdAt should not be updated.
+    if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
 
     const data = await TerritoryObservation.create(newObs, { returning: true });
 
@@ -63,7 +50,6 @@ router.get(
       "organisation",
       "createdAt",
       "updatedAt",
-      // Old fields (that are now all custom fields, should have been already encrypted)
     ];
 
     if (req.query.lastRefresh) {
@@ -86,7 +72,7 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const query = {
       where: {
         _id: req.params._id,
@@ -98,28 +84,21 @@ router.put(
     const observation = await TerritoryObservation.findOne(query);
     if (!observation) return res.status(404).send({ ok: false, error: "Not found" });
 
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-
-    if (!organisation.encryptionEnabled) {
-      if (req.body.hasOwnProperty("personsMale")) updateObs.personsMale = req.body.personsMale || null;
-      if (req.body.hasOwnProperty("personsFemale")) updateObs.personsFemale = req.body.personsFemale || null;
-      if (req.body.hasOwnProperty("police")) updateObs.police = req.body.police || null;
-      if (req.body.hasOwnProperty("material")) updateObs.material = req.body.material || null;
-      if (req.body.hasOwnProperty("atmosphere")) updateObs.atmosphere = req.body.atmosphere || null;
-      if (req.body.hasOwnProperty("mediation")) updateObs.mediation = req.body.mediation || null;
-      if (req.body.hasOwnProperty("comment")) updateObs.comment = req.body.comment || null;
-    }
-
-    if (req.body.hasOwnProperty("createdAt")) {
-      observation.changed("createdAt", true);
-      updateObs.createdAt = req.body.createdAt || null;
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in territoryObs create");
     }
 
     if (req.body.hasOwnProperty("encrypted")) updateObs.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
+    // FIXME: This "createdAt" pattern should be avoided. createdAt should not be updated.
+    if (req.body.hasOwnProperty("createdAt")) {
+      observation.changed("createdAt", true);
+      updateObs.createdAt = req.body.createdAt || null;
+    }
+
     await TerritoryObservation.update(updateObs, query, { silent: false });
-    const newObservation = await TerritoryObservation.findOne({ ...query });
+    const newObservation = await TerritoryObservation.findOne(query);
 
     return res.status(200).send({ ok: true, data: newObservation });
   })

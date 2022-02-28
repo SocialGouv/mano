@@ -137,7 +137,13 @@ const Reception = () => {
           md={5}
           style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'column', borderRight: '1px solid #ddd' }}>
           <div style={{ flexShrink: 0, width: '100%' }}>
-            <SelectAndCreatePerson value={selectedPersons} onChange={onSelectPerson} autoCreate />
+            <SelectAndCreatePerson
+              value={selectedPersons}
+              onChange={onSelectPerson}
+              autoCreate
+              inputId="person-select-and-create-reception"
+              classNamePrefix="person-select-and-create-reception"
+            />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
             <CreateAction noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
@@ -157,6 +163,7 @@ const Reception = () => {
           <Card
             title="Nombre de passages"
             count={passages}
+            countId="number-of-passages"
             unit={`passage${passages > 1 ? 's' : ''}`}
             onChange={async (newValue) => {
               setAddingPassage(true);
@@ -174,6 +181,7 @@ const Reception = () => {
               color="link"
               title="Ajouter un passage anonyme"
               padding="0px"
+              id="add-anonymous-passage"
               disabled={addingPassage}
             />
             <ButtonCustom

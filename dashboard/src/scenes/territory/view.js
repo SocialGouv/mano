@@ -71,6 +71,8 @@ const View = () => {
                         placeholder={' -- Choisir -- '}
                         getOptionValue={(i) => i}
                         getOptionLabel={(i) => i}
+                        inputId="territory-select-types"
+                        classNamePrefix="territory-select-types"
                       />
                     </FormGroup>
                   </Col>

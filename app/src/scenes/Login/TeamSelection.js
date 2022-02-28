@@ -9,17 +9,17 @@ import Title from '../../components/Title';
 import ScreenTitle from '../../components/ScreenTitle';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentTeamState, userState } from '../../recoil/auth';
-import { useRefresh } from '../../recoil/refresh';
+import { refreshTriggerState } from '../../components/Loader';
 
 const TeamBody = ({ onSelect }) => {
   const [loading, setLoading] = useState(false);
   const user = useRecoilValue(userState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
-  const { refresh } = useRefresh();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const onTeamSelected = async (teamIndex) => {
     setLoading(teamIndex);
-    refresh({ showFullScreen: true, initialLoad: true });
+    setRefreshTrigger({ status: true, options: { showFullScreen: true, initialLoad: true } });
     setCurrentTeam(user.teams[teamIndex]);
     setLoading(false);
     onSelect();

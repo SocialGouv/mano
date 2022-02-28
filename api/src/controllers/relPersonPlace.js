@@ -10,18 +10,17 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const { person, place } = req.body;
     if (!person || !place) return res.status(400).send({ ok: false, error: "Missing place or person" });
 
     const newRelPersonPlace = {};
 
     newRelPersonPlace.organisation = req.user.organisation;
-    newRelPersonPlace.user = req.user._id;
 
-    // Todo: ignore fields that are encrypted.
-    newRelPersonPlace.person = req.body.person || null;
-    newRelPersonPlace.place = req.body.place || null;
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in relPersonPlace create");
+    }
 
     if (req.body.hasOwnProperty("encrypted")) newRelPersonPlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newRelPersonPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
@@ -61,8 +60,6 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
-        // Not yet encrypted. Should it be?
-        "user",
       ],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });

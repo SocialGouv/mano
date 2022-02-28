@@ -22,13 +22,12 @@ export const refreshTriggerState = atom({
 
 const Loader = () => {
   const { loading, progress, fullScreen, ...refreshers } = useRefresh();
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-
   useEffect(() => {
     setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
   }, [fullScreen]);
 
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   useEffect(() => {
     if (refreshTrigger.status === false) return;
     if (refreshers[refreshTrigger.method]) refreshers[refreshTrigger.method](...refreshTrigger.options);

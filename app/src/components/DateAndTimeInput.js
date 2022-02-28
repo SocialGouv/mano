@@ -53,7 +53,19 @@ const formatDate = (date, withTime) => {
   return newDate.toISOString();
 };
 
-const DateAndTimeInput = ({ required, withTime, setWithTime, label, date, editable = true, setDate, showTime, showDay, showYear = false }) => {
+const DateAndTimeInput = ({
+  required,
+  withTime,
+  setWithTime,
+  label,
+  date,
+  editable = true,
+  setDate,
+  showTime,
+  showDay,
+  showYear = false,
+  testID = '',
+}) => {
   const [mode, setMode] = React.useState('date');
   const [visible, setVisible] = React.useState(false);
 
@@ -128,7 +140,7 @@ const DateAndTimeInput = ({ required, withTime, setWithTime, label, date, editab
       <InputContainer>
         {label && <Label bold label={label} />}
         <Inputs>
-          <InputSubContainer onPress={onDateChooseRequest}>
+          <InputSubContainer onPress={onDateChooseRequest} testID={testID}>
             <Input asPlaceholder={!date?.length}>{renderDate()}</Input>
             {!required && Boolean(date?.length) && <ButtonReset onPress={onClearDate} />}
           </InputSubContainer>

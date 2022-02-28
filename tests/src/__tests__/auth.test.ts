@@ -1,5 +1,9 @@
 import "expect-puppeteer";
+import { setDefaultOptions } from "expect-puppeteer";
 import { useSuperAdminAndOrga } from "../utils";
+
+jest.setTimeout(100000);
+setDefaultOptions({ timeout: 60000 });
 
 describe("Authentication page", () => {
   beforeEach(async () => {
@@ -41,6 +45,6 @@ describe("Authentication page", () => {
     await expect(page).toFill("#email", "superadmin@example.org");
     await expect(page).toFill("#password", "secret");
     await expect(page).toClick("button[type=submit]");
-    await expect(page).toMatch("Support");
+    await expect(page).toMatch("Support", { timeout: 4000 });
   });
 });

@@ -10,13 +10,13 @@ import Button from '../../components/Button';
 import Title, { SubTitle } from '../../components/Title';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentTeamState, userState } from '../../recoil/auth';
-import { useRefresh } from '../../recoil/refresh';
+import { refreshTriggerState } from '../../components/Loader';
 
 const CharteAcceptance = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const user = useRecoilValue(userState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
-  const { refresh } = useRefresh();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const onAccept = async () => {
     setLoading(true);
@@ -24,7 +24,7 @@ const CharteAcceptance = ({ navigation }) => {
     if (response.ok) {
       if (user?.teams?.length === 1) {
         setCurrentTeam(user.teams[0]);
-        refresh({ showFullScreen: true, initialLoad: true });
+        setRefreshTrigger({ status: true, options: { showFullScreen: true, initialLoad: true } });
         navigation.navigate('Home');
       } else {
         navigation.navigate('TeamSelection');

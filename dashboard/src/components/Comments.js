@@ -135,7 +135,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment,
     <>
       {!!newComment && !forPassages && <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />}
       <Modal isOpen={!!open} toggle={onCancelRequest} size="lg">
-        <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créér un' : 'Éditer le'} commentaire</ModalHeader>
+        <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={value}

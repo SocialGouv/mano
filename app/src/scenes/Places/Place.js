@@ -11,6 +11,7 @@ import ButtonDelete from '../../components/ButtonDelete';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import API from '../../services/api';
+import { MMKV } from '../../services/dataManagement';
 
 const Place = ({ navigation, route }) => {
   const [name, setName] = useState(false);
@@ -89,10 +90,18 @@ const Place = ({ navigation, route }) => {
     }
     if (response.ok) {
       setPlaces((places) => places.filter((p) => p._id !== placeDB._id));
+      await MMKV.setMapAsync(
+        'place',
+        places.filter((p) => p._id !== placeDB._id)
+      );
       for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === placeDB._id)) {
         await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
       }
       setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel.place !== placeDB._id));
+      await MMKV.setMapAsync(
+        'relPersonPlace',
+        relsPersonPlace.filter((rel) => rel.place !== placeDB._id)
+      );
       setUpdating(false);
       Alert.alert('Lieu supprimé !');
       onBack();

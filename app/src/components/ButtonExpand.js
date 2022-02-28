@@ -10,10 +10,10 @@ const hitSlop = {
   bottom: 20,
 };
 
-const ButtonExpand = ({ onPress, color = '#888', expanded }) => {
+const ButtonExpand = ({ onPress, color = '#888', expanded, testID = '' }) => {
   return (
     <ButtonContainer>
-      <TouchableWithoutFeedback onPress={onPress} hitSlop={hitSlop}>
+      <TouchableWithoutFeedback onPress={onPress} hitSlop={hitSlop} testID={testID}>
         <Icon expanded={expanded}>
           <ArrowRightIcon color={color} size={15} />
         </Icon>

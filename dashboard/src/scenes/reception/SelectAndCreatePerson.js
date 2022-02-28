@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import { usePersons } from '../../recoil/persons';
 
-const SelectAndCreatePerson = ({ value, onChange, autoCreate }) => {
+const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, classNamePrefix }) => {
   const { persons, addPerson } = usePersons();
 
   return (
@@ -39,6 +39,8 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate }) => {
       }}
       format
       creatable
+      inputId={inputId}
+      classNamePrefix={classNamePrefix}
     />
   );
 };

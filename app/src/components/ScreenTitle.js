@@ -27,6 +27,7 @@ const ScreenTitle = ({
   saving,
   children,
   parentScroll,
+  testID = '',
 }) => {
   const showRightButton = Boolean(onAdd) || Boolean(onEdit) || Boolean(onSave);
   const showLeftButton = showRightButton || Boolean(onBack);
@@ -52,7 +53,7 @@ const ScreenTitle = ({
           <View style={[styles.buttonsContainer, styles.buttonsContainerFixed]}>
             {!!showLeftButton && (
               <Animated.View style={styles.buttonContainer(Boolean(onBack))} pointerEvents={onBack ? 'auto' : 'none'}>
-                <TouchableOpacity hitSlop={hitSlop} onPress={onBack}>
+                <TouchableOpacity hitSlop={hitSlop} onPress={onBack} testID={`${testID}-back-button`}>
                   <ArrowLeftExtended color="#fff" size={20} />
                 </TouchableOpacity>
               </Animated.View>

@@ -6,10 +6,11 @@ import { Alert } from 'react-native';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { commentsState } from '../../recoil/comments';
+import { MMKV } from '../../services/dataManagement';
 
 const hitSlop = {
   top: 20,
@@ -20,7 +21,7 @@ const hitSlop = {
 
 const CommentRow = ({ onArrowPress, onPress, onUpdate, comment, createdAt, user: commentUser, showActionSheetWithOptions, id, metaCaption }) => {
   const user = useRecoilValue(userState);
-  const setComments = useSetRecoilState(commentsState);
+  const [comments, setComments] = useRecoilState(commentsState);
 
   const onPressRequest = async () => {
     if (onPress) return onPress();
@@ -57,6 +58,10 @@ const CommentRow = ({ onArrowPress, onPress, onUpdate, comment, createdAt, user:
     const response = await API.delete({ path: `/comment/${id}` });
     if (!response.ok) return Alert.alert(response.error);
     setComments((comments) => comments.filter((p) => p._id !== id));
+    await MMKV.setMapAsync(
+      'comment',
+      comments.filter((p) => p._id !== id)
+    );
   };
 
   return (

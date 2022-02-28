@@ -3,13 +3,13 @@ import styled from 'styled-components';
 import { Platform } from 'react-native';
 import colors from '../utils/colors';
 
-const SceneContainer = ({ children, debug, enabled = true, backgroundColor = colors.app.color }) => (
+const SceneContainer = ({ children, debug, enabled = true, backgroundColor = colors.app.color, testID = '' }) => (
   <KeyboardAvoidingView
     enabled={enabled}
     debug={debug}
     // keyboardVerticalOffset={Platform.select({ ios: 0, android: 0 })}
     behavior={Platform.select({ ios: 'padding', android: null })}>
-    <Container backgroundColor={backgroundColor} debug={debug}>
+    <Container testID={testID} backgroundColor={backgroundColor} debug={debug}>
       {children}
     </Container>
   </KeyboardAvoidingView>

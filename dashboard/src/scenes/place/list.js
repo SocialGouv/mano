@@ -120,7 +120,7 @@ const Create = () => {
         padding="12px 24px"
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
-        <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau lieux frequenté</ModalHeader>
+        <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau lieu frequenté</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={{ name: '', organisation: '' }}
@@ -140,12 +140,12 @@ const Create = () => {
                   <Col md={6}>
                     <FormGroup>
                       <div>Nom</div>
-                      <Input name="name" value={values.name} onChange={handleChange} />
+                      <Input name="name" id="create-place-name" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom loading={isSubmitting} color="info" onClick={handleSubmit} title="Créer" />
+                <ButtonCustom id="create-place-button" loading={isSubmitting} color="info" onClick={handleSubmit} title="Créer" />
               </React.Fragment>
             )}
           </Formik>

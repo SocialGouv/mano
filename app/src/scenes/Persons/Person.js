@@ -22,6 +22,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
+import { MMKV } from '../../services/dataManagement';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -176,6 +177,10 @@ const Person = ({ route, navigation }) => {
     if (res.error) {
       if (res.error === 'Not Found') {
         setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
+        await MMKV.setMapAsync(
+          'person',
+          persons.filter((p) => p._id !== personDB._id)
+        );
       } else {
         Alert.alert(res.error);
         return;
@@ -185,21 +190,47 @@ const Person = ({ route, navigation }) => {
       const actionRes = await API.delete({ path: `/action/${action._id}` });
       if (actionRes.ok) {
         setActions((actions) => actions.filter((a) => a._id !== action._id));
+        await MMKV.setMapAsync(
+          'action',
+          actions.filter((a) => a._id !== action._id)
+        );
         for (let comment of comments.filter((c) => c.action === action._id)) {
           const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-          if (commentRes.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
+          if (commentRes.ok) {
+            setComments((comments) => comments.filter((p) => p._id !== comment._id));
+            await MMKV.setMapAsync(
+              'comment',
+              comments.filter((p) => p._id !== comment._id)
+            );
+          }
         }
       }
     }
     for (let comment of comments.filter((c) => c.person === personDB._id)) {
       const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-      if (commentRes.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
+      if (commentRes.ok) {
+        setComments((comments) => comments.filter((p) => p._id !== comment._id));
+        await MMKV.setMapAsync(
+          'comment',
+          comments.filter((p) => p._id !== comment._id)
+        );
+      }
     }
     for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === personDB._id)) {
       const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-      if (res.ok) setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+      if (res.ok) {
+        setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+        await MMKV.setMapAsync(
+          'relPersonPlace',
+          relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id)
+        );
+      }
     }
     setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
+    await MMKV.setMapAsync(
+      'person',
+      persons.filter((p) => p._id !== personDB._id)
+    );
     Alert.alert('Personne supprimée !');
     onBack();
   };
@@ -261,7 +292,7 @@ const Person = ({ route, navigation }) => {
   };
 
   return (
-    <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}>
+    <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey} testID="person">
       <ScreenTitle
         title={person.name}
         onBack={onGoBackRequested}
@@ -269,6 +300,7 @@ const Person = ({ route, navigation }) => {
         onSave={!editable || isUpdateDisabled ? null : onUpdatePerson}
         saving={updating}
         backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+        testID="person"
       />
       <TabNavigator.Navigator
         tabBar={(props) => (

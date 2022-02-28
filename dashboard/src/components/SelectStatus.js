@@ -2,7 +2,7 @@ import React from 'react';
 import { mappedIdsToLabels } from '../recoil/actions';
 import SelectCustom from './SelectCustom';
 
-const SelectStatus = ({ onChange, value, name = 'status' }) => {
+const SelectStatus = ({ onChange, value, name = 'status', inputId = '', classNamePrefix = '' }) => {
   return (
     <SelectCustom
       options={mappedIdsToLabels}
@@ -10,6 +10,8 @@ const SelectStatus = ({ onChange, value, name = 'status' }) => {
       onChange={(v) => onChange({ target: { value: v?._id, name } })}
       getOptionValue={(i) => i?._id}
       getOptionLabel={(i) => mappedIdsToLabels.find((o) => o._id === i._id)?.name}
+      inputId={inputId}
+      classNamePrefix={classNamePrefix}
     />
   );
 };

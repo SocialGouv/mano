@@ -67,13 +67,13 @@ const View = () => {
 
   const report = currentTeamReports[reportIndex];
 
-  const onPreviousReport = () => {
+  const onFirstLaterReport = () => {
     if (reportIndex === currentTeamReports.length - 1) return;
     const prevReport = currentTeamReports[reportIndex + 1];
     if (!prevReport) return;
     history.push(`/report/${prevReport._id}`);
   };
-  const onNextReport = () => {
+  const onFirstBeforeReport = () => {
     if (reportIndex === 0) return;
     const nextReport = currentTeamReports[reportIndex - 1];
     if (!nextReport) return;
@@ -107,18 +107,21 @@ const View = () => {
 
   if (!report) return <Loading />;
 
-  const renderPrintOnly = () => (
-    <div className="printonly">
-      <Description report={report} />
-      <Reception report={report} />
-      <ActionCompletedAt date={report.date} status={DONE} />
-      <ActionCreatedAt date={report.date} />
-      <ActionCompletedAt date={report.date} status={CANCEL} />
-      <CommentCreatedAt date={report.date} />
-      <PassagesCreatedAt date={report.date} />
-      <TerritoryObservationsCreatedAt date={report.date} />
-    </div>
-  );
+  const renderPrintOnly = () => {
+    if (process.env.REACT_APP_TEST === 'true') return null;
+    return (
+      <div className="printonly">
+        <Description report={report} />
+        <Reception report={report} />
+        <ActionCompletedAt date={report.date} status={DONE} />
+        <ActionCreatedAt date={report.date} />
+        <ActionCompletedAt date={report.date} status={CANCEL} />
+        <CommentCreatedAt date={report.date} />
+        <PassagesCreatedAt date={report.date} />
+        <TerritoryObservationsCreatedAt date={report.date} />
+      </div>
+    );
+  };
 
   const renderScreenOnly = () => (
     <div className="noprint">
@@ -185,14 +188,14 @@ const View = () => {
                 <BackButtonWrapper caption="Supprimer" onClick={deleteData} />
               </div>
               <div style={{ display: 'flex' }}>
+                <ButtonCustom color="link" className="noprint" title="Précédent" disabled={reportIndex === 0} onClick={onFirstBeforeReport} />
                 <ButtonCustom
                   color="link"
                   className="noprint"
-                  title="Précédent"
+                  title="Suivant"
                   disabled={reportIndex === currentTeamReports.length - 1}
-                  onClick={onPreviousReport}
+                  onClick={onFirstLaterReport}
                 />
-                <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onNextReport} />
               </div>
             </div>
             <div>
@@ -253,7 +256,7 @@ const Reception = ({ report }) => {
       <Row style={{ marginBottom: 20, flexShrink: 0 }}>
         <Col md={4} />
         <Col md={4} style={{ marginBottom: 20 }}>
-          <Card title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
+          <Card countId="report-number-of-passages" title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
         </Col>
         <Col md={4} />
         {renderServices()}
@@ -416,7 +419,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
       <StyledBox>
         <Table
           className="Table"
-          title={`Commentaires' ajoutés le ${formatDateWithFullMonth(date)}`}
+          title={`Commentaires ajoutés le ${formatDateWithFullMonth(date)}`}
           data={data}
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {
@@ -506,10 +509,16 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
         <Row style={{ marginBottom: 20 }}>
           <Col md={2} />
           <Col md={4}>
-            <Card title="Nombre de passages anonymes" count={numberOfAnonymousPassages} unit={`passage${numberOfAnonymousPassages > 1 ? 's' : ''}`} />
+            <Card
+              countId="report-passages-anonymous-count"
+              title="Nombre de passages anonymes"
+              count={numberOfAnonymousPassages}
+              unit={`passage${numberOfAnonymousPassages > 1 ? 's' : ''}`}
+            />
           </Col>
           <Col md={4}>
             <Card
+              countId="report-passages-non-anonymous-count"
               title="Nombre de passages non-anonymes"
               count={numberOfNonAnonymousPassages}
               unit={`passage${numberOfNonAnonymousPassages > 1 ? 's' : ''}`}
@@ -696,25 +705,27 @@ const Description = ({ report }) => {
           )}
         </Formik>
       </DescriptionBox>
-      <DescriptionBox className="printonly" report={report}>
-        {!!report?.collaborations?.length && (
-          <>
-            <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
-            <p>{report?.collaborations.join(', ')}</p>
-          </>
-        )}
-        <Title>Description</Title>
-        <p>
-          {!report?.description
-            ? 'Pas de description'
-            : report?.description?.split('\n').map((sentence, index) => (
-                <React.Fragment key={index}>
-                  {sentence}
-                  <br />
-                </React.Fragment>
-              ))}
-        </p>
-      </DescriptionBox>
+      {process.env.REACT_APP_TEST !== 'true' && (
+        <DescriptionBox className="printonly" report={report}>
+          {!!report?.collaborations?.length && (
+            <>
+              <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
+              <p>{report?.collaborations.join(', ')}</p>
+            </>
+          )}
+          <Title>Description</Title>
+          <p>
+            {!report?.description
+              ? 'Pas de description'
+              : report?.description?.split('\n').map((sentence, index) => (
+                  <React.Fragment key={index}>
+                    {sentence}
+                    <br />
+                  </React.Fragment>
+                ))}
+          </p>
+        </DescriptionBox>
+      )}
     </>
   );
 };

@@ -12,7 +12,7 @@ const statuses = [
   CANCEL,
 ];
 
-const ActionStatusSelect = ({ value = CHOOSE, onSelect, onSelectAndSave, editable }) => {
+const ActionStatusSelect = ({ value = CHOOSE, onSelect, onSelectAndSave, editable, testID = 'action-status' }) => {
   if (!editable) {
     return (
       <Container>
@@ -24,6 +24,7 @@ const ActionStatusSelect = ({ value = CHOOSE, onSelect, onSelectAndSave, editabl
           onSelect={onSelect}
           onSelectAndSave={onSelectAndSave}
           editable={editable}
+          testID={testID}
         />
         <ButtonsContainer>
           {value !== CANCEL && (
@@ -60,6 +61,7 @@ const ActionStatusSelect = ({ value = CHOOSE, onSelect, onSelectAndSave, editabl
       onSelect={onSelect}
       onSelectAndSave={onSelectAndSave}
       editable={editable}
+      testID={testID}
     />
   );
 };

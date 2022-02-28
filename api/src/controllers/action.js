@@ -10,26 +10,19 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const newAction = {};
 
     newAction.organisation = req.user.organisation;
-    newAction.user = req.user._id;
-    newAction.team = req.body.team;
 
-    if (!req.body.team) return res.status(400).send({ ok: false, error: "Team is required" });
-    if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
-      return res.send(403).send({ ok: false, error: "No team while creating action" });
-    }
-
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("name")) newAction.name = req.body.name || null;
-    if (req.body.hasOwnProperty("person")) newAction.person = req.body.person || null;
+    // These fields are not encrypted
     if (req.body.hasOwnProperty("status")) newAction.status = req.body.status || null;
     if (req.body.hasOwnProperty("dueAt")) newAction.dueAt = req.body.dueAt || null;
-    if (req.body.hasOwnProperty("withTime")) newAction.withTime = req.body.withTime || null;
     if (req.body.hasOwnProperty("completedAt")) newAction.completedAt = req.body.completedAt || null;
-    if (req.body.hasOwnProperty("structure")) newAction.structure = req.body.structure || null;
+    // Encrypted fields.
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in action creation");
+    }
     if (req.body.hasOwnProperty("encrypted")) newAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -87,12 +80,6 @@ router.get(
         "dueAt",
         "completedAt",
         // All other fields are encrypted and should not be returned.
-
-        // WARNING!
-        // Temporary fix: we need to return the team, user and structure since it's currently not returned by mobile
-        "team",
-        "structure",
-        "user",
       ],
     });
     const todo = actions.filter((a) => a.status === TODO);
@@ -108,27 +95,24 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const where = { _id: req.params._id };
     where.organisation = req.user.organisation;
-    if (req.user.role !== "admin") where.team = req.user.teams.map((e) => e._id);
+    // Todo: check team before updating action for non-admin.
 
     let action = await Action.findOne({ where });
     if (!action) return res.status(404).send({ ok: false, error: "Not Found" });
 
     const updateAction = {};
 
-    // Todo: ignore fields that are encrypted.
+    // These fields are not encrypted
     if (req.body.hasOwnProperty("status")) updateAction.status = req.body.status || null;
-    if (req.body.hasOwnProperty("withTime")) updateAction.withTime = req.body.withTime || null;
     if (req.body.hasOwnProperty("dueAt")) updateAction.dueAt = req.body.dueAt || null;
     if (req.body.hasOwnProperty("completedAt")) updateAction.completedAt = req.body.completedAt || null;
-    if (req.body.hasOwnProperty("category")) updateAction.category = req.body.category || null;
-    if (req.body.hasOwnProperty("categories")) updateAction.categories = req.body.categories || null;
-    if (req.body.hasOwnProperty("person")) updateAction.person = req.body.person || null;
-    if (req.body.hasOwnProperty("structure")) updateAction.structure = req.body.structure || null;
-    if (req.body.hasOwnProperty("name")) updateAction.name = req.body.name || null;
-    if (req.body.hasOwnProperty("description")) updateAction.description = req.body.description || null;
+    // Encrypted fields.
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in action update");
+    }
     if (req.body.hasOwnProperty("encrypted")) updateAction.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updateAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -150,7 +134,6 @@ router.delete(
       },
     };
 
-    if (req.user.role !== "admin") query.where.team = req.user.teams.map((e) => e._id);
     let action = await Action.findOne(query);
     if (!action) return res.status(200).send({ ok: true });
 

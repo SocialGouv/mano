@@ -27,6 +27,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
+import { MMKV } from '../../services/dataManagement';
 
 const castToAction = (action = {}) => ({
   name: action.name?.trim() || '',
@@ -212,6 +213,11 @@ const Action = ({ navigation, route }) => {
   const onUpdateActionRequest = async () => {
     setUpdating(true);
     const multipleActions = route?.params?.actions?.length > 1;
+    if (!action.name.trim()) {
+      Alert.alert("Vous devez rentrer un nom d'action");
+      setUpdating(false);
+      return false;
+    }
     if (!action.dueAt) {
       Alert.alert("Vous devez rentrer une date d'échéance");
       setUpdating(false);
@@ -277,6 +283,7 @@ const Action = ({ navigation, route }) => {
         name,
         person,
         team: currentTeam._id,
+        user: user._id,
         dueAt,
         withTime,
         status: TODO,
@@ -319,9 +326,19 @@ const Action = ({ navigation, route }) => {
       setActions((actions) => actions.filter((a) => a._id !== id));
       for (let comment of comments.filter((c) => c.action === id)) {
         const res = await API.delete({ path: `/comment/${comment._id}` });
-        if (res.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
+        if (res.ok) {
+          setComments((comments) => comments.filter((p) => p._id !== comment._id));
+          await MMKV.setMapAsync(
+            'comment',
+            comments.filter((p) => p._id !== comment._id)
+          );
+        }
       }
     }
+    await MMKV.setMapAsync(
+      'action',
+      actions.filter((a) => a._id !== id)
+    );
     return res;
   };
 
@@ -375,11 +392,12 @@ const Action = ({ navigation, route }) => {
   return (
     <SceneContainer>
       <ScreenTitle
-        title={persons?.length && persons.length === 1 ? `${name} - ${persons[0].name}` : name}
+        title={persons?.length && persons.length === 1 ? `${name} - ${persons[0]?.name}` : name}
         onBack={onGoBackRequested}
         onEdit={!editable ? () => setEditable(true) : null}
         onSave={!editable || isUpdateDisabled ? null : onUpdateActionRequest}
         saving={updating}
+        testID="action"
       />
       <ScrollContainer ref={scrollViewRef}>
         {!!action.user && <UserName metaCaption="Action ajoutée par" id={action.user?._id || action.user} />}
@@ -389,6 +407,7 @@ const Action = ({ navigation, route }) => {
           value={name}
           placeholder="Nom de l’action"
           editable={editable}
+          testID="action-name"
         />
         {persons.length < 2 ? (
           <InputFromSearchList

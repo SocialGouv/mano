@@ -103,13 +103,14 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const newPerson = {};
 
     newPerson.organisation = req.user.organisation;
-    newPerson.user = req.user._id;
 
-    if (req.body.hasOwnProperty("name")) newPerson.name = req.body.name;
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in person create");
+    }
     if (req.body.hasOwnProperty("encrypted")) newPerson.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) newPerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
@@ -148,20 +149,8 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
-        // These fields should be encrypted but it seems they are not for some reason.
-        // We have to keep them, then find a solution to re-encrypt them all then drop them.
-        // This will be hard to maintain.
-        "reason", // Maybe not used since we have "reasons" field.
-        "startTakingCareAt", // Seems to be not used.
-        "outOfActiveList", // Should have been stored in encrypted fields.
-        // "vulnerabilities" and "consumptions" were removed but should have been previously encrypted.
       ],
     });
-
-    if (ENCRYPTED_FIELDS_ONLY) return res.status(200).send({ ok: true, hasMore: data.length === limit, data, total });
-
-    // Todo: check if relTeamPerson is always needed in full encryption mode.
-    const teams = await Team.findAll(query);
 
     return res.status(200).send({
       ok: true,
@@ -175,7 +164,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const query = {
       where: {
         _id: req.params._id,
@@ -186,23 +175,20 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    // Maybe this is not needed anymore.
-    if (!person.user) req.body.user = req.user._id; // mitigate weird bug that puts no user for person creation
+    const updatePerson = {};
 
-    // Maybe this is not needed anymore.
-    if (["Non", ""].includes(req.body.address)) {
-      req.body.addressDetail = "";
+    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
+      return next("No encrypted field in person update");
     }
-
-    if (req.body.createdAt) {
+    if (req.body.hasOwnProperty("encrypted")) updatePerson.encrypted = req.body.encrypted || null;
+    if (req.body.hasOwnProperty("encryptedEntityKey")) updatePerson.encryptedEntityKey = req.body.encryptedEntityKey || null;
+    // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
+    if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
       person.changed("createdAt", true);
-      req.body.createdAt = new Date(req.body.createdAt);
-    } else {
-      req.body.createdAt = person.createdAt;
+      updatePerson.createdAt = new Date(req.body.createdAt);
     }
-
     await Person.update(req.body, query, { silent: false });
-    const newPerson = await Person.findOne({ ...query });
+    const newPerson = await Person.findOne(query);
     res.status(200).send({ ok: true, data: newPerson.toJSON() });
   })
 );

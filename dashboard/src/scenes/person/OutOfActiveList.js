@@ -51,6 +51,8 @@ const OutOfActiveList = ({ person }) => {
                           name="outOfActiveListReason"
                           value={values.outOfActiveListReason || ''}
                           onChange={handleChange}
+                          inputId="person-select-outOfActiveListReason"
+                          classNamePrefix="person-select-outOfActiveListReason"
                         />
                       </label>
                     </FormGroup>

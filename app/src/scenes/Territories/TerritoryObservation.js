@@ -13,6 +13,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
+import { MMKV } from '../../services/dataManagement';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -157,6 +158,10 @@ const TerritoryObservation = ({ route, navigation }) => {
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
       setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obsDB._id));
+      await MMKV.setMapAsync(
+        'territory-observation',
+        allTerritoryOservations.filter((p) => p._id !== obsDB._id)
+      );
       Alert.alert('Observation supprimée !');
       onBack();
     }
@@ -218,8 +223,9 @@ const TerritoryObservation = ({ route, navigation }) => {
         onEdit={!editable ? onEdit : null}
         onSave={!editable || isUpdateDisabled ? null : onSaveObservation}
         saving={updating}
+        testID="observation"
       />
-      <ScrollContainer ref={scrollViewRef}>
+      <ScrollContainer ref={scrollViewRef} testID="observation">
         <View>
           <CreatedAt>{new Date(obs?.createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
           {customFieldsObs

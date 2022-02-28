@@ -7,13 +7,12 @@ import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
-import { currentTeamState } from '../../recoil/auth';
 import API from '../../services/api';
+import { MMKV } from '../../services/dataManagement';
 
 const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
-  const currentTeam = useRecoilValue(currentTeamState);
   const [comments, setComments] = useRecoilState(commentsState);
   const commentDB = useMemo(() => comments.find((c) => c._id === route.params?._id), [comments, route?.params]);
 
@@ -30,10 +29,8 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
     const response = await API.put({
       path: `/comment/${commentDB._id}`,
       body: prepareCommentForEncryption({
+        ...commentDB,
         comment: comment.trim(),
-        team: currentTeam._id,
-        _id: commentDB._id,
-        entityKey: commentDB.entityKey,
       }),
     });
     if (response.error) {
@@ -59,6 +56,10 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
       setComments((comments) => comments.filter((p) => p._id !== commentDB._id));
+      await MMKV.setMapAsync(
+        'comment',
+        comments.filter((p) => p._id !== commentDB._id)
+      );
       Alert.alert('Commentaire supprimé !');
       onBack();
     }
@@ -127,7 +128,7 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title={`${route?.params?.name} - Commentaire`} onBack={onGoBackRequested} />
+      <ScreenTitle title={`${route?.params?.name} - Commentaire`} onBack={onGoBackRequested} testID="comment" />
       <ScrollContainer>
         <View>
           <InputLabelled label="Commentaire" onChangeText={writeComment} value={comment} placeholder="Description" multiline />

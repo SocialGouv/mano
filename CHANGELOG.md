@@ -1,3 +1,92 @@
+## [1.58.3](https://github.com/SocialGouv/mano/compare/v1.58.2...v1.58.3) (2022-02-25)
+
+
+### Bug Fixes
+
+* **api:** remove orgEncryptionKeyCacheForDebug ([244d406](https://github.com/SocialGouv/mano/commit/244d406f87bd62431ddfefa3d012ae8f35c46980))
+
+## [1.58.2](https://github.com/SocialGouv/mano/compare/v1.58.1...v1.58.2) (2022-02-25)
+
+
+### Bug Fixes
+
+* **api:** remove capture ([379c7fe](https://github.com/SocialGouv/mano/commit/379c7fe0bdc38d6a14dd880d048df174c8ad57a7))
+
+## [1.58.1](https://github.com/SocialGouv/mano/compare/v1.58.0...v1.58.1) (2022-02-25)
+
+
+### Bug Fixes
+
+* bump ([5752399](https://github.com/SocialGouv/mano/commit/5752399ef0f267e7bffe2828ffa557309b814247))
+* up ([1c6bdd0](https://github.com/SocialGouv/mano/commit/1c6bdd01b8d7c2bbe0b65b5bbb7f52c35bf5f4f7))
+* **api:** action update ([a0e9b56](https://github.com/SocialGouv/mano/commit/a0e9b56fdbbf089ff911f879739906f6c7889958))
+* **api:** only admin can update org ([c3bce83](https://github.com/SocialGouv/mano/commit/c3bce83a47577d28a4270c1deadfd1c78d3cd0fb))
+* **api:** remove team check since it does not exist anymore on tables ([f147dff](https://github.com/SocialGouv/mano/commit/f147dff82d7a782caf0d6a9586a14d99de10493f))
+* **app:** text color on dark mode ([#395](https://github.com/SocialGouv/mano/issues/395)) ([8c0038c](https://github.com/SocialGouv/mano/commit/8c0038c5d999af1340863779a816048d025e7a01))
+
+# [1.58.0](https://github.com/SocialGouv/mano/compare/v1.57.2...v1.58.0) (2022-02-25)
+
+
+### Features
+
+* remove encrypted field from columns ([#364](https://github.com/SocialGouv/mano/issues/364)) ([d76fcc3](https://github.com/SocialGouv/mano/commit/d76fcc3502ef7a21e3f9ea67e7fdab25c0a96825))
+
+## [1.57.2](https://github.com/SocialGouv/mano/compare/v1.57.1...v1.57.2) (2022-02-25)
+
+
+### Bug Fixes
+
+* **app:** refactor refresher + fix clear cache when change organisation ([#394](https://github.com/SocialGouv/mano/issues/394)) ([4a1b151](https://github.com/SocialGouv/mano/commit/4a1b151cf069821f1fc45d1e28c47295a853f962))
+
+## [1.57.1](https://github.com/SocialGouv/mano/compare/v1.57.0...v1.57.1) (2022-02-25)
+
+
+### Bug Fixes
+
+* update yarn.lock ([fae2114](https://github.com/SocialGouv/mano/commit/fae21142614c7d757894b2456e08e7a9656657e0))
+
+# [1.57.0](https://github.com/SocialGouv/mano/compare/v1.56.3...v1.57.0) (2022-02-24)
+
+
+### Features
+
+* **app,api:** new version ([#393](https://github.com/SocialGouv/mano/issues/393)) ([df9dd0d](https://github.com/SocialGouv/mano/commit/df9dd0d7e6dad91a223d203c15b506ec4864753a))
+
+## [1.56.3](https://github.com/SocialGouv/mano/compare/v1.56.2...v1.56.3) (2022-02-24)
+
+
+### Bug Fixes
+
+* **app:** cannot update aciton with no name ([#392](https://github.com/SocialGouv/mano/issues/392)) ([a01b2dc](https://github.com/SocialGouv/mano/commit/a01b2dcc7b512f49cc313a3eb77b41109b1d87f9))
+
+## [1.56.2](https://github.com/SocialGouv/mano/compare/v1.56.1...v1.56.2) (2022-02-24)
+
+
+### Bug Fixes
+
+* **app,dashboard:**  last fixes before encryption ([#391](https://github.com/SocialGouv/mano/issues/391)) ([06a3a8a](https://github.com/SocialGouv/mano/commit/06a3a8a286e1922c1d8e7f04eec924323e509543))
+
+## [1.56.1](https://github.com/SocialGouv/mano/compare/v1.56.0...v1.56.1) (2022-02-24)
+
+
+### Bug Fixes
+
+* **app:** remove mano-tests from dependencies ([#388](https://github.com/SocialGouv/mano/issues/388)) ([d26373d](https://github.com/SocialGouv/mano/commit/d26373db8a3b127ac77f367ee354b58efd99dd5f))
+
+# [1.56.0](https://github.com/SocialGouv/mano/compare/v1.55.0...v1.56.0) (2022-02-24)
+
+
+### Features
+
+* **app:** test with detox ([#387](https://github.com/SocialGouv/mano/issues/387)) ([be86e19](https://github.com/SocialGouv/mano/commit/be86e19939407b4ebcb90c9126bd824bf307ca7b))
+
+# [1.55.0](https://github.com/SocialGouv/mano/compare/v1.54.3...v1.55.0) (2022-02-23)
+
+
+### Features
+
+* **dashboard:** tests persons/actions/territories ([#382](https://github.com/SocialGouv/mano/issues/382)) ([08b1857](https://github.com/SocialGouv/mano/commit/08b1857f95f76cabc5211a8a70f0c62231f5191c))
+
 ## [1.54.3](https://github.com/SocialGouv/mano/compare/v1.54.2...v1.54.3) (2022-02-22)
 
 

@@ -26,6 +26,7 @@ import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
+import { MMKV } from '../../services/dataManagement';
 
 const PersonSummary = ({
   navigation,
@@ -66,6 +67,10 @@ const PersonSummary = ({
           const response = await API.delete({ path: `/relPersonPlace/${relPersPlace?._id}` });
           if (response.ok) {
             setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id));
+            await MMKV.setMapAsync(
+              'relPersonPlace',
+              relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id)
+            );
           }
           if (!response.ok) return Alert.alert(response.error);
         }
@@ -133,7 +138,7 @@ const PersonSummary = ({
   const teams = useRecoilValue(teamsState);
 
   return (
-    <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
+    <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
       {person.outOfActiveList && (
         <AlterOutOfActiveList>
           <Text style={{ color: colors.app.colorWhite }}>
@@ -272,6 +277,7 @@ const PersonSummary = ({
       <SubList
         label="Actions"
         onAdd={onAddActionRequest}
+        testID="person-actions-list"
         data={actions}
         renderItem={(action, index) => (
           <ActionRow
@@ -279,6 +285,7 @@ const PersonSummary = ({
             action={action}
             showStatus
             withTeamName
+            testID="person-action"
             onActionPress={() => {
               Sentry.setContext('action', { _id: action._id });
               navigation.push('Actions', {

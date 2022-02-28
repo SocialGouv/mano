@@ -16,7 +16,6 @@ const getUrl = (path, query) => {
 
 /* encryption */
 export let hashedOrgEncryptionKey = null;
-let orgEncryptionKeyCacheForDebug = null; // TO BE REMOVED WHEN WE ARE HAPPY WITH ENCRYPTION
 let enableEncrypt = false;
 let blockEncrypt = false;
 let sendCaptureError = 0; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryptionVerificationKey`
@@ -34,11 +33,9 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
       toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
       return false;
     }
-    capture(`Pour orga ${name} ${_id}: ${orgEncryptionKey}`);
   }
   hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
   enableEncrypt = true;
-  orgEncryptionKeyCacheForDebug = orgEncryptionKey; // for debug only
   sendCaptureError = 0;
   wrongKeyWarned = false;
   blockEncrypt = false;
@@ -93,7 +90,6 @@ const decryptDBItem = async (item, { logout, debug = false, encryptedVerificatio
         extra: {
           message: 'ERROR DECRYPTING ITEM',
           item,
-          orgEncryptionKeyCacheForDebug,
           hashedOrgEncryptionKey,
         },
       });
@@ -140,7 +136,6 @@ const useApi = () => {
   const reset = () => {
     hashedOrgEncryptionKey = null;
     enableEncrypt = false;
-    orgEncryptionKeyCacheForDebug = null;
     tokenCached = null;
     sendCaptureError = 0;
     wrongKeyWarned = false;
