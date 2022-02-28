@@ -1,3 +1,10 @@
+# [1.60.0](https://github.com/SocialGouv/mano/compare/v1.59.0...v1.60.0) (2022-02-28)
+
+
+### Features
+
+* **dashboard:** refresh button everywhere ([#404](https://github.com/SocialGouv/mano/issues/404)) ([a3ac762](https://github.com/SocialGouv/mano/commit/a3ac76226eef3d9d63e6740391bc751b8a265175))
+
 # [1.59.0](https://github.com/SocialGouv/mano/compare/v1.58.4...v1.59.0) (2022-02-28)
 
 
