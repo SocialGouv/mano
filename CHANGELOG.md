@@ -1,3 +1,10 @@
+# [1.59.0](https://github.com/SocialGouv/mano/compare/v1.58.4...v1.59.0) (2022-02-28)
+
+
+### Features
+
+* **dashboard:** show date also in comment research ([#403](https://github.com/SocialGouv/mano/issues/403)) ([270283a](https://github.com/SocialGouv/mano/commit/270283a639d1c9ef004575071391e1e75b699421))
+
 ## [1.58.4](https://github.com/SocialGouv/mano/compare/v1.58.3...v1.58.4) (2022-02-28)
 
 
