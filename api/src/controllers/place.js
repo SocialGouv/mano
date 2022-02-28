@@ -85,9 +85,6 @@ router.put(
     if (req.body.hasOwnProperty("encrypted")) updatePlace.encrypted = req.body.encrypted || null;
     if (req.body.hasOwnProperty("encryptedEntityKey")) updatePlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const place = await Place.findOne(query);
-    if (!place) return res.status(404).send({ ok: false, error: "Not found" });
-
     place.set(updatePlace);
     await place.save();
 
