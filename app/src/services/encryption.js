@@ -123,6 +123,19 @@ const encryptVerificationKey = async (masterKey_base64) => {
   return encryptedVerificationKey;
 };
 
+// Encrypt a file with the master key + entity key, and return the encrypted file and the entity key
+// (file: Base64, masterKey: Base64) => Promise<{encryptedFile: File, encryptedEntityKey: Uint8Array}>
+const encryptFile = async (fileInBase64, masterKey_base64) => {
+  const entityKey_base64 = await generateEntityKey();
+  const encryptedFile = await _encrypt_and_prepend_nonce(fileInBase64, entityKey_base64);
+  const encryptedEntityKey = await _encrypt_and_prepend_nonce(entityKey_base64, masterKey_base64);
+
+  return {
+    encryptedFile: encryptedFile,
+    encryptedEntityKey: encryptedEntityKey,
+  };
+};
+
 const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey) => {
   try {
     const decrypted = await _decrypt_after_extracting_nonce(encryptedVerificationKey, masterKey);
@@ -135,4 +148,4 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   return false;
 };
 
-export { derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey };
+export { derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey, encryptFile };

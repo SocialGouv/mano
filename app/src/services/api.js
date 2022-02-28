@@ -1,11 +1,12 @@
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
 import { capture } from './sentry';
+import ReactNativeBlobUtil from 'react-native-blob-util';
 
 class ApiService {
-  getUrl = (path, query) => {
+  getUrl = (path, query = {}) => {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
   };
 
@@ -210,6 +211,41 @@ class ApiService {
       this.blockEncrypt = this.enableEncrypt && errorDecrypt.message.includes('FAILURE');
     }
     return item;
+  };
+
+  // Upload a file to a path.
+  upload = async ({ file, path }) => {
+    // Prepare file.
+    const { encryptedEntityKey, encryptedFile } = await encryptFile(file.base64, this.hashedOrgEncryptionKey);
+
+    // https://github.com/RonRadtke/react-native-blob-util#multipartform-data-example-post-form-data-with-file-and-data
+
+    const url = this.getUrl(path);
+    const response = await ReactNativeBlobUtil.fetch(
+      'POST',
+      url,
+      { 'Content-Type': 'multipart/form-data', Authorization: `JWT ${this.token}`, Accept: 'application/json', platform: 'app', version },
+      [
+        // element with property `filename` will be transformed into `file` in form data
+        { name: 'file', filename: file.fileName, mime: file.type, type: file.type, data: encryptedFile },
+        // custom content type
+        // { name: 'avatar-png', filename: 'avatar-png.png', type: 'image/png', data: binaryDataInBase64 },
+        // // part file from storage
+        // { name: 'avatar-foo', filename: 'avatar-foo.png', type: 'image/foo', data: ReactNativeBlobUtil.wrap(path_to_a_file) },
+        // // elements without property `filename` will be sent as plain text
+        // { name: 'name', data: 'user' },
+        // {
+        //   name: 'info',
+        //   data: JSON.stringify({
+        //     mail: 'example@example.com',
+        //     tel: '12345678',
+        //   }),
+        // },
+      ]
+    );
+
+    const json = await response.json();
+    return { ...json, encryptedEntityKey };
   };
 }
 

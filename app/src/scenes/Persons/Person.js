@@ -82,6 +82,7 @@ const Person = ({ route, navigation }) => {
         entityKey: person.entityKey || '',
         outOfActiveList: person.outOfActiveList || false,
         outOfActiveListReason: person.outOfActiveListReason || '',
+        documents: person.documents || [],
       };
     },
     [customFieldsPersonsMedical, customFieldsPersonsSocial]
@@ -339,6 +340,7 @@ const Person = ({ route, navigation }) => {
               navigation={navigation}
               route={route}
               person={person}
+              personDB={personDB}
               backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
               onChange={onChange}
               onUpdatePerson={onUpdatePerson}

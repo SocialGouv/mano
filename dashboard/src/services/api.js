@@ -10,7 +10,7 @@ import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVe
 import { AppSentry, capture } from './sentry';
 const fetch = fetchRetry(window.fetch);
 
-const getUrl = (path, query) => {
+const getUrl = (path, query = {}) => {
   return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
 };
 
@@ -175,7 +175,7 @@ const useApi = () => {
       body: formData,
       headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version },
     };
-    const url = getUrl(path, {});
+    const url = getUrl(path);
     const response = await fetch(url, options);
     const json = await response.json();
     return { ...json, encryptedEntityKey };
@@ -189,7 +189,7 @@ const useApi = () => {
       credentials: 'include',
       headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
-    const url = getUrl(path, {});
+    const url = getUrl(path);
     const response = await fetch(url, options);
     const blob = await response.blob();
     const decrypted = await decryptFile(blob, encryptedEntityKey, hashedOrgEncryptionKey);
@@ -203,7 +203,7 @@ const useApi = () => {
       credentials: 'include',
       headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
-    const url = getUrl(path, {});
+    const url = getUrl(path);
     const response = await fetch(url, options);
     return await response.json();
   };
