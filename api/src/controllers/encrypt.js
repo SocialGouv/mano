@@ -12,6 +12,7 @@ const Territory = require("../models/territory");
 const Report = require("../models/report");
 const TerritoryObservation = require("../models/territoryObservation");
 const sequelize = require("../db/sequelize");
+const { capture } = require("../sentry");
 
 // this controller is required BECAUSE
 // if we encrypt one by one each of the actions, persons, comments, territories, observations, places, reports
@@ -93,10 +94,10 @@ router.post(
           encrypting: false,
           encryptedVerificationKey: req.body.encryptedVerificationKey,
         });
-        await organisation.save();
+        await organisation.save({ transaction: tx });
       });
     } catch (e) {
-      console.log("error encrypting", e);
+      capture("error encrypting", e);
       organisation.set({ encrypting: false });
       await organisation.save();
       throw e;
