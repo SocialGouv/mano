@@ -16,12 +16,13 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
   const API = useApi();
 
   const onChangeRequest = (newCollabs) => {
+    console.log({ newCollabs });
     onChange({ currentTarget: { value: newCollabs || [], name: 'collaborations' } });
   };
 
   const onCreateOption = async (collab) => {
     toastr.info('Création de la nouvelle collaboration...');
-    onChangeRequest([...(organisation.collaborations || []), collab]);
+    onChangeRequest([...(values || []), collab]);
     await new Promise((res) => setTimeout(res, 2000));
     const response = await API.put({
       path: `/organisation/${organisation._id}`,
@@ -31,9 +32,9 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
       toastr.clean();
       toastr.success('Collaboration créée !');
       setOrganisation(response.data);
-      onChangeRequest([...(organisation.collaborations || []), collab]);
+      onChangeRequest([...(values || []), collab]);
     } else {
-      onChangeRequest(organisation.collaborations || []);
+      onChangeRequest(values || []);
     }
   };
 

@@ -31,7 +31,7 @@ const List = () => {
             options: [],
           });
         }}
-        loading={loading}
+        loading={!!loading}
       />
       {getMonths().map((date, index) => (
         <HitMonth debug={index === 0} date={date} key={date} reports={reports} team={currentTeam} />
