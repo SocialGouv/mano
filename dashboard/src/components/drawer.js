@@ -1,8 +1,6 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { DropdownToggle } from 'reactstrap';
-import logo from '../assets/logo-green.png';
 
 import { theme } from '../config';
 

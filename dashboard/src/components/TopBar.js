@@ -144,32 +144,6 @@ const Organisation = styled.div`
   letter-spacing: -0.01em;
 `;
 
-const Nav = styled.div`
-  a {
-    text-decoration: none;
-    padding: 0px;
-    display: block;
-    border-radius: 8px;
-    color: ${theme.black75};
-    font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 24px;
-    margin: 2px 0;
-  }
-  a.active,
-  a:hover {
-    background-color: ${theme.mainLight};
-    color: ${theme.main};
-  }
-  a:hover {
-    opacity: 0.6;
-  }
-  li {
-    list-style-type: none;
-  }
-`;
-
 const DropdownToggleStyled = styled(DropdownToggle)`
   border-radius: 40px !important;
   padding: 0px 20px;
