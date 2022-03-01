@@ -19,7 +19,7 @@ import { useRelsPerson } from '../../recoil/relPersonPlace';
 import { usePlaces } from '../../recoil/places';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateWithFullMonth } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -96,7 +96,9 @@ const Create = () => {
   const [open, setOpen] = useState(false);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const { addPlace, loading } = usePlaces();
+  const loading = useRecoilValue(loadingState);
+  const { addPlace } = usePlaces();
+
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
       <LinkButton

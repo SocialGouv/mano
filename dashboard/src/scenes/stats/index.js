@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Col, Container, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -13,7 +13,6 @@ import {
   ressourcesOptions,
   filterPersonsBase,
   personsState,
-  usePersons,
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
 } from '../../recoil/persons';
@@ -23,14 +22,14 @@ import { CustomResponsiveBar, CustomResponsivePie } from '../../components/chart
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsState, useActions } from '../../recoil/actions';
+import { actionsState } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { useTerritories } from '../../recoil/territory';
 import { passagesNonAnonymousPerDatePerTeamSelector } from '../../recoil/selectors';
 import { dayjsInstance } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -48,9 +47,7 @@ const Stats = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
 
-  const { loading: personsLoading } = usePersons();
   const allPersons = useRecoilValue(personsState);
-  const { loading: actionsLoading } = useActions();
   const allActions = useRecoilValue(actionsState);
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
@@ -59,7 +56,7 @@ const Stats = () => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const { territories } = useTerritories();
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const [loading, setLoading] = useState(false);
+  const loading = useRecoilValue(loadingState);
   const [territory, setTerritory] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
@@ -78,19 +75,6 @@ const Stats = () => {
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
   };
-
-  useEffect(() => {
-    if (loading) {
-      setRefreshTrigger({
-        status: true,
-        options: { initialLoad: false, showFullScreen: false },
-      });
-    }
-  }, [loading]);
-
-  useEffect(() => {
-    if (!personsLoading && !actionsLoading) setLoading(false);
-  }, [personsLoading, actionsLoading]);
 
   if (loading) return <Loading />;
 
@@ -141,7 +125,12 @@ const Stats = () => {
           </>
         }
         titleStyle={{ fontWeight: 400 }}
-        onRefresh={() => setLoading(true)}
+        onRefresh={() =>
+          setRefreshTrigger({
+            status: true,
+            options: { initialLoad: false, showFullScreen: false },
+          })
+        }
       />
       <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center' }}>
         <Col md={4}>
