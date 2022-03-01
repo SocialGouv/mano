@@ -17,9 +17,9 @@ import PaginationContext from '../../contexts/pagination';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesFullSearchSelector } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { useRefresh } from '../../recoil/refresh';
 import { formatDateWithFullMonth } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
+import { loadingState } from '../../components/Loader';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
@@ -80,7 +80,7 @@ const CreateTerritory = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const { addTerritory } = useTerritories();
-  const { loading } = useRefresh();
+  const loading = useRecoilValue(loadingState);
 
   return (
     <CreateStyle>
@@ -89,8 +89,7 @@ const CreateTerritory = () => {
         onClick={() => {
           setRefreshTrigger({
             status: true,
-            method: 'territoriesRefresher',
-            options: [],
+            options: { initialLoad: false, showFullScreen: false },
           });
         }}
         color="link"

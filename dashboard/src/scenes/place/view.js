@@ -46,8 +46,7 @@ const View = () => {
         onRefresh={() =>
           setRefreshTrigger({
             status: true,
-            method: 'placesAndRelationsRefresher',
-            options: [],
+            options: { initialLoad: false, showFullScreen: false },
           })
         }
       />

@@ -12,14 +12,15 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import useApi, { setOrgEncryptionKey, hashedOrgEncryptionKey } from '../../services/api';
-import { encryptVerificationKey } from '../../services/encryption';
-import { AppSentry, capture } from '../../services/sentry';
+import useApi, { setOrgEncryptionKey } from '../../services/api';
+import { AppSentry } from '../../services/sentry';
 import { refreshTriggerState } from '../../components/Loader';
+import { loadingState } from '../../components/Loader';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
+  const setGlobalLoading = useSetRecoilState(loadingState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
@@ -34,28 +35,28 @@ const SignIn = () => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const API = useApi();
 
-  // temporary migration : until all organisations have an `encryptedVerificationKey`
-  const setEncryptionVerificationKey = async (organisation, user) => {
-    if (!organisation.encryptionEnabled) return;
-    if (!organisation.encryptedVerificationKey) {
-      capture(`setting encryptedVerificationKey : ${organisation.name}`);
-      const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
-      const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
-      if (orgRes.ok) setOrganisation(orgRes.data);
-    }
-  };
-
-  const onSigninValidated = async (organisation, user) => {
-    setRefreshTrigger({
-      status: true,
-      method: 'refresh',
-      options: [{ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation, user)],
-    });
+  useEffect(() => {
+    if (refreshTrigger.status !== true) return;
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
       history.push('/action');
     }
+  }, [organisation, refreshTrigger]);
+
+  const onSigninValidated = async (organisation, user) => {
+    setRefreshTrigger({
+      status: true,
+      options: { initialLoad: true, showFullScreen: true },
+    });
+    setGlobalLoading('Initialisation...');
+    /*
+    if (!!organisation?.receptionEnabled) {
+      history.push('/reception');
+    } else {
+      history.push('/action');
+    }
+    */
   };
 
   const onLogout = async () => {

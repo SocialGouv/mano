@@ -83,8 +83,7 @@ const Stats = () => {
     if (loading) {
       setRefreshTrigger({
         status: true,
-        method: 'refresh',
-        options: [],
+        method: { initialLoad: false, showFullScreen: false },
       });
     }
   }, [loading]);

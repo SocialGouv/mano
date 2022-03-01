@@ -104,8 +104,7 @@ const View = () => {
         onRefresh={() => {
           setRefreshTrigger({
             status: true,
-            method: 'refresh',
-            options: [],
+            options: { initialLoad: false, showFullScreen: false },
           });
         }}
       />

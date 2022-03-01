@@ -15,10 +15,10 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { DONE, TODO, useActions } from '../../recoil/actions';
 import SelectStatus from '../../components/SelectStatus';
 import { organisationState, teamsState, userState } from '../../recoil/auth';
-import { useRefresh } from '../../recoil/refresh';
 import SelectCustom from '../../components/SelectCustom';
 import { dateForDatePicker, formatDateWithFullMonth } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
+import { loadingState } from '../../components/Loader';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
@@ -27,7 +27,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const { addAction } = useActions();
-  const { loading } = useRefresh();
+  const loading = useRecoilValue(loadingState);
   const history = useHistory();
 
   title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${formatDateWithFullMonth(completedAt)}` : '');
@@ -51,8 +51,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
           onClick={() => {
             setRefreshTrigger({
               status: true,
-              method: 'actionsRefresher',
-              options: [],
+              options: { showFullScreen: false, initialLoad: false },
             });
           }}
           disabled={!!loading}

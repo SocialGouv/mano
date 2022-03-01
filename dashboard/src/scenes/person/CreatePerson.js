@@ -9,9 +9,9 @@ import personIcon from '../../assets/icons/person-icon.svg';
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
-import { useRefresh } from '../../recoil/refresh';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { refreshTriggerState } from '../../components/Loader';
+import { loadingState } from '../../components/Loader';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
@@ -19,7 +19,7 @@ const CreatePerson = ({ refreshable }) => {
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
   const { addPerson, persons } = usePersons();
-  const { loading } = useRefresh();
+  const loading = useRecoilValue(loadingState);
 
   return (
     <>
@@ -28,8 +28,7 @@ const CreatePerson = ({ refreshable }) => {
           onClick={() => {
             setRefreshTrigger({
               status: true,
-              method: 'personsRefresher',
-              options: [],
+              options: { initialLoad: false, showFullScreen: false },
             });
           }}
           disabled={!!loading}

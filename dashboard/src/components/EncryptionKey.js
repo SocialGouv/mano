@@ -21,7 +21,7 @@ import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../rec
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
 import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
-import { useRefresh } from '../recoil/refresh';
+import { loadingState } from './Loader';
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -50,7 +50,7 @@ const EncryptionKey = ({ isMain }) => {
   const places = useRecoilValue(placesState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const reports = useRecoilValue(reportsState);
-  const { loading } = useRefresh();
+  const loading = useRecoilValue(loadingState);
   const API = useApi();
 
   const totalToEncrypt =

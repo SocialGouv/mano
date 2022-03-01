@@ -104,8 +104,7 @@ const Create = () => {
         onClick={() => {
           setRefreshTrigger({
             status: true,
-            method: 'placesAndRelationsRefresher',
-            options: [],
+            options: { initialLoad: false, showFullScreen: false },
           });
         }}
         color="link"
