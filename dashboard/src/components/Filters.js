@@ -71,7 +71,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
           </Col>
         </Row>
         {filters.map(({ field, value }, index) => {
-          const filterFields = base.map((filter) => filter.field);
+          const filterFields = base.filter((f) => f.field !== 'alertness').map((filter) => filter.field);
           const filterValues = !!field ? [...(base.find((filter) => filter.field === field)?.options || []), 'Non renseigné'] : [];
           const { type } = base.find((filter) => filter.field === field) || {};
 
