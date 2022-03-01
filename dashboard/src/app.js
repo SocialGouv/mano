@@ -33,6 +33,7 @@ import Charte from './scenes/auth/charte';
 import { userState } from './recoil/auth';
 import useApi, { recoilResetKeyState, tokenCached } from './services/api';
 import ScrollToTop from './components/ScrollToTop';
+import TopBar from './components/TopBar';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -59,41 +60,47 @@ const App = ({ resetRecoil }) => {
 
   return (
     <div className="main-container">
-      <div className="main">
-        <Router>
-          <ScrollToTop />
-          <Switch>
-            <Route path="/auth" component={Auth} />
-            <RestrictedRoute path="/charte" component={Charte} />
-            <RestrictedRoute path="/account" component={Account} />
-            <RestrictedRoute path="/user" component={User} />
-            <RestrictedRoute path="/person" component={Person} />
-            <RestrictedRoute path="/place" component={Place} />
-            <RestrictedRoute path="/action" component={Action} />
-            <RestrictedRoute path="/territory" component={Territory} />
-            <RestrictedRoute path="/structure" component={Structure} />
-            <RestrictedRoute path="/team" component={Team} />
-            <RestrictedRoute path="/organisation" component={Organisation} />
-            <RestrictedRoute path="/stats" component={Stats} />
-            <RestrictedRoute path="/reception" component={Reception} />
-            <RestrictedRoute path="/search" component={SearchView} />
-            <RestrictedRoute path="/report" component={Report} />
-            <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
-          </Switch>
-        </Router>
-      </div>
+      <Router>
+        <ScrollToTop />
+        <Switch>
+          <Route path="/auth" component={Auth} />
+          <RestrictedRoute path="/charte" component={Charte} />
+          <RestrictedRoute path="/account" component={Account} />
+          <RestrictedRoute path="/user" component={User} />
+          <RestrictedRoute path="/person" component={Person} />
+          <RestrictedRoute path="/place" component={Place} />
+          <RestrictedRoute path="/action" component={Action} />
+          <RestrictedRoute path="/territory" component={Territory} />
+          <RestrictedRoute path="/structure" component={Structure} />
+          <RestrictedRoute path="/team" component={Team} />
+          <RestrictedRoute path="/organisation" component={Organisation} />
+          <RestrictedRoute path="/stats" component={Stats} />
+          <RestrictedRoute path="/reception" component={Reception} />
+          <RestrictedRoute path="/search" component={SearchView} />
+          <RestrictedRoute path="/report" component={Report} />
+          <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
+        </Switch>
+      </Router>
     </div>
   );
 };
 
 const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
   const user = useRecoilValue(userState);
-  if (!!user && !user?.termsAccepted) return <Route {...rest} path="/auth" component={Charte} />;
+  if (!!user && !user?.termsAccepted)
+    return (
+      <main className="main">
+        <Route {...rest} path="/auth" component={Charte} />
+      </main>
+    );
   return (
     <>
-      {user && <Drawer />}
-      <div className="main-content" style={{ marginLeft: user ? 230 : 0, marginTop: user ? 65 : 0 }}>
-        <Route {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
+      {!!user && <TopBar />}
+      <div className="main">
+        {!!user && <Drawer />}
+        <main className="main-content">
+          <Route {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
+        </main>
       </div>
     </>
   );

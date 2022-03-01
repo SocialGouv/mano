@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Col, Container, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
+import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -21,7 +21,7 @@ const List = () => {
   const history = useHistory();
 
   return (
-    <Container>
+    <>
       <Header titleStyle={{ fontWeight: 400 }} title="Équipes" />
       <Create />
       <Table
@@ -43,7 +43,7 @@ const List = () => {
           },
         ]}
       />
-    </Container>
+    </>
   );
 };
 

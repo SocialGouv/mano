@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
-import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
+import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -40,7 +40,7 @@ const View = () => {
   if (!place) return <Loading />;
 
   return (
-    <Container style={{ padding: '40px 0' }}>
+    <>
       <Header
         title={<BackButton />}
         onRefresh={() =>
@@ -95,7 +95,7 @@ const View = () => {
           )}
         </Formik>
       </Box>
-    </Container>
+    </>
   );
 };
 

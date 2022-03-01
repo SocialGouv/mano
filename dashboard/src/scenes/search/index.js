@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState, useEffect } from 'react';
-import { Container, Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import { Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import DateBloc from '../../components/DateBloc';
@@ -97,7 +97,7 @@ const View = () => {
   };
 
   return (
-    <Container>
+    <>
       <Header
         titleStyle={{ fontWeight: '400' }}
         title="Rechercher"
@@ -114,7 +114,7 @@ const View = () => {
         </Col>
       </Row>
       {renderContent()}
-    </Container>
+    </>
   );
 };
 

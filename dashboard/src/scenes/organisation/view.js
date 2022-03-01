@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
-import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
+import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
@@ -29,7 +29,7 @@ const View = () => {
   const API = useApi();
 
   return (
-    <Container style={{ padding: '40px 0', margin: '0 -40px' }}>
+    <>
       <Header title={<BackButton />} />
       <Box>
         <Formik
@@ -228,7 +228,7 @@ const View = () => {
           }}
         </Formik>
       </Box>
-    </Container>
+    </>
   );
 };
 

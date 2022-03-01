@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
-import { Col, Container, Row } from 'reactstrap';
+import { Col, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import Header from '../../components/header';
@@ -114,7 +114,7 @@ const Reception = () => {
   const onGoToPrevReport = () => history.push(lastReport?._id ? `/report/${lastReport._id}` : '/report');
 
   return (
-    <Container style={{ padding: 0 }}>
+    <>
       <Header
         titleStyle={{ fontWeight: '400' }}
         title={
@@ -203,15 +203,13 @@ const Reception = () => {
           </Card>
         </Col>
       </Row>
-      <Row style={{ paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid #ddd' }}>
+      <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
         <Col md={8} style={{ paddingBottom: 20, marginBottom: 20, borderRight: '1px solid #ddd' }}>
-          <Container>
-            <SectionTitle>Actions</SectionTitle>
-            <div style={{ margin: '15px' }}>
-              <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
-            </div>
-            <ActionsCalendar actions={actionsByStatus} columns={['Heure', 'Nom', 'Personne suivie', 'Status']} />
-          </Container>
+          <SectionTitle>Actions</SectionTitle>
+          <div style={{ margin: '15px' }}>
+            <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
+          </div>
+          <ActionsCalendar actions={actionsByStatus} columns={['Heure', 'Nom', 'Personne suivie', 'Status']} />
         </Col>
         <Col md={4}>
           <SectionTitle style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Services</SectionTitle>
@@ -220,7 +218,7 @@ const Reception = () => {
           ))}
         </Col>
       </Row>
-    </Container>
+    </>
   );
 };
 

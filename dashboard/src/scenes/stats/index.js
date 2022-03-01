@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Col, Container, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
+import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -107,7 +107,7 @@ const Stats = () => {
   ];
 
   return (
-    <Container>
+    <>
       <Header
         title={
           <>
@@ -369,7 +369,7 @@ const Stats = () => {
           />
         </TabPane>
       </TabContent>
-    </Container>
+    </>
   );
 };
 

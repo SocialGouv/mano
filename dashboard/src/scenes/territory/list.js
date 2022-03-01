@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState } from 'react';
-import { Col, Button as LinkButton, Container, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
+import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
@@ -36,7 +36,7 @@ const List = () => {
   const total = territories.length;
 
   return (
-    <Container>
+    <>
       <Header
         titleStyle={{ fontWeight: 400 }}
         title={
@@ -68,7 +68,7 @@ const List = () => {
         ]}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
-    </Container>
+    </>
   );
 };
 
