@@ -1,3 +1,10 @@
+# [1.64.0](https://github.com/SocialGouv/mano/compare/v1.63.0...v1.64.0) (2022-03-01)
+
+
+### Features
+
+* **dashboard:** improve filters for persons ([#405](https://github.com/SocialGouv/mano/issues/405)) ([0eb73db](https://github.com/SocialGouv/mano/commit/0eb73dbd6ac79106b5f709858a6bb64bd1838f04))
+
 # [1.63.0](https://github.com/SocialGouv/mano/compare/v1.62.0...v1.63.0) (2022-03-01)
 
 
