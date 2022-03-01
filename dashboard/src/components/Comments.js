@@ -19,11 +19,14 @@ import { useComments } from '../recoil/comments';
 import { useRecoilValue } from 'recoil';
 import { commentsFilteredSelector } from '../recoil/selectors';
 import { dateForDatePicker } from '../services/date';
+import { loadingState } from './Loader';
 
 const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
-  const { deleteComment, addComment, updateComment, loading } = useComments();
+  const { deleteComment, addComment, updateComment } = useComments();
+
+  const loading = useRecoilValue(loadingState);
 
   const comments = useRecoilValue(commentsFilteredSelector({ personId, actionId, forPassages }));
 
