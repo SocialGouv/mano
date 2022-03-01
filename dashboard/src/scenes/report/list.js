@@ -8,15 +8,14 @@ import styled from 'styled-components';
 import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday, isOnSameDay } from '../../services/date';
 import { currentTeamState } from '../../recoil/auth';
 import { reportsState, useReports } from '../../recoil/reports';
-import { useRefresh } from '../../recoil/refresh';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { refreshTriggerState } from '../../components/Loader';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
 
 const List = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const allReports = useRecoilValue(reportsState);
-  const { loading } = useRefresh();
+  const loading = useRecoilValue(loadingState);
 
   const reports = allReports.filter((r) => r.team === currentTeam._id);
 
@@ -27,8 +26,7 @@ const List = () => {
         onRefresh={() => {
           setRefreshTrigger({
             status: true,
-            method: 'reportsRefresher',
-            options: [],
+            options: { initialLoad: false, showFullScreen: false },
           });
         }}
         loading={!!loading}

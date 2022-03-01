@@ -45,8 +45,7 @@ const View = () => {
         onRefresh={() =>
           setRefreshTrigger({
             status: true,
-            method: 'territoriesRefresher',
-            options: [],
+            options: { initialLoad: false, showFullScreen: false },
           })
         }
       />

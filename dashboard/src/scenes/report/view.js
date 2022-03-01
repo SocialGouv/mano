@@ -197,8 +197,7 @@ const View = () => {
                   onClick={() =>
                     setRefreshTrigger({
                       status: true,
-                      method: 'reportsRefresher',
-                      options: [],
+                      options: { initialLoad: false, showFullScreen: false },
                     })
                   }
                 />
