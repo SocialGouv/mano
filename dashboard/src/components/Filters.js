@@ -52,7 +52,6 @@ export const filterData = (data, filters) => {
         .filter(Boolean);
     }
   }
-  console.log(data);
   return data;
 };
 
@@ -81,7 +80,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
           const onRemoveFilter = () => onChange(filters.filter((f, i) => i !== index));
 
           return (
-            <Row style={{ marginBottom: 10 }} key={field}>
+            <Row style={{ marginBottom: 10 }} key={field || 'empty'}>
               <Col md={4}>
                 <SelectCustom
                   options={filterFields}
