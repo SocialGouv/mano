@@ -9,8 +9,7 @@ import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday, isOnS
 import { currentTeamState } from '../../recoil/auth';
 import { reportsState, useReports } from '../../recoil/reports';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { refreshTriggerState } from '../../components/Loader';
-import { loadingState } from '../../components/Loader';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
 
 const List = () => {
   const currentTeam = useRecoilValue(currentTeamState);

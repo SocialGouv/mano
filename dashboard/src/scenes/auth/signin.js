@@ -14,8 +14,7 @@ import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import useApi, { setOrgEncryptionKey } from '../../services/api';
 import { AppSentry } from '../../services/sentry';
-import { refreshTriggerState } from '../../components/Loader';
-import { loadingState } from '../../components/Loader';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);

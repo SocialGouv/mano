@@ -17,8 +17,7 @@ import SelectStatus from '../../components/SelectStatus';
 import { organisationState, teamsState, userState } from '../../recoil/auth';
 import SelectCustom from '../../components/SelectCustom';
 import { dateForDatePicker, formatDateWithFullMonth } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
-import { loadingState } from '../../components/Loader';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);

@@ -10,8 +10,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState } from '../../recoil/auth';
 import { usePersons } from '../../recoil/persons';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { refreshTriggerState } from '../../components/Loader';
-import { loadingState } from '../../components/Loader';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);

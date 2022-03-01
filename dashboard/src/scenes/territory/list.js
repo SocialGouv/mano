@@ -18,8 +18,7 @@ import SelectCustom from '../../components/SelectCustom';
 import { territoriesFullSearchSelector } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { formatDateWithFullMonth } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
-import { loadingState } from '../../components/Loader';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
