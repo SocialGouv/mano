@@ -1,9 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import styled from 'styled-components';
 import { Col, Row, Input } from 'reactstrap';
 import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
+import { dayjsInstance, isOnSameDay } from '../services/date';
 
 export const filterData = (data, filters) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) {
@@ -17,7 +17,15 @@ export const filterData = (data, filters) => {
             return itemValue === (filter.value === 'Oui') ? item : null;
           }
 
+          if (['date-with-time', 'date'].includes(filter.type)) {
+            const { date, dateComparator } = filter.value;
+            if (dateComparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
+            if (dateComparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
+            if (dateComparator === 'equals') return isOnSameDay(itemValue, date) ? item : null;
+          }
+
           if (typeof itemValue === 'string') {
+            // For type text we trim and lower case the value.
             if (
               filter.type === 'text' &&
               (itemValue || '')
@@ -98,6 +106,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
 };
 
 function ValueSelector({ field, filterValues, value, onChangeValue, base }) {
+  const [dateComparator, setDateComparator] = React.useState(null);
   if (!field) return <></>;
   const { type, field: name } = base.find((filter) => filter.field === field);
 
@@ -119,10 +128,38 @@ function ValueSelector({ field, filterValues, value, onChangeValue, base }) {
     return (
       <Row>
         <Col sm={6}>
-          <SelectCustom options={['before', 'after']} getOptionLabel={(f) => f} getOptionValue={(f) => f} isClearable={!value} />
+          <SelectCustom
+            options={[
+              {
+                label: 'Avant',
+                value: 'before',
+              },
+              {
+                label: 'Après',
+                value: 'after',
+              },
+              {
+                label: 'Date exacte',
+                value: 'equals',
+              },
+            ]}
+            isClearable={!value}
+            onChange={(e) => {
+              if (!e) return setDateComparator(null);
+              setDateComparator(e.value);
+              onChangeValue({ date: value?.date, dateComparator: e.value });
+            }}
+          />
         </Col>
         <Col sm={6}>
-          <DatePicker className="form-control" name={name} selected={value} onChange={(date) => onChangeValue(date)} />
+          <DatePicker
+            locale="fr"
+            dateFormat="dd/MM/yyyy"
+            className="form-control"
+            name={name}
+            selected={value?.date}
+            onChange={(date) => onChangeValue({ date, dateComparator })}
+          />
         </Col>
       </Row>
     );
@@ -146,7 +183,6 @@ const Title = styled.span`
 
 const Container = styled.div`
   align-self: center;
-  /* margin: 15px; */
   padding-bottom: 15px;
   margin-bottom: 30px;
   display: flex;
