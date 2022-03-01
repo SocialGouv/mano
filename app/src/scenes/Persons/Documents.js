@@ -50,7 +50,7 @@ const Documents = ({ editable, updating, personDB, navigation, onUpdatePerson, o
       <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Documents" />
       <ScrollContainer backgroundColor={backgroundColor || colors.app.color}>
         {(personDB?.documents || []).map((doc) => (
-          <DocumentContainer>
+          <DocumentContainer key={doc.name}>
             <DocumentTitle>{doc.name}</DocumentTitle>
           </DocumentContainer>
         ))}
