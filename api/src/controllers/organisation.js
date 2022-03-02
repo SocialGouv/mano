@@ -125,7 +125,13 @@ router.put(
     const organisation = await Organisation.findOne(query);
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    if (req.user.role !== "admin") return res.status(403).send({ ok: false, error: "Forbidden" });
+    if (req.user.role !== "admin") {
+      if (!req.body.hasOwnProperty("collaborations")) return res.status(403).send({ ok: false, error: "Forbidden" });
+      const updateOrg = {};
+      updateOrg.collaborations = req.body.collaborations;
+      await organisation.update(updateOrg);
+      return res.status(200).send({ ok: true, data: organisation });
+    }
 
     const updateOrg = {};
     if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
