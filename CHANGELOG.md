@@ -1,3 +1,10 @@
+## [1.65.1](https://github.com/SocialGouv/mano/compare/v1.65.0...v1.65.1) (2022-03-02)
+
+
+### Bug Fixes
+
+* **dashboard:** prev next report ([#419](https://github.com/SocialGouv/mano/issues/419)) ([3c4f2cb](https://github.com/SocialGouv/mano/commit/3c4f2cbb846b519f76d9c35b82cf9c994cedbd03))
+
 # [1.65.0](https://github.com/SocialGouv/mano/compare/v1.64.5...v1.65.0) (2022-03-02)
 
 
