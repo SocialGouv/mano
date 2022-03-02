@@ -85,6 +85,7 @@ const FileSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, 
             return (
               <CustomFieldInput
                 label={label}
+                key={field._id}
                 field={field}
                 value={person[name]}
                 handleChange={(newValue) => onChange({ [name]: newValue })}
