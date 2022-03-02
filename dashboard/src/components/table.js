@@ -1,8 +1,25 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
+import Sortable from 'sortablejs';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', className, title, noData }) => {
+const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', className, title, noData, isSortable, onSort }) => {
+  const gridRef = useRef(null);
+  const sortableJsRef = useRef(null);
+
+  const onListChange = useCallback(() => {
+    onSort([...gridRef.current.children].map((i) => i.dataset.key));
+  }, [onSort]);
+
+  useEffect(() => {
+    if (!!isSortable && !!data.length) {
+      sortableJsRef.current = new Sortable(gridRef.current, {
+        animation: 150,
+        onEnd: onListChange,
+      });
+    }
+  }, [onListChange, isSortable, data.length]);
+
   if (!data.length && noData) {
     return (
       <TableWrapper className={className}>
@@ -21,9 +38,8 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
       </TableWrapper>
     );
   }
-
   return (
-    <TableWrapper className={className} withPointer={Boolean(onRowClick)}>
+    <TableWrapper className={className} withPointer={Boolean(onRowClick)} isSortable={isSortable}>
       <thead>
         {!!title && (
           <tr>
@@ -53,10 +69,10 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
           })}
         </tr>
       </thead>
-      <tbody>
+      <tbody ref={gridRef}>
         {data.map((item) => {
           return (
-            <tr onClick={() => (onRowClick ? onRowClick(item) : null)} key={item[rowKey] || item._id}>
+            <tr onClick={() => (onRowClick ? onRowClick(item) : null)} key={item[rowKey] || item._id} data-key={item[rowKey] || item._id}>
               {columns.map((column) => {
                 return (
                   <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
@@ -89,6 +105,13 @@ const TableWrapper = styled.table`
     border-radius: 4px;
     ${(props) => !props.withPointer && 'cursor: auto;'}
   }
+  ${(props) =>
+    props.isSortable &&
+    `
+  tbody > tr {
+    cursor: move;
+  }
+  `}
 
   tbody > tr:nth-child(odd) {
     background-color: ${theme.black05};

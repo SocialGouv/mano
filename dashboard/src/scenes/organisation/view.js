@@ -230,6 +230,7 @@ const View = () => {
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsObs"
+                                key="customFieldsObs"
                                 data={(() => {
                                   if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
                                   return defaultCustomFields;
@@ -264,6 +265,7 @@ const View = () => {
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsPersonsSocial"
+                                key="customFieldsPersonsSocial"
                                 data={(() => {
                                   if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
                                   return [];
@@ -274,6 +276,7 @@ const View = () => {
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsPersonsMedical"
+                                key="customFieldsPersonsMedical"
                                 data={(() => {
                                   if (Array.isArray(organisation.customFieldsPersonsMedical)) return organisation.customFieldsPersonsMedical;
                                   return defaultMedicalCustomFields;
