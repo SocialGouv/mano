@@ -243,12 +243,12 @@ jobs:
           echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
       - name: Download k8s manifests
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: manifests-preprod.yml
 
       - name: Download k8s namespace
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: namespace-preprod.yml
 
@@ -327,7 +327,7 @@ jobs:
         echo "project=${GITHUB_REPOSITORY#*/}" >> $GITHUB_ENV
 
     - name: Download production manifests
-      uses: actions/download-artifact@v2
+      uses: actions/download-artifact@v3
       with:
         name: manifests-production.yml
 
