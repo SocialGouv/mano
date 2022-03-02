@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Container, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -26,16 +26,19 @@ import { usePersons } from '../../recoil/persons';
 import { useReports } from '../../recoil/reports';
 import { useRecoilValue } from 'recoil';
 import { useComments } from '../../recoil/comments';
+import { collectionsToLoadState } from '../../components/Loader';
 
 const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const { loading: reportsLoading, addReport, updateReport } = useReports();
+  const { addReport, updateReport } = useReports();
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
   const lastReport = useRecoilValue(lastReportSelector);
+  const collectionsToLoad = useRecoilValue(collectionsToLoadState);
+  const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
   const { addComment } = useComments();
 
   const anonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
