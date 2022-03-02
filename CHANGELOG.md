@@ -1,3 +1,10 @@
+## [1.64.5](https://github.com/SocialGouv/mano/compare/v1.64.4...v1.64.5) (2022-03-02)
+
+
+### Bug Fixes
+
+* **app,dashboard:**  check date before showing ([#417](https://github.com/SocialGouv/mano/issues/417)) ([87d63ba](https://github.com/SocialGouv/mano/commit/87d63baf28397247ba1d09b122d58b79dd7296a0))
+
 ## [1.64.4](https://github.com/SocialGouv/mano/compare/v1.64.3...v1.64.4) (2022-03-02)
 
 
