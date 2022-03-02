@@ -352,9 +352,10 @@ const Title = styled.h2`
   font-weight: bold;
   font-size: 1.5rem;
   line-height: 2rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
   padding: 1rem;
   margin: 0;
+  background-color: ${theme.main}22;
 `;
 
 const SubTitle = styled.h3`
@@ -380,8 +381,9 @@ const Drawer = styled.aside`
   flex-direction: column;
   align-items: flex-start;
   flex-shrink: 0;
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
+  border-top: 1px solid rgba(0, 0, 0, 0.1);
   height: 100%;
+  background-color: ${theme.main}22;
   button {
     text-align: left;
   }
