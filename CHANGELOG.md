@@ -1,3 +1,10 @@
+# [1.66.0](https://github.com/SocialGouv/mano/compare/v1.65.2...v1.66.0) (2022-03-02)
+
+
+### Features
+
+* **dashboard:** reorganize organisation setup ([#408](https://github.com/SocialGouv/mano/issues/408)) ([e5f0450](https://github.com/SocialGouv/mano/commit/e5f0450dd3cb9448b5f359be91a18cd786f3addf))
+
 ## [1.65.2](https://github.com/SocialGouv/mano/compare/v1.65.1...v1.65.2) (2022-03-02)
 
 
