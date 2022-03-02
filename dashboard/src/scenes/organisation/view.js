@@ -21,6 +21,7 @@ import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
 import { theme } from '../../config';
+import SortableGrid from '../../components/SortableGrid';
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -122,6 +123,7 @@ const View = () => {
                           <Col md={12}>
                             <FormGroup>
                               <Label>Categories des actions</Label>
+                              <SortableGrid list={actionsCategories} onUpdateList={console.log} />
                               <SelectCustom
                                 creatable
                                 options={actionsCategories.sort((c1, c2) => c1.localeCompare(c2)).map((cat) => ({ value: cat, label: cat }))}
