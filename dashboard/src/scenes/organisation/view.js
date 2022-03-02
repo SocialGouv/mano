@@ -40,7 +40,7 @@ const View = () => {
           Infos
         </DrawerButton>
         <DrawerButton className={tab === 'encryption' ? 'active' : ''} onClick={() => setTab('encryption')}>
-          Encryption
+          Chiffrement
         </DrawerButton>
         <hr />
         <DrawerButton className={tab === 'reception' ? 'active' : ''} onClick={() => setTab('reception')}>
@@ -106,7 +106,7 @@ const View = () => {
                 case 'encryption':
                   return (
                     <>
-                      <Title>Encryption</Title>
+                      <Title>Chiffrement</Title>
                       <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
                         <EncryptionKey isMain />
                       </div>

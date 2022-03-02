@@ -82,7 +82,7 @@ const List = () => {
             },
           },
           {
-            title: 'Encryption activée',
+            title: 'Chiffrement activé',
             dataKey: 'encryptionEnabled',
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,

@@ -38,6 +38,7 @@ describe("Encryption", () => {
     await expect(page).toMatch("Dossier de Ma première personne");
     /* Change the key */
     await expect(page).toClick("a", { text: "Organisation" });
+    await expect(page).toClick("button", { text: "Chiffrement" });
     await expect(page).toMatch("Changer la clé de chiffrement");
     await expect(page).toClick("button", { text: "Changer la clé de chiffrement" });
     await expect(page).toMatch("Confirmez la clé de chiffrement");
