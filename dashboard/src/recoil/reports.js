@@ -82,7 +82,7 @@ export const useReports = () => {
       if (existingReport) return { ok: true, data: existingReport };
       const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team, date }) });
       if (!res.ok) return res;
-      setReports((reports) => [res.decryptedData, ...reports]);
+      setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
       return res;
     } catch (error) {
       capture('error in creating report' + error, { extra: { error, date, team } });
