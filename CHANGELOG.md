@@ -1,3 +1,10 @@
+## [1.66.1](https://github.com/SocialGouv/mano/compare/v1.66.0...v1.66.1) (2022-03-02)
+
+
+### Bug Fixes
+
+* **dashboard:** onboarding show encryption ([#421](https://github.com/SocialGouv/mano/issues/421)) ([3bddfd5](https://github.com/SocialGouv/mano/commit/3bddfd50b9dd1bf7a2adf7e9aead93fbeb69ea0a))
+
 # [1.66.0](https://github.com/SocialGouv/mano/compare/v1.65.2...v1.66.0) (2022-03-02)
 
 
