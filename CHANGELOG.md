@@ -1,3 +1,10 @@
+## [1.64.3](https://github.com/SocialGouv/mano/compare/v1.64.2...v1.64.3) (2022-03-02)
+
+
+### Bug Fixes
+
+* **dashboard:** auto report create in reception ([#415](https://github.com/SocialGouv/mano/issues/415)) ([8a04b22](https://github.com/SocialGouv/mano/commit/8a04b2241526289c139dfee4219baa4e36cc5dec))
+
 ## [1.64.2](https://github.com/SocialGouv/mano/compare/v1.64.1...v1.64.2) (2022-03-01)
 
 
