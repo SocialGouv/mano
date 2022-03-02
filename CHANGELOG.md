@@ -1,3 +1,10 @@
+## [1.66.2](https://github.com/SocialGouv/mano/compare/v1.66.1...v1.66.2) (2022-03-02)
+
+
+### Bug Fixes
+
+* **api:** authorize normal user to add collaboration ([#422](https://github.com/SocialGouv/mano/issues/422)) ([629b07a](https://github.com/SocialGouv/mano/commit/629b07a07ce2f0851a202afbcb89d4718b5f7063))
+
 ## [1.66.1](https://github.com/SocialGouv/mano/compare/v1.66.0...v1.66.1) (2022-03-02)
 
 
