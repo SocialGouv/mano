@@ -4,7 +4,7 @@ import { theme } from '../config';
 import picture1 from '../assets/MANO_livraison_elements-07_green.png';
 import picture2 from '../assets/MANO_livraison_elements-08_green.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
-import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { getData } from '../services/dataManagement';
 import { organisationState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
@@ -26,6 +26,11 @@ function randomIntFromInterval(min, max) {
 export const loadingState = atom({
   key: 'loadingState',
   default: '',
+});
+
+export const collectionsToLoadState = atom({
+  key: 'collectionsToLoadState',
+  default: ['person', 'report', 'action', 'territory', 'place', 'relPersonPlace', 'territory-observation', 'comment'],
 });
 
 const progressState = atom({
@@ -62,6 +67,7 @@ const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
   const [lastRefresh, setLastRefresh] = useRecoilState(lastRefreshState);
   const [loading, setLoading] = useRecoilState(loadingState);
+  const setCollectionsToLoad = useSetRecoilState(collectionsToLoadState);
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
   const organisation = useRecoilValue(organisationState);
@@ -117,6 +123,27 @@ const Loader = () => {
       API,
     });
     if (refreshedPersons) setPersons(refreshedPersons.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'person'));
+    /*
+    Get reports
+    */
+    setLoading('Chargement des comptes-rendus');
+    const refreshedReports = await getData({
+      collectionName: 'report',
+      data: reports,
+      isInitialization: initialLoad,
+      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+      lastRefresh,
+      setBatchData: (newReports) => setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports))),
+      API,
+    });
+    if (refreshedReports) setReports(refreshedReports);
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'report'));
+    /*
+    Switch to not full screen
+    */
+    setFullScreen(false);
+
     /*
     Get actions
     */
@@ -131,6 +158,7 @@ const Loader = () => {
       API,
     });
     if (refreshedActions) setActions(refreshedActions);
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'action'));
     /*
     Get territories
     */
@@ -146,6 +174,7 @@ const Loader = () => {
       API,
     });
     if (refreshedTerritories) setTerritories(refreshedTerritories);
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory'));
 
     /*
     Get places
@@ -172,25 +201,7 @@ const Loader = () => {
       API,
     });
     if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
-    /*
-    Get reports
-    */
-    setLoading('Chargement des comptes-rendus');
-    const refreshedReports = await getData({
-      collectionName: 'report',
-      data: reports,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newReports) => setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports))),
-      API,
-    });
-    if (refreshedReports) setReports(refreshedReports);
-    /*
-    Switch to not full screen
-    */
-    setFullScreen(false);
-
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'place'));
     /*
     Get observations territories
     */
@@ -205,6 +216,8 @@ const Loader = () => {
       API,
     });
     if (refreshedObs) setTerritoryObs(refreshedObs);
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory-observation'));
+
     /*
     Get comments
     */
@@ -220,6 +233,7 @@ const Loader = () => {
       API,
     });
     if (refreshedComments) setComments(refreshedComments);
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'comment'));
 
     /*
     Reset refresh trigger
