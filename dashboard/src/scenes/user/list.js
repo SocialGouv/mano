@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -34,7 +34,7 @@ const List = () => {
 
   if (!users) return <Loading />;
   return (
-    <Container>
+    <>
       <Header titleStyle={{ fontWeight: 400 }} title="Utilisateurs" />
       {['superadmin', 'admin'].includes(user.role) && <Create onChange={() => setRefresh(true)} />}
       <Table
@@ -61,7 +61,7 @@ const List = () => {
           { title: 'Dernière connection le', dataKey: 'lastLoginAt', render: (i) => formatDateWithFullMonth(i.lastLoginAt) },
         ]}
       />
-    </Container>
+    </>
   );
 };
 

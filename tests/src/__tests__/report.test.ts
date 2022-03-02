@@ -227,7 +227,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
     await expect(page).toClick("div.close-toastr");
-    await expect(page).toMatch("Ma première collab");
+    // await expect(page).toMatch("Ma première collab");
     await expect(page).toMatch("Ma deuxième collab");
   });
 

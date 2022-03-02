@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, Collapse } from 'reactstrap';
+import { Collapse } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import Header from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -20,7 +20,7 @@ const List = () => {
   const reports = allReports.filter((r) => r.team === currentTeam._id);
 
   return (
-    <Container style={{ padding: '40px 0' }}>
+    <>
       <Header
         title={`Comptes rendus de l'équipe ${currentTeam?.nightSession ? 'de nuit ' : ''}${currentTeam?.name || ''}`}
         onRefresh={() => {
@@ -34,7 +34,7 @@ const List = () => {
       {getMonths().map((date, index) => (
         <HitMonth debug={index === 0} date={date} key={date} reports={reports} team={currentTeam} />
       ))}
-    </Container>
+    </>
   );
 };
 

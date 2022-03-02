@@ -29,7 +29,7 @@ const List = ({ territory = {} }) => {
   };
 
   return (
-    <React.Fragment>
+    <>
       <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
         <Col md={9}>
           <Title>Observations</Title>
@@ -62,7 +62,7 @@ const List = ({ territory = {} }) => {
         ))}
       </Box>
       <CreateObservation observation={{ ...observation, territory: observation.territory || territory?._id }} forceOpen={openObservationModale} />
-    </React.Fragment>
+    </>
   );
 };
 

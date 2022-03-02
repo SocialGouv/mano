@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
@@ -40,7 +40,7 @@ const List = () => {
 
   if (!organisations?.length) return <Loading />;
   return (
-    <Container style={{ padding: '40px 0' }}>
+    <>
       <Create onChange={() => setRefresh(true)} />
       <Table
         data={organisations}
@@ -82,7 +82,7 @@ const List = () => {
             },
           },
           {
-            title: 'Encryption activée',
+            title: 'Chiffrement activé',
             dataKey: 'encryptionEnabled',
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
@@ -119,7 +119,7 @@ const List = () => {
         rowKey={'_id'}
         onRowClick={null}
       />
-    </Container>
+    </>
   );
 };
 

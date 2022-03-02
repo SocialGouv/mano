@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Container, FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
+import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -444,7 +444,7 @@ const Actions = ({ person, onUpdateResults }) => {
   );
 };
 
-const StyledContainer = styled(Container)`
+const StyledContainer = styled.div`
   div.row {
     padding: 10px 0;
   }

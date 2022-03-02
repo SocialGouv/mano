@@ -46,7 +46,9 @@ const Wrapper = styled.div`
   flex-direction: column;
   margin-bottom: 10px;
   border: 1px solid ${theme.mainlight};
-  width: 100%;
+  min-width: 220px;
+  flex-basis: 30%;
+  max-width: 100%;
 `;
 
 const IncContainer = styled.div`

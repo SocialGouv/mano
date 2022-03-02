@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
+import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
@@ -113,6 +113,11 @@ const View = () => {
     if (process.env.REACT_APP_TEST === 'true') return null;
     return (
       <div className="printonly">
+        <div style={{ fontSize: 24, lineHeight: '32px', fontWeight: 'bold', padding: '16px 32px' }}>
+          {`Compte rendu de l'équipe ${currentTeam?.name || ''}`}
+          <br />
+          {getPeriodTitle(report.date, currentTeam?.nightSession)}
+        </div>
         <Description report={report} />
         <Reception report={report} />
         <ActionCompletedAt date={report.date} status={DONE} />
@@ -127,57 +132,6 @@ const View = () => {
 
   const renderScreenOnly = () => (
     <div className="noprint">
-      <Description report={report} />
-      <Nav tabs fill style={{ marginBottom: 20 }}>
-        {tabsContents.map((tabCaption, index) => {
-          if (!organisation.receptionEnabled && index === 0) return null;
-          return (
-            <NavItem key={index} style={{ cursor: 'pointer' }}>
-              <NavLink
-                key={index}
-                className={`${activeTab === index && 'active'}`}
-                onClick={() => {
-                  const searchParams = new URLSearchParams(location.search);
-                  searchParams.set('tab', index);
-                  history.replace({ pathname: location.pathname, search: searchParams.toString() });
-                  setActiveTab(index);
-                }}>
-                {tabCaption}
-              </NavLink>
-            </NavItem>
-          );
-        })}
-      </Nav>
-      <TabContent activeTab={activeTab}>
-        {!!organisation.receptionEnabled && (
-          <TabPane tabId={0}>
-            <Reception report={report} />
-          </TabPane>
-        )}
-        <TabPane tabId={1}>
-          <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(1, `Actions complétées (${total})`)} />
-        </TabPane>
-        <TabPane tabId={2}>
-          <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(2, `Actions créées (${total})`)} />
-        </TabPane>
-        <TabPane tabId={3}>
-          <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(3, `Actions annulées (${total})`)} />
-        </TabPane>
-        <TabPane tabId={4}>
-          <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
-        </TabPane>
-        <TabPane tabId={5}>
-          <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} />
-        </TabPane>
-        <TabPane tabId={6}>
-          <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
-        </TabPane>
-      </TabContent>
-    </div>
-  );
-
-  return (
-    <Container className="report-container" style={{ padding: '40px 0' }}>
       <Header
         style={{ width: '100%' }}
         titleStyle={{ width: '100%' }}
@@ -219,9 +173,62 @@ const View = () => {
           </div>
         }
       />
+      <div className="noprint">
+        <Description report={report} />
+        <Nav tabs fill style={{ marginBottom: 20 }}>
+          {tabsContents.map((tabCaption, index) => {
+            if (!organisation.receptionEnabled && index === 0) return null;
+            return (
+              <NavItem key={index} style={{ cursor: 'pointer' }}>
+                <NavLink
+                  key={index}
+                  className={`${activeTab === index && 'active'}`}
+                  onClick={() => {
+                    const searchParams = new URLSearchParams(location.search);
+                    searchParams.set('tab', index);
+                    history.replace({ pathname: location.pathname, search: searchParams.toString() });
+                    setActiveTab(index);
+                  }}>
+                  {tabCaption}
+                </NavLink>
+              </NavItem>
+            );
+          })}
+        </Nav>
+        <TabContent activeTab={activeTab}>
+          {!!organisation.receptionEnabled && (
+            <TabPane tabId={0}>
+              <Reception report={report} />
+            </TabPane>
+          )}
+          <TabPane tabId={1}>
+            <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(1, `Actions complétées (${total})`)} />
+          </TabPane>
+          <TabPane tabId={2}>
+            <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(2, `Actions créées (${total})`)} />
+          </TabPane>
+          <TabPane tabId={3}>
+            <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(3, `Actions annulées (${total})`)} />
+          </TabPane>
+          <TabPane tabId={4}>
+            <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
+          </TabPane>
+          <TabPane tabId={5}>
+            <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} />
+          </TabPane>
+          <TabPane tabId={6}>
+            <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
+          </TabPane>
+        </TabContent>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
       {renderPrintOnly()}
       {renderScreenOnly()}
-    </Container>
+    </>
   );
 };
 
@@ -255,9 +262,7 @@ const Reception = ({ report }) => {
     return (
       <>
         {organisation?.services?.map((service) => (
-          <Col md={4} key={service} style={{ marginBottom: 20 }}>
-            <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
-          </Col>
+          <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
         ))}
       </>
     );
@@ -266,14 +271,12 @@ const Reception = ({ report }) => {
   return (
     <StyledBox>
       <TabTitle>Accueil</TabTitle>
-      <Row style={{ marginBottom: 20, flexShrink: 0 }}>
-        <Col md={4} />
-        <Col md={4} style={{ marginBottom: 20 }}>
-          <Card countId="report-number-of-passages" title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
-        </Col>
-        <Col md={4} />
+      <div style={{ marginLeft: 'auto', marginRight: 'auto', width: '15rem', marginBottom: 15 }}>
+        <Card countId="report-number-of-passages" title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
+      </div>
+      <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 20, flexShrink: 0, gap: 5, justifyContent: 'space-evenly' }}>
         {renderServices()}
-      </Row>
+      </div>
     </StyledBox>
   );
 };

@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react';
-import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton } from 'reactstrap';
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -44,7 +44,7 @@ const List = () => {
   const { data, total } = filterPlaces(places, { page, limit, search });
 
   return (
-    <Container>
+    <>
       <Header
         titleStyle={{ fontWeight: 400 }}
         title={
@@ -88,7 +88,7 @@ const List = () => {
         ]}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
-    </Container>
+    </>
   );
 };
 

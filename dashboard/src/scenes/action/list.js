@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useState } from 'react';
-import { Col, Container, Row } from 'reactstrap';
+import { Col, Row } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 
 import Header from '../../components/header';
@@ -50,7 +50,7 @@ const List = () => {
   const total = actionsFiltered.length;
 
   return (
-    <Container>
+    <>
       <Header
         titleStyle={{ fontWeight: '400' }}
         title={
@@ -135,7 +135,7 @@ const List = () => {
           <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
         </>
       )}
-    </Container>
+    </>
   );
 };
 

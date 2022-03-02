@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
-import { Container, Row, Col, FormGroup, Input, Label } from 'reactstrap';
+import { Row, Col, FormGroup, Input, Label } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
@@ -55,7 +55,7 @@ const View = () => {
   const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
 
   return (
-    <Container style={{ padding: '40px 0' }}>
+    <>
       <Header
         title={<BackButton />}
         onRefresh={() =>
@@ -196,7 +196,7 @@ const View = () => {
         </Formik>
       </Box>
       <Comments actionId={action._id} />
-    </Container>
+    </>
   );
 };
 
