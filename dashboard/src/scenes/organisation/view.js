@@ -182,20 +182,42 @@ const View = () => {
                           <Col md={12}>
                             <FormGroup>
                               <Label>Services disponibles</Label>
+                              <SortableGrid
+                                list={values.services || []}
+                                onUpdateList={(newServices) => handleChange({ target: { value: newServices, name: 'services' } })}
+                                onRemoveItem={(content) =>
+                                  handleChange({ target: { value: values.services.filter((service) => service !== content), name: 'services' } })
+                                }
+                              />
+                            </FormGroup>
+                            <FormGroup>
+                              <Label>Ajouter un service</Label>
                               <SelectCustom
+                                key={JSON.stringify(values.services)}
                                 creatable
+                                isOptionDisabled={({ value }) => values.services.includes(value)}
                                 options={[...(organisation.services || [])]
                                   .sort((c1, c2) => c1.localeCompare(c2))
                                   .map((cat) => ({ value: cat, label: cat }))}
-                                value={(values.services || []).map((cat) => ({ value: cat, label: cat }))}
-                                isMulti
-                                onChange={(cats) => handleChange({ target: { value: cats.map((cat) => cat.value), name: 'services' } })}
+                                value={null}
+                                onCreateOption={async (name) => {
+                                  handleChange({ target: { value: [...values.services, name], name: 'services' } });
+                                }}
+                                isClearable
+                                inputId="organisation-select-services"
+                                classNamePrefix="organisation-select-services"
                               />
                             </FormGroup>
                           </Col>
                         </Row>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                          <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                          <ButtonCustom
+                            title={'Mettre à jour'}
+                            disabled={JSON.stringify(organisation.services) === JSON.stringify(values.services)}
+                            loading={isSubmitting}
+                            onClick={handleSubmit}
+                            width={200}
+                          />
                         </div>
                       </>
                     );
