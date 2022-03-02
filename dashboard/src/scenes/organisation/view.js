@@ -34,7 +34,7 @@ const View = () => {
   }, [tab]);
 
   return (
-    <div style={{ display: 'flex', margin: '0 -4rem -3rem', overflow: 'hidden' }}>
+    <div style={{ display: 'flex', margin: '0 -4rem -3rem', overflow: 'hidden', height: 'calc(100% + 3rem)' }}>
       <Drawer>
         <DrawerButton className={tab === 'infos' ? 'active' : ''} onClick={() => setTab('infos')}>
           Infos
