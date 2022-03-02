@@ -17,6 +17,7 @@ import { commentsState } from '../recoil/comments';
 import { capture } from '../services/sentry';
 import useApi from '../services/api';
 import { reportsState } from '../recoil/reports';
+import dayjs from 'dayjs';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -137,7 +138,7 @@ const Loader = () => {
       setBatchData: (newReports) => setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports))),
       API,
     });
-    if (refreshedReports) setReports(refreshedReports);
+    if (refreshedReports) setReports(refreshedReports.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'report'));
     /*
     Switch to not full screen
