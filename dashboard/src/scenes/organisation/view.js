@@ -26,7 +26,7 @@ const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const { personFieldsIncludingCustomFields } = usePersons();
   const API = useApi();
-  const [tab, setTab] = useState('infos');
+  const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
 
   useEffect(() => {
@@ -35,7 +35,7 @@ const View = () => {
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', margin: '0 -4rem -3rem', height: 'calc(100% + 3rem)' }}>
-      <Title>Réglages de l'organisation</Title>
+      <Title>Réglages de l'organisation {organisation.name}</Title>
       <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
         <Drawer>
           <DrawerButton className={tab === 'infos' ? 'active' : ''} onClick={() => setTab('infos')}>
