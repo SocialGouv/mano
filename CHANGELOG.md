@@ -1,3 +1,10 @@
+## [1.65.2](https://github.com/SocialGouv/mano/compare/v1.65.1...v1.65.2) (2022-03-02)
+
+
+### Bug Fixes
+
+* **dashboard:** sort reports on creation ([#420](https://github.com/SocialGouv/mano/issues/420)) ([cb8b8ab](https://github.com/SocialGouv/mano/commit/cb8b8abe99b8ded03e7f3ea2152d4dfbcd6b92b8))
+
 ## [1.65.1](https://github.com/SocialGouv/mano/compare/v1.65.0...v1.65.1) (2022-03-02)
 
 
