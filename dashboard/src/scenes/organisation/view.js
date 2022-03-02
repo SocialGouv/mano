@@ -123,19 +123,45 @@ const View = () => {
                           <Col md={12}>
                             <FormGroup>
                               <Label>Categories des actions</Label>
-                              <SortableGrid list={actionsCategories} onUpdateList={console.log} />
+                              <SortableGrid
+                                list={values.categories || []}
+                                onUpdateList={(cats) => handleChange({ target: { value: cats, name: 'categories' } })}
+                                onRemoveItem={(content) =>
+                                  handleChange({ target: { value: values.categories.filter((cat) => cat !== content), name: 'categories' } })
+                                }
+                              />
+                            </FormGroup>
+                            <FormGroup>
+                              <Label>Ajouter une catégorie</Label>
                               <SelectCustom
+                                key={JSON.stringify(values.categories)}
                                 creatable
-                                options={actionsCategories.sort((c1, c2) => c1.localeCompare(c2)).map((cat) => ({ value: cat, label: cat }))}
-                                value={(values.categories || []).map((cat) => ({ value: cat, label: cat }))}
-                                isMulti
-                                onChange={(cats) => handleChange({ target: { value: cats.map((cat) => cat.value), name: 'categories' } })}
+                                options={[...(actionsCategories || [])]
+                                  .filter((cat) => !values.categories.includes(cat))
+                                  .sort((c1, c2) => c1.localeCompare(c2))
+                                  .map((cat) => ({ value: cat, label: cat }))}
+                                value={null}
+                                onChange={(cat) => {
+                                  handleChange({ target: { value: [...values.categories, cat.value], name: 'categories' } });
+                                }}
+                                onCreateOption={async (name) => {
+                                  handleChange({ target: { value: [...values.categories, name], name: 'categories' } });
+                                }}
+                                isClearable
+                                inputId="organisation-select-categories"
+                                classNamePrefix="organisation-select-categories"
                               />
                             </FormGroup>
                           </Col>
                         </Row>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                          <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                          <ButtonCustom
+                            title={'Mettre à jour'}
+                            disabled={JSON.stringify(organisation.categories) === JSON.stringify(values.categories)}
+                            loading={isSubmitting}
+                            onClick={handleSubmit}
+                            width={200}
+                          />
                         </div>
                       </>
                     );
