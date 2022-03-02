@@ -131,6 +131,8 @@ const DateAndTimeInput = ({
 
   const renderDate = () => {
     if (!date) return 'JJ-MM-AAAA';
+    // eslint-disable-next-line eqeqeq
+    if (new Date(date) == 'Invalid Date') return 'JJ-MM-AAAA';
     if (showYear) return new Date(date).getLongDate('fr');
     return new Date(date).getLocaleDate('fr');
   };

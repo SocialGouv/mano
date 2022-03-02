@@ -74,7 +74,7 @@ export function isAfterToday(date) {
 }
 
 export function dateForDatePicker(date) {
-  return date ? dayjs(date).toDate() : null;
+  return date && dayjs(date).isValid() ? dayjs(date).toDate() : null;
 }
 
 export function getMonths() {
