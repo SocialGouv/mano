@@ -69,13 +69,13 @@ const View = () => {
 
   const report = currentTeamReports[reportIndex];
 
-  const onFirstLaterReport = () => {
+  const onFirstBeforeReport = () => {
     if (reportIndex === currentTeamReports.length - 1) return;
     const prevReport = currentTeamReports[reportIndex + 1];
     if (!prevReport) return;
     history.push(`/report/${prevReport._id}`);
   };
-  const onFirstBeforeReport = () => {
+  const onFirstLaterReport = () => {
     if (reportIndex === 0) return;
     const nextReport = currentTeamReports[reportIndex - 1];
     if (!nextReport) return;
@@ -201,14 +201,14 @@ const View = () => {
                     })
                   }
                 />
-                <ButtonCustom color="link" className="noprint" title="Précédent" disabled={reportIndex === 0} onClick={onFirstBeforeReport} />
                 <ButtonCustom
                   color="link"
                   className="noprint"
-                  title="Suivant"
+                  title="Précédent"
                   disabled={reportIndex === currentTeamReports.length - 1}
-                  onClick={onFirstLaterReport}
+                  onClick={onFirstBeforeReport}
                 />
+                <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onFirstLaterReport} />
               </div>
             </div>
             <div>

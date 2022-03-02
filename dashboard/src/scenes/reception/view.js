@@ -111,7 +111,7 @@ const Reception = () => {
   };
 
   const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
-  const onGoToLastReport = () => history.push(lastReport?._id ? `/report/${lastReport._id}` : '/report');
+  const onGoToPrevReport = () => history.push(lastReport?._id ? `/report/${lastReport._id}` : '/report');
 
   return (
     <Container style={{ padding: 0 }}>
@@ -129,9 +129,9 @@ const Reception = () => {
           md={3}
           style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'column', borderRight: '1px solid #ddd' }}>
           <ButtonCustom
-            onClick={onGoToLastReport}
+            onClick={onGoToPrevReport}
             color="link"
-            title="Accéder au dernier compte-rendu"
+            title="Accéder au compte-rendu précédent"
             padding="12px 24px"
             disabled={!lastReport?._id}
           />
