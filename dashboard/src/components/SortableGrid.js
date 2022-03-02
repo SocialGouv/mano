@@ -54,6 +54,7 @@ const Item = styled.div`
   width: 12.5rem;
   height: 3.5rem;
   position: relative;
+  cursor: move;
   span {
     display: flex;
     justify-content: center;
