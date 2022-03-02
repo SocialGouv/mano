@@ -1,3 +1,10 @@
+# [1.65.0](https://github.com/SocialGouv/mano/compare/v1.64.5...v1.65.0) (2022-03-02)
+
+
+### Features
+
+* **api:** send platform and version to sentry ([#418](https://github.com/SocialGouv/mano/issues/418)) ([e51d63e](https://github.com/SocialGouv/mano/commit/e51d63e1a600b2c2e2e474d8203068a1b0be18d3))
+
 ## [1.64.5](https://github.com/SocialGouv/mano/compare/v1.64.4...v1.64.5) (2022-03-02)
 
 
