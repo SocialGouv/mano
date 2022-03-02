@@ -1,3 +1,10 @@
+## [1.64.4](https://github.com/SocialGouv/mano/compare/v1.64.3...v1.64.4) (2022-03-02)
+
+
+### Bug Fixes
+
+* **api:** add orinigal url to sentry ([#416](https://github.com/SocialGouv/mano/issues/416)) ([3090a12](https://github.com/SocialGouv/mano/commit/3090a12bbfb09fe1adb2327e80ad62ea6d505355))
+
 ## [1.64.3](https://github.com/SocialGouv/mano/compare/v1.64.2...v1.64.3) (2022-03-02)
 
 
