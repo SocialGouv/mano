@@ -115,13 +115,13 @@ jobs:
           SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
 
       - name: Archive k8s manifests
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: manifests.yml
           path: manifests.yml
 
       - name: Archive k8s namespace
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: namespace.yml
           path: namespace.yml

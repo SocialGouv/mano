@@ -211,13 +211,13 @@ jobs:
           SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
 
       - name: Archive preproduction manifests
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: manifests-preprod.yml
           path: manifests-preprod.yml
 
       - name: Archive preproduction namespace
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: namespace-preprod.yml
           path: namespace-preprod.yml
@@ -301,7 +301,7 @@ jobs:
           SOCIALGOUV_BASE_DOMAIN: ${{ env.SOCIALGOUV_BASE_DOMAIN }}
 
       - name: Archive production manifests
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v3
         with:
           name: manifests-production.yml
           path: manifests-production.yml
