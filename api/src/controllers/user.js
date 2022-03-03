@@ -220,7 +220,18 @@ Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 1
 `;
     await mailservice.sendEmail(data.email, subject, body);
 
-    return res.status(200).send({ ok: true, data });
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: data._id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        organisation: data.organisation,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
+    });
   })
 );
 
