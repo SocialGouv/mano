@@ -169,7 +169,6 @@ router.post(
       z.array(z.string().uuid()).optional().parse(req.body.team);
       z.enum(["admin", "normal"]).parse(req.body.role);
     } catch (e) {
-      console.log(e);
       return res.status(400).send({ ok: false, error: "Invalid request" });
     }
 
