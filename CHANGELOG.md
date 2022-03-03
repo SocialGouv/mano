@@ -1,3 +1,10 @@
+## [1.67.2](https://github.com/SocialGouv/mano/compare/v1.67.1...v1.67.2) (2022-03-03)
+
+
+### Bug Fixes
+
+* **dashboard:** datepicker on small screens ([#429](https://github.com/SocialGouv/mano/issues/429)) ([c81138e](https://github.com/SocialGouv/mano/commit/c81138e2f85a9630941a11eb631e5b18788af481))
+
 ## [1.67.1](https://github.com/SocialGouv/mano/compare/v1.67.0...v1.67.1) (2022-03-03)
 
 
