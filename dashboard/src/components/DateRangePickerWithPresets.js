@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import styled from 'styled-components';
 import OutsideClickHandler from 'react-outside-click-handler';
 import { DateRangePicker } from 'react-dates';
@@ -83,21 +83,6 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   const [showDatePicker, setShowDatepicker] = useState(true);
   const [preset, setPreset] = useState(null);
   const [datePickerFocused, setDatePickerFocused] = useState(null);
-  const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
-
-  const handleWindowResize = useCallback(() => {
-    console.log(window.innerWidth);
-    if (window.innerWidth < 1100) {
-      setNumberOfMonths(1);
-    } else {
-      setNumberOfMonths(2);
-    }
-  }, [setNumberOfMonths]);
-
-  useEffect(() => {
-    window.addEventListener('resize', handleWindowResize);
-    return () => window.removeEventListener('resize', handleWindowResize);
-  });
 
   useEffect(() => {
     if (!datePickerFocused) closeDatePicker();
@@ -139,7 +124,9 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
 
   return (
     <Container>
-      <OpenPickerButton onClick={openDatePicker}>{renderLabel()}</OpenPickerButton>
+      <Buttons>
+        <OpenPickerButton onClick={openDatePicker}>{renderLabel()}</OpenPickerButton>
+      </Buttons>
       {!!showDatePicker && (
         <OutsideClickHandler onOutsideClick={closeDatePicker}>
           <PickerContainer>
@@ -167,7 +154,6 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
               displayFormat="DD-MM-yyyy"
               isOutsideRange={() => null}
               hideKeyboardShortcutsPanel
-              numberOfMonths={numberOfMonths}
             />
           </PickerContainer>
         </OutsideClickHandler>
@@ -178,7 +164,10 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
 
 const Container = styled.div`
   position: relative;
-  min-width: 15rem;
+`;
+
+const Buttons = styled.div`
+  display: flex;
 `;
 
 const OpenPickerButton = styled.button`
@@ -198,7 +187,6 @@ const Presets = styled.div`
   overflow-y: scroll;
   box-sizing: border-box;
   height: 100%;
-  flex-shrink: 0;
   button:first-child {
     margin-top: 150px;
   }
@@ -222,20 +210,15 @@ const PickerContainer = styled.div`
   position: absolute;
   z-index: 1000;
   top: 50px;
-  left: -4rem;
-  min-width: 40rem;
-  max-width: calc(100vw - 230px);
+  left: -100px;
+  min-width: 40em;
   height: 25em;
   padding: 25px;
   background-color: #fff;
   border-radius: 8px;
-  overflow-x: auto;
+  overflow: hidden;
   box-shadow: 0 2px 6px 0 #d5d0d7;
   display: flex;
-
-  .DateRangePicker {
-    display: block;
-  }
 
   .DateRangePickerInput {
     border: none;
@@ -250,7 +233,6 @@ const PickerContainer = styled.div`
     border: none;
     position: relative;
     top: unset !important;
-    left: 0 !important;
   }
 
   .DayPicker__withBorder {

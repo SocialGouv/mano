@@ -132,11 +132,11 @@ const Stats = () => {
           })
         }
       />
-      <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
-        <Col md={4} style={{ flexShrink: 0, minWidth: '15rem', padding: 0 }}>
+      <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center' }}>
+        <Col md={4}>
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
         </Col>
-        <Col md={4} style={{ flexShrink: 0 }}>
+        <Col md={4}>
           {teams.length > 1 && (
             <label>
               <input type="checkbox" style={{ marginRight: '1rem' }} onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)} />
