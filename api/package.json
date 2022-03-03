@@ -32,7 +32,8 @@
     "password-validator": "^5.1.0",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^6.3.5"
+    "sequelize": "^6.3.5",
+    "zod": "^3.13.4"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.6",
