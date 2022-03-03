@@ -9,9 +9,9 @@ import { ListEmptyActions, ListNoMoreActions } from '../../components/ListEmptyC
 import FloatAddButton from '../../components/FloatAddButton';
 import { MyText } from '../../components/MyText';
 import FlatListStyled, { SectionListStyled } from '../../components/FlatListStyled';
-import { DONE, TODO, CANCEL } from '../../recoil/actions';
+import { TODO } from '../../recoil/actions';
 import API from '../../services/api';
-import { actionsDoneSelector, actionsTodoSelector, actionsCanceledSelector } from '../../recoil/selectors';
+import { actionsByStatusSelector } from '../../recoil/selectors';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 
@@ -24,15 +24,8 @@ const ActionsList = () => {
   const loading = useRecoilValue(loadingState);
   const status = useRoute().params.status;
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
-  const actionsDone = useRecoilValue(actionsDoneSelector);
-  const actionsTodo = useRecoilValue(actionsTodoSelector);
-  const actionsCanceled = useRecoilValue(actionsCanceledSelector);
 
-  const actionsByStatus = useMemo(() => {
-    if (status === DONE) return actionsDone;
-    if (status === TODO) return actionsTodo;
-    if (status === CANCEL) return actionsCanceled;
-  }, [actionsCanceled, actionsDone, actionsTodo, status]);
+  const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
 
   useEffect(() => {
     API.navigation = navigation;
