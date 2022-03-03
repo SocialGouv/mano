@@ -14,7 +14,7 @@ import Table from '../../components/table';
 import CreateWrapper from '../../components/createWrapper';
 import SelectCustom from '../../components/SelectCustom';
 import TagTeam from '../../components/TagTeam';
-import { organisationState, userState } from '../../recoil/auth';
+import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 
@@ -73,7 +73,6 @@ const TeamWrapper = styled.div`
 
 const Create = ({ onChange }) => {
   const [open, setOpen] = useState(false);
-  const organisation = useRecoilValue(organisationState);
   const API = useApi();
 
   return (
@@ -83,34 +82,43 @@ const Create = ({ onChange }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouvel utilisateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', email: '' }}
+            initialValues={{ name: '', email: '', role: '' }}
+            validate={(values) => {
+              const errors = {};
+              if (!values.name) errors.name = 'Le nom est obligatoire';
+              if (!values.email) errors.email = "L'email est obligatoire";
+              else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) errors.email = "L'email est invalide";
+              if (!values.role) errors.role = 'Le rôle est obligatoire';
+              return errors;
+            }}
             onSubmit={async (body, actions) => {
               try {
-                body.organisation = organisation._id;
-                const res = await API.post({ path: '/user', body });
+                const { ok } = await API.post({ path: '/user', body });
                 actions.setSubmitting(false);
-                if (!res.ok) return;
+                if (!ok) return;
                 toastr.success('Création réussie !');
                 onChange();
                 setOpen(false);
               } catch (errorCreatingUser) {
                 console.log('error in creating user', errorCreatingUser);
-                toastr.error('Erreur!', errorCreatingUser.message);
+                toastr.error('Erreur !', errorCreatingUser.message);
               }
             }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
+            {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (
               <React.Fragment>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
                       <Label>Nom</Label>
                       <Input name="name" value={values.name} onChange={handleChange} />
+                      {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label>Email</Label>
                       <Input name="email" value={values.email} onChange={handleChange} />
+                      {touched.email && errors.email && <Error>{errors.email}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -121,6 +129,7 @@ const Create = ({ onChange }) => {
                         onChange={({ value }) => handleChange({ target: { value, name: 'role' } })}
                         value={{ value: values.role, label: values.role }}
                       />
+                      {touched.role && errors.role && <Error>{errors.role}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -150,5 +159,10 @@ const Create = ({ onChange }) => {
     </CreateWrapper>
   );
 };
+
+const Error = styled.span`
+  color: red;
+  font-size: 11px;
+`;
 
 export default List;

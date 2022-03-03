@@ -4,6 +4,7 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { Op } = require("sequelize");
+const { z } = require("zod");
 
 const { catchErrors } = require("../errors");
 const { validatePassword } = require("../utils");
@@ -160,39 +161,43 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") {
-      capture("attempt of creating a user with no admin role", { user: req.user });
-      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
+    try {
+      z.literal("admin").parse(req.user.role);
+      z.string().uuid().parse(req.user.organisation);
+      z.string().min(1).parse(req.body.name);
+      z.string().email().parse(req.body.email);
+      z.array(z.string().uuid()).optional().parse(req.body.team);
+      z.enum(["admin", "normal"]).parse(req.body.role);
+    } catch (e) {
+      console.log(e);
+      return res.status(400).send({ ok: false, error: "Invalid request" });
     }
-    if (!req.body.name) return res.status(403).send({ ok: false, error: "A name is required" });
-    if (!req.body.email) return res.status(403).send({ ok: false, error: "An email is required" });
-    if (!req.body.organisation) return res.status(403).send({ ok: false, error: "An organisation is required" });
-    if (!req.body.role) return res.status(403).send({ ok: false, error: "A role is required" });
-    const newUser = {};
-    newUser.name = req.body.name;
-    newUser.email = req.body.email.trim().toLowerCase();
-    newUser.password = generatePassword();
-    newUser.organisation = req.body.organisation;
-    newUser.role = req.body.role;
+
+    const { name, email, role, team } = req.body;
     const token = crypto.randomBytes(20).toString("hex");
-    newUser.forgotPasswordResetToken = token;
-    newUser.forgotPasswordResetExpires = new Date(Date.now() + JWT_MAX_AGE * 1000);
+    const newUser = {
+      name,
+      role,
+      email: email.trim().toLowerCase(),
+      password: generatePassword(),
+      organisation: req.user.organisation,
+      forgotPasswordResetToken: token,
+      forgotPasswordResetExpires: new Date(Date.now() + JWT_MAX_AGE * 1000),
+    };
 
     const prevUser = await User.findOne({ where: { email: newUser.email } });
-    if (!!prevUser) return res.status(400).send({ ok: false, error: "A user already exists with this email" });
+    if (prevUser) return res.status(400).send({ ok: false, error: "A user already exists with this email" });
 
     const data = await User.create(newUser, { returning: true });
 
-    if (req.body.hasOwnProperty("team")) {
+    if (team) {
       const user = await User.findOne({ where: { _id: data._id } });
+      const teams = await Team.findAll({ where: { organisation: req.user.organisation, _id: { [Op.in]: team } } });
       const tx = await User.sequelize.transaction();
-      const team = req.body.team;
-      if (team && Array.isArray(team)) {
-        await RelUserTeam.bulkCreate(
-          team.map((teamId) => ({ user: data._id, team: teamId })),
-          { transaction: tx }
-        );
-      }
+      await RelUserTeam.bulkCreate(
+        teams.map((t) => ({ user: data._id, team: t._id })),
+        { transaction: tx }
+      );
       await tx.commit();
       await user.save({ transaction: tx });
     }
