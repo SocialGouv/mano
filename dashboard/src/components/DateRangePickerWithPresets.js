@@ -86,7 +86,6 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
 
   const handleWindowResize = useCallback(() => {
-    console.log(window.innerWidth);
     if (window.innerWidth < 1100) {
       setNumberOfMonths(1);
     } else {
