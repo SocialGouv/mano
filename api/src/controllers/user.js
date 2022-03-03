@@ -166,7 +166,7 @@ router.post(
       z.string().uuid().parse(req.user.organisation);
       z.string().min(1).parse(req.body.name);
       z.string().email().parse(req.body.email);
-      z.array(z.string().uuid()).optional().parse(req.body.team);
+      z.array(z.string().uuid()).parse(req.body.team);
       z.enum(["admin", "normal"]).parse(req.body.role);
     } catch (e) {
       return res.status(400).send({ ok: false, error: "Invalid request" });
@@ -189,17 +189,15 @@ router.post(
 
     const data = await User.create(newUser, { returning: true });
 
-    if (team) {
-      const user = await User.findOne({ where: { _id: data._id } });
-      const teams = await Team.findAll({ where: { organisation: req.user.organisation, _id: { [Op.in]: team } } });
-      const tx = await User.sequelize.transaction();
-      await RelUserTeam.bulkCreate(
-        teams.map((t) => ({ user: data._id, team: t._id })),
-        { transaction: tx }
-      );
-      await tx.commit();
-      await user.save({ transaction: tx });
-    }
+    const user = await User.findOne({ where: { _id: data._id } });
+    const teams = await Team.findAll({ where: { organisation: req.user.organisation, _id: { [Op.in]: team } } });
+    const tx = await User.sequelize.transaction();
+    await RelUserTeam.bulkCreate(
+      teams.map((t) => ({ user: data._id, team: t._id })),
+      { transaction: tx }
+    );
+    await tx.commit();
+    await user.save({ transaction: tx });
 
     const subject = "Bienvenue dans Mano 👋";
     const body = `Bonjour ${data.name} !

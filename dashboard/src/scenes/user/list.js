@@ -82,13 +82,14 @@ const Create = ({ onChange }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouvel utilisateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', email: '', role: '' }}
+            initialValues={{ name: '', email: '', role: '', team: [] }}
             validate={(values) => {
               const errors = {};
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.email) errors.email = "L'email est obligatoire";
               else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) errors.email = "L'email est invalide";
               if (!values.role) errors.role = 'Le rôle est obligatoire';
+              if (!values.team?.length) errors.team = 'Veuillez sélectionner une équipe';
               return errors;
             }}
             onSubmit={async (body, actions) => {
@@ -141,6 +142,7 @@ const Create = ({ onChange }) => {
                           value={values.team || []}
                           colored
                         />
+                        {touched.team && errors.team && <Error>{errors.team}</Error>}
                       </div>
                     </FormGroup>
                   </Col>
