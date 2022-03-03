@@ -45,8 +45,8 @@ class ApiService {
       const response = await this.fetch(url, options);
 
       if (!response.ok && response.status === 401) {
-        if (this.handleLogoutError) this.handleLogoutError();
         if (this.logout) this.logout('401');
+        if (this.handleLogoutError) this.handleLogoutError();
         return response;
       }
 
