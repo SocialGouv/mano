@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Alert, findNodeHandle, Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
@@ -136,6 +136,17 @@ const PersonSummary = ({
   const comments = useMemo(() => allComments.filter((c) => c.person === personDB?._id), [allComments, personDB?._id]);
 
   const teams = useRecoilValue(teamsState);
+
+  const onActionPress = useCallback(
+    (action) => {
+      Sentry.setContext('action', { _id: action._id });
+      navigation.push('Actions', {
+        screen: 'Action',
+        params: { _id: action._id, fromRoute: 'Person' },
+      });
+    },
+    [navigation]
+  );
 
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
@@ -280,20 +291,7 @@ const PersonSummary = ({
         testID="person-actions-list"
         data={actions}
         renderItem={(action, index) => (
-          <ActionRow
-            key={index}
-            action={action}
-            showStatus
-            withTeamName
-            testID="person-action"
-            onActionPress={() => {
-              Sentry.setContext('action', { _id: action._id });
-              navigation.push('Actions', {
-                screen: 'Action',
-                params: { _id: action._id, fromRoute: 'Person' },
-              });
-            }}
-          />
+          <ActionRow key={index} action={action} showStatus withTeamName testID="person-action" onActionPress={onActionPress} />
         )}
         ifEmpty="Pas encore d'action"
       />

@@ -97,8 +97,6 @@ const Loader = () => {
       return;
     }
 
-    console.log('response.data.actions', response.data.actions);
-
     let total =
       response.data.actions +
       response.data.persons +
@@ -112,7 +110,6 @@ const Loader = () => {
       const numberOfCollections = 8;
       total = total + numberOfCollections; // for the progress bar to be beautiful
     }
-    console.log('total', total);
     /*
     Get persons
     */

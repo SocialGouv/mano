@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useCallback, useRef } from 'react';
 import { Animated, Platform } from 'react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import SceneContainer from '../../components/SceneContainer';
@@ -10,36 +10,21 @@ import { CANCEL, DONE, TODO } from '../../recoil/actions';
 const TabNavigator = createMaterialTopTabNavigator();
 
 const ActionsTabNavigator = () => {
-  const scrollY = useRef(new Animated.Value(0)).current;
-  const onScroll = Animated.event(
-    [
-      {
-        nativeEvent: {
-          contentOffset: {
-            y: scrollY,
-          },
-        },
-      },
-    ],
-    { useNativeDriver: true }
-  );
   return (
     <SceneContainer>
-      <ScreenTitle title="Agenda" parentScroll={scrollY} />
       <TabNavigator.Navigator
-        tabBar={(props) => <Tabs numberOfTabs={3} parentScroll={scrollY} {...props} />}
+        tabBar={(props) => (
+          <>
+            <ScreenTitle title="Agenda" forceTop />
+            <Tabs numberOfTabs={3} forceTop {...props} />
+          </>
+        )}
         lazy
         removeClippedSubviews={Platform.OS === 'android'}
         swipeEnabled>
-        <TabNavigator.Screen name={TODO} options={{ tabBarLabel: 'À Faire' }}>
-          {(props) => <ActionsList onScroll={onScroll} parentScroll={scrollY} status={TODO} />}
-        </TabNavigator.Screen>
-        <TabNavigator.Screen name={DONE} options={{ tabBarLabel: 'Faites' }}>
-          {(props) => <ActionsList onScroll={onScroll} parentScroll={scrollY} status={DONE} />}
-        </TabNavigator.Screen>
-        <TabNavigator.Screen name={CANCEL} options={{ tabBarLabel: 'Annulées' }}>
-          {(props) => <ActionsList onScroll={onScroll} parentScroll={scrollY} status={CANCEL} />}
-        </TabNavigator.Screen>
+        <TabNavigator.Screen name={TODO} options={{ tabBarLabel: 'À Faire' }} component={ActionsList} initialParams={{ status: TODO }} />
+        <TabNavigator.Screen name={DONE} options={{ tabBarLabel: 'Faites' }} component={ActionsList} initialParams={{ status: DONE }} />
+        <TabNavigator.Screen name={CANCEL} options={{ tabBarLabel: 'Annulées' }} component={ActionsList} initialParams={{ status: CANCEL }} />
       </TabNavigator.Navigator>
     </SceneContainer>
   );
