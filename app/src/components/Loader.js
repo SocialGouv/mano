@@ -47,11 +47,11 @@ export const refreshTriggerState = atom({
   },
 });
 
-const mergeItems = (oldItems, newItems) =>
-  [...oldItems, ...newItems].reduce((items, item) => {
-    if (items.find((i) => i?.id === item._id)) return items.map((i) => (i._id === item._id ? item : i));
-    return [...items, item];
-  }, []);
+const mergeItems = (oldItems, newItems) => {
+  const newItemsIds = newItems.map((i) => i._id);
+  const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
+  return [...oldItemsPurged, ...newItems];
+};
 
 const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
@@ -70,9 +70,6 @@ const Loader = () => {
   const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
   const [comments, setComments] = useRecoilState(commentsState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
-
-  console.log('actions.length', actions.length);
-  console.log('refreshTrigger', refreshTrigger);
 
   useEffect(() => {
     if (refreshTrigger.status === true) {
@@ -99,6 +96,9 @@ const Loader = () => {
       });
       return;
     }
+
+    console.log('response.data.actions', response.data.actions);
+
     let total =
       response.data.actions +
       response.data.persons +
@@ -112,6 +112,7 @@ const Loader = () => {
       const numberOfCollections = 8;
       total = total + numberOfCollections; // for the progress bar to be beautiful
     }
+    console.log('total', total);
     /*
     Get persons
     */
