@@ -160,6 +160,17 @@ router.put(
 );
 
 router.delete(
+  "/:_id/clean",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res) => {
+    // Super admin can delete any organisation. Admin can delete only their organisation.
+    const { persons, actions, territories, places, relsPersonPlace, territoryObservations, comments } = req.body;
+    // WIP: SQL check if exists multiple ids
+    return res.status(200).send({ ok: true });
+  })
+);
+
+router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {

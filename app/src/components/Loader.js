@@ -8,7 +8,7 @@ import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
-import { getData, useStorage } from '../services/dataManagement';
+import { getData, MMKV, useStorage } from '../services/dataManagement';
 import { organisationState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
@@ -103,7 +103,6 @@ const Loader = () => {
       (response.data.territoryObservations || 1) +
       (response.data.places || 1) +
       (response.data.comments || 1) +
-      (response.data.reports || 1) +
       (response.data.relsPersonPlace || 1);
     /*
     Get persons
@@ -205,6 +204,81 @@ const Loader = () => {
         setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
       API,
     });
+    if (refreshedComments) setComments(refreshedComments);
+    /*
+    Clean cache
+    */
+    setLoading('Nettoyage de la mémoire cache');
+    const itemsToDelete = await API.delete({
+      path: `/organisation/${organisationId}/clean`,
+      body: {
+        persons: persons.map((p) => p._id),
+        actions: actions.map((a) => a._id),
+        territories: territories.map((t) => t._id),
+        places: places.map((p) => p._id),
+        relsPersonPlace: relsPersonPlace.map((r) => r._id),
+        territoryObservations: territoryObservations.map((t) => t._id),
+        comments: comments.map((c) => c._id),
+      },
+    });
+    if (Object.keys(itemsToDelete?.data)) {
+      for (const key of Object.keys(itemsToDelete.data)) {
+        const idsToRemove = itemsToDelete.data[key];
+        switch (key) {
+          case 'person':
+            setPersons(persons.filter((p) => !idsToRemove.includes(p._id)));
+            await MMKV.setMapAsync(
+              'person',
+              persons.filter((p) => !idsToRemove.includes(p._id))
+            );
+            break;
+          case 'action':
+            setActions(actions.filter((a) => !idsToRemove.includes(a._id)));
+            await MMKV.setMapAsync(
+              'action',
+              actions.filter((a) => !idsToRemove.includes(a._id))
+            );
+            break;
+          case 'territory':
+            setTerritories(territories.filter((t) => !idsToRemove.includes(t._id)));
+            await MMKV.setMapAsync(
+              'territory',
+              territories.filter((t) => !idsToRemove.includes(t._id))
+            );
+            break;
+          case 'place':
+            setPlaces(places.filter((p) => !idsToRemove.includes(p._id)));
+            await MMKV.setMapAsync(
+              'place',
+              places.filter((p) => !idsToRemove.includes(p._id))
+            );
+            break;
+          case 'relPersonPlace':
+            setRelsPersonPlace(relsPersonPlace.filter((r) => !idsToRemove.includes(r._id)));
+            await MMKV.setMapAsync(
+              'relPersonPlace',
+              relsPersonPlace.filter((r) => !idsToRemove.includes(r._id))
+            );
+            break;
+          case 'territory-observation':
+            setTerritoryObs(territoryObservations.filter((t) => !idsToRemove.includes(t._id)));
+            await MMKV.setMapAsync(
+              'territory-observation',
+              territoryObservations.filter((t) => !idsToRemove.includes(t._id))
+            );
+            break;
+          case 'comment':
+            setComments(comments.filter((c) => !idsToRemove.includes(c._id)));
+            await MMKV.setMapAsync(
+              'comment',
+              comments.filter((c) => !idsToRemove.includes(c._id))
+            );
+            break;
+          default:
+            break;
+        }
+      }
+    }
     if (refreshedComments) setComments(refreshedComments);
 
     /*
