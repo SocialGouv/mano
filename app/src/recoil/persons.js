@@ -214,7 +214,15 @@ export const personFields = [
   { name: 'structureMedical', type: 'text', label: 'Structure de suivi médical', encrypted: true, importable: true, filterable: true },
   { name: 'employment', type: 'enum', label: 'Emploi', encrypted: true, importable: true, options: employmentOptions, filterable: true },
   { name: 'address', type: 'yes-no', label: 'Hébergement', encrypted: true, importable: true, options: yesNoOptions, filterable: true },
-  { name: 'addressDetail', type: 'text', label: "Type d'hébergement", encrypted: true, importable: true, filterable: true },
+  {
+    name: 'addressDetail',
+    type: 'enum',
+    label: "Type d'hébergement",
+    encrypted: true,
+    options: [...addressDetailsFixedFields, 'Autre'],
+    importable: true,
+    filterable: true,
+  },
   { name: 'resources', type: 'multi-choice', label: 'Ressources', encrypted: true, importable: true, options: ressourcesOptions, filterable: true },
   {
     name: 'reasons',
