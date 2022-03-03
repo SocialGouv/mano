@@ -1,3 +1,10 @@
+## [1.67.3](https://github.com/SocialGouv/mano/compare/v1.67.2...v1.67.3) (2022-03-03)
+
+
+### Bug Fixes
+
+* **dashboard:** celan ([#431](https://github.com/SocialGouv/mano/issues/431)) ([43ac42c](https://github.com/SocialGouv/mano/commit/43ac42ceb2ec1cb6b36c57e46412610e4c9c6635))
+
 ## [1.67.2](https://github.com/SocialGouv/mano/compare/v1.67.1...v1.67.2) (2022-03-03)
 
 
