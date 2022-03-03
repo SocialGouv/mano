@@ -1,3 +1,10 @@
+## [1.67.1](https://github.com/SocialGouv/mano/compare/v1.67.0...v1.67.1) (2022-03-03)
+
+
+### Bug Fixes
+
+* **app:** expired session ([#426](https://github.com/SocialGouv/mano/issues/426)) ([a954e73](https://github.com/SocialGouv/mano/commit/a954e73079b6c995d5a5c9c26b8d9f50973cd150))
+
 # [1.67.0](https://github.com/SocialGouv/mano/compare/v1.66.2...v1.67.0) (2022-03-03)
 
 
