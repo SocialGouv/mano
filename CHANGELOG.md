@@ -1,3 +1,10 @@
+## [1.67.5](https://github.com/SocialGouv/mano/compare/v1.67.4...v1.67.5) (2022-03-03)
+
+
+### Bug Fixes
+
+* data validation ([#427](https://github.com/SocialGouv/mano/issues/427)) ([017ece4](https://github.com/SocialGouv/mano/commit/017ece4cf40c745bb00eaaaa09adfe005fb541ff))
+
 ## [1.67.4](https://github.com/SocialGouv/mano/compare/v1.67.3...v1.67.4) (2022-03-03)
 
 
