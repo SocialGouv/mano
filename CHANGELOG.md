@@ -1,3 +1,10 @@
+## [1.67.4](https://github.com/SocialGouv/mano/compare/v1.67.3...v1.67.4) (2022-03-03)
+
+
+### Bug Fixes
+
+* **dashboard,app:** addressDetails as enum not text filter ([#432](https://github.com/SocialGouv/mano/issues/432)) ([416fcbf](https://github.com/SocialGouv/mano/commit/416fcbf27e7880823ea3536301ad8134b08a8bd7))
+
 ## [1.67.3](https://github.com/SocialGouv/mano/compare/v1.67.2...v1.67.3) (2022-03-03)
 
 
