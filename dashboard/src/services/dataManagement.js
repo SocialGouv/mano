@@ -40,7 +40,7 @@ export async function getData({
   lastRefresh = 0,
 }) {
   const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
-  if (!response.ok) throw { message: `Error getting ${collectionName} data`, response };
+  if (!response.ok) console.log({ message: `Error getting ${collectionName} data`, response });
 
   data = mergeNewUpdatedData(response.decryptedData, data);
   // await MMKV.setMapAsync(collectionName, data);
