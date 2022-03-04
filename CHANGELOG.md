@@ -1,3 +1,10 @@
+## [1.68.1](https://github.com/SocialGouv/mano/compare/v1.68.0...v1.68.1) (2022-03-04)
+
+
+### Bug Fixes
+
+* noisy error ([65e12c8](https://github.com/SocialGouv/mano/commit/65e12c8ab03109648fa0a4f5eb0232bc5fbba4ea))
+
 # [1.68.0](https://github.com/SocialGouv/mano/compare/v1.67.6...v1.68.0) (2022-03-04)
 
 
