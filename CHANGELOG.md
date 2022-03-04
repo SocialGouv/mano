@@ -1,3 +1,10 @@
+## [1.70.1](https://github.com/SocialGouv/mano/compare/v1.70.0...v1.70.1) (2022-03-04)
+
+
+### Bug Fixes
+
+* **dashboard:** loader message ([#445](https://github.com/SocialGouv/mano/issues/445)) ([dc12a25](https://github.com/SocialGouv/mano/commit/dc12a25959a19f9601d6e47c559c0b503fe7b64a))
+
 # [1.70.0](https://github.com/SocialGouv/mano/compare/v1.69.0...v1.70.0) (2022-03-04)
 
 
