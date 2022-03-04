@@ -1,3 +1,10 @@
+## [1.68.3](https://github.com/SocialGouv/mano/compare/v1.68.2...v1.68.3) (2022-03-04)
+
+
+### Bug Fixes
+
+* **app:** show only a few actions ([#439](https://github.com/SocialGouv/mano/issues/439)) ([3b82473](https://github.com/SocialGouv/mano/commit/3b82473353f7b9e3d621787d52a2f783727024fe))
+
 ## [1.68.2](https://github.com/SocialGouv/mano/compare/v1.68.1...v1.68.2) (2022-03-04)
 
 
