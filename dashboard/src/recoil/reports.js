@@ -2,7 +2,6 @@ import dayjs from 'dayjs';
 import { atom, useRecoilState } from 'recoil';
 import { useComments } from '../recoil/comments';
 import useApi from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 
 export const reportsState = atom({
@@ -10,47 +9,11 @@ export const reportsState = atom({
   default: [],
 });
 
-export const reportsLoadingState = atom({
-  key: 'reportsLoadingState',
-  default: true,
-});
-
 export const useReports = () => {
   const { addComment } = useComments();
   const API = useApi();
 
   const [reports, setReports] = useRecoilState(reportsState);
-  const [loading, setLoading] = useRecoilState(reportsLoadingState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-reports', 0);
-
-  const setReportsFullState = (newReports) => {
-    if (newReports) setReports(newReports.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
-    setLoading(false);
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newReports) => setReports((reports) => [...reports, ...newReports]);
-
-  const refreshReports = async (setProgress, initialLoad) => {
-    setLoading(true);
-    try {
-      const data = await getData({
-        collectionName: 'report',
-        data: reports,
-        isInitialization: initialLoad,
-        setProgress,
-        lastRefresh,
-        setBatchData,
-        API,
-      });
-      setReportsFullState(data);
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      setLoading(false);
-      return false;
-    }
-  };
 
   const deleteReport = async (id) => {
     const res = await API.delete({ path: `/report/${id}` });
@@ -114,8 +77,6 @@ export const useReports = () => {
 
   return {
     reports,
-    loading,
-    refreshReports,
     setReports,
     updateReport,
     incrementPassage,

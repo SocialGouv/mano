@@ -1,6 +1,5 @@
 import { atom, useRecoilState } from 'recoil';
 import useApi from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useTerritoryObservations } from './territoryObservations';
 
@@ -9,48 +8,11 @@ export const territoriesState = atom({
   default: [],
 });
 
-export const territoriesLoadingState = atom({
-  key: 'territoriesLoadingState',
-  default: true,
-});
-
 export const useTerritories = () => {
   const { territoryObservations, deleteTerritoryObs } = useTerritoryObservations();
   const API = useApi();
 
   const [territories, setTerritories] = useRecoilState(territoriesState);
-  const [loading, setLoading] = useRecoilState(territoriesLoadingState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-territories', 0);
-
-  const setTerritoriesFullState = (newTerritories) => {
-    if (newTerritories) setTerritories(newTerritories);
-    setLoading(false);
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newTerritories) => setTerritories((territories) => [...territories, ...newTerritories]);
-
-  const refreshTerritories = async (setProgress, initialLoad) => {
-    setLoading(true);
-    try {
-      setTerritoriesFullState(
-        await getData({
-          collectionName: 'territory',
-          data: territories,
-          isInitialization: initialLoad,
-          setProgress,
-          lastRefresh,
-          setBatchData,
-          API,
-        })
-      );
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      setLoading(false);
-      return false;
-    }
-  };
 
   const deleteTerritory = async (id) => {
     const res = await API.delete({ path: `/territory/${id}` });
@@ -100,8 +62,6 @@ export const useTerritories = () => {
 
   return {
     territories,
-    loading,
-    refreshTerritories,
     setTerritories,
     deleteTerritory,
     addTerritory,

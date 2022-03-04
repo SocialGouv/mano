@@ -1,7 +1,6 @@
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth';
 import useApi from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
 import { now } from '../services/date';
 import { capture } from '../services/sentry';
 import { useComments } from './comments';
@@ -11,49 +10,12 @@ export const actionsState = atom({
   default: [],
 });
 
-export const actionsLoadingState = atom({
-  key: 'actionsLoadingState',
-  default: true,
-});
-
 export const useActions = () => {
   const { comments, addComment, deleteComment } = useComments();
   const user = useRecoilValue(userState);
   const API = useApi();
 
   const [actions, setActions] = useRecoilState(actionsState);
-  const [loading, setLoading] = useRecoilState(actionsLoadingState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-actions', 0);
-
-  const setActionsFullState = (newActions) => {
-    if (newActions) setActions(newActions);
-    setLoading(false);
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newActions) => setActions((actions) => [...actions, ...newActions]);
-
-  const refreshActions = async (setProgress, initialLoad) => {
-    setLoading(true);
-    try {
-      setActionsFullState(
-        await getData({
-          collectionName: 'action',
-          data: actions,
-          isInitialization: initialLoad,
-          setProgress,
-          lastRefresh,
-          setBatchData,
-          API,
-        })
-      );
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      setLoading(false);
-      return false;
-    }
-  };
 
   const deleteAction = async (id) => {
     const res = await API.delete({ path: `/action/${id}` });
@@ -128,12 +90,10 @@ export const useActions = () => {
   };
 
   return {
-    refreshActions,
     deleteAction,
     updateAction,
     addAction,
     actions,
-    loading,
   };
 };
 
