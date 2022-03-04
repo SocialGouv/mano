@@ -11,7 +11,7 @@ import Box from '../../components/Box';
 import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
-import { actionsCategories } from '../../recoil/actions';
+import { actionsCategories, actionsState } from '../../recoil/actions';
 import { defaultMedicalCustomFields, usePersons } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
@@ -25,6 +25,7 @@ import SortableGrid from '../../components/SortableGrid';
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const [actions, setActions] = useRecoilState(actionsState);
   const { personFieldsIncludingCustomFields } = usePersons();
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
@@ -125,10 +126,26 @@ const View = () => {
                               <Label>Categories des actions</Label>
                               <SortableGrid
                                 list={values.categories || []}
+                                editItemTitle="Changer le nom de la catégorie d'action"
                                 onUpdateList={(cats) => handleChange({ target: { value: cats, name: 'categories' } })}
                                 onRemoveItem={(content) =>
                                   handleChange({ target: { value: values.categories.filter((cat) => cat !== content), name: 'categories' } })
                                 }
+                                onEditItem={async ({ content, newContent }) => {
+                                  handleChange({ target: { value: values.categories.filter((cat) => cat !== content), name: 'categories' } });
+                                  const response = await API.put({
+                                    path: `/organisation/${organisation._id}`,
+                                    body: { categories: values.categories.map((cat) => (cat === content ? newContent : cat)) },
+                                  });
+                                  if (response.ok) {
+                                    const actionsWithThisCategory = actions.filter((a) => a.categories.includes(content));
+                                    for (const action of actionsWithThisCategory) {
+                                      const res = await updateAction(body);
+                                      if (res.ok) {
+                                      }
+                                    }
+                                  }
+                                }}
                               />
                             </FormGroup>
                             <FormGroup>
@@ -184,10 +201,12 @@ const View = () => {
                               <Label>Services disponibles</Label>
                               <SortableGrid
                                 list={values.services || []}
+                                editItemTitle="Changer le nom du service"
                                 onUpdateList={(newServices) => handleChange({ target: { value: newServices, name: 'services' } })}
                                 onRemoveItem={(content) =>
                                   handleChange({ target: { value: values.services.filter((service) => service !== content), name: 'services' } })
                                 }
+                                onEditItem={console.log}
                               />
                             </FormGroup>
                             <FormGroup>

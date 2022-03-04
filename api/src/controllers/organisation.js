@@ -161,6 +161,34 @@ router.put(
   })
 );
 
+router.put(
+  "/service/:_id",
+  passport.authenticate("user", { session: false }),
+  catchErrors(async (req, res) => {
+    const query = { where: { _id: req.params._id } };
+    const organisation = await Organisation.findOne(query);
+    if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    if (req.user.role !== "admin") return res.status(403).send({ ok: false, error: "Forbidden" });
+    try {
+      z.literal("admin").parse(req.user.role);
+      z.string().uuid().parse(req.user.organisation);
+      z.string().min(1).parse(req.body.name);
+      z.string().email().parse(req.body.email);
+      z.array(z.string().uuid()).parse(req.body.team);
+      z.enum(["admin", "normal"]).parse(req.body.role);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+
+    if (req.body.hasOwnProperty("services")) updateOrg.services = req.body.services;
+
+    await organisation.update(updateOrg);
+
+    return res.status(200).send({ ok: true, data: organisation });
+  })
+);
+
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
