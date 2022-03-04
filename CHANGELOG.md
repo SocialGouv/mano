@@ -1,3 +1,10 @@
+## [1.68.4](https://github.com/SocialGouv/mano/compare/v1.68.3...v1.68.4) (2022-03-04)
+
+
+### Bug Fixes
+
+* **app:** duplicate comments on duplicate action ([#433](https://github.com/SocialGouv/mano/issues/433)) ([0949a71](https://github.com/SocialGouv/mano/commit/0949a71ae908aead47b34239424dfb000c56b69c))
+
 ## [1.68.3](https://github.com/SocialGouv/mano/compare/v1.68.2...v1.68.3) (2022-03-04)
 
 
