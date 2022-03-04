@@ -5,29 +5,58 @@ const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const Action = require("../models/action");
+const { z } = require("zod");
+const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
+
+const TODO = "A FAIRE";
+const DONE = "FAIT";
+const CANCEL = "ANNULEE";
+const STATUS = [TODO, DONE, CANCEL];
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
-  catchErrors(async (req, res, next) => {
-    const newAction = {};
-
-    newAction.organisation = req.user.organisation;
-
-    // These fields are not encrypted
-    if (req.body.hasOwnProperty("status")) newAction.status = req.body.status || null;
-    if (req.body.hasOwnProperty("dueAt")) newAction.dueAt = req.body.dueAt || null;
-    if (req.body.hasOwnProperty("completedAt")) newAction.completedAt = req.body.completedAt || null;
-    // Encrypted fields.
-    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      return next("No encrypted field in action creation");
+  catchErrors(async (req, res) => {
+    try {
+      z.enum(["admin", "normal"]).parse(req.user.role);
+      z.string().regex(looseUuidRegex).parse(req.user.organisation);
+      z.enum(STATUS).parse(req.body.status);
+      z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
+      z.preprocess((input) => (input ? new Date(input) : null), z.date())
+        .optional()
+        .parse(req.body.completedAt);
+      z.string().parse("encrypted");
+      z.string().parse("encryptedEntityKey");
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
     }
-    if (req.body.hasOwnProperty("encrypted")) newAction.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) newAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
 
-    const data = await Action.create(newAction, { returning: true });
-    return res.status(200).send({ ok: true, data });
+    const { status, dueAt, completedAt, encrypted, encryptedEntityKey } = req.body;
+    const action = {
+      organisation: req.user.organisation,
+      status,
+      dueAt,
+      completedAt: completedAt || null,
+      encrypted,
+      encryptedEntityKey,
+    };
+
+    const data = await Action.create(action, { returning: true });
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: data._id,
+        encrypted: data.encrypted,
+        encryptedEntityKey: data.encryptedEntityKey,
+        organisation: data.organisation,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+        status: data.status,
+        dueAt: data.dueAt,
+        completedAt: data.completedAt,
+      },
+    });
   })
 );
 
@@ -35,28 +64,30 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    const TODO = "A FAIRE";
-    const DONE = "FAIT";
-    const CANCEL = "ANNULEE";
+    try {
+      z.enum(["admin", "normal"]).parse(req.user.role);
+      z.string().regex(looseUuidRegex).parse(req.user.organisation);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+    const { limit, page, lastRefresh } = req.query;
 
     const query = {
-      where: {
-        organisation: req.user.organisation,
-      },
+      where: { organisation: req.user.organisation },
       order: [
         ["status", "ASC"],
         ["dueAt", "ASC"],
         ["createdAt", "ASC"],
       ],
     };
-    const total = await Action.count(query);
-    const limit = parseInt(req.query.limit, 10);
-    if (!!req.query.limit) query.limit = limit;
-    if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
 
-    if (req.query.lastRefresh) {
-      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-    }
+    const total = await Action.count(query);
+    if (limit) query.limit = Number(limit);
+    if (page) query.offset = Number(page) * limit;
+    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
 
     const sortDoneOrCancel = (a, b) => {
       if (!a.dueAt) return -1;
@@ -85,7 +116,6 @@ router.get(
     const todo = actions.filter((a) => a.status === TODO);
     const done = actions.filter((a) => a.status === DONE).sort(sortDoneOrCancel);
     const cancel = actions.filter((a) => a.status === CANCEL).sort(sortDoneOrCancel);
-
     const data = [...todo, ...done, ...cancel];
     return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
   })
@@ -95,31 +125,54 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
-  catchErrors(async (req, res, next) => {
-    const where = { _id: req.params._id };
-    where.organisation = req.user.organisation;
-    // Todo: check team before updating action for non-admin.
+  catchErrors(async (req, res) => {
+    try {
+      z.enum(["admin", "normal"]).parse(req.user.role);
+      z.string().regex(looseUuidRegex).parse(req.user.organisation);
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.enum(STATUS).parse(req.body.status);
+      z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
+      z.preprocess((input) => (input ? new Date(input) : null), z.date())
+        .optional()
+        .parse(req.body.completedAt);
+      z.string().parse("encrypted");
+      z.string().parse("encryptedEntityKey");
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
 
-    let action = await Action.findOne({ where });
+    const action = await Action.findOne({
+      where: {
+        _id: req.params._id,
+        organisation: req.user.organisation,
+      },
+    });
     if (!action) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const updateAction = {};
-
-    // These fields are not encrypted
-    if (req.body.hasOwnProperty("status")) updateAction.status = req.body.status || null;
-    if (req.body.hasOwnProperty("dueAt")) updateAction.dueAt = req.body.dueAt || null;
-    if (req.body.hasOwnProperty("completedAt")) updateAction.completedAt = req.body.completedAt || null;
-    // Encrypted fields.
-    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      return next("No encrypted field in action update");
-    }
-    if (req.body.hasOwnProperty("encrypted")) updateAction.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) updateAction.encryptedEntityKey = req.body.encryptedEntityKey || null;
-
-    action.set(updateAction);
+    const { status, dueAt, completedAt, encrypted, encryptedEntityKey } = req.body;
+    action.set({
+      status,
+      dueAt,
+      completedAt: completedAt || null,
+      encrypted,
+      encryptedEntityKey,
+    });
     await action.save();
 
-    return res.status(200).send({ ok: true, data: action });
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: action._id,
+        encrypted: action.encrypted,
+        encryptedEntityKey: action.encryptedEntityKey,
+        organisation: action.organisation,
+        createdAt: action.createdAt,
+        updatedAt: action.updatedAt,
+        status: action.status,
+        dueAt: action.dueAt,
+        completedAt: action.completedAt,
+      },
+    });
   })
 );
 
@@ -127,16 +180,21 @@ router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   catchErrors(async (req, res) => {
-    const query = {
+    try {
+      z.enum(["admin", "normal"]).parse(req.user.role);
+      z.string().regex(looseUuidRegex).parse(req.user.organisation);
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+
+    const action = await Action.findOne({
       where: {
         _id: req.params._id,
         organisation: req.user.organisation,
       },
-    };
-
-    let action = await Action.findOne(query);
+    });
     if (!action) return res.status(200).send({ ok: true });
-
     await action.destroy();
 
     res.status(200).send({ ok: true });
