@@ -2,7 +2,6 @@
 import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
 import { useComments } from '../recoil/comments';
 import useApi from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { useActions } from './actions';
 import { organisationState } from './auth';
@@ -11,11 +10,6 @@ import { useRelsPerson } from './relPersonPlace';
 export const personsState = atom({
   key: 'personsState',
   default: [],
-});
-
-export const personsLoadingState = atom({
-  key: 'personsLoadingState',
-  default: true,
 });
 
 export const customFieldsPersonsMedicalSelector = selector({
@@ -46,38 +40,6 @@ export const usePersons = () => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
 
   const [persons, setPersons] = useRecoilState(personsState);
-  const [loading, setLoading] = useRecoilState(personsLoadingState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-persons', 0);
-
-  const setPersonsFullState = (newPersons) => {
-    if (newPersons) setPersons(newPersons.sort(sortPersons));
-    setLoading(false);
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newPersons) => setPersons((persons) => [...persons, ...newPersons]);
-
-  const refreshPersons = async (setProgress, initialLoad = false) => {
-    setLoading(true);
-    try {
-      setPersonsFullState(
-        await getData({
-          collectionName: 'person',
-          data: persons,
-          isInitialization: initialLoad,
-          setProgress,
-          lastRefresh,
-          setBatchData,
-          API,
-        })
-      );
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      setLoading(false);
-      return false;
-    }
-  };
 
   const deletePerson = async (id) => {
     const res = await API.delete({ path: `/person/${id}` });
@@ -198,11 +160,9 @@ export const usePersons = () => {
 
   return {
     persons,
-    loading,
     personFieldsIncludingCustomFields,
     customFieldsPersonsSocial,
     customFieldsPersonsMedical,
-    refreshPersons,
     deletePerson,
     addPerson,
     updatePerson,

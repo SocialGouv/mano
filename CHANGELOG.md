@@ -1,3 +1,38 @@
+## [1.68.4](https://github.com/SocialGouv/mano/compare/v1.68.3...v1.68.4) (2022-03-04)
+
+
+### Bug Fixes
+
+* **app:** duplicate comments on duplicate action ([#433](https://github.com/SocialGouv/mano/issues/433)) ([0949a71](https://github.com/SocialGouv/mano/commit/0949a71ae908aead47b34239424dfb000c56b69c))
+
+## [1.68.3](https://github.com/SocialGouv/mano/compare/v1.68.2...v1.68.3) (2022-03-04)
+
+
+### Bug Fixes
+
+* **app:** show only a few actions ([#439](https://github.com/SocialGouv/mano/issues/439)) ([3b82473](https://github.com/SocialGouv/mano/commit/3b82473353f7b9e3d621787d52a2f783727024fe))
+
+## [1.68.2](https://github.com/SocialGouv/mano/compare/v1.68.1...v1.68.2) (2022-03-04)
+
+
+### Bug Fixes
+
+* **dashboard:** stop throw error on fail api request ([#441](https://github.com/SocialGouv/mano/issues/441)) ([2d06ded](https://github.com/SocialGouv/mano/commit/2d06ded8b587707849daab4420df253a4c146ab3))
+
+## [1.68.1](https://github.com/SocialGouv/mano/compare/v1.68.0...v1.68.1) (2022-03-04)
+
+
+### Bug Fixes
+
+* noisy error ([65e12c8](https://github.com/SocialGouv/mano/commit/65e12c8ab03109648fa0a4f5eb0232bc5fbba4ea))
+
+# [1.68.0](https://github.com/SocialGouv/mano/compare/v1.67.6...v1.68.0) (2022-03-04)
+
+
+### Features
+
+* **dashboard:** reorder services categories and custom fields ([#423](https://github.com/SocialGouv/mano/issues/423)) ([5022f9c](https://github.com/SocialGouv/mano/commit/5022f9c5fabe6a28460b6b743133cbca8ca28d96))
+
 ## [1.67.6](https://github.com/SocialGouv/mano/compare/v1.67.5...v1.67.6) (2022-03-04)
 
 

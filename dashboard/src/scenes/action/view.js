@@ -35,7 +35,7 @@ const View = () => {
   const user = useRecoilValue(userState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
-  const { deleteAction, updateAction, actions, refreshActions } = useActions();
+  const { deleteAction, updateAction, actions } = useActions();
   const history = useHistory();
 
   const action = actions.find((a) => a._id === id);
@@ -76,7 +76,10 @@ const View = () => {
             const res = await updateAction(body);
             if (res.ok) {
               toastr.success('Mis à jour !');
-              refreshActions();
+              setRefreshTrigger({
+                status: true,
+                options: { showFullScreen: false, initialLoad: false },
+              });
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => {
