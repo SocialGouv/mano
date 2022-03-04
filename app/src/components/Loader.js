@@ -80,6 +80,7 @@ const Loader = () => {
 
   const refresh = async () => {
     const { showFullScreen, initialLoad } = refreshTrigger.options;
+    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
     setFullScreen(showFullScreen);
     /*
     Get number of data to download to show the appropriate loading progress bar
@@ -109,6 +110,11 @@ const Loader = () => {
     if (initialLoad) {
       const numberOfCollections = 8;
       total = total + numberOfCollections; // for the progress bar to be beautiful
+    }
+    if (!initialLoad && !total) {
+      setLoading('Rien à télécharger');
+      setProgress(1);
+      await new Promise((res) => setTimeout(res, 500));
     }
     /*
     Get persons

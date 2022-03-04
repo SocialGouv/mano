@@ -77,8 +77,6 @@ const ActionsList = () => {
     return <ActionRow action={item.item} onPseudoPress={onPseudoPress} onActionPress={onActionPress} />;
   };
 
-  console.log({ SectionListFooterComponent });
-
   return (
     <SceneContainer testID="actions-list">
       {[TODO].includes(status) ? (
