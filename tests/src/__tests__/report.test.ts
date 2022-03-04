@@ -202,6 +202,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
     await expect(page).toClick("div.close-toastr");
+    await page.waitForTimeout(500);
     await expect(page).toClick("a", { text: "Retour" });
     await page.waitForTimeout(500);
     await expect(page).toClick("a", { text: "Actions complétées (0)" });

@@ -13,7 +13,6 @@ const Territory = require("../models/territory");
 const Report = require("../models/report");
 const Comment = require("../models/comment");
 const mailservice = require("../utils/mailservice");
-const { generatePassword } = require("../utils");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -33,7 +32,7 @@ router.post(
       {
         name: req.body.name,
         email: req.body.email.trim().toLowerCase(),
-        password: generatePassword(),
+        password: crypto.randomBytes(60).toString("hex"), // A useless password.,
         role: "admin",
         organisation: organisation._id,
         forgotPasswordResetToken: token,

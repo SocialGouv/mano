@@ -1,16 +1,5 @@
 import { dayjsInstance } from './services/date';
 
-// This function should be replaced with secure crypto.
-const generatePassword = () => {
-  let length = 6;
-  let charset = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let retVal = '';
-  for (let i = 0, n = charset.length; i < length; ++i) {
-    retVal += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return retVal;
-};
-
 const isNullOrUndefined = (value) => {
   if (typeof value === 'undefined') return true;
   if (value === null) return true;
@@ -112,7 +101,6 @@ function download(file, fileName) {
 
 export {
   download,
-  generatePassword,
   typeOptions,
   isNullOrUndefined,
   validateString,
