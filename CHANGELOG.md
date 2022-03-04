@@ -1,3 +1,10 @@
+# [1.68.0](https://github.com/SocialGouv/mano/compare/v1.67.6...v1.68.0) (2022-03-04)
+
+
+### Features
+
+* **dashboard:** reorder services categories and custom fields ([#423](https://github.com/SocialGouv/mano/issues/423)) ([5022f9c](https://github.com/SocialGouv/mano/commit/5022f9c5fabe6a28460b6b743133cbca8ca28d96))
+
 ## [1.67.6](https://github.com/SocialGouv/mano/compare/v1.67.5...v1.67.6) (2022-03-04)
 
 
