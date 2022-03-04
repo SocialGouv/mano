@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -11,21 +11,28 @@ import { MyText } from '../../components/MyText';
 import FlatListStyled, { SectionListStyled } from '../../components/FlatListStyled';
 import { TODO } from '../../recoil/actions';
 import API from '../../services/api';
-import { actionsByStatusSelector } from '../../recoil/selectors';
+import { actionsByStatusSelector, totalActionsByStatusSelector } from '../../recoil/selectors';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
+import Button from '../../components/Button';
 
 const emptyArray = [];
 const keyExtractor = (action) => action._id;
 const SectionHeader = ({ section: { title } }) => <SectionHeaderStyled heavy>{title}</SectionHeaderStyled>;
 
+const limitSteps = 100;
+
 const ActionsList = () => {
   const navigation = useNavigation();
   const loading = useRecoilValue(loadingState);
   const status = useRoute().params.status;
+  const [limit, setLimit] = useState(limitSteps);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
 
-  const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
+  const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status, limit }));
+  const total = useRecoilValue(totalActionsByStatusSelector({ status }));
+
+  const hasMore = useMemo(() => limit < total, [limit, total]);
 
   useEffect(() => {
     API.navigation = navigation;
@@ -37,7 +44,11 @@ const ActionsList = () => {
 
   const onCreateAction = useCallback(() => navigation.navigate('NewActionForm', { fromRoute: 'ActionsList' }), [navigation]);
 
-  const ListFooterComponent = useMemo(() => (!actionsByStatus.length ? null : ListNoMoreActions), [actionsByStatus.length]);
+  const SectionListFooterComponent = useMemo(() => (!actionsByStatus.length ? null : ListNoMoreActions), [actionsByStatus.length]);
+  const FlatListFooterComponent = useMemo(() => {
+    if (hasMore) return <Button caption="Montrer plus d'actions" onPress={() => setLimit((l) => l + limitSteps)} testID="show-more-actions" />;
+    return ListNoMoreActions;
+  }, [hasMore]);
   const ListEmptyComponent = useMemo(() => (loading ? Spinner : ListEmptyActions), [loading]);
 
   const onPseudoPress = useCallback(
@@ -66,11 +77,12 @@ const ActionsList = () => {
     return <ActionRow action={item.item} onPseudoPress={onPseudoPress} onActionPress={onActionPress} />;
   };
 
+  console.log({ SectionListFooterComponent });
+
   return (
     <SceneContainer testID="actions-list">
       {[TODO].includes(status) ? (
         <SectionListStyled
-          // onScroll={onScroll}
           refreshing={refreshTrigger.status}
           onRefresh={onRefresh}
           sections={actionsByStatus || emptyArray}
@@ -79,13 +91,11 @@ const ActionsList = () => {
           renderSectionHeader={SectionHeader}
           keyExtractor={keyExtractor}
           ListEmptyComponent={ListEmptyComponent}
-          ListFooterComponent={ListFooterComponent}
-          // parentScroll={parentScroll}
+          ListFooterComponent={SectionListFooterComponent}
         />
       ) : (
         <FlatListStyled
           refreshing={refreshTrigger.status}
-          // onScroll={onScroll}
           onRefresh={onRefresh}
           data={actionsByStatus}
           initialNumToRender={5}
@@ -93,8 +103,7 @@ const ActionsList = () => {
           keyExtractor={keyExtractor}
           ListEmptyComponent={ListEmptyComponent}
           onEndReachedThreshold={0.3}
-          ListFooterComponent={ListFooterComponent}
-          // parentScroll={parentScroll}
+          ListFooterComponent={FlatListFooterComponent}
         />
       )}
       <FloatAddButton onPress={onCreateAction} />

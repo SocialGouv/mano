@@ -224,6 +224,16 @@ export const actionsDoneSelector = selector({
   },
 });
 
+export const actionsDoneSelectorSliced = selectorFamily({
+  key: 'actionsDoneSelectorSliced',
+  get:
+    ({ limit }) =>
+    ({ get }) => {
+      const actionsDone = get(actionsDoneSelector);
+      return actionsDone.filter((_, index) => index < limit);
+    },
+});
+
 export const actionsTodoSelector = selector({
   key: 'actionsTodoSelector',
   get: ({ get }) => {
@@ -240,14 +250,35 @@ export const actionsCanceledSelector = selector({
   },
 });
 
+export const actionsCanceledSelectorSliced = selectorFamily({
+  key: 'actionsCanceledSelectorSliced',
+  get:
+    ({ limit }) =>
+    ({ get }) => {
+      const actionsCanceled = get(actionsCanceledSelector);
+      return actionsCanceled.filter((_, index) => index < limit);
+    },
+});
+
 export const actionsByStatusSelector = selectorFamily({
   key: 'actionsByStatusSelector',
   get:
+    ({ status, limit }) =>
+    ({ get }) => {
+      if (status === DONE) return get(actionsDoneSelectorSliced({ limit }));
+      if (status === TODO) return get(actionsTodoSelector);
+      if (status === CANCEL) return get(actionsCanceledSelectorSliced({ limit }));
+    },
+});
+
+export const totalActionsByStatusSelector = selectorFamily({
+  key: 'totalActionsByStatusSelector',
+  get:
     ({ status }) =>
     ({ get }) => {
-      if (status === DONE) return get(actionsDoneSelector);
-      if (status === TODO) return get(actionsTodoSelector);
-      if (status === CANCEL) return get(actionsCanceledSelector);
+      if (status === DONE) return get(actionsDoneSelector).length;
+      if (status === TODO) return get(actionsTodoSelector).length;
+      if (status === CANCEL) return get(actionsCanceledSelector).length;
     },
 });
 
