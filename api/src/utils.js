@@ -36,9 +36,12 @@ function hashPassword(password) {
   return bcrypt.hash(password, 10);
 }
 
+const looseUuidRegex = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+
 module.exports = {
   validatePassword,
   comparePassword,
   hashPassword,
   generatePassword,
+  looseUuidRegex,
 };

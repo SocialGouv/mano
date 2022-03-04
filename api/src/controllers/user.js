@@ -7,7 +7,7 @@ const { Op } = require("sequelize");
 const { z } = require("zod");
 
 const { catchErrors } = require("../errors");
-const { validatePassword } = require("../utils");
+const { validatePassword, looseUuidRegex } = require("../utils");
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
 const { comparePassword, generatePassword } = require("../utils");
@@ -163,10 +163,10 @@ router.post(
   catchErrors(async (req, res) => {
     try {
       z.literal("admin").parse(req.user.role);
-      z.string().uuid().parse(req.user.organisation);
+      z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.string().min(1).parse(req.body.name);
       z.string().email().parse(req.body.email);
-      z.array(z.string().uuid()).parse(req.body.team);
+      z.array(z.string().regex(looseUuidRegex)).parse(req.body.team);
       z.enum(["admin", "normal"]).parse(req.body.role);
     } catch (e) {
       return res.status(400).send({ ok: false, error: "Invalid request" });
