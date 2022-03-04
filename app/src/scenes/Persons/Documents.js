@@ -34,6 +34,7 @@ const Documents = ({ updating, personDB, navigation, onUpdatePerson, backgroundC
   };
 
   const sendPictureToDB = async () => {
+    setLoading('sending');
     const extension = asset.fileName.split('.').reverse()[0];
     const { data: file, encryptedEntityKey } = await API.upload({
       file: {
@@ -116,7 +117,7 @@ const Documents = ({ updating, personDB, navigation, onUpdatePerson, backgroundC
           <ScrollContainer>
             <InputLabelled label="Nom" onChangeText={setName} value={name} placeholder="Nom" editable />
             <ButtonsContainer>
-              <Button caption="Enregistrer" onPress={sendPictureToDB} disabled={!name.length} />
+              <Button caption="Enregistrer" onPress={sendPictureToDB} disabled={!name.length} loading={loading === 'sending'} />
             </ButtonsContainer>
           </ScrollContainer>
         </SceneContainer>
