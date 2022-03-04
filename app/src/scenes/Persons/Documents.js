@@ -21,11 +21,14 @@ const Documents = ({ updating, personDB, navigation, onUpdatePerson, backgroundC
   const user = useRecoilValue(userState);
   const [asset, setAsset] = useState(null);
   const [name, setName] = useState('');
+  const [loading, setLoading] = useState('');
   const handleSavePicture = async (result) => {
-    if (result.didCancel) return;
+    if (result.didCancel) return reset();
     if (result.errorCode) {
       Alert.alert('Désolé, une erreur est survenue', "L'équipe technique a été prévenue");
       capture('error selecting picture from library', { extra: { result } });
+      reset();
+      return;
     }
     setAsset(result.assets[0]);
   };
@@ -59,6 +62,7 @@ const Documents = ({ updating, personDB, navigation, onUpdatePerson, backgroundC
 
   const reset = () => {
     setAsset(null);
+    setLoading(null);
     setName('');
   };
 
@@ -73,32 +77,36 @@ const Documents = ({ updating, personDB, navigation, onUpdatePerson, backgroundC
         ))}
         <Button
           caption="Ajouter une photo"
+          disabled={!!loading}
+          loading={loading === 'camera'}
           onPress={async () => {
+            setLoading('camera');
             const permission = await getCameraPermission();
             if (!permission) {
               alertPhotosSetting(new Error('Access to camera was denied', 'camera'));
+              reset();
               return;
             }
             const result = await launchCamera({ mediaType: 'photo', includeBase64: true, saveToPhotos: true });
             handleSavePicture(result);
           }}
-          disabled={updating}
-          loading={updating}
         />
         <Spacer />
         <Button
           caption="Sélectionner une photo"
+          disabled={!!loading}
+          loading={loading === 'images'}
           onPress={async () => {
+            setLoading('images');
             const permission = await getPhotoLibraryPermission();
             if (!permission) {
               alertPhotosSetting(new Error('Access to photo library was denied', 'images'));
+              reset();
               return;
             }
             const result = await launchImageLibrary({ includeBase64: true, mediaType: 'photo' });
             handleSavePicture(result);
           }}
-          disabled={updating}
-          loading={updating}
         />
         <Hint>Il n'est pour l'instant pas possible de lire, télécharger ou supprimer un document depuis l'app - seulement depuis le dashboard.</Hint>
       </ScrollContainer>
