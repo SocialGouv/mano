@@ -1,3 +1,10 @@
+## [1.70.2](https://github.com/SocialGouv/mano/compare/v1.70.1...v1.70.2) (2022-03-04)
+
+
+### Bug Fixes
+
+* **api:** fix uuid ([4e4ac67](https://github.com/SocialGouv/mano/commit/4e4ac674cf76b97155b62cbdc9b5f2852c1b5629))
+
 ## [1.70.1](https://github.com/SocialGouv/mano/compare/v1.70.0...v1.70.1) (2022-03-04)
 
 
