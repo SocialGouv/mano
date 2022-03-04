@@ -111,20 +111,6 @@ const Loader = () => {
       const numberOfCollections = 8;
       total = total + numberOfCollections; // for the progress bar to be beautiful
     }
-    if (!initialLoad && !total) {
-      setLoading('Rien à télécharger');
-      setProgress(1);
-      await new Promise((res) => setTimeout(res, 500));
-      setLastRefresh(Date.now());
-      setLoading('');
-      setProgress(0);
-      setFullScreen(false);
-      setRefreshTrigger({
-        status: false,
-        options: { showFullScreen: false, initialLoad: false },
-      });
-      return;
-    }
     /*
     Get persons
     */
