@@ -29,20 +29,23 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import { capture } from '../../services/sentry';
 import { MMKV } from '../../services/dataManagement';
 
-const castToAction = (action = {}) => ({
-  name: action.name?.trim() || '',
-  description: action.description?.trim()?.split('\\n').join('\u000A') || '',
-  person: action.person || null,
-  categories: action.categories || [],
-  user: action.user || null,
-  status: action.status || TODO,
-  dueAt: action.dueAt || null,
-  withTime: action.withTime || false,
-  completedAt: action.completedAt || null,
-  entityKey: action.entityKey || '',
-  team: action.team || null,
-  structure: action.structure || null,
-});
+const castToAction = (action) => {
+  if (!action) action = {};
+  return {
+    name: action.name?.trim() || '',
+    description: action.description?.trim()?.split('\\n').join('\u000A') || '',
+    person: action.person || null,
+    categories: action.categories || [],
+    user: action.user || null,
+    status: action.status || TODO,
+    dueAt: action.dueAt || null,
+    withTime: action.withTime || false,
+    completedAt: action.completedAt || null,
+    entityKey: action.entityKey || '',
+    team: action.team || null,
+    structure: action.structure || null,
+  };
+};
 
 const Action = ({ navigation, route }) => {
   const [actions, setActions] = useRecoilState(actionsState);
