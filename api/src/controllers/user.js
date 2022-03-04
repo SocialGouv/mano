@@ -10,7 +10,7 @@ const { catchErrors } = require("../errors");
 const { validatePassword, looseUuidRegex } = require("../utils");
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
-const { comparePassword, generatePassword } = require("../utils");
+const { comparePassword } = require("../utils");
 const User = require("../models/user");
 const Action = require("../models/action");
 const Person = require("../models/person");
@@ -178,7 +178,7 @@ router.post(
       name,
       role,
       email: email.trim().toLowerCase(),
-      password: generatePassword(),
+      password: crypto.randomBytes(60).toString("hex"), // A useless password.
       organisation: req.user.organisation,
       forgotPasswordResetToken: token,
       forgotPasswordResetExpires: new Date(Date.now() + JWT_MAX_AGE * 1000),
