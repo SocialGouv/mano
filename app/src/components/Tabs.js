@@ -10,7 +10,7 @@ const tabsHorizontalMargin = 0.1;
 const tabsWidth = windowWidth * (1 - 2 * tabsHorizontalMargin);
 const tabMarginHorizontal = tabsWidth * 0.02;
 
-const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs, backgroundColor = colors.app.colorDark }) => {
+const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs, forceTop = false, backgroundColor = colors.app.colorDark }) => {
   const indicatorPosition = useRef(new Animated.Value(state.index)).current;
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs, back
   }, [state.index]);
   const tabWidth = tabsWidth * ((1 / numberOfTabs) * 0.9);
   return (
-    <Animated.View style={styles.container(parentScroll, backgroundColor)}>
+    <Animated.View style={styles.container(parentScroll, forceTop, backgroundColor)}>
       <Animated.View style={[styles.indicatorStyle(tabWidth), styles.indicatorPosition(indicatorPosition, tabWidth, numberOfTabs)]} />
       {state.routes.map((route, index) => {
         const { options } = descriptors[route.key];
@@ -69,7 +69,7 @@ const Tabs = ({ state, descriptors, navigation, parentScroll, numberOfTabs, back
 };
 
 const styles = StyleSheet.create({
-  container: (parentScroll, backgroundColor) => ({
+  container: (parentScroll, forceTop, backgroundColor) => ({
     height: tabHeight,
     borderRadius: tabHeight,
     overflow: 'hidden',
@@ -81,13 +81,14 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     transform: [
       {
-        translateY: parentScroll?.interpolate
-          ? parentScroll.interpolate({
-              inputRange: [0, 100],
-              outputRange: [90, 0],
-              extrapolate: 'clamp',
-            })
-          : 0,
+        translateY:
+          parentScroll?.interpolate && !forceTop
+            ? parentScroll.interpolate({
+                inputRange: [0, 100],
+                outputRange: [90, 0],
+                extrapolate: 'clamp',
+              })
+            : 0,
       },
     ],
   }),

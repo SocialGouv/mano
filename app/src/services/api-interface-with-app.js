@@ -1,7 +1,6 @@
 import { Alert, Linking, Platform } from 'react-native';
 import { MANO_DOWNLOAD_URL } from '../config';
 import API from './api';
-import { MMKV } from './dataManagement';
 import fetchRetry from 'fetch-retry';
 
 API.fetch = fetchRetry(fetch);
@@ -55,8 +54,6 @@ API.handleWrongKey = () => {
     API.navigation = null;
     API.token = null;
   }
-  MMKV?.clearStore();
-  MMKV?.clearMemoryCache();
 };
 
 API.handleNewVersion = (message) =>

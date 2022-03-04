@@ -115,7 +115,7 @@ export const personsSearchSelector = selectorFamily({
     ({ search = '' }) =>
     ({ get }) => {
       const persons = get(personsState);
-      if (!search?.length) return [];
+      if (!search?.length) return persons;
       return filterBySearch(search, persons);
     },
 });
@@ -240,6 +240,17 @@ export const actionsCanceledSelector = selector({
   },
 });
 
+export const actionsByStatusSelector = selectorFamily({
+  key: 'actionsByStatusSelector',
+  get:
+    ({ status }) =>
+    ({ get }) => {
+      if (status === DONE) return get(actionsDoneSelector);
+      if (status === TODO) return get(actionsTodoSelector);
+      if (status === CANCEL) return get(actionsCanceledSelector);
+    },
+});
+
 export const actionsSearchSelector = selectorFamily({
   key: 'actionsSearchSelector',
   get:
@@ -248,34 +259,6 @@ export const actionsSearchSelector = selectorFamily({
       const actions = get(actionsState);
       if (!search?.length) return [];
       return filterBySearch(search, actions);
-    },
-});
-
-export const actionsFullSearchSelector = selectorFamily({
-  key: 'actionsFullSearchSelector',
-  get:
-    ({ status, search = '' }) =>
-    ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
-      let actionsFiltered = actions;
-      if (status) actionsFiltered = actionsFiltered.filter((a) => a.status === status);
-      if (search?.length) {
-        const actionsFilteredIds = actionsFiltered.map((p) => p._id);
-        const comments = get(commentsState);
-        const persons = get(personsWithPlacesSelector);
-        const personsOfFilteredActions = persons.filter((a) => actionsFilteredIds.includes(a.person));
-        const commentsOfFilteredActions = comments.filter((c) => actionsFilteredIds.includes(c.action));
-        const actionsIdsFilteredByActionsSearch = filterBySearch(search, actionsFiltered).map((a) => a._id);
-        const actionsIdsFilteredByActionsCommentsSearch = filterBySearch(search, commentsOfFilteredActions).map((c) => c.action);
-        const personIdsFilteredByPersonsSearch = filterBySearch(search, personsOfFilteredActions).map((p) => p._id);
-        const actionIdsFilteredByPersonsSearch = actionsFiltered.filter((a) => personIdsFilteredByPersonsSearch.includes(a.person));
-
-        const actionsIdsFilterBySearch = [
-          ...new Set([...actionsIdsFilteredByActionsSearch, ...actionsIdsFilteredByActionsCommentsSearch, ...actionIdsFilteredByPersonsSearch]),
-        ];
-        actionsFiltered = actionsFiltered.filter((a) => actionsIdsFilterBySearch.includes(a._id));
-      }
-      return actionsFiltered;
     },
 });
 

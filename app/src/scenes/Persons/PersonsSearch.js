@@ -7,7 +7,7 @@ import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyC
 import Search from '../../components/Search';
 import FlatListStyled from '../../components/FlatListStyled';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { personsFullSearchSelector } from '../../recoil/selectors';
+import { personsSearchSelector } from '../../recoil/selectors';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 
 const PersonsSearch = ({ navigation, route }) => {
@@ -15,7 +15,7 @@ const PersonsSearch = ({ navigation, route }) => {
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const loading = useRecoilState(loadingState);
 
-  const filteredPersons = useRecoilValue(personsFullSearchSelector({ search }));
+  const filteredPersons = useRecoilValue(personsSearchSelector({ search }));
 
   const onRefresh = async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });

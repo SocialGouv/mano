@@ -11,6 +11,7 @@ const Territory = require("../models/territory");
 const TerritoryObservation = require("../models/territoryObservation");
 const Report = require("../models/report");
 const RelPersonPlace = require("../models/relPersonPlace");
+const { Op } = require("sequelize");
 
 router.get(
   "/stats",
@@ -19,7 +20,7 @@ router.get(
     if (req.query.organisation) query.where = { organisation: req.query.organisation };
     if (Number(req.query.lastRefresh)) {
       if (!query.where) query.where = {};
-      query.where.updatedAt = { $gte: req.query.lastRefresh };
+      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
     }
     const places = await Place.count(query);
     const relsPersonPlace = await RelPersonPlace.count(query);
