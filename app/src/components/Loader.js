@@ -80,7 +80,7 @@ const Loader = () => {
 
   const refresh = async () => {
     const { showFullScreen, initialLoad } = refreshTrigger.options;
-    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
+    setLoading('Chargement...');
     setFullScreen(showFullScreen);
     /*
     Get number of data to download to show the appropriate loading progress bar
