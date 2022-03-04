@@ -1,3 +1,10 @@
+# [1.69.0](https://github.com/SocialGouv/mano/compare/v1.68.4...v1.69.0) (2022-03-04)
+
+
+### Features
+
+* **app:** ask permissions before accessing to stuff + can change nam… ([#435](https://github.com/SocialGouv/mano/issues/435)) ([5fa6167](https://github.com/SocialGouv/mano/commit/5fa61674bb433e1ca7a2ebe4afc954976e89117e))
+
 ## [1.68.4](https://github.com/SocialGouv/mano/compare/v1.68.3...v1.68.4) (2022-03-04)
 
 
