@@ -115,6 +115,15 @@ const Loader = () => {
       setLoading('Rien à télécharger');
       setProgress(1);
       await new Promise((res) => setTimeout(res, 500));
+      setLastRefresh(Date.now());
+      setLoading('');
+      setProgress(0);
+      setFullScreen(false);
+      setRefreshTrigger({
+        status: false,
+        options: { showFullScreen: false, initialLoad: false },
+      });
+      return;
     }
     /*
     Get persons
