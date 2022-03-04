@@ -56,6 +56,7 @@ const PersonsSearch = ({ navigation, route }) => {
         extraData={filteredPersons}
         renderItem={renderPersonRow}
         keyExtractor={keyExtractor}
+        initialNumToRender={10}
         ListEmptyComponent={loading ? Spinner : ListEmptyPersons}
         ListFooterComponent={ListFooterComponent}
       />
