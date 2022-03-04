@@ -1,3 +1,10 @@
+## [1.70.3](https://github.com/SocialGouv/mano/compare/v1.70.2...v1.70.3) (2022-03-04)
+
+
+### Bug Fixes
+
+* remove unsecure password generation ([#442](https://github.com/SocialGouv/mano/issues/442)) ([512a7c3](https://github.com/SocialGouv/mano/commit/512a7c363eb65b2e1b35533e8a021aff3dffcc75))
+
 ## [1.70.2](https://github.com/SocialGouv/mano/compare/v1.70.1...v1.70.2) (2022-03-04)
 
 
