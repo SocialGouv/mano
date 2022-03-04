@@ -114,7 +114,7 @@ const Loader = () => {
       response.data.relsPersonPlace;
 
     if (!total) {
-      setLoading('Rien à télécharger');
+      setLoading('');
       setProgress(1);
       await new Promise((res) => setTimeout(res, 500));
     }
