@@ -57,11 +57,11 @@ const lastRefreshState = atom({
   default: 0,
 });
 
-const mergeItems = (oldItems, newItems) =>
-  [...oldItems, ...newItems].reduce((items, item) => {
-    if (items.find((i) => i?.id === item._id)) return items.map((i) => (i._id === item._id ? item : i));
-    return [...items, item];
-  }, []);
+const mergeItems = (oldItems, newItems) => {
+  const newItemsIds = newItems.map((i) => i._id);
+  const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
+  return [...oldItemsPurged, ...newItems];
+};
 
 const Loader = () => {
   const API = useApi();
