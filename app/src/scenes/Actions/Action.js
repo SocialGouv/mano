@@ -64,7 +64,12 @@ const Action = ({ navigation, route }) => {
   const [editable, setEditable] = useState(route?.params?.editable || false);
 
   useEffect(() => {
-    if (route?.params?.duplicate) Alert.alert("L'action est dupliquée, vous pouvez la modifier !", "L'action originale est annulée");
+    if (route?.params?.duplicate) {
+      Alert.alert(
+        "L'action est dupliquée, vous pouvez la modifier !",
+        "Les commentaires de l'action aussi sont dupliqués. L'action originale est annulée"
+      );
+    }
   }, []);
 
   const isUpdateDisabled = useMemo(() => {
@@ -296,10 +301,26 @@ const Action = ({ navigation, route }) => {
       return;
     }
     setActions((actions) => [response.decryptedData, ...actions]);
-    Sentry.setContext('action', { _id: response.data._id });
+    for (let c of comments.filter((c) => c.action === actionDB._id).filter((c) => !c.comment.includes('a changé le status'))) {
+      const body = {
+        comment: c.comment,
+        action: response.decryptedData._id,
+        item: response.decryptedData._id,
+        type: 'action',
+        user: c.user,
+        team: c.team,
+        organisation: c.organisation,
+      };
+      const res = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+      if (res.ok) {
+        setComments((comments) => [res.decryptedData, ...comments]);
+        await MMKV.setMapAsync('comment', [res.decryptedData, ...comments]);
+      }
+    }
+    Sentry.setContext('action', { _id: response.decryptedData._id });
     backRequestHandledRef.current = true;
     navigation.replace('Action', {
-      ...response.data,
+      ...response.decryptedData,
       fromRoute: 'ActionsList',
       editable: true,
       duplicate: true,
