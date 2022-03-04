@@ -1,3 +1,10 @@
+## [1.70.4](https://github.com/SocialGouv/mano/compare/v1.70.3...v1.70.4) (2022-03-04)
+
+
+### Bug Fixes
+
+* **app:** action empty #MANO-99 ([#446](https://github.com/SocialGouv/mano/issues/446)) ([d65a9b9](https://github.com/SocialGouv/mano/commit/d65a9b99dd7ff9d21c1d720242ffe876bb708b0f)), closes [#MANO-99](https://github.com/SocialGouv/mano/issues/MANO-99)
+
 ## [1.70.3](https://github.com/SocialGouv/mano/compare/v1.70.2...v1.70.3) (2022-03-04)
 
 
