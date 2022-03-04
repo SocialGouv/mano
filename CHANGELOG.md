@@ -1,3 +1,10 @@
+# [1.70.0](https://github.com/SocialGouv/mano/compare/v1.69.0...v1.70.0) (2022-03-04)
+
+
+### Features
+
+* **dashboard:** show comments on superadmin ([#443](https://github.com/SocialGouv/mano/issues/443)) ([b0ac051](https://github.com/SocialGouv/mano/commit/b0ac0519acc6df98ba265315be8f6affc87b53de))
+
 # [1.69.0](https://github.com/SocialGouv/mano/compare/v1.68.4...v1.69.0) (2022-03-04)
 
 
