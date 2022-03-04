@@ -16,17 +16,19 @@ import { formatDateWithFullMonth } from '../../services/date';
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
   const [updateKey, setUpdateKey] = useState(null);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortOrder, setSortOrder] = useState('ASC');
+  const [sortBy, setSortBy] = useState('countersTotal');
+  const [sortOrder, setSortOrder] = useState('DESC');
   const [refresh, setRefresh] = useState(true);
   const API = useApi();
+
+  console.log({ sortBy, sortOrder });
 
   useEffect(() => {
     (async () => {
       if (!refresh) return;
       const { data } = await API.get({ path: '/organisation', query: { withCounters: true } });
       const sortedDataAscendant = data?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-      setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
+      setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
       setUpdateKey((k) => k + 1);
       setRefresh(false);
     })();
@@ -34,7 +36,7 @@ const List = () => {
 
   useEffect(() => {
     const sortedDataAscendant = organisations?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-    setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
+    setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
     setUpdateKey((k) => k + 1);
   }, [sortBy, sortOrder]);
 
@@ -76,6 +78,8 @@ const List = () => {
                   <span>Territoires: {o.counters.territories || 0}</span>
                   <br />
                   <span>Comptes-rendus: {o.counters.reports || 0}</span>
+                  <br />
+                  <span>Commentaires: {o.counters.comments || 0}</span>
                   <br />
                 </StyledCounters>
               );
