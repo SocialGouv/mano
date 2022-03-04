@@ -238,11 +238,14 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to create another comment for this person", async () => {
+    await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Commentaires (2)" });
+    await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
     await expect(page).toMatch("Créer un commentaire", { timeout: 4000 });
     await expect(page).toFill('textarea[name="comment"]', "Ceci est un autre commentaire");
     await expect(page).toClick("button", { text: "Sauvegarder" });
+    await page.waitForTimeout(1000);
     await expect(page).toClick("div.close-toastr");
     await expect(page).toMatch("Ceci est un commentaire");
     await expect(page).toMatch("Ceci est un autre commentaire");
