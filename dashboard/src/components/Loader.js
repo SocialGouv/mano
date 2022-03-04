@@ -86,6 +86,7 @@ const Loader = () => {
   const refresh = async () => {
     const { showFullScreen, initialLoad } = refreshTrigger.options;
     setFullScreen(showFullScreen);
+    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
     /*
     Get number of data to download to show the appropriate loading progress bar
     */
@@ -101,44 +102,55 @@ const Loader = () => {
       });
       return;
     }
-    const total =
-      (response.data.actions || 1) +
-      (response.data.persons || 1) +
-      (response.data.territories || 1) +
-      (response.data.territoryObservations || 1) +
-      (response.data.places || 1) +
-      (response.data.comments || 1) +
-      (response.data.reports || 1) +
-      (response.data.relsPersonPlace || 1);
+
+    let total =
+      response.data.actions +
+      response.data.persons +
+      response.data.territories +
+      response.data.territoryObservations +
+      response.data.places +
+      response.data.comments +
+      response.data.reports +
+      response.data.relsPersonPlace;
+
+    if (!total) {
+      setLoading('Rien à télécharger');
+      setProgress(1);
+      await new Promise((res) => setTimeout(res, 500));
+    }
     /*
     Get persons
     */
-    setLoading('Chargement des personnes');
-    const refreshedPersons = await getData({
-      collectionName: 'person',
-      data: persons,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
-      API,
-    });
-    if (refreshedPersons) setPersons(refreshedPersons.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    if (response.data.persons) {
+      setLoading('Chargement des personnes');
+      const refreshedPersons = await getData({
+        collectionName: 'person',
+        data: persons,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
+        API,
+      });
+      if (refreshedPersons) setPersons(refreshedPersons.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'person'));
     /*
     Get reports
     */
-    setLoading('Chargement des comptes-rendus');
-    const refreshedReports = await getData({
-      collectionName: 'report',
-      data: reports,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newReports) => setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports))),
-      API,
-    });
-    if (refreshedReports) setReports(refreshedReports.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    if (response.data.reports) {
+      setLoading('Chargement des comptes-rendus');
+      const refreshedReports = await getData({
+        collectionName: 'report',
+        data: reports,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newReports) => setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports))),
+        API,
+      });
+      if (refreshedReports) setReports(refreshedReports.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'report'));
     /*
     Switch to not full screen
@@ -148,92 +160,104 @@ const Loader = () => {
     /*
     Get actions
     */
-    setLoading('Chargement des actions');
-    const refreshedActions = await getData({
-      collectionName: 'action',
-      data: actions,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newActions) => setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions))),
-      API,
-    });
-    if (refreshedActions) setActions(refreshedActions);
+    if (response.data.actions) {
+      setLoading('Chargement des actions');
+      const refreshedActions = await getData({
+        collectionName: 'action',
+        data: actions,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newActions) => setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions))),
+        API,
+      });
+      if (refreshedActions) setActions(refreshedActions);
+    }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'action'));
     /*
     Get territories
     */
-    setLoading('Chargement des territoires');
-    const refreshedTerritories = await getData({
-      collectionName: 'territory',
-      data: territories,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newTerritories) =>
-        setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
-      API,
-    });
-    if (refreshedTerritories) setTerritories(refreshedTerritories);
+    if (response.data.territories) {
+      setLoading('Chargement des territoires');
+      const refreshedTerritories = await getData({
+        collectionName: 'territory',
+        data: territories,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newTerritories) =>
+          setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
+        API,
+      });
+      if (refreshedTerritories) setTerritories(refreshedTerritories);
+    }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory'));
 
     /*
     Get places
     */
-    setLoading('Chargement des lieux');
-    const refreshedPlaces = await getData({
-      collectionName: 'place',
-      data: places,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
-      API,
-    });
-    if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
-    const refreshedRelPersonPlaces = await getData({
-      collectionName: 'relPersonPlace',
-      data: relsPersonPlace,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newRelPerPlace) =>
-        setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
-      API,
-    });
-    if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
+    if (response.data.places) {
+      setLoading('Chargement des lieux');
+      const refreshedPlaces = await getData({
+        collectionName: 'place',
+        data: places,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
+        API,
+      });
+      if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    }
+    if (response.data.relsPersonPlace) {
+      const refreshedRelPersonPlaces = await getData({
+        collectionName: 'relPersonPlace',
+        data: relsPersonPlace,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newRelPerPlace) =>
+          setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
+        API,
+      });
+      if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
+    }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'place'));
     /*
     Get observations territories
     */
-    setLoading('Chargement des observations');
-    const refreshedObs = await getData({
-      collectionName: 'territory-observation',
-      data: territoryObservations,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
-      API,
-    });
-    if (refreshedObs) setTerritoryObs(refreshedObs);
+    if (response.data.territoryObservations) {
+      setLoading('Chargement des observations');
+      const refreshedObs = await getData({
+        collectionName: 'territory-observation',
+        data: territoryObservations,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
+        API,
+      });
+      if (refreshedObs) setTerritoryObs(refreshedObs);
+    }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory-observation'));
 
     /*
     Get comments
     */
-    setLoading('Chargement des commentaires');
-    const refreshedComments = await getData({
-      collectionName: 'comment',
-      data: comments,
-      isInitialization: initialLoad,
-      setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-      lastRefresh,
-      setBatchData: (newComments) =>
-        setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
-      API,
-    });
-    if (refreshedComments) setComments(refreshedComments);
+    if (response.data.comments) {
+      setLoading('Chargement des commentaires');
+      const refreshedComments = await getData({
+        collectionName: 'comment',
+        data: comments,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newComments) =>
+          setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
+        API,
+      });
+      if (refreshedComments) setComments(refreshedComments);
+    }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'comment'));
 
     /*
