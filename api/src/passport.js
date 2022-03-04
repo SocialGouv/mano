@@ -20,9 +20,11 @@ module.exports = (app) => {
       try {
         const { _id } = jwt;
         const user = await User.findOne({ where: { _id } });
-        const t = await user.getTeams();
-        const teams = t.map((t) => t.toJSON());
-        if (user) return done(null, { ...user.toJSON(), teams });
+        if (user) {
+          const t = await user.getTeams();
+          const teams = t.map((t) => t.toJSON());
+          return done(null, { ...user.toJSON(), teams });
+        }
       } catch (e) {
         console.log("error passport", e);
       }
