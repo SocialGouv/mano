@@ -21,6 +21,7 @@ import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
 import { theme } from '../../config';
+import SortableGrid from '../../components/SortableGrid';
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -122,18 +123,45 @@ const View = () => {
                           <Col md={12}>
                             <FormGroup>
                               <Label>Categories des actions</Label>
+                              <SortableGrid
+                                list={values.categories || []}
+                                onUpdateList={(cats) => handleChange({ target: { value: cats, name: 'categories' } })}
+                                onRemoveItem={(content) =>
+                                  handleChange({ target: { value: values.categories.filter((cat) => cat !== content), name: 'categories' } })
+                                }
+                              />
+                            </FormGroup>
+                            <FormGroup>
+                              <Label>Ajouter une catégorie</Label>
                               <SelectCustom
+                                key={JSON.stringify(values.categories)}
                                 creatable
-                                options={actionsCategories.sort((c1, c2) => c1.localeCompare(c2)).map((cat) => ({ value: cat, label: cat }))}
-                                value={(values.categories || []).map((cat) => ({ value: cat, label: cat }))}
-                                isMulti
-                                onChange={(cats) => handleChange({ target: { value: cats.map((cat) => cat.value), name: 'categories' } })}
+                                options={[...(actionsCategories || [])]
+                                  .filter((cat) => !values.categories.includes(cat))
+                                  .sort((c1, c2) => c1.localeCompare(c2))
+                                  .map((cat) => ({ value: cat, label: cat }))}
+                                value={null}
+                                onChange={(cat) => {
+                                  handleChange({ target: { value: [...values.categories, cat.value], name: 'categories' } });
+                                }}
+                                onCreateOption={async (name) => {
+                                  handleChange({ target: { value: [...values.categories, name], name: 'categories' } });
+                                }}
+                                isClearable
+                                inputId="organisation-select-categories"
+                                classNamePrefix="organisation-select-categories"
                               />
                             </FormGroup>
                           </Col>
                         </Row>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                          <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                          <ButtonCustom
+                            title={'Mettre à jour'}
+                            disabled={JSON.stringify(organisation.categories) === JSON.stringify(values.categories)}
+                            loading={isSubmitting}
+                            onClick={handleSubmit}
+                            width={200}
+                          />
                         </div>
                       </>
                     );
@@ -154,20 +182,42 @@ const View = () => {
                           <Col md={12}>
                             <FormGroup>
                               <Label>Services disponibles</Label>
+                              <SortableGrid
+                                list={values.services || []}
+                                onUpdateList={(newServices) => handleChange({ target: { value: newServices, name: 'services' } })}
+                                onRemoveItem={(content) =>
+                                  handleChange({ target: { value: values.services.filter((service) => service !== content), name: 'services' } })
+                                }
+                              />
+                            </FormGroup>
+                            <FormGroup>
+                              <Label>Ajouter un service</Label>
                               <SelectCustom
+                                key={JSON.stringify(values.services)}
                                 creatable
+                                isOptionDisabled={({ value }) => values.services.includes(value)}
                                 options={[...(organisation.services || [])]
                                   .sort((c1, c2) => c1.localeCompare(c2))
                                   .map((cat) => ({ value: cat, label: cat }))}
-                                value={(values.services || []).map((cat) => ({ value: cat, label: cat }))}
-                                isMulti
-                                onChange={(cats) => handleChange({ target: { value: cats.map((cat) => cat.value), name: 'services' } })}
+                                value={null}
+                                onCreateOption={async (name) => {
+                                  handleChange({ target: { value: [...values.services, name], name: 'services' } });
+                                }}
+                                isClearable
+                                inputId="organisation-select-services"
+                                classNamePrefix="organisation-select-services"
                               />
                             </FormGroup>
                           </Col>
                         </Row>
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                          <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                          <ButtonCustom
+                            title={'Mettre à jour'}
+                            disabled={JSON.stringify(organisation.services) === JSON.stringify(values.services)}
+                            loading={isSubmitting}
+                            onClick={handleSubmit}
+                            width={200}
+                          />
                         </div>
                       </>
                     );
@@ -180,6 +230,7 @@ const View = () => {
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsObs"
+                                key="customFieldsObs"
                                 data={(() => {
                                   if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
                                   return defaultCustomFields;
@@ -214,6 +265,7 @@ const View = () => {
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsPersonsSocial"
+                                key="customFieldsPersonsSocial"
                                 data={(() => {
                                   if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
                                   return [];
@@ -224,6 +276,7 @@ const View = () => {
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsPersonsMedical"
+                                key="customFieldsPersonsMedical"
                                 data={(() => {
                                   if (Array.isArray(organisation.customFieldsPersonsMedical)) return organisation.customFieldsPersonsMedical;
                                   return defaultMedicalCustomFields;

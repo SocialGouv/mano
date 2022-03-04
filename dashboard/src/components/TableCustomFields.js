@@ -78,11 +78,32 @@ const TableCustomFields = ({ data, customFields }) => {
     setIsSubmitting(false);
   };
 
+  const handleSort = async (keys) => {
+    setIsSubmitting(true);
+    try {
+      const response = await API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { [customFields]: keys.map((key) => mutableData.find((field) => field.name === key)) },
+      });
+      if (response.ok) {
+        toastr.success('Mise à jour !');
+        setOrganisation(response.data);
+        setMutableData(response.data[customFields]);
+      }
+    } catch (orgUpdateError) {
+      console.log('error in updating organisation', orgUpdateError);
+      toastr.error('Erreur!', orgUpdateError.message);
+    }
+    setIsSubmitting(false);
+  };
+
   return (
     <>
       <Table
         data={mutableData}
         rowKey="name"
+        isSortable
+        onSort={handleSort}
         noData="Pas de champs personnalisés"
         columns={[
           {
@@ -140,7 +161,13 @@ const TableCustomFields = ({ data, customFields }) => {
       />
       <ButtonsWrapper>
         <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={() => setIsNewField(true)} width={200} />
-        <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={() => handleSubmit()} width={200} />
+        <ButtonCustom
+          title="Mettre à jour"
+          loading={isSubmitting}
+          onClick={() => handleSubmit()}
+          disabled={JSON.stringify(mutableData) === JSON.stringify(data)}
+          width={200}
+        />
       </ButtonsWrapper>
       <EditCustomField
         editingField={editingField}
