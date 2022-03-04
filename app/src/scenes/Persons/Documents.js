@@ -1,5 +1,5 @@
-import React from 'react';
-import { Alert } from 'react-native';
+import React, { useState } from 'react';
+import { Alert, Modal } from 'react-native';
 import styled from 'styled-components';
 import ScrollContainer from '../../components/ScrollContainer';
 import SubHeader from '../../components/SubHeader';
@@ -11,21 +11,36 @@ import { capture } from '../../services/sentry';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/auth';
 import Spacer from '../../components/Spacer';
+import { alertPhotosSetting, getCameraPermission, getPhotoLibraryPermission } from '../../services/permissions-photo';
+import SceneContainer from '../../components/SceneContainer';
+import ScreenTitle from '../../components/ScreenTitle';
+import InputLabelled from '../../components/InputLabelled';
+import ButtonsContainer from '../../components/ButtonsContainer';
 
-const Documents = ({ editable, updating, personDB, navigation, onUpdatePerson, onEdit, isUpdateDisabled, backgroundColor }) => {
+const Documents = ({ updating, personDB, navigation, onUpdatePerson, backgroundColor }) => {
   const user = useRecoilValue(userState);
+  const [asset, setAsset] = useState(null);
+  const [name, setName] = useState('');
+  const [loading, setLoading] = useState('');
   const handleSavePicture = async (result) => {
-    if (result.didCancel) return;
+    if (result.didCancel) return reset();
     if (result.errorCode) {
       Alert.alert('Désolé, une erreur est survenue', "L'équipe technique a été prévenue");
       capture('error selecting picture from library', { extra: { result } });
+      reset();
+      return;
     }
-    const asset = result.assets[0];
+    setAsset(result.assets[0]);
+  };
+
+  const sendPictureToDB = async () => {
+    setLoading('sending');
+    const extension = asset.fileName.split('.').reverse()[0];
     const { data: file, encryptedEntityKey } = await API.upload({
       file: {
         uri: asset.uri,
         base64: asset.base64,
-        fileName: asset.fileName,
+        fileName: `${name}.${extension}`,
         type: asset.type,
       },
       path: `/person/${personDB._id}/document`,
@@ -43,6 +58,13 @@ const Documents = ({ editable, updating, personDB, navigation, onUpdatePerson, o
         },
       ],
     });
+    reset();
+  };
+
+  const reset = () => {
+    setAsset(null);
+    setLoading(null);
+    setName('');
   };
 
   return (
@@ -56,24 +78,50 @@ const Documents = ({ editable, updating, personDB, navigation, onUpdatePerson, o
         ))}
         <Button
           caption="Ajouter une photo"
+          disabled={!!loading}
+          loading={loading === 'camera'}
           onPress={async () => {
+            setLoading('camera');
+            const permission = await getCameraPermission();
+            if (!permission) {
+              alertPhotosSetting(new Error('Access to camera was denied', 'camera'));
+              reset();
+              return;
+            }
             const result = await launchCamera({ mediaType: 'photo', includeBase64: true, saveToPhotos: true });
             handleSavePicture(result);
           }}
-          disabled={updating}
-          loading={updating}
         />
         <Spacer />
         <Button
           caption="Sélectionner une photo"
+          disabled={!!loading}
+          loading={loading === 'images'}
           onPress={async () => {
+            setLoading('images');
+            const permission = await getPhotoLibraryPermission();
+            if (!permission) {
+              alertPhotosSetting(new Error('Access to photo library was denied', 'images'));
+              reset();
+              return;
+            }
             const result = await launchImageLibrary({ includeBase64: true, mediaType: 'photo' });
             handleSavePicture(result);
           }}
-          disabled={updating}
-          loading={updating}
         />
+        <Hint>Il n'est pour l'instant pas possible de lire, télécharger ou supprimer un document depuis l'app - seulement depuis le dashboard.</Hint>
       </ScrollContainer>
+      <Modal animationType="fade" visible={!!asset}>
+        <SceneContainer>
+          <ScreenTitle title="Donner un nom à cette photo" onBack={reset} />
+          <ScrollContainer>
+            <InputLabelled label="Nom" onChangeText={setName} value={name} placeholder="Nom" editable />
+            <ButtonsContainer>
+              <Button caption="Enregistrer" onPress={sendPictureToDB} disabled={!name.length} loading={loading === 'sending'} />
+            </ButtonsContainer>
+          </ScrollContainer>
+        </SceneContainer>
+      </Modal>
     </>
   );
 };
@@ -93,6 +141,12 @@ const DocumentContainer = styled.TouchableOpacity`
 
 const DocumentTitle = styled.Text`
   text-align: left;
+`;
+
+const Hint = styled.Text`
+  font-size: 12px;
+  margin-vertical: 15px;
+  text-align: center;
 `;
 
 export default Documents;

@@ -8170,6 +8170,11 @@ react-native-image-picker@^4.7.3:
   resolved "https://registry.yarnpkg.com/react-native-image-picker/-/react-native-image-picker-4.7.3.tgz#f5863b27bf2e76c83649dd8efea4598426bd04e8"
   integrity sha512-eRKm4wlsmZHmsWFyv77kYc2F+ZyEVqe0m7mqhsMzWk6TQT4FBDtEDxmRDDFq+ivCu/1QD+EPhmYcAIpeGr7Ekg==
 
+react-native-intent-launcher@^0.2.1:
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-intent-launcher/-/react-native-intent-launcher-0.2.1.tgz#1519e8b0b87285d579c44cd83831bbcd8c08830b"
+  integrity sha512-V1rzMQrMsvvLA8mJqw2lrHwMseeo8XEbzNI9c2YsR2oUTF2tzw4mHzV/mKuBxL2cJEksPekpA53vJeM8YtjwYA==
+
 react-native-iphone-x-helper@^1.3.0:
   version "1.3.1"
   resolved "https://registry.yarnpkg.com/react-native-iphone-x-helper/-/react-native-iphone-x-helper-1.3.1.tgz#20c603e9a0e765fd6f97396638bdeb0e5a60b010"
@@ -8191,6 +8196,11 @@ react-native-pdf@^6.3.0:
   integrity sha512-pfrCvHg4dqAPzl2FtRmGGl/D2dHec4w8+wGAKv7L97wxz5oF/QNvQ6q0KdfXdFlIZ22sS+BOwsRMzbB2mHPs2w==
   dependencies:
     crypto-js "^3.2.0"
+
+react-native-permissions@^3.3.0:
+  version "3.3.0"
+  resolved "https://registry.yarnpkg.com/react-native-permissions/-/react-native-permissions-3.3.0.tgz#f63b7f91457dd2b11991ca46ebe4262a8eb1f73c"
+  integrity sha512-F0Yjcp0V340lQW2ibg1lTGmStsMoWsBtosSCRIZOatOQAsNMp77zL6SdYcIGwJUBMVDX3BMraB4AX4Ph3cW1NA==
 
 react-native-reanimated@^2.3.1:
   version "2.4.1"

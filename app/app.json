@@ -1,4 +1,8 @@
 {
   "name": "mano",
-  "displayName": "mano"
+  "displayName": "mano",
+  "bundle": {
+    "android": "com.mano",
+    "ios": "com.mano"
+  }
 }

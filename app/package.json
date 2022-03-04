@@ -1,6 +1,6 @@
 {
   "name": "mano",
-  "version": "2.12.0",
+  "version": "2.13.0",
   "private": true,
   "scripts": {
     "get-ip": "./get-ip.sh",
@@ -59,9 +59,11 @@
     "react-native-device-info": "^8.4.8",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-image-picker": "^4.7.3",
+    "react-native-intent-launcher": "^0.2.1",
     "react-native-keychain": "^6.2.0",
     "react-native-mmkv-storage": "^0.6.12",
     "react-native-pdf": "^6.3.0",
+    "react-native-permissions": "^3.3.0",
     "react-native-reanimated": "^2.3.1",
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^2.18.1",
