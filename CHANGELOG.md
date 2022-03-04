@@ -1,3 +1,10 @@
+## [1.68.2](https://github.com/SocialGouv/mano/compare/v1.68.1...v1.68.2) (2022-03-04)
+
+
+### Bug Fixes
+
+* **dashboard:** stop throw error on fail api request ([#441](https://github.com/SocialGouv/mano/issues/441)) ([2d06ded](https://github.com/SocialGouv/mano/commit/2d06ded8b587707849daab4420df253a4c146ab3))
+
 ## [1.68.1](https://github.com/SocialGouv/mano/compare/v1.68.0...v1.68.1) (2022-03-04)
 
 
