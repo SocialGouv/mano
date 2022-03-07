@@ -278,7 +278,7 @@ const View = () => {
                                     handleChange({ target: { value: newServices, name: 'services' } });
                                     setOrganisation({ ...organisation, services: newServices });
                                     toastr.success(
-                                      'Service mis-à-jour',
+                                      'Service mis à jour',
                                       "Veuillez notifier vos équipes pour qu'ils rechargent leur app ou leur dashboard"
                                     );
                                   } else {
