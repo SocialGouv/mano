@@ -60,6 +60,8 @@ app.use("/team", require("./controllers/team"));
 app.use("/organisation", require("./controllers/organisation"));
 app.use("/public", require("./controllers/public"));
 app.use("/encrypt", require("./controllers/encrypt"));
+app.use("/category", require("./controllers/category"));
+app.use("/service", require("./controllers/service"));
 
 app.use(errors.sendError);
 

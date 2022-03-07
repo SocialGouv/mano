@@ -4,27 +4,32 @@ import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
 import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
-import { actionsCategories } from '../../recoil/actions';
+import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import { defaultMedicalCustomFields, usePersons } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
 import { theme } from '../../config';
 import SortableGrid from '../../components/SortableGrid';
+import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
+import { refreshTriggerState } from '../../components/Loader';
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const actions = useRecoilValue(actionsState);
+  const reports = useRecoilValue(reportsState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const { personFieldsIncludingCustomFields } = usePersons();
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
@@ -125,10 +130,49 @@ const View = () => {
                               <Label>Categories des actions</Label>
                               <SortableGrid
                                 list={values.categories || []}
+                                editItemTitle="Changer le nom de la catégorie d'action"
                                 onUpdateList={(cats) => handleChange({ target: { value: cats, name: 'categories' } })}
                                 onRemoveItem={(content) =>
                                   handleChange({ target: { value: values.categories.filter((cat) => cat !== content), name: 'categories' } })
                                 }
+                                onEditItem={async ({ content, newContent }) => {
+                                  if (!newContent) {
+                                    toastr.error('Erreur', 'Vous devez saisir un nom pour la catégorie');
+                                    return;
+                                  }
+                                  const encryptedActions = await Promise.all(
+                                    actions
+                                      .filter((a) => a.categories.includes(content))
+                                      .map((action) => ({
+                                        ...action,
+                                        categories: [...new Set(action.categories.map((cat) => (cat === content ? newContent : cat)))],
+                                      }))
+                                      .map(prepareActionForEncryption)
+                                      .map(encryptItem(hashedOrgEncryptionKey))
+                                  );
+                                  const newCategories = [...new Set(values.categories.map((cat) => (cat === content ? newContent : cat)))];
+                                  const response = await API.put({
+                                    path: `/category`,
+                                    body: {
+                                      categories: newCategories,
+                                      actions: encryptedActions,
+                                    },
+                                  });
+                                  if (response.ok) {
+                                    setRefreshTrigger({
+                                      status: true,
+                                      options: { showFullScreen: false, initialLoad: false },
+                                    });
+                                    handleChange({ target: { value: newCategories, name: 'categories' } });
+                                    setOrganisation({ ...organisation, categories: newCategories });
+                                    toastr.success(
+                                      'Catégorie mise à jour',
+                                      "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
+                                    );
+                                  } else {
+                                    toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+                                  }
+                                }}
                               />
                             </FormGroup>
                             <FormGroup>
@@ -184,10 +228,71 @@ const View = () => {
                               <Label>Services disponibles</Label>
                               <SortableGrid
                                 list={values.services || []}
+                                editItemTitle="Changer le nom du service"
                                 onUpdateList={(newServices) => handleChange({ target: { value: newServices, name: 'services' } })}
                                 onRemoveItem={(content) =>
                                   handleChange({ target: { value: values.services.filter((service) => service !== content), name: 'services' } })
                                 }
+                                onEditItem={async ({ content, newContent }) => {
+                                  if (!newContent) {
+                                    toastr.error('Erreur', 'Vous devez saisir un nom pour le service');
+                                    return;
+                                  }
+                                  // two cases:
+                                  // 1. just change 'one_service' to 'another_new_service'
+                                  // 2. merge 'one_service' to 'an_existing_service'
+                                  const reportsWithService = reports.filter((r) => Object.keys(JSON.parse(r.services || '{}')).includes(content));
+                                  const encryptedReports = await Promise.all(
+                                    reportsWithService
+                                      .map((report) => {
+                                        const newServices = {};
+                                        const oldServices = JSON.parse(report.services || '{}');
+                                        for (const service of Object.keys(oldServices)) {
+                                          if (service === content) {
+                                            if (Object.keys(oldServices).includes(newContent)) {
+                                              // merge
+                                              if (!newServices[newContent]) newServices[newContent] = 0;
+                                              newServices[newContent] = newServices[newContent] + oldServices[newContent];
+                                            } else {
+                                              newServices[newContent] = oldServices[content];
+                                            }
+                                          } else {
+                                            if (!newServices[service]) newServices[service] = 0;
+                                            newServices[service] = newServices[service] + oldServices[service];
+                                          }
+                                        }
+                                        return {
+                                          ...report,
+                                          services: JSON.stringify(newServices),
+                                        };
+                                      })
+                                      .map(prepareReportForEncryption)
+                                      .map(encryptItem(hashedOrgEncryptionKey))
+                                  );
+
+                                  const newServices = [...new Set(values.services.map((service) => (service === content ? newContent : service)))];
+                                  const response = await API.put({
+                                    path: `/service`,
+                                    body: {
+                                      services: newServices,
+                                      reports: encryptedReports,
+                                    },
+                                  });
+                                  if (response.ok) {
+                                    setRefreshTrigger({
+                                      status: true,
+                                      options: { showFullScreen: false, initialLoad: false },
+                                    });
+                                    handleChange({ target: { value: newServices, name: 'services' } });
+                                    setOrganisation({ ...organisation, services: newServices });
+                                    toastr.success(
+                                      'Service mis à jour',
+                                      "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
+                                    );
+                                  } else {
+                                    toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+                                  }
+                                }}
                               />
                             </FormGroup>
                             <FormGroup>
