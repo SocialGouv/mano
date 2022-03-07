@@ -1,3 +1,10 @@
+## [1.71.1](https://github.com/SocialGouv/mano/compare/v1.71.0...v1.71.1) (2022-03-07)
+
+
+### Bug Fixes
+
+* cat value must be set ([0c37f60](https://github.com/SocialGouv/mano/commit/0c37f6069a85e43add4dae1ec22f5220126e95f7))
+
 # [1.71.0](https://github.com/SocialGouv/mano/compare/v1.70.4...v1.71.0) (2022-03-07)
 
 
