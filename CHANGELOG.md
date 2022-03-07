@@ -1,3 +1,10 @@
+## [1.71.7](https://github.com/SocialGouv/mano/compare/v1.71.6...v1.71.7) (2022-03-07)
+
+
+### Bug Fixes
+
+* **dashboard:** fix not found on comment from reports ([435b2b0](https://github.com/SocialGouv/mano/commit/435b2b0f6029ac9c78f3bb88e2c510c41c1ad1be))
+
 ## [1.71.6](https://github.com/SocialGouv/mano/compare/v1.71.5...v1.71.6) (2022-03-07)
 
 
