@@ -117,7 +117,7 @@ router.get(
     const done = actions.filter((a) => a.status === DONE).sort(sortDoneOrCancel);
     const cancel = actions.filter((a) => a.status === CANCEL).sort(sortDoneOrCancel);
     const data = [...todo, ...done, ...cancel];
-    return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
+    return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
 );
 
