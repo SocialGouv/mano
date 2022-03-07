@@ -133,7 +133,7 @@ const View = () => {
                                 editItemTitle="Changer le nom de la catégorie d'action"
                                 onUpdateList={(cats) => handleChange({ target: { value: cats, name: 'categories' } })}
                                 onRemoveItem={(content) =>
-                                  handleChange({ target: { value: values.categories.filter((cat) => cat !== content), name: 'categories' } })
+                                  handleChange({ target: { value: (values.categories || []).filter((cat) => cat !== content), name: 'categories' } })
                                 }
                                 onEditItem={async ({ content, newContent }) => {
                                   if (!newContent) {
@@ -150,7 +150,7 @@ const View = () => {
                                       .map(prepareActionForEncryption)
                                       .map(encryptItem(hashedOrgEncryptionKey))
                                   );
-                                  const newCategories = [...new Set(values.categories.map((cat) => (cat === content ? newContent : cat)))];
+                                  const newCategories = [...new Set((values.categories || []).map((cat) => (cat === content ? newContent : cat)))];
                                   const response = await API.put({
                                     path: `/category`,
                                     body: {
@@ -178,20 +178,20 @@ const View = () => {
                             <FormGroup>
                               <Label>Ajouter une catégorie</Label>
                               <SelectCustom
-                                key={JSON.stringify(values.categories)}
+                                key={JSON.stringify(values.categories || [])}
                                 creatable
                                 options={[...(actionsCategories || [])]
-                                  .filter((cat) => !values.categories.includes(cat))
+                                  .filter((cat) => !(values.categories || []).includes(cat))
                                   .sort((c1, c2) => c1.localeCompare(c2))
                                   .map((cat) => ({ value: cat, label: cat }))}
                                 value={null}
                                 onChange={(cat) => {
                                   if (cat && cat.value) {
-                                    handleChange({ target: { value: [...values.categories, cat.value], name: 'categories' } });
+                                    handleChange({ target: { value: [...(values.categories || []), cat.value], name: 'categories' } });
                                   }
                                 }}
                                 onCreateOption={async (name) => {
-                                  handleChange({ target: { value: [...values.categories, name], name: 'categories' } });
+                                  handleChange({ target: { value: [...(values.categories || []), name], name: 'categories' } });
                                 }}
                                 isClearable
                                 inputId="organisation-select-categories"
@@ -203,7 +203,7 @@ const View = () => {
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
                           <ButtonCustom
                             title={'Mettre à jour'}
-                            disabled={JSON.stringify(organisation.categories) === JSON.stringify(values.categories)}
+                            disabled={JSON.stringify(organisation.categories) === JSON.stringify(values.categories || [])}
                             loading={isSubmitting}
                             onClick={handleSubmit}
                             width={200}
