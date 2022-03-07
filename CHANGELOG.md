@@ -1,3 +1,10 @@
+## [1.71.4](https://github.com/SocialGouv/mano/compare/v1.71.3...v1.71.4) (2022-03-07)
+
+
+### Bug Fixes
+
+* **app:** person name ([4465d86](https://github.com/SocialGouv/mano/commit/4465d86b4d8d315a46db5ee655a6d701bc7a11e3))
+
 ## [1.71.3](https://github.com/SocialGouv/mano/compare/v1.71.2...v1.71.3) (2022-03-07)
 
 
