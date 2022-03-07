@@ -234,7 +234,6 @@ const View = () => {
                                   // 1. just change 'one_service' to 'another_new_service'
                                   // 2. merge 'one_service' to 'an_existing_service'
                                   const reportsWithService = reports.filter((r) => Object.keys(JSON.parse(r.services || '{}')).includes(content));
-                                  console.log({ reportsWithService });
                                   const encryptedReports = await Promise.all(
                                     reportsWithService
                                       .map((report) => {
