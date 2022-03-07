@@ -1,3 +1,10 @@
+## [1.71.6](https://github.com/SocialGouv/mano/compare/v1.71.5...v1.71.6) (2022-03-07)
+
+
+### Bug Fixes
+
+* **api:** add security on actions ([#448](https://github.com/SocialGouv/mano/issues/448)) ([4e34c4c](https://github.com/SocialGouv/mano/commit/4e34c4cf5b0a8b5c4ed999885f171888509bad69))
+
 ## [1.71.5](https://github.com/SocialGouv/mano/compare/v1.71.4...v1.71.5) (2022-03-07)
 
 
