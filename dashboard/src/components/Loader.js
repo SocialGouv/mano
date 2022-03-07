@@ -261,6 +261,16 @@ const Loader = () => {
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'comment'));
 
     /*
+    Play organisation internal migrations (things that requires the database to be fully loaded locally).
+    */
+    // if (!organisation.migrations?.includes('passages-from-comments-to-table')) {
+    //   setLoading('Migration des passages');
+    //  // Do something and call API.
+    //  // Then update the organisation.
+    //  await API.put({ path: `/migration/passages-from-comments-to-table`, body: { comments } });
+    // }
+
+    /*
     Reset refresh trigger
     */
     await new Promise((res) => setTimeout(res, 150));
