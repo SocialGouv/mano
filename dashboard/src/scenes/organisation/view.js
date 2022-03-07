@@ -167,7 +167,7 @@ const View = () => {
                                     setOrganisation({ ...organisation, categories: newCategories });
                                     toastr.success(
                                       'Catégorie mise à jour',
-                                      "Veuillez notifier vos équipes pour qu'ils rechargent leur app ou leur dashboard"
+                                      "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
                                     );
                                   } else {
                                     toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
@@ -287,7 +287,7 @@ const View = () => {
                                     setOrganisation({ ...organisation, services: newServices });
                                     toastr.success(
                                       'Service mis à jour',
-                                      "Veuillez notifier vos équipes pour qu'ils rechargent leur app ou leur dashboard"
+                                      "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
                                     );
                                   } else {
                                     toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
