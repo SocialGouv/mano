@@ -15,7 +15,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
   const name = action?.name;
   const status = action?.status;
   const withTime = action?.withTime;
-  const person = useMemo(() => (action?.person ? persons?.find((p) => p._id === action.person)?.name : null), [persons, action.person]);
+  const person = useMemo(() => (action?.person ? persons?.find((p) => p._id === action.person) : null), [persons, action.person]);
   const pseudo = useMemo(() => action?.personName || person?.name, [action, person?.name]);
   const dueAt = action?.dueAt ? new Date(action?.dueAt) : null;
 
