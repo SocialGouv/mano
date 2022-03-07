@@ -1,3 +1,10 @@
+## [1.71.3](https://github.com/SocialGouv/mano/compare/v1.71.2...v1.71.3) (2022-03-07)
+
+
+### Bug Fixes
+
+* categories empty ([781dac9](https://github.com/SocialGouv/mano/commit/781dac97fcb70815266f6e62b607be35f8280f12))
+
 ## [1.71.2](https://github.com/SocialGouv/mano/compare/v1.71.1...v1.71.2) (2022-03-07)
 
 
