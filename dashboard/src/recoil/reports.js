@@ -41,8 +41,6 @@ export const useReports = () => {
 
   const addReport = async (date, team) => {
     try {
-      // console.log({ date }, prepareReportForEncryption({ team, date }));
-      // return;
       const existingReport = reports.find((r) => r.date === date && r.team === team);
       if (existingReport) return { ok: true, data: existingReport };
       const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team, date }) });
