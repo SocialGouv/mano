@@ -1,3 +1,10 @@
+## [1.71.8](https://github.com/SocialGouv/mano/compare/v1.71.7...v1.71.8) (2022-03-07)
+
+
+### Bug Fixes
+
+* **dashboard:** limit actions 1000 ([f19fcfd](https://github.com/SocialGouv/mano/commit/f19fcfd6a9d2ee48c18baad4326097379137d8b0))
+
 ## [1.71.7](https://github.com/SocialGouv/mano/compare/v1.71.6...v1.71.7) (2022-03-07)
 
 
