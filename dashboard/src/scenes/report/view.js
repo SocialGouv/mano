@@ -413,11 +413,13 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
     .map((comment) => {
       const commentPopulated = { ...comment };
       if (comment.person) {
-        commentPopulated.person = persons.find((p) => p._id === comment?.person);
+        const id = comment?.person || comment?.item;
+        commentPopulated.person = persons.find((p) => p._id === id);
         commentPopulated.type = 'person';
       }
       if (comment.action) {
-        const action = actions.find((p) => p._id === comment?.action);
+        const id = comment?.action || comment?.item;
+        const action = actions.find((p) => p._id === id);
         commentPopulated.action = action;
         commentPopulated.person = persons.find((p) => p._id === action?.person);
         commentPopulated.type = 'action';
