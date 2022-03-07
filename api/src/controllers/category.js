@@ -15,12 +15,10 @@ router.put(
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
   catchErrors(async (req, res) => {
-    console.log(req.user);
     try {
       z.literal("admin").parse(req.user.role);
       z.string().regex(looseUuidRegex).parse(req.user.organisation);
     } catch (e) {
-      console.log(e);
       return res.status(400).send({ ok: false, error: "Invalid request" });
     }
 
