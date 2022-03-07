@@ -302,13 +302,13 @@ const View = () => {
                               <SelectCustom
                                 key={JSON.stringify(values.services)}
                                 creatable
-                                isOptionDisabled={({ value }) => values.services.includes(value)}
+                                isOptionDisabled={({ value }) => (values.services || []).includes(value)}
                                 options={[...(organisation.services || [])]
                                   .sort((c1, c2) => c1.localeCompare(c2))
                                   .map((cat) => ({ value: cat, label: cat }))}
                                 value={null}
                                 onCreateOption={async (name) => {
-                                  handleChange({ target: { value: [...values.services, name], name: 'services' } });
+                                  handleChange({ target: { value: [...(values.services || []), name], name: 'services' } });
                                 }}
                                 isClearable
                                 inputId="organisation-select-services"
@@ -320,7 +320,7 @@ const View = () => {
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
                           <ButtonCustom
                             title={'Mettre à jour'}
-                            disabled={JSON.stringify(organisation.services) === JSON.stringify(values.services)}
+                            disabled={JSON.stringify(organisation.services) === JSON.stringify(values.services || [])}
                             loading={isSubmitting}
                             onClick={handleSubmit}
                             width={200}
