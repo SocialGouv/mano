@@ -186,7 +186,9 @@ const View = () => {
                                   .map((cat) => ({ value: cat, label: cat }))}
                                 value={null}
                                 onChange={(cat) => {
-                                  handleChange({ target: { value: [...values.categories, cat.value], name: 'categories' } });
+                                  if (cat && cat.value) {
+                                    handleChange({ target: { value: [...values.categories, cat.value], name: 'categories' } });
+                                  }
                                 }}
                                 onCreateOption={async (name) => {
                                   handleChange({ target: { value: [...values.categories, name], name: 'categories' } });
