@@ -35,9 +35,6 @@ const View = () => {
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
 
-  console.log(reports.filter((r) => !r.date).length);
-  console.log(reports.map((r) => [r.date, r.createdAt]));
-
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });
   }, [tab]);
