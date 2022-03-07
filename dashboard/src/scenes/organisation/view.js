@@ -166,7 +166,7 @@ const View = () => {
                                     handleChange({ target: { value: newCategories, name: 'categories' } });
                                     setOrganisation({ ...organisation, categories: newCategories });
                                     toastr.success(
-                                      'Catégorie mis-à-jour',
+                                      'Catégorie mise à jour',
                                       "Veuillez notifier vos équipes pour qu'ils rechargent leur app ou leur dashboard"
                                     );
                                   } else {
