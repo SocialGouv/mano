@@ -1,3 +1,10 @@
+# [1.71.0](https://github.com/SocialGouv/mano/compare/v1.70.4...v1.71.0) (2022-03-07)
+
+
+### Features
+
+* **dashboard:** can rename services categories ([#447](https://github.com/SocialGouv/mano/issues/447)) ([99f7424](https://github.com/SocialGouv/mano/commit/99f742406f2fbbf2db4cf5dc339ef6116a09246f))
+
 ## [1.70.4](https://github.com/SocialGouv/mano/compare/v1.70.3...v1.70.4) (2022-03-04)
 
 
