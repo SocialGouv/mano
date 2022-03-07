@@ -253,10 +253,6 @@ const View = () => {
                                             newServices[service] = newServices[service] + oldServices[service];
                                           }
                                         }
-                                        console.log({
-                                          ...report,
-                                          services: JSON.stringify(newServices),
-                                        });
                                         return {
                                           ...report,
                                           services: JSON.stringify(newServices),
