@@ -136,6 +136,10 @@ const View = () => {
                                   handleChange({ target: { value: values.categories.filter((cat) => cat !== content), name: 'categories' } })
                                 }
                                 onEditItem={async ({ content, newContent }) => {
+                                  if (!newContent) {
+                                    toastr.error('Erreur', 'Vous devez saisir un nom pour la catégorie');
+                                    return;
+                                  }
                                   const encryptedActions = await Promise.all(
                                     actions
                                       .filter((a) => a.categories.includes(content))
@@ -230,6 +234,10 @@ const View = () => {
                                   handleChange({ target: { value: values.services.filter((service) => service !== content), name: 'services' } })
                                 }
                                 onEditItem={async ({ content, newContent }) => {
+                                  if (!newContent) {
+                                    toastr.error('Erreur', 'Vous devez saisir un nom pour le service');
+                                    return;
+                                  }
                                   // two cases:
                                   // 1. just change 'one_service' to 'another_new_service'
                                   // 2. merge 'one_service' to 'an_existing_service'
