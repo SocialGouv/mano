@@ -2,6 +2,7 @@ const { z } = require("zod");
 const { looseUuidRegex } = require("../utils");
 
 /**
+ * Check that the request user has the correct role, return 403 otherwise.
  * @param {string|string[]} roles
  */
 function validateUser(roles = ["admin", "normal"]) {
