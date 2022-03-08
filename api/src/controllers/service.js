@@ -1,27 +1,20 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { z } = require("zod");
 const sequelize = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const Report = require("../models/report");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
-const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
+const validateUser = require("../middleware/validateUser");
 
 router.put(
   "/",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
+  validateUser("admin"),
   catchErrors(async (req, res) => {
-    try {
-      z.literal("admin").parse(req.user.role);
-      z.string().regex(looseUuidRegex).parse(req.user.organisation);
-    } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
-    }
-
     const query = { where: { _id: req.user.organisation } };
     const organisation = await Organisation.findOne(query);
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
