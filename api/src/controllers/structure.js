@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { where, fn, col, Op } = require("sequelize");
+const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 const validateUser = require("../middleware/validateUser");
 const Structure = require("../models/structure");
