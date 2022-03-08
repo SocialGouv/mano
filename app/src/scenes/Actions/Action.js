@@ -73,6 +73,7 @@ const Action = ({ navigation, route }) => {
         "Les commentaires de l'action aussi sont dupliqués. L'action originale est annulée"
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isUpdateDisabled = useMemo(() => {
