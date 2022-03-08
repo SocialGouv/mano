@@ -10,6 +10,7 @@ const { catchErrors } = require("../errors");
 const Person = require("../models/person");
 const { STORAGE_DIRECTORY } = require("../config");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateUser = require("../middleware/validateUser");
 
 // Return the basedir to store persons' documents.
 function personDocumentBasedir(userOrganisation, personId) {
@@ -21,6 +22,7 @@ function personDocumentBasedir(userOrganisation, personId) {
 router.post(
   "/:id/document",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   // Use multer to handle the file upload.
   multer({
     storage: multer.diskStorage({
@@ -56,6 +58,7 @@ router.post(
 router.get(
   "/:id/document/:filename",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const dir = personDocumentBasedir(req.user.organisation, req.params.id);
     const file = path.join(dir, req.params.filename);
@@ -71,6 +74,7 @@ router.get(
 router.delete(
   "/:id/document/:filename",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const dir = personDocumentBasedir(req.user.organisation, req.params.id);
     const file = path.join(dir, req.params.filename);
@@ -86,6 +90,7 @@ router.delete(
 router.post(
   "/import",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     const persons = req.body.map((p) => ({
@@ -101,6 +106,7 @@ router.post(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const newPerson = {};
@@ -121,6 +127,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {
@@ -163,6 +170,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const query = {
@@ -196,6 +204,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {
