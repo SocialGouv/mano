@@ -17,6 +17,7 @@ const Person = require("../models/person");
 const Comment = require("../models/comment");
 const RelUserTeam = require("../models/relUserTeam");
 const Team = require("../models/team");
+const validateUser = require("../middleware/validateUser");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
@@ -160,10 +161,9 @@ router.post(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
     try {
-      z.literal("admin").parse(req.user.role);
-      z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.string().min(1).parse(req.body.name);
       z.string().email().parse(req.body.email);
       z.array(z.string().regex(looseUuidRegex)).parse(req.body.team);

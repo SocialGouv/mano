@@ -1,11 +1,12 @@
 const express = require("express");
+const { z } = require("zod");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
+const validateUser = require("../middleware/validateUser");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const Action = require("../models/action");
-const { z } = require("zod");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 const TODO = "A FAIRE";
@@ -16,11 +17,10 @@ const STATUS = [TODO, DONE, CANCEL];
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     try {
-      z.enum(["admin", "normal"]).parse(req.user.role);
-      z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.enum(STATUS).parse(req.body.status);
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
       z.preprocess((input) => (input ? new Date(input) : null), z.date())
@@ -63,10 +63,9 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     try {
-      z.enum(["admin", "normal"]).parse(req.user.role);
-      z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
@@ -124,11 +123,10 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res) => {
     try {
-      z.enum(["admin", "normal"]).parse(req.user.role);
-      z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.enum(STATUS).parse(req.body.status);
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
@@ -179,10 +177,9 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     try {
-      z.enum(["admin", "normal"]).parse(req.user.role);
-      z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
       return res.status(400).send({ ok: false, error: "Invalid request" });
