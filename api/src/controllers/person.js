@@ -8,8 +8,7 @@ const multer = require("multer");
 const crypto = require("crypto");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
-const Team = require("../models/team");
-const { ENCRYPTED_FIELDS_ONLY, STORAGE_DIRECTORY } = require("../config");
+const { STORAGE_DIRECTORY } = require("../config");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 
 // Return the basedir to store persons' documents.
