@@ -13,14 +13,15 @@ const Territory = require("../models/territory");
 const Report = require("../models/report");
 const Comment = require("../models/comment");
 const mailservice = require("../utils/mailservice");
+const validateUser = require("../middleware/validateUser");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser("superadmin"),
   catchErrors(async (req, res) => {
-    if (req.user.role !== "superadmin") return res.status(403).send({ ok: false, error: "Forbidden" });
     if (!req.body.orgName) return res.status(400).send({ ok: false, error: "Missing organisation name" });
     const organisation = await Organisation.create({ name: req.body.orgName }, { returning: true });
     if (!req.body.name) return res.status(400).send({ ok: false, error: "Missing admin name" });
@@ -69,6 +70,7 @@ Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 1
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser("superadmin"),
   catchErrors(async (req, res) => {
     const where = {};
     if (req.user.role !== "superadmin") where._id = req.user.organisation;
@@ -111,8 +113,8 @@ router.get(
 router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") return res.status(403).send({ ok: false, error: "Forbidden" });
     const data = await Organisation.findOne({ where: { _id: req.params._id } });
     if (!data) return res.status(404).send({ ok: false, error: "Not Found" });
     return res.status(200).send({ ok: true, data });
@@ -122,6 +124,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = { where: { _id: req.params._id } };
     const organisation = await Organisation.findOne(query);
@@ -164,6 +167,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["superadmin", "admin"]),
   catchErrors(async (req, res) => {
     // Super admin can delete any organisation. Admin can delete only their organisation.
     const canDelete = req.user.role === "superadmin" || (req.user.role === "admin" && req.user.organisation === req.params._id);

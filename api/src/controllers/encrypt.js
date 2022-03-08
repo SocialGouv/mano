@@ -13,6 +13,7 @@ const Report = require("../models/report");
 const TerritoryObservation = require("../models/territoryObservation");
 const sequelize = require("../db/sequelize");
 const { capture } = require("../sentry");
+const validateUser = require("../middleware/validateUser");
 
 // this controller is required BECAUSE
 // if we encrypt one by one each of the actions, persons, comments, territories, observations, places, reports
@@ -26,12 +27,8 @@ const { capture } = require("../sentry");
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") {
-      capture("Only an admin can change the encryption", { user: req.user });
-      return res.status(403).send({ ok: false, error: "Seul un admin peut modifier le chiffrement" });
-    }
-
     let organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     if (organisation.encrypting) {
       return res.status(403).send({ ok: false, error: "L'organisation est déjà en cours de chiffrement" });
