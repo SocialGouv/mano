@@ -23,9 +23,7 @@ router.post(
     try {
       z.enum(STATUS).parse(req.body.status);
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
-      z.preprocess((input) => (input ? new Date(input) : null), z.date())
-        .optional()
-        .parse(req.body.completedAt);
+      if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
       z.string().parse("encrypted");
       z.string().parse("encryptedEntityKey");
     } catch (e) {
@@ -130,9 +128,7 @@ router.put(
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.enum(STATUS).parse(req.body.status);
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
-      z.preprocess((input) => (input ? new Date(input) : null), z.date())
-        .optional()
-        .parse(req.body.completedAt);
+      if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
       z.string().parse("encrypted");
       z.string().parse("encryptedEntityKey");
     } catch (e) {
