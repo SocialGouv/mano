@@ -57,7 +57,7 @@ const Action = ({ navigation, route }) => {
 
   const actionDB = useMemo(() => {
     const existingAction = actions.find((a) => a._id === route.params?._id);
-    if (!existingAction) return null;
+    if (!existingAction) return {};
     return Object.assign({}, castToAction(existingAction), { _id: existingAction._id });
   }, [actions, route.params]);
 
