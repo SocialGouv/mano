@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { where, fn, col } = require("sequelize");
+const { where, fn, col, Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 const validateUser = require("../middleware/validateUser");
 const Structure = require("../models/structure");
@@ -25,23 +25,21 @@ router.get(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const search = req.query.search;
-    let condition = "";
-    if (search && search.length) {
-      // Todo: fix or explain this.
-      // Search should not be an SQL injection.
-      condition = search
-        .trim()
-        .replace("/&/g", "")
-        .split(" ")
-        .map((k) => k.normalize("NFD").toLowerCase().trim())
-        .filter((s) => !!s)
-        .map((s) => s + ":*")
-        .join(" | ");
-    }
-
     let query = { order: [["createdAt", "ASC"]] };
-    if (condition) query.where = { name: where(fn("to_tsvector", fn("LOWER", col("name"))), "@@", fn("to_tsquery", condition)) };
-
+    if (search && search.length) {
+      const terms = search
+        .split(" ")
+        .map((e) => e.trim())
+        .filter((e) => e)
+        .map((e) => `%${e}%`);
+      query.where = {
+        name: {
+          [Op.iLike]: {
+            [Op.any]: terms,
+          },
+        },
+      };
+    }
     const data = await Structure.findAll(query);
     return res.status(200).send({ ok: true, data });
   })
