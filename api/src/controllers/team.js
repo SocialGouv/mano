@@ -6,13 +6,14 @@ const { catchErrors } = require("../errors");
 
 const Team = require("../models/team");
 const RelUserTeam = require("../models/relUserTeam");
+const validateUser = require("../middleware/validateUser");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
     if (!req.body.name) return res.status(400).send({ ok: false, error: "Name is required" });
-    if (req.user.role !== "admin") return res.status(400).send({ ok: false, error: "Admin role is required" });
     let organisation = req.user.organisation;
     const team = await Team.create({ organisation, name: req.body.name, nightSession: req.body.nightSession || false }, { returning: true });
     res.status(200).send({ ok: true, data: team });
@@ -22,6 +23,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     let query = { where: {}, include: ["Organisation"] };
     query.where.organisation = req.user.organisation;
@@ -33,6 +35,7 @@ router.get(
 router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
     const where = { _id: req.params._id };
     where.organisation = req.user.organisation;
@@ -45,6 +48,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res, next) => {
     const where = { _id: req.params._id };
     where.organisation = req.user.organisation;
@@ -60,6 +64,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
     const queryTeam = { where: { _id: req.params._id } };
     const queryRel = { where: { team: req.params._id } };

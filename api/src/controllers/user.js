@@ -48,6 +48,7 @@ function logoutCookieOptions() {
 router.get(
   "/me",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
     const teams = await user.getTeams();
@@ -59,6 +60,7 @@ router.get(
 router.post(
   "/logout",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res) => {
     res.clearCookie("jwt", logoutCookieOptions());
     return res.status(200).send({ ok: true });
@@ -97,6 +99,7 @@ router.post(
 router.get(
   "/signin-token",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res) => {
     const token = req.cookies.jwt;
     const user = await User.findOne({ where: { _id: req.user._id } });
@@ -236,6 +239,7 @@ Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 1
 router.post(
   "/reset_password",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res) => {
     const _id = req.user._id;
     const { password, newPassword, verifyPassword } = req.body;
@@ -265,6 +269,7 @@ router.post(
 router.get(
   "/:id",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
     const query = { where: { _id: req.params.id } };
     query.where.organisation = req.user.organisation;
@@ -279,6 +284,7 @@ router.get(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res) => {
     const where = {};
     where.organisation = req.user.organisation;
@@ -304,6 +310,7 @@ router.get(
 router.put(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res) => {
     const _id = req.user._id;
     const { name, email, password, team, termsAccepted } = req.body;
@@ -334,13 +341,9 @@ router.put(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
     const _id = req.params._id;
-
-    if (req.user.role !== "admin") {
-      capture("attempt of updating a user with no admin role", { user: req.user });
-      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
-    }
     const { name, email, team, role } = req.body;
 
     const user = await User.findOne({ where: { _id, organisation: req.user.organisation } });
@@ -370,12 +373,8 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser("admin"),
   catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") {
-      capture("attempt of deleting a user with no admin role", { user: req.user });
-      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
-    }
-
     const userId = req.params._id;
 
     const fkQuery = { where: { user: userId } };

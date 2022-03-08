@@ -6,10 +6,12 @@ const { catchErrors } = require("../errors");
 const Territory = require("../models/territory");
 const { Op } = require("sequelize");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateUser = require("../middleware/validateUser");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const newTerritory = {};
@@ -29,6 +31,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {
@@ -65,6 +68,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const query = {
@@ -93,6 +97,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {
