@@ -4,11 +4,13 @@ const passport = require("passport");
 const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateUser = require("../middleware/validateUser");
 const RelPersonPlace = require("../models/relPersonPlace");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const { person, place } = req.body;
@@ -34,6 +36,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {
@@ -69,6 +72,7 @@ router.get(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const { _id } = req.params;
     await RelPersonPlace.destroy({ where: { _id } });

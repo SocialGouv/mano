@@ -4,11 +4,13 @@ const passport = require("passport");
 const { Op } = require("sequelize");
 const { catchErrors } = require("../errors");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateUser = require("../middleware/validateUser");
 const Place = require("../models/place");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     if (!req.body.name) return res.status(400).send({ ok: false, error: "Name is needed" });
@@ -31,6 +33,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {
@@ -66,6 +69,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const query = {
@@ -95,6 +99,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {

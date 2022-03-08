@@ -1,14 +1,15 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { Op, where, fn, col } = require("sequelize");
-
+const { where, fn, col } = require("sequelize");
 const { catchErrors } = require("../errors");
+const validateUser = require("../middleware/validateUser");
 const Structure = require("../models/structure");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const name = req.body.name;
     const organisation = req.user.organisation;
@@ -21,6 +22,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const search = req.query.search;
     let condition = "";
@@ -48,6 +50,7 @@ router.get(
 router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const _id = req.params._id;
     const data = await Structure.findOne({ where: { _id } });
@@ -59,6 +62,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const _id = req.params._id;
     const body = req.body;
@@ -72,6 +76,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const _id = req.params._id;
     await Structure.destroy({ where: { _id } });

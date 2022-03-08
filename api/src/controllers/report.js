@@ -2,15 +2,15 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
-
 const { catchErrors } = require("../errors");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
-
+const validateUser = require("../middleware/validateUser");
 const Report = require("../models/report");
 
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {
@@ -48,6 +48,7 @@ router.get(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const newReport = { organisation: req.user.organisation };
@@ -68,6 +69,7 @@ router.post(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
   catchErrors(async (req, res, next) => {
     const where = { _id: req.params._id };
@@ -92,6 +94,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     const query = {
       where: {
