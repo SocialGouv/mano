@@ -1,3 +1,10 @@
+## [1.71.13](https://github.com/SocialGouv/mano/compare/v1.71.12...v1.71.13) (2022-03-08)
+
+
+### Bug Fixes
+
+* **security:** remove injection in structure search ([332c722](https://github.com/SocialGouv/mano/commit/332c72263e4d27910cd4d0d81a6caa1f32aa7566))
+
 ## [1.71.12](https://github.com/SocialGouv/mano/compare/v1.71.11...v1.71.12) (2022-03-08)
 
 
