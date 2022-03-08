@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const { z } = require("zod");
 const sequelize = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
@@ -8,6 +9,7 @@ const Action = require("../models/action");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
+const { looseUuidRegex } = require("../utils");
 
 router.put(
   "/",
@@ -15,19 +17,31 @@ router.put(
   validateUser("admin"),
   validateOrganisationEncryption,
   catchErrors(async (req, res) => {
-    const query = { where: { _id: req.user.organisation } };
-    const organisation = await Organisation.findOne(query);
+    try {
+      z.array(
+        z.object({
+          _id: z.string().regex(looseUuidRegex),
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        })
+      ).parse(req.body.actions);
+      z.array(z.string()).parse(req.body.categories);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+
+    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    const { actions = [], categories = [] } = req.body;
 
     try {
       await sequelize.transaction(async (tx) => {
-        const { actions = [] } = req.body;
-
         for (let { encrypted, encryptedEntityKey, _id } of actions) {
           await Action.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
 
-        organisation.set({ categories: req.body.categories });
+        organisation.set({ categories });
         await organisation.save({ transaction: tx });
       });
     } catch (e) {
