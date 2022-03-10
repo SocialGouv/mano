@@ -1,3 +1,10 @@
+## [1.71.16](https://github.com/SocialGouv/mano/compare/v1.71.15...v1.71.16) (2022-03-10)
+
+
+### Bug Fixes
+
+* **dashboard:** fix #MANO-9M ([#456](https://github.com/SocialGouv/mano/issues/456)) ([c88432d](https://github.com/SocialGouv/mano/commit/c88432de6bcaaa4ee1df9fad7c9e50e6482f7394)), closes [#MANO-9](https://github.com/SocialGouv/mano/issues/MANO-9)
+
 ## [1.71.15](https://github.com/SocialGouv/mano/compare/v1.71.14...v1.71.15) (2022-03-10)
 
 
