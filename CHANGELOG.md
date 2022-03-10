@@ -1,3 +1,10 @@
+## [1.71.17](https://github.com/SocialGouv/mano/compare/v1.71.16...v1.71.17) (2022-03-10)
+
+
+### Bug Fixes
+
+* **dahsboard:** fix #MANO-64 ([454f396](https://github.com/SocialGouv/mano/commit/454f396ab256a24ac76980caece84a83fab0ebf2)), closes [#MANO-64](https://github.com/SocialGouv/mano/issues/MANO-64)
+
 ## [1.71.16](https://github.com/SocialGouv/mano/compare/v1.71.15...v1.71.16) (2022-03-10)
 
 
