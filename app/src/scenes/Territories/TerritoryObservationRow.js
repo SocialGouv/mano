@@ -102,6 +102,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
     <Container>
       <CaptionsContainer>
         {customFieldsObs
+          .filter((f) => f)
           .filter((f) => f.enabled)
           .map((field) => {
             const { name, label } = field;

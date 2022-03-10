@@ -30,6 +30,7 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
       <div className="time">{dayjs(obs.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
         {customFieldsObs
+          .filter((f) => f)
           .filter((f) => f.enabled)
           .map((field) => {
             const { name, label } = field;

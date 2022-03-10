@@ -47,6 +47,7 @@ const FileMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, i
           />
           {!editable && <Spacer />}
           {(customFieldsPersonsMedical || [])
+            .filter((f) => f)
             .filter((f) => f.enabled)
             .map((field) => {
               const { label, name } = field;
