@@ -278,7 +278,14 @@ const useApi = () => {
           headers,
         },
       });
-      toastr.error(errorExecuteApi, 'Désolé une erreur est survenue');
+      if (typeof errorExecuteApi === 'string') {
+        toastr.error(errorExecuteApi, 'Désolé une erreur est survenue');
+      } else if (errorExecuteApi?.message) {
+        toastr.error(errorExecuteApi.message, 'Désolé une erreur est survenue');
+      } else {
+        toastr.error('Une erreur est survenue', 'Désolé une erreur est survenue');
+      }
+
       throw errorExecuteApi;
     }
   };
