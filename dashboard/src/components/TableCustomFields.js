@@ -78,12 +78,13 @@ const TableCustomFields = ({ data, customFields }) => {
     setIsSubmitting(false);
   };
 
-  const handleSort = async (keys) => {
+  const handleSort = async (keys, currentDataRef) => {
+    // See ./Table.js for more information about currentDataRef.
     setIsSubmitting(true);
     try {
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { [customFields]: keys.map((key) => mutableData.find((field) => field.name === key)) },
+        body: { [customFields]: keys.map((key) => currentDataRef.find((field) => field.name === key)) },
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
