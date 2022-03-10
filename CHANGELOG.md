@@ -1,3 +1,10 @@
+## [1.71.19](https://github.com/SocialGouv/mano/compare/v1.71.18...v1.71.19) (2022-03-10)
+
+
+### Bug Fixes
+
+* **api:** validate actual body ([33415cb](https://github.com/SocialGouv/mano/commit/33415cbdb88e5a1ff29976cd768141f0f7244933))
+
 ## [1.71.18](https://github.com/SocialGouv/mano/compare/v1.71.17...v1.71.18) (2022-03-10)
 
 
