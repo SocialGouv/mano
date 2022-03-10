@@ -23,7 +23,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res) => {
     let query = { where: {}, include: ["Organisation"] };
     query.where.organisation = req.user.organisation;
