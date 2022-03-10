@@ -47,7 +47,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                 territory: values.territory,
                 _id: observation._id,
               };
-              for (const customField of customFieldsObs.filter((f) => f.enabled)) {
+              for (const customField of customFieldsObs.filter((f) => f).filter((f) => f.enabled)) {
                 body[customField.name] = values[customField.name];
               }
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
@@ -61,6 +61,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               <React.Fragment>
                 <Row>
                   {customFieldsObs
+                    .filter((f) => f)
                     .filter((f) => f.enabled)
                     .map((field) => (
                       <CustomFieldInput model="observation" values={values} handleChange={handleChange} field={field} key={field.name} />

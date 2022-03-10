@@ -229,6 +229,7 @@ const TerritoryObservation = ({ route, navigation }) => {
         <View>
           <CreatedAt>{new Date(obs?.createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
           {customFieldsObs
+            .filter((f) => f)
             .filter((f) => f.enabled)
             .map((field) => {
               const { label, name } = field;

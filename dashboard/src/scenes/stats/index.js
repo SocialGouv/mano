@@ -280,6 +280,7 @@ const Stats = () => {
               return (
                 <React.Fragment key={key}>
                   {customFields
+                    .filter((f) => f)
                     .filter((f) => f.enabled)
                     .filter((f) => f.showInStats)
                     .filter((field) => ['number'].includes(field.type))
@@ -289,6 +290,7 @@ const Stats = () => {
                       </Col>
                     ))}
                   {customFields
+                    .filter((f) => f)
                     .filter((f) => f.enabled)
                     .filter((f) => f.showInStats)
                     .filter((field) => ['date', 'date-with-time'].includes(field.type))
@@ -298,6 +300,7 @@ const Stats = () => {
                       </Col>
                     ))}
                   {customFields
+                    .filter((f) => f)
                     .filter((f) => f.enabled)
                     .filter((f) => f.showInStats)
                     .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
@@ -331,6 +334,7 @@ const Stats = () => {
           </div>
           <Row>
             {customFieldsObs
+              .filter((f) => f)
               .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['number'].includes(field.type))
@@ -340,6 +344,7 @@ const Stats = () => {
                 </Col>
               ))}
             {customFieldsObs
+              .filter((f) => f)
               .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['date', 'date-with-time'].includes(field.type))
@@ -349,6 +354,7 @@ const Stats = () => {
                 </Col>
               ))}
             {customFieldsObs
+              .filter((f) => f)
               .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
