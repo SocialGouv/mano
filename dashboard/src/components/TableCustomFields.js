@@ -52,7 +52,7 @@ const TableCustomFields = ({ data, customFields }) => {
   const onDelete = (fieldToDelete) => {
     const confirm = window.confirm('Voulez-vous vraiment supprimer ce champ ? Cette opération est irréversible.');
     if (confirm) {
-      const dataToSave = mutableData.filter((f) => f.name !== fieldToDelete.name);
+      const dataToSave = mutableData.filter((f) => f).filter((f) => f.name !== fieldToDelete.name);
       setMutableData(dataToSave);
       handleSubmit(dataToSave);
     }
