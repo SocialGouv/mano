@@ -24,8 +24,8 @@ router.post(
       z.enum(STATUS).parse(req.body.status);
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
       if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
-      z.string().parse("encrypted");
-      z.string().parse("encryptedEntityKey");
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
       return res.status(400).send({ ok: false, error: "Invalid request" });
     }
@@ -129,8 +129,8 @@ router.put(
       z.enum(STATUS).parse(req.body.status);
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
       if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
-      z.string().parse("encrypted");
-      z.string().parse("encryptedEntityKey");
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
       return res.status(400).send({ ok: false, error: "Invalid request" });
     }
