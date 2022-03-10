@@ -1,3 +1,10 @@
+## [1.71.14](https://github.com/SocialGouv/mano/compare/v1.71.13...v1.71.14) (2022-03-10)
+
+
+### Bug Fixes
+
+* super admin connexion ([6397210](https://github.com/SocialGouv/mano/commit/63972106d7d32007b1c82b667a4a8e1a3aeb94ad))
+
 ## [1.71.13](https://github.com/SocialGouv/mano/compare/v1.71.12...v1.71.13) (2022-03-08)
 
 
