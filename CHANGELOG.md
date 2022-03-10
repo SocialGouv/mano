@@ -1,3 +1,10 @@
+## [1.71.18](https://github.com/SocialGouv/mano/compare/v1.71.17...v1.71.18) (2022-03-10)
+
+
+### Bug Fixes
+
+* **dashboard:** delete custom field ([d97889a](https://github.com/SocialGouv/mano/commit/d97889af5ab9cb4edf2da3d7eb3708f784d4c86e))
+
 ## [1.71.17](https://github.com/SocialGouv/mano/compare/v1.71.16...v1.71.17) (2022-03-10)
 
 
