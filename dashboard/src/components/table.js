@@ -70,19 +70,21 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
         </tr>
       </thead>
       <tbody ref={gridRef}>
-        {data.map((item) => {
-          return (
-            <tr onClick={() => (onRowClick ? onRowClick(item) : null)} key={item[rowKey] || item._id} data-key={item[rowKey] || item._id}>
-              {columns.map((column) => {
-                return (
-                  <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
-                    {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
-                  </td>
-                );
-              })}
-            </tr>
-          );
-        })}
+        {data
+          .filter((e) => e)
+          .map((item) => {
+            return (
+              <tr onClick={() => (onRowClick ? onRowClick(item) : null)} key={item[rowKey] || item._id} data-key={item[rowKey] || item._id}>
+                {columns.map((column) => {
+                  return (
+                    <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
+                      {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
       </tbody>
     </TableWrapper>
   );
