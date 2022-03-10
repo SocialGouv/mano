@@ -1,3 +1,10 @@
+## [1.71.20](https://github.com/SocialGouv/mano/compare/v1.71.19...v1.71.20) (2022-03-10)
+
+
+### Bug Fixes
+
+* fix table sort ([#458](https://github.com/SocialGouv/mano/issues/458)) ([09dd5f7](https://github.com/SocialGouv/mano/commit/09dd5f769480a612541d520df80c498709ee2505))
+
 ## [1.71.19](https://github.com/SocialGouv/mano/compare/v1.71.18...v1.71.19) (2022-03-10)
 
 
