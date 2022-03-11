@@ -141,21 +141,21 @@ const SignIn = () => {
               const encryptionIsValid = await setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
               if (!encryptionIsValid) return;
             }
+            setUser(user);
+            AppSentry.setUser(user);
+            // now login !
+            // superadmin
+            if (['superadmin'].includes(user.role)) {
+              actions.setSubmitting(false);
+              history.push('/organisation');
+              return;
+            }
             const teamResponse = await API.get({ path: '/team' });
             const teams = teamResponse.data;
             const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
             const users = usersResponse.data;
             setTeams(teams);
             setUsers(users);
-            setUser(user);
-            AppSentry.setUser(user);
-            actions.setSubmitting(false);
-            // now login !
-            // superadmin
-            if (['superadmin'].includes(user.role)) {
-              history.push('/organisation');
-              return;
-            }
             // onboarding
             if (!organisation.encryptionEnabled && ['admin'].includes(user.role)) {
               history.push(`/organisation/${organisation._id}`);
