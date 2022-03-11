@@ -9,7 +9,7 @@ export const choices = [
 ];
 
 const YesNoSelect = ({ label, value = choices[0], onSelect, editable }) => {
-  return <SelectLabelled label={label} values={choices} value={value.length ? value : choices[0]} onSelect={onSelect} editable={editable} />;
+  return <SelectLabelled label={label} values={choices} value={value?.length ? value : choices[0]} onSelect={onSelect} editable={editable} />;
 };
 
 export default YesNoSelect;
