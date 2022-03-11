@@ -1,3 +1,10 @@
+## [1.71.22](https://github.com/SocialGouv/mano/compare/v1.71.21...v1.71.22) (2022-03-11)
+
+
+### Bug Fixes
+
+* **app:** value if null ([#473](https://github.com/SocialGouv/mano/issues/473)) ([0953851](https://github.com/SocialGouv/mano/commit/095385103ab34dcf3ee588c6ef498b484299e487))
+
 ## [1.71.21](https://github.com/SocialGouv/mano/compare/v1.71.20...v1.71.21) (2022-03-11)
 
 
