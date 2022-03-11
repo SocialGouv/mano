@@ -16,7 +16,7 @@ router.put(
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
   validateUser("admin"),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.array(
         z.object({
@@ -27,7 +27,9 @@ router.put(
       ).parse(req.body.reports);
       z.array(z.string()).parse(req.body.services);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in services put: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });

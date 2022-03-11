@@ -84,7 +84,7 @@ router.get(
   "/me",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
     const teams = await user.getTeams();
     const organisation = await user.getOrganisation();
@@ -107,14 +107,16 @@ router.post(
 
 router.post(
   "/signin",
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().parse(req.body.password);
       z.string()
         .email()
         .parse((req.body.email || "").trim().toLowerCase());
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in signin: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     let { password, email } = req.body;
@@ -148,11 +150,13 @@ router.get(
   "/signin-token",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().parse(req.cookies.jwt);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in signin token: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const token = req.cookies.jwt;
     const user = await User.findOne({ where: { _id: req.user._id } });
@@ -174,7 +178,9 @@ router.post(
         .email()
         .parse((email || "").trim().toLowerCase());
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in forget password: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
@@ -210,7 +216,9 @@ router.post(
       z.string().min(1).parse(token);
       z.string().min(1).parse(password);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in forget password reset: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
@@ -232,14 +240,16 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().min(1).parse(req.body.name);
       z.string().email().parse(req.body.email);
       z.array(z.string().regex(looseUuidRegex)).parse(req.body.team);
       z.enum(["admin", "normal"]).parse(req.body.role);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in user creation: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const { name, email, role, team } = req.body;
@@ -307,13 +317,15 @@ router.post(
   "/reset_password",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().min(1).parse(req.body.password);
       z.string().min(1).parse(req.body.newPassword);
       z.string().min(1).parse(req.body.verifyPassword);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in reset password: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const _id = req.user._id;
     const { password, newPassword, verifyPassword } = req.body;
@@ -356,11 +368,13 @@ router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in get user by id: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const query = { where: { _id: req.params._id } };
@@ -388,11 +402,13 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.optional(z.literal("true")).parse(req.query.minimal);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in get users: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const users = await User.findAll({ where: { organisation: req.user.organisation } });
@@ -435,7 +451,7 @@ router.put(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().min(1)).parse(req.body.name);
       z.string()
@@ -447,7 +463,9 @@ router.put(
       z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
       if (req.body.termsAccepted) z.preprocess((input) => new Date(input), z.date()).parse(req.body.termsAccepted);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in put user by id: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const _id = req.user._id;
@@ -495,7 +513,7 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.optional(z.string().min(1)).parse(req.body.name);
@@ -507,7 +525,9 @@ router.put(
       z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
       z.optional(z.enum(["admin", "normal"])).parse(req.body.role);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in put user by id: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const _id = req.params._id;
@@ -551,11 +571,13 @@ router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in delete user by id: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const userId = req.params._id;
 

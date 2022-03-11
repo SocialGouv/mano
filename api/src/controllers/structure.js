@@ -12,11 +12,13 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().min(1).parse(req.body.name);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in structure creation: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const name = req.body.name;
     const organisation = req.user.organisation;
@@ -30,11 +32,13 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string()).parse(req.body.search);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in structure get: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const search = req.query.search;
     let query = { order: [["createdAt", "ASC"]] };
@@ -61,11 +65,13 @@ router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in structure get by id: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const _id = req.params._id;
     const data = await Structure.findOne({ where: { _id } });
@@ -78,7 +84,7 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.string().min(1).parse(req.body.name);
@@ -88,7 +94,9 @@ router.put(
       z.optional(z.string()).parse(req.body.adresse);
       z.optional(z.string()).parse(req.body.phone);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in structure put: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const _id = req.params._id;
     const updatedStructure = {
@@ -110,11 +118,13 @@ router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in structure delete: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const _id = req.params._id;
     await Structure.destroy({ where: { _id } });

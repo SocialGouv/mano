@@ -30,7 +30,7 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       const objectsKeys = ["actions", "persons", "comments", "territories", "observations", "places", "reports", "relsPersonPlace"];
       for (const objectKey of objectsKeys) {
@@ -45,7 +45,9 @@ router.post(
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.encryptionLastUpdateAt || 0);
       z.string().parse(req.body.encryptedVerificationKey);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in encryption: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     let organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });

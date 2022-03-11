@@ -15,12 +15,14 @@ const { positiveIntegerRegex, looseUuidRegex } = require("../utils");
 
 router.get(
   "/stats",
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       if (req.query.organisation) z.string().regex(looseUuidRegex).parse(req.query.organisation);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in stats get: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const query = {};
