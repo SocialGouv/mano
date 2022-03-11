@@ -1,3 +1,10 @@
+## [1.71.21](https://github.com/SocialGouv/mano/compare/v1.71.20...v1.71.21) (2022-03-11)
+
+
+### Bug Fixes
+
+* **dashboard:** change signin process ([#471](https://github.com/SocialGouv/mano/issues/471)) ([69f5011](https://github.com/SocialGouv/mano/commit/69f50114f12df1f7a5cdd5da7d6f85de21115200))
+
 ## [1.71.20](https://github.com/SocialGouv/mano/compare/v1.71.19...v1.71.20) (2022-03-10)
 
 
