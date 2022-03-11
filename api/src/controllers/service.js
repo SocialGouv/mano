@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
+const { z } = require("zod");
+const { looseUuidRegex } = require("../utils");
 const sequelize = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
@@ -15,8 +17,20 @@ router.put(
   validateOrganisationEncryption,
   validateUser("admin"),
   catchErrors(async (req, res) => {
-    const query = { where: { _id: req.user.organisation } };
-    const organisation = await Organisation.findOne(query);
+    try {
+      z.array(
+        z.object({
+          _id: z.string().regex(looseUuidRegex),
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        })
+      ).parse(req.body.reports);
+      z.array(z.string()).parse(req.body.services);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+
+    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
 
     try {
