@@ -12,7 +12,9 @@ function validateUser(roles = ["admin", "normal"]) {
       else z.literal(roles).parse(req.user.role);
       z.string().regex(looseUuidRegex).parse(req.user.organisation);
     } catch (e) {
-      return res.status(403).send({ ok: false, error: "Invalid user" });
+      const error = new Error(`Invalid user: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     next();

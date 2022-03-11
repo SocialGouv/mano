@@ -14,13 +14,15 @@ router.post(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
       if (req.body.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.createdAt);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in observation creation: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const newObs = {
       organisation: req.user.organisation,
@@ -49,13 +51,15 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in observation get: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const { limit, page, lastRefresh } = req.query;
 
@@ -89,7 +93,9 @@ router.put(
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in observation put: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
@@ -129,11 +135,13 @@ router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in observation delete: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 

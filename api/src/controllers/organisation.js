@@ -15,6 +15,7 @@ const Comment = require("../models/comment");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");
+const { capture } = require("../sentry");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -22,13 +23,15 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser("superadmin"),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().min(1).parse(req.body.orgName);
       z.string().min(1).parse(req.body.name);
       z.string().email().parse(req.body.email);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in organisation post: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const { orgName, name, email } = req.body;
     const organisation = await Organisation.create({ name: orgName }, { returning: true });
@@ -75,11 +78,13 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser("superadmin"),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string()).parse(req.query.withCounters);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in organisation get: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const { withCounters } = req.query;
     const data = await Organisation.findAll();
@@ -123,7 +128,7 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
       if (req.user.role !== "admin") {
@@ -153,7 +158,9 @@ router.put(
         z.optional(z.array(z.string().min(1))).parse(req.body.services);
       }
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in organisation put: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const { _id } = req.params;
 
@@ -198,11 +205,13 @@ router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["superadmin", "admin"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in organisation delete: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     // Super admin can delete any organisation. Admin can delete only their organisation.
     const canDelete = req.user.role === "superadmin" || (req.user.role === "admin" && req.user.organisation === req.params._id);

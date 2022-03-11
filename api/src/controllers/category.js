@@ -16,7 +16,7 @@ router.put(
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.array(
         z.object({
@@ -27,7 +27,9 @@ router.put(
       ).parse(req.body.actions);
       z.array(z.string()).parse(req.body.categories);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in category update: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });

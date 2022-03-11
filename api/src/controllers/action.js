@@ -19,7 +19,7 @@ router.post(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.enum(STATUS).parse(req.body.status);
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
@@ -27,7 +27,9 @@ router.post(
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in action creation: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const { status, dueAt, completedAt, encrypted, encryptedEntityKey } = req.body;
@@ -62,13 +64,15 @@ router.get(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in action get: ${e}`);
+      error.status = 400;
+      return next(error);
     }
     const { limit, page, lastRefresh } = req.query;
 
@@ -123,7 +127,7 @@ router.put(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.enum(STATUS).parse(req.body.status);
@@ -132,7 +136,9 @@ router.put(
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in action put: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const action = await Action.findOne({
@@ -174,11 +180,13 @@ router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in action delete: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const action = await Action.findOne({
