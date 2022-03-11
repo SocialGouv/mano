@@ -129,7 +129,7 @@ const View = () => {
                   </Col>
                   <Col md={4}>
                     <FormGroup>
-                      <Label>Afficher l'heure</Label>
+                      <Label />
                       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                         <span>Afficher l'heure</span>
                         <Input
