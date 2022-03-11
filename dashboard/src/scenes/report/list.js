@@ -17,6 +17,9 @@ const List = () => {
   const allReports = useRecoilValue(reportsState);
   const loading = useRecoilValue(loadingState);
 
+  console.log(allReports.filter((r) => !r.date).length);
+  console.log(allReports.filter((r) => !r.date).map((r) => [r.date, r.createdAt, r.team, r.services, r.collaborations]));
+
   const reports = allReports.filter((r) => r.team === currentTeam._id);
 
   return (
