@@ -20,7 +20,6 @@ const validateUser = require("../middleware/validateUser");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
-const ACOUNT_NOT_ACTIVATED = "ACOUNT_NOT_ACTIVATED";
 
 const passwordCheckError =
   "Le mot de passe n'est pas valide. Il doit comprendre 6 caractères, au moins une lettre, un chiffre et un caractère spécial";
@@ -371,14 +370,14 @@ router.get(
     return res.status(200).send({
       ok: true,
       data: {
-        _id: data._id,
-        name: data.name,
-        email: data.email,
-        createdAt: data.createdAt,
-        updatedAt: data.updatedAt,
-        role: data.role,
-        lastChangePasswordAt: data.lastChangePasswordAt,
-        termsAccepted: data.termsAccepted,
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        role: user.role,
+        lastChangePasswordAt: user.lastChangePasswordAt,
+        termsAccepted: user.termsAccepted,
         team: team.map((t) => t._id),
       },
     });
