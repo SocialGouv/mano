@@ -438,7 +438,11 @@ router.put(
   catchErrors(async (req, res) => {
     try {
       z.optional(z.string().min(1)).parse(req.body.name);
-      z.optional(z.string().email()).parse((req.body.email || "").trim().toLowerCase());
+      z.string()
+        .email()
+        .optional()
+        .or(z.literal(""))
+        .parse((req.body.email || "").trim().toLowerCase());
       z.optional(z.string().min(1)).parse(req.body.password);
       z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
       if (req.body.termsAccepted) z.preprocess((input) => new Date(input), z.date()).parse(req.body.termsAccepted);
@@ -495,7 +499,11 @@ router.put(
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.optional(z.string().min(1)).parse(req.body.name);
-      z.optional(z.string().email()).parse((req.body.email || "").trim().toLowerCase());
+      z.string()
+        .email()
+        .optional()
+        .or(z.literal(""))
+        .parse((req.body.email || "").trim().toLowerCase());
       z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
       z.optional(z.enum(["admin", "normal"])).parse(req.body.role);
     } catch (e) {
