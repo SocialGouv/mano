@@ -121,8 +121,8 @@ router.post(
           encrypted: z.string(),
           encryptedEntityKey: z.string(),
         })
-      ).parse(body);
-      for (const person of body) {
+      ).parse(req.body);
+      for (const person of req.body) {
         if (person.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(person.createdAt);
       }
     } catch (e) {
@@ -137,6 +137,7 @@ router.post(
         user: req.user._id,
       };
       if (p.createdAt) person.createdAt = p.createdAt;
+      return person;
     });
     const data = await Person.bulkCreate(persons, { returning: true });
     return res.status(200).send({
