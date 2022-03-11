@@ -28,7 +28,7 @@ const SortableGrid = ({ list, onUpdateList, onRemoveItem, onEditItem, editItemTi
         {list.map((content) => (
           <Item key={content} data-content={content} className="grid-square">
             <span>{content}</span>
-            <button onClick={() => setContentToEdit(content)}>
+            <button onClick={() => setContentToEdit(content)} id={`${content}-edit`}>
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path
                   strokeLinecap="round"
@@ -119,7 +119,7 @@ const Item = styled.div`
     text-align: center;
   }
   button {
-    display: none;
+    display: ${process.env.REACT_APP_TEST === 'true' ? 'block' : 'none'};
     border: none;
     position: absolute;
     top: 5px;
