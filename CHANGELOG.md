@@ -1,3 +1,10 @@
+## [1.71.25](https://github.com/SocialGouv/mano/compare/v1.71.24...v1.71.25) (2022-03-11)
+
+
+### Bug Fixes
+
+* **dashboard:**  reports date team ([#476](https://github.com/SocialGouv/mano/issues/476)) ([0c99d1c](https://github.com/SocialGouv/mano/commit/0c99d1ccd805767b40261e4de58e8d34a3e24496))
+
 ## [1.71.24](https://github.com/SocialGouv/mano/compare/v1.71.23...v1.71.24) (2022-03-11)
 
 
