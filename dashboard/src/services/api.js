@@ -1,7 +1,6 @@
 import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
 import URI from 'urijs';
 import { toastr } from 'react-redux-toastr';
-import { useHistory } from 'react-router';
 import fetchRetry from 'fetch-retry';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
@@ -129,7 +128,6 @@ export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0
 const useApi = () => {
   const organisation = useRecoilValue(organisationState);
   const setRecoilResetKey = useSetRecoilState(recoilResetKeyState);
-  const history = useHistory();
 
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey } = organisation;
 
@@ -152,12 +150,7 @@ const useApi = () => {
     });
     reset();
     if (window.location.pathname !== '/auth') {
-      if (history) {
-        history.push('/auth');
-        if (status === '401') toastr.error('Votre session a expiré, veuillez vous reconnecter');
-      } else {
-        window.location.replace('/auth');
-      }
+      window.location.reload(true);
     }
   };
 
@@ -173,7 +166,7 @@ const useApi = () => {
       mode: 'cors',
       credentials: 'include',
       body: formData,
-      headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version },
+      headers: { Accept: 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -187,7 +180,7 @@ const useApi = () => {
       method: 'GET',
       mode: 'cors',
       credentials: 'include',
-      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+      headers: { 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -201,16 +194,15 @@ const useApi = () => {
       method: 'DELETE',
       mode: 'cors',
       credentials: 'include',
-      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+      headers: { 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
-    return await response.json();
+    return response.json();
   };
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false } = {}) => {
     try {
-      if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
       const options = {
         method,
         mode: 'cors',
