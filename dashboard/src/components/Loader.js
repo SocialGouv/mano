@@ -138,6 +138,16 @@ const Loader = () => {
     /*
     Get reports
     */
+    /*
+    NOTA:
+    From commit ef6e2751 (2022/02/08) until commit d76fcc35 (2022/02/25), commit of full encryption
+    we had a bug where no encryption was save on report creation
+    (https://github.com/SocialGouv/mano/blob/ef6e2751ce02f6f34933cf2472492b1d5cd028d6/api/src/controllers/report.js#L67)
+    therefore, no date nor team was encryptely saved and those reports are just pollution
+    TODO: migration to delete all those reports from each organisation
+    QUICK WIN: filter those reports from recoil state
+    */
+
     if (response.data.reports) {
       setLoading('Chargement des comptes-rendus');
       const refreshedReports = await getData({
@@ -146,10 +156,14 @@ const Loader = () => {
         isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newReports) => setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports))),
+        setBatchData: (newReports) => {
+          newReports = newReports.filter((r) => !!r.team && !!r.date);
+          setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
+        },
         API,
       });
-      if (refreshedReports) setReports(refreshedReports.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+      if (refreshedReports)
+        setReports(refreshedReports.filter((r) => !!r.team && !!r.date).sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
     }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'report'));
     /*
