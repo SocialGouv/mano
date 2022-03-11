@@ -3,7 +3,7 @@ const router = express.Router();
 const passport = require("passport");
 const { fn } = require("sequelize");
 const crypto = require("crypto");
-
+const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const User = require("../models/user");
@@ -14,6 +14,7 @@ const Report = require("../models/report");
 const Comment = require("../models/comment");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
+const { looseUuidRegex } = require("../utils");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -22,17 +23,20 @@ router.post(
   passport.authenticate("user", { session: false }),
   validateUser("superadmin"),
   catchErrors(async (req, res) => {
-    if (!req.body.orgName) return res.status(400).send({ ok: false, error: "Missing organisation name" });
-    const organisation = await Organisation.create({ name: req.body.orgName }, { returning: true });
-    if (!req.body.name) return res.status(400).send({ ok: false, error: "Missing admin name" });
-    if (!req.body.email) return res.status(400).send({ ok: false, error: "Missing admin email" });
-
+    try {
+      z.string().min(1).parse(req.body.orgName);
+      z.string().min(1).parse(req.body.name);
+      z.string().email().parse(req.body.email);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+    const { orgName, name, email } = req.body;
+    const organisation = await Organisation.create({ name: orgName }, { returning: true });
     const token = crypto.randomBytes(20).toString("hex");
-
     const adminUser = await User.create(
       {
-        name: req.body.name,
-        email: req.body.email.trim().toLowerCase(),
+        name: name,
+        email: email.trim().toLowerCase(),
         password: crypto.randomBytes(60).toString("hex"), // A useless password.,
         role: "admin",
         organisation: organisation._id,
@@ -72,10 +76,15 @@ router.get(
   passport.authenticate("user", { session: false }),
   validateUser("superadmin"),
   catchErrors(async (req, res) => {
-    const where = {};
-    if (req.user.role !== "superadmin") where._id = req.user.organisation;
-    const data = await Organisation.findAll({ where });
-    if (req.query.withCounters !== "true") return res.status(200).send({ ok: true, data });
+    try {
+      z.optional(z.string()).parse(req.query.withCounters);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+    const { withCounters } = req.query;
+    const data = await Organisation.findAll();
+    if (withCounters !== "true") return res.status(200).send({ ok: true, data });
+
     const countQuery = {
       group: ["organisation"],
       attributes: ["organisation", [fn("COUNT", "TagName"), "countByOrg"]],
@@ -110,31 +119,52 @@ router.get(
   })
 );
 
-router.get(
-  "/:_id",
-  passport.authenticate("user", { session: false }),
-  validateUser("admin"),
-  catchErrors(async (req, res) => {
-    const data = await Organisation.findOne({ where: { _id: req.params._id } });
-    if (!data) return res.status(404).send({ ok: false, error: "Not Found" });
-    return res.status(200).send({ ok: true, data });
-  })
-);
-
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
-    const query = { where: { _id: req.params._id } };
-    const organisation = await Organisation.findOne(query);
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+      if (req.user.role !== "admin") {
+        z.array(z.string()).parse(req.body.collaborations);
+      } else {
+        z.optional(z.string().min(1)).parse(req.body.name);
+        z.optional(z.array(z.string().min(1))).parse(req.body.categories);
+        z.optional(z.array(z.string().min(1))).parse(req.body.collaborations);
+        const customFieldSchema = z
+          .object({
+            name: z.string().min(1),
+            type: z.string().min(1),
+            label: z.optional(z.string().min(1)),
+            enabled: z.optional(z.boolean()),
+            required: z.optional(z.boolean()),
+            showInStats: z.optional(z.boolean()),
+            options: z.optional(z.array(z.string())),
+          })
+          .strict();
+        z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsObs);
+        z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsSocial);
+        z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsMedical);
+        z.optional(z.string().min(1)).parse(req.body.encryptedVerificationKey);
+        z.optional(z.boolean()).parse(req.body.encryptionEnabled);
+        if (req.body.encryptionLastUpdateAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.encryptionLastUpdateAt);
+        z.optional(z.boolean()).parse(req.body.receptionEnabled);
+        z.optional(z.array(z.string().min(1))).parse(req.body.services);
+      }
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+    const { _id } = req.params;
+
+    const canUpdate = req.user.organisation === _id;
+    if (!canUpdate) return res.status(403).send({ ok: false, error: "Forbidden" });
+
+    const organisation = await Organisation.findOne({ where: { _id } });
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
 
     if (req.user.role !== "admin") {
-      if (!req.body.hasOwnProperty("collaborations")) return res.status(403).send({ ok: false, error: "Forbidden" });
-      const updateOrg = {};
-      updateOrg.collaborations = req.body.collaborations;
-      await organisation.update(updateOrg);
+      await organisation.update({ collaborations: req.body.collaborations });
       return res.status(200).send({ ok: true, data: organisation });
     }
 
@@ -169,6 +199,11 @@ router.delete(
   passport.authenticate("user", { session: false }),
   validateUser(["superadmin", "admin"]),
   catchErrors(async (req, res) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
     // Super admin can delete any organisation. Admin can delete only their organisation.
     const canDelete = req.user.role === "superadmin" || (req.user.role === "admin" && req.user.organisation === req.params._id);
     if (!canDelete) return res.status(403).send({ ok: false, error: "Forbidden" });
