@@ -74,11 +74,6 @@ const EncryptionKey = ({ isMain }) => {
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
-      capture('debug: setting encryption key', {
-        extra: { orgEncryptionKey: values.encryptionKey.trim(), hashedOrgEncryptionKey, organisation },
-        user,
-      });
-
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
       const encryptedPersons = await Promise.all(
