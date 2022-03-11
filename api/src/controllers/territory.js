@@ -1,7 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-
+const { z } = require("zod");
+const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 const { catchErrors } = require("../errors");
 const Territory = require("../models/territory");
 const { Op } = require("sequelize");
@@ -13,18 +14,32 @@ router.post(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
-  catchErrors(async (req, res, next) => {
-    const newTerritory = {};
-    newTerritory.organisation = req.user.organisation;
-
-    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      return next("No encrypted field in territory create");
+  catchErrors(async (req, res) => {
+    try {
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
     }
-    if (req.body.hasOwnProperty("encrypted")) newTerritory.encrypted = req.body.encrypted;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) newTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
-
-    const data = await Territory.create(newTerritory, { returning: true });
-    return res.status(200).send({ ok: true, data });
+    const data = await Territory.create(
+      {
+        organisation: req.user.organisation,
+        encrypted: req.body.encrypted,
+        encryptedEntityKey: req.body.encryptedEntityKey,
+      },
+      { returning: true }
+    );
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: data._id,
+        encrypted: data.encrypted,
+        encryptedEntityKey: data.encryptedEntityKey,
+        organisation: data.organisation,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
+    });
   })
 );
 
@@ -33,35 +48,30 @@ router.get(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
+    try {
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+    const { limit, page, lastRefresh } = req.query;
+
     const query = {
-      where: {
-        organisation: req.user.organisation,
-      },
+      where: { organisation: req.user.organisation },
       order: [["createdAt", "DESC"]],
     };
-    const attributes = [
-      // Generic fields
-      "_id",
-      "encrypted",
-      "encryptedEntityKey",
-      "organisation",
-      "createdAt",
-      "updatedAt",
-    ];
-
-    if (req.query.lastRefresh) {
-      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      const data = await Territory.findAll({ ...query, attributes });
-      return res.status(200).send({ ok: true, data });
-    }
 
     const total = await Territory.count(query);
-    const limit = parseInt(req.query.limit, 10);
-    if (!!req.query.limit) query.limit = limit;
-    if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
+    if (limit) query.limit = Number(limit);
+    if (page) query.offset = Number(page) * limit;
+    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
 
-    const data = await Territory.findAll({ ...query, attributes });
-    return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
+    const data = await Territory.findAll({
+      ...query,
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
+    });
+    return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
 );
 
@@ -70,23 +80,25 @@ router.put(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   validateOrganisationEncryption,
-  catchErrors(async (req, res, next) => {
-    const query = {
-      where: {
-        _id: req.params._id,
-        organisation: req.user.organisation,
-      },
-    };
-    const updateTerritory = {};
-
-    if (!req.body.hasOwnProperty("encrypted") || !req.body.hasOwnProperty("encryptedEntityKey")) {
-      return next("No encrypted field in territory create");
+  catchErrors(async (req, res) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
     }
-    if (req.body.hasOwnProperty("encrypted")) updateTerritory.encrypted = req.body.encrypted;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) updateTerritory.encryptedEntityKey = req.body.encryptedEntityKey;
-
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
     const territory = await Territory.findOne(query);
     if (!territory) return res.status(404).send({ ok: false, error: "Not found" });
+
+    const { encrypted, encryptedEntityKey } = req.body;
+
+    const updateTerritory = {
+      encrypted: encrypted,
+      encryptedEntityKey: encryptedEntityKey,
+    };
+
     territory.set(updateTerritory);
     await territory.save();
 
@@ -99,14 +111,14 @@ router.delete(
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
-    const query = {
-      where: {
-        _id: req.params._id,
-        organisation: req.user.organisation,
-      },
-    };
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      return res.status(400).send({ ok: false, error: "Invalid request" });
+    }
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
-    let territory = await Territory.findOne(query);
+    const territory = await Territory.findOne(query);
     if (!territory) return res.status(404).send({ ok: false, error: "Not Found" });
 
     await territory.destroy();
