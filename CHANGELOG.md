@@ -1,3 +1,10 @@
+## [1.71.24](https://github.com/SocialGouv/mano/compare/v1.71.23...v1.71.24) (2022-03-11)
+
+
+### Bug Fixes
+
+* **api:** capture invalid requests ([#478](https://github.com/SocialGouv/mano/issues/478)) ([e580208](https://github.com/SocialGouv/mano/commit/e5802089a8ec36b96556a413af7e5b7373cbafd1))
+
 ## [1.71.23](https://github.com/SocialGouv/mano/compare/v1.71.22...v1.71.23) (2022-03-11)
 
 
