@@ -97,7 +97,7 @@ const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
     <>
       {!!user && <TopBar />}
       <div className="main">
-        {!!user && <Drawer />}
+        {!!user && !['superadmin'].includes(user.role) && <Drawer />}
         <main className="main-content">
           <Route {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
         </main>
