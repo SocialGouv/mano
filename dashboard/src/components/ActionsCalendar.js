@@ -32,7 +32,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   const [activeTab, setActiveTab] = useState(Number(new URLSearchParams(location.search)?.get('calendarTab') || 2));
 
   useEffect(() => {
-    if (!currentDate || !actions?.length) return;
+    if (!currentDate) return;
     const filteredActions = actions.filter((a) => a.dueAt);
     setTheDayBeforeActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, subtractOneDay(currentDate))));
     setTheDayAfterActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, addOneDay(currentDate))));
