@@ -1,3 +1,10 @@
+## [1.71.23](https://github.com/SocialGouv/mano/compare/v1.71.22...v1.71.23) (2022-03-11)
+
+
+### Bug Fixes
+
+* **dashboard:** fix "optimization" ([d9509ac](https://github.com/SocialGouv/mano/commit/d9509ace1cc36bb5c92e8817fb4083dc58af938b))
+
 ## [1.71.22](https://github.com/SocialGouv/mano/compare/v1.71.21...v1.71.22) (2022-03-11)
 
 
