@@ -67,6 +67,10 @@ const TopBar = () => {
               Se déconnecter
             </DropdownItem>
             <DropdownItem divider />
+            <DropdownItem tag="a" href="https://mano-app.fabrique.social.gouv.fr/faq/" target="_blank" rel="noreferrer">
+              Besoin d'aide ?
+            </DropdownItem>
+            <DropdownItem divider />
             <DropdownItem
               tag="a"
               target="_blank"
