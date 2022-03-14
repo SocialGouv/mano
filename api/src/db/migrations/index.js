@@ -11,3 +11,4 @@ require("./2021-11-16_observations-as-json");
 require("./2021-11-26-custom-fields-persons");
 require("./2022-02-14-drop-unencrypted-columns");
 require("./2022-02-22-encrypting");
+require("./2022-03-07_add_migrations_in_organisation.js");
