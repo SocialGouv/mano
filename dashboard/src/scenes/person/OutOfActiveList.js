@@ -12,9 +12,10 @@ const OutOfActiveList = ({ person }) => {
   const { updatePerson } = usePersons();
 
   const handleSetOutOfActiveList = async (outOfActiveListReason = '') => {
-    const res = await updatePerson({ ...person, outOfActiveList: !person.outOfActiveList, outOfActiveListReason });
+    const outOfActiveList = !person.outOfActiveList;
+    const res = await updatePerson({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReason });
     if (res?.ok) {
-      toastr.success('Mise à jour réussie', person.name + (person.outOfActiveList ? ' est hors de la file active.' : ' est dans file active.'));
+      toastr.success('Mise à jour réussie', person.name + (outOfActiveList ? ' est hors de la file active.' : ' est dans file active.'));
     }
   };
 
