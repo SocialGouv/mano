@@ -13,3 +13,4 @@ require("./2022-02-14-drop-unencrypted-columns");
 require("./2022-02-22-encrypting");
 require("./2022-03-07_add_migrations_in_organisation.js");
 require("./2022-03-16-migrating");
+require("./2022-03-14_add_passage_table");

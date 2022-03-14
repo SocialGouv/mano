@@ -12,6 +12,7 @@ const Person = require("../models/person");
 const Territory = require("../models/territory");
 const Report = require("../models/report");
 const Comment = require("../models/comment");
+const Passage = require("../models/passage");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");
@@ -99,6 +100,7 @@ router.get(
     const territories = (await Territory.findAll(countQuery)).map((item) => item.toJSON());
     const reports = (await Report.findAll(countQuery)).map((item) => item.toJSON());
     const comments = (await Comment.findAll(countQuery)).map((item) => item.toJSON());
+    const passages = (await Passage.findAll(countQuery)).map((item) => item.toJSON());
 
     return res.status(200).send({
       ok: true,
@@ -113,6 +115,7 @@ router.get(
               : 0,
             reports: reports.find((r) => r.organisation === org._id) ? Number(reports.find((r) => r.organisation === org._id).countByOrg) : 0,
             comments: comments.find((r) => r.organisation === org._id) ? Number(comments.find((r) => r.organisation === org._id).countByOrg) : 0,
+            passages: passages.find((r) => r.organisation === org._id) ? Number(passages.find((r) => r.organisation === org._id).countByOrg) : 0,
           };
           return {
             ...org,
