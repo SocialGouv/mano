@@ -320,7 +320,10 @@ const View = () => {
                         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
                           <ButtonCustom
                             title={'Mettre à jour'}
-                            disabled={JSON.stringify(organisation.services) === JSON.stringify(values.services || [])}
+                            disabled={
+                              values.receptionEnabled === organisation.receptionEnabled &&
+                              JSON.stringify(organisation.services) === JSON.stringify(values.services || [])
+                            }
                             loading={isSubmitting}
                             onClick={handleSubmit}
                             width={200}
