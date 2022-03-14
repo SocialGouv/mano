@@ -1,3 +1,10 @@
+## [1.72.2](https://github.com/SocialGouv/mano/compare/v1.72.1...v1.72.2) (2022-03-14)
+
+
+### Bug Fixes
+
+* **dashboard:** boolean custom field display ([#477](https://github.com/SocialGouv/mano/issues/477)) ([c0d35b1](https://github.com/SocialGouv/mano/commit/c0d35b13636b3ad7cca530d2bd0b52c20a2238dd))
+
 ## [1.72.1](https://github.com/SocialGouv/mano/compare/v1.72.0...v1.72.1) (2022-03-14)
 
 
