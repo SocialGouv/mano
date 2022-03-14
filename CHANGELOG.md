@@ -1,3 +1,10 @@
+## [1.71.26](https://github.com/SocialGouv/mano/compare/v1.71.25...v1.71.26) (2022-03-14)
+
+
+### Bug Fixes
+
+* **dashboard:** enable/disable reception ([#482](https://github.com/SocialGouv/mano/issues/482)) ([ffbce3f](https://github.com/SocialGouv/mano/commit/ffbce3f62c0f53c860daaa9449a76cc5326dbdcb))
+
 ## [1.71.25](https://github.com/SocialGouv/mano/compare/v1.71.24...v1.71.25) (2022-03-11)
 
 
