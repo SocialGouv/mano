@@ -1,3 +1,10 @@
+# [1.72.0](https://github.com/SocialGouv/mano/compare/v1.71.26...v1.72.0) (2022-03-14)
+
+
+### Features
+
+* **dashboard:** link to q&a ([#483](https://github.com/SocialGouv/mano/issues/483)) ([5485214](https://github.com/SocialGouv/mano/commit/54852140aa695ecd4b4ac8f23e61bec592c76d71))
+
 ## [1.71.26](https://github.com/SocialGouv/mano/compare/v1.71.25...v1.71.26) (2022-03-14)
 
 
