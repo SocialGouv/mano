@@ -218,7 +218,7 @@ const View = () => {
                         <Row>
                           <Col md={12}>
                             <FormGroup>
-                              <Label>Accueil de jour activé</Label>
+                              <Label />
                               <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                                 <span>Accueil de jour activé</span>
                                 <Input type="checkbox" name="receptionEnabled" checked={values.receptionEnabled || false} onChange={handleChange} />

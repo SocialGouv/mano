@@ -10,7 +10,7 @@ import { dateForDatePicker } from '../services/date';
 const CustomFieldInput = ({ field, values, handleChange, model }) => (
   <Col md={6} key={field.name}>
     <FormGroup>
-      <Label>{field.label}</Label>
+      <Label>{field.type !== 'boolean' ? field.label : ''}</Label>
       {!!['text', 'number'].includes(field.type) && (
         <Input
           name={field.name}

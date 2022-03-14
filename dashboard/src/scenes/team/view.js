@@ -82,12 +82,11 @@ const View = () => {
                 <Col md={6} />
                 <Col md={12}>
                   <FormGroup>
-                    <Label>
-                      Maraude de nuit <NightSessionModale />
-                    </Label>
-                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                    <Label />
+                    <div style={{ display: 'flex', marginLeft: 20, width: '80%' }}>
                       <span>Maraude de nuit</span>
                       <Input type="checkbox" name="nightSession" checked={values.nightSession} onChange={handleChange} />
+                      <NightSessionModale />
                     </div>
                   </FormGroup>
                 </Col>

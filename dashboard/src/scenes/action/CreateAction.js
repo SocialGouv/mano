@@ -180,7 +180,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                   </Col>
                   <Col lg={3} md={6}>
                     <FormGroup>
-                      <Label>Afficher l'heure</Label>
+                      <Label />
                       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                         <span>Montrer l'heure</span>
                         <Input type="checkbox" name="withTime" checked={values.withTime} onChange={handleChange} />

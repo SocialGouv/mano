@@ -245,7 +245,7 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Personne très vulnérable</Label>
+                    <Label />
                     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                       <span>Personne très vulnérable, ou ayant besoin d'une attention particulière</span>
                       <Input id="person-alertness-checkbox" type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
