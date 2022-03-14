@@ -1,3 +1,10 @@
+## [1.72.1](https://github.com/SocialGouv/mano/compare/v1.72.0...v1.72.1) (2022-03-14)
+
+
+### Bug Fixes
+
+* **dashboard:** outOfActiveList message ([76ac7a0](https://github.com/SocialGouv/mano/commit/76ac7a076bbca9ce92430a2e6a7682ea1820345e))
+
 # [1.72.0](https://github.com/SocialGouv/mano/compare/v1.71.26...v1.72.0) (2022-03-14)
 
 
