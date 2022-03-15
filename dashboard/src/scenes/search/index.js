@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -21,17 +21,14 @@ import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-  actionsSearchSelector,
-  commentsSearchSelector,
-  personsSearchSelector,
-  placesSearchSelector,
-  territoriesObservationsSearchSelector,
-  territoriesSearchSelector,
-} from '../../recoil/selectors';
+import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import ActionPersonName from '../../components/ActionPersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
+import { placesState } from '../../recoil/places';
+import { filterBySearch } from './utils';
+import { commentsState } from '../../recoil/comments';
+import { territoryObservationsState } from '../../recoil/territoryObservations';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -120,8 +117,12 @@ const View = () => {
 
 const Actions = ({ search, onUpdateResults }) => {
   const history = useHistory();
+  const actions = useRecoilValue(actionsState);
 
-  const data = useRecoilValue(actionsSearchSelector({ search }));
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, actions);
+  }, []);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -173,8 +174,12 @@ const Alertness = styled.span`
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
+  const persons = useRecoilValue(personsState);
 
-  const data = useRecoilValue(personsSearchSelector({ search }));
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, persons);
+  }, [search]);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -223,21 +228,25 @@ const Comments = ({ search, onUpdateResults }) => {
 
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
+  const comments = useRecoilValue(commentsState);
 
-  const data = useRecoilValue(commentsSearchSelector({ search })).map((comment) => {
-    const commentPopulated = { ...comment };
-    if (comment.person) {
-      commentPopulated.person = persons.find((p) => p._id === comment?.person);
-      commentPopulated.type = 'person';
-    }
-    if (comment.action) {
-      const action = actions.find((p) => p._id === comment?.action);
-      commentPopulated.action = action;
-      commentPopulated.person = persons.find((p) => p._id === action?.person);
-      commentPopulated.type = 'action';
-    }
-    return commentPopulated;
-  });
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, comments).map((comment) => {
+      const commentPopulated = { ...comment };
+      if (comment.person) {
+        commentPopulated.person = persons.find((p) => p._id === comment?.person);
+        commentPopulated.type = 'person';
+      }
+      if (comment.action) {
+        const action = actions.find((p) => p._id === comment?.action);
+        commentPopulated.action = action;
+        commentPopulated.person = persons.find((p) => p._id === action?.person);
+        commentPopulated.type = 'action';
+      }
+      return commentPopulated;
+    });
+  }, [search, comments]);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -331,8 +340,12 @@ const Comments = ({ search, onUpdateResults }) => {
 
 const Territories = ({ search, onUpdateResults }) => {
   const history = useHistory();
+  const territories = useRecoilValue(territoriesState);
 
-  const data = useRecoilValue(territoriesSearchSelector({ search }));
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, territories);
+  }, []);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -368,8 +381,12 @@ const Places = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const persons = useRecoilValue(personsState);
+  const places = useRecoilValue(placesState);
 
-  const data = useRecoilValue(placesSearchSelector({ search }));
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, places);
+  }, [search, places]);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -417,10 +434,19 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const territories = useRecoilValue(territoriesState);
 
-  const data = useRecoilValue(territoriesObservationsSearchSelector({ search })).map((obs) => ({
-    ...obs,
-    territory: territories.find((t) => t._id === obs.territory),
-  }));
+  const onlyFilledObservations = useRecoilValue(onlyFilledObservationsTerritories);
+  const observations = useRecoilValue(territoryObservationsState);
+
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    const obsIds = filterBySearch(search, onlyFilledObservations).map((obs) => obs._id);
+    return observations
+      .filter((obs) => obsIds.includes(obs._id))
+      .map((obs) => ({
+        ...obs,
+        territory: territories.find((t) => t._id === obs.territory),
+      }));
+  }, [search, territories, observations, onlyFilledObservations]);
 
   useEffect(() => {
     onUpdateResults(data.length);

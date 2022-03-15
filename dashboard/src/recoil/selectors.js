@@ -1,17 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { actionsState } from './actions';
 import { currentTeamState } from './auth';
 import { commentsState } from './comments';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
-import { territoriesState } from './territory';
-import { getIsDayWithinHoursOffsetOfPeriod, isOnSameDay, isToday } from '../services/date';
+import { getIsDayWithinHoursOffsetOfPeriod, isOnSameDay } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
-import { filterData } from '../components/Filters';
-import { filterBySearch } from '../scenes/search/utils';
 
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
@@ -19,23 +15,6 @@ export const currentTeamReportsSelector = selector({
     const reports = get(reportsState);
     const currentTeam = get(currentTeamState);
     return reports.filter((a) => a.team === currentTeam?._id);
-  },
-});
-
-export const todaysReportSelector = selector({
-  key: 'todaysReportSelector',
-  get: ({ get }) => {
-    const teamsReports = get(currentTeamReportsSelector);
-    return teamsReports.find((rep) => isToday(rep.date));
-  },
-});
-
-export const lastReportSelector = selector({
-  key: 'lastReportSelector',
-  get: ({ get }) => {
-    const teamsReports = get(currentTeamReportsSelector);
-    const todays = get(todaysReportSelector);
-    return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
   },
 });
 
@@ -69,133 +48,6 @@ export const personsWithPlacesSelector = selector({
   },
 });
 
-export const placesSearchSelector = selectorFamily({
-  key: 'placesSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const places = get(placesState);
-      if (!search?.length) return [];
-      return filterBySearch(search, places);
-    },
-});
-
-export const commentsFilteredSelector = selectorFamily({
-  key: 'commentsFilteredSelector',
-  get:
-    ({ personId, actionId, forPassages }) =>
-    ({ get }) => {
-      const comments = get(commentsState);
-      return comments
-        .filter((c) => {
-          if (!!personId) return c.person === personId;
-          if (!!actionId) return c.action === actionId;
-          return false;
-        })
-        .filter((c) => {
-          const commentIsPassage = c?.comment?.includes('Passage enregistré');
-          if (forPassages) return commentIsPassage;
-          return !commentIsPassage;
-        });
-    },
-});
-
-export const commentsSearchSelector = selectorFamily({
-  key: 'commentsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const comments = get(commentsState);
-      if (!search?.length) return [];
-      return filterBySearch(search, comments);
-    },
-});
-
-export const personsSearchSelector = selectorFamily({
-  key: 'personsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const persons = get(personsState);
-      if (!search?.length) return [];
-      return filterBySearch(search, persons);
-    },
-});
-
-export const personsFullSearchSelector = selectorFamily({
-  key: 'personsFullSearchSelector',
-  get:
-    ({ search = '', filterTeams = [], filters = [], alertness = false }) =>
-    ({ get }) => {
-      const persons = get(personsWithPlacesSelector);
-      let personsFiltered = persons;
-      if (!!filters?.filter((f) => Boolean(f?.value)).length) personsFiltered = filterData(personsFiltered, filters);
-      if (!!alertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
-      if (filterTeams.length) {
-        personsFiltered = personsFiltered.filter((p) => {
-          for (let assignedTeam of p.assignedTeams || []) {
-            if (filterTeams.includes(assignedTeam)) return true;
-          }
-          return false;
-        });
-      }
-      if (search?.length) {
-        const personsFilteredIds = personsFiltered.map((p) => p._id);
-        const comments = get(commentsState);
-        const actions = get(actionsState);
-        const actionsOfFilteredPersons = actions.filter((a) => personsFilteredIds.includes(a.person));
-        const actionsOfFilteredPersonsIds = actionsOfFilteredPersons.map((a) => a._id);
-        const commentsOfFilteredPersons = comments.filter((c) => personsFilteredIds.includes(c.person));
-        const commentsOfFilteredActions = comments.filter((c) => actionsOfFilteredPersonsIds.includes(c.action));
-        const personsIdsFilteredByActionsSearch = filterBySearch(search, actionsOfFilteredPersons).map((a) => a.person);
-        const personsIdsFilteredByActionsCommentsSearch = filterBySearch(search, commentsOfFilteredPersons).map((c) => c.person);
-        const personsIdsFilteredByPersonsCommentsSearch = filterBySearch(search, commentsOfFilteredActions).map((c) => c.person);
-        const personsIdsFilteredByPersonsSearch = filterBySearch(search, personsFiltered).map((c) => c._id);
-
-        const personsIdsFilterBySearch = [
-          ...new Set([
-            ...personsIdsFilteredByActionsSearch,
-            ...personsIdsFilteredByActionsCommentsSearch,
-            ...personsIdsFilteredByPersonsCommentsSearch,
-            ...personsIdsFilteredByPersonsSearch,
-          ]),
-        ];
-        personsFiltered = personsFiltered.filter((p) => personsIdsFilterBySearch.includes(p._id));
-      }
-      return personsFiltered;
-    },
-});
-
-export const actionsForCurrentTeamSelector = selector({
-  key: 'actionsForCurrentTeamSelector',
-  get: ({ get }) => {
-    const actions = get(actionsState);
-    const currentTeam = get(currentTeamState);
-    return actions.filter((a) => a.team === currentTeam?._id);
-  },
-});
-
-export const actionsByStatusSelector = selectorFamily({
-  key: 'actionsByStatusSelector',
-  get:
-    ({ status }) =>
-    ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
-      return actions.filter((a) => a.status === status);
-    },
-});
-
-export const actionsSearchSelector = selectorFamily({
-  key: 'actionsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const actions = get(actionsState);
-      if (!search?.length) return [];
-      return filterBySearch(search, actions);
-    },
-});
-
 export const onlyFilledObservationsTerritories = selector({
   key: 'onlyFilledObservationsTerritories',
   get: ({ get }) => {
@@ -215,49 +67,6 @@ export const onlyFilledObservationsTerritories = selector({
       return { territory: obs.territory, ...obsWithOnlyFilledFields };
     });
   },
-});
-
-export const territoriesObservationsSearchSelector = selectorFamily({
-  key: 'territoriesObservationsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const onlyFilledObservations = get(onlyFilledObservationsTerritories);
-      const observations = get(territoryObservationsState);
-
-      if (!search?.length) return [];
-      const obsIds = filterBySearch(search, onlyFilledObservations).map((obs) => obs._id);
-      return observations.filter((obs) => obsIds.includes(obs._id));
-    },
-});
-
-export const territoriesSearchSelector = selectorFamily({
-  key: 'territoriesSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const territories = get(territoriesState);
-      if (!search?.length) return [];
-      return filterBySearch(search, territories);
-    },
-});
-
-export const territoriesFullSearchSelector = selectorFamily({
-  key: 'territoriesFullSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const territories = get(territoriesState);
-      if (!search.length) return territories;
-
-      const territoryObservations = get(onlyFilledObservationsTerritories);
-
-      const territoriesIdsByTerritoriesSearch = filterBySearch(search, territories).map((t) => t._id);
-      const territoriesIdsFilteredByObsSearch = filterBySearch(search, territoryObservations).map((obs) => obs.territory);
-
-      const territoriesIdsFilterBySearch = [...new Set([...territoriesIdsByTerritoriesSearch, ...territoriesIdsFilteredByObsSearch])];
-      return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id));
-    },
 });
 
 export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({

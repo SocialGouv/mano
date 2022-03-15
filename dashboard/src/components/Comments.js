@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import dayjs from 'dayjs';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
@@ -16,8 +16,7 @@ import Loading from './loading';
 import { Formik } from 'formik';
 import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { commentsFilteredSelector } from '../recoil/selectors';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { dateForDatePicker } from '../services/date';
 import { loadingState } from './Loader';
 import useApi from '../services/api';
@@ -26,14 +25,28 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
   const API = useApi();
-  const setComments = useSetRecoilState(commentsState);
+  const [allComments, setComments] = useRecoilState(commentsState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
 
   const loading = useRecoilValue(loadingState);
 
-  const comments = useRecoilValue(commentsFilteredSelector({ personId, actionId, forPassages }));
+  const comments = useMemo(
+    () =>
+      allComments
+        .filter((c) => {
+          if (!!personId) return c.person === personId;
+          if (!!actionId) return c.action === actionId;
+          return false;
+        })
+        .filter((c) => {
+          const commentIsPassage = c?.comment?.includes('Passage enregistré');
+          if (forPassages) return commentIsPassage;
+          return !commentIsPassage;
+        }),
+    [personId, actionId, forPassages, allComments]
+  );
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(comments.length);

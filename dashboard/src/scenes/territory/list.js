@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useState } from 'react';
+import React, { useContext, useMemo, useState } from 'react';
 import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
@@ -15,11 +15,12 @@ import Search from '../../components/search';
 import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import SelectCustom from '../../components/SelectCustom';
-import { territoriesFullSearchSelector } from '../../recoil/selectors';
+import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { formatDateWithFullMonth } from '../../services/date';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 import useApi from '../../services/api';
+import { filterBySearch } from '../search/utils';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
@@ -27,14 +28,26 @@ const List = () => {
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
 
-  const territories = useRecoilValue(territoriesFullSearchSelector({ search }));
+  const territories = useRecoilValue(territoriesState);
+  const territoryObservations = useRecoilValue(onlyFilledObservationsTerritories);
+
+  const filteredTerritories = useMemo(() => {
+    if (!search.length) return territories;
+    const territoriesIdsByTerritoriesSearch = filterBySearch(search, territories).map((t) => t._id);
+    const territoriesIdsFilteredByObsSearch = filterBySearch(search, territoryObservations).map((obs) => obs.territory);
+
+    const territoriesIdsFilterBySearch = [...new Set([...territoriesIdsByTerritoriesSearch, ...territoriesIdsFilteredByObsSearch])];
+    return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id));
+  }, [territoryObservations, territories]);
 
   const limit = 20;
+  const data = useMemo(
+    () => filteredTerritories?.filter((_, index) => index < (page + 1) * limit && index >= page * limit),
+    [filteredTerritories, page, limit]
+  );
+  const total = filteredTerritories?.length;
 
   if (!territories) return <Loading />;
-
-  const data = territories.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  const total = territories.length;
 
   return (
     <>

@@ -4,13 +4,11 @@ import { Col, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import Header from '../../components/header';
-import { formatDateWithNameOfDay, now, startOfToday } from '../../services/date';
+import { formatDateWithNameOfDay, isToday, now, startOfToday } from '../../services/date';
 import {
-  actionsByStatusSelector,
-  lastReportSelector,
+  currentTeamReportsSelector,
   numberOfPassagesAnonymousPerDatePerTeamSelector,
   numberOfPassagesNonAnonymousPerDatePerTeamSelector,
-  todaysReportSelector,
 } from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
@@ -20,15 +18,51 @@ import SelectAndCreatePerson from './SelectAndCreatePerson';
 import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectStatus from '../../components/SelectStatus';
-import { TODO } from '../../recoil/actions';
+import { actionsState, TODO } from '../../recoil/actions';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { selector, selectorFamily, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { collectionsToLoadState } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
+
+export const actionsForCurrentTeamSelector = selector({
+  key: 'actionsForCurrentTeamSelector',
+  get: ({ get }) => {
+    const actions = get(actionsState);
+    const currentTeam = get(currentTeamState);
+    return actions.filter((a) => a.team === currentTeam?._id);
+  },
+});
+
+export const actionsByStatusSelector = selectorFamily({
+  key: 'actionsByStatusSelector',
+  get:
+    ({ status }) =>
+    ({ get }) => {
+      const actions = get(actionsForCurrentTeamSelector);
+      return actions.filter((a) => a.status === status);
+    },
+});
+
+const todaysReportSelector = selector({
+  key: 'todaysReportSelector',
+  get: ({ get }) => {
+    const teamsReports = get(currentTeamReportsSelector);
+    return teamsReports.find((rep) => isToday(rep.date));
+  },
+});
+
+const lastReportSelector = selector({
+  key: 'lastReportSelector',
+  get: ({ get }) => {
+    const teamsReports = get(currentTeamReportsSelector);
+    const todays = get(todaysReportSelector);
+    return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
+  },
+});
 
 const Reception = () => {
   const organisation = useRecoilValue(organisationState);
