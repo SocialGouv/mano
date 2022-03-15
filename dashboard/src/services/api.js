@@ -166,7 +166,7 @@ const useApi = () => {
       mode: 'cors',
       credentials: 'include',
       body: formData,
-      headers: { Accept: 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -180,7 +180,7 @@ const useApi = () => {
       method: 'GET',
       mode: 'cors',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -194,7 +194,7 @@ const useApi = () => {
       method: 'DELETE',
       mode: 'cors',
       credentials: 'include',
-      headers: { 'Content-Type': 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -203,6 +203,7 @@ const useApi = () => {
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false } = {}) => {
     try {
+      if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
       const options = {
         method,
         mode: 'cors',
@@ -233,6 +234,10 @@ const useApi = () => {
 
       if (!response.ok && response.status === 401) {
         if (!['/user/logout', '/user/signin-token'].includes(path)) logout();
+        return response;
+      }
+      if (!response.ok && response.status === 505) {
+        window.location.reload(true);
         return response;
       }
 

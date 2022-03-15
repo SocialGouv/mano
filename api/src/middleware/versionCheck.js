@@ -1,9 +1,22 @@
 const MINIMUM_MOBILE_APP_VERSION = [2, 11, 5];
+const MINIMUM_DASHBOARD_APP_VERSION = [1, 71, 0];
 
 module.exports = ({ headers: { version, platform } }, res, next) => {
-  if (platform === "dashboard") return next();
   if (platform === "website") return next();
-  if (!version) return res.status(403).send({ ok: false, message: "Veuillez mettre à jour votre application!" });
+  if (platform === "dashboard") {
+    const dashVer = version.split(".").map((d) => parseInt(d));
+
+    for (let i = 0; i < 3; i++) {
+      console.log(dashVer, MINIMUM_DASHBOARD_APP_VERSION);
+      if (dashVer[i] > MINIMUM_DASHBOARD_APP_VERSION[i]) {
+        return next();
+      } else if (dashVer[i] < MINIMUM_DASHBOARD_APP_VERSION[i]) {
+        return res.status(505).send({ ok: false });
+      }
+    }
+    return next();
+  }
+  if (!version) return res.status(505).send({ ok: false, message: "Veuillez mettre à jour votre application!" });
 
   const appVer = version.split(".").map((d) => parseInt(d));
 
@@ -11,7 +24,7 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
     if (appVer[i] > MINIMUM_MOBILE_APP_VERSION[i]) {
       return next();
     } else if (appVer[i] < MINIMUM_MOBILE_APP_VERSION[i]) {
-      return res.status(403).send({ ok: false, message: "Veuillez mettre à jour votre application!" });
+      return res.status(505).send({ ok: false, message: "Veuillez mettre à jour votre application!" });
     }
   }
 
