@@ -8,6 +8,7 @@ import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
+import { apiVersionState } from '../recoil/apiVersion';
 const fetch = fetchRetry(window.fetch);
 
 const getUrl = (path, query = {}) => {
@@ -129,6 +130,7 @@ export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0
 const useApi = () => {
   const organisation = useRecoilValue(organisationState);
   const setRecoilResetKey = useSetRecoilState(recoilResetKeyState);
+  const setApiVersion = useSetRecoilState(apiVersionState);
   const history = useHistory();
 
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey } = organisation;
@@ -238,6 +240,9 @@ const useApi = () => {
 
       const url = getUrl(path, query);
       const response = await fetch(url, options);
+      if (response.headers.has('x-api-version')) {
+        setApiVersion(response.headers.get('x-api-version'));
+      }
 
       if (!response.ok && response.status === 401) {
         if (!['/user/logout', '/user/signin-token'].includes(path)) logout();
