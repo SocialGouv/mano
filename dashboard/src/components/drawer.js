@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
+import { version } from '../../package.json';
 
 import { theme } from '../config';
 
@@ -101,6 +102,7 @@ const Drawer = () => {
           </>
         )}
       </Nav>
+      <Version>Version: {version}</Version>
     </Sidebar>
   );
 };
@@ -151,6 +153,13 @@ const Nav = styled.div`
   li {
     list-style-type: none;
   }
+`;
+
+const Version = styled.span`
+  margin-top: auto;
+  font-size: 0.65rem;
+  display: block;
+  color: ${theme.main};
 `;
 
 export default Drawer;

@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
 import validator from 'validator';
@@ -7,6 +6,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import lifecycle from 'page-lifecycle';
 import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
@@ -41,7 +41,7 @@ const SignIn = () => {
     } else {
       history.push('/action');
     }
-  }, [organisation, refreshTrigger]);
+  }, [organisation, refreshTrigger, history]);
 
   const onSigninValidated = async (organisation, user) => {
     setRefreshTrigger({
@@ -49,13 +49,6 @@ const SignIn = () => {
       options: { initialLoad: true, showFullScreen: true },
     });
     setGlobalLoading('Initialisation...');
-    /*
-    if (!!organisation?.receptionEnabled) {
-      history.push('/reception');
-    } else {
-      history.push('/action');
-    }
-    */
   };
 
   const onLogout = async () => {
@@ -68,23 +61,40 @@ const SignIn = () => {
     setAuthViaCookie(false);
   };
 
-  useEffect(() => {
-    (async () => {
-      const { token, ok, user } = await API.get({
-        path: '/user/signin-token',
-        skipEncryption: '/user/signin-token',
-      });
-      if (ok && token && user) {
-        setAuthViaCookie(true);
-        const { organisation } = user;
-        setOrganisation(organisation);
-        setUserName(user.name);
-        if (!!organisation.encryptionEnabled && !['superadmin'].includes(user.role)) setShowEncryption(true);
-      }
+  const checkSigninToken = useCallback(async () => {
+    const { token, ok, user } = await API.get({
+      path: '/user/signin-token',
+      skipEncryption: '/user/signin-token',
+    });
+    if (ok && token && user) {
+      setAuthViaCookie(true);
+      const { organisation } = user;
+      setOrganisation(organisation);
+      setUserName(user.name);
+      if (!!organisation.encryptionEnabled && !['superadmin'].includes(user.role)) setShowEncryption(true);
+    }
 
-      return setLoading(false);
-    })();
+    return setLoading(false);
+  }, [API, setOrganisation]);
+
+  useEffect(() => {
+    checkSigninToken();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const onWindowFocus = useCallback(
+    (e) => {
+      if (e.newState === 'active') checkSigninToken();
+    },
+    [checkSigninToken]
+  );
+
+  useEffect(() => {
+    lifecycle.addEventListener('statechange', onWindowFocus);
+    return () => {
+      lifecycle.removeEventListener('statechange', onWindowFocus);
+    };
+  }, [onWindowFocus]);
 
   if (loading) return <></>;
 
