@@ -1,11 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
-import { useComments } from '../recoil/comments';
-import useApi from '../services/api';
+import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
-import { useActions } from './actions';
 import { organisationState } from './auth';
-import { useRelsPerson } from './relPersonPlace';
 
 export const personsState = atom({
   key: 'personsState',
@@ -30,119 +26,11 @@ export const customFieldsPersonsSocialSelector = selector({
   },
 });
 
-export const usePersons = () => {
-  const { comments, addComment, deleteComment } = useComments();
-  const { deleteAction, actions } = useActions();
-  const { relsPersonPlace, deleteRelation } = useRelsPerson();
-  const API = useApi();
-
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-
-  const [persons, setPersons] = useRecoilState(personsState);
-
-  const deletePerson = async (id) => {
-    const res = await API.delete({ path: `/person/${id}` });
-    if (res.ok) {
-      setPersons((persons) => persons.filter((p) => p._id !== id));
-      for (const action of actions.filter((a) => a.person === id)) {
-        await deleteAction(action._id);
-      }
-      for (let comment of comments.filter((c) => c.person === id)) {
-        await deleteComment(comment._id);
-      }
-      for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === id)) {
-        await deleteRelation(relPersonPlace._id);
-      }
-    }
-    return res;
-  };
-
-  const addPerson = async (person) => {
-    try {
-      const existingPerson = persons.find((p) => p.name === person.name);
-      if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
-      const response = await API.post({
-        path: '/person',
-        body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(person),
-      });
-      if (response.ok) {
-        setPersons((persons) => [response.decryptedData, ...persons].sort(sortPersons));
-      }
-      return response;
-    } catch (error) {
-      capture('error in creating person' + error, { extra: { error, person } });
-      return { ok: false, error: error.message };
-    }
-  };
-  const uploadDocument = async (file, person) => {
-    try {
-      const response = await API.upload({
-        path: `/person/${person._id}/document`,
-        file: file,
-      });
-      return response;
-    } catch (error) {
-      capture('error in uploading document: ' + error, { extra: { error, document } });
-      return { ok: false, error: error.message };
-    }
-  };
-  const downloadDocument = async (person, document) => {
-    try {
-      const file = await API.download({
-        path: `/person/${person._id}/document/${document.file.filename}`,
-        encryptedEntityKey: document.encryptedEntityKey,
-      });
-      return file;
-    } catch (error) {
-      capture('error in downloading document: ' + error, { extra: { error, document } });
-      return { ok: false, error: error.message };
-    }
-  };
-  const deleteDocument = async (person, document) => {
-    try {
-      const response = await API.delete({
-        path: `/person/${person._id}/document/${document.file.filename}`,
-      });
-      return response;
-    } catch (error) {
-      capture('error in deleting document: ' + error, { extra: { error, document } });
-      return { ok: false, error: error.message };
-    }
-  };
-  const updatePerson = async (person) => {
-    try {
-      const oldPerson = persons.find((a) => a._id === person._id);
-      const response = await API.put({
-        path: `/person/${person._id}`,
-        body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(person),
-      });
-      if (response.ok) {
-        const newPerson = response.decryptedData;
-        setPersons((persons) =>
-          persons.map((p) => {
-            if (p._id === person._id) return newPerson;
-            return p;
-          })
-        );
-        const comment = commentForUpdatePerson({ newPerson, oldPerson });
-        if (comment) {
-          const response = await addComment(comment);
-          if (!response.ok) {
-            capture(response.error, {
-              extra: { message: 'error in creating comment for person update', newPerson, comment },
-            });
-          }
-        }
-      }
-      return response;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating person', person } });
-      return { ok: false, error: error.message };
-    }
-  };
-
-  const personFieldsIncludingCustomFields = (person) => {
+export const personFieldsIncludingCustomFieldsSelector = selector({
+  key: 'personFieldsIncludingCustomFieldsSelector',
+  get: ({ get }) => {
+    const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
+    const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
     return [
       ...personFields,
       ...[...customFieldsPersonsMedical, ...customFieldsPersonsSocial].map((f) => {
@@ -156,21 +44,8 @@ export const usePersons = () => {
         };
       }),
     ];
-  };
-
-  return {
-    persons,
-    personFieldsIncludingCustomFields,
-    customFieldsPersonsSocial,
-    customFieldsPersonsMedical,
-    deletePerson,
-    addPerson,
-    updatePerson,
-    uploadDocument,
-    downloadDocument,
-    deleteDocument,
-  };
-};
+  },
+});
 
 /*
 Choices on selects
@@ -431,9 +306,7 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
   };
 };
 
-const sortPersons = (p1, p2) => p1.name.localeCompare(p2.name);
-
-const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
+export const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
   try {
     const commentbody = {
       type: 'person',

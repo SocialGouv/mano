@@ -14,17 +14,22 @@ import SelectUser from './SelectUser';
 import { theme } from '../config';
 import Loading from './loading';
 import { Formik } from 'formik';
-import { userState } from '../recoil/auth';
-import { useComments } from '../recoil/comments';
-import { useRecoilValue } from 'recoil';
+import { currentTeamState, organisationState, userState } from '../recoil/auth';
+import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { commentsFilteredSelector } from '../recoil/selectors';
 import { dateForDatePicker } from '../services/date';
 import { loadingState } from './Loader';
+import useApi from '../services/api';
 
 const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
-  const { deleteComment, addComment, updateComment } = useComments();
+  const API = useApi();
+  const setComments = useSetRecoilState(commentsState);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
 
   const loading = useRecoilValue(loadingState);
 
@@ -37,14 +42,20 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
   const deleteData = async (id) => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deleteComment(id);
+      const res = await API.delete({ path: `/comment/${id}` });
+      if (res.ok) setComments((comments) => comments.filter((p) => p._id !== id));
       if (!res.ok) return;
       toastr.success('Suppression réussie');
     }
   };
 
   const addData = async ({ comment }) => {
-    const commentBody = { comment };
+    const commentBody = {
+      comment,
+      user: user._id,
+      team: currentTeam._id,
+      organisation: organisation._id,
+    };
     if (!!personId) {
       commentBody.item = personId;
       commentBody.person = personId;
@@ -55,15 +66,28 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
       commentBody.action = actionId;
       commentBody.type = 'action';
     }
-    const res = await addComment(commentBody);
-    if (!res.ok) return;
+
+    const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
+    if (!response.ok) return;
+    setComments((comments) => [response.decryptedData, ...comments]);
     toastr.success('Commentaire ajouté !');
     setClearNewCommentKey((k) => k + 1);
   };
 
   const updateData = async (comment) => {
-    const res = await updateComment(comment);
-    if (!res.ok) return;
+    const response = await API.put({
+      path: `/comment/${comment._id}`,
+      body: prepareCommentForEncryption(comment),
+    });
+    if (response.ok) {
+      setComments((comments) =>
+        comments.map((c) => {
+          if (c._id === comment._id) return response.decryptedData;
+          return c;
+        })
+      );
+    }
+    if (!response.ok) return;
     toastr.success('Commentaire mis-à-jour');
     setEditing(null);
   };

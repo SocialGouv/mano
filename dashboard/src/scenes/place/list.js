@@ -14,12 +14,13 @@ import PaginationContext from '../../contexts/pagination';
 import Page from '../../components/pagination';
 import { filterBySearch } from '../search/utils';
 import { currentTeamState, organisationState } from '../../recoil/auth';
-import { usePersons } from '../../recoil/persons';
-import { useRelsPerson } from '../../recoil/relPersonPlace';
-import { usePlaces } from '../../recoil/places';
+import { personsState } from '../../recoil/persons';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateWithFullMonth } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
+import useApi from '../../services/api';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -29,10 +30,10 @@ const filterPlaces = (places, { page, limit, search }) => {
 };
 
 const List = () => {
-  const { places } = usePlaces();
-  const { relsPersonPlace } = useRelsPerson();
-  const { persons } = usePersons();
+  const places = useRecoilValue(placesState);
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const organisation = useRecoilValue(organisationState);
+  const persons = useRecoilValue(personsState);
   const history = useHistory();
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
@@ -97,7 +98,8 @@ const Create = () => {
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
   const loading = useRecoilValue(loadingState);
-  const { addPlace } = usePlaces();
+  const setPlaces = useSetRecoilState(placesState);
+  const API = useApi();
 
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
@@ -126,13 +128,14 @@ const Create = () => {
           <Formik
             initialValues={{ name: '', organisation: '' }}
             onSubmit={async (body, actions) => {
-              const response = await addPlace(body);
-              actions.setSubmitting(false);
+              const response = await API.post({ path: '/place', body: preparePlaceForEncryption(body) });
               if (response.ok) {
+                setPlaces((places) => [response.decryptedData, ...places].sort((p1, p2) => p1.name.localeCompare(p2.name)));
                 toastr.success('Création réussie !');
               } else {
                 toastr.error('Erreur!', response.error);
               }
+              actions.setSubmitting(false);
               setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (

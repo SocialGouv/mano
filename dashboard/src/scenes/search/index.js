@@ -16,9 +16,9 @@ import PaginationContext, { PaginationProvider } from '../../contexts/pagination
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
 import { teamsState } from '../../recoil/auth';
-import { useActions } from '../../recoil/actions';
-import { usePersons } from '../../recoil/persons';
-import { useRelsPerson } from '../../recoil/relPersonPlace';
+import { actionsState } from '../../recoil/actions';
+import { personsState } from '../../recoil/persons';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
@@ -221,8 +221,8 @@ const Persons = ({ search, onUpdateResults }) => {
 const Comments = ({ search, onUpdateResults }) => {
   const history = useHistory();
 
-  const { persons } = usePersons();
-  const { actions } = useActions();
+  const persons = useRecoilValue(personsState);
+  const actions = useRecoilValue(actionsState);
 
   const data = useRecoilValue(commentsSearchSelector({ search })).map((comment) => {
     const commentPopulated = { ...comment };
@@ -366,8 +366,8 @@ const Territories = ({ search, onUpdateResults }) => {
 
 const Places = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { relsPersonPlace } = useRelsPerson();
-  const { persons } = usePersons();
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
+  const persons = useRecoilValue(personsState);
 
   const data = useRecoilValue(placesSearchSelector({ search }));
 

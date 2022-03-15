@@ -3,10 +3,20 @@ import 'react-datepicker/dist/react-datepicker.css';
 import SelectCustom from '../../components/SelectCustom';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
-import { usePersons } from '../../recoil/persons';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import useApi from '../../services/api';
 
 const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, classNamePrefix }) => {
-  const { persons, addPerson } = usePersons();
+  const [persons, setPersons] = useRecoilState(personsState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const API = useApi();
 
   return (
     <SelectCustom
@@ -20,8 +30,14 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
         if (!autoCreate) {
           onChange([...value, { value: `temporary-id-${Date.now()}`, label: `${name} (en cours de création)`, name }]);
         } else {
-          const personResponse = await addPerson({ name });
+          const existingPerson = persons.find((p) => p.name === name);
+          if (existingPerson) return toastr.error('Un utilisateur existe déjà à ce nom');
+          const personResponse = await API.post({
+            path: '/person',
+            body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name }),
+          });
           if (personResponse.ok) {
+            setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
             toastr.success('Nouvelle personne ajoutée !');
             onChange([...value, personResponse.decryptedData]);
           }

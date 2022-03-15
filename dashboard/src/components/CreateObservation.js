@@ -6,15 +6,16 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { useTerritoryObservations } from '../recoil/territoryObservations';
+import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
 import SelectTeam from './SelectTeam';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import CustomFieldInput from './CustomFieldInput';
 import { userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../services/date';
+import useApi from '../services/api';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
 
@@ -26,8 +27,31 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   }, [forceOpen]);
 
   const user = useRecoilValue(userState);
-  const { addTerritoryObs, updateTerritoryObs, customFieldsObs } = useTerritoryObservations();
   const territories = useRecoilValue(territoriesState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const setTerritoryObs = useSetRecoilState(territoryObservationsState);
+  const API = useApi();
+
+  const addTerritoryObs = async (obs) => {
+    const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
+    if (res.ok) {
+      setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
+    }
+    return res;
+  };
+
+  const updateTerritoryObs = async (obs) => {
+    const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
+    if (res.ok) {
+      setTerritoryObs((territoryObservations) =>
+        territoryObservations.map((a) => {
+          if (a._id === obs._id) return res.decryptedData;
+          return a;
+        })
+      );
+    }
+    return res;
+  };
 
   return (
     <CreateStyle>

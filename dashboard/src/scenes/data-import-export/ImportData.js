@@ -9,9 +9,9 @@ import ButtonCustom from '../../components/ButtonCustom';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
+  personFieldsIncludingCustomFieldsSelector,
   personsState,
   preparePersonForEncryption,
-  usePersons,
 } from '../../recoil/persons';
 import { teamsState, userState } from '../../recoil/auth';
 import { isNullOrUndefined, typeOptions } from '../../utils';
@@ -20,7 +20,7 @@ import { formatDateWithFullMonth, now } from '../../services/date';
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
-  const { personFieldsIncludingCustomFields } = usePersons();
+  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const fileDialogRef = useRef(null);
   const setAllPersons = useSetRecoilState(personsState);
   const teams = useRecoilValue(teamsState);
@@ -36,7 +36,7 @@ const ImportData = () => {
   const [ignoredFields, setIgnoredFields] = useState([]);
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
 
-  const importableFields = personFieldsIncludingCustomFields().filter((f) => f.importable);
+  const importableFields = personFieldsIncludingCustomFields.filter((f) => f.importable);
   const importableLabels = importableFields.map((f) => f.label);
 
   const onParseData = async (event) => {

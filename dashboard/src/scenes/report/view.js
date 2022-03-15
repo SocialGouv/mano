@@ -16,7 +16,7 @@ import Table from '../../components/table';
 import CreateAction from '../action/CreateAction';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import { CANCEL, DONE, useActions } from '../../recoil/actions';
+import { actionsState, CANCEL, DONE } from '../../recoil/actions';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
@@ -27,9 +27,9 @@ import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionName from '../../components/ActionName';
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { useComments } from '../../recoil/comments';
-import { usePersons } from '../../recoil/persons';
-import { useReports } from '../../recoil/reports';
+import { commentsState } from '../../recoil/comments';
+import { personsState } from '../../recoil/persons';
+import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import ActionPersonName from '../../components/ActionPersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -41,6 +41,7 @@ import {
 } from '../../recoil/selectors';
 import Incrementor from '../../components/Incrementor';
 import { refreshTriggerState } from '../../components/Loader';
+import useApi from '../../services/api';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -58,12 +59,13 @@ const View = () => {
   const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
-  const { deleteReport } = useReports();
+  const setReports = useSetRecoilState(reportsState);
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || !!organisation.receptionEnabled ? 0 : 1));
   const [tabsContents, setTabsContents] = useState(tabs);
+  const API = useApi();
 
   const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
 
@@ -85,10 +87,12 @@ const View = () => {
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deleteReport(id);
-      if (!res.ok) return;
-      toastr.success('Suppression réussie');
-      history.goBack();
+      const res = await API.delete({ path: `/report/${id}` });
+      if (res.ok) {
+        setReports((reports) => reports.filter((p) => p._id !== id));
+        toastr.success('Suppression réussie');
+        history.goBack();
+      }
     }
   };
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
@@ -237,7 +241,8 @@ const Reception = ({ report }) => {
   const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: report.date }));
   const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: report.date }));
 
-  const { updateReport } = useReports();
+  const setReports = useSetRecoilState(reportsState);
+  const API = useApi();
 
   const passages = numberOfNonAnonymousPassages + numberOfAnonymousPassages;
 
@@ -251,7 +256,15 @@ const Reception = ({ report }) => {
         [service]: newCount,
       }),
     };
-    await updateReport(reportUpdate);
+    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+    if (res.ok) {
+      setReports((reports) =>
+        reports.map((a) => {
+          if (a._id === report._id) return res.decryptedData;
+          return a;
+        })
+      );
+    }
   };
 
   if (!organisation.receptionEnabled) return null;
@@ -283,8 +296,8 @@ const Reception = ({ report }) => {
 
 const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const history = useHistory();
-  const { actions: allActions } = useActions();
   const currentTeam = useRecoilValue(currentTeamState);
+  const allActions = useRecoilValue(actionsState);
 
   const data = allActions
     ?.filter((a) => a.team === currentTeam._id)
@@ -347,8 +360,8 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
 const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
-  const { actions } = useActions();
   const currentTeam = useRecoilValue(currentTeamState);
+  const actions = useRecoilValue(actionsState);
 
   const data = actions
     ?.filter((a) => a.team === currentTeam._id)
@@ -401,9 +414,9 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
 const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
-  const { comments } = useComments();
-  const { persons } = usePersons();
-  const { actions } = useActions();
+  const comments = useRecoilValue(commentsState);
+  const persons = useRecoilValue(personsState);
+  const actions = useRecoilValue(actionsState);
   const currentTeam = useRecoilValue(currentTeamState);
 
   const data = comments
@@ -667,7 +680,8 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
 };
 
 const Description = ({ report }) => {
-  const { updateReport } = useReports();
+  const setReports = useSetRecoilState(reportsState);
+  const API = useApi();
 
   return (
     <>
@@ -680,8 +694,14 @@ const Description = ({ report }) => {
               ...report,
               ...body,
             };
-            const res = await updateReport(reportUpdate);
+            const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
             if (res.ok) {
+              setReports((reports) =>
+                reports.map((a) => {
+                  if (a._id === report._id) return res.decryptedData;
+                  return a;
+                })
+              );
               toastr.success('Mis à jour !');
             }
           }}>

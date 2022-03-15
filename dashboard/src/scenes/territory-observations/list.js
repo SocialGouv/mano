@@ -8,12 +8,15 @@ import Box from '../../components/Box';
 import ButtonCustom from '../../components/ButtonCustom';
 import Observation from './view';
 import CreateObservation from '../../components/CreateObservation';
-import { useTerritoryObservations } from '../../recoil/territoryObservations';
+import { territoryObservationsState } from '../../recoil/territoryObservations';
+import { useRecoilState } from 'recoil';
+import useApi from '../../services/api';
 
 const List = ({ territory = {} }) => {
-  const { territoryObservations, deleteTerritoryObs } = useTerritoryObservations();
+  const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
+  const API = useApi();
 
   const observations = territoryObservations.filter((obs) => obs.territory === territory._id);
 
@@ -22,7 +25,10 @@ const List = ({ territory = {} }) => {
   const deleteData = async (id) => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deleteTerritoryObs(id);
+      const res = await API.delete({ path: `/territory-observation/${id}` });
+      if (res.ok) {
+        setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
+      }
       if (!res.ok) return;
       toastr.success('Suppression réussie');
     }

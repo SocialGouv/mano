@@ -21,30 +21,35 @@ import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectStatus from '../../components/SelectStatus';
 import { TODO } from '../../recoil/actions';
-import { currentTeamState, organisationState } from '../../recoil/auth';
-import { usePersons } from '../../recoil/persons';
-import { useReports } from '../../recoil/reports';
-import { useRecoilValue } from 'recoil';
-import { useComments } from '../../recoil/comments';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { personsState } from '../../recoil/persons';
+import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { collectionsToLoadState } from '../../components/Loader';
+import useApi from '../../services/api';
+import dayjs from 'dayjs';
 
 const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const { addReport, updateReport } = useReports();
+  const [reports, setReports] = useRecoilState(reportsState);
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
   const lastReport = useRecoilValue(lastReportSelector);
+  const user = useRecoilValue(userState);
   const collectionsToLoad = useRecoilValue(collectionsToLoadState);
+  const setComments = useSetRecoilState(commentsState);
   const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
-  const { addComment } = useComments();
+  const API = useApi();
 
   const anonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
   const nonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
 
-  const { persons } = usePersons();
+  const persons = useRecoilValue(personsState);
+
   const history = useHistory();
   const location = useLocation();
 
@@ -61,7 +66,14 @@ const Reception = () => {
     return params.map((id) => persons.find((p) => p._id === id));
   });
 
-  const createReport = () => addReport(startOfToday(), currentTeam._id);
+  const createReport = async () => {
+    const existingReport = reports.find((r) => r.date === startOfToday() && r.team === currentTeam._id);
+    if (!!existingReport) return;
+    const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: startOfToday() }) });
+    if (!res.ok) return;
+    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    history.push(`/report/${res.data._id}`);
+  };
 
   useEffect(() => {
     if (!reportsLoading && !todaysReport && !!currentTeam?._id) createReport();
@@ -76,6 +88,19 @@ const Reception = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
+  const updateReport = async (report) => {
+    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(report) });
+    if (res.ok) {
+      setReports((reports) =>
+        reports.map((a) => {
+          if (a._id === report._id) return res.decryptedData;
+          return a;
+        })
+      );
+    }
+    return res;
+  };
+
   const onServiceUpdate = async (service, newCount) => {
     const reportUpdate = {
       ...todaysReport,
@@ -88,11 +113,10 @@ const Reception = () => {
   };
 
   const incrementPassage = async (report, { newValue = null } = {}) => {
-    const res = await updateReport({
+    await updateReport({
       ...report,
       passages: newValue,
     });
-    return res;
   };
 
   const onAddPassageForPersons = async () => {
@@ -104,10 +128,14 @@ const Reception = () => {
         item: person._id,
         person: person._id,
         type: 'person',
+        user: user._id,
+        team: currentTeam._id,
+        organisation: organisation._id,
       };
-      await addComment(commentBody);
+      const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
+      if (!response.ok) return;
+      setComments((comments) => [response.decryptedData, ...comments]);
     }
-    setAddingPassage(false);
   };
 
   const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);

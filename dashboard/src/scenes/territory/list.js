@@ -12,13 +12,14 @@ import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import { useTerritories, territoryTypes } from '../../recoil/territory';
+import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from '../../recoil/territory';
 import PaginationContext from '../../contexts/pagination';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesFullSearchSelector } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { formatDateWithFullMonth } from '../../services/date';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
+import useApi from '../../services/api';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
@@ -78,8 +79,9 @@ const CreateTerritory = () => {
   const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-  const { addTerritory } = useTerritories();
+  const API = useApi();
   const loading = useRecoilValue(loadingState);
+  const setTerritories = useSetRecoilState(territoriesState);
 
   return (
     <CreateStyle>
@@ -108,7 +110,10 @@ const CreateTerritory = () => {
           <Formik
             initialValues={{ name: '', types: [], perimeter: '' }}
             onSubmit={async (body, actions) => {
-              const res = await addTerritory({ ...body, user: user._id });
+              const res = await API.post({ path: '/territory', body: prepareTerritoryForEncryption({ ...body, user: user._id }) });
+              if (res.ok) {
+                setTerritories((territories) => [res.decryptedData, ...territories]);
+              }
               actions.setSubmitting(false);
               if (res.ok) {
                 toastr.success('Création réussie !');

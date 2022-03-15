@@ -18,11 +18,11 @@ import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
 import { personsFullSearchSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
-import { usePlaces } from '../../recoil/places';
+import { placesState } from '../../recoil/places';
 
 const List = () => {
   const [filters, setFilters] = useState([]);
-  const { places } = usePlaces();
+  const places = useRecoilValue(placesState);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(true);
   const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
   const personsFiltered = useRecoilValue(personsFullSearchSelector({ search, filterTeams, filters, alertness }));
