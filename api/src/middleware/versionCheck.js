@@ -7,7 +7,6 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
     const dashVer = version.split(".").map((d) => parseInt(d));
 
     for (let i = 0; i < 3; i++) {
-      console.log(dashVer, MINIMUM_DASHBOARD_APP_VERSION);
       if (dashVer[i] > MINIMUM_DASHBOARD_APP_VERSION[i]) {
         return next();
       } else if (dashVer[i] < MINIMUM_DASHBOARD_APP_VERSION[i]) {
