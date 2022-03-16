@@ -178,7 +178,7 @@ describe("Organisation CRUD", () => {
     expect(await getInnerText("div.update-action-select-status__single-value")).toBe("FAITE");
     await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
-    await expect(page).toMatch("Mis à jour !");
+    await expect(page).toMatch("Mise à jour !");
     await expect(page).toClick("div.close-toastr");
     await expect(page).toClick("a", { text: "Retour" });
     await page.waitForTimeout(500);
@@ -200,7 +200,7 @@ describe("Organisation CRUD", () => {
     expect(await getInnerText("div.update-action-select-status__single-value")).toBe("ANNULÉE");
     await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
-    await expect(page).toMatch("Mis à jour !");
+    await expect(page).toMatch("Mise à jour !");
     await expect(page).toClick("div.close-toastr");
     await page.waitForTimeout(500);
     await expect(page).toClick("a", { text: "Retour" });

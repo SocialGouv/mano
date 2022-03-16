@@ -97,7 +97,6 @@ const List = () => {
   const history = useHistory();
 
   useEffect(() => {
-    console.log('change effect');
     setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewAllOrganisationData, currentTeam, teams]);
