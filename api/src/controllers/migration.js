@@ -8,14 +8,15 @@ const Organisation = require("../models/organisation");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
+const validateUser = require("../middleware/validateUser");
 
 router.put(
   "/:migrationName",
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res) => {
     try {
-      z.literal("admin").parse(req.user.role);
       z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.string().min(1).parse(req.params.migrationName);
     } catch (e) {
