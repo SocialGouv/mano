@@ -63,7 +63,7 @@ const lastReportSelector = selector({
     return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
   },
 });
-
+// MIGRATION TODO
 const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);

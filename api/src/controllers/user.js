@@ -78,6 +78,8 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
       encryptedVerificationKey: organisation.encryptedVerificationKey,
       customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
       customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
+      migrations: organisation.migrations,
+      migrationLastUpdateAt: organisation.migrationLastUpdateAt,
     },
   };
 }

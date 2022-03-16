@@ -21,7 +21,7 @@ import { dateForDatePicker } from '../services/date';
 import { loadingState } from './Loader';
 import useApi from '../services/api';
 
-const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
+const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
   const API = useApi();
@@ -34,18 +34,12 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
 
   const comments = useMemo(
     () =>
-      allComments
-        .filter((c) => {
-          if (!!personId) return c.person === personId;
-          if (!!actionId) return c.action === actionId;
-          return false;
-        })
-        .filter((c) => {
-          const commentIsPassage = c?.comment?.includes('Passage enregistré');
-          if (forPassages) return commentIsPassage;
-          return !commentIsPassage;
-        }),
-    [personId, actionId, forPassages, allComments]
+      allComments.filter((c) => {
+        if (!!personId) return c.person === personId;
+        if (!!actionId) return c.action === actionId;
+        return false;
+      }),
+    [personId, actionId, allComments]
   );
 
   useEffect(() => {
@@ -109,7 +103,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
     <React.Fragment>
       <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
         <Col md={4}>
-          <Title>{!forPassages ? 'Commentaires' : 'Passages'}</Title>
+          <Title>Commentaires</Title>
         </Col>
       </Row>
       <Box>
@@ -117,7 +111,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
           <Loading />
         ) : (
           <>
-            <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment forPassages={forPassages} />
+            <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment />
             {comments.map((comment) => {
               return (
                 <StyledComment key={comment._id}>
@@ -152,13 +146,12 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
         value={comments.find((c) => c._id === editingId)}
         onSubmit={updateData}
         onCancel={() => setEditing(null)}
-        forPassages={forPassages}
       />
     </React.Fragment>
   );
 };
 
-const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment, forPassages }) => {
+const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment }) => {
   const user = useRecoilValue(userState);
   const [open, setOpen] = useState(false);
 
@@ -173,7 +166,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment,
 
   return (
     <>
-      {!!newComment && !forPassages && <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />}
+      {!!newComment && <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />}
       <Modal isOpen={!!open} toggle={onCancelRequest} size="lg">
         <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
         <ModalBody>

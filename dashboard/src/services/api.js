@@ -133,7 +133,7 @@ const useApi = () => {
   const setApiVersion = useSetRecoilState(apiVersionState);
   const history = useHistory();
 
-  const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey } = organisation;
+  const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
 
   const reset = () => {
     hashedOrgEncryptionKey = null;
@@ -231,6 +231,7 @@ const useApi = () => {
         query = {
           encryptionLastUpdateAt,
           encryptionEnabled,
+          migrationLastUpdateAt,
           ...query,
         };
       }

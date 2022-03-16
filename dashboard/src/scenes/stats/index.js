@@ -40,7 +40,7 @@ const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
 };
 
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
-
+// MIGRATION TODO
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);

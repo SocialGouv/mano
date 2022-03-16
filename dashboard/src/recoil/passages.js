@@ -5,7 +5,7 @@ export const passagesState = atom({
   default: [],
 });
 
-const encryptedFields = ['person', 'team', 'user'];
+const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
 
 export const preparePassageForEncryption = (passage) => {
   const decrypted = {};
@@ -20,7 +20,5 @@ export const preparePassageForEncryption = (passage) => {
 
     decrypted,
     entityKey: passage.entityKey,
-
-    ...passage,
   };
 };
