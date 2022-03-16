@@ -1,3 +1,10 @@
+# [1.74.0](https://github.com/SocialGouv/mano/compare/v1.73.1...v1.74.0) (2022-03-16)
+
+
+### Features
+
+* **dashboard:** outdated version checker ([#485](https://github.com/SocialGouv/mano/issues/485)) ([2a46d17](https://github.com/SocialGouv/mano/commit/2a46d1783948dc254f1551f1adfb03d2e84c01cc))
+
 ## [1.73.1](https://github.com/SocialGouv/mano/compare/v1.73.0...v1.73.1) (2022-03-16)
 
 
