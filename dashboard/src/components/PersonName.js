@@ -4,15 +4,15 @@ import { useHistory } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { personsState } from '../recoil/persons';
 
-export default function ActionPersonName({ action }) {
+export default function ActionPersonName({ item }) {
   const history = useHistory();
   const persons = useRecoilValue(personsState);
-  const personName = persons.find((p) => p._id === action.person)?.name;
+  const personName = persons.find((p) => p._id === item.person)?.name;
   return (
     <BoldOnHover
       onClick={(e) => {
         e.stopPropagation();
-        if (action.person) history.push(`/person/${action.person}`);
+        if (item.person) history.push(`/person/${item.person}`);
       }}>
       {personName}
     </BoldOnHover>

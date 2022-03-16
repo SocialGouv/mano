@@ -5,6 +5,7 @@ const { z } = require("zod");
 const sequelize = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
+const Passage = require("../models/passage");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
@@ -15,7 +16,7 @@ router.put(
   passport.authenticate("user", { session: false }),
   validateOrganisationEncryption,
   validateUser(["admin", "normal"]),
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.string().min(1).parse(req.params.migrationName);
@@ -30,6 +31,9 @@ router.put(
         .status(403)
         .send({ ok: false, error: "Une mise-à-jour de vos données est en cours, veuillez recharger la page dans quelques minutes" });
     }
+    if (organisation.migrations?.includes(req.params.migrationName)) {
+      return res.status(403).send({ ok: false, error: "Une mise-à-jour de vos données a été effectuée, veuillez recharger votre navigateur" });
+    }
     organisation.set({ migrating: true });
     await organisation.save();
 
@@ -38,18 +42,37 @@ router.put(
         // Each migration has its own "if". This is an example.
         if (req.params.migrationName === "passages-from-comments-to-table") {
           try {
-            z.array(z.string().regex(looseUuidRegex)).parse(req.body.commentIds);
+            z.array(z.string().regex(looseUuidRegex)).parse(req.body.commentIdsToDelete);
+            z.array(
+              z.object({
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.passages);
           } catch (e) {
-            return res.status(400).send({ ok: false, error: "Invalid request" });
+            const error = new Error(`Invalid request in report creation: ${e}`);
+            error.status = 400;
+            throw error;
           }
-          for (const _id of actions) {
-            const comment = await Comment.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
-            if (comment) await comment.destroy();
+          for (const passage of req.body.passages) {
+            await Passage.create({
+              encrypted: passage.encrypted,
+              encryptedEntityKey: passage.encryptedEntityKey,
+              organisation: req.user.organisation,
+            });
           }
+          // for (const _id of req.body.commentIdsToDelete) {
+          //   const comment = await Comment.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+          //   if (comment) await comment.destroy();
+          // }
         }
 
-        organisation.set({ migrations: [...organisation.migrations, req.params.migrationName] });
-        await organisation.save({ transaction: tx, migrating: false });
+        organisation.set({
+          migrations: [...(organisation.migrations || []), req.params.migrationName],
+          migrating: false,
+          migrationLastUpdateAt: new Date(),
+        });
+        await organisation.save({ transaction: tx });
       });
     } catch (e) {
       capture("error migrating", e);

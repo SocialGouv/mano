@@ -5,7 +5,7 @@ function dateForCompare(date) {
 }
 
 async function validateOrganisationEncryption(req, res, next) {
-  const { encryptionLastUpdateAt } = req.query;
+  const { encryptionLastUpdateAt, migrationLastUpdateAt } = req.query;
   const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
 
   if (!encryptionLastUpdateAt) {
@@ -26,6 +26,21 @@ async function validateOrganisationEncryption(req, res, next) {
       status: 403,
       error: "La clé de chiffrement a changé ou a été régénérée. Veuillez vous déconnecter et vous reconnecter avec la nouvelle clé.",
     });
+  }
+
+  if (organisation.migrationLastUpdateAt) {
+    if (!migrationLastUpdateAt) {
+      return res
+        .status(400)
+        .send({ ok: false, status: 400, error: "Une mise-à-jour de vos données a été effectuée, veuillez recharger votre navigateur" });
+    }
+    if (dateForCompare(migrationLastUpdateAt) < dateForCompare(organisation.migrationLastUpdateAt)) {
+      return res.status(403).send({
+        ok: false,
+        status: 403,
+        error: "Une mise-à-jour de vos données a été effectuée, veuillez recharger votre navigateur",
+      });
+    }
   }
 
   next();

@@ -1,11 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
-import { addOneDay, formatDateWithFullMonth, formatTime, getIsDayWithinHoursOffsetOfDay, startOfToday } from '../../services/date';
+import {
+  addOneDay,
+  formatDateTimeWithNameOfDay,
+  formatDateWithFullMonth,
+  formatTime,
+  getIsDayWithinHoursOffsetOfDay,
+  getIsDayWithinHoursOffsetOfPeriod,
+  startOfToday,
+} from '../../services/date';
 import DateBloc from '../../components/DateBloc';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -31,7 +39,7 @@ import { commentsState } from '../../recoil/comments';
 import { personsState } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
-import ActionPersonName from '../../components/ActionPersonName';
+import PersonName from '../../components/PersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import {
   numberOfPassagesAnonymousPerDatePerTeamSelector,
@@ -42,6 +50,7 @@ import {
 import Incrementor from '../../components/Incrementor';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
+import { passagesState } from '../../recoil/passages';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -50,7 +59,7 @@ const getPeriodTitle = (date, nightSession) => {
   const nextDay = addOneDay(date);
   return `Nuit du ${formatDateWithFullMonth(date)} au ${formatDateWithFullMonth(nextDay)}`;
 };
-
+// MIGRATION TODO
 const View = () => {
   const { id } = useParams();
   const organisation = useRecoilValue(organisationState);
@@ -63,7 +72,7 @@ const View = () => {
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || !!organisation.receptionEnabled ? 0 : 1));
+  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (!!organisation.receptionEnabled ? 0 : 1)));
   const [tabsContents, setTabsContents] = useState(tabs);
   const API = useApi();
 
@@ -128,7 +137,7 @@ const View = () => {
         <ActionCreatedAt date={report.date} />
         <ActionCompletedAt date={report.date} status={CANCEL} />
         <CommentCreatedAt date={report.date} />
-        <PassagesCreatedAt date={report.date} />
+        <PassagesCreatedAt date={report.date} report={report} />
         <TerritoryObservationsCreatedAt date={report.date} />
       </div>
     );
@@ -238,13 +247,28 @@ const View = () => {
 
 const Reception = ({ report }) => {
   const organisation = useRecoilValue(organisationState);
-  const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: report.date }));
-  const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: report.date }));
+  const allPassages = useRecoilValue(passagesState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
+  const passages = useMemo(
+    () =>
+      allPassages
+        .filter((p) => p.team === currentTeam._id)
+        .filter((p) =>
+          getIsDayWithinHoursOffsetOfPeriod(
+            p.date,
+            {
+              referenceStartDay: report?.date,
+              referenceEndDay: report?.date,
+            },
+            currentTeam?.nightSession ? 12 : 0
+          )
+        ).length,
+    [report?.date, allPassages]
+  );
 
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
-
-  const passages = numberOfNonAnonymousPassages + numberOfAnonymousPassages;
 
   const services = report?.services?.length ? JSON.parse(report?.services) : {};
 
@@ -345,7 +369,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => <ActionPersonName action={action} />,
+              render: (action) => <PersonName item={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -399,7 +423,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => <ActionPersonName action={action} />,
+              render: (action) => <PersonName item={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt) },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -522,16 +546,37 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
+const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
   const history = useHistory();
 
-  const nonAnonymousPassages = useRecoilValue(passagesNonAnonymousPerDatePerTeamSelector({ date: { startDate: date, endDate: date } }));
-  const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date }));
-  const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date }));
+  const allPassages = useRecoilValue(passagesState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
+  const passages = useMemo(
+    () =>
+      allPassages
+        .filter((p) => p.team === currentTeam._id)
+        .filter((p) =>
+          getIsDayWithinHoursOffsetOfPeriod(
+            p.date,
+            {
+              referenceStartDay: date,
+              referenceEndDay: date,
+            },
+            currentTeam?.nightSession ? 12 : 0
+          )
+        ),
+    [date, allPassages]
+  );
 
   useEffect(() => {
-    onUpdateResults(numberOfNonAnonymousPassages + numberOfAnonymousPassages);
-  }, [numberOfNonAnonymousPassages, numberOfAnonymousPassages]);
+    onUpdateResults(passages.length);
+  }, [passages.length]);
+
+  console.log(date, passages);
+
+  const numberOfAnonymousPassages = useMemo(() => passages.filter((p) => !p.person)?.length, [passages]);
+  const numberOfNonAnonymousPassages = useMemo(() => passages.filter((p) => !!p.person)?.length, [passages]);
 
   return (
     <>
@@ -559,63 +604,34 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
         <Table
           className="Table"
           title={`Passages non-anonymes ajoutés le ${formatDateWithFullMonth(date)}`}
-          data={nonAnonymousPassages}
           noData="Pas de passage ce jour"
-          onRowClick={(passage) => {
-            try {
-              history.push(`/person/${passage.person._id}`);
-            } catch (errorLoadingPassage) {
-              capture(errorLoadingPassage, { extra: { message: 'error loading passage from report', passage, date } });
-            }
-          }}
-          rowKey="_id"
+          onRowClick={(passage) => (passage.person ? history.push(`/person/${passage.person}`) : null)}
+          data={passages}
+          rowKey={'_id'}
           columns={[
             {
               title: 'Heure',
-              dataKey: 'createdAt',
-              render: (comment) => <span>{dayjs(comment.createdAt).format('HH:mm')}</span>,
-            },
-            {
-              title: 'Utilisateur',
-              dataKey: 'user',
-              render: (comment) => <UserName id={comment.user} />,
-            },
-            {
-              title: 'Type',
-              dataKey: 'type',
-              render: () => <span>Personne suivie</span>,
-            },
-            {
-              title: 'Nom',
-              dataKey: 'person',
-              render: (comment) => (
-                <>
-                  <b></b>
-                  <b>{comment.person?.name || ''}</b>
-                </>
-              ),
-            },
-            {
-              title: 'Commentaire',
-              dataKey: 'comment',
+              dataKey: 'date',
               render: (passage) => {
-                return (
-                  <p>
-                    {passage.comment
-                      ? passage.comment.split('\n').map((c, i, a) => {
-                          if (i === a.length - 1) return c;
-                          return (
-                            <React.Fragment key={i}>
-                              {c}
-                              <br />
-                            </React.Fragment>
-                          );
-                        })
-                      : ''}
-                  </p>
-                );
+                const time = dayjs(passage.date).format('HH:mm');
+                // anonymous comment migrated from `report.passages`
+                // have no time
+                // have no user assigned either
+                if (time === '00:00' && !passage.user) return null;
+                return <span>{time}</span>;
               },
             },
+            {
+              title: 'Personne suivie',
+              dataKey: 'person',
+              render: (passage) => (passage.person ? <PersonName item={passage} /> : 'Anonyme'),
+            },
+            {
+              title: 'Enregistré par',
+              dataKey: 'user',
+              render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+            },
+            { title: 'Commentaire', dataKey: 'comment' },
           ]}
         />
       </StyledBox>

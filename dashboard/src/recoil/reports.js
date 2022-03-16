@@ -5,7 +5,7 @@ export const reportsState = atom({
   default: [],
 });
 
-const encryptedFields = ['description', 'services', 'passages', 'team', 'date', 'collaborations'];
+const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations'];
 
 export const prepareReportForEncryption = (report) => {
   const decrypted = {};
