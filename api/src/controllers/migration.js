@@ -25,6 +25,13 @@ router.put(
 
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
+    if (organisation.migrating) {
+      return res
+        .status(403)
+        .send({ ok: false, error: "Une mise-à-jour de vos données est en cours, veuillez recharger la page dans quelques minutes" });
+    }
+    organisation.set({ migrating: true });
+    await organisation.save();
 
     try {
       await sequelize.transaction(async (tx) => {
@@ -42,12 +49,15 @@ router.put(
         }
 
         organisation.set({ migrations: [...organisation.migrations, req.params.migrationName] });
-        await organisation.save({ transaction: tx });
+        await organisation.save({ transaction: tx, migrating: false });
       });
     } catch (e) {
       capture("error migrating", e);
+      organisation.set({ migrating: false });
+      await organisation.save();
       throw e;
     }
+
     return res.status(200).send({ ok: true });
   })
 );
