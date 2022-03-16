@@ -1,3 +1,10 @@
+## [1.73.1](https://github.com/SocialGouv/mano/compare/v1.73.0...v1.73.1) (2022-03-16)
+
+
+### Bug Fixes
+
+* **api:** password disclosure in sentry ([#486](https://github.com/SocialGouv/mano/issues/486)) ([80827e1](https://github.com/SocialGouv/mano/commit/80827e11948b0d14ef359f9996f1480f276dc4ba))
+
 # [1.73.0](https://github.com/SocialGouv/mano/compare/v1.72.2...v1.73.0) (2022-03-15)
 
 
