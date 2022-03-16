@@ -38,7 +38,7 @@ const List = () => {
 
     const territoriesIdsFilterBySearch = [...new Set([...territoriesIdsByTerritoriesSearch, ...territoriesIdsFilteredByObsSearch])];
     return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id));
-  }, [territoryObservations, territories]);
+  }, [territoryObservations, territories, search]);
 
   const limit = 20;
   const data = useMemo(

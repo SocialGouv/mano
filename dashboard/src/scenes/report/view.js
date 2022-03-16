@@ -122,7 +122,7 @@ const View = () => {
           <br />
           {getPeriodTitle(report.date, currentTeam?.nightSession)}
         </div>
-        <Description report={report} />
+        <DescriptionAndCollaborations report={report} key={report._id} />
         <Reception report={report} />
         <ActionCompletedAt date={report.date} status={DONE} />
         <ActionCreatedAt date={report.date} />
@@ -178,7 +178,7 @@ const View = () => {
         }
       />
       <div className="noprint">
-        <Description report={report} />
+        <DescriptionAndCollaborations report={report} key={report._id} />
         <Nav tabs fill style={{ marginBottom: 20 }}>
           {tabsContents.map((tabCaption, index) => {
             if (!organisation.receptionEnabled && index === 0) return null;
@@ -679,7 +679,7 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   );
 };
 
-const Description = ({ report }) => {
+const DescriptionAndCollaborations = ({ report }) => {
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
 

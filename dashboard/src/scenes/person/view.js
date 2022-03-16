@@ -208,7 +208,7 @@ const Summary = ({ person }) => {
               comment.team = currentTeam._id;
               comment.organisation = organisation._id;
               const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-              if (commentResponse.ok) setComments((comments) => [response.decryptedData, ...comments]);
+              if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
             }
           }
           if (response.ok) {

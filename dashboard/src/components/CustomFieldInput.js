@@ -16,7 +16,7 @@ const CustomFieldInput = ({ field, values, handleChange, model }) => (
           name={field.name}
           type={field.type}
           required={field.required}
-          value={values[field.name]}
+          value={values[field.name] || ''}
           onChange={handleChange}
           id={`${model}-custom-input-${field.name}`}
         />

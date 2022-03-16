@@ -106,7 +106,6 @@ const Reception = () => {
     const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: startOfToday() }) });
     if (!res.ok) return;
     setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
-    history.push(`/report/${res.data._id}`);
   };
 
   useEffect(() => {
@@ -167,9 +166,12 @@ const Reception = () => {
         organisation: organisation._id,
       };
       const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
-      if (!response.ok) return;
-      setComments((comments) => [response.decryptedData, ...comments]);
+      if (response.ok) {
+        setComments((comments) => [response.decryptedData, ...comments]);
+      }
     }
+    setAddingPassage(false);
+    setSelectedPersons([]);
   };
 
   const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
