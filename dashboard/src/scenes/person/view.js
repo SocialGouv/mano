@@ -7,7 +7,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import Header from '../../components/header';
@@ -48,7 +48,7 @@ import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../se
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
-import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import DeletePerson from './DeletePerson';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -132,51 +132,14 @@ const View = () => {
 };
 
 const Summary = ({ person }) => {
-  const history = useHistory();
   const setPersons = useSetRecoilState(personsState);
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [comments, setComments] = useRecoilState(commentsState);
-  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const setComments = useSetRecoilState(commentsState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const API = useApi();
-
-  const deleteData = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const personRes = await API.delete({ path: `/person/${person._id}` });
-      if (personRes.ok) {
-        setPersons((persons) => persons.filter((p) => p._id !== person._id));
-        for (const action of actions.filter((a) => a.person === person._id)) {
-          const actionRes = await API.delete({ path: `/action/${action._id}` });
-          if (actionRes.ok) {
-            setActions((actions) => actions.filter((a) => a._id !== action._id));
-            for (let comment of comments.filter((c) => c.action === action._id)) {
-              const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-              if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
-            }
-          }
-        }
-        for (let comment of comments.filter((c) => c.person === person._id)) {
-          const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-          if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
-        }
-        for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === person._id)) {
-          const relRes = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-          if (relRes.ok) {
-            setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
-          }
-        }
-      }
-      if (personRes?.ok) {
-        toastr.success('Suppression réussie');
-        history.goBack();
-      }
-    }
-  };
 
   return (
     <>
@@ -445,7 +408,7 @@ const Summary = ({ person }) => {
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <OutOfActiveList person={person} />
-                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
+                <DeletePerson person={person} />
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
               </div>
             </React.Fragment>
