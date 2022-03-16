@@ -8,7 +8,6 @@ import lifecycle from 'page-lifecycle';
 import { Provider } from 'react-redux';
 import { combineReducers, createStore } from 'redux';
 import ReduxToastr, { reducer as toastr } from 'react-redux-toastr';
-
 import Account from './scenes/account';
 import Auth from './scenes/auth';
 import Organisation from './scenes/organisation';
@@ -21,12 +20,9 @@ import Stats from './scenes/stats';
 import SearchView from './scenes/search';
 import User from './scenes/user';
 import Report from './scenes/report';
-
 import Person from './scenes/person';
-
 import Drawer from './components/drawer';
 import Loader from './components/Loader';
-
 import 'react-datepicker/dist/react-datepicker.css';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
@@ -34,6 +30,7 @@ import { userState } from './recoil/auth';
 import useApi, { recoilResetKeyState, tokenCached } from './services/api';
 import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
+import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -60,6 +57,7 @@ const App = ({ resetRecoil }) => {
 
   return (
     <div className="main-container">
+      <VersionOutdatedAlert />
       <Router>
         <ScrollToTop />
         <Switch>
