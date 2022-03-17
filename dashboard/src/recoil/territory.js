@@ -20,8 +20,6 @@ export const prepareTerritoryForEncryption = (territory) => {
 
     decrypted,
     entityKey: territory.entityKey,
-
-    ...territory,
   };
 };
 

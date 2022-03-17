@@ -302,7 +302,6 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
 
     decrypted,
     entityKey: person.entityKey,
-    ...person,
   };
 };
 

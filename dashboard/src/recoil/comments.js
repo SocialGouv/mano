@@ -21,7 +21,5 @@ export const prepareCommentForEncryption = (comment) => {
 
     decrypted,
     entityKey: comment.entityKey,
-
-    ...comment,
   };
 };
