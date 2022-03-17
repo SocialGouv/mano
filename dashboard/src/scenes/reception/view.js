@@ -27,6 +27,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import { collectionsToLoadState } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
+import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -69,6 +70,7 @@ const Reception = () => {
   const currentTeam = useRecoilValue(currentTeamState);
 
   const [reports, setReports] = useRecoilState(reportsState);
+  const [passages, setPassages] = useRecoilState(passagesState);
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
@@ -79,20 +81,13 @@ const Reception = () => {
   const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
   const API = useApi();
 
-  const anonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
-  const nonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
-
   const persons = useRecoilValue(personsState);
 
   const history = useHistory();
   const location = useLocation();
 
   // for better UX when increase passage
-  const [passages, setPassages] = useState(todaysReport?.passages || 0);
   const [addingPassage, setAddingPassage] = useState(false);
-  useEffect(() => {
-    setPassages(anonymousPassages + nonAnonymousPassages);
-  }, [anonymousPassages, nonAnonymousPassages]);
 
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
@@ -145,29 +140,41 @@ const Reception = () => {
     await updateReport(reportUpdate);
   };
 
-  const incrementPassage = async (report, { newValue = null } = {}) => {
-    await updateReport({
-      ...report,
-      passages: newValue,
-    });
+  const incrementPassage = async () => {
+    const optimisticId = Date.now();
+    const newPassage = {
+      user: user._id,
+      team: currentTeam._id,
+      date: new Date(),
+      optimisticId,
+    };
+    // optimistic UI
+    setPassages((passages) => [newPassage, ...passages]);
+    const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
+    if (response.ok) {
+      setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId === optimisticId)]);
+    }
   };
 
   const onAddPassageForPersons = async () => {
     if (!selectedPersons.length) return;
     setAddingPassage(true);
-    for (const person of selectedPersons) {
-      const commentBody = {
-        comment: 'Passage enregistré',
-        item: person._id,
+    const newPassages = [];
+    for (const [index, person] of Object.entries(selectedPersons)) {
+      newPassages.push({
         person: person._id,
-        type: 'person',
         user: user._id,
         team: currentTeam._id,
-        organisation: organisation._id,
-      };
-      const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
+        date: new Date(),
+        optimisticId: index,
+      });
+    }
+    // optimistic UI
+    setPassages((passages) => [...newPassages, ...passages]);
+    for (const [index, passage] of Object.entries(newPassages)) {
+      const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
       if (response.ok) {
-        setComments((comments) => [response.decryptedData, ...comments]);
+        setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId === index)]);
       }
     }
     setAddingPassage(false);
