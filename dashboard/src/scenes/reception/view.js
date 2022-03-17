@@ -4,7 +4,7 @@ import { Col, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { SmallerHeaderWithBackButton } from '../../components/header';
-import { formatDateWithNameOfDay, isToday, now, startOfToday } from '../../services/date';
+import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import {
   currentTeamReportsSelector,
   numberOfPassagesAnonymousPerDatePerTeamSelector,
@@ -23,7 +23,6 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import { personsState } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { selector, selectorFamily, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { collectionsToLoadState } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
@@ -64,22 +63,45 @@ const lastReportSelector = selector({
     return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
   },
 });
+
+const todaysPassagesSelector = selector({
+  key: 'todaysPassagesSelector',
+  get: ({ get }) => {
+    const passages = get(passagesState);
+    const currentTeam = get(currentTeamState);
+    return passages
+      .filter((p) => p.team === currentTeam._id)
+      .filter((p) =>
+        getIsDayWithinHoursOffsetOfPeriod(
+          p.date,
+          {
+            referenceStartDay: dayjs(),
+            referenceEndDay: dayjs(),
+          },
+          currentTeam?.nightSession ? 12 : 0
+        )
+      );
+  },
+});
 // MIGRATION TODO
 const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
   const [reports, setReports] = useRecoilState(reportsState);
-  const [passages, setPassages] = useRecoilState(passagesState);
+  const setPassages = useSetRecoilState(passagesState);
+  const passages = useSetRecoilState(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
   const lastReport = useRecoilValue(lastReportSelector);
   const user = useRecoilValue(userState);
   const collectionsToLoad = useRecoilValue(collectionsToLoadState);
-  const setComments = useSetRecoilState(commentsState);
   const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
   const API = useApi();
+
+  const anonymousPassages = useMemo((passages) => passages.filter((p) => !p.person), [passages]);
+  const nonAnonymousPassages = useMemo((passages) => passages.filter((p) => !!p.person), [passages]);
 
   const persons = useRecoilValue(personsState);
 
@@ -234,17 +256,7 @@ const Reception = () => {
           </div>
         </Col>
         <Col md={4}>
-          <Card
-            title="Nombre de passages"
-            count={passages}
-            countId="number-of-passages"
-            unit={`passage${passages > 1 ? 's' : ''}`}
-            onChange={async (newValue) => {
-              setAddingPassage(true);
-              setPassages(newValue);
-              await incrementPassage(todaysReport, { newValue });
-              setAddingPassage(false);
-            }}>
+          <Card title="Nombre de passages" count={passages} countId="number-of-passages" unit={`passage${passages > 1 ? 's' : ''}`}>
             <ButtonCustom
               onClick={async () => {
                 setAddingPassage(true);
