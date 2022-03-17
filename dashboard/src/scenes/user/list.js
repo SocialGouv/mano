@@ -45,6 +45,18 @@ const List = () => {
           { title: 'Nom', dataKey: 'name' },
           { title: 'Email', dataKey: 'email' },
           {
+            title: 'Rôle',
+            dataKey: 'role',
+            render: (user) => {
+              return (
+                <>
+                  <div>{user.role}</div>
+                  {user.healthcareProfessional ? <div>🧑‍⚕️ professionnel de santé</div> : ''}
+                </>
+              );
+            },
+          },
+          {
             title: 'Equipe',
             dataKey: 'teams',
             render: (user) => {
@@ -146,8 +158,8 @@ const Create = ({ onChange }) => {
                       </div>
                     </FormGroup>
                   </Col>
-                  <Col md={6}>
-                    <Label>
+                  <Col md={12}>
+                    <Label style={{ marginBottom: 0 }}>
                       <input
                         type="checkbox"
                         style={{ marginRight: '0.5rem' }}
@@ -157,6 +169,9 @@ const Create = ({ onChange }) => {
                       />
                       Professionnel de santé
                     </Label>
+                    <div>
+                      <small className="text-muted">Un professionnel de santé à accès au dossier médical complet des personnes.</small>
+                    </div>
                   </Col>
                 </Row>
                 <br />

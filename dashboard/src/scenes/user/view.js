@@ -50,7 +50,13 @@ const View = () => {
       <Header title={<BackButton />} />
       <Box>
         <Formik
-          initialValues={localUser}
+          initialValues={{
+            name: localUser.name,
+            email: localUser.email,
+            team: localUser.team,
+            role: localUser.role,
+            healthcareProfessional: localUser.healthcareProfessional,
+          }}
           onSubmit={async (body, actions) => {
             try {
               if (!body.team?.length) return toastr.error('Erreur !', 'Au moins une équipe est obligatoire');
@@ -107,6 +113,23 @@ const View = () => {
                       value={{ value: values.role, label: values.role }}
                     />
                   </FormGroup>
+                </Col>
+                <Col md={12}>
+                  <Label style={{ marginBottom: 0 }}>
+                    <input
+                      type="checkbox"
+                      style={{ marginRight: '0.5rem' }}
+                      name="healthcareProfessional"
+                      checked={values.healthcareProfessional}
+                      onChange={() => {
+                        handleChange({ target: { value: !values.healthcareProfessional, name: 'healthcareProfessional' } });
+                      }}
+                    />
+                    Professionnel de santé
+                  </Label>
+                  <div>
+                    <small className="text-muted">Un professionnel de santé à accès au dossier médical complet des personnes.</small>
+                  </div>
                 </Col>
               </Row>
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>

@@ -525,12 +525,14 @@ router.put(
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.optional(z.string().min(1)).parse(req.body.name);
+
       z.string()
         .email()
         .optional()
         .or(z.literal(""))
         .parse((req.body.email || "").trim().toLowerCase());
       z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
+      z.optional(z.boolean()).parse(req.body.healthcareProfessional);
       z.optional(z.enum(["admin", "normal"])).parse(req.body.role);
     } catch (e) {
       const error = new Error(`Invalid request in put user by id: ${e}`);
@@ -539,13 +541,14 @@ router.put(
     }
 
     const _id = req.params._id;
-    const { name, email, team, role } = req.body;
+    const { name, email, team, role, healthcareProfessional } = req.body;
 
     const user = await User.findOne({ where: { _id, organisation: req.user.organisation } });
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
 
     if (name) user.name = name;
     if (email) user.email = email.trim().toLowerCase();
+    if (healthcareProfessional !== undefined) user.healthcareProfessional = healthcareProfessional;
     if (role) user.role = role;
 
     const tx = await User.sequelize.transaction();
