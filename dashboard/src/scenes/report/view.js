@@ -51,6 +51,7 @@ import Incrementor from '../../components/Incrementor';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
+import EditPassage from '../../components/EditPassage';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -551,6 +552,7 @@ const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
 
   const allPassages = useRecoilValue(passagesState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const [editPassageId, setEditPassageId] = useState(null);
 
   const passages = useMemo(
     () =>
@@ -573,15 +575,13 @@ const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
     onUpdateResults(passages.length);
   }, [passages.length]);
 
-  console.log(date, passages);
-
   const numberOfAnonymousPassages = useMemo(() => passages.filter((p) => !p.person)?.length, [passages]);
   const numberOfNonAnonymousPassages = useMemo(() => passages.filter((p) => !!p.person)?.length, [passages]);
 
   return (
     <>
       <StyledBox>
-        <TabTitle>Passages</TabTitle>
+        <TabTitle>Passages ajoutés le {formatDateWithFullMonth(date)}</TabTitle>
         <Row style={{ marginBottom: 20 }}>
           <Col md={2} />
           <Col md={4}>
@@ -601,11 +601,10 @@ const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
             />
           </Col>
         </Row>
+        <EditPassage id={editPassageId} onFinished={() => setEditPassageId(null)} />
         <Table
           className="Table"
-          title={`Passages non-anonymes ajoutés le ${formatDateWithFullMonth(date)}`}
-          noData="Pas de passage ce jour"
-          onRowClick={(passage) => (passage.person ? history.push(`/person/${passage.person}`) : null)}
+          onRowClick={(passage) => setEditPassageId(passage._id)}
           data={passages}
           rowKey={'_id'}
           columns={[

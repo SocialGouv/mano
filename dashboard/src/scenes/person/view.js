@@ -50,6 +50,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import DeletePerson from './DeletePerson';
 import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
+import EditPassage from '../../components/EditPassage';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -468,8 +469,8 @@ const Actions = ({ person, onUpdateResults }) => {
 
 const Passages = ({ personId, onUpdateResults }) => {
   const passages = useRecoilValue(passagesState);
-
   const personPassages = useMemo(() => passages.filter((passage) => passage.person === personId), [personId, passages]);
+  const [editPassageId, setEditPassageId] = useState(null);
 
   useEffect(() => {
     onUpdateResults(personPassages.length);
@@ -480,9 +481,11 @@ const Passages = ({ personId, onUpdateResults }) => {
       <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
         <Title>Passages</Title>
       </div>
-      <StyledTable
+      <EditPassage id={editPassageId} onFinished={() => setEditPassageId(null)} />
+      <Table
         data={personPassages}
         rowKey={'_id'}
+        onRowClick={(passage) => setEditPassageId(passage._id)}
         columns={[
           {
             title: 'Date',
@@ -493,7 +496,7 @@ const Passages = ({ personId, onUpdateResults }) => {
           },
           {
             title: 'Heure',
-            dataKey: 'date',
+            dataKey: 'time',
             render: (passage) => formatTime(passage.date),
           },
           {

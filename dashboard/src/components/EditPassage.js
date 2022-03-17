@@ -1,21 +1,22 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
-import { Modal, Input, Button as Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
+import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import { Formik } from 'formik';
 
 import ButtonCustom from './ButtonCustom';
 import SelectUser from './SelectUser';
-import { Formik } from 'formik';
 import { teamsState, userState } from '../recoil/auth';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { dateForDatePicker } from '../services/date';
 import useApi from '../services/api';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import SelectTeam from './SelectTeam';
+import SelectPerson from './SelectPerson';
 
-const EditPassage = ({ id, onSubmit, onCancel }) => {
+const EditPassage = ({ id, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
@@ -29,7 +30,7 @@ const EditPassage = ({ id, onSubmit, onCancel }) => {
 
   const onCancelRequest = () => {
     setOpen(false);
-    if (onCancel) onCancel();
+    onFinished();
   };
 
   const passage = useMemo(() => passages.find((p) => p._id === id), [id]);
@@ -41,15 +42,13 @@ const EditPassage = ({ id, onSubmit, onCancel }) => {
         <ModalBody>
           <Formik
             initialValues={passage}
-            key={id}
             onSubmit={async (body, actions) => {
               if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
               if (!body.team) return toastr.error('Erreur!', 'La date est obligatoire');
-              const updatedPassage = { ...passage, ...body };
               const response = await API.put({
-                path: `/comment/${id}`,
-                body: preparePassageForEncryption(updatedPassage),
+                path: `/passage/${id}`,
+                body: preparePassageForEncryption(body),
               });
               if (response.ok) {
                 setPassages((passages) =>
@@ -60,6 +59,8 @@ const EditPassage = ({ id, onSubmit, onCancel }) => {
                 );
               }
               if (!response.ok) return;
+              setOpen(false);
+              onFinished();
               toastr.success('Passage mis-à-jour');
               actions.setSubmitting(false);
             }}>
@@ -73,13 +74,18 @@ const EditPassage = ({ id, onSubmit, onCancel }) => {
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          selected={dateForDatePicker(values.createdAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                          selected={dateForDatePicker(values.date)}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
                           timeInputLabel="Heure :"
                           dateFormat="dd/MM/yyyy HH:mm"
                           showTimeInput
                         />
                       </div>
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <SelectPerson value={values.person} onChange={handleChange} isClearable />
                     </FormGroup>
                   </Col>
                   <Col md={12}>
