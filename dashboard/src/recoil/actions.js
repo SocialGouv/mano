@@ -116,8 +116,6 @@ export const prepareActionForEncryption = (action) => {
 
     decrypted,
     entityKey: action.entityKey,
-
-    ...action,
   };
 };
 

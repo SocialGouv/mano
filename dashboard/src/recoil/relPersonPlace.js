@@ -56,7 +56,5 @@ export const prepareRelPersonPlaceForEncryption = (relPersonPlace) => {
 
     decrypted,
     entityKey: relPersonPlace.entityKey,
-
-    ...relPersonPlace,
   };
 };

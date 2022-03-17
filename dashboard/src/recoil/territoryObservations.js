@@ -149,8 +149,6 @@ export const prepareObsForEncryption = (customFields) => (obs) => {
 
     decrypted,
     entityKey: obs.entityKey,
-
-    ...obs,
   };
 };
 

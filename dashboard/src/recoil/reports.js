@@ -100,7 +100,5 @@ export const prepareReportForEncryption = (report) => {
 
     decrypted,
     entityKey: report.entityKey,
-
-    ...report,
   };
 };

@@ -20,7 +20,5 @@ export const preparePlaceForEncryption = (place) => {
 
     decrypted,
     entityKey: place.entityKey,
-
-    ...place,
   };
 };

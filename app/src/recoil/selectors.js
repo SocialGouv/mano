@@ -5,47 +5,10 @@ import { commentsState } from './comments';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
-import { reportsState } from './reports';
 import { territoriesState } from './territory';
-import { getIsDayWithinHoursOffsetOfDay, isComingInDays, isOnSameDay, isPassed, isToday, isTomorrow, today } from '../services/date';
+import { getIsDayWithinHoursOffsetOfDay, isComingInDays, isPassed, isToday, isTomorrow } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { filterBySearch, filterData } from '../utils/search';
-
-export const currentTeamReportsSelector = selector({
-  key: 'currentTeamReportsSelector',
-  get: ({ get }) => {
-    const reports = get(reportsState);
-    const currentTeam = get(currentTeamState);
-    return reports.filter((a) => a.team === currentTeam?._id);
-  },
-});
-
-export const todaysReportSelector = selector({
-  key: 'todaysReportSelector',
-  get: ({ get }) => {
-    const teamsReports = get(currentTeamReportsSelector);
-    return teamsReports.find((rep) => isOnSameDay(new Date(rep.date), today()));
-  },
-});
-
-export const lastReportSelector = selector({
-  key: 'lastReportSelector',
-  get: ({ get }) => {
-    const teamsReports = get(currentTeamReportsSelector);
-    const todays = get(todaysReportSelector);
-    return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
-  },
-});
-
-export const reportPerDateSelector = selectorFamily({
-  key: 'reportPerDateSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const teamsReports = get(currentTeamReportsSelector);
-      return teamsReports.find((rep) => isOnSameDay(new Date(rep.date), new Date(date)));
-    },
-});
 
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',

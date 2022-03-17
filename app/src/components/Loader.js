@@ -105,7 +105,6 @@ const Loader = () => {
       response.data.territoryObservations +
       response.data.places +
       response.data.comments +
-      response.data.reports +
       response.data.relsPersonPlace;
     if (initialLoad) {
       const numberOfCollections = 8;

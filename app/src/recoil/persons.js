@@ -302,11 +302,8 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
 
     decrypted,
     entityKey: person.entityKey,
-    ...person,
   };
 };
-
-const sortPersons = (p1, p2) => p1.name.localeCompare(p2.name);
 
 export const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
   try {
