@@ -82,7 +82,7 @@ const Create = ({ onChange }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouvel utilisateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', email: '', role: '', team: [] }}
+            initialValues={{ name: '', email: '', role: '', team: [], healthcareProfessional: false }}
             validate={(values) => {
               const errors = {};
               if (!values.name) errors.name = 'Le nom est obligatoire';
@@ -145,6 +145,18 @@ const Create = ({ onChange }) => {
                         {touched.team && errors.team && <Error>{errors.team}</Error>}
                       </div>
                     </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <Label>
+                      <input
+                        type="checkbox"
+                        style={{ marginRight: '0.5rem' }}
+                        name="healthcareProfessional"
+                        checked={values.healthcareProfessional}
+                        onChange={handleChange}
+                      />
+                      Professionnel de santé
+                    </Label>
                   </Col>
                 </Row>
                 <br />
