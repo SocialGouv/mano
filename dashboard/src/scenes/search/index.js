@@ -122,11 +122,11 @@ const Actions = ({ search, onUpdateResults }) => {
   const data = useMemo(() => {
     if (!search?.length) return [];
     return filterBySearch(search, actions);
-  }, []);
+  }, [search, actions]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -179,11 +179,11 @@ const Persons = ({ search, onUpdateResults }) => {
   const data = useMemo(() => {
     if (!search?.length) return [];
     return filterBySearch(search, persons);
-  }, [search]);
+  }, [search, persons]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -250,7 +250,7 @@ const Comments = ({ search, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -345,11 +345,11 @@ const Territories = ({ search, onUpdateResults }) => {
   const data = useMemo(() => {
     if (!search?.length) return [];
     return filterBySearch(search, territories);
-  }, []);
+  }, [search, territories]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -390,7 +390,7 @@ const Places = ({ search, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -450,7 +450,7 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
