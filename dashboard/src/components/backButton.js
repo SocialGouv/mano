@@ -2,9 +2,10 @@ import React from 'react';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { theme } from '../config';
+import backImage from '../assets/back.svg';
 
 const BackButtonWrapperStyled = styled.a`
-  ${(props) => props.withArrow && `background: url(${require('../assets/back.svg')}) left center no-repeat;`}
+  ${(props) => props.withArrow && `background: url(${backImage}) left center no-repeat;`}
 
   background-size: 20px;
   color: ${theme.main};
