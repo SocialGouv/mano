@@ -1,3 +1,10 @@
+# [1.76.0](https://github.com/SocialGouv/mano/compare/v1.75.0...v1.76.0) (2022-03-17)
+
+
+### Features
+
+* **dashboard:** warning before delete person ([#491](https://github.com/SocialGouv/mano/issues/491)) ([4617e05](https://github.com/SocialGouv/mano/commit/4617e053211ba7d88647d0dc324c916f95313e72))
+
 # [1.75.0](https://github.com/SocialGouv/mano/compare/v1.74.0...v1.75.0) (2022-03-17)
 
 
