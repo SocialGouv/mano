@@ -2,20 +2,46 @@ import React, { useState } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import { outOfActiveListReasonOptions, usePersons } from '../../recoil/persons';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  outOfActiveListReasonOptions,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
 import SelectAsInput from '../../components/SelectAsInput';
+import useApi from '../../services/api';
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
-  const { updatePerson } = usePersons();
+  const API = useApi();
+
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+
+  const setPersons = useSetRecoilState(personsState);
 
   const handleSetOutOfActiveList = async (outOfActiveListReason = '') => {
     const outOfActiveList = !person.outOfActiveList;
-    const res = await updatePerson({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReason });
-    if (res?.ok) {
-      toastr.success('Mise à jour réussie', person.name + (outOfActiveList ? ' est hors de la file active.' : ' est dans file active.'));
+    const response = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(
+        customFieldsPersonsMedical,
+        customFieldsPersonsSocial
+      )({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReason }),
+    });
+    if (response.ok) {
+      const newPerson = response.decryptedData;
+      setPersons((persons) =>
+        persons.map((p) => {
+          if (p._id === person._id) return newPerson;
+          return p;
+        })
+      );
+      toastr.success('Mise à jour réussie', person.name + (person.outOfActiveList ? ' est hors de la file active.' : ' est dans file active.'));
     }
   };
 

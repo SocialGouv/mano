@@ -1,10 +1,11 @@
 import React from 'react';
 import { Label } from 'reactstrap';
-import { usePersons } from '../recoil/persons';
+import { useRecoilValue } from 'recoil';
+import { personsState } from '../recoil/persons';
 import SelectCustom from './SelectCustom';
 
 const SelectPerson = ({ value = '', onChange, isMulti = false, noLabel = false, ...props }) => {
-  const { persons } = usePersons();
+  const persons = useRecoilValue(personsState);
 
   return (
     <>

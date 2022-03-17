@@ -11,29 +11,39 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
-import { usePersons } from '../../recoil/persons';
-import { useRelsPerson } from '../../recoil/relPersonPlace';
-import { usePlaces } from '../../recoil/places';
-import { useSetRecoilState } from 'recoil';
+import { personsState } from '../../recoil/persons';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import { placesState, preparePlaceForEncryption } from '../../recoil/places';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { refreshTriggerState } from '../../components/Loader';
+import useApi from '../../services/api';
 
 const View = () => {
   const { id } = useParams();
   const history = useHistory();
-  const { places, updatePlace, deletePlace } = usePlaces();
-  const { relsPersonPlace } = useRelsPerson();
-  const { persons } = usePersons();
+  const [places, setPlaces] = useRecoilState(placesState);
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const persons = useRecoilValue(personsState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const API = useApi();
 
   const place = places.find((p) => p._id === id);
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deletePlace(id);
-      if (!res.ok) return;
-      toastr.success('Suppression réussie');
-      history.goBack();
+      const placeRes = await API.delete({ path: `/place/${id}` });
+      if (placeRes.ok) {
+        setPlaces((places) => places.filter((p) => p._id !== id));
+        for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === id)) {
+          const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+          if (res.ok) {
+            setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+          }
+        }
+        toastr.success('Suppression réussie');
+        history.goBack();
+      }
     }
   };
 
@@ -54,14 +64,22 @@ const View = () => {
         <Formik
           initialValues={place}
           onSubmit={async (body) => {
-            try {
-              const res = await updatePlace(body);
-              if (res.ok) {
-                toastr.success('Mise à jour !');
-              }
-            } catch (placeUpdateError) {
-              console.log('error in updating place', placeUpdateError);
-              toastr.error('Erreur!', placeUpdateError.message);
+            const response = await API.put({
+              path: `/place/${place._id}`,
+              body: preparePlaceForEncryption(body),
+            });
+            if (response.ok) {
+              setPlaces((places) =>
+                places
+                  .map((p) => {
+                    if (p._id === place._id) return response.decryptedData;
+                    return p;
+                  })
+                  .sort((p1, p2) => p1.name.localeCompare(p2.name))
+              );
+              toastr.success('Mise à jour !');
+            } else {
+              toastr.error('Erreur!', response.error);
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (

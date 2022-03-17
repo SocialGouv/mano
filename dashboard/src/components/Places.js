@@ -5,22 +5,23 @@ import { Col, FormGroup, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import { useHistory } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import Box from './Box';
 import ButtonCustom from './ButtonCustom';
-import { usePlaces } from '../recoil/places';
+import { placesState } from '../recoil/places';
 import Table from './table';
 import SelectCustom from './SelectCustom';
 import { currentTeamState, userState } from '../recoil/auth';
-import { useRelsPerson } from '../recoil/relPersonPlace';
+import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { formatDateWithFullMonth } from '../services/date';
+import useApi from '../services/api';
 
 const Places = ({ personId = '', onUpdateResults }) => {
   const history = useHistory();
 
-  const { places } = usePlaces();
-  const { relsPersonPlace } = useRelsPerson();
+  const places = useRecoilValue(placesState);
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
 
   const data = relsPersonPlace
     .filter((relation) => relation.person === personId)
@@ -66,8 +67,9 @@ const AddPlace = ({ personId }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
 
-  const { places } = usePlaces();
-  const { addRelation } = useRelsPerson();
+  const places = useRecoilValue(placesState);
+  const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
+  const API = useApi();
 
   return (
     <div style={{ marginTop: 15, marginBottom: 30 }}>
@@ -79,12 +81,16 @@ const AddPlace = ({ personId }) => {
             initialValues={{ place: null }}
             onSubmit={async (body, actions) => {
               if (!body.place) return toastr.error('Veuillez sélectionner un lieu');
-              const res = await addRelation({ place: body.place._id, person: personId, user: user._id });
-              actions.setSubmitting(false);
+              const res = await API.post({
+                path: '/relPersonPlace',
+                body: prepareRelPersonPlaceForEncryption({ place: body.place._id, person: personId, user: user._id }),
+              });
               if (res.ok) {
+                setRelsPersonPlace((relsPersonPlace) => [res.decryptedData, ...relsPersonPlace]);
                 toastr.success('Lieu ajouté !');
                 setOpen(false);
               }
+              actions.setSubmitting(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>

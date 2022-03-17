@@ -22,21 +22,26 @@ import SelectStatus from '../../components/SelectStatus';
 import SelectCustom from '../../components/SelectCustom';
 import SelectTeam from '../../components/SelectTeam';
 
-import { organisationState, teamsState, userState } from '../../recoil/auth';
-import { useActions, CANCEL, DONE } from '../../recoil/actions';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker } from '../../services/date';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption } from '../../recoil/actions';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { dateForDatePicker, now } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import useApi from '../../services/api';
 
 const View = () => {
   const { id } = useParams();
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [comments, setComments] = useRecoilState(commentsState);
 
-  const { deleteAction, updateAction, actions } = useActions();
   const history = useHistory();
+  const API = useApi();
 
   const action = actions.find((a) => a._id === id);
 
@@ -45,8 +50,15 @@ const View = () => {
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deleteAction(id);
-      if (!res.ok) return;
+      const actionRes = await API.delete({ path: `/action/${action._id}` });
+      if (actionRes.ok) {
+        setActions((actions) => actions.filter((a) => a._id !== action._id));
+        for (let comment of comments.filter((c) => c.action === action._id)) {
+          const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+          if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
+        }
+      }
+      if (!actionRes.ok) return;
       toastr.success('Suppression réussie');
       history.goBack();
     }
@@ -73,9 +85,42 @@ const View = () => {
         <Formik
           initialValues={action}
           onSubmit={async (body) => {
-            const res = await updateAction(body);
-            if (res.ok) {
-              toastr.success('Mis à jour !');
+            const statusChanged = body.status && action.status !== body.status;
+            if (statusChanged) {
+              if ([DONE, CANCEL].includes(body.status)) {
+                body.completedAt = now();
+              } else {
+                body.completedAt = null;
+              }
+            }
+            const actionResponse = await API.put({
+              path: `/action/${body._id}`,
+              body: prepareActionForEncryption(body),
+            });
+            if (actionResponse.ok) {
+              const newAction = actionResponse.decryptedData;
+              setActions((actions) =>
+                actions.map((a) => {
+                  if (a._id === newAction._id) return newAction;
+                  return a;
+                })
+              );
+              if (statusChanged) {
+                const comment = {
+                  comment: `${user.name} a changé le status de l'action: ${
+                    mappedIdsToLabels.find((status) => status._id === newAction.status)?.name
+                  }`,
+                  type: 'action',
+                  item: action._id,
+                  action: action._id,
+                  team: currentTeam._id,
+                  user: user._id,
+                  organisation: organisation._id,
+                };
+                const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+                if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
+              }
+              toastr.success('Mise à jour !');
               setRefreshTrigger({
                 status: true,
                 options: { showFullScreen: false, initialLoad: false },

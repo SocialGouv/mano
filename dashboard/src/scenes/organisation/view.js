@@ -12,7 +12,7 @@ import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { defaultMedicalCustomFields, usePersons } from '../../recoil/persons';
+import { defaultMedicalCustomFields, personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState } from '../../recoil/auth';
@@ -30,7 +30,7 @@ const View = () => {
   const actions = useRecoilValue(actionsState);
   const reports = useRecoilValue(reportsState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const { personFieldsIncludingCustomFields } = usePersons();
+  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
@@ -452,7 +452,7 @@ const View = () => {
                                     </tr>
                                   </thead>
                                   <tbody>
-                                    {personFieldsIncludingCustomFields()
+                                    {personFieldsIncludingCustomFields
                                       .filter((f) => f.importable)
                                       .map((f) => {
                                         return (

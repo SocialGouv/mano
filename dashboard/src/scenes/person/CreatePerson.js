@@ -8,17 +8,26 @@ import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState } from '../../recoil/auth';
-import { usePersons } from '../../recoil/persons';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
+import useApi from '../../services/api';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
-  const { addPerson, persons } = usePersons();
+  const [persons, setPersons] = useRecoilState(personsState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const loading = useRecoilValue(loadingState);
+  const API = useApi();
 
   return (
     <>
@@ -50,15 +59,19 @@ const CreatePerson = ({ refreshable }) => {
           <Formik
             initialValues={{ name: '' }}
             onSubmit={async (body, actions) => {
-              const res = await addPerson(body);
-              actions.setSubmitting(false);
               const existingPerson = persons.find((p) => p.name === body.name);
               if (existingPerson) return toastr.error('Un utilisateur existe déjà à ce nom');
-              if (res.ok) {
+              const response = await API.post({
+                path: '/person',
+                body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
+              });
+              if (response.ok) {
+                setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
                 toastr.success('Création réussie !');
                 setOpen(false);
-                history.push(`/person/${res.data._id}`);
+                history.push(`/person/${response.decryptedData._id}`);
               }
+              actions.setSubmitting(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>

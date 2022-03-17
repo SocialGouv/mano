@@ -1,7 +1,5 @@
 import { organisationState } from './auth';
-import useApi from '../services/api';
-import { capture } from '../services/sentry';
-import { atom, selector, useRecoilState, useRecoilValue } from 'recoil';
+import { atom, selector } from 'recoil';
 
 export const territoryObservationsState = atom({
   key: 'territoryObservationsState',
@@ -16,62 +14,6 @@ export const customFieldsObsSelector = selector({
     return defaultCustomFields;
   },
 });
-
-export const useTerritoryObservations = () => {
-  const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
-
-  const API = useApi();
-
-  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-
-  const deleteTerritoryObs = async (id) => {
-    const res = await API.delete({ path: `/territory-observation/${id}` });
-    if (res.ok) {
-      setTerritoryObs((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
-    }
-    return res;
-  };
-
-  const addTerritoryObs = async (obs) => {
-    try {
-      const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
-      if (res.ok) {
-        setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
-      }
-      return res;
-    } catch (error) {
-      capture('error in creating obs' + error, { extra: { error, obs } });
-      return { ok: false, error: error.message };
-    }
-  };
-
-  const updateTerritoryObs = async (obs) => {
-    try {
-      const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
-      if (res.ok) {
-        setTerritoryObs((territoryObservations) =>
-          territoryObservations.map((a) => {
-            if (a._id === obs._id) return res.decryptedData;
-            return a;
-          })
-        );
-      }
-      return res;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in creating obs', obs } });
-      return { ok: false, error: error.message };
-    }
-  };
-
-  return {
-    territoryObservations,
-    customFieldsObs,
-    setTerritoryObs,
-    deleteTerritoryObs,
-    addTerritoryObs,
-    updateTerritoryObs,
-  };
-};
 
 export const defaultCustomFields = [
   {

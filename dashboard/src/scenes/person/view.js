@@ -7,7 +7,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import Header from '../../components/header';
@@ -19,7 +19,6 @@ import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import {
-  usePersons,
   addressDetails,
   addressDetailsFixedFields,
   employmentOptions,
@@ -30,18 +29,26 @@ import {
   reasonsOptions,
   ressourcesOptions,
   yesNoOptions,
+  personsState,
+  customFieldsPersonsSocialSelector,
+  customFieldsPersonsMedicalSelector,
+  preparePersonForEncryption,
+  commentForUpdatePerson,
 } from '../../recoil/persons';
-import { useActions } from '../../recoil/actions';
+import { actionsState } from '../../recoil/actions';
 import UserName from '../../components/UserName';
 import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
 import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
-import { organisationState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
 import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
+import useApi from '../../services/api';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -49,7 +56,7 @@ const View = () => {
   const { id } = useParams();
   const location = useLocation();
   const history = useHistory();
-  const { persons } = usePersons();
+  const persons = useRecoilValue(personsState);
   const organisation = useRecoilValue(organisationState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [tabsContents, setTabsContents] = useState(initTabs);
@@ -126,13 +133,45 @@ const View = () => {
 
 const Summary = ({ person }) => {
   const history = useHistory();
-  const { updatePerson, deletePerson, customFieldsPersonsMedical, customFieldsPersonsSocial } = usePersons();
+  const setPersons = useSetRecoilState(personsState);
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [comments, setComments] = useRecoilState(commentsState);
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+  const API = useApi();
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deletePerson(person._id);
-      if (res?.ok) {
+      const personRes = await API.delete({ path: `/person/${person._id}` });
+      if (personRes.ok) {
+        setPersons((persons) => persons.filter((p) => p._id !== person._id));
+        for (const action of actions.filter((a) => a.person === person._id)) {
+          const actionRes = await API.delete({ path: `/action/${action._id}` });
+          if (actionRes.ok) {
+            setActions((actions) => actions.filter((a) => a._id !== action._id));
+            for (let comment of comments.filter((c) => c.action === action._id)) {
+              const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+              if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
+            }
+          }
+        }
+        for (let comment of comments.filter((c) => c.person === person._id)) {
+          const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+          if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
+        }
+        for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === person._id)) {
+          const relRes = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+          if (relRes.ok) {
+            setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+          }
+        }
+      }
+      if (personRes?.ok) {
         toastr.success('Suppression réussie');
         history.goBack();
       }
@@ -151,8 +190,28 @@ const Summary = ({ person }) => {
         onSubmit={async (body) => {
           if (!body.createdAt) body.createdAt = person.createdAt;
           body.entityKey = person.entityKey;
-          const res = await updatePerson(body);
-          if (res.ok) {
+          const response = await API.put({
+            path: `/person/${person._id}`,
+            body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
+          });
+          if (response.ok) {
+            const newPerson = response.decryptedData;
+            setPersons((persons) =>
+              persons.map((p) => {
+                if (p._id === person._id) return newPerson;
+                return p;
+              })
+            );
+            const comment = commentForUpdatePerson({ newPerson, oldPerson: person });
+            if (comment) {
+              comment.user = user._id;
+              comment.team = currentTeam._id;
+              comment.organisation = organisation._id;
+              const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+              if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
+            }
+          }
+          if (response.ok) {
             toastr.success('Mis à jour !');
           }
         }}>
@@ -398,7 +457,7 @@ const Summary = ({ person }) => {
 };
 
 const Actions = ({ person, onUpdateResults }) => {
-  const { actions } = useActions();
+  const actions = useRecoilValue(actionsState);
   const [data, setData] = useState([]);
   const history = useHistory();
 

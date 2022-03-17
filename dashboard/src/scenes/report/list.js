@@ -7,17 +7,17 @@ import { theme } from '../../config';
 import styled from 'styled-components';
 import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday, isOnSameDay } from '../../services/date';
 import { currentTeamState } from '../../recoil/auth';
-import { reportsState, useReports } from '../../recoil/reports';
+import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
+import useApi from '../../services/api';
+import dayjs from 'dayjs';
+import { currentTeamReportsSelector } from '../../recoil/selectors';
 
 const List = () => {
-  const currentTeam = useRecoilValue(currentTeamState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const allReports = useRecoilValue(reportsState);
   const loading = useRecoilValue(loadingState);
-
-  const reports = allReports.filter((r) => r.team === currentTeam._id);
+  const currentTeam = useRecoilValue(currentTeamState);
 
   return (
     <>
@@ -32,25 +32,30 @@ const List = () => {
         loading={!!loading}
       />
       {getMonths().map((date, index) => (
-        <HitMonth debug={index === 0} date={date} key={date} reports={reports} team={currentTeam} />
+        <HitMonth debug={index === 0} date={date} key={date} />
       ))}
     </>
   );
 };
 
-const HitMonth = ({ date, reports, team, debug }) => {
+const HitMonth = ({ date, debug }) => {
+  const currentTeam = useRecoilValue(currentTeamState);
+  const reports = useRecoilValue(currentTeamReportsSelector);
   const [isOpen, setIsOpen] = useState(true);
   const [submiting, setSubmiting] = useState(false);
-  const { addReport } = useReports();
+  const API = useApi();
+  const setReports = useSetRecoilState(reportsState);
 
   const history = useHistory();
 
   const createReport = async (date) => {
     if (submiting) return;
     setSubmiting(true);
-
-    const res = await addReport(date, team._id);
+    const existingReport = reports.find((r) => r.date === date && r.team === currentTeam._id);
+    if (!!existingReport) return history.push(`/report/${existingReport._id}`);
+    const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date }) });
     if (!res.ok) return;
+    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
     history.push(`/report/${res.data._id}`);
   };
 

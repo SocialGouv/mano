@@ -26,7 +26,7 @@ import { actionsState } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
-import { useTerritories } from '../../recoil/territory';
+import { territoriesState } from '../../recoil/territory';
 import { passagesNonAnonymousPerDatePerTeamSelector } from '../../recoil/selectors';
 import { dayjsInstance } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
@@ -54,7 +54,7 @@ const Stats = () => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const { territories } = useTerritories();
+  const territories = useRecoilValue(territoriesState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const loading = useRecoilValue(loadingState);
   const [territory, setTerritory] = useState(null);
