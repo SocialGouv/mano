@@ -10,9 +10,8 @@ import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
-import BackButton from '../../components/backButton';
 import CreateAction from '../action/CreateAction';
 import Comments from '../../components/Comments';
 import ActionStatus from '../../components/ActionStatus';
@@ -70,9 +69,8 @@ const View = () => {
   const person = persons.find((p) => p._id === id) || {};
 
   return (
-    <StyledContainer style={{ padding: '40px 0' }}>
-      <Header
-        title={<BackButton />}
+    <StyledContainer>
+      <SmallerHeaderWithBackButton
         onRefresh={() =>
           setRefreshTrigger({
             status: true,

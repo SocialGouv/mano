@@ -7,9 +7,8 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
-import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
 import useApi from '../../services/api';
 
@@ -39,7 +38,7 @@ const View = () => {
 
   return (
     <>
-      <Header title={<BackButton />} />
+      <SmallerHeaderWithBackButton />
       <Box>
         <Formik
           initialValues={structure}
