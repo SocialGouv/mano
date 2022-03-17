@@ -1,3 +1,10 @@
+# [1.75.0](https://github.com/SocialGouv/mano/compare/v1.74.0...v1.75.0) (2022-03-17)
+
+
+### Features
+
+* **dashboard:**  remove abstractions ([#487](https://github.com/SocialGouv/mano/issues/487)) ([d4a7566](https://github.com/SocialGouv/mano/commit/d4a75665f0fb37e5445919f2490868225b2469a0))
+
 # [1.74.0](https://github.com/SocialGouv/mano/compare/v1.73.1...v1.74.0) (2022-03-16)
 
 
