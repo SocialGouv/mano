@@ -3,7 +3,7 @@ import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
 import Search from '../../components/search';
 import Loading from '../../components/loading';
@@ -121,7 +121,7 @@ const List = () => {
 
   return (
     <>
-      <Header
+      <SmallerHeaderWithBackButton
         title={
           <>
             Personnes suivies par{' '}

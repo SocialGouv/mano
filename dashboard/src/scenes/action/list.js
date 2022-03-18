@@ -4,7 +4,7 @@ import { Col, Row } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import CreateAction from './CreateAction';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
 import SelectStatus from '../../components/SelectStatus';
 import Loading from '../../components/loading';
@@ -23,6 +23,7 @@ import { commentsState } from '../../recoil/comments';
 import { currentTeamState } from '../../recoil/auth';
 import { personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
+import ButtonCustom from '../../components/ButtonCustom';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
@@ -35,6 +36,7 @@ const List = () => {
   const persons = useRecoilValue(personsWithPlacesSelector);
   const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
   const [showAs, setShowAs] = useState(new URLSearchParams(location.search)?.get('showAs') || showAsOptions[0]); // calendar, list
+  const [showSearchOptions, setShowSearchOptions] = useState(false);
   // List of actions filtered by current team and selected status.
   const actionsByTeamAndStatus = useMemo(
     () => (status ? actions.filter((action) => action.team === currentTeam._id && action.status === status) : []),
@@ -76,7 +78,7 @@ const List = () => {
 
   return (
     <>
-      <Header
+      <SmallerHeaderWithBackButton
         titleStyle={{ fontWeight: '400' }}
         title={
           <span>
@@ -84,23 +86,8 @@ const List = () => {
           </span>
         }
       />
-      <Row style={{ marginBottom: 40, justifyContent: 'center' }}>
-        <Col>
-          <CreateAction disabled={!currentTeam} isMulti refreshable />
-        </Col>
-      </Row>
-      <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
-          <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
-        </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par status : </span>
-          <div style={{ width: 300 }}>
-            <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
-          </div>
-        </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+      <Row style={{ marginBottom: 20, justifyContent: 'center' }}>
+        <Col md={6} style={{ display: 'flex', alignItems: 'center' }}>
           <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Afficher par : </span>
           <div style={{ width: 300 }}>
             <SelectCustom
@@ -114,7 +101,31 @@ const List = () => {
             />
           </div>
         </Col>
+        <Col md={6}>
+          <CreateAction disabled={!currentTeam} isMulti refreshable />
+        </Col>
       </Row>
+      {showSearchOptions ? (
+        <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
+          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
+            <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
+          </Col>
+          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par status : </span>
+            <div style={{ width: 300 }}>
+              <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
+            </div>
+          </Col>
+        </Row>
+      ) : (
+        <Row>
+          <Col md={12}>
+            <ButtonCustom title="Rechercher..." onClick={() => setShowSearchOptions(true)} />
+          </Col>
+        </Row>
+      )}
+
       {showAs === showAsOptions[0] && (
         <div style={{ minHeight: '100vh' }}>
           {' '}

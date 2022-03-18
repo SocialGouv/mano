@@ -5,7 +5,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
@@ -22,7 +22,7 @@ const List = () => {
 
   return (
     <>
-      <Header titleStyle={{ fontWeight: 400 }} title="Équipes" />
+      <SmallerHeaderWithBackButton titleStyle={{ fontWeight: 400 }} title="Équipes" />
       <Create />
       <Table
         data={teams}
