@@ -6,6 +6,8 @@ const sequelize = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const Passage = require("../models/passage");
+const Comment = require("../models/comment");
+const Report = require("../models/report");
 const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
 const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
@@ -49,23 +51,37 @@ router.put(
                 encrypted: z.string(),
                 encryptedEntityKey: z.string(),
               })
-            ).parse(req.body.passages);
+            ).parse(req.body.newPassages);
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.reportsToMigrate);
           } catch (e) {
             const error = new Error(`Invalid request in report creation: ${e}`);
             error.status = 400;
             throw error;
           }
-          for (const passage of req.body.passages) {
+          for (const passage of req.body.newPassages) {
             await Passage.create({
               encrypted: passage.encrypted,
               encryptedEntityKey: passage.encryptedEntityKey,
               organisation: req.user.organisation,
             });
           }
-          // for (const _id of req.body.commentIdsToDelete) {
-          //   const comment = await Comment.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
-          //   if (comment) await comment.destroy();
-          // }
+          for (const _id of req.body.commentIdsToDelete) {
+            const comment = await Comment.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (comment) await comment.destroy();
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.reportsToMigrate) {
+            const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (report) {
+              report.set({ encrypted, encryptedEntityKey });
+              await report.save();
+            }
+          }
         }
 
         organisation.set({

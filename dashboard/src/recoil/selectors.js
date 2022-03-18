@@ -102,27 +102,3 @@ export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
         });
     },
 });
-
-export const numberOfPassagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'numberOfPassagesNonAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const nonAnonymousPassages = get(
-        passagesNonAnonymousPerDatePerTeamSelector({
-          date: { startDate: date, endDate: date },
-        })
-      );
-      return nonAnonymousPassages?.length || 0;
-    },
-});
-
-export const numberOfPassagesAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'numberOfPassagesAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const todaysReports = get(reportPerDateSelector({ date }));
-      return todaysReports?.passages || 0;
-    },
-});

@@ -16,7 +16,7 @@ import { territoryObservationsState } from '../recoil/territoryObservations';
 import { commentsState } from '../recoil/comments';
 import { capture } from '../services/sentry';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
-import { reportsState } from '../recoil/reports';
+import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 
@@ -98,7 +98,7 @@ const Loader = () => {
     if (!organisation.migrations?.includes('passages-from-comments-to-table')) {
       await new Promise((res) => setTimeout(res, 500));
       setLoading('Mise-à-jour des données de votre organisation, veuillez patienter quelques instants...');
-      const reportsToMigrate = await getData({
+      const allReports = await getData({
         collectionName: 'report',
         data: reports,
         isInitialization: initialLoad,
@@ -117,17 +117,16 @@ const Loader = () => {
         API,
       });
       // Anonymous passages
+      const reportsToMigrate = allReports.filter((r) => r.passages > 0);
       const newPassages = [];
       for (const report of reportsToMigrate) {
-        if (report.passages > 0) {
-          for (let i = 1; i <= report.passages; i++) {
-            newPassages.push({
-              person: null,
-              team: report.team,
-              user: null,
-              date: dayjs(report.date).add(teams.find((t) => t._id === report.team).nightSession ? 12 : 0, 'hour'),
-            });
-          }
+        for (let i = 1; i <= report.passages; i++) {
+          newPassages.push({
+            person: null,
+            team: report.team,
+            user: null,
+            date: dayjs(report.date).add(teams.find((t) => t._id === report.team).nightSession ? 12 : 0, 'hour'),
+          });
         }
       }
       const passagesComments = commentsToMigrate.filter((c) => c?.comment?.includes('Passage enregistré'));
@@ -142,13 +141,22 @@ const Loader = () => {
       const commentIdsToDelete = passagesComments.map((p) => p._id);
       setComments((comments) => comments.filter((c) => !commentIdsToDelete.includes(c._id)));
       const encryptedPassages = await Promise.all(newPassages.map(preparePassageForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
-      await API.put({
+      const encryptedReportsToMigrate = await Promise.all(reportsToMigrate.map(prepareReportForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const response = await API.put({
         path: `/migration/passages-from-comments-to-table`,
         body: {
-          passages: encryptedPassages,
+          newPassages: encryptedPassages,
           commentIdsToDelete,
+          reportsToMigrate: encryptedReportsToMigrate,
         },
       });
+      if (!response.ok) {
+        if (response.error) {
+          setLoading(response.error);
+          setProgress(1);
+        }
+        return;
+      }
     }
 
     /*

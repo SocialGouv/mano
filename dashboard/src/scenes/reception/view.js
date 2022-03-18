@@ -5,11 +5,7 @@ import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
-import {
-  currentTeamReportsSelector,
-  numberOfPassagesAnonymousPerDatePerTeamSelector,
-  numberOfPassagesNonAnonymousPerDatePerTeamSelector,
-} from '../../recoil/selectors';
+import { currentTeamReportsSelector } from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
