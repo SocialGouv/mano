@@ -6,11 +6,10 @@ import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
-import BackButton from '../../components/backButton';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, teamsState } from '../../recoil/auth';
 import useApi from '../../services/api';
@@ -48,7 +47,7 @@ const View = () => {
 
   return (
     <>
-      <Header title={<BackButton />} />
+      <SmallerHeaderWithBackButton />
       <Box>
         <Formik
           initialValues={team}

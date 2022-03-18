@@ -7,9 +7,8 @@ import { Formik } from 'formik';
 
 import 'react-datepicker/dist/react-datepicker.css';
 
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
-import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
 import ButtonCustom from '../../components/ButtonCustom';
 
@@ -53,8 +52,7 @@ const View = () => {
 
   return (
     <>
-      <Header
-        title={<BackButton />}
+      <SmallerHeaderWithBackButton
         onRefresh={() =>
           setRefreshTrigger({
             status: true,

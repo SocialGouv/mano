@@ -7,10 +7,9 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
-import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectCustom from '../../components/SelectCustom';
@@ -47,7 +46,7 @@ const View = () => {
 
   return (
     <>
-      <Header title={<BackButton />} />
+      <SmallerHeaderWithBackButton />
       <Box>
         <Formik
           initialValues={localUser}
