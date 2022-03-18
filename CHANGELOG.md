@@ -1,3 +1,10 @@
+## [1.76.1](https://github.com/SocialGouv/mano/compare/v1.76.0...v1.76.1) (2022-03-18)
+
+
+### Bug Fixes
+
+* **app:** can delete territory ([#499](https://github.com/SocialGouv/mano/issues/499)) ([210d623](https://github.com/SocialGouv/mano/commit/210d623289d0aa2fadb1ef3771978a221541fad4))
+
 # [1.76.0](https://github.com/SocialGouv/mano/compare/v1.75.0...v1.76.0) (2022-03-17)
 
 
