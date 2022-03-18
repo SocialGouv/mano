@@ -250,7 +250,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                   <br />
                   <ButtonCustom
                     color="info"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !field.label}
                     loading={isSubmitting}
                     onClick={() => !isSubmitting && handleSubmit()}
                     title="Enregistrer"
