@@ -188,6 +188,7 @@ const Container = styled.div`
   justify-content: center;
   border-bottom: 1px solid #ddd;
   width: 100%;
+  z-index: 1000;
 `;
 
 const Subcontainer = styled.div`
