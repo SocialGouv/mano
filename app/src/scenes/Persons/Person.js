@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, Modal } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -23,6 +23,11 @@ import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { MMKV } from '../../services/dataManagement';
+import ScrollContainer from '../../components/ScrollContainer';
+import InputLabelled from '../../components/InputLabelled';
+import ButtonsContainer from '../../components/ButtonsContainer';
+import ButtonDelete from '../../components/ButtonDelete';
+import { SubTitle } from '../../components/Title';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -42,6 +47,9 @@ const Person = ({ route, navigation }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [nameConfirm, setNameConfirm] = useState('');
 
   const personDB = useMemo(() => persons.find((p) => p._id === route.params?._id), [persons, route.params?._id]);
 
@@ -158,18 +166,16 @@ const Person = ({ route, navigation }) => {
     return true;
   };
 
-  const onDeleteRequest = () => {
-    Alert.alert('Voulez-vous vraiment supprimer cette personne ?', 'Cette opération est irréversible.', [
-      {
-        text: 'Supprimer',
-        style: 'destructive',
-        onPress: onDelete,
-      },
-      {
-        text: 'Annuler',
-        style: 'cancel',
-      },
-    ]);
+  const onDeleteRequest = () => setShowConfirmDelete(true);
+  const onDeleteConfirm = () => {
+    if (!nameConfirm) return Alert.alert('Le nom est obligatoire');
+    if (nameConfirm.trim().toLocaleLowerCase() !== personDB?.name.trim().toLocaleLowerCase()) {
+      return Alert.alert('Le nom de la personne est incorrect');
+    }
+    if (nameConfirm.trim() !== personDB?.name.trim()) {
+      return Alert.alert('Veuillez respecter les minuscules/majuscules');
+    }
+    onDelete();
   };
 
   const onDelete = async () => {
@@ -232,6 +238,8 @@ const Person = ({ route, navigation }) => {
       'person',
       persons.filter((p) => p._id !== personDB._id)
     );
+    setShowConfirmDelete(false);
+    setDeleting(false);
     Alert.alert('Personne supprimée !');
     onBack();
   };
@@ -293,68 +301,93 @@ const Person = ({ route, navigation }) => {
   };
 
   return (
-    <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey} testID="person">
-      <ScreenTitle
-        title={person.name}
-        onBack={onGoBackRequested}
-        onEdit={!editable ? onEdit : null}
-        onSave={!editable || isUpdateDisabled ? null : onUpdatePerson}
-        saving={updating}
-        backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-        testID="person"
-      />
-      <TabNavigator.Navigator
-        tabBar={(props) => (
-          <Tabs
-            numberOfTabs={2}
-            {...props}
-            backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
-          />
-        )}
-        lazy
-        removeClippedSubviews={Platform.OS === 'android'}
-        swipeEnabled>
-        <TabNavigator.Screen name="Summary" options={{ tabBarLabel: 'Résumé' }}>
-          {() => (
-            <PersonSummary
-              navigation={navigation}
-              route={route}
-              person={person}
-              personDB={personDB}
-              backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-              onChange={onChange}
-              onUpdatePerson={onUpdatePerson}
-              writeComment={setWritingComment}
-              onEdit={onEdit}
-              isUpdateDisabled={isUpdateDisabled}
-              onDeleteRequest={onDeleteRequest}
-              updating={updating}
-              deleting={deleting}
-              editable={editable}
+    <>
+      <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey} testID="person">
+        <ScreenTitle
+          title={person.name}
+          onBack={onGoBackRequested}
+          onEdit={!editable ? onEdit : null}
+          onSave={!editable || isUpdateDisabled ? null : onUpdatePerson}
+          saving={updating}
+          backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+          testID="person"
+        />
+        <TabNavigator.Navigator
+          tabBar={(props) => (
+            <Tabs
+              numberOfTabs={2}
+              {...props}
+              backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
             />
           )}
-        </TabNavigator.Screen>
-        <TabNavigator.Screen name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
-          {() => (
-            <FoldersNavigator
-              navigation={navigation}
-              route={route}
-              person={person}
-              personDB={personDB}
-              backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-              onChange={onChange}
-              onUpdatePerson={onUpdatePerson}
-              onEdit={onEdit}
-              isUpdateDisabled={isUpdateDisabled}
-              onDeleteRequest={onDeleteRequest}
-              editable={editable}
-              updating={updating}
-              deleting={deleting}
+          lazy
+          removeClippedSubviews={Platform.OS === 'android'}
+          swipeEnabled>
+          <TabNavigator.Screen name="Summary" options={{ tabBarLabel: 'Résumé' }}>
+            {() => (
+              <PersonSummary
+                navigation={navigation}
+                route={route}
+                person={person}
+                personDB={personDB}
+                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+                onChange={onChange}
+                onUpdatePerson={onUpdatePerson}
+                writeComment={setWritingComment}
+                onEdit={onEdit}
+                isUpdateDisabled={isUpdateDisabled}
+                onDeleteRequest={onDeleteRequest}
+                updating={updating}
+                deleting={deleting}
+                editable={editable}
+              />
+            )}
+          </TabNavigator.Screen>
+          <TabNavigator.Screen name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
+            {() => (
+              <FoldersNavigator
+                navigation={navigation}
+                route={route}
+                person={person}
+                personDB={personDB}
+                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+                onChange={onChange}
+                onUpdatePerson={onUpdatePerson}
+                onEdit={onEdit}
+                isUpdateDisabled={isUpdateDisabled}
+                onDeleteRequest={onDeleteRequest}
+                editable={editable}
+                updating={updating}
+                deleting={deleting}
+              />
+            )}
+          </TabNavigator.Screen>
+        </TabNavigator.Navigator>
+      </SceneContainer>
+      <Modal animationType="fade" visible={!!showConfirmDelete}>
+        <SceneContainer>
+          <ScreenTitle title={`Voulez-vous vraiment supprimer ${personDB?.name} ?`} onBack={() => setShowConfirmDelete(false)} />
+          <ScrollContainer>
+            <SubTitle>
+              Cette opération est irréversible et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;: {'\n'}actions,
+              commentaires, lieux visités, passages, documents...
+            </SubTitle>
+            <SubTitle>Veuillez taper le nom de la personne pour confirmer en respectant les majuscules, minuscules ou accents</SubTitle>
+            <InputLabelled
+              label="Nom"
+              value={nameConfirm}
+              onChangeText={setNameConfirm}
+              placeholder={personDB?.name}
+              editable
+              onSubmitEditing={onDeleteConfirm}
             />
-          )}
-        </TabNavigator.Screen>
-      </TabNavigator.Navigator>
-    </SceneContainer>
+            <ButtonsContainer>
+              <ButtonDelete onPress={onDeleteConfirm} deleting={deleting} />
+            </ButtonsContainer>
+          </ScrollContainer>
+        </SceneContainer>
+      </Modal>
+    </>
   );
 };
 
