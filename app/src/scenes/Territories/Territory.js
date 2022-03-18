@@ -30,7 +30,7 @@ const Territory = ({ route, navigation }) => {
   const [territory, setTerritory] = useState(castToTerritory(route?.params));
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territoryObservations = useMemo(
-    () => allTerritoryOservations.filter((obs) => obs.territory === territoryDB._id),
+    () => allTerritoryOservations.filter((obs) => obs.territory === territoryDB?._id),
     [territoryDB, allTerritoryOservations]
   );
 
@@ -100,23 +100,21 @@ const Territory = ({ route, navigation }) => {
 
   const onDelete = async () => {
     const response = await API.delete({ path: `/territory/${territoryDB._id}` });
+    if (response.error) return Alert.alert(response.error);
     if (response.ok) {
+      for (let obs of territoryObservations.filter((o) => o.territory === territoryDB._id)) {
+        await API.delete({ path: `/territory-observation/${obs._id}` });
+        setTerritoryObservations((obs) => obs.filter((o) => o.territory !== territoryDB._id));
+        await MMKV.setMapAsync(
+          'territory-observation',
+          allTerritoryOservations.filter((o) => o.territory !== territoryDB._id)
+        );
+      }
       setTerritories((territories) => territories.filter((t) => t._id !== territoryDB._id));
       await MMKV.setMapAsync(
         'territory',
         territories.filter((t) => t._id !== territoryDB._id)
       );
-      for (let obs of territoryObservations.filter((o) => o.territory === territoryDB._id)) {
-        await API.delete({ path: `/territory-observation/${obs.id}` });
-      }
-      setTerritoryObservations((obs) => obs.filter((o) => o.territory !== territoryDB._id));
-      await MMKV.setMapAsync(
-        'territory-observation',
-        allTerritoryOservations.filter((o) => o.territory !== territoryDB._id)
-      );
-    }
-    if (response.error) return Alert.alert(response.error);
-    if (response.ok) {
       Alert.alert('Territoire supprimé !');
       onBack();
     }
