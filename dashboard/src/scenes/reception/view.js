@@ -90,7 +90,7 @@ const Reception = () => {
 
   const [reports, setReports] = useRecoilState(reportsState);
   const setPassages = useSetRecoilState(passagesState);
-  const passages = useSetRecoilState(todaysPassagesSelector);
+  const passages = useRecoilValue(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
@@ -99,9 +99,6 @@ const Reception = () => {
   const collectionsToLoad = useRecoilValue(collectionsToLoadState);
   const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
   const API = useApi();
-
-  const anonymousPassages = useMemo((passages) => passages.filter((p) => !p.person), [passages]);
-  const nonAnonymousPassages = useMemo((passages) => passages.filter((p) => !!p.person), [passages]);
 
   const persons = useRecoilValue(personsState);
 
@@ -162,7 +159,7 @@ const Reception = () => {
     await updateReport(reportUpdate);
   };
 
-  const incrementPassage = async () => {
+  const onAddAnonymousPassage = async () => {
     const optimisticId = Date.now();
     const newPassage = {
       user: user._id,
@@ -174,7 +171,7 @@ const Reception = () => {
     setPassages((passages) => [newPassage, ...passages]);
     const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
     if (response.ok) {
-      setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId === optimisticId)]);
+      setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
     }
   };
 
@@ -196,7 +193,7 @@ const Reception = () => {
     for (const [index, passage] of Object.entries(newPassages)) {
       const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
       if (response.ok) {
-        setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId === index)]);
+        setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
       }
     }
     setAddingPassage(false);
@@ -256,14 +253,9 @@ const Reception = () => {
           </div>
         </Col>
         <Col md={4}>
-          <Card title="Nombre de passages" count={passages} countId="number-of-passages" unit={`passage${passages > 1 ? 's' : ''}`}>
+          <Card title="Nombre de passages" count={passages.length} countId="number-of-passages" unit={`passage${passages.length > 1 ? 's' : ''}`}>
             <ButtonCustom
-              onClick={async () => {
-                setAddingPassage(true);
-                setPassages((p) => p + 1);
-                await incrementPassage(todaysReport, { newValue: anonymousPassages + 1 });
-                setAddingPassage(false);
-              }}
+              onClick={onAddAnonymousPassage}
               color="link"
               title="Ajouter un passage anonyme"
               padding="0px"
@@ -271,17 +263,10 @@ const Reception = () => {
               disabled={addingPassage}
             />
             <ButtonCustom
-              onClick={async () => {
-                setAddingPassage(true);
-                if (!anonymousPassages) return;
-                setPassages((p) => p - 1);
-                await incrementPassage(todaysReport, { newValue: anonymousPassages - 1 });
-                setAddingPassage(false);
-              }}
+              onClick={() => history.push(`/report/${todaysReport._id}?tab=5`)}
               color="link"
-              title="Retirer un passage anonyme"
+              title="Modifier les passages"
               padding="0px"
-              disabled={addingPassage || !anonymousPassages}
             />
           </Card>
         </Col>

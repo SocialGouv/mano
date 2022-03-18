@@ -4,7 +4,7 @@ import { useHistory } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { personsState } from '../recoil/persons';
 
-export default function ActionPersonName({ item }) {
+export default function PersonName({ item, redirectToTab = 'résumé' }) {
   const history = useHistory();
   const persons = useRecoilValue(personsState);
   const personName = persons.find((p) => p._id === item.person)?.name;
@@ -12,7 +12,7 @@ export default function ActionPersonName({ item }) {
     <BoldOnHover
       onClick={(e) => {
         e.stopPropagation();
-        if (item.person) history.push(`/person/${item.person}`);
+        if (item.person) history.push(`/person/${item.person}?tab=${redirectToTab}`);
       }}>
       {personName}
     </BoldOnHover>

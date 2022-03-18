@@ -41,17 +41,12 @@ import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-  numberOfPassagesAnonymousPerDatePerTeamSelector,
-  numberOfPassagesNonAnonymousPerDatePerTeamSelector,
-  passagesNonAnonymousPerDatePerTeamSelector,
-  currentTeamReportsSelector,
-} from '../../recoil/selectors';
+import { currentTeamReportsSelector } from '../../recoil/selectors';
 import Incrementor from '../../components/Incrementor';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
-import EditPassage from '../../components/EditPassage';
+import Passage from '../../components/Passage';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -248,25 +243,6 @@ const View = () => {
 
 const Reception = ({ report }) => {
   const organisation = useRecoilValue(organisationState);
-  const allPassages = useRecoilValue(passagesState);
-  const currentTeam = useRecoilValue(currentTeamState);
-
-  const passages = useMemo(
-    () =>
-      allPassages
-        .filter((p) => p.team === currentTeam._id)
-        .filter((p) =>
-          getIsDayWithinHoursOffsetOfPeriod(
-            p.date,
-            {
-              referenceStartDay: report?.date,
-              referenceEndDay: report?.date,
-            },
-            currentTeam?.nightSession ? 12 : 0
-          )
-        ).length,
-    [report?.date, allPassages]
-  );
 
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
@@ -308,11 +284,8 @@ const Reception = ({ report }) => {
 
   return (
     <StyledBox>
-      <TabTitle>Accueil</TabTitle>
-      <div style={{ marginLeft: 'auto', marginRight: 'auto', width: '15rem', marginBottom: 15 }}>
-        <Card countId="report-number-of-passages" title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
-      </div>
-      <div style={{ display: 'flex', flexWrap: 'wrap', marginBottom: 20, flexShrink: 0, gap: 5, justifyContent: 'space-evenly' }}>
+      <TabTitle>Services effectués ce jour</TabTitle>
+      <div style={{ display: 'flex', flexWrap: 'wrap', margin: '20px 0', flexShrink: 0, gap: 5, justifyContent: 'space-evenly' }}>
         {renderServices()}
       </div>
     </StyledBox>
@@ -548,11 +521,10 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
 };
 
 const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
-  const history = useHistory();
-
   const allPassages = useRecoilValue(passagesState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const [editPassageId, setEditPassageId] = useState(null);
+  const user = useRecoilValue(userState);
+  const [passageToEdit, setPassageToEdit] = useState(null);
 
   const passages = useMemo(
     () =>
@@ -581,7 +553,20 @@ const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
   return (
     <>
       <StyledBox>
-        <TabTitle>Passages ajoutés le {formatDateWithFullMonth(date)}</TabTitle>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+          <TabTitle>Passages enregistrés le {formatDateWithFullMonth(date)}</TabTitle>
+          <ButtonCustom
+            title="Ajouter un passage ce jour"
+            style={{ marginLeft: 'auto', marginBottom: '10px' }}
+            onClick={() =>
+              setPassageToEdit({
+                date: dayjs(date),
+                user: user._id,
+                team: currentTeam._id,
+              })
+            }
+          />
+        </div>
         <Row style={{ marginBottom: 20 }}>
           <Col md={2} />
           <Col md={4}>
@@ -601,38 +586,45 @@ const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
             />
           </Col>
         </Row>
-        <EditPassage id={editPassageId} onFinished={() => setEditPassageId(null)} />
-        <Table
-          className="Table"
-          onRowClick={(passage) => setEditPassageId(passage._id)}
-          data={passages}
-          rowKey={'_id'}
-          columns={[
-            {
-              title: 'Heure',
-              dataKey: 'date',
-              render: (passage) => {
-                const time = dayjs(passage.date).format('HH:mm');
-                // anonymous comment migrated from `report.passages`
-                // have no time
-                // have no user assigned either
-                if (time === '00:00' && !passage.user) return null;
-                return <span>{time}</span>;
+        <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+        {!!passages.length && (
+          <Table
+            className="Table"
+            onRowClick={setPassageToEdit}
+            data={passages}
+            rowKey={'_id'}
+            columns={[
+              {
+                title: 'Heure',
+                dataKey: 'date',
+                render: (passage) => {
+                  const time = dayjs(passage.date).format('HH:mm');
+                  // anonymous comment migrated from `report.passages`
+                  // have no time
+                  // have no user assigned either
+                  if (time === '00:00' && !passage.user) return null;
+                  return <span>{time}</span>;
+                },
               },
-            },
-            {
-              title: 'Personne suivie',
-              dataKey: 'person',
-              render: (passage) => (passage.person ? <PersonName item={passage} /> : 'Anonyme'),
-            },
-            {
-              title: 'Enregistré par',
-              dataKey: 'user',
-              render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
-            },
-            { title: 'Commentaire', dataKey: 'comment' },
-          ]}
-        />
+              {
+                title: 'Personne suivie',
+                dataKey: 'person',
+                render: (passage) =>
+                  passage.person ? (
+                    <PersonName item={passage} redirectToTab="passages" />
+                  ) : (
+                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
+                  ),
+              },
+              {
+                title: 'Enregistré par',
+                dataKey: 'user',
+                render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+              },
+              { title: 'Commentaire', dataKey: 'comment' },
+            ]}
+          />
+        )}
       </StyledBox>
     </>
   );

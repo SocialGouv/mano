@@ -230,6 +230,25 @@ const Loader = () => {
         setReports(refreshedReports.filter((r) => !!r.team && !!r.date).sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
     }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'report'));
+
+    /*
+    Get passages
+    */
+    if (response.data.passages) {
+      setLoading('Chargement des passages');
+      const refreshedPassages = await getData({
+        collectionName: 'passage',
+        data: passages,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newPassages) =>
+          setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
+        API,
+      });
+      if (refreshedPassages) setPassages(refreshedPassages.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'passage'));
     /*
     Switch to not full screen
     */
@@ -319,25 +338,6 @@ const Loader = () => {
       if (refreshedObs) setTerritoryObs(refreshedObs);
     }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory-observation'));
-
-    /*
-    Get passages
-    */
-    if (response.data.passages) {
-      setLoading('Chargement des passages');
-      const refreshedPassages = await getData({
-        collectionName: 'passage',
-        data: passages,
-        isInitialization: initialLoad,
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newPassages) =>
-          setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
-        API,
-      });
-      if (refreshedPassages) setPassages(refreshedPassages.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'passage'));
     /*
     Get comments
     */

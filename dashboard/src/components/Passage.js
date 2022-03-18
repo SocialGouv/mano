@@ -9,59 +9,79 @@ import { Formik } from 'formik';
 import ButtonCustom from './ButtonCustom';
 import SelectUser from './SelectUser';
 import { teamsState, userState } from '../recoil/auth';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../services/date';
 import useApi from '../services/api';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import SelectTeam from './SelectTeam';
 import SelectPerson from './SelectPerson';
 
-const EditPassage = ({ id, onFinished }) => {
+const Passage = ({ passage, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
   const API = useApi();
 
-  const [passages, setPassages] = useRecoilState(passagesState);
+  const setPassages = useSetRecoilState(passagesState);
 
   useEffect(() => {
-    setOpen(!!id);
-  }, [id]);
+    setOpen(!!passage);
+  }, [passage]);
 
   const onCancelRequest = () => {
     setOpen(false);
     onFinished();
   };
 
-  const passage = useMemo(() => passages.find((p) => p._id === id), [id]);
+  const onDeletePassage = async () => {
+    const confirm = window.confirm('Êtes-vous sûr ?');
+    if (confirm) {
+      const passageRes = await API.delete({ path: `/passage/${passage._id}` });
+      if (passageRes.ok) {
+        toastr.success('Suppression réussie');
+        setOpen(false);
+        setPassages((passages) => passages.filter((p) => p._id !== passage._id));
+      }
+    }
+  };
+
+  const isNew = !passage?._id;
 
   return (
     <>
       <Modal isOpen={!!open && !!passage} toggle={onCancelRequest} size="lg">
-        <ModalHeader toggle={onCancelRequest}>Éditer le passage</ModalHeader>
+        <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer un passage' : 'Éditer le passage'}</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={passage}
             onSubmit={async (body, actions) => {
               if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
-              if (!body.team) return toastr.error('Erreur!', 'La date est obligatoire');
-              const response = await API.put({
-                path: `/passage/${id}`,
-                body: preparePassageForEncryption(body),
-              });
+              if (!body.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
+
+              const response = isNew
+                ? await API.post({
+                    path: '/passage',
+                    body: preparePassageForEncryption(body),
+                  })
+                : await API.put({
+                    path: `/passage/${passage._id}`,
+                    body: preparePassageForEncryption(body),
+                  });
               if (response.ok) {
                 setPassages((passages) =>
-                  passages.map((p) => {
-                    if (p._id === id) return response.decryptedData;
-                    return p;
-                  })
+                  isNew
+                    ? [response.decryptedData, ...passages]
+                    : passages.map((p) => {
+                        if (p._id === passage._id) return response.decryptedData;
+                        return p;
+                      })
                 );
               }
               if (!response.ok) return;
               setOpen(false);
               onFinished();
-              toastr.success('Passage mis-à-jour');
+              toastr.success(isNew ? 'Passage enregistré' : 'Passage mis-à-jour');
               actions.setSubmitting(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -117,13 +137,12 @@ const EditPassage = ({ id, onFinished }) => {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom
-                  type="submit"
-                  color="info"
-                  disabled={isSubmitting}
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
+                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                  {!isNew && (
+                    <ButtonCustom title="Supprimer" type="button" style={{ marginRight: 10 }} color="danger" onClick={onDeletePassage} width={200} />
+                  )}
+                  <ButtonCustom title="Enregistrer" loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} width={200} />
+                </div>
               </React.Fragment>
             )}
           </Formik>
@@ -133,4 +152,4 @@ const EditPassage = ({ id, onFinished }) => {
   );
 };
 
-export default EditPassage;
+export default Passage;

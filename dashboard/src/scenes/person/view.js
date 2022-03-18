@@ -50,7 +50,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import DeletePerson from './DeletePerson';
 import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
-import EditPassage from '../../components/EditPassage';
+import Passage from '../../components/Passage';
 
 const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -470,7 +470,9 @@ const Actions = ({ person, onUpdateResults }) => {
 const Passages = ({ personId, onUpdateResults }) => {
   const passages = useRecoilValue(passagesState);
   const personPassages = useMemo(() => passages.filter((passage) => passage.person === personId), [personId, passages]);
-  const [editPassageId, setEditPassageId] = useState(null);
+  const [passageToEdit, setPassageToEdit] = useState(null);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
 
   useEffect(() => {
     onUpdateResults(personPassages.length);
@@ -480,12 +482,23 @@ const Passages = ({ personId, onUpdateResults }) => {
     <React.Fragment>
       <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
         <Title>Passages</Title>
+        <ButtonCustom
+          title="Ajouter un passage"
+          style={{ marginLeft: 'auto', marginBottom: '10px' }}
+          onClick={() =>
+            setPassageToEdit({
+              user: user._id,
+              team: currentTeam._id,
+              person: personId,
+            })
+          }
+        />
       </div>
-      <EditPassage id={editPassageId} onFinished={() => setEditPassageId(null)} />
+      <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
       <Table
         data={personPassages}
         rowKey={'_id'}
-        onRowClick={(passage) => setEditPassageId(passage._id)}
+        onRowClick={(passage) => setPassageToEdit(passage)}
         columns={[
           {
             title: 'Date',
