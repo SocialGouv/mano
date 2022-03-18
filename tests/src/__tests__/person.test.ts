@@ -436,10 +436,9 @@ describe("Organisation CRUD", () => {
     );
     await expect(page).toClick("button", { text: "Ajouter un passage" });
     await page.waitForTimeout(1000);
-    expect(await getInputValue("input#number-of-passages")).toBe("1");
+    expect(await getInnerText("span#number-of-passages")).toBe("1");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     await expect(page).toClick("a", { text: "Passages (1)" });
-    await expect(page).toMatch("Passage enregistré");
   });
 });

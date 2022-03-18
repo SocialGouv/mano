@@ -72,7 +72,7 @@ const Loader = () => {
   const setCollectionsToLoad = useSetRecoilState(collectionsToLoadState);
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
-  const organisation = useRecoilValue(organisationState);
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
   const teams = useRecoilValue(teamsState);
   const organisationId = organisation?._id;
 
@@ -157,6 +157,7 @@ const Loader = () => {
         }
         return;
       }
+      setOrganisation(response.organisation);
     }
 
     /*
@@ -260,8 +261,7 @@ const Loader = () => {
     /*
     Switch to not full screen
     */
-    const forceFullScreenBecauseMigration = !organisation.migrations?.includes('passages-from-comments-to-table');
-    setFullScreen(forceFullScreenBecauseMigration);
+    setFullScreen(false);
 
     /*
     Get actions

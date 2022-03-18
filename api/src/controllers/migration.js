@@ -97,8 +97,27 @@ router.put(
       await organisation.save();
       throw e;
     }
-
-    return res.status(200).send({ ok: true });
+    return res.status(200).send({
+      ok: true,
+      organisation: {
+        _id: organisation._id,
+        name: organisation.name,
+        createdAt: organisation.createdAt,
+        updatedAt: organisation.updatedAt,
+        categories: organisation.categories,
+        encryptionEnabled: organisation.encryptionEnabled,
+        encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
+        receptionEnabled: organisation.receptionEnabled,
+        services: organisation.services,
+        collaborations: organisation.collaborations,
+        customFieldsObs: organisation.customFieldsObs,
+        encryptedVerificationKey: organisation.encryptedVerificationKey,
+        customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
+        customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
+        migrations: organisation.migrations,
+        migrationLastUpdateAt: organisation.migrationLastUpdateAt,
+      },
+    });
   })
 );
 

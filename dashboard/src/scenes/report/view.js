@@ -7,7 +7,6 @@ import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
 import {
   addOneDay,
-  formatDateTimeWithNameOfDay,
   formatDateWithFullMonth,
   formatTime,
   getIsDayWithinHoursOffsetOfDay,
