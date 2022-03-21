@@ -75,7 +75,7 @@ export const defaultCustomFields = [
   },
 ];
 
-const compulsoryEncryptedFields = ['territory', 'user', 'team'];
+const compulsoryEncryptedFields = ['territory', 'user', 'team', 'observedAt'];
 
 export const prepareObsForEncryption = (customFields) => (obs) => {
   const encryptedFields = [...customFields.map((f) => f.name), ...compulsoryEncryptedFields];
