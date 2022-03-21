@@ -36,7 +36,7 @@ const TerritoryObservation = ({ route, navigation }) => {
       }
       return {
         ...toReturn,
-        createdAt: territoryObservation.createdAt || null,
+        observedAt: territoryObservation.observedAt || territoryObservation.createdAt || null,
         user: territoryObservation.user || {},
         entityKey: territoryObservation.entityKey || '',
       };
@@ -85,6 +85,7 @@ const TerritoryObservation = ({ route, navigation }) => {
         Object.assign({}, castToTerritoryObservation(obs), {
           territory: route.params.territory._id,
           user: user._id,
+          observedAt: new Date(),
           team: currentTeam._id,
           organisation: organisation._id,
         })
@@ -227,7 +228,7 @@ const TerritoryObservation = ({ route, navigation }) => {
       />
       <ScrollContainer ref={scrollViewRef} testID="observation">
         <View>
-          <CreatedAt>{new Date(obs?.createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
+          <CreatedAt>{new Date(obs?.observedAt || obs?.createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
           {customFieldsObs
             .filter((f) => f)
             .filter((f) => f.enabled)

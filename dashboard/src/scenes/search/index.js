@@ -468,11 +468,11 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
           columns={[
             {
               title: 'Date',
-              dataKey: 'createdAt',
+              dataKey: 'observedAt',
               render: (obs) => (
                 <span>
-                  {dayjs(obs.createdAt).format('ddd DD/MM/YY')}
-                  <br />à {dayjs(obs.createdAt).format('HH:mm')}
+                  {dayjs(obs.observedAt || obs.createdAt).format('ddd DD/MM/YY')}
+                  <br />à {dayjs(obs.observedAt || obs.createdAt).format('HH:mm')}
                 </span>
               ),
             },
