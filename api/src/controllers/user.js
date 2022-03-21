@@ -51,6 +51,7 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
     role: user.role,
+    healthcareProfessional: user.healthcareProfessional,
     lastChangePasswordAt: user.lastChangePasswordAt,
     termsAccepted: user.termsAccepted,
     teams: teams.map((t) => ({
@@ -244,6 +245,7 @@ router.post(
     try {
       z.string().min(1).parse(req.body.name);
       z.string().email().parse(req.body.email);
+      z.boolean().parse(req.body.healthcareProfessional);
       z.array(z.string().regex(looseUuidRegex)).parse(req.body.team);
       z.enum(["admin", "normal"]).parse(req.body.role);
     } catch (e) {
@@ -252,11 +254,12 @@ router.post(
       return next(error);
     }
 
-    const { name, email, role, team } = req.body;
+    const { name, email, role, team, healthcareProfessional } = req.body;
     const token = crypto.randomBytes(20).toString("hex");
     const newUser = {
       name,
       role,
+      healthcareProfessional,
       email: email.trim().toLowerCase(),
       password: crypto.randomBytes(60).toString("hex"), // A useless password.
       organisation: req.user.organisation,
@@ -305,6 +308,7 @@ Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 1
         name: data.name,
         email: data.email,
         role: data.role,
+        healthcareProfessional: data.healthcareProfessional,
         organisation: data.organisation,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
@@ -357,6 +361,7 @@ router.post(
         createdAt: userWithoutPassword.createdAt,
         updatedAt: userWithoutPassword.updatedAt,
         role: userWithoutPassword.role,
+        healthcareProfessional: userWithoutPassword.healthcareProfessional,
         lastChangePasswordAt: userWithoutPassword.lastChangePasswordAt,
         termsAccepted: userWithoutPassword.termsAccepted,
       },
@@ -390,6 +395,7 @@ router.get(
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
         team: team.map((t) => t._id),
@@ -430,6 +436,7 @@ router.get(
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
         lastLoginAt: user.lastLoginAt,
@@ -502,6 +509,7 @@ router.put(
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
       },
@@ -517,12 +525,14 @@ router.put(
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.optional(z.string().min(1)).parse(req.body.name);
+
       z.string()
         .email()
         .optional()
         .or(z.literal(""))
         .parse((req.body.email || "").trim().toLowerCase());
       z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
+      z.optional(z.boolean()).parse(req.body.healthcareProfessional);
       z.optional(z.enum(["admin", "normal"])).parse(req.body.role);
     } catch (e) {
       const error = new Error(`Invalid request in put user by id: ${e}`);
@@ -531,13 +541,14 @@ router.put(
     }
 
     const _id = req.params._id;
-    const { name, email, team, role } = req.body;
+    const { name, email, team, role, healthcareProfessional } = req.body;
 
     const user = await User.findOne({ where: { _id, organisation: req.user.organisation } });
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
 
     if (name) user.name = name;
     if (email) user.email = email.trim().toLowerCase();
+    if (healthcareProfessional !== undefined) user.healthcareProfessional = healthcareProfessional;
     if (role) user.role = role;
 
     const tx = await User.sequelize.transaction();
@@ -560,6 +571,7 @@ router.put(
         createdAt: user.createdAt,
         updatedAt: user.updatedAt,
         role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
       },

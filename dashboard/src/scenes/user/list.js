@@ -45,6 +45,18 @@ const List = () => {
           { title: 'Nom', dataKey: 'name' },
           { title: 'Email', dataKey: 'email' },
           {
+            title: 'Rôle',
+            dataKey: 'role',
+            render: (user) => {
+              return (
+                <>
+                  <div>{user.role}</div>
+                  {user.healthcareProfessional ? <div>🧑‍⚕️ professionnel de santé</div> : ''}
+                </>
+              );
+            },
+          },
+          {
             title: 'Equipe',
             dataKey: 'teams',
             render: (user) => {
@@ -82,7 +94,7 @@ const Create = ({ onChange }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouvel utilisateur</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '', email: '', role: '', team: [] }}
+            initialValues={{ name: '', email: '', role: '', team: [], healthcareProfessional: false }}
             validate={(values) => {
               const errors = {};
               if (!values.name) errors.name = 'Le nom est obligatoire';
@@ -145,6 +157,21 @@ const Create = ({ onChange }) => {
                         {touched.team && errors.team && <Error>{errors.team}</Error>}
                       </div>
                     </FormGroup>
+                  </Col>
+                  <Col md={12}>
+                    <Label style={{ marginBottom: 0 }}>
+                      <input
+                        type="checkbox"
+                        style={{ marginRight: '0.5rem' }}
+                        name="healthcareProfessional"
+                        checked={values.healthcareProfessional}
+                        onChange={handleChange}
+                      />
+                      Professionnel de santé
+                    </Label>
+                    <div>
+                      <small className="text-muted">Un professionnel de santé à accès au dossier médical complet des personnes.</small>
+                    </div>
                   </Col>
                 </Row>
                 <br />

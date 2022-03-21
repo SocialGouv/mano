@@ -17,6 +17,7 @@ User.init(
     lastChangePasswordAt: DataTypes.DATE,
     forgotPasswordResetToken: DataTypes.TEXT,
     forgotPasswordResetExpires: DataTypes.DATE,
+    healthcareProfessional: DataTypes.BOOLEAN,
     role: { type: DataTypes.TEXT, defaultValue: "normal" },
   },
   {
