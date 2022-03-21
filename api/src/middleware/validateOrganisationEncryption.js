@@ -4,7 +4,7 @@ function dateForCompare(date) {
   return Date.parse(new Date(date));
 }
 
-async function validateOrganisationEncryption(req, res, next) {
+async function validateEncryptionAndMigrations(req, res, next) {
   const { encryptionLastUpdateAt, migrationLastUpdateAt } = req.query;
   const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
 
@@ -46,4 +46,4 @@ async function validateOrganisationEncryption(req, res, next) {
   next();
 }
 
-module.exports = validateOrganisationEncryption;
+module.exports = validateEncryptionAndMigrations;

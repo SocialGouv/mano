@@ -8,7 +8,7 @@ const Organisation = require("../models/organisation");
 const Passage = require("../models/passage");
 const Comment = require("../models/comment");
 const Report = require("../models/report");
-const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
@@ -16,7 +16,7 @@ const validateUser = require("../middleware/validateUser");
 router.put(
   "/:migrationName",
   passport.authenticate("user", { session: false }),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
