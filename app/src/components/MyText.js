@@ -8,7 +8,7 @@ const MyText = styled.Text.attrs({ selectable: true })`
   ${(props) => props.color && `color: ${props.color};`}
 `;
 
-const MyTextInput = styled.TextInput`
+const MyTextInput = styled.TextInput.attrs({ placeholderTextColor: '#ccc' })`
   font-family: NexaRegular;
   color: #000000;
 `;
