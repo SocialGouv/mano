@@ -27,7 +27,7 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
         <UserName id={obs.user} wrapper={(name) => <span className="author">{name}</span>} />
         <i style={{ marginLeft: 10 }}>(équipe {teams.find((t) => obs.team === t._id)?.name})</i>
       </div>
-      <div className="time">{formatDateTimeWithNameOfDay(obs.createdAt)}</div>
+      <div className="time">{formatDateTimeWithNameOfDay(obs.observedAt || obs.createdAt)}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
         {customFieldsObs
           .filter((f) => f)

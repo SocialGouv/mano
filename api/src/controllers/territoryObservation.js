@@ -18,7 +18,6 @@ router.post(
     try {
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
-      if (req.body.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.createdAt);
     } catch (e) {
       const error = new Error(`Invalid request in observation creation: ${e}`);
       error.status = 400;
@@ -29,8 +28,6 @@ router.post(
       encrypted: req.body.encrypted,
       encryptedEntityKey: req.body.encryptedEntityKey,
     };
-    // FIXME: This "createdAt" pattern should be avoided. createdAt should not be updated.
-    if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
 
     const data = await TerritoryObservation.create(newObs, { returning: true });
     return res.status(200).send({
@@ -89,7 +86,6 @@ router.put(
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
-      if (req.body.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.createdAt);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
@@ -102,17 +98,11 @@ router.put(
     const territoryObservation = await TerritoryObservation.findOne(query);
     if (!territoryObservation) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { createdAt, encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey } = req.body;
     const updatedTerritoryObservation = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
     };
-
-    // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
-    if (createdAt) {
-      territoryObservation.changed("createdAt", true);
-      updatedTerritoryObservation.createdAt = new Date(createdAt);
-    }
 
     await TerritoryObservation.update(updatedTerritoryObservation, query, { silent: false });
     const newTerritoryObservation = await TerritoryObservation.findOne(query);

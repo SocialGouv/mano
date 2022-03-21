@@ -52,7 +52,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toFill('textarea[name="comment"]', "No comment");
     await expect(page).toClick("input#observation-custom-select-atmosphere");
     await expect(page).toClick("div.observation-custom-select-atmosphere__option");
-    await expect(page).toFill("input#observation-createdat", "20/04/2019");
+    await expect(page).toFill("input#observation-observedat", "20/04/2019");
     await page.keyboard.press("Escape");
     await expect(page).toClick("input#observation-select-team");
     await expect(page).toClick("div.observation-select-team__option");
