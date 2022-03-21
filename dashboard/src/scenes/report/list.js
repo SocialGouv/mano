@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Collapse } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import styled from 'styled-components';
@@ -21,7 +21,7 @@ const List = () => {
 
   return (
     <>
-      <Header
+      <SmallerHeaderWithBackButton
         title={`Comptes rendus de l'équipe ${currentTeam?.nightSession ? 'de nuit ' : ''}${currentTeam?.name || ''}`}
         onRefresh={() => {
           setRefreshTrigger({

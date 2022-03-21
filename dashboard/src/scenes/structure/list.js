@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
@@ -39,7 +39,7 @@ const List = () => {
 
   return (
     <>
-      <Header titleStyle={{ fontWeight: 400 }} title="Structures" />
+      <SmallerHeaderWithBackButton titleStyle={{ fontWeight: 400 }} title="Structures" />
       <Row style={{ marginBottom: 20 }}>
         <Col>
           <Create onChange={() => setRefresh(true)} />

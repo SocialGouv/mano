@@ -4,7 +4,7 @@ import { Col, Row } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import CreateAction from './CreateAction';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
 import SelectStatus from '../../components/SelectStatus';
 import Loading from '../../components/loading';
@@ -76,7 +76,7 @@ const List = () => {
 
   return (
     <>
-      <Header
+      <SmallerHeaderWithBackButton
         titleStyle={{ fontWeight: '400' }}
         title={
           <span>
@@ -84,8 +84,8 @@ const List = () => {
           </span>
         }
       />
-      <Row style={{ marginBottom: 40, justifyContent: 'center' }}>
-        <Col>
+      <Row style={{ marginBottom: 20, justifyContent: 'center' }}>
+        <Col md={12}>
           <CreateAction disabled={!currentTeam} isMulti refreshable />
         </Col>
       </Row>
@@ -100,7 +100,7 @@ const List = () => {
             <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
           </div>
         </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+        <Col md={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Afficher par : </span>
           <div style={{ width: 300 }}>
             <SelectCustom
@@ -115,6 +115,7 @@ const List = () => {
           </div>
         </Col>
       </Row>
+
       {showAs === showAsOptions[0] && (
         <div style={{ minHeight: '100vh' }}>
           {' '}

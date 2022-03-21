@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import { formatDateWithNameOfDay, isToday, now, startOfToday } from '../../services/date';
 import {
   currentTeamReportsSelector,
@@ -179,7 +179,7 @@ const Reception = () => {
 
   return (
     <>
-      <Header
+      <SmallerHeaderWithBackButton
         titleStyle={{ fontWeight: '400' }}
         title={
           <span>

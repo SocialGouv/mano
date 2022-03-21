@@ -6,7 +6,7 @@ import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
@@ -51,7 +51,7 @@ const List = () => {
 
   return (
     <>
-      <Header
+      <SmallerHeaderWithBackButton
         titleStyle={{ fontWeight: 400 }}
         title={
           <>

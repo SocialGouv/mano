@@ -7,7 +7,7 @@ import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
 import { addOneDay, formatDateWithFullMonth, formatTime, getIsDayWithinHoursOffsetOfDay, startOfToday } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
 import Box from '../../components/Box';
@@ -136,8 +136,8 @@ const View = () => {
 
   const renderScreenOnly = () => (
     <div className="noprint">
-      <Header
-        style={{ width: '100%' }}
+      <SmallerHeaderWithBackButton
+        style={{ width: '100%', padding: 0 }}
         titleStyle={{ width: '100%' }}
         title={
           <div style={{ minWidth: '100%', width: '100%' }}>
@@ -816,7 +816,7 @@ const StyledBox = styled(Box)`
 const DescriptionBox = styled(StyledBox)`
   @media screen {
     padding: 0;
-    margin-top: -40px;
+    margin-top: 10px;
     margin-bottom: 40px;
   }
   @media print {

@@ -3,8 +3,7 @@ import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as Li
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
-
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
@@ -46,7 +45,7 @@ const List = () => {
 
   return (
     <>
-      <Header
+      <SmallerHeaderWithBackButton
         titleStyle={{ fontWeight: 400 }}
         title={
           <>
