@@ -49,7 +49,7 @@ import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import DeletePerson from './DeletePerson';
 
-const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
+const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
 const View = () => {
   const { id } = useParams();
@@ -112,22 +112,107 @@ const View = () => {
           <Summary person={person} />
         </TabPane>
         <TabPane tabId={1}>
-          <Actions person={person} onUpdateResults={(total) => updateTabContent(1, `Actions (${total})`)} />
+          <MedicalFile person={person} />
         </TabPane>
         <TabPane tabId={2}>
-          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(2, `Commentaires (${total})`)} />
+          <Actions person={person} onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
         </TabPane>
         <TabPane tabId={3}>
-          <Comments personId={person?._id} forPassages onUpdateResults={(total) => updateTabContent(3, `Passages (${total})`)} />
+          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Commentaires (${total})`)} />
         </TabPane>
         <TabPane tabId={4}>
-          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Lieux (${total})`)} />
+          <Comments personId={person?._id} forPassages onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
-        <TabPane tabId={5}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(5, `Documents (${total})`)} />}</TabPane>
+        <TabPane tabId={5}>
+          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
+        </TabPane>
+        <TabPane tabId={6}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)} />}</TabPane>
       </TabContent>
     </StyledContainer>
   );
 };
+
+function MedicalFile({ person }) {
+  const setPersons = useSetRecoilState(personsState);
+  const setComments = useSetRecoilState(commentsState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+  const API = useApi();
+  return (
+    <>
+      <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
+        <Title>Informations</Title>
+        <div
+          style={{
+            width: '100%',
+            display: 'flex',
+            justifyContent: 'flex-end',
+            columnGap: '1rem',
+          }}>
+          <ButtonCustom icon={false} disabled={false} onClick={() => {}} color="primary" title={'Dossier PDF'} padding="12px 24px" />
+          <ButtonCustom icon={false} disabled={false} onClick={() => {}} color="primary" title={'Ajouter une consultation'} padding="12px 24px" />
+        </div>
+      </div>
+      <Formik
+        initialValues={person}
+        onSubmit={async (body) => {
+          if (!body.createdAt) body.createdAt = person.createdAt;
+          body.entityKey = person.entityKey;
+          const response = await API.put({
+            path: `/person/${person._id}`,
+            body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
+          });
+          if (response.ok) {
+            const newPerson = response.decryptedData;
+            setPersons((persons) =>
+              persons.map((p) => {
+                if (p._id === person._id) return newPerson;
+                return p;
+              })
+            );
+            const comment = commentForUpdatePerson({ newPerson, oldPerson: person });
+            if (comment) {
+              comment.user = user._id;
+              comment.team = currentTeam._id;
+              comment.organisation = organisation._id;
+              const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+              if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
+            }
+          }
+          if (response.ok) {
+            toastr.success('Mis à jour !');
+          }
+        }}>
+        {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
+          return (
+            <React.Fragment>
+              <Row>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label>Date de naissance</Label>
+                    <div>
+                      <DatePicker
+                        locale="fr"
+                        className="form-control"
+                        selected={dateForDatePicker(values.birthdate)}
+                        onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
+                        dateFormat="dd/MM/yyyy"
+                        id="person-birthdate"
+                      />
+                    </div>
+                  </FormGroup>
+                </Col>
+              </Row>
+            </React.Fragment>
+          );
+        }}
+      </Formik>
+    </>
+  );
+}
 
 const Summary = ({ person }) => {
   const setPersons = useSetRecoilState(personsState);
