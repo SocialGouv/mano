@@ -117,6 +117,26 @@ router.post(
       z.string()
         .email()
         .parse((req.body.email || "").trim().toLowerCase());
+      /* get app/dashboard device infos for debug */
+      z.optional(z.string()).parse(req.headers.apilevel);
+      z.optional(z.string()).parse(req.headers.brand);
+      z.optional(z.string()).parse(req.headers.carrier);
+      z.optional(z.string()).parse(req.headers.device);
+      z.optional(z.string()).parse(req.headers.deviceid);
+      z.optional(z.string()).parse(req.headers.freediskstorage);
+      z.optional(z.string()).parse(req.headers.hardware);
+      z.optional(z.string()).parse(req.headers.manufacturer);
+      z.optional(z.string()).parse(req.headers.maxmemory);
+      z.optional(z.string()).parse(req.headers.model);
+      z.optional(z.string()).parse(req.headers.product);
+      z.optional(z.string()).parse(req.headers.readableversion);
+      z.optional(z.string()).parse(req.headers.systemname);
+      z.optional(z.string()).parse(req.headers.systemversion);
+      z.optional(z.string()).parse(req.headers.buildid);
+      z.optional(z.string()).parse(req.headers.totaldiskcapacity);
+      z.optional(z.string()).parse(req.headers.totalmemory);
+      z.optional(z.string()).parse(req.headers.useragent);
+      z.optional(z.string()).parse(req.headers.tablet);
     } catch (e) {
       const error = new Error(`Invalid request in signin: ${e}`);
       error.status = 400;
@@ -135,6 +155,30 @@ router.post(
     const match = await comparePassword(password, expectedPassword);
     if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
     user.lastLoginAt = new Date();
+    if (req.headers.platform === "android") {
+      console.log("yo");
+      user.debugApp = {
+        apilevel: req.headers.apilevel,
+        brand: req.headers.brand,
+        carrier: req.headers.carrier,
+        device: req.headers.device,
+        deviceid: req.headers.deviceid,
+        freediskstorage: req.headers.freediskstorage,
+        hardware: req.headers.hardware,
+        manufacturer: req.headers.manufacturer,
+        maxmemory: req.headers.maxmemory,
+        model: req.headers.model,
+        product: req.headers.product,
+        readableversion: req.headers.readableversion,
+        systemname: req.headers.systemname,
+        systemversion: req.headers.systemversion,
+        buildid: req.headers.buildid,
+        totaldiskcapacity: req.headers.totaldiskcapacity,
+        totalmemory: req.headers.totalmemory,
+        useragent: req.headers.useragent,
+        tablet: req.headers.tablet,
+      };
+    }
 
     await user.save();
 

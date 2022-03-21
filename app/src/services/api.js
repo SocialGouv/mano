@@ -4,10 +4,74 @@ import { HOST, SCHEME } from '../config';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
 import { capture } from './sentry';
 import ReactNativeBlobUtil from 'react-native-blob-util';
+import {
+  getApiLevel,
+  getBrand,
+  getCarrier,
+  getDevice,
+  getDeviceId,
+  getFreeDiskStorage,
+  getHardware,
+  getManufacturer,
+  getMaxMemory,
+  getModel,
+  getProduct,
+  getReadableVersion,
+  getSystemName,
+  getSystemVersion,
+  getBuildId,
+  getTotalDiskCapacity,
+  getTotalMemory,
+  getUserAgent,
+  isTablet,
+} from 'react-native-device-info';
 
 class ApiService {
   getUrl = (path, query = {}) => {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
+  };
+
+  getDebugHeaders = async () => {
+    const apilevel = await getApiLevel();
+    const brand = getBrand();
+    const carrier = await getCarrier();
+    const device = await getDevice();
+    const deviceid = getDeviceId();
+    const freediskstorage = await getFreeDiskStorage();
+    const hardware = await getHardware();
+    const manufacturer = await getManufacturer();
+    const maxmemory = await getMaxMemory();
+    const model = getModel();
+    const product = await getProduct();
+    const readableversion = getReadableVersion();
+    const systemname = getSystemName();
+    const systemversion = getSystemVersion();
+    const buildid = await getBuildId();
+    const totaldiskcapacity = await getTotalDiskCapacity();
+    const totalmemory = await getTotalMemory();
+    const useragent = await getUserAgent();
+    const tablet = isTablet();
+    return {
+      apilevel,
+      brand,
+      carrier,
+      device,
+      deviceid,
+      freediskstorage,
+      hardware,
+      manufacturer,
+      maxmemory,
+      model,
+      product,
+      readableversion,
+      systemname,
+      systemversion,
+      buildid,
+      totaldiskcapacity,
+      totalmemory,
+      useragent,
+      tablet,
+    };
   };
 
   execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {

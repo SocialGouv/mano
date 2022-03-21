@@ -15,3 +15,4 @@ require("./2022-03-07_add_migrations_in_organisation.js");
 require("./2022-03-14_add_passage_table");
 require("./2022-03-16-migrating");
 require("./2022-03-17_user_healthcare_professional.js");
+require("./2022-03-21-debug-app-dashboard-user.js");
