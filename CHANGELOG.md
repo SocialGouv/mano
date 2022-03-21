@@ -1,3 +1,10 @@
+# [1.77.0](https://github.com/SocialGouv/mano/compare/v1.76.1...v1.77.0) (2022-03-21)
+
+
+### Features
+
+* add healthcare professional property on users ([#492](https://github.com/SocialGouv/mano/issues/492)) ([417f65b](https://github.com/SocialGouv/mano/commit/417f65b6d6a42dac5b345b0bc37c40a1898799bd))
+
 ## [1.76.1](https://github.com/SocialGouv/mano/compare/v1.76.0...v1.76.1) (2022-03-18)
 
 
