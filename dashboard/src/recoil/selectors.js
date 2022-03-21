@@ -68,37 +68,3 @@ export const onlyFilledObservationsTerritories = selector({
     });
   },
 });
-
-export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'passagesNonAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date: { startDate, endDate }, filterCurrentTeam = true }) =>
-    ({ get }) => {
-      const currentTeam = get(currentTeamState);
-      const comments = get(commentsState);
-      const persons = get(personsState);
-      return comments
-        .filter((c) => (filterCurrentTeam ? c.team === currentTeam._id : true))
-        .filter(
-          (c) =>
-            (startDate === null && endDate === null) ||
-            getIsDayWithinHoursOffsetOfPeriod(
-              c.createdAt,
-              {
-                referenceStartDay: startDate,
-                referenceEndDay: endDate,
-              },
-              currentTeam?.nightSession ? 12 : 0
-            )
-        )
-        .filter((c) => !!(c.comment || '').includes('Passage enregistré'))
-        .map((passage) => {
-          const commentPopulated = { ...passage };
-          if (passage.person) {
-            commentPopulated.person = persons.find((p) => p._id === passage?.person);
-            commentPopulated.type = 'person';
-          }
-          return commentPopulated;
-        });
-    },
-});

@@ -54,7 +54,7 @@ const getPeriodTitle = (date, nightSession) => {
   const nextDay = addOneDay(date);
   return `Nuit du ${formatDateWithFullMonth(date)} au ${formatDateWithFullMonth(nextDay)}`;
 };
-// MIGRATION TODO
+
 const View = () => {
   const { id } = useParams();
   const organisation = useRecoilValue(organisationState);
@@ -419,7 +419,6 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const data = comments
     .filter((c) => c.team === currentTeam._id)
     .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-    .filter((c) => !c.comment.includes('Passage enregistré'))
     .map((comment) => {
       const commentPopulated = { ...comment };
       if (comment.person) {

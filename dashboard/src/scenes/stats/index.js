@@ -27,9 +27,9 @@ import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesState } from '../../recoil/territory';
-import { passagesNonAnonymousPerDatePerTeamSelector } from '../../recoil/selectors';
 import { dayjsInstance } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
+import { passagesState } from '../../recoil/passages';
 
 const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -40,7 +40,6 @@ const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
 };
 
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
-// MIGRATION TODO
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -51,6 +50,7 @@ const Stats = () => {
   const allActions = useRecoilValue(actionsState);
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
+  const allPassages = useRecoilValue(passagesState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
@@ -62,15 +62,6 @@ const Stats = () => {
   const [filterPersons, setFilterPersons] = useState([]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
-  const nonAnonymousPassages = useRecoilValue(
-    passagesNonAnonymousPerDatePerTeamSelector({
-      filterCurrentTeam: !viewAllOrganisationData,
-      date: {
-        startDate: period.startDate,
-        endDate: period.endDate,
-      },
-    })
-  );
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
@@ -91,6 +82,10 @@ const Stats = () => {
     allObservations
       .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
       .filter((e) => !territory?._id || e.territory === territory._id),
+    period
+  );
+  const passages = getDataForPeriod(
+    allPassages.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
     period
   );
   const reports = getDataForPeriod(
@@ -176,10 +171,7 @@ const Stats = () => {
           <TabPane tabId={1}>
             <Title>Statistiques de l'accueil</Title>
             <Row>
-              <Block
-                data={reports.reduce((passages, rep) => passages + (rep.passages || 0), 0) + (nonAnonymousPassages?.length || 0)}
-                title="Nombre de passages"
-              />
+              <Block data={passages.length} title="Nombre de passages" />
               {organisation.services?.map((service) => (
                 <Block
                   key={service}

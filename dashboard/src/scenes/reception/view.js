@@ -79,7 +79,7 @@ const todaysPassagesSelector = selector({
       );
   },
 });
-// MIGRATION TODO
+
 const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
