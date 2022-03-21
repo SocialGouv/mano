@@ -9,6 +9,7 @@ import InputLabelled from '../../components/InputLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ActionRow from '../Actions/ActionRow';
 import CommentRow from '../Comments/CommentRow';
+import PlaceRow from '../Places/PlaceRow';
 import SubList from '../../components/SubList';
 import ButtonDelete from '../../components/ButtonDelete';
 import DateAndTimeInput, { displayBirthDate } from '../../components/DateAndTimeInput';
@@ -298,17 +299,7 @@ const PersonSummary = ({
       <SubList
         label="Commentaires"
         data={comments}
-        renderItem={(comment, index) => (
-          <CommentRow
-            key={index}
-            comment={comment.comment}
-            id={comment._id}
-            user={comment.user}
-            createdAt={comment.createdAt}
-            onUpdate={comment.team ? () => onCommentUpdate(comment) : null}
-            metaCaption="Commentaire de"
-          />
-        )}
+        renderItem={(comment) => <CommentRow key={comment._id} comment={comment} onUpdate={comment.team ? () => onCommentUpdate(comment) : null} />}
         ifEmpty="Pas encore de commentaire">
         <NewCommentInput
           forwardRef={newCommentRef}
@@ -321,18 +312,9 @@ const PersonSummary = ({
         label="Lieux fréquentés"
         onAdd={onAddPlaceRequest}
         data={relsPersonPlace}
-        renderItem={(rel, index) => {
-          const place = { ...places.find((pl) => pl._id === rel.place), ...rel };
-          return (
-            <CommentRow
-              key={index}
-              comment={place.name}
-              createdAt={place.createdAt}
-              user={place.user}
-              onPress={() => onPlaceMore(place)}
-              metaCaption="Lieu ajouté par"
-            />
-          );
+        renderItem={(relPersonPlace, index) => {
+          const place = places.find((pl) => pl._id === relPersonPlace.place);
+          return <PlaceRow key={index} place={place} relPersonPlace={relPersonPlace} personDB={personDB} />;
         }}
         ifEmpty="Pas encore de lieu"
       />
