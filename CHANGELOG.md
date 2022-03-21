@@ -1,3 +1,10 @@
+# [1.78.0](https://github.com/SocialGouv/mano/compare/v1.77.0...v1.78.0) (2022-03-21)
+
+
+### Features
+
+* **dashboard:** improve browser support ([#494](https://github.com/SocialGouv/mano/issues/494)) ([d2c75d5](https://github.com/SocialGouv/mano/commit/d2c75d5e3f6ad7069f5674c7754690115ad1b74e))
+
 # [1.77.0](https://github.com/SocialGouv/mano/compare/v1.76.1...v1.77.0) (2022-03-21)
 
 
