@@ -1,3 +1,10 @@
+## [1.78.1](https://github.com/SocialGouv/mano/compare/v1.78.0...v1.78.1) (2022-03-21)
+
+
+### Bug Fixes
+
+* **app:** delete person confirm in app ([#498](https://github.com/SocialGouv/mano/issues/498)) ([3b206a5](https://github.com/SocialGouv/mano/commit/3b206a5681b9842c538a54f9783e51c19cf6b661))
+
 # [1.78.0](https://github.com/SocialGouv/mano/compare/v1.77.0...v1.78.0) (2022-03-21)
 
 
