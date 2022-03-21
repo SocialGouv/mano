@@ -1,3 +1,10 @@
+## [1.78.2](https://github.com/SocialGouv/mano/compare/v1.78.1...v1.78.2) (2022-03-21)
+
+
+### Bug Fixes
+
+* **dashboard:** fix am-pm dates ([#513](https://github.com/SocialGouv/mano/issues/513)) ([1cb83d0](https://github.com/SocialGouv/mano/commit/1cb83d034d3e3db638c72d90bb58d24c425007df))
+
 ## [1.78.1](https://github.com/SocialGouv/mano/compare/v1.78.0...v1.78.1) (2022-03-21)
 
 
