@@ -100,7 +100,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                           selected={dateForDatePicker(values.createdAt ?? new Date())}
                           onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
                           timeInputLabel="Heure :"
-                          dateFormat="dd/MM/yyyy hh:mm"
+                          dateFormat="dd/MM/yyyy HH:mm"
                           showTimeInput
                           id="observation-createdat"
                         />
