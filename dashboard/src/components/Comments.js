@@ -1,7 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import dayjs from 'dayjs';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
@@ -20,6 +19,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { dateForDatePicker } from '../services/date';
 import { loadingState } from './Loader';
 import useApi from '../services/api';
+import { formatDateTimeWithNameOfDay } from '../services/date';
 
 const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
@@ -124,7 +124,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
                   <CloseButton close onClick={() => deleteData(comment._id)} />
                   <UserName id={comment.user} wrapper={(name) => <div className="author">{name}</div>} />
                   <div className="user"></div>
-                  <div className="time">{dayjs(comment.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
+                  <div className="time">{formatDateTimeWithNameOfDay(comment.createdAt)}</div>
                   <div className="content">
                     <p onClick={() => setEditing(comment._id)}>
                       {comment.comment
