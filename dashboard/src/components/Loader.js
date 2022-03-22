@@ -97,7 +97,7 @@ const Loader = () => {
 
     if (!organisation.migrations?.includes('passages-from-comments-to-table')) {
       await new Promise((res) => setTimeout(res, 500));
-      setLoading('Mise-à-jour des données de votre organisation, veuillez patienter quelques instants...');
+      setLoading('Mise à jour des données de votre organisation, veuillez patienter quelques instants...');
       const allReports = await getData({
         collectionName: 'report',
         data: reports,
