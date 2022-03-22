@@ -35,7 +35,7 @@ router.put(
         .send({ ok: false, error: "Une mise à jour de vos données est en cours, veuillez recharger la page dans quelques minutes" });
     }
     if (organisation.migrations?.includes(req.params.migrationName)) {
-      return res.status(403).send({ ok: false, error: "Une mise-à-jour de vos données a été effectuée, veuillez recharger votre navigateur" });
+      return res.status(403).send({ ok: false, error: "Une mise à jour de vos données a été effectuée, veuillez recharger votre navigateur" });
     }
     organisation.set({ migrating: true });
     await organisation.save();
