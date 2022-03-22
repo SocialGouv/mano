@@ -81,7 +81,7 @@ const Passage = ({ passage, onFinished }) => {
               if (!response.ok) return;
               setOpen(false);
               onFinished();
-              toastr.success(isNew ? 'Passage enregistré' : 'Passage mis-à-jour');
+              toastr.success(isNew ? 'Passage enregistré' : 'Passage mis à jour');
               actions.setSubmitting(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
