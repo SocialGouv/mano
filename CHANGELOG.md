@@ -1,3 +1,10 @@
+# [1.79.0](https://github.com/SocialGouv/mano/compare/v1.78.2...v1.79.0) (2022-03-22)
+
+
+### Features
+
+* **api,dashboard:**  passages migration cherry picked ([#493](https://github.com/SocialGouv/mano/issues/493)) ([32b940e](https://github.com/SocialGouv/mano/commit/32b940e7a10261a9cd20b0e05601b66f0970ac49))
+
 ## [1.78.2](https://github.com/SocialGouv/mano/compare/v1.78.1...v1.78.2) (2022-03-21)
 
 
