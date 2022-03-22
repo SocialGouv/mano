@@ -34,7 +34,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toClick("button#add-anonymous-passage");
     await page.waitForTimeout(500);
-    expect(await getInputValue("input#number-of-passages")).toBe("1");
+    expect(await getInnerText("span#number-of-passages")).toBe("1");
     await expect(page).toClick("button#Café-add");
     await page.waitForTimeout(500);
     expect(await getInputValue("input#Café-count")).toBe("1");
@@ -97,11 +97,10 @@ describe("Organisation CRUD", () => {
     );
     await expect(page).toClick("button", { text: "Ajouter un passage" });
     await page.waitForTimeout(1000);
-    expect(await getInputValue("input#number-of-passages")).toBe("2");
+    expect(await getInnerText("span#number-of-passages")).toBe("2");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     await expect(page).toClick("a", { text: "Passages (1)" });
-    await expect(page).toMatch("Passage enregistré");
   });
 
   it("should be able go in the report", async () => {
@@ -133,8 +132,6 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to modify services in the report", async () => {
-    expect(await getInnerText("span#report-number-of-passages")).toBe("2");
-    await scrollDown();
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("1");
     await page.waitForTimeout(500);
@@ -155,7 +152,7 @@ describe("Organisation CRUD", () => {
     expect(await getInnerText("span#report-passages-anonymous-count")).toBe("1");
     expect(await getInnerText("span#report-passages-non-anonymous-count")).toBe("1");
     await expect(page).toMatch("Ma première personne");
-    await expect(page).toMatch("Passage enregistré");
+    await expect(page).toMatch("Anonyme");
   });
 
   it("should be able to see actions in the report", async () => {

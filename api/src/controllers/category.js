@@ -6,7 +6,7 @@ const sequelize = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const Action = require("../models/action");
-const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");
@@ -15,7 +15,7 @@ router.put(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       z.array(

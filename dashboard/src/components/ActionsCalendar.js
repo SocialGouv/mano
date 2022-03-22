@@ -15,7 +15,7 @@ import {
 import Table from './table';
 import ActionStatus from './ActionStatus';
 import ActionName from './ActionName';
-import ActionPersonName from './ActionPersonName';
+import PersonName from './PersonName';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Status'] }) => {
   const history = useHistory();
@@ -75,7 +75,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
         {
           title: 'Personne suivie',
           dataKey: 'person',
-          render: (action) => <ActionPersonName action={action} />,
+          render: (action) => <PersonName item={action} />,
         },
         { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
         { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },

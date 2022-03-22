@@ -1,11 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { currentTeamState } from './auth';
-import { commentsState } from './comments';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
-import { getIsDayWithinHoursOffsetOfPeriod, isOnSameDay } from '../services/date';
+import { isOnSameDay } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 
@@ -67,62 +66,4 @@ export const onlyFilledObservationsTerritories = selector({
       return { territory: obs.territory, ...obsWithOnlyFilledFields };
     });
   },
-});
-
-export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'passagesNonAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date: { startDate, endDate }, filterCurrentTeam = true }) =>
-    ({ get }) => {
-      const currentTeam = get(currentTeamState);
-      const comments = get(commentsState);
-      const persons = get(personsState);
-      return comments
-        .filter((c) => (filterCurrentTeam ? c.team === currentTeam._id : true))
-        .filter(
-          (c) =>
-            (startDate === null && endDate === null) ||
-            getIsDayWithinHoursOffsetOfPeriod(
-              c.createdAt,
-              {
-                referenceStartDay: startDate,
-                referenceEndDay: endDate,
-              },
-              currentTeam?.nightSession ? 12 : 0
-            )
-        )
-        .filter((c) => !!(c.comment || '').includes('Passage enregistré'))
-        .map((passage) => {
-          const commentPopulated = { ...passage };
-          if (passage.person) {
-            commentPopulated.person = persons.find((p) => p._id === passage?.person);
-            commentPopulated.type = 'person';
-          }
-          return commentPopulated;
-        });
-    },
-});
-
-export const numberOfPassagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'numberOfPassagesNonAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const nonAnonymousPassages = get(
-        passagesNonAnonymousPerDatePerTeamSelector({
-          date: { startDate: date, endDate: date },
-        })
-      );
-      return nonAnonymousPassages?.length || 0;
-    },
-});
-
-export const numberOfPassagesAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'numberOfPassagesAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const todaysReports = get(reportPerDateSelector({ date }));
-      return todaysReports?.passages || 0;
-    },
 });

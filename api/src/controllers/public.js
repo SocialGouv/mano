@@ -4,6 +4,7 @@ const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const Action = require("../models/action");
 const Comment = require("../models/comment");
+const Passage = require("../models/passage");
 const Person = require("../models/person");
 const Place = require("../models/place");
 const Territory = require("../models/territory");
@@ -37,12 +38,13 @@ router.get(
     const actions = await Action.count(query);
     const persons = await Person.count(query);
     const comments = await Comment.count(query);
+    const passages = await Passage.count(query);
     const reports = await Report.count(query);
     const territoryObservations = await TerritoryObservation.count(query);
     const territories = await Territory.count(query);
     return res
       .status(200)
-      .send({ ok: true, data: { actions, comments, persons, places, relsPersonPlace, territories, territoryObservations, reports } });
+      .send({ ok: true, data: { actions, comments, passages, persons, places, relsPersonPlace, territories, territoryObservations, reports } });
   })
 );
 

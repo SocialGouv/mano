@@ -1,13 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { z } = require("zod");
-const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
-const { catchErrors } = require("../errors");
-const TerritoryObservation = require("../models/territoryObservation");
 const { Op } = require("sequelize");
+const { z } = require("zod");
+const { catchErrors } = require("../errors");
+const Passage = require("../models/passage");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
+const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 router.post(
   "/",
@@ -19,17 +19,20 @@ router.post(
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
-      const error = new Error(`Invalid request in observation creation: ${e}`);
+      const error = new Error(`Invalid request in passage creation: ${e}`);
       error.status = 400;
       return next(error);
     }
-    const newObs = {
-      organisation: req.user.organisation,
-      encrypted: req.body.encrypted,
-      encryptedEntityKey: req.body.encryptedEntityKey,
-    };
 
-    const data = await TerritoryObservation.create(newObs, { returning: true });
+    const data = await Passage.create(
+      {
+        organisation: req.user.organisation,
+        encrypted: req.body.encrypted,
+        encryptedEntityKey: req.body.encryptedEntityKey,
+      },
+      { returning: true }
+    );
+
     return res.status(200).send({
       ok: true,
       data: {
@@ -54,7 +57,7 @@ router.get(
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
     } catch (e) {
-      const error = new Error(`Invalid request in observation get: ${e}`);
+      const error = new Error(`Invalid request in passage get: ${e}`);
       error.status = 400;
       return next(error);
     }
@@ -65,12 +68,12 @@ router.get(
       order: [["createdAt", "DESC"]],
     };
 
-    const total = await TerritoryObservation.count(query);
+    const total = await Passage.count(query);
     if (limit) query.limit = Number(limit);
     if (page) query.offset = Number(page) * limit;
     if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
 
-    const data = await TerritoryObservation.findAll({
+    const data = await Passage.findAll({
       ...query,
       attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
     });
@@ -86,36 +89,37 @@ router.put(
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
+      if (req.body.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.createdAt);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
-      const error = new Error(`Invalid request in observation put: ${e}`);
+      const error = new Error(`Invalid request in passage put: ${e}`);
       error.status = 400;
       return next(error);
     }
-
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
-    const territoryObservation = await TerritoryObservation.findOne(query);
-    if (!territoryObservation) return res.status(404).send({ ok: false, error: "Not Found" });
+    const passage = await Passage.findOne(query);
+    if (!passage) return res.status(404).send({ ok: false, error: "Not Found" });
 
     const { encrypted, encryptedEntityKey } = req.body;
-    const updatedTerritoryObservation = {
+
+    const updatePassage = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
     };
 
-    await TerritoryObservation.update(updatedTerritoryObservation, query, { silent: false });
-    const newTerritoryObservation = await TerritoryObservation.findOne(query);
+    await Passage.update(updatePassage, query, { silent: false });
+    const newPassage = await Passage.findOne(query);
 
-    res.status(200).send({
+    return res.status(200).send({
       ok: true,
       data: {
-        _id: newTerritoryObservation._id,
-        encrypted: newTerritoryObservation.encrypted,
-        encryptedEntityKey: newTerritoryObservation.encryptedEntityKey,
-        organisation: newTerritoryObservation.organisation,
-        createdAt: newTerritoryObservation.createdAt,
-        updatedAt: newTerritoryObservation.updatedAt,
+        _id: newPassage._id,
+        encrypted: newPassage.encrypted,
+        encryptedEntityKey: newPassage.encryptedEntityKey,
+        organisation: newPassage.organisation,
+        createdAt: newPassage.createdAt,
+        updatedAt: newPassage.updatedAt,
       },
     });
   })
@@ -129,16 +133,16 @@ router.delete(
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
     } catch (e) {
-      const error = new Error(`Invalid request in observation delete: ${e}`);
+      const error = new Error(`Invalid request in passage delete: ${e}`);
       error.status = 400;
       return next(error);
     }
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
-    let observation = await TerritoryObservation.findOne(query);
-    if (!observation) return res.status(404).send({ ok: false, error: "Not Found" });
+    const passage = await Passage.findOne(query);
+    if (!passage) return res.status(200).send({ ok: true });
 
-    await observation.destroy();
+    await passage.destroy();
     res.status(200).send({ ok: true });
   })
 );

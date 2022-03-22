@@ -101,7 +101,13 @@ export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay
   const startDate = dayjs(referenceStartDay).startOf('day').add(offsetHours, 'hour');
   const endDate = dayjs(referenceEndDay).startOf('day').add(1, 'day').add(offsetHours, 'hour');
 
-  return dayjs(dayToTest).isBetween(startDate, endDate);
+  // Parameter 4 is a string with two characters; '[' means inclusive, '(' exclusive
+  // '()' excludes start and end date (default)
+  // '[]' includes start and end date
+  // '[)' includes the start date but excludes the stop
+  // Source: https://day.js.org/docs/en/plugin/is-between
+  // we need 'inclusive' to include start of the day
+  return dayjs(dayToTest).isBetween(startDate, endDate, null, '[]');
 };
 
 export const dayjsInstance = dayjs;

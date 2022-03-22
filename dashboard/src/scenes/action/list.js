@@ -16,7 +16,7 @@ import Search from '../../components/search';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
-import ActionPersonName from '../../components/ActionPersonName';
+import PersonName from '../../components/PersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
 import { actionsState } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
@@ -133,7 +133,7 @@ const List = () => {
                 title: 'À faire le',
                 dataKey: 'dueAt' || '_id',
                 render: (action) => {
-                  return <DateBloc date={action.dueAt} withTime={action.withTime} />;
+                  return <DateBloc date={action.dueAt} />;
                 },
               },
               {
@@ -152,7 +152,7 @@ const List = () => {
               {
                 title: 'Personne suivie',
                 dataKey: 'person',
-                render: (action) => <ActionPersonName action={action} />,
+                render: (action) => <PersonName item={action} />,
               },
               { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
               { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },

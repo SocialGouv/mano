@@ -22,6 +22,7 @@ import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
 import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
 import { loadingState } from './Loader';
+import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -42,6 +43,7 @@ const EncryptionKey = ({ isMain }) => {
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
+  const passages = useRecoilValue(passagesState);
   const territories = useRecoilValue(territoriesState);
   const observations = useRecoilValue(territoryObservationsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
@@ -57,6 +59,7 @@ const EncryptionKey = ({ isMain }) => {
     persons.length +
     actions.length +
     comments.length +
+    passages.length +
     territories.length +
     observations.length +
     relsPersonPlace.length +
@@ -82,6 +85,7 @@ const EncryptionKey = ({ isMain }) => {
 
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedPassages = await Promise.all(passages.map(preparePassageForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedTerritories = await Promise.all(territories.map(prepareTerritoryForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedTerritoryObservations = await Promise.all(
         observations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem(hashedOrgEncryptionKey))
@@ -106,6 +110,7 @@ const EncryptionKey = ({ isMain }) => {
           persons: encryptedPersons,
           actions: encryptedActions,
           comments: encryptedComments,
+          passages: encryptedPassages,
           territories: encryptedTerritories,
           observations: encryptedTerritoryObservations,
           places: encryptedPlaces,
