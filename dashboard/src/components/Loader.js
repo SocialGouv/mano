@@ -125,7 +125,9 @@ const Loader = () => {
             person: null,
             team: report.team,
             user: null,
-            date: dayjs(report.date).add(teams.find((t) => t._id === report.team).nightSession ? 12 : 0, 'hour'),
+            date: dayjs(report.date)
+              .startOf('day')
+              .add(teams.find((t) => t._id === report.team).nightSession ? 12 : 0, 'hour'),
           });
         }
       }
