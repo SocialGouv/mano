@@ -7,6 +7,7 @@ import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { detect } from 'detect-browser';
 import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
@@ -119,15 +120,26 @@ const SignIn = () => {
               email: values.email,
               password: values.password,
             };
+            const browser = detect();
+            const headers = {};
+            if (browser) {
+              headers.browsertype = browser.type;
+              headers.browsername = browser.name;
+              headers.browserversion = browser.version;
+              headers.browseros = browser.os;
+            }
+
             const { user, token, ok } = authViaCookie
               ? await API.get({
                   path: '/user/signin-token',
                   skipEncryption: '/user/signin-token',
+                  headers,
                 })
               : await API.post({
                   path: '/user/signin',
                   skipEncryption: '/user/signin',
                   body,
+                  headers,
                 });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;

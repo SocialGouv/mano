@@ -31,48 +31,27 @@ class ApiService {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
   };
 
-  getDebugHeaders = async () => {
-    const apilevel = await getApiLevel();
-    const brand = getBrand();
-    const carrier = await getCarrier();
-    const device = await getDevice();
-    const deviceid = getDeviceId();
-    const freediskstorage = await getFreeDiskStorage();
-    const hardware = await getHardware();
-    const manufacturer = await getManufacturer();
-    const maxmemory = await getMaxMemory();
-    const model = getModel();
-    const product = await getProduct();
-    const readableversion = getReadableVersion();
-    const systemname = getSystemName();
-    const systemversion = getSystemVersion();
-    const buildid = await getBuildId();
-    const totaldiskcapacity = await getTotalDiskCapacity();
-    const totalmemory = await getTotalMemory();
-    const useragent = await getUserAgent();
-    const tablet = isTablet();
-    return {
-      apilevel,
-      brand,
-      carrier,
-      device,
-      deviceid,
-      freediskstorage,
-      hardware,
-      manufacturer,
-      maxmemory,
-      model,
-      product,
-      readableversion,
-      systemname,
-      systemversion,
-      buildid,
-      totaldiskcapacity,
-      totalmemory,
-      useragent,
-      tablet,
-    };
-  };
+  getDebugHeaders = async () => ({
+    apilevel: await getApiLevel(), // 30
+    brand: getBrand(), // "google"
+    carrier: await getCarrier(), // "Android"
+    device: await getDevice(), // "emulator_arm64"
+    deviceid: getDeviceId(), // "goldfish_arm64"
+    freediskstorage: await getFreeDiskStorage(), // 4580667392
+    hardware: await getHardware(), // "ranchu"
+    manufacturer: await getManufacturer(), // "Google"
+    maxmemory: await getMaxMemory(), // 201326592
+    model: getModel(), // "sdk_gphone_arm64"
+    product: await getProduct(), // "sdk_gphone_arm64"
+    readableversion: getReadableVersion(), // "2.15.0.3"
+    systemname: getSystemName(), // "Android"
+    systemversion: getSystemVersion(), // "11"
+    buildid: await getBuildId(), // "RSR1.201216.001"
+    totaldiskcapacity: await getTotalDiskCapacity(), // 6983450624
+    totalmemory: await getTotalMemory(), // 2079838208
+    useragent: await getUserAgent(), // "Mozilla/5.0 (Linux, Android 11, ..."
+    tablet: isTablet(), // false
+  });
 
   execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
     try {
