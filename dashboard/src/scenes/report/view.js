@@ -307,7 +307,8 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [data.length, onUpdateResults]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -375,7 +376,8 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [data.length, onUpdateResults]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -450,7 +452,9 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [data.length, onUpdateResults]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
+
   if (!data) return <div />;
 
   return (
@@ -555,7 +559,8 @@ const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
 
   useEffect(() => {
     onUpdateResults(passages.length);
-  }, [onUpdateResults, passages.length]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passages.length]);
 
   const numberOfAnonymousPassages = useMemo(() => passages.filter((p) => !p.person)?.length, [passages]);
   const numberOfNonAnonymousPassages = useMemo(() => passages.filter((p) => !!p.person)?.length, [passages]);
@@ -658,7 +663,8 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [data.length, date, onUpdateResults]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
