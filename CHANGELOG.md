@@ -1,3 +1,10 @@
+## [1.79.3](https://github.com/SocialGouv/mano/compare/v1.79.2...v1.79.3) (2022-03-23)
+
+
+### Bug Fixes
+
+* **dashboard:** number of comments ([#517](https://github.com/SocialGouv/mano/issues/517)) ([f974537](https://github.com/SocialGouv/mano/commit/f974537235e70acc9983f3788ee2e2b6f23fb1d5))
+
 ## [1.79.2](https://github.com/SocialGouv/mano/compare/v1.79.1...v1.79.2) (2022-03-23)
 
 
