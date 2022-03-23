@@ -1,3 +1,4 @@
 /node_modules
 /build
-/src-tauri
+/src-tauri/target/
+/src-tauri/WixTools
