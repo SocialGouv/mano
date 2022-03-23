@@ -31,12 +31,13 @@ import { dayjsInstance } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { passagesState } from '../../recoil/passages';
 
-const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
+const getDataForPeriod = (data, period, { filters = [], field = 'createdAt' } = {}) => {
+  const { startDate, endDate } = period;
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
   if (!startDate || !endDate) {
     return data;
   }
-  return data.filter((item) => dayjsInstance(item.createdAt).isBetween(startDate, endDate));
+  return data.filter((item) => dayjsInstance(item[field] || item.createdAt).isBetween(startDate, endDate));
 };
 
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
@@ -72,7 +73,7 @@ const Stats = () => {
   const persons = getDataForPeriod(
     allPersons.filter((e) => viewAllOrganisationData || (e.assignedTeams || []).includes(currentTeam._id)),
     period,
-    filterPersons
+    { filters: filterPersons }
   );
   const actions = getDataForPeriod(
     allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
@@ -82,15 +83,19 @@ const Stats = () => {
     allObservations
       .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
       .filter((e) => !territory?._id || e.territory === territory._id),
-    period
+    period,
+    { field: 'observedAt' }
   );
   const passages = getDataForPeriod(
     allPassages.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
-    period
+    period,
+    { field: 'date' }
   );
+
   const reports = getDataForPeriod(
     allreports.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
-    period
+    period,
+    { field: 'date' }
   );
   const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
 
