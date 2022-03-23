@@ -1,11 +1,19 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { atom, selector } from 'recoil';
+import { writeCollection } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
 
 export const personsState = atom({
   key: 'personsState',
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet((newValue) => {
+        writeCollection('person', newValue);
+      });
+    },
+  ],
 });
 
 export const customFieldsPersonsMedicalSelector = selector({

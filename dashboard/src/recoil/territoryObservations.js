@@ -1,9 +1,17 @@
 import { organisationState } from './auth';
 import { atom, selector } from 'recoil';
+import { writeCollection } from '../services/dataManagement';
 
 export const territoryObservationsState = atom({
   key: 'territoryObservationsState',
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet((newValue) => {
+        writeCollection('territory-observation', newValue);
+      });
+    },
+  ],
 });
 
 export const customFieldsObsSelector = selector({

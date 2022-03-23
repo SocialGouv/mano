@@ -119,7 +119,6 @@ const SignIn = () => {
               email: values.email,
               password: values.password,
             };
-            console.log('yam');
             const { user, token, ok } = authViaCookie
               ? await API.get({
                   path: '/user/signin-token',

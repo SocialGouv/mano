@@ -5,7 +5,7 @@ import picture1 from '../assets/MANO_livraison_elements-07_green.png';
 import picture2 from '../assets/MANO_livraison_elements-08_green.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { getData } from '../services/dataManagement';
+import { getData, useLastRefresh } from '../services/dataManagement';
 import { organisationState, teamsState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
@@ -53,11 +53,6 @@ export const refreshTriggerState = atom({
   },
 });
 
-const lastRefreshState = atom({
-  key: 'lastRefreshState',
-  default: 0,
-});
-
 const mergeItems = (oldItems, newItems) => {
   const newItemsIds = newItems.map((i) => i._id);
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
@@ -67,7 +62,7 @@ const mergeItems = (oldItems, newItems) => {
 const Loader = () => {
   const API = useApi();
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  const [lastRefresh, setLastRefresh] = useRecoilState(lastRefreshState);
+  const [lastRefresh, setLastRefresh] = useLastRefresh();
   const [loading, setLoading] = useRecoilState(loadingState);
   const setCollectionsToLoad = useSetRecoilState(collectionsToLoadState);
   const [progress, setProgress] = useRecoilState(progressState);
@@ -75,6 +70,8 @@ const Loader = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const teams = useRecoilValue(teamsState);
   const organisationId = organisation?._id;
+
+  console.log({ lastRefresh });
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
@@ -197,7 +194,7 @@ const Loader = () => {
     /*
     Get persons
     */
-    if (response.data.persons) {
+    if (initialLoad || response.data.persons) {
       setLoading('Chargement des personnes');
       const refreshedPersons = await getData({
         collectionName: 'person',
@@ -224,7 +221,7 @@ const Loader = () => {
     QUICK WIN: filter those reports from recoil state
     */
 
-    if (response.data.reports) {
+    if (initialLoad || response.data.reports) {
       setLoading('Chargement des comptes-rendus');
       const refreshedReports = await getData({
         collectionName: 'report',
@@ -246,7 +243,7 @@ const Loader = () => {
     /*
     Get passages
     */
-    if (response.data.passages) {
+    if (initialLoad || response.data.passages) {
       setLoading('Chargement des passages');
       const refreshedPassages = await getData({
         collectionName: 'passage',
@@ -269,7 +266,7 @@ const Loader = () => {
     /*
     Get actions
     */
-    if (response.data.actions) {
+    if (initialLoad || response.data.actions) {
       setLoading('Chargement des actions');
       const refreshedActions = await getData({
         collectionName: 'action',
@@ -286,7 +283,7 @@ const Loader = () => {
     /*
     Get territories
     */
-    if (response.data.territories) {
+    if (initialLoad || response.data.territories) {
       setLoading('Chargement des territoires');
       const refreshedTerritories = await getData({
         collectionName: 'territory',
@@ -305,7 +302,7 @@ const Loader = () => {
     /*
     Get places
     */
-    if (response.data.places) {
+    if (initialLoad || response.data.places) {
       setLoading('Chargement des lieux');
       const refreshedPlaces = await getData({
         collectionName: 'place',
@@ -318,7 +315,7 @@ const Loader = () => {
       });
       if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
     }
-    if (response.data.relsPersonPlace) {
+    if (initialLoad || response.data.relsPersonPlace) {
       const refreshedRelPersonPlaces = await getData({
         collectionName: 'relPersonPlace',
         data: relsPersonPlace,
@@ -335,7 +332,7 @@ const Loader = () => {
     /*
     Get observations territories
     */
-    if (response.data.territoryObservations) {
+    if (initialLoad || response.data.territoryObservations) {
       setLoading('Chargement des observations');
       const refreshedObs = await getData({
         collectionName: 'territory-observation',
@@ -352,7 +349,7 @@ const Loader = () => {
     /*
     Get comments
     */
-    if (response.data.comments) {
+    if (initialLoad || response.data.comments) {
       setLoading('Chargement des commentaires');
       const refreshedComments = await getData({
         collectionName: 'comment',

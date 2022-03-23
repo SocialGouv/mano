@@ -50,8 +50,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "tauri": "tauri",
-    "bundle": "tauri build"
+    "tauri:dev": "tauri dev",
+    "tauri:bundle": "tauri build"
   },
   "eslintConfig": {
     "extends": [

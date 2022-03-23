@@ -101,8 +101,6 @@ const Reception = () => {
   const history = useHistory();
   const location = useLocation();
 
-  console.log('YALLLAAA');
-
   // for better UX when increase passage
   const [addingPassage, setAddingPassage] = useState(false);
 

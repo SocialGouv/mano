@@ -1,9 +1,17 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { atom } from 'recoil';
+import { writeCollection } from '../services/dataManagement';
 
 export const commentsState = atom({
   key: 'commentsState',
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet((newValue) => {
+        writeCollection('comment', newValue);
+      });
+    },
+  ],
 });
 
 const encryptedFields = ['comment', 'type', 'item', 'person', 'action', 'team', 'user'];

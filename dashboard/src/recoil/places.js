@@ -1,8 +1,16 @@
 import { atom } from 'recoil';
+import { writeCollection } from '../services/dataManagement';
 
 export const placesState = atom({
   key: 'placesState',
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet((newValue) => {
+        writeCollection('place', newValue);
+      });
+    },
+  ],
 });
 
 const encryptedFields = ['user', 'name'];
