@@ -1,3 +1,10 @@
+## [1.79.4](https://github.com/SocialGouv/mano/compare/v1.79.3...v1.79.4) (2022-03-23)
+
+
+### Bug Fixes
+
+* **dashboard:** prevent reports updating non stop ([#518](https://github.com/SocialGouv/mano/issues/518)) ([19ea779](https://github.com/SocialGouv/mano/commit/19ea779a3170704648d4186bbcc489a93d85aee3))
+
 ## [1.79.3](https://github.com/SocialGouv/mano/compare/v1.79.2...v1.79.3) (2022-03-23)
 
 
