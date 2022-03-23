@@ -1,3 +1,10 @@
+## [1.79.1](https://github.com/SocialGouv/mano/compare/v1.79.0...v1.79.1) (2022-03-23)
+
+
+### Bug Fixes
+
+* cors update to include tauri ([#515](https://github.com/SocialGouv/mano/issues/515)) ([b634df0](https://github.com/SocialGouv/mano/commit/b634df061d455289160ab226d09cb397b9fa581d))
+
 # [1.79.0](https://github.com/SocialGouv/mano/compare/v1.78.2...v1.79.0) (2022-03-22)
 
 
