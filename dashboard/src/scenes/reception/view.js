@@ -193,7 +193,6 @@ const Reception = () => {
       }
     }
     setAddingPassage(false);
-    setSelectedPersons([]);
   };
 
   const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
