@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
@@ -103,6 +102,7 @@ const View = () => {
 
   useEffect(() => {
     if (report && report.team !== currentTeam._id) history.goBack();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTeam._id]);
 
   useEffect(() => {
@@ -296,14 +296,18 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const allActions = useRecoilValue(actionsState);
 
-  const data = allActions
-    ?.filter((a) => a.team === currentTeam._id)
-    .filter((a) => a.status === status)
-    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
+  const data = useMemo(
+    () =>
+      allActions
+        ?.filter((a) => a.team === currentTeam._id)
+        .filter((a) => a.status === status)
+        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0)),
+    [allActions, currentTeam._id, currentTeam?.nightSession, status, date]
+  );
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [date]);
+  }, [data.length, onUpdateResults]);
 
   if (!data) return <div />;
 
@@ -360,14 +364,18 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);
 
-  const data = actions
-    ?.filter((a) => a.team === currentTeam._id)
-    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
+  const data = useMemo(
+    () =>
+      actions
+        ?.filter((a) => a.team === currentTeam._id)
+        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0)),
+    [date, actions, currentTeam?._id, currentTeam?.nightSession]
+  );
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [date]);
+  }, [data.length, onUpdateResults]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -416,29 +424,33 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const actions = useRecoilValue(actionsState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const data = comments
-    .filter((c) => c.team === currentTeam._id)
-    .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-    .map((comment) => {
-      const commentPopulated = { ...comment };
-      if (comment.person) {
-        const id = comment?.person || comment?.item;
-        commentPopulated.person = persons.find((p) => p._id === id);
-        commentPopulated.type = 'person';
-      }
-      if (comment.action) {
-        const id = comment?.action || comment?.item;
-        const action = actions.find((p) => p._id === id);
-        commentPopulated.action = action;
-        commentPopulated.person = persons.find((p) => p._id === action?.person);
-        commentPopulated.type = 'action';
-      }
-      return commentPopulated;
-    });
+  const data = useMemo(
+    () =>
+      comments
+        .filter((c) => c.team === currentTeam._id)
+        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .map((comment) => {
+          const commentPopulated = { ...comment };
+          if (comment.person) {
+            const id = comment?.person || comment?.item;
+            commentPopulated.person = persons.find((p) => p._id === id);
+            commentPopulated.type = 'person';
+          }
+          if (comment.action) {
+            const id = comment?.action || comment?.item;
+            const action = actions.find((p) => p._id === id);
+            commentPopulated.action = action;
+            commentPopulated.person = persons.find((p) => p._id === action?.person);
+            commentPopulated.type = 'action';
+          }
+          return commentPopulated;
+        }),
+    [comments, currentTeam._id, currentTeam?.nightSession, date, persons, actions]
+  );
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [date]);
+  }, [data.length, onUpdateResults]);
   if (!data) return <div />;
 
   return (
@@ -538,12 +550,12 @@ const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
             currentTeam?.nightSession ? 12 : 0
           )
         ),
-    [date, allPassages]
+    [allPassages, currentTeam._id, currentTeam?.nightSession, date]
   );
 
   useEffect(() => {
     onUpdateResults(passages.length);
-  }, [passages.length]);
+  }, [onUpdateResults, passages.length]);
 
   const numberOfAnonymousPassages = useMemo(() => passages.filter((p) => !p.person)?.length, [passages]);
   const numberOfNonAnonymousPassages = useMemo(() => passages.filter((p) => !!p.person)?.length, [passages]);
@@ -636,13 +648,17 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   const territories = useRecoilValue(territoriesState);
   const territoryObservations = useRecoilValue(territoryObservationsState);
 
-  const data = territoryObservations
-    .filter((o) => o.team === currentTeam._id)
-    .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0));
+  const data = useMemo(
+    () =>
+      territoryObservations
+        .filter((o) => o.team === currentTeam._id)
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0)),
+    [currentTeam._id, currentTeam?.nightSession, date, territoryObservations]
+  );
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [date]);
+  }, [data.length, date, onUpdateResults]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
