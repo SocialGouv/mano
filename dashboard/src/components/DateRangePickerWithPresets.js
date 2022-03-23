@@ -162,6 +162,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
               onFocusChange={setDatePickerFocused}
               disabled={false}
               monthFormat="MMMM YYYY"
+              minimumNights={0}
               showClearDates
               displayFormat="DD-MM-yyyy"
               isOutsideRange={() => null}
