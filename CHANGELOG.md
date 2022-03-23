@@ -1,3 +1,10 @@
+## [1.79.2](https://github.com/SocialGouv/mano/compare/v1.79.1...v1.79.2) (2022-03-23)
+
+
+### Bug Fixes
+
+* **dashboard:**  bugs related to new passage migration ([#516](https://github.com/SocialGouv/mano/issues/516)) ([a05fd7d](https://github.com/SocialGouv/mano/commit/a05fd7d1324d41a3255217329d1fb5fbd14c0ffc))
+
 ## [1.79.1](https://github.com/SocialGouv/mano/compare/v1.79.0...v1.79.1) (2022-03-23)
 
 
