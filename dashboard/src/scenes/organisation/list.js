@@ -21,8 +21,6 @@ const List = () => {
   const [refresh, setRefresh] = useState(true);
   const API = useApi();
 
-  console.log({ sortBy, sortOrder });
-
   useEffect(() => {
     (async () => {
       if (!refresh) return;
