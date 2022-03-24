@@ -49,6 +49,7 @@ import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import DeletePerson from './DeletePerson';
 import { MedicalFile } from './MedicalFile';
+import { ENV } from '../../config';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -57,6 +58,7 @@ const View = () => {
   const location = useLocation();
   const history = useHistory();
   const persons = useRecoilValue(personsState);
+  const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [tabsContents, setTabsContents] = useState(initTabs);
@@ -92,10 +94,17 @@ const View = () => {
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
           return (
-            <NavItem key={index} style={{ cursor: 'pointer' }}>
+            <NavItem
+              // This implementation is temporary. Currently, the tabs are not dynamic so we have to hide them when disabled.
+              // Also, this is currently only displayed in localhost. Todo: fix me!
+              className={`${
+                initTabs[index].toLowerCase() === 'dossier médical' && (ENV !== 'development' || !user.healthcareProfessional) ? 'd-none' : ''
+              }`}
+              key={index}
+              style={{ cursor: 'pointer' }}>
               <NavLink
                 key={index}
-                className={`${activeTab === index && 'active'}`}
+                className={`${activeTab === index ? 'active' : ''}`}
                 onClick={() => {
                   const searchParams = new URLSearchParams(location.search);
                   searchParams.set('tab', initTabs[index].toLowerCase());

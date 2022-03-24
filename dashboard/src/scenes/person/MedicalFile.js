@@ -126,7 +126,7 @@ export function MedicalFile({ person }) {
                 </Col>
                 <Col md={4}>
                   <Label>Numéro de sécurité sociale</Label>
-                  <Input name="phone" value={values.numeroSecuriteSociale || ''} onChange={handleChange} />
+                  <Input name="numeroSecuriteSociale" value={values.numeroSecuriteSociale || ''} onChange={handleChange} />
                 </Col>
               </Row>
               <Row>

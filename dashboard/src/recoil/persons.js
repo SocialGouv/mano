@@ -298,6 +298,13 @@ export const personFields = [
     encrypted: true,
     importable: false,
   },
+  {
+    name: 'numeroSecuriteSociale',
+    type: 'text',
+    label: 'Numéro de sécurité sociale',
+    encrypted: true,
+    importable: false,
+  },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
