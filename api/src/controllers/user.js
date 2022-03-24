@@ -235,13 +235,6 @@ router.get(
     const token = req.cookies.jwt;
     const user = await User.findOne({ where: { _id: req.user._id } });
 
-    user.lastLoginAt = new Date();
-
-    getUserDebugInfos(req, user);
-    console.log(user);
-
-    await user.save();
-
     const organisation = await user.getOrganisation();
     const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
     const userTeams = await RelUserTeam.findAll({ where: { user: user._id, team: { [Op.in]: orgTeams.map((t) => t._id) } } });
