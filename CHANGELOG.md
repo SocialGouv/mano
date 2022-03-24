@@ -1,3 +1,10 @@
+## [1.79.6](https://github.com/SocialGouv/mano/compare/v1.79.5...v1.79.6) (2022-03-24)
+
+
+### Bug Fixes
+
+* normal user also can migrate ([d3a14be](https://github.com/SocialGouv/mano/commit/d3a14be71ab8261c1b823161da0c0e80e844df63))
+
 ## [1.79.5](https://github.com/SocialGouv/mano/compare/v1.79.4...v1.79.5) (2022-03-24)
 
 
