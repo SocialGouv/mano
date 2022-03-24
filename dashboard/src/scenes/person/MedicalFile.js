@@ -1,24 +1,23 @@
-import React, { useEffect, useState } from 'react';
-import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import React, { useState } from 'react';
+import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
   personsState,
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
   preparePersonForEncryption,
-  commentForUpdatePerson,
   genderOptions,
   healthInsuranceOptions,
 } from '../../recoil/persons';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, formatDateTimeWithNameOfDay, formatDateWithFullMonth } from '../../services/date';
 import useApi from '../../services/api';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import SelectAsInput from '../../components/SelectAsInput';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import Table from '../../components/table';
@@ -27,62 +26,58 @@ import ActionStatus from '../../components/ActionStatus';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
-  const setComments = useSetRecoilState(commentsState);
   const [showAddConsultation, setShowAddConsultation] = useState(false);
   const [showAddTreatment, setShowAddTreatment] = useState(false);
+  const [currentConsultation, setCurrentConsultation] = useState(null);
+  const [currentTreatment, setCurrentTreatment] = useState(null);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
-  const currentTeam = useRecoilValue(currentTeamState);
-  const organisation = useRecoilValue(organisationState);
+  const users = useRecoilValue(usersState);
   const API = useApi();
+
+  async function updatePerson(properties = {}, message = 'Mise à jour effectuée !') {
+    const response = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ ...person, ...properties }),
+    });
+    if (!response.ok) {
+      toastr.success('Erreur lors de la mise à jour');
+      return;
+    }
+    setPersons((persons) =>
+      persons.map((p) => {
+        if (p._id === person._id) return response.decryptedData;
+        return p;
+      })
+    );
+    toastr.success(message);
+  }
+
   return (
     <>
       <TitleWithButtonsContainer>
         <Title>Dossier médical</Title>
         <ButtonsFloatingRight>
-          <ButtonCustom icon={false} disabled={false} onClick={() => {}} color="primary" title={'📋&nbsp;&nbsp;Dossier PDF'} padding="12px 24px" />
           <ButtonCustom
             icon={false}
             disabled={false}
-            onClick={() => {}}
+            onClick={() => {
+              window.print();
+            }}
             color="primary"
-            title={'🩺&nbsp;&nbsp;Ajouter une consultation'}
+            title={'📋&nbsp;&nbsp;Imprimer le dossier PDF'}
             padding="12px 24px"
           />
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
       <Formik
+        enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
-          if (!body.createdAt) body.createdAt = person.createdAt;
-          body.entityKey = person.entityKey;
-          const response = await API.put({
-            path: `/person/${person._id}`,
-            body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
-          });
-          if (response.ok) {
-            const newPerson = response.decryptedData;
-            setPersons((persons) =>
-              persons.map((p) => {
-                if (p._id === person._id) return newPerson;
-                return p;
-              })
-            );
-            const comment = commentForUpdatePerson({ newPerson, oldPerson: person });
-            if (comment) {
-              comment.user = user._id;
-              comment.team = currentTeam._id;
-              comment.organisation = organisation._id;
-              const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-              if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
-            }
-          }
-          if (response.ok) {
-            toastr.success('Mis à jour !');
-          }
+          await updatePerson(body);
         }}>
-        {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
+        {({ values, handleChange, handleSubmit, isSubmitting }) => {
           return (
             <React.Fragment>
               <Row>
@@ -114,8 +109,8 @@ export function MedicalFile({ person }) {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Structure de suivi social</Label>
-                    <Input name="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />
+                    <Label>Structure de suivi médical</Label>
+                    <Input name="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
@@ -154,6 +149,14 @@ export function MedicalFile({ person }) {
             disabled={false}
             onClick={() => {
               setShowAddTreatment(true);
+              setCurrentTreatment({
+                _id: uuidv4(),
+                endDate: new Date(),
+                name: '',
+                dosage: '',
+                frequency: '',
+                user: user._id,
+              });
             }}
             color="primary"
             title={'💊&nbsp;&nbsp;Ajouter un traitement'}
@@ -166,24 +169,42 @@ export function MedicalFile({ person }) {
         rowKey={'_id'}
         columns={[
           {
-            title: 'Nom',
-            dataKey: 'name',
-            render: (e) => e.name,
+            dataKey: '_id',
+            render: (treatment) => (
+              <EditButton
+                className="noprint"
+                onClick={() => {
+                  setShowAddTreatment(true);
+                  setCurrentTreatment(treatment);
+                }}>
+                &#9998;
+              </EditButton>
+            ),
+            small: true,
           },
-          {
-            title: 'Dosage',
-            dataKey: 'dosage',
-            render: (e) => e.dosage,
-          },
-          {
-            title: 'Fréquence',
-            dataKey: 'frequency',
-            render: (e) => e.frequency,
-          },
+          { title: 'Nom', dataKey: 'name' },
+          { title: 'Dosage', dataKey: 'dosage' },
+          { title: 'Fréquence', dataKey: 'frequency' },
           {
             title: 'Date de fin',
             dataKey: 'endDate',
             render: (e) => (e.endDate ? formatDateWithFullMonth(e.endDate) : ''),
+          },
+          {
+            title: 'Action',
+            render: (e) => (
+              <ButtonCustom
+                style={{ margin: 'auto' }}
+                icon={false}
+                disabled={false}
+                onClick={async () => {
+                  if (!window.confirm('Voulez-vous supprimer ce traitement ?')) return;
+                  await updatePerson({ treatments: (person.treatments || []).filter((c) => c._id !== e._id) }, 'Traitement supprimée !');
+                }}
+                color="danger"
+                title={'Supprimer'}
+              />
+            ),
           },
         ]}
         noData="Aucun traitement en cours"
@@ -196,6 +217,13 @@ export function MedicalFile({ person }) {
             disabled={false}
             onClick={() => {
               setShowAddConsultation(true);
+              setCurrentConsultation({
+                _id: uuidv4(),
+                date: new Date(),
+                name: '',
+                status: 'A FAIRE',
+                user: user._id,
+              });
             }}
             color="primary"
             title={'🩺&nbsp;&nbsp;Ajouter une consultation'}
@@ -208,24 +236,50 @@ export function MedicalFile({ person }) {
         rowKey={'_id'}
         columns={[
           {
+            dataKey: '_id',
+            render: (consultation) => (
+              <EditButton
+                className="noprint"
+                onClick={() => {
+                  setShowAddConsultation(true);
+                  setCurrentConsultation(consultation);
+                }}>
+                &#9998;
+              </EditButton>
+            ),
+            small: true,
+          },
+          {
             title: 'Date',
             dataKey: 'date',
             render: (e) => (e.date ? formatDateTimeWithNameOfDay(e.date) : ''),
           },
-          {
-            title: 'Description',
-            dataKey: 'name',
-            render: (e) => e.name,
-          },
+          { title: 'Description', dataKey: 'name' },
           {
             title: 'Créé par',
             dataKey: 'user',
-            render: (e) => e.user,
+            render: (e) => (e.user ? users.find((u) => u._id === e.user)?.name : ''),
           },
           {
             title: 'Statut',
             dataKey: 'status',
             render: (e) => <ActionStatus status={e.status} />,
+          },
+          {
+            title: 'Action',
+            render: (e) => (
+              <ButtonCustom
+                style={{ margin: 'auto' }}
+                icon={false}
+                disabled={false}
+                onClick={async () => {
+                  if (!window.confirm('Voulez-vous supprimer cette consultation ?')) return;
+                  await updatePerson({ consultations: (person.consultations || []).filter((c) => c._id !== e._id) }, 'Consultation supprimée !');
+                }}
+                color="danger"
+                title={'Supprimer'}
+              />
+            ),
           },
         ]}
         noData="Aucune consultation enregistrée"
@@ -234,39 +288,37 @@ export function MedicalFile({ person }) {
         <ModalHeader toggle={() => setShowAddConsultation(false)}>Ajouter une consultation</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{
-              date: new Date(),
-              name: '',
-              status: 'A FAIRE',
-              user: user._id,
+            enableReinitialize
+            initialValues={currentConsultation}
+            validate={(values) => {
+              const errors = {};
+              if (!values._id) errors._id = "L'identifiant est obligatoire";
+              if (!values.name) errors.name = 'Le nom est obligatoire';
+              if (!values.status) errors.status = 'Le statut est obligatoire';
+              if (!values.date) errors.date = 'La date est obligatoire';
+              return errors;
             }}
             onSubmit={async (values) => {
-              const response = await API.put({
-                path: `/person/${person._id}`,
-                body: preparePersonForEncryption(
-                  customFieldsPersonsMedical,
-                  customFieldsPersonsSocial
-                )({ ...person, consultations: [...(person.consultations || []), values] }),
-              });
-              if (response.ok) {
-                const newPerson = response.decryptedData;
-                setPersons((persons) =>
-                  persons.map((p) => {
-                    if (p._id === person._id) return newPerson;
-                    return p;
-                  })
-                );
-                toastr.success('Mis à jour !');
+              let consultations = person.consultations || [];
+              if (consultations.find((t) => t._id === values._id)) {
+                consultations = consultations.map((t) => {
+                  if (t._id === values._id) return values;
+                  return t;
+                });
+              } else {
+                consultations = [...consultations, values];
               }
+              await updatePerson({ consultations }, 'Consultation mise à jour !');
               setShowAddConsultation(false);
             }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
+            {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
               <React.Fragment>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
                       <Label>Nom</Label>
                       <Input id="create-action-name" name="name" value={values.name} onChange={handleChange} />
+                      {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -278,6 +330,7 @@ export function MedicalFile({ person }) {
                       inputId="new-action-select-status"
                       classNamePrefix="new-action-select-status"
                     />
+                    {touched.status && errors.status && <Error>{errors.status}</Error>}
                   </Col>
                   <Col md={6}>
                     <FormGroup>
@@ -294,6 +347,7 @@ export function MedicalFile({ person }) {
                           showTimeInput
                         />
                       </div>
+                      {touched.date && errors.date && <Error>{errors.date}</Error>}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -314,15 +368,11 @@ export function MedicalFile({ person }) {
         <ModalHeader toggle={() => setShowAddTreatment(false)}>Ajouter un traitement</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{
-              endDate: new Date(),
-              name: '',
-              dosage: '',
-              frequency: '',
-              user: user._id,
-            }}
+            enableReinitialize
+            initialValues={currentTreatment}
             validate={(values) => {
               const errors = {};
+              if (!values._id) errors._id = "L'identifiant est obligatoire";
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.dosage) errors.dosage = 'Le dosage est obligatoire';
               if (!values.frequency) errors.frequency = 'La fréquence est obligatoire';
@@ -330,24 +380,17 @@ export function MedicalFile({ person }) {
               return errors;
             }}
             onSubmit={async (values) => {
-              const response = await API.put({
-                path: `/person/${person._id}`,
-                body: preparePersonForEncryption(
-                  customFieldsPersonsMedical,
-                  customFieldsPersonsSocial
-                )({ ...person, treatments: [...(person.treatments || []), values] }),
-              });
-              if (response.ok) {
-                const newPerson = response.decryptedData;
-                setPersons((persons) =>
-                  persons.map((p) => {
-                    if (p._id === person._id) return newPerson;
-                    return p;
-                  })
-                );
-                toastr.success('Mis à jour !');
+              let treatments = person.treatments || [];
+              if (treatments.find((t) => t._id === values._id)) {
+                treatments = treatments.map((t) => {
+                  if (t._id === values._id) return values;
+                  return t;
+                });
+              } else {
+                treatments = [...treatments, values];
               }
-              setShowAddConsultation(false);
+              await updatePerson({ treatments }, 'Traitement mise à jour !');
+              setShowAddTreatment(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (
               <React.Fragment>
@@ -436,4 +479,10 @@ const TitleWithButtonsContainer = styled.div`
 const Error = styled.span`
   color: red;
   font-size: 11px;
+`;
+
+const EditButton = styled.button`
+  width: 30px;
+  border: none;
+  background: transparent;
 `;

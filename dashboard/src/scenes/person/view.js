@@ -151,6 +151,7 @@ const Summary = ({ person }) => {
         </Col>
       </Row>
       <Formik
+        enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
           if (!body.createdAt) body.createdAt = person.createdAt;
