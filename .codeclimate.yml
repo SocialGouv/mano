@@ -2,13 +2,16 @@ version: "2"
 checks:
   file-lines:
     config:
-      threshold: 350
+      threshold: 500
   method-lines:
     config:
       threshold: 35
   return-statements:
     config:
       threshold: 15
+  method-complexity:
+    config:
+      threshold: 5
   similar-code:
     config:
       threshold: 150
