@@ -9,6 +9,7 @@ const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const Action = require("../models/action");
 const Comment = require("../models/comment");
+const Passage = require("../models/passage");
 const Territory = require("../models/territory");
 const Report = require("../models/report");
 const TerritoryObservation = require("../models/territoryObservation");
@@ -63,6 +64,7 @@ router.post(
           actions = [],
           persons = [],
           comments = [],
+          passages = [],
           territories = [],
           observations = [],
           places = [],
@@ -86,6 +88,10 @@ router.post(
 
         for (let { encrypted, encryptedEntityKey, _id } of comments) {
           await Comment.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        }
+
+        for (let { encrypted, encryptedEntityKey, _id } of passages) {
+          await Passage.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of territories) {

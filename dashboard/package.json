@@ -1,6 +1,6 @@
 {
   "name": "dashboard",
-  "version": "1.78.1",
+  "version": "1.79.6",
   "private": true,
   "dependencies": {
     "@babel/runtime": "^7.14.5",
@@ -41,6 +41,7 @@
     "sortablejs": "^1.14.0",
     "styled-components": "^5.2.1",
     "urijs": "^1.19.10",
+    "uuid": "^8.3.2",
     "validator": "^13.7.0",
     "xlsx": "^0.18.0"
   },

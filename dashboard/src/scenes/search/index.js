@@ -22,7 +22,7 @@ import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
-import ActionPersonName from '../../components/ActionPersonName';
+import PersonName from '../../components/PersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
 import { placesState } from '../../recoil/places';
@@ -153,7 +153,7 @@ const Actions = ({ search, onUpdateResults }) => {
               },
             },
             { title: 'Nom', dataKey: 'name' },
-            { title: 'Personne suivie', dataKey: 'person', render: (action) => <ActionPersonName action={action} /> },
+            { title: 'Personne suivie', dataKey: 'person', render: (action) => <PersonName item={action} /> },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
@@ -214,7 +214,7 @@ const Persons = ({ search, onUpdateResults }) => {
               render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
-            { title: 'Suivi(e) depuis le', dataKey: 'createdAt', render: (p) => formatDateWithFullMonth(p.createdAt || '') },
+            { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },
           ]}
         />
       </StyledBox>
@@ -468,11 +468,11 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
           columns={[
             {
               title: 'Date',
-              dataKey: 'createdAt',
+              dataKey: 'observedAt',
               render: (obs) => (
                 <span>
-                  {dayjs(obs.createdAt).format('ddd DD/MM/YY')}
-                  <br />à {dayjs(obs.createdAt).format('HH:mm')}
+                  {dayjs(obs.observedAt || obs.createdAt).format('ddd DD/MM/YY')}
+                  <br />à {dayjs(obs.observedAt || obs.createdAt).format('HH:mm')}
                 </span>
               ),
             },

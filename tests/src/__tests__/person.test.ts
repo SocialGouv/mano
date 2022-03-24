@@ -105,7 +105,7 @@ describe("Organisation CRUD", () => {
     await page.keyboard.press("Escape");
     await expect(page).toFill("input#person-wanderingAt", "26/04/2005");
     await page.keyboard.press("Escape");
-    await expect(page).toFill("input#person-createdAt", "20/04/2019");
+    await expect(page).toFill("input#person-followedSince", "20/04/2019");
     await page.keyboard.press("Escape");
     await page.keyboard.press("Escape");
     await expect(page).toClick("input#person-select-assigned-team");
@@ -155,7 +155,7 @@ describe("Organisation CRUD", () => {
     expect(await getInnerText("div.person-select-gender__single-value")).toBe("Homme");
     expect(await getInputValue("input#person-birthdate")).toBe("26/05/1981");
     expect(await getInputValue("input#person-wanderingAt")).toBe("26/04/2005");
-    expect(await getInputValue("input#person-createdAt")).toBe("20/04/2019");
+    expect(await getInputValue("input#person-followedSince")).toBe("20/04/2019");
     expect(await getInnerText("div.person-select-assigned-team__multi-value__label")).toBe(
       "Encrypted Orga Team"
     );
@@ -300,7 +300,7 @@ describe("Organisation CRUD", () => {
     expect(await getInnerText("div.person-select-gender__single-value")).toBe("Homme");
     expect(await getInputValue("input#person-birthdate")).toBe("26/05/1981");
     expect(await getInputValue("input#person-wanderingAt")).toBe("26/04/2005");
-    expect(await getInputValue("input#person-createdAt")).toBe("20/04/2019");
+    expect(await getInputValue("input#person-followedSince")).toBe("20/04/2019");
     expect(await getInnerText("div.person-select-assigned-team__multi-value__label")).toBe(
       "Encrypted Orga Team"
     );
@@ -436,10 +436,9 @@ describe("Organisation CRUD", () => {
     );
     await expect(page).toClick("button", { text: "Ajouter un passage" });
     await page.waitForTimeout(1000);
-    expect(await getInputValue("input#number-of-passages")).toBe("1");
+    expect(await getInnerText("span#number-of-passages")).toBe("1");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     await expect(page).toClick("a", { text: "Passages (1)" });
-    await expect(page).toMatch("Passage enregistré");
   });
 });

@@ -4,12 +4,8 @@ import { Col, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { SmallerHeaderWithBackButton } from '../../components/header';
-import { formatDateWithNameOfDay, isToday, now, startOfToday } from '../../services/date';
-import {
-  currentTeamReportsSelector,
-  numberOfPassagesAnonymousPerDatePerTeamSelector,
-  numberOfPassagesNonAnonymousPerDatePerTeamSelector,
-} from '../../recoil/selectors';
+import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
+import { currentTeamReportsSelector } from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
@@ -23,10 +19,10 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import { personsState } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { selector, selectorFamily, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { collectionsToLoadState } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
+import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -64,23 +60,41 @@ const lastReportSelector = selector({
   },
 });
 
+const todaysPassagesSelector = selector({
+  key: 'todaysPassagesSelector',
+  get: ({ get }) => {
+    const passages = get(passagesState);
+    const currentTeam = get(currentTeamState);
+    return passages
+      .filter((p) => p.team === currentTeam._id)
+      .filter((p) =>
+        getIsDayWithinHoursOffsetOfPeriod(
+          p.date,
+          {
+            referenceStartDay: dayjs(),
+            referenceEndDay: dayjs(),
+          },
+          currentTeam?.nightSession ? 12 : 0
+        )
+      );
+  },
+});
+
 const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
   const [reports, setReports] = useRecoilState(reportsState);
+  const setPassages = useSetRecoilState(passagesState);
+  const passages = useRecoilValue(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
   const lastReport = useRecoilValue(lastReportSelector);
   const user = useRecoilValue(userState);
   const collectionsToLoad = useRecoilValue(collectionsToLoadState);
-  const setComments = useSetRecoilState(commentsState);
   const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
   const API = useApi();
-
-  const anonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
-  const nonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
 
   const persons = useRecoilValue(personsState);
 
@@ -88,11 +102,7 @@ const Reception = () => {
   const location = useLocation();
 
   // for better UX when increase passage
-  const [passages, setPassages] = useState(todaysReport?.passages || 0);
   const [addingPassage, setAddingPassage] = useState(false);
-  useEffect(() => {
-    setPassages(anonymousPassages + nonAnonymousPassages);
-  }, [anonymousPassages, nonAnonymousPassages]);
 
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
@@ -145,33 +155,44 @@ const Reception = () => {
     await updateReport(reportUpdate);
   };
 
-  const incrementPassage = async (report, { newValue = null } = {}) => {
-    await updateReport({
-      ...report,
-      passages: newValue,
-    });
+  const onAddAnonymousPassage = async () => {
+    const optimisticId = Date.now();
+    const newPassage = {
+      user: user._id,
+      team: currentTeam._id,
+      date: new Date(),
+      optimisticId,
+    };
+    // optimistic UI
+    setPassages((passages) => [newPassage, ...passages]);
+    const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
+    if (response.ok) {
+      setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
+    }
   };
 
   const onAddPassageForPersons = async () => {
     if (!selectedPersons.length) return;
     setAddingPassage(true);
-    for (const person of selectedPersons) {
-      const commentBody = {
-        comment: 'Passage enregistré',
-        item: person._id,
+    const newPassages = [];
+    for (const [index, person] of Object.entries(selectedPersons)) {
+      newPassages.push({
         person: person._id,
-        type: 'person',
         user: user._id,
         team: currentTeam._id,
-        organisation: organisation._id,
-      };
-      const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
+        date: new Date(),
+        optimisticId: index,
+      });
+    }
+    // optimistic UI
+    setPassages((passages) => [...newPassages, ...passages]);
+    for (const [index, passage] of Object.entries(newPassages)) {
+      const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
       if (response.ok) {
-        setComments((comments) => [response.decryptedData, ...comments]);
+        setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
       }
     }
     setAddingPassage(false);
-    setSelectedPersons([]);
   };
 
   const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
@@ -227,24 +248,9 @@ const Reception = () => {
           </div>
         </Col>
         <Col md={4}>
-          <Card
-            title="Nombre de passages"
-            count={passages}
-            countId="number-of-passages"
-            unit={`passage${passages > 1 ? 's' : ''}`}
-            onChange={async (newValue) => {
-              setAddingPassage(true);
-              setPassages(newValue);
-              await incrementPassage(todaysReport, { newValue });
-              setAddingPassage(false);
-            }}>
+          <Card title="Nombre de passages" count={passages.length} countId="number-of-passages" unit={`passage${passages.length > 1 ? 's' : ''}`}>
             <ButtonCustom
-              onClick={async () => {
-                setAddingPassage(true);
-                setPassages((p) => p + 1);
-                await incrementPassage(todaysReport, { newValue: anonymousPassages + 1 });
-                setAddingPassage(false);
-              }}
+              onClick={onAddAnonymousPassage}
               color="link"
               title="Ajouter un passage anonyme"
               padding="0px"
@@ -252,17 +258,10 @@ const Reception = () => {
               disabled={addingPassage}
             />
             <ButtonCustom
-              onClick={async () => {
-                setAddingPassage(true);
-                if (!anonymousPassages) return;
-                setPassages((p) => p - 1);
-                await incrementPassage(todaysReport, { newValue: anonymousPassages - 1 });
-                setAddingPassage(false);
-              }}
+              onClick={() => history.push(`/report/${todaysReport._id}?tab=5`)}
               color="link"
-              title="Retirer un passage anonyme"
+              title="Modifier les passages"
               padding="0px"
-              disabled={addingPassage || !anonymousPassages}
             />
           </Card>
         </Col>

@@ -69,6 +69,7 @@ const Person = ({ route, navigation }) => {
         birthdate: person.birthdate || null,
         alertness: person.alertness || false,
         wanderingAt: person.wanderingAt || null,
+        followedSince: person.followedSince || person.createdAt,
         createdAt: person.createdAt,
         gender: person.gender || genders[0],
         phone: person.phone?.trim() || '',

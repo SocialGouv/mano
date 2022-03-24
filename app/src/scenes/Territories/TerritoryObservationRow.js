@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { Alert } from 'react-native';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
@@ -56,7 +56,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
 
   const onPressRequest = async () => {
     const options = ['Supprimer', 'Annuler'];
-    if (onUpdate && observation.user._id === user._id) options.unshift('Modifier');
+    if (onUpdate && observation.user === user._id) options.unshift('Modifier');
     showActionSheetWithOptions(
       {
         options,
@@ -96,7 +96,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
     }
   };
 
-  const { createdAt } = observation;
+  const { observedAt, createdAt } = observation;
 
   return (
     <Container>
@@ -115,7 +115,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
         <CreationDate>
           {!!observation?.user && <UserName caption="Observation faite par" id={observation.user?._id || observation.user} />}
           {'\u000A'}
-          {new Date(createdAt).getLocaleDateAndTime('fr')}
+          {new Date(observedAt || createdAt).getLocaleDateAndTime('fr')}
         </CreationDate>
       </CaptionsContainer>
       <OnMoreContainer hitSlop={hitSlop} onPress={onPressRequest}>

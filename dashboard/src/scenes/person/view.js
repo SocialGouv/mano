@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
@@ -43,19 +43,25 @@ import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
-import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import DeletePerson from './DeletePerson';
+import { MedicalFile } from './MedicalFile';
+import { ENV } from '../../config';
+import { passagesState } from '../../recoil/passages';
+import DateBloc from '../../components/DateBloc';
+import Passage from '../../components/Passage';
 
-const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
+const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
 const View = () => {
   const { id } = useParams();
   const location = useLocation();
   const history = useHistory();
   const persons = useRecoilValue(personsState);
+  const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [tabsContents, setTabsContents] = useState(initTabs);
@@ -91,10 +97,17 @@ const View = () => {
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
           return (
-            <NavItem key={index} style={{ cursor: 'pointer' }}>
+            <NavItem
+              // This implementation is temporary. Currently, the tabs are not dynamic so we have to hide them when disabled.
+              // Also, this is currently only displayed in localhost. Todo: fix me!
+              className={`${
+                initTabs[index].toLowerCase() === 'dossier médical' && (ENV !== 'development' || !user.healthcareProfessional) ? 'd-none' : ''
+              }`}
+              key={index}
+              style={{ cursor: 'pointer' }}>
               <NavLink
                 key={index}
-                className={`${activeTab === index && 'active'}`}
+                className={`${activeTab === index ? 'active' : ''}`}
                 onClick={() => {
                   const searchParams = new URLSearchParams(location.search);
                   searchParams.set('tab', initTabs[index].toLowerCase());
@@ -112,18 +125,21 @@ const View = () => {
           <Summary person={person} />
         </TabPane>
         <TabPane tabId={1}>
-          <Actions person={person} onUpdateResults={(total) => updateTabContent(1, `Actions (${total})`)} />
+          <MedicalFile person={person} />
         </TabPane>
         <TabPane tabId={2}>
-          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(2, `Commentaires (${total})`)} />
+          <Actions person={person} onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
         </TabPane>
         <TabPane tabId={3}>
-          <Comments personId={person?._id} forPassages onUpdateResults={(total) => updateTabContent(3, `Passages (${total})`)} />
+          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Commentaires (${total})`)} />
         </TabPane>
         <TabPane tabId={4}>
-          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Lieux (${total})`)} />
+          <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
-        <TabPane tabId={5}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(5, `Documents (${total})`)} />}</TabPane>
+        <TabPane tabId={5}>
+          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
+        </TabPane>
+        <TabPane tabId={6}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)} />}</TabPane>
       </TabContent>
     </StyledContainer>
   );
@@ -147,9 +163,10 @@ const Summary = ({ person }) => {
         </Col>
       </Row>
       <Formik
+        enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
-          if (!body.createdAt) body.createdAt = person.createdAt;
+          if (!body.followedSince) body.followedSince = person.createdAt;
           body.entityKey = person.entityKey;
           const response = await API.put({
             path: `/person/${person._id}`,
@@ -236,15 +253,15 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Suivi(e) depuis le / Créé le</Label>
+                    <Label>Suivi(e) depuis le / Créé(e) le</Label>
                     <div>
                       <DatePicker
                         locale="fr"
                         className="form-control"
-                        selected={dateForDatePicker(values.createdAt)}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                        selected={dateForDatePicker(values.followedSince || values.createdAt)}
+                        onChange={(date) => handleChange({ target: { value: date, name: 'followedSince' } })}
                         dateFormat="dd/MM/yyyy"
-                        id="person-createdAt"
+                        id="person-followedSince"
                       />
                     </div>
                   </FormGroup>
@@ -442,8 +459,7 @@ const Actions = ({ person, onUpdateResults }) => {
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         columns={[
-          { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
-          { title: 'À faire le', dataKey: 'dueAt', render: (action) => formatDateWithFullMonth(action.dueAt) },
+          { title: 'À faire le', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
           {
             title: 'Heure',
             dataKey: '_id',
@@ -452,12 +468,75 @@ const Actions = ({ person, onUpdateResults }) => {
               return formatTime(action.dueAt);
             },
           },
+          { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
           { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           {
             title: 'Équipe',
             dataKey: 'team',
             render: (action) => <TagTeam key={action.team} teamId={action.team} />,
           },
+        ]}
+      />
+    </React.Fragment>
+  );
+};
+
+const Passages = ({ personId, onUpdateResults }) => {
+  const passages = useRecoilValue(passagesState);
+  const personPassages = useMemo(() => passages.filter((passage) => passage.person === personId), [personId, passages]);
+  const [passageToEdit, setPassageToEdit] = useState(null);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
+  useEffect(() => {
+    onUpdateResults(personPassages.length);
+  }, [personPassages.length]);
+
+  return (
+    <React.Fragment>
+      <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
+        <Title>Passages</Title>
+        <ButtonCustom
+          title="Ajouter un passage"
+          style={{ marginLeft: 'auto', marginBottom: '10px' }}
+          onClick={() =>
+            setPassageToEdit({
+              user: user._id,
+              team: currentTeam._id,
+              person: personId,
+            })
+          }
+        />
+      </div>
+      <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+      <Table
+        data={personPassages}
+        rowKey={'_id'}
+        onRowClick={(passage) => setPassageToEdit(passage)}
+        columns={[
+          {
+            title: 'Date',
+            dataKey: 'date',
+            render: (passage) => {
+              return <DateBloc date={passage.date} />;
+            },
+          },
+          {
+            title: 'Heure',
+            dataKey: 'time',
+            render: (passage) => formatTime(passage.date),
+          },
+          {
+            title: 'Équipe',
+            dataKey: 'team',
+            render: (passage) => <TagTeam key={passage.team} teamId={passage.team} />,
+          },
+          {
+            title: 'Enregistré par',
+            dataKey: 'user',
+            render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+          },
+          { title: 'Commentaire', dataKey: 'comment' },
         ]}
       />
     </React.Fragment>

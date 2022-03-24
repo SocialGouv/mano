@@ -264,7 +264,8 @@ export const personFields = [
   { name: 'assignedTeams', type: 'multi-choice', label: 'Équipes en charge', encrypted: true, importable: true, filterable: false },
   { name: '_id', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'organisation', label: '', encrypted: false, importable: false, filterable: false },
-  { name: 'createdAt', type: 'date', label: 'Suivi(e) depuis le / Créé le', encrypted: false, importable: true, filterable: true },
+  { name: 'followedSince', type: 'date', label: 'Suivi(e) depuis le / Créé(e) le', encrypted: true, importable: true, filterable: true },
+  { name: 'createdAt', type: 'date', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'updatedAt', type: 'date', label: '', encrypted: false, importable: false, filterable: false },
   {
     name: 'outOfActiveList',
@@ -284,6 +285,27 @@ export const personFields = [
     options: outOfActiveListReasonOptions,
   },
   { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
+  {
+    name: 'consultations',
+    type: 'consultations',
+    label: 'Historique des consultations',
+    encrypted: true,
+    importable: false,
+  },
+  {
+    name: 'treatments',
+    type: 'treatments',
+    label: 'Traitements en cours',
+    encrypted: true,
+    importable: false,
+  },
+  {
+    name: 'numeroSecuriteSociale',
+    type: 'text',
+    label: 'Numéro de sécurité sociale',
+    encrypted: true,
+    importable: false,
+  },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);

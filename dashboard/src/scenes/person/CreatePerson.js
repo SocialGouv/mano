@@ -61,6 +61,7 @@ const CreatePerson = ({ refreshable }) => {
             onSubmit={async (body, actions) => {
               const existingPerson = persons.find((p) => p.name === body.name);
               if (existingPerson) return toastr.error('Un utilisateur existe déjà à ce nom');
+              body.followedSince = new Date();
               const response = await API.post({
                 path: '/person',
                 body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),

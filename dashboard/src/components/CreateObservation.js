@@ -65,9 +65,9 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               if (!values.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
               if (!values.territory) return toastr.error('Erreur!', 'Le territoire est obligatoire');
               const body = {
-                createdAt: values.createdAt,
+                observedAt: values.observedAt,
                 team: values.team,
-                user: user._id,
+                user: values.user || user._id,
                 territory: values.territory,
                 _id: observation._id,
               };
@@ -97,12 +97,12 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          selected={dateForDatePicker(values.createdAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                          selected={dateForDatePicker((values.observedAt || values.createdAt) ?? new Date())}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'observedAt' } })}
                           timeInputLabel="Heure :"
-                          dateFormat="dd/MM/yyyy hh:mm"
+                          dateFormat="dd/MM/yyyy HH:mm"
                           showTimeInput
-                          id="observation-createdat"
+                          id="observation-observedat"
                         />
                       </div>
                     </FormGroup>

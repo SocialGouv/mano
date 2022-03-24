@@ -35,13 +35,17 @@ create table if not exists "mano"."Organisation"
     categories                 text[],
     "encryptionEnabled"        boolean default false,
     "encryptionLastUpdateAt"   timestamp with time zone,
+    encrypting                 boolean default false,
     "receptionEnabled"         boolean default false,
     services                   text[],
     collaborations             text[],
     "customFieldsObs"          jsonb,
     "customFieldsPersonsSocial"          jsonb,
     "customFieldsPersonsMedical"          jsonb,
-    "encryptedVerificationKey" text
+    "encryptedVerificationKey" text,
+    migrations                 text[],
+    "migrationLastUpdateAt"    timestamp with time zone,
+    migrating                 boolean default false
 );
 
 create table if not exists "mano"."Structure"
@@ -165,6 +169,21 @@ create table if not exists "mano"."Comment"
     "updatedAt"          timestamp with time zone not null,
     organisation         uuid
         constraint "Comment_organisation_fkey"
+            references "mano"."Organisation"
+            on update cascade on delete cascade,
+    encrypted            text,
+    "encryptedEntityKey" text
+);
+
+create table if not exists "mano"."Passage"
+(
+    _id                  uuid                     not null
+        constraint "Passage_pkey"
+            primary key,
+    "createdAt"          timestamp with time zone not null,
+    "updatedAt"          timestamp with time zone not null,
+    organisation         uuid
+        constraint "Passage_organisation_fkey"
             references "mano"."Organisation"
             on update cascade on delete cascade,
     encrypted            text,

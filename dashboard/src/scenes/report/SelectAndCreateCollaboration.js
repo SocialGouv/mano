@@ -16,7 +16,6 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
   const API = useApi();
 
   const onChangeRequest = (newCollabs) => {
-    console.log({ newCollabs });
     onChange({ currentTarget: { value: newCollabs || [], name: 'collaborations' } });
   };
 

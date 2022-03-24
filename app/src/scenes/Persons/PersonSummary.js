@@ -187,15 +187,15 @@ const PersonSummary = ({
       {editable ? (
         <DateAndTimeInput
           label="Suivi(e) depuis / Créé(e) le"
-          setDate={(createdAt) => onChange({ createdAt })}
-          date={person.createdAt}
+          setDate={(followedSince) => onChange({ followedSince })}
+          date={person.followedSince}
           editable={editable}
           showYear
         />
       ) : (
         <InputLabelled
           label="Suivi(e) depuis / Créé(e) le"
-          value={displayBirthDate(person.createdAt, {
+          value={displayBirthDate(person.followedSince, {
             reverse: true,
             roundHalf: true,
           })}

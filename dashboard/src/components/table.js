@@ -6,23 +6,13 @@ import { theme } from '../config';
 const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', className, title, noData, isSortable, onSort }) => {
   const gridRef = useRef(null);
   const sortableJsRef = useRef(null);
-  // There was a bug where we can't add a field then re-order the list: `data` is not updated
-  // in `onListChange` callack so the list is partial and re-order fails (or loose fields).
-  // We have to use a Ref for data since data does not react inside `{ onEnd: onListChange }` and is in its old state.
-  // The bug is fixed, via using one more Ref 😱 (a.k.a "this"-ish) that is updated on each data change.
-  // In a near future we should either avoir using Refs or use https://github.com/SortableJS/react-sortablejs instead.
-  // To discuss with @Arnaud.
-  const dataRef = useRef(null);
-  useEffect(() => {
-    dataRef.current = data;
-  }, [data]);
 
   const onListChange = useCallback(() => {
     onSort(
       [...gridRef.current.children].map((i) => i.dataset.key),
-      dataRef.current
+      data
     );
-  }, [onSort]);
+  }, [onSort, data]);
 
   useEffect(() => {
     if (!!isSortable && !!data.length) {

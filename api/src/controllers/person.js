@@ -10,7 +10,7 @@ const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
 const { STORAGE_DIRECTORY } = require("../config");
-const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, cryptoHexRegex, positiveIntegerRegex } = require("../utils");
 const { capture } = require("../sentry");
@@ -119,7 +119,7 @@ router.post(
   "/import",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       z.array(
@@ -128,9 +128,6 @@ router.post(
           encryptedEntityKey: z.string(),
         })
       ).parse(req.body);
-      for (const person of req.body) {
-        if (person.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(person.createdAt);
-      }
     } catch (e) {
       const error = new Error(`Invalid request in person import: ${e}`);
       error.status = 400;
@@ -144,7 +141,6 @@ router.post(
         organisation: req.user.organisation,
         user: req.user._id,
       };
-      if (p.createdAt) person.createdAt = p.createdAt;
       return person;
     });
     const data = await Person.bulkCreate(persons, { returning: true });
@@ -166,7 +162,7 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       z.string().parse(req.body.encrypted);
@@ -242,11 +238,10 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
-      if (req.body.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.createdAt);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
@@ -259,17 +254,11 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { createdAt, encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey } = req.body;
     const updatePerson = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
     };
-
-    // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
-    if (createdAt) {
-      person.changed("createdAt", true);
-      updatePerson.createdAt = new Date(createdAt);
-    }
 
     await Person.update(updatePerson, query, { silent: false });
     const newPerson = await Person.findOne(query);

@@ -78,13 +78,12 @@ const TableCustomFields = ({ data, customFields }) => {
     setIsSubmitting(false);
   };
 
-  const handleSort = async (keys, currentDataRef) => {
-    // See ./Table.js for more information about currentDataRef.
+  const handleSort = async (keys) => {
     setIsSubmitting(true);
     try {
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { [customFields]: keys.map((key) => currentDataRef.find((field) => field.name === key)) },
+        body: { [customFields]: keys.map((key) => mutableData.find((field) => field.name === key)) },
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
@@ -102,6 +101,8 @@ const TableCustomFields = ({ data, customFields }) => {
     <>
       <Table
         data={mutableData}
+        // use this key prop to reset table and reset sortablejs on each element added/removed
+        key={mutableData.length}
         rowKey="name"
         isSortable
         onSort={handleSort}
@@ -218,7 +219,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                           <Label>Choix</Label>
                           <SelectCustom
                             creatable
-                            options={[...((editingField || field).options || [])]
+                            options={[...(editingField?.options || field?.options || [])]
                               .sort((c1, c2) => c1.localeCompare(c2))
                               .map((opt) => ({ value: opt, label: opt }))}
                             value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}

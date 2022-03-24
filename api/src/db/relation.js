@@ -10,6 +10,7 @@ const RelUserTeam = require("../models/relUserTeam");
 const Structure = require("../models/structure");
 const Action = require("../models/action");
 const Comment = require("../models/comment");
+const Passage = require("../models/passage");
 const Territory = require("../models/territory");
 const TerritoryObservation = require("../models/territoryObservation");
 
@@ -54,6 +55,10 @@ Organisation.hasMany(Report, organisationForeignKey);
 // Comment
 Comment.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(Comment, organisationForeignKey);
+
+// Passage
+Passage.belongsTo(Organisation, organisationForeignKey);
+Organisation.hasMany(Passage, organisationForeignKey);
 
 // Action
 Action.belongsTo(Organisation, organisationForeignKey);
