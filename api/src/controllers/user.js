@@ -595,21 +595,12 @@ router.delete(
       return next(error);
     }
     const userId = req.params._id;
-
-    const fkQuery = { where: { user: userId } };
-    await Comment.update({ user: null }, fkQuery);
-    await Passage.update({ user: null }, fkQuery);
-    await Action.update({ user: null }, fkQuery);
-    await Person.update({ user: null }, fkQuery);
-    // Todo: there are missing tables, such as territory observations.
-
     const query = { where: { _id: userId, organisation: req.user.organisation } };
 
     let user = await User.findOne(query);
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
 
     let tx = await User.sequelize.transaction();
-
     await Promise.all([User.destroy({ ...query, transaction: tx }), RelUserTeam.destroy({ where: { user: userId }, transaction: tx })]);
     await user.destroy({ transaction: tx });
     await tx.commit();
