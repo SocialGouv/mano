@@ -213,10 +213,11 @@ const List = () => {
           { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
           {
             title: 'Suivi(e) depuis le',
-            dataKey: 'createdAt',
+            dataKey: 'followedSince',
             render: (p) => {
-              if (p.outOfActiveList) return <div style={{ color: theme.black50 }}>{formatDateWithFullMonth(p.createdAt || '')}</div>;
-              return formatDateWithFullMonth(p.createdAt || '');
+              if (p.outOfActiveList)
+                return <div style={{ color: theme.black50 }}>{formatDateWithFullMonth(p.followedSince || p.createdAt || '')}</div>;
+              return formatDateWithFullMonth(p.followedSince || p.createdAt || '');
             },
           },
         ]}

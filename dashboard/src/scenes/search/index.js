@@ -214,7 +214,7 @@ const Persons = ({ search, onUpdateResults }) => {
               render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
-            { title: 'Suivi(e) depuis le', dataKey: 'createdAt', render: (p) => formatDateWithFullMonth(p.createdAt || '') },
+            { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },
           ]}
         />
       </StyledBox>

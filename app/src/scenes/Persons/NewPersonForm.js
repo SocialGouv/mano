@@ -60,7 +60,7 @@ const NewPersonForm = ({ navigation, route }) => {
     if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
     const response = await API.post({
       path: '/person',
-      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name }),
+      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name, followedSince: new Date() }),
     });
     if (response.ok) {
       setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));

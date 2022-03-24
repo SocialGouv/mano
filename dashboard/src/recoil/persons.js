@@ -264,7 +264,8 @@ export const personFields = [
   { name: 'assignedTeams', type: 'multi-choice', label: 'Équipes en charge', encrypted: true, importable: true, filterable: false },
   { name: '_id', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'organisation', label: '', encrypted: false, importable: false, filterable: false },
-  { name: 'createdAt', type: 'date', label: 'Suivi(e) depuis le / Créé le', encrypted: false, importable: true, filterable: true },
+  { name: 'followedSince', type: 'date', label: 'Suivi(e) depuis le / Créé(e) le', encrypted: true, importable: true, filterable: true },
+  { name: 'createdAt', type: 'date', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'updatedAt', type: 'date', label: '', encrypted: false, importable: false, filterable: false },
   {
     name: 'outOfActiveList',

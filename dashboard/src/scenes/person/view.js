@@ -166,7 +166,7 @@ const Summary = ({ person }) => {
         enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
-          if (!body.createdAt) body.createdAt = person.createdAt;
+          if (!body.followedSince) body.followedSince = person.createdAt;
           body.entityKey = person.entityKey;
           const response = await API.put({
             path: `/person/${person._id}`,
@@ -253,15 +253,15 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Suivi(e) depuis le / Créé le</Label>
+                    <Label>Suivi(e) depuis le / Créé(e) le</Label>
                     <div>
                       <DatePicker
                         locale="fr"
                         className="form-control"
-                        selected={dateForDatePicker(values.createdAt)}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                        selected={dateForDatePicker(values.followedSince || values.createdAt)}
+                        onChange={(date) => handleChange({ target: { value: date, name: 'followedSince' } })}
                         dateFormat="dd/MM/yyyy"
-                        id="person-createdAt"
+                        id="person-followedSince"
                       />
                     </div>
                   </FormGroup>
