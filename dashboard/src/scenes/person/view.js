@@ -48,17 +48,20 @@ import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import DeletePerson from './DeletePerson';
+import { MedicalFile } from './MedicalFile';
+import { ENV } from '../../config';
 import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
 import Passage from '../../components/Passage';
 
-const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
+const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
 const View = () => {
   const { id } = useParams();
   const location = useLocation();
   const history = useHistory();
   const persons = useRecoilValue(personsState);
+  const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [tabsContents, setTabsContents] = useState(initTabs);
@@ -94,10 +97,17 @@ const View = () => {
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
           return (
-            <NavItem key={index} style={{ cursor: 'pointer' }}>
+            <NavItem
+              // This implementation is temporary. Currently, the tabs are not dynamic so we have to hide them when disabled.
+              // Also, this is currently only displayed in localhost. Todo: fix me!
+              className={`${
+                initTabs[index].toLowerCase() === 'dossier médical' && (ENV !== 'development' || !user.healthcareProfessional) ? 'd-none' : ''
+              }`}
+              key={index}
+              style={{ cursor: 'pointer' }}>
               <NavLink
                 key={index}
-                className={`${activeTab === index && 'active'}`}
+                className={`${activeTab === index ? 'active' : ''}`}
                 onClick={() => {
                   const searchParams = new URLSearchParams(location.search);
                   searchParams.set('tab', initTabs[index].toLowerCase());
@@ -115,18 +125,21 @@ const View = () => {
           <Summary person={person} />
         </TabPane>
         <TabPane tabId={1}>
-          <Actions person={person} onUpdateResults={(total) => updateTabContent(1, `Actions (${total})`)} />
+          <MedicalFile person={person} />
         </TabPane>
         <TabPane tabId={2}>
-          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(2, `Commentaires (${total})`)} />
+          <Actions person={person} onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
         </TabPane>
         <TabPane tabId={3}>
-          <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Passages (${total})`)} />
+          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Commentaires (${total})`)} />
         </TabPane>
         <TabPane tabId={4}>
-          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Lieux (${total})`)} />
+          <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
-        <TabPane tabId={5}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(5, `Documents (${total})`)} />}</TabPane>
+        <TabPane tabId={5}>
+          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
+        </TabPane>
+        <TabPane tabId={6}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)} />}</TabPane>
       </TabContent>
     </StyledContainer>
   );
@@ -150,6 +163,7 @@ const Summary = ({ person }) => {
         </Col>
       </Row>
       <Formik
+        enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
           if (!body.createdAt) body.createdAt = person.createdAt;

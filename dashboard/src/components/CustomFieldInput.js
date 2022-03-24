@@ -7,8 +7,8 @@ import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../services/date';
 
-const CustomFieldInput = ({ field, values, handleChange, model }) => (
-  <Col md={6} key={field.name}>
+const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) => (
+  <Col md={colWidth} key={field.name}>
     <FormGroup>
       <Label>{field.type !== 'boolean' ? field.label : ''}</Label>
       {!!['text', 'number'].includes(field.type) && (
