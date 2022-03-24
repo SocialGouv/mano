@@ -284,6 +284,20 @@ export const personFields = [
     options: outOfActiveListReasonOptions,
   },
   { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
+  {
+    name: 'consultations',
+    type: 'consultations',
+    label: 'Historique des consultations',
+    encrypted: true,
+    importable: false,
+  },
+  {
+    name: 'treatments',
+    type: 'treatments',
+    label: 'Traitements en cours',
+    encrypted: true,
+    importable: false,
+  },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
