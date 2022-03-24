@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import XLSX from 'xlsx';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toastr } from 'react-redux-toastr';
@@ -36,8 +36,17 @@ const ImportData = () => {
   const [ignoredFields, setIgnoredFields] = useState([]);
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
 
-  const importableFields = personFieldsIncludingCustomFields.filter((f) => f.importable);
-  const importableLabels = importableFields.map((f) => f.label);
+  const importableFields = useMemo(
+    () =>
+      personFieldsIncludingCustomFields
+        .filter((field) => field.importable)
+        .map((field) => ({
+          ...field,
+          options: field.name === 'assignedTeams' ? teams.map((team) => team.name) : field.options,
+        })),
+    [personFieldsIncludingCustomFields]
+  );
+  const importableLabels = useMemo(() => importableFields.map((f) => f.label), [importableFields]);
 
   const onParseData = async (event) => {
     try {
@@ -78,9 +87,6 @@ const ImportData = () => {
         const field = importableFields.find((f) => f.label === personsSheet[cell].v?.trim()); // { name: type: label: importable: options: }
         const fieldname = field.name; // 'name', 'gender', ...
         const type = typeOptions.find((typeOption) => typeOption.value === field.type); // { value: label: validator: }
-        if (fieldname === 'assignedTeams') {
-          field.options = teams.map((team) => team.name);
-        }
         const validator = field.options ? type.validator(field.options) : type.validator;
         return [column, fieldname, validator];
       }); // [['C', 'name], ['D', birthdate]]
