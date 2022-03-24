@@ -1,3 +1,13 @@
+## [1.79.7](https://github.com/SocialGouv/mano/compare/v1.79.6...v1.79.7) (2022-03-24)
+
+
+### Bug Fixes
+
+* **api:** trigger api release ([31d35df](https://github.com/SocialGouv/mano/commit/31d35dffc1beffe7dd6f5db29b227c852a898534))
+* **app,dashboard,api:** remove ability to PUT createdAt of comment ([#503](https://github.com/SocialGouv/mano/issues/503)) ([dfde586](https://github.com/SocialGouv/mano/commit/dfde586bb068188cae984714fff2a9443787950a))
+* **dashboard:** editingField may exist but not have options ([15a6dd5](https://github.com/SocialGouv/mano/commit/15a6dd582ed99aa6321875e19511423f4ee78a81))
+* migrations not activated yet in app ([#529](https://github.com/SocialGouv/mano/issues/529)) ([c5cb5bd](https://github.com/SocialGouv/mano/commit/c5cb5bd5f8c28fb196e2e6c357f55c8b59771442))
+
 ## [1.79.6](https://github.com/SocialGouv/mano/compare/v1.79.5...v1.79.6) (2022-03-24)
 
 
