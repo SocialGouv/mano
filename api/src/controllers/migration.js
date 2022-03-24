@@ -20,7 +20,6 @@ router.put(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.literal("admin").parse(req.user.role);
       z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.string().min(1).parse(req.params.migrationName);
     } catch (e) {
