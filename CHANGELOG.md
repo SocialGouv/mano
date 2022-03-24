@@ -1,3 +1,10 @@
+## [1.79.5](https://github.com/SocialGouv/mano/compare/v1.79.4...v1.79.5) (2022-03-24)
+
+
+### Bug Fixes
+
+* **dashboard:** import crashed with team after [#487](https://github.com/SocialGouv/mano/issues/487) refactor ([14a2bae](https://github.com/SocialGouv/mano/commit/14a2baefbae53cafc6d9d13c6c792fa1e7c389e8))
+
 ## [1.79.4](https://github.com/SocialGouv/mano/compare/v1.79.3...v1.79.4) (2022-03-23)
 
 
