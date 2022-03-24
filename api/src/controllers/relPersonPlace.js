@@ -4,7 +4,7 @@ const passport = require("passport");
 const { Op } = require("sequelize");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
 const RelPersonPlace = require("../models/relPersonPlace");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
@@ -13,7 +13,7 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       z.string().parse(req.body.encrypted);

@@ -7,14 +7,14 @@ const sequelize = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const Report = require("../models/report");
-const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 
 router.put(
   "/",
   passport.authenticate("user", { session: false }),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {

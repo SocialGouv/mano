@@ -10,7 +10,7 @@ const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
 const { STORAGE_DIRECTORY } = require("../config");
-const validateOrganisationEncryption = require("../middleware/validateOrganisationEncryption");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, cryptoHexRegex, positiveIntegerRegex } = require("../utils");
 const { capture } = require("../sentry");
@@ -119,7 +119,7 @@ router.post(
   "/import",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       z.array(
@@ -166,7 +166,7 @@ router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       z.string().parse(req.body.encrypted);
@@ -242,7 +242,7 @@ router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal"]),
-  validateOrganisationEncryption,
+  validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
@@ -43,13 +43,16 @@ import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
-import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import DeletePerson from './DeletePerson';
 import { MedicalFile } from './MedicalFile';
 import { ENV } from '../../config';
+import { passagesState } from '../../recoil/passages';
+import DateBloc from '../../components/DateBloc';
+import Passage from '../../components/Passage';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -131,7 +134,7 @@ const View = () => {
           <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Commentaires (${total})`)} />
         </TabPane>
         <TabPane tabId={4}>
-          <Comments personId={person?._id} forPassages onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
+          <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
         <TabPane tabId={5}>
           <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
@@ -456,8 +459,7 @@ const Actions = ({ person, onUpdateResults }) => {
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         columns={[
-          { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
-          { title: 'À faire le', dataKey: 'dueAt', render: (action) => formatDateWithFullMonth(action.dueAt) },
+          { title: 'À faire le', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
           {
             title: 'Heure',
             dataKey: '_id',
@@ -466,12 +468,75 @@ const Actions = ({ person, onUpdateResults }) => {
               return formatTime(action.dueAt);
             },
           },
+          { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
           { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           {
             title: 'Équipe',
             dataKey: 'team',
             render: (action) => <TagTeam key={action.team} teamId={action.team} />,
           },
+        ]}
+      />
+    </React.Fragment>
+  );
+};
+
+const Passages = ({ personId, onUpdateResults }) => {
+  const passages = useRecoilValue(passagesState);
+  const personPassages = useMemo(() => passages.filter((passage) => passage.person === personId), [personId, passages]);
+  const [passageToEdit, setPassageToEdit] = useState(null);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
+  useEffect(() => {
+    onUpdateResults(personPassages.length);
+  }, [personPassages.length]);
+
+  return (
+    <React.Fragment>
+      <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
+        <Title>Passages</Title>
+        <ButtonCustom
+          title="Ajouter un passage"
+          style={{ marginLeft: 'auto', marginBottom: '10px' }}
+          onClick={() =>
+            setPassageToEdit({
+              user: user._id,
+              team: currentTeam._id,
+              person: personId,
+            })
+          }
+        />
+      </div>
+      <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+      <Table
+        data={personPassages}
+        rowKey={'_id'}
+        onRowClick={(passage) => setPassageToEdit(passage)}
+        columns={[
+          {
+            title: 'Date',
+            dataKey: 'date',
+            render: (passage) => {
+              return <DateBloc date={passage.date} />;
+            },
+          },
+          {
+            title: 'Heure',
+            dataKey: 'time',
+            render: (passage) => formatTime(passage.date),
+          },
+          {
+            title: 'Équipe',
+            dataKey: 'team',
+            render: (passage) => <TagTeam key={passage.team} teamId={passage.team} />,
+          },
+          {
+            title: 'Enregistré par',
+            dataKey: 'user',
+            render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+          },
+          { title: 'Commentaire', dataKey: 'comment' },
         ]}
       />
     </React.Fragment>

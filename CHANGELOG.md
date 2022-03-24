@@ -1,3 +1,38 @@
+## [1.79.4](https://github.com/SocialGouv/mano/compare/v1.79.3...v1.79.4) (2022-03-23)
+
+
+### Bug Fixes
+
+* **dashboard:** prevent reports updating non stop ([#518](https://github.com/SocialGouv/mano/issues/518)) ([19ea779](https://github.com/SocialGouv/mano/commit/19ea779a3170704648d4186bbcc489a93d85aee3))
+
+## [1.79.3](https://github.com/SocialGouv/mano/compare/v1.79.2...v1.79.3) (2022-03-23)
+
+
+### Bug Fixes
+
+* **dashboard:** number of comments ([#517](https://github.com/SocialGouv/mano/issues/517)) ([f974537](https://github.com/SocialGouv/mano/commit/f974537235e70acc9983f3788ee2e2b6f23fb1d5))
+
+## [1.79.2](https://github.com/SocialGouv/mano/compare/v1.79.1...v1.79.2) (2022-03-23)
+
+
+### Bug Fixes
+
+* **dashboard:**  bugs related to new passage migration ([#516](https://github.com/SocialGouv/mano/issues/516)) ([a05fd7d](https://github.com/SocialGouv/mano/commit/a05fd7d1324d41a3255217329d1fb5fbd14c0ffc))
+
+## [1.79.1](https://github.com/SocialGouv/mano/compare/v1.79.0...v1.79.1) (2022-03-23)
+
+
+### Bug Fixes
+
+* cors update to include tauri ([#515](https://github.com/SocialGouv/mano/issues/515)) ([b634df0](https://github.com/SocialGouv/mano/commit/b634df061d455289160ab226d09cb397b9fa581d))
+
+# [1.79.0](https://github.com/SocialGouv/mano/compare/v1.78.2...v1.79.0) (2022-03-22)
+
+
+### Features
+
+* **api,dashboard:**  passages migration cherry picked ([#493](https://github.com/SocialGouv/mano/issues/493)) ([32b940e](https://github.com/SocialGouv/mano/commit/32b940e7a10261a9cd20b0e05601b66f0970ac49))
+
 ## [1.78.2](https://github.com/SocialGouv/mano/compare/v1.78.1...v1.78.2) (2022-03-21)
 
 

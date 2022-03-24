@@ -22,7 +22,7 @@ import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
-import ActionPersonName from '../../components/ActionPersonName';
+import PersonName from '../../components/PersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
 import { placesState } from '../../recoil/places';
@@ -153,7 +153,7 @@ const Actions = ({ search, onUpdateResults }) => {
               },
             },
             { title: 'Nom', dataKey: 'name' },
-            { title: 'Personne suivie', dataKey: 'person', render: (action) => <ActionPersonName action={action} /> },
+            { title: 'Personne suivie', dataKey: 'person', render: (action) => <PersonName item={action} /> },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}

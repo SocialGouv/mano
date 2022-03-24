@@ -14,6 +14,7 @@ const User = require("../models/user");
 const Action = require("../models/action");
 const Person = require("../models/person");
 const Comment = require("../models/comment");
+const Passage = require("../models/passage");
 const RelUserTeam = require("../models/relUserTeam");
 const Team = require("../models/team");
 const validateUser = require("../middleware/validateUser");
@@ -77,6 +78,8 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
       encryptedVerificationKey: organisation.encryptedVerificationKey,
       customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
       customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
+      migrations: organisation.migrations,
+      migrationLastUpdateAt: organisation.migrationLastUpdateAt,
     },
   };
 }
@@ -595,6 +598,7 @@ router.delete(
 
     const fkQuery = { where: { user: userId } };
     await Comment.update({ user: null }, fkQuery);
+    await Passage.update({ user: null }, fkQuery);
     await Action.update({ user: null }, fkQuery);
     await Person.update({ user: null }, fkQuery);
     // Todo: there are missing tables, such as territory observations.
