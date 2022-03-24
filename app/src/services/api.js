@@ -33,6 +33,7 @@ class ApiService {
         query = {
           encryptionLastUpdateAt: this.organisation?.encryptionLastUpdateAt,
           encryptionEnabled: this.organisation?.encryptionEnabled,
+          migrationLastUpdateAt: this.organisation?.migrationLastUpdateAt,
           ...query,
         };
       }
