@@ -275,11 +275,11 @@ const Comments = ({ search, onUpdateResults }) => {
           columns={[
             {
               title: 'Date',
-              dataKey: 'createdAt',
+              dataKey: 'date',
               render: (comment) => (
                 <span>
-                  {dayjs(comment.createdAt).format('ddd DD/MM/YY')}
-                  <br />à {dayjs(comment.createdAt).format('HH:mm')}
+                  {dayjs(comment.date || comment.createdAt).format('ddd DD/MM/YY')}
+                  <br />à {dayjs(comment.date || comment.createdAt).format('HH:mm')}
                 </span>
               ),
             },

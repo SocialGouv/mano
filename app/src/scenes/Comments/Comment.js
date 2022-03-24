@@ -20,7 +20,7 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
   const [updating, setUpdating] = useState(false);
 
   const isUpdateDisabled = useMemo(() => {
-    if (commentDB?.comment !== comment.comment) return false;
+    if (commentDB?.comment !== comment) return false;
     return true;
   }, [comment, commentDB]);
 

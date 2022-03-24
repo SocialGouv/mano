@@ -499,14 +499,10 @@ const Action = ({ navigation, route }) => {
           label="Commentaires"
           key={actionDB?._id}
           data={comments.filter((c) => c.action === actionDB?._id)}
-          renderItem={(comment, index) => (
+          renderItem={(comment) => (
             <CommentRow
-              key={index}
-              comment={comment.comment}
-              id={comment._id}
-              createdAt={comment.createdAt}
-              user={comment.user}
-              metaCaption="Commentaire de"
+              key={comment._id}
+              comment={comment}
               onUpdate={
                 comment.team
                   ? () =>

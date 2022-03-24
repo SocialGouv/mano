@@ -89,7 +89,6 @@ router.put(
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
-      if (req.body.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.createdAt);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
@@ -101,18 +100,12 @@ router.put(
     const comment = await Comment.findOne(query);
     if (!comment) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { createdAt, encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey } = req.body;
 
     const updateComment = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
     };
-
-    // FIXME: This pattern should be avoided. createdAt should be updated only when it is created.
-    if (createdAt) {
-      comment.changed("createdAt", true);
-      updateComment.createdAt = new Date(createdAt);
-    }
 
     await Comment.update(updateComment, query, { silent: false });
     const newComment = await Comment.findOne(query);

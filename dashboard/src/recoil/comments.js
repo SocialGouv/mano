@@ -6,7 +6,7 @@ export const commentsState = atom({
   default: [],
 });
 
-const encryptedFields = ['comment', 'type', 'item', 'person', 'action', 'team', 'user'];
+const encryptedFields = ['comment', 'type', 'item', 'person', 'action', 'team', 'user', 'date'];
 
 export const prepareCommentForEncryption = (comment) => {
   const decrypted = {};

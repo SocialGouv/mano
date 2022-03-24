@@ -60,6 +60,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
     const commentBody = {
       comment,
       user: user._id,
+      date: new Date(),
       team: currentTeam._id,
       organisation: organisation._id,
     };
@@ -118,7 +119,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
                   <CloseButton close onClick={() => deleteData(comment._id)} />
                   <UserName id={comment.user} wrapper={(name) => <div className="author">{name}</div>} />
                   <div className="user"></div>
-                  <div className="time">{formatDateTimeWithNameOfDay(comment.createdAt)}</div>
+                  <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                   <div className="content">
                     <p onClick={() => setEditing(comment._id)}>
                       {comment.comment
@@ -174,7 +175,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
             initialValues={value}
             onSubmit={async (body, actions) => {
               if (!body.user && !newComment) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
-              if (!body.createdAt && !newComment) return toastr.error('Erreur!', 'La date est obligatoire');
+              if (!body.date && !newComment) return toastr.error('Erreur!', 'La date est obligatoire');
               if (!body.comment) return toastr.error('Erreur!', 'Le commentaire est obligatoire');
               await onSubmit({ ...value, ...body });
               actions.setSubmitting(false);
@@ -201,8 +202,8 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                             <DatePicker
                               locale="fr"
                               className="form-control"
-                              selected={dateForDatePicker(values.createdAt ?? new Date())}
-                              onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                              selected={dateForDatePicker((values.date || values.createdAt) ?? new Date())}
+                              onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
                               timeInputLabel="Heure :"
                               dateFormat="dd/MM/yyyy HH:mm"
                               showTimeInput
