@@ -83,8 +83,8 @@ const Login = ({ navigation }) => {
       return;
     }
     setLoading(true);
-    const headers = await API.getDebugHeaders();
-    const response = await API.post({ path: '/user/signin', body: { password, email }, skipEncryption: true, headers });
+    const userDebugInfos = await API.getUserDebugInfos();
+    const response = await API.post({ path: '/user/signin', body: { password, email, ...userDebugInfos }, skipEncryption: true });
     if (response.error) {
       Alert.alert(response.error, null, [{ text: 'OK', onPress: () => passwordRef.current.focus() }], {
         cancelable: true,

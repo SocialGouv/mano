@@ -45,69 +45,69 @@ function logoutCookieOptions() {
   }
 }
 
-function getUserDebugInfos(req, user) {
+function updateUserDebugInfos(req, user) {
   if (req.headers.platform === "android") {
     try {
-      z.optional(z.string()).parse(req.headers.apilevel);
-      z.optional(z.string()).parse(req.headers.brand);
-      z.optional(z.string()).parse(req.headers.carrier);
-      z.optional(z.string()).parse(req.headers.device);
-      z.optional(z.string()).parse(req.headers.deviceid);
-      z.optional(z.string()).parse(req.headers.freediskstorage);
-      z.optional(z.string()).parse(req.headers.hardware);
-      z.optional(z.string()).parse(req.headers.manufacturer);
-      z.optional(z.string()).parse(req.headers.maxmemory);
-      z.optional(z.string()).parse(req.headers.model);
-      z.optional(z.string()).parse(req.headers.product);
-      z.optional(z.string()).parse(req.headers.readableversion);
-      z.optional(z.string()).parse(req.headers.systemname);
-      z.optional(z.string()).parse(req.headers.systemversion);
-      z.optional(z.string()).parse(req.headers.buildid);
-      z.optional(z.string()).parse(req.headers.totaldiskcapacity);
-      z.optional(z.string()).parse(req.headers.totalmemory);
-      z.optional(z.string()).parse(req.headers.useragent);
-      z.optional(z.string()).parse(req.headers.tablet);
+      z.optional(z.string()).parse(req.body.apilevel);
+      z.optional(z.string()).parse(req.body.brand);
+      z.optional(z.string()).parse(req.body.carrier);
+      z.optional(z.string()).parse(req.body.device);
+      z.optional(z.string()).parse(req.body.deviceid);
+      z.optional(z.string()).parse(req.body.freediskstorage);
+      z.optional(z.string()).parse(req.body.hardware);
+      z.optional(z.string()).parse(req.body.manufacturer);
+      z.optional(z.string()).parse(req.body.maxmemory);
+      z.optional(z.string()).parse(req.body.model);
+      z.optional(z.string()).parse(req.body.product);
+      z.optional(z.string()).parse(req.body.readableversion);
+      z.optional(z.string()).parse(req.body.systemname);
+      z.optional(z.string()).parse(req.body.systemversion);
+      z.optional(z.string()).parse(req.body.buildid);
+      z.optional(z.string()).parse(req.body.totaldiskcapacity);
+      z.optional(z.string()).parse(req.body.totalmemory);
+      z.optional(z.string()).parse(req.body.useragent);
+      z.optional(z.string()).parse(req.body.tablet);
     } catch (e) {
-      capture(e, { extra: { headers: req.headers }, user });
+      capture(e, { extra: { body: req.body }, user });
       return;
     }
     user.debugApp = {
-      apilevel: req.headers.apilevel,
-      brand: req.headers.brand,
-      carrier: req.headers.carrier,
-      device: req.headers.device,
-      deviceid: req.headers.deviceid,
-      freediskstorage: req.headers.freediskstorage,
-      hardware: req.headers.hardware,
-      manufacturer: req.headers.manufacturer,
-      maxmemory: req.headers.maxmemory,
-      model: req.headers.model,
-      product: req.headers.product,
-      readableversion: req.headers.readableversion,
-      systemname: req.headers.systemname,
-      systemversion: req.headers.systemversion,
-      buildid: req.headers.buildid,
-      totaldiskcapacity: req.headers.totaldiskcapacity,
-      totalmemory: req.headers.totalmemory,
-      useragent: req.headers.useragent,
-      tablet: req.headers.tablet,
+      apilevel: req.body.apilevel,
+      brand: req.body.brand,
+      carrier: req.body.carrier,
+      device: req.body.device,
+      deviceid: req.body.deviceid,
+      freediskstorage: req.body.freediskstorage,
+      hardware: req.body.hardware,
+      manufacturer: req.body.manufacturer,
+      maxmemory: req.body.maxmemory,
+      model: req.body.model,
+      product: req.body.product,
+      readableversion: req.body.readableversion,
+      systemname: req.body.systemname,
+      systemversion: req.body.systemversion,
+      buildid: req.body.buildid,
+      totaldiskcapacity: req.body.totaldiskcapacity,
+      totalmemory: req.body.totalmemory,
+      useragent: req.body.useragent,
+      tablet: req.body.tablet,
     };
   }
   if (req.headers.platform === "dashboard") {
     try {
-      z.optional(z.string()).parse(req.headers.browsertype);
-      z.optional(z.string()).parse(req.headers.browsername);
-      z.optional(z.string()).parse(req.headers.browserversion);
-      z.optional(z.string()).parse(req.headers.browseros);
+      z.optional(z.string()).parse(req.body.browsertype);
+      z.optional(z.string()).parse(req.body.browsername);
+      z.optional(z.string()).parse(req.body.browserversion);
+      z.optional(z.string()).parse(req.body.browseros);
     } catch (e) {
-      capture(e, { extra: { headers: req.headers }, user });
+      capture(e, { extra: { body: req.body }, user });
       return;
     }
     user.debugDashboard = {
-      browserType: req.headers.browsertype,
-      browserName: req.headers.browsername,
-      browserVersion: req.headers.browserversion,
-      browserOs: req.headers.browseros,
+      browserType: req.body.browsertype,
+      browserName: req.body.browsername,
+      browserVersion: req.body.browserversion,
+      browserOs: req.body.browseros,
     };
   }
 }
@@ -204,7 +204,7 @@ router.post(
     if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
     user.lastLoginAt = new Date();
 
-    getUserDebugInfos(req, user);
+    updateUserDebugInfos(req, user);
 
     await user.save();
 

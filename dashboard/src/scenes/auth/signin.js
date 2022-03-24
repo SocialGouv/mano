@@ -121,25 +121,22 @@ const SignIn = () => {
               password: values.password,
             };
             const browser = detect();
-            const headers = {};
             if (browser) {
-              headers.browsertype = browser.type;
-              headers.browsername = browser.name;
-              headers.browserversion = browser.version;
-              headers.browseros = browser.os;
+              body.browsertype = browser.type;
+              body.browsername = browser.name;
+              body.browserversion = browser.version;
+              body.browseros = browser.os;
             }
 
             const { user, token, ok } = authViaCookie
               ? await API.get({
                   path: '/user/signin-token',
                   skipEncryption: '/user/signin-token',
-                  headers,
                 })
               : await API.post({
                   path: '/user/signin',
                   skipEncryption: '/user/signin',
                   body,
-                  headers,
                 });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;

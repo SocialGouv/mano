@@ -31,7 +31,7 @@ class ApiService {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
   };
 
-  getDebugHeaders = async () => ({
+  getUserDebugInfos = async () => ({
     apilevel: await getApiLevel(), // 30
     brand: getBrand(), // "google"
     carrier: await getCarrier(), // "Android"
