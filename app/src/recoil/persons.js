@@ -135,6 +135,7 @@ export const outOfActiveListReasonOptions = [
   'Perdu de vue',
   'Hospitalisation',
   'Reconduite à la frontière',
+  'Autre',
 ];
 
 export const defaultMedicalCustomFields = [
