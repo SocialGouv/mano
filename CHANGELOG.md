@@ -1,3 +1,10 @@
+## [1.79.8](https://github.com/SocialGouv/mano/compare/v1.79.7...v1.79.8) (2022-03-25)
+
+
+### Bug Fixes
+
+* **dashboard:** sanitize imports ([#530](https://github.com/SocialGouv/mano/issues/530)) ([a4fed0e](https://github.com/SocialGouv/mano/commit/a4fed0ea6b2c5b54cebbe93dba22166499ebcf00))
+
 ## [1.79.7](https://github.com/SocialGouv/mano/compare/v1.79.6...v1.79.7) (2022-03-24)
 
 
