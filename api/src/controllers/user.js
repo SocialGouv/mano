@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const { Op } = require("sequelize");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const { validatePassword, looseUuidRegex } = require("../utils");
+const { validatePassword, looseUuidRegex, jwtRegex } = require("../utils");
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
 const { comparePassword } = require("../utils");
@@ -156,7 +156,7 @@ router.get(
   validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.cookies.jwt);
+      z.string().regex(jwtRegex).parse(req.cookies.jwt);
     } catch (e) {
       const error = new Error(`Invalid request in signin token: ${e}`);
       error.status = 400;

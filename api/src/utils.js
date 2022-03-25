@@ -29,6 +29,7 @@ function hashPassword(password) {
 const looseUuidRegex = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
 const cryptoHexRegex = /^[A-Fa-f0-9]{16,128}$/;
 const positiveIntegerRegex = /^\d+$/;
+const jwtRegex = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
 
 module.exports = {
   validatePassword,
@@ -37,4 +38,5 @@ module.exports = {
   looseUuidRegex,
   positiveIntegerRegex,
   cryptoHexRegex,
+  jwtRegex,
 };
