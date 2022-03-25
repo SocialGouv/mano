@@ -151,10 +151,12 @@ export function MedicalFile({ person }) {
               setShowAddTreatment(true);
               setCurrentTreatment({
                 _id: uuidv4(),
+                startDate: new Date(),
                 endDate: new Date(),
                 name: '',
                 dosage: '',
                 frequency: '',
+                indication: '',
                 user: user._id,
               });
             }}
@@ -182,13 +184,41 @@ export function MedicalFile({ person }) {
             ),
             small: true,
           },
-          { title: 'Nom', dataKey: 'name' },
-          { title: 'Dosage', dataKey: 'dosage' },
-          { title: 'Fréquence', dataKey: 'frequency' },
           {
-            title: 'Date de fin',
+            title: 'Nom',
+            dataKey: 'name',
+            render: (treatment) => {
+              return (
+                <>
+                  <div>{treatment.name}</div>
+                  <small className="text-muted">{treatment.indication}</small>
+                </>
+              );
+            },
+          },
+          {
+            title: 'Dosage / fréquence',
+            dataKey: 'dosage',
+            render: (treatment) => {
+              return (
+                <>
+                  <div>{treatment.dosage}</div>
+                  <small className="text-muted">{treatment.frequency}</small>
+                </>
+              );
+            },
+          },
+          {
+            title: 'Dates',
             dataKey: 'endDate',
-            render: (e) => (e.endDate ? formatDateWithFullMonth(e.endDate) : ''),
+            render: (e) => {
+              return (
+                <div style={{ fontSize: '12px' }}>
+                  Du {formatDateWithFullMonth(e.startDate)}
+                  <br /> au {formatDateWithFullMonth(e.endDate)}
+                </div>
+              );
+            },
           },
           {
             title: 'Action',
@@ -376,7 +406,9 @@ export function MedicalFile({ person }) {
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.dosage) errors.dosage = 'Le dosage est obligatoire';
               if (!values.frequency) errors.frequency = 'La fréquence est obligatoire';
+              if (!values.indication) errors.indication = "L'indication est obligatoire";
               if (!values.endDate) errors.endDate = 'La date de fin est obligatoire';
+              if (!values.startDate) errors.startDate = 'La date de fin est obligatoire';
               return errors;
             }}
             onSubmit={async (values) => {
@@ -398,7 +430,7 @@ export function MedicalFile({ person }) {
                   <Col md={6}>
                     <FormGroup>
                       <Label>Nom</Label>
-                      <Input placeholder="Amoxiciline" name="name" value={values.name} onChange={handleChange} />
+                      <Input placeholder="Amoxicilline" name="name" value={values.name} onChange={handleChange} />
                       {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
@@ -418,7 +450,29 @@ export function MedicalFile({ person }) {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Date</Label>
+                      <Label>Indication</Label>
+                      <Input placeholder="Angine" name="indication" value={values.indication} onChange={handleChange} />
+                      {touched.indication && errors.indication && <Error>{errors.indication}</Error>}
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label>Date de début</Label>
+                      <div>
+                        <DatePicker
+                          locale="fr"
+                          className="form-control"
+                          selected={dateForDatePicker(values.startDate)}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'startDate' } })}
+                          dateFormat={'dd/MM/yyyy'}
+                        />
+                      </div>
+                      {touched.startDate && errors.startDate && <Error>{errors.startDate}</Error>}
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label>Date de fin</Label>
                       <div>
                         <DatePicker
                           locale="fr"
