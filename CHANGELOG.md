@@ -1,3 +1,10 @@
+# [1.80.0](https://github.com/SocialGouv/mano/compare/v1.79.9...v1.80.0) (2022-03-25)
+
+
+### Features
+
+* **dashboard:** add autre to outOfActiveListReasonOptions ([86ea129](https://github.com/SocialGouv/mano/commit/86ea129d3e2c5ff6b07211122a3c5b6e768728b3))
+
 ## [1.79.9](https://github.com/SocialGouv/mano/compare/v1.79.8...v1.79.9) (2022-03-25)
 
 
