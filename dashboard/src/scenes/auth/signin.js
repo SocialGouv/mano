@@ -43,19 +43,12 @@ const SignIn = () => {
     }
   }, [organisation, refreshTrigger]);
 
-  const onSigninValidated = async (organisation, user) => {
+  const onSigninValidated = async () => {
     setRefreshTrigger({
       status: true,
       options: { initialLoad: true, showFullScreen: true },
     });
     setGlobalLoading('Initialisation...');
-    /*
-    if (!!organisation?.receptionEnabled) {
-      history.push('/reception');
-    } else {
-      history.push('/action');
-    }
-    */
   };
 
   const onLogout = async () => {
@@ -99,7 +92,7 @@ const SignIn = () => {
               title={team.name}
               onClick={() => {
                 setCurrentTeam(team);
-                onSigninValidated(organisation, user);
+                onSigninValidated();
               }}
             />
           ))}
@@ -168,7 +161,7 @@ const SignIn = () => {
             // basic login
             if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
-              onSigninValidated(organisation, user);
+              onSigninValidated();
               return;
             }
             setShowSelectTeam(true);
