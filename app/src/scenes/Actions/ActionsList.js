@@ -42,7 +42,7 @@ const ActionsList = () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   }, [setRefreshTrigger]);
 
-  const onCreateAction = useCallback(() => navigation.navigate('NewActionForm', { fromRoute: 'ActionsList' }), [navigation]);
+  const onCreateAction = () => navigation.navigate('NewActionForm', { fromRoute: 'ActionsList' });
 
   const SectionListFooterComponent = useMemo(() => (!actionsByStatus.length ? null : ListNoMoreActions), [actionsByStatus.length]);
   const FlatListFooterComponent = useMemo(() => {

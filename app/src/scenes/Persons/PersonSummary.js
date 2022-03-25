@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { Alert, findNodeHandle, Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
@@ -28,9 +28,9 @@ import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
 import { MMKV } from '../../services/dataManagement';
+import { useNavigation } from '@react-navigation/native';
 
 const PersonSummary = ({
-  navigation,
   person,
   personDB,
   showActionSheetWithOptions,
@@ -45,6 +45,10 @@ const PersonSummary = ({
   backgroundColor,
   writeComment,
 }) => {
+  const navigation = useNavigation();
+  useEffect(() => {
+    API.navigation = navigation;
+  }, [navigation]);
   const onAddPlaceRequest = () => navigation.push('NewPersonPlaceForm', { person: personDB, fromRoute: 'Person' });
 
   const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
@@ -88,9 +92,9 @@ const PersonSummary = ({
   };
 
   const onAddActionRequest = () => {
-    navigation.push('Actions', {
-      screen: 'NewActionForm',
-      params: { person: personDB?._id, fromRoute: 'Person' },
+    navigation.navigate('NewActionForm', {
+      fromRoute: 'Person',
+      params: { fromRoute: 'Person', person: personDB?._id },
     });
   };
 
