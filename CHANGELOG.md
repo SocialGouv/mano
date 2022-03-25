@@ -1,3 +1,10 @@
+## [1.79.9](https://github.com/SocialGouv/mano/compare/v1.79.8...v1.79.9) (2022-03-25)
+
+
+### Bug Fixes
+
+* **dashboard:** completedAt was overridden ([83dbd18](https://github.com/SocialGouv/mano/commit/83dbd18ff75dab4e606c898cba5625fe0fe7b281))
+
 ## [1.79.8](https://github.com/SocialGouv/mano/compare/v1.79.7...v1.79.8) (2022-03-25)
 
 
