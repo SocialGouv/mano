@@ -86,8 +86,10 @@ const View = () => {
             const statusChanged = body.status && action.status !== body.status;
             if (statusChanged) {
               if ([DONE, CANCEL].includes(body.status)) {
-                body.completedAt = now();
+                // When status changed to finished (done, cancel) completedAt we set it to now if not set.
+                body.completedAt = body.completedAt || now();
               } else {
+                // When status just changed to "todo" we set completedAt to null (since it's not done yet).
                 body.completedAt = null;
               }
             }
