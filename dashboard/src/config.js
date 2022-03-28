@@ -31,6 +31,6 @@ const HOST = getHost();
 const SCHEME = process.env.NODE_ENV === 'development' || process.env.REACT_APP_TEST === 'true' ? process.env.REACT_APP_SCHEME : 'https';
 const ENV = process.env.NODE_ENV || 'production';
 const VERSION = version;
-const DEFAULT_ORGANTISATION_KEY = ENV === 'development' ? process.env.REACT_APP_DEFAULT_ORGANTISATION_KEY : '';
+const DEFAULT_ORGANISATION_KEY = ENV === 'development' ? process.env.REACT_APP_DEFAULT_ORGANISATION_KEY : '';
 
 export { theme, HOST, SCHEME, ENV, VERSION, DEFAULT_ORGANTISATION_KEY };
