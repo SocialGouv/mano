@@ -10,7 +10,7 @@ const QuestionMarkButtonDiv = styled.button`
   width: 20px;
   height: 20px;
   border-radius: 20px;
-  margin-left: 10px;
+  margin-left: 5px;
   box-shadow: none;
   border: 1px solid ${theme.main};
   color: ${theme.main};
