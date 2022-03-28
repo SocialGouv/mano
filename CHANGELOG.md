@@ -1,3 +1,10 @@
+## [1.80.1](https://github.com/SocialGouv/mano/compare/v1.80.0...v1.80.1) (2022-03-28)
+
+
+### Bug Fixes
+
+* **app:** ignore noisy errors for mobile ([#539](https://github.com/SocialGouv/mano/issues/539)) ([156a2c2](https://github.com/SocialGouv/mano/commit/156a2c2c32260ae0a607ca40640e581ec32d9bf1))
+
 # [1.80.0](https://github.com/SocialGouv/mano/compare/v1.79.9...v1.80.0) (2022-03-25)
 
 
