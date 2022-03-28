@@ -253,6 +253,7 @@ export function MedicalFile({ person }) {
                 name: '',
                 status: 'A FAIRE',
                 user: user._id,
+                onlyVisibleByCreator: false,
               });
             }}
             color="primary"
@@ -262,7 +263,7 @@ export function MedicalFile({ person }) {
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
       <Table
-        data={person.consultations}
+        data={(person.consultations || []).filter((e) => !e.onlyVisibleByCreator || e.user === user._id)}
         rowKey={'_id'}
         columns={[
           {
@@ -378,6 +379,21 @@ export function MedicalFile({ person }) {
                         />
                       </div>
                       {touched.date && errors.date && <Error>{errors.date}</Error>}
+                    </FormGroup>
+                  </Col>
+                  <Col md={12}>
+                    <FormGroup>
+                      <Label>
+                        <input
+                          type="checkbox"
+                          id="create-action-onlyme"
+                          style={{ marginRight: '0.5rem' }}
+                          name="onlyVisibleByCreator"
+                          checked={values.onlyVisibleByCreator}
+                          onChange={handleChange}
+                        />
+                        Seulement visible par moi
+                      </Label>
                     </FormGroup>
                   </Col>
                 </Row>
