@@ -56,7 +56,7 @@ function updateUserDebugInfos(req, user) {
       z.optional(z.number()).parse(req.body.freediskstorage);
       z.optional(z.string()).parse(req.body.hardware);
       z.optional(z.string()).parse(req.body.manufacturer);
-      z.optional(z.string()).parse(req.body.maxmemory);
+      z.optional(z.number()).parse(req.body.maxmemory);
       z.optional(z.string()).parse(req.body.model);
       z.optional(z.string()).parse(req.body.product);
       z.optional(z.string()).parse(req.body.readableversion);
