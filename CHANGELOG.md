@@ -1,3 +1,10 @@
+# [1.81.0](https://github.com/SocialGouv/mano/compare/v1.80.1...v1.81.0) (2022-03-28)
+
+
+### Features
+
+* **dashboard,app:** only healthcare professional ([#543](https://github.com/SocialGouv/mano/issues/543)) ([64ff190](https://github.com/SocialGouv/mano/commit/64ff190c3ca79e2a91716745b7f213e7c03e20f8))
+
 ## [1.80.1](https://github.com/SocialGouv/mano/compare/v1.80.0...v1.80.1) (2022-03-28)
 
 
