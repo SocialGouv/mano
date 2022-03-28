@@ -48,7 +48,7 @@ function logoutCookieOptions() {
 function updateUserDebugInfos(req, user) {
   if (req.headers.platform === "android") {
     try {
-      z.optional(z.string()).parse(req.body.apilevel);
+      z.optional(z.number()).parse(req.body.apilevel);
       z.optional(z.string()).parse(req.body.brand);
       z.optional(z.string()).parse(req.body.carrier);
       z.optional(z.string()).parse(req.body.device);
