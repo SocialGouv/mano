@@ -10,7 +10,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { detect } from 'detect-browser';
 import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
-import { theme } from '../../config';
+import { DEFAULT_ORGANISATION_KEY, theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import useApi, { setOrgEncryptionKey } from '../../services/api';
@@ -106,7 +106,7 @@ const SignIn = () => {
     <AuthWrapper>
       <Title>{userName ? `Bienvenue ${userName?.split(' ')?.[0]} !` : 'Bienvenue !'}</Title>
       <Formik
-        initialValues={{ email: '', password: '', orgEncryptionKey: '' }}
+        initialValues={{ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' }}
         onSubmit={async (values, actions) => {
           try {
             const body = {
