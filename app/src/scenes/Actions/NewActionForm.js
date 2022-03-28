@@ -57,10 +57,7 @@ const NewActionForm = ({ route, navigation }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation, route?.params?.person]);
 
-  const onSearchPerson = () =>
-    navigation.push('PersonsSearch', {
-      fromRoute: 'NewActionForm',
-    });
+  const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'NewActionForm' });
 
   const onCreateAction = async () => {
     setPosting(true);
