@@ -9,7 +9,7 @@ import styled from 'styled-components';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
-import { DEFAULT_ORGANTISATION_KEY, theme } from '../../config';
+import { DEFAULT_ORGANISATION_KEY, theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import useApi, { setOrgEncryptionKey } from '../../services/api';
