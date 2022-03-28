@@ -112,7 +112,7 @@ const SignIn = () => {
     <AuthWrapper>
       <Title>{userName ? `Bienvenue ${userName?.split(' ')?.[0]} !` : 'Bienvenue !'}</Title>
       <Formik
-        initialValues={{ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANTISATION_KEY || '' }}
+        initialValues={{ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' }}
         onSubmit={async (values, actions) => {
           try {
             const body = {
