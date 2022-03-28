@@ -33,4 +33,4 @@ const ENV = process.env.NODE_ENV || 'production';
 const VERSION = version;
 const DEFAULT_ORGANISATION_KEY = ENV === 'development' ? process.env.REACT_APP_DEFAULT_ORGANISATION_KEY : '';
 
-export { theme, HOST, SCHEME, ENV, VERSION, DEFAULT_ORGANTISATION_KEY };
+export { theme, HOST, SCHEME, ENV, VERSION, DEFAULT_ORGANISATION_KEY };
