@@ -65,7 +65,16 @@ const TableCustomFields = ({ data, customFields, showHealthcareProfessionnalColu
   };
 
   const handleSubmit = async (newData) => {
-    if (!newData) newData = mutableData.filter((field) => !!field.label.length);
+    if (!newData)
+      newData = mutableData
+        .filter((field) => !!field.label.length)
+        .map((field) => {
+          const sanitizedField = {};
+          for (const key of Object.keys(field)) {
+            if (![undefined, null].includes(field[key])) sanitizedField[key] = field[key];
+          }
+          return sanitizedField;
+        });
     setIsSubmitting(true);
     try {
       const response = await API.put({
