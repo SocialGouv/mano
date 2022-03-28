@@ -66,7 +66,7 @@ function updateUserDebugInfos(req, user) {
       z.optional(z.number()).parse(req.body.totaldiskcapacity);
       z.optional(z.number()).parse(req.body.totalmemory);
       z.optional(z.string()).parse(req.body.useragent);
-      z.optional(z.string()).parse(req.body.tablet);
+      z.optional(z.boolean()).parse(req.body.tablet);
     } catch (e) {
       capture(e, { extra: { body: req.body }, user });
       return;
