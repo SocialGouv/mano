@@ -49,6 +49,9 @@ const ActionsNavigator = () => {
       <ActionsStack.Screen name="Action" component={Action} />
       <ActionsStack.Screen name="NewActionForm" component={NewActionForm} />
       <ActionsStack.Screen name="ActionComment" component={Comment} />
+
+      <PersonsStack.Screen name="Person" component={Person} />
+      <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
     </ActionsStack.Navigator>
   );
 };
@@ -66,6 +69,9 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="PersonPlace" component={Place} />
       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
+
+      <ActionsStack.Screen name="Action" component={Action} />
+      <ActionsStack.Screen name="NewActionForm" component={NewActionForm} />
     </PersonsStack.Navigator>
   );
 };
@@ -210,8 +216,6 @@ const App = () => {
           <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
             <AppStack.Screen name="LoginStack" component={LoginNavigator} />
             <AppStack.Screen name="Home" component={TabNavigator} />
-            <AppStack.Screen name="Persons" component={PersonsNavigator} />
-            <AppStack.Screen name="Actions" component={ActionsNavigator} />
           </AppStack.Navigator>
           <Loader />
           <EnvironmentIndicator />

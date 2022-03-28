@@ -58,9 +58,8 @@ const NewActionForm = ({ route, navigation }) => {
   }, [navigation, route?.params?.person]);
 
   const onSearchPerson = () =>
-    navigation.push('Persons', {
-      screen: 'PersonsSearch',
-      params: { fromRoute: 'NewActionForm' },
+    navigation.push('PersonsSearch', {
+      fromRoute: 'NewActionForm',
     });
 
   const onCreateAction = async () => {
