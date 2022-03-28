@@ -13,6 +13,18 @@ if (!__DEV__) {
   Sentry.init({
     dsn: SENTRY_XXX,
     environment: 'app',
+    ignoreErrors: [
+      'Network request failed',
+      'Failed to fetch',
+      'NetworkError',
+      // ???
+      'withrealtime/messaging',
+      // This error seems to happen only in firefox and to be ignorable.
+      // The "fetch" failed because user has navigated.
+      // Since other browsers don't have this problem, we don't care about it,
+      // it may be a false positive.
+      'AbortError: The operation was aborted',
+    ],
   });
 }
 
