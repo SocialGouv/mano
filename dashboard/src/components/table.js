@@ -59,7 +59,7 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
               <td
                 onClick={!!onSortBy ? onNameClick : null}
                 className={`column-header ${column.left && 'align-left'} ${!!onSortBy && 'clickable'}`}
-                key={column.title || dataKey}>
+                key={String(dataKey) + String(column.title)}>
                 <span>{column.title}</span>
                 {(sortBy === sortableKey || sortBy === dataKey) && (
                   <>

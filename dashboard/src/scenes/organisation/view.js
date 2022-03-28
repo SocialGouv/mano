@@ -386,6 +386,7 @@ const View = () => {
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsPersonsMedical"
+                                showHealthcareProfessionnalColumn
                                 key="customFieldsPersonsMedical"
                                 data={(() => {
                                   if (Array.isArray(organisation.customFieldsPersonsMedical)) return organisation.customFieldsPersonsMedical;
