@@ -19,13 +19,15 @@ User.init(
     forgotPasswordResetExpires: DataTypes.DATE,
     healthcareProfessional: DataTypes.BOOLEAN,
     role: { type: DataTypes.TEXT, defaultValue: "normal" },
+    debugApp: DataTypes.JSONB,
+    debugDashboard: DataTypes.JSONB,
   },
   {
     sequelize,
     modelName: "User",
     freezeTableName: true,
     defaultScope: {
-      attributes: { exclude: ["password", "forgotPasswordResetToken", "forgotPasswordResetExpires"] },
+      attributes: { exclude: ["password", "forgotPasswordResetToken", "forgotPasswordResetExpires", "debugApp", "debugDashboard"] },
     },
     scopes: {
       withPassword: {

@@ -18,6 +18,7 @@ const Passage = require("../models/passage");
 const RelUserTeam = require("../models/relUserTeam");
 const Team = require("../models/team");
 const validateUser = require("../middleware/validateUser");
+const { capture } = require("../sentry");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
@@ -41,6 +42,73 @@ function logoutCookieOptions() {
     return { httpOnly: true, secure: true, sameSite: "None" };
   } else {
     return { httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
+  }
+}
+
+function updateUserDebugInfos(req, user) {
+  if (req.headers.platform === "android") {
+    try {
+      z.optional(z.number()).parse(req.body.apilevel);
+      z.optional(z.string()).parse(req.body.brand);
+      z.optional(z.string()).parse(req.body.carrier);
+      z.optional(z.string()).parse(req.body.device);
+      z.optional(z.string()).parse(req.body.deviceid);
+      z.optional(z.number()).parse(req.body.freediskstorage);
+      z.optional(z.string()).parse(req.body.hardware);
+      z.optional(z.string()).parse(req.body.manufacturer);
+      z.optional(z.number()).parse(req.body.maxmemory);
+      z.optional(z.string()).parse(req.body.model);
+      z.optional(z.string()).parse(req.body.product);
+      z.optional(z.string()).parse(req.body.readableversion);
+      z.optional(z.string()).parse(req.body.systemname);
+      z.optional(z.string()).parse(req.body.systemversion);
+      z.optional(z.string()).parse(req.body.buildid);
+      z.optional(z.number()).parse(req.body.totaldiskcapacity);
+      z.optional(z.number()).parse(req.body.totalmemory);
+      z.optional(z.string()).parse(req.body.useragent);
+      z.optional(z.boolean()).parse(req.body.tablet);
+    } catch (e) {
+      capture(e, { extra: { body: req.body }, user });
+      return;
+    }
+    user.debugApp = {
+      apilevel: req.body.apilevel,
+      brand: req.body.brand,
+      carrier: req.body.carrier,
+      device: req.body.device,
+      deviceid: req.body.deviceid,
+      freediskstorage: req.body.freediskstorage,
+      hardware: req.body.hardware,
+      manufacturer: req.body.manufacturer,
+      maxmemory: req.body.maxmemory,
+      model: req.body.model,
+      product: req.body.product,
+      readableversion: req.body.readableversion,
+      systemname: req.body.systemname,
+      systemversion: req.body.systemversion,
+      buildid: req.body.buildid,
+      totaldiskcapacity: req.body.totaldiskcapacity,
+      totalmemory: req.body.totalmemory,
+      useragent: req.body.useragent,
+      tablet: req.body.tablet,
+    };
+  }
+  if (req.headers.platform === "dashboard") {
+    try {
+      z.optional(z.string()).parse(req.body.browsertype);
+      z.optional(z.string()).parse(req.body.browsername);
+      z.optional(z.string()).parse(req.body.browserversion);
+      z.optional(z.string()).parse(req.body.browseros);
+    } catch (e) {
+      capture(e, { extra: { body: req.body }, user });
+      return;
+    }
+    user.debugDashboard = {
+      browserType: req.body.browsertype,
+      browserName: req.body.browsername,
+      browserVersion: req.body.browserversion,
+      browserOs: req.body.browseros,
+    };
   }
 }
 
@@ -135,6 +203,8 @@ router.post(
     const match = await comparePassword(password, expectedPassword);
     if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
     user.lastLoginAt = new Date();
+
+    updateUserDebugInfos(req, user);
 
     await user.save();
 
