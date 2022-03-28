@@ -64,7 +64,7 @@ function updateUserDebugInfos(req, user) {
       z.optional(z.string()).parse(req.body.systemversion);
       z.optional(z.string()).parse(req.body.buildid);
       z.optional(z.number()).parse(req.body.totaldiskcapacity);
-      z.optional(z.string()).parse(req.body.totalmemory);
+      z.optional(z.number()).parse(req.body.totalmemory);
       z.optional(z.string()).parse(req.body.useragent);
       z.optional(z.string()).parse(req.body.tablet);
     } catch (e) {
