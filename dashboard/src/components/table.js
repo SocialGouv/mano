@@ -52,14 +52,14 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
           </tr>
         )}
         <tr>
-          {columns.map((column) => {
+          {columns.map((column, index) => {
             const { onSortBy, onSortOrder, sortBy, sortOrder, sortableKey, dataKey } = column;
             const onNameClick = () => onSortBy(sortableKey || dataKey);
             return (
               <td
                 onClick={!!onSortBy ? onNameClick : null}
                 className={`column-header ${column.left && 'align-left'} ${!!onSortBy && 'clickable'}`}
-                key={column.title || dataKey}>
+                key={dataKey + typeof column.title === 'string' ? column.title : index}>
                 <span>{column.title}</span>
                 {(sortBy === sortableKey || sortBy === dataKey) && (
                   <>
