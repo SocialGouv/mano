@@ -15,7 +15,7 @@ import {
   genderOptions,
   healthInsuranceOptions,
 } from '../../recoil/persons';
-import { usersState, userState } from '../../recoil/auth';
+import { organisationState, usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, formatDateTimeWithNameOfDay, formatDateWithFullMonth } from '../../services/date';
 import useApi from '../../services/api';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -23,9 +23,11 @@ import CustomFieldInput from '../../components/CustomFieldInput';
 import Table from '../../components/table';
 import SelectStatus from '../../components/SelectStatus';
 import ActionStatus from '../../components/ActionStatus';
+import SelectCustom from '../../components/SelectCustom';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
+  const organisation = useRecoilValue(organisationState);
   const [showAddConsultation, setShowAddConsultation] = useState(false);
   const [showAddTreatment, setShowAddTreatment] = useState(false);
   const [currentConsultation, setCurrentConsultation] = useState(null);
@@ -254,6 +256,7 @@ export function MedicalFile({ person }) {
                 status: 'A FAIRE',
                 user: user._id,
                 onlyVisibleByCreator: false,
+                type: '',
               });
             }}
             color="primary"
@@ -344,6 +347,7 @@ export function MedicalFile({ person }) {
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
               <React.Fragment>
+                {JSON.stringify(values)}
                 <Row>
                   <Col md={6}>
                     <FormGroup>
@@ -352,6 +356,27 @@ export function MedicalFile({ person }) {
                       {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label>Type</Label>
+                      <SelectCustom
+                        onChange={(t) => {
+                          handleChange({ currentTarget: { value: t.value, name: 'consultationType' } });
+                        }}
+                        options={organisation.consultations.map((e) => ({ label: e.name, value: e.name }))}
+                      />
+                      {touched.consultationType && errors.consultationType && <Error>{errors.consultationType}</Error>}
+                    </FormGroup>
+                  </Col>
+                  {organisation.consultations
+                    .find((e) => e.name === values.consultationType)
+                    ?.fields.filter((f) => f.enabled)
+                    .map((field) => {
+                      return (
+                        <CustomFieldInput colWidth={6} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                      );
+                    })}
+
                   <Col md={6}>
                     <Label>Statut</Label>
                     <SelectStatus

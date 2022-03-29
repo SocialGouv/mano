@@ -57,6 +57,9 @@ const View = () => {
           <DrawerButton className={tab === 'persons' ? 'active' : ''} onClick={() => setTab('persons')} disabled={!organisation.encryptionEnabled}>
             Personnes suivies
           </DrawerButton>
+          <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
+            Consultations
+          </DrawerButton>
           <DrawerButton className={tab === 'actions' ? 'active' : ''} onClick={() => setTab('actions')}>
             Actions
           </DrawerButton>
@@ -65,9 +68,6 @@ const View = () => {
             onClick={() => setTab('territories')}
             disabled={!organisation.encryptionEnabled}>
             Territoires
-          </DrawerButton>
-          <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
-            Consultations
           </DrawerButton>
           <hr />
           <DrawerButton className={tab === 'export' ? 'active' : ''} onClick={() => setTab('export')}>
@@ -486,7 +486,7 @@ const View = () => {
 };
 
 function Consultations({ handleChange, isSubmitting, handleSubmit }) {
-  const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const organisation = useRecoilValue(organisationState);
   const [consultations, setConsultations] = useState([]);
   const consultationsSortable = useMemo(() => consultations.map((e) => e.name), [consultations]);
   useEffect(() => {
@@ -564,22 +564,9 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
                 customFields="consultations"
                 keyPrefix={consultation.name}
                 mergeData={(newData) => {
-                  console.log(
-                    'mergeData',
-                    newData,
-                    organisation.consultations,
-                    consultations,
-                    organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e))
-                  );
                   return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));
                 }}
                 extractData={(data) => {
-                  console.log(
-                    'extractData',
-                    data,
-                    consultation.name,
-                    data.find((e) => e.name === consultation.name)
-                  );
                   return data.find((e) => e.name === consultation.name).fields || [];
                 }}
                 data={(() => {
