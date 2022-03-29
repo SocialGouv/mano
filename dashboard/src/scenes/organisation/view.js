@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -66,6 +66,9 @@ const View = () => {
             disabled={!organisation.encryptionEnabled}>
             Territoires
           </DrawerButton>
+          <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
+            Consultations
+          </DrawerButton>
           <hr />
           <DrawerButton className={tab === 'export' ? 'active' : ''} onClick={() => setTab('export')}>
             Export
@@ -111,14 +114,9 @@ const View = () => {
                         </div>
                       </>
                     );
-                  case 'encryption':
+                  case 'consultations':
                     return (
-                      <>
-                        <SubTitle>Chiffrement</SubTitle>
-                        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
-                          <EncryptionKey isMain />
-                        </div>
-                      </>
+                      <Consultations organisation={values} handleChange={handleChange} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
                     );
                   case 'actions':
                     return (
@@ -486,6 +484,107 @@ const View = () => {
     </div>
   );
 };
+
+function Consultations({ organisation, handleChange, isSubmitting, handleSubmit }) {
+  const [consultations, setConsultations] = useState([]);
+  const consultationsSortable = useMemo(() => consultations.map((e) => e.name), [consultations]);
+  useEffect(() => {
+    setConsultations(organisation.consultations);
+  }, [organisation, setConsultations]);
+  return (
+    <>
+      <SubTitle>Consultations</SubTitle>
+      <FormGroup>
+        <Label>Types de consultations</Label>
+
+        <SortableGrid
+          list={consultationsSortable}
+          editItemTitle="Changer le nom du type de consultation"
+          onUpdateList={(list) => {
+            const newConsultations = [];
+            for (const item of list) {
+              const consultation = consultations.find((e) => e.name === item);
+              if (consultation) newConsultations.push(consultation);
+              else newConsultations.push({ name: item, fields: [] });
+            }
+            setConsultations(newConsultations);
+          }}
+          onRemoveItem={(content) => {
+            setConsultations(consultations.filter((e) => e.name !== content));
+          }}
+          onEditItem={async ({ content, newContent }) => {
+            setConsultations(consultations.map((e) => (e.name === content ? { ...e, name: newContent } : e)));
+          }}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label>Ajouter un type de consultation</Label>
+        <SelectCustom
+          key={JSON.stringify(consultationsSortable || [])}
+          creatable
+          options={consultationsSortable
+            .filter((cat) => consultationsSortable.includes(cat))
+            .sort((c1, c2) => c1.localeCompare(c2))
+            .map((cat) => ({ value: cat, label: cat }))}
+          value={null}
+          onChange={(cat) => {
+            if (cat && cat.value) {
+              setConsultations([...consultations, { name: cat.value, fields: [] }]);
+            }
+          }}
+          onCreateOption={async (name) => {
+            setConsultations([...consultations, { name, fields: [] }]);
+          }}
+          isClearable
+        />
+      </FormGroup>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '2rem', marginTop: '1rem' }}>
+        <ButtonCustom
+          title="Mettre à jour"
+          loading={isSubmitting}
+          onClick={() => {
+            handleChange({ target: { value: consultations, name: 'consultations' } });
+            handleSubmit();
+          }}
+          width={200}
+        />
+      </div>
+      {organisation.consultations.map((consultation) => {
+        return (
+          <div key={consultation.name}>
+            <h5 style={{ marginTop: '2rem' }}>{consultation.name}</h5>
+
+            <small>
+              Vous pouvez personnaliser les champs disponibles pour les consultations de type <strong>{consultation.name}</strong>.
+            </small>
+            <Row>
+              <TableCustomFields
+                customFields="consultations"
+                keyPrefix={consultation.name}
+                mergeData={(newData) => {
+                  console.log(
+                    'mergeData',
+                    newData,
+                    organisation.consultations,
+                    organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e))
+                  );
+                  return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));
+                }}
+                extractData={(data) => {
+                  console.log(data, consultation.name);
+                  return data.find((e) => e.name === consultation.name).fields || [];
+                }}
+                data={(() => {
+                  return Array.isArray(consultation.fields) ? consultation.fields : [];
+                })()}
+              />
+            </Row>
+          </div>
+        );
+      })}
+    </>
+  );
+}
 
 const ImportFieldDetails = ({ field }) => {
   if (field.options?.length) {

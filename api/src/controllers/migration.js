@@ -100,6 +100,7 @@ router.put(
         encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
         receptionEnabled: organisation.receptionEnabled,
         services: organisation.services,
+        consultations: organisation.consultations,
         collaborations: organisation.collaborations,
         customFieldsObs: organisation.customFieldsObs,
         encryptedVerificationKey: organisation.encryptedVerificationKey,

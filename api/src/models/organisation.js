@@ -9,6 +9,7 @@ Organisation.init(
     name: DataTypes.TEXT,
     categories: DataTypes.ARRAY(DataTypes.TEXT),
     collaborations: { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] },
+    consultations: DataTypes.JSONB,
     encryptionEnabled: { type: DataTypes.BOOLEAN },
     encryptionLastUpdateAt: DataTypes.DATE,
     encryptedVerificationKey: DataTypes.TEXT,

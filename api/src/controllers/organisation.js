@@ -155,6 +155,15 @@ router.put(
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsObs);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsSocial);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsMedical);
+        z.optional(
+          z.array(
+            z.object({
+              name: z.string().min(1),
+              fields: z.array(customFieldSchema),
+            })
+          )
+        ).parse(req.body.consultations);
+
         z.optional(z.string().min(1)).parse(req.body.encryptedVerificationKey);
         z.optional(z.boolean()).parse(req.body.encryptionEnabled);
         if (req.body.encryptionLastUpdateAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.encryptionLastUpdateAt);
@@ -193,6 +202,8 @@ router.put(
         typeof req.body.customFieldsPersonsMedical === "string"
           ? JSON.parse(req.body.customFieldsPersonsMedical)
           : req.body.customFieldsPersonsMedical;
+    if (req.body.hasOwnProperty("consultations"))
+      updateOrg.consultations = typeof req.body.consultations === "string" ? JSON.parse(req.body.consultations) : req.body.consultations;
     if (req.body.hasOwnProperty("encryptedVerificationKey")) updateOrg.encryptedVerificationKey = req.body.encryptedVerificationKey;
     if (req.body.hasOwnProperty("encryptionEnabled")) updateOrg.encryptionEnabled = req.body.encryptionEnabled;
     if (req.body.hasOwnProperty("encryptionLastUpdateAt")) updateOrg.encryptionLastUpdateAt = req.body.encryptionLastUpdateAt;
