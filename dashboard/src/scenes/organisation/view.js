@@ -492,7 +492,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   useEffect(() => {
     setConsultations(organisation.consultations);
   }, [organisation, setConsultations]);
-  console.log('anciennes ? ', organisation.consultations);
+  console.log('anciennes ? ', organisation.consultations, consultations);
   return (
     <>
       <SubTitle>Consultations</SubTitle>
@@ -501,6 +501,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
 
         <SortableGrid
           list={consultationsSortable}
+          key={JSON.stringify(consultations)}
           editItemTitle="Changer le nom du type de consultation"
           onUpdateList={(list) => {
             const newConsultations = [];
@@ -545,6 +546,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
           title="Mettre à jour"
           loading={isSubmitting}
           onClick={() => {
+            debugger;
             handleChange({ target: { value: consultations, name: 'consultations' } });
             handleSubmit();
           }}
@@ -562,6 +564,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
             <Row>
               <TableCustomFields
                 customFields="consultations"
+                hideStats
                 keyPrefix={consultation.name}
                 mergeData={(newData) => {
                   return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));

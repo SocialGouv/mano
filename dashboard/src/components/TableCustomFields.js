@@ -31,6 +31,7 @@ const TableCustomFields = ({
   mergeData = null,
   extractData = null,
   keyPrefix = null,
+  hideStats = false,
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mutableData, setMutableData] = useState(data);
@@ -177,17 +178,19 @@ const TableCustomFields = ({
                 dataKey: 'onlyHealthcareProfessional',
                 render: (f) => <input type="checkbox" checked={f.onlyHealthcareProfessional} onChange={onOnlyHealthcareProfessionalChange(f)} />,
               },
-          {
-            title: (
-              <>
-                Voir dans les
-                <br />
-                statistiques
-              </>
-            ),
-            dataKey: 'showInStats',
-            render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
-          },
+          hideStats
+            ? null
+            : {
+                title: (
+                  <>
+                    Voir dans les
+                    <br />
+                    statistiques
+                  </>
+                ),
+                dataKey: 'showInStats',
+                render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
+              },
           {
             title: '',
             dataKey: 'name',
