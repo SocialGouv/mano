@@ -485,12 +485,14 @@ const View = () => {
   );
 };
 
-function Consultations({ organisation, handleChange, isSubmitting, handleSubmit }) {
+function Consultations({ handleChange, isSubmitting, handleSubmit }) {
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
   const [consultations, setConsultations] = useState([]);
   const consultationsSortable = useMemo(() => consultations.map((e) => e.name), [consultations]);
   useEffect(() => {
     setConsultations(organisation.consultations);
   }, [organisation, setConsultations]);
+  console.log('anciennes ? ', organisation.consultations);
   return (
     <>
       <SubTitle>Consultations</SubTitle>
@@ -566,12 +568,18 @@ function Consultations({ organisation, handleChange, isSubmitting, handleSubmit 
                     'mergeData',
                     newData,
                     organisation.consultations,
+                    consultations,
                     organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e))
                   );
                   return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));
                 }}
                 extractData={(data) => {
-                  console.log(data, consultation.name);
+                  console.log(
+                    'extractData',
+                    data,
+                    consultation.name,
+                    data.find((e) => e.name === consultation.name)
+                  );
                   return data.find((e) => e.name === consultation.name).fields || [];
                 }}
                 data={(() => {

@@ -90,8 +90,8 @@ const TableCustomFields = ({
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
-        setOrganisation(response.data);
         setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
+        setOrganisation(response.data);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
@@ -104,15 +104,14 @@ const TableCustomFields = ({
     setIsSubmitting(true);
     try {
       const dataForApi = keys.map((key) => mutableData.find((field) => field.name === key));
-      debugger;
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
         body: { [customFields]: mergeData ? mergeData(dataForApi) : dataForApi },
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
-        setOrganisation(response.data);
         setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
+        setOrganisation(response.data);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
