@@ -1,3 +1,10 @@
+## [1.81.2](https://github.com/SocialGouv/mano/compare/v1.81.1...v1.81.2) (2022-03-30)
+
+
+### Bug Fixes
+
+* **dash:** sanitize custom field ([#554](https://github.com/SocialGouv/mano/issues/554)) ([21ea43c](https://github.com/SocialGouv/mano/commit/21ea43c1371c7184a55ab2220619c5df42492cfa))
+
 ## [1.81.1](https://github.com/SocialGouv/mano/compare/v1.81.0...v1.81.1) (2022-03-30)
 
 
