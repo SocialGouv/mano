@@ -1,3 +1,10 @@
+## [1.81.1](https://github.com/SocialGouv/mano/compare/v1.81.0...v1.81.1) (2022-03-30)
+
+
+### Bug Fixes
+
+* **api:** add onlyHealthcareProfessional to checked fields ([#553](https://github.com/SocialGouv/mano/issues/553)) ([00550b6](https://github.com/SocialGouv/mano/commit/00550b647e2f98d14385cd50879aacd8a26eab58))
+
 # [1.81.0](https://github.com/SocialGouv/mano/compare/v1.80.1...v1.81.0) (2022-03-28)
 
 
