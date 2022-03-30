@@ -148,6 +148,7 @@ router.put(
             enabled: z.optional(z.boolean()),
             required: z.optional(z.boolean()),
             showInStats: z.optional(z.boolean()),
+            onlyHealthcareProfessional: z.optional(z.boolean()),
             options: z.optional(z.array(z.string())),
           })
           .strict();
