@@ -26,12 +26,10 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, writeComment: wr
     };
     if (person) {
       body.person = person;
-      body.item = person;
       body.type = 'person';
     }
     if (action) {
       body.action = action;
-      body.item = action;
       body.type = 'action';
     }
     if (!body.user) body.user = user._id;

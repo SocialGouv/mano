@@ -65,12 +65,10 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
       organisation: organisation._id,
     };
     if (!!personId) {
-      commentBody.item = personId;
       commentBody.person = personId;
       commentBody.type = 'person';
     }
     if (!!actionId) {
-      commentBody.item = actionId;
       commentBody.action = actionId;
       commentBody.type = 'action';
     }
