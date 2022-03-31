@@ -28,7 +28,7 @@ import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api'
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
-import { theme } from '../../config';
+import { ENV, theme } from '../../config';
 import SortableGrid from '../../components/SortableGrid';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { refreshTriggerState } from '../../components/Loader';
@@ -65,9 +65,13 @@ const View = () => {
           <DrawerButton className={tab === 'persons' ? 'active' : ''} onClick={() => setTab('persons')} disabled={!organisation.encryptionEnabled}>
             Personnes suivies
           </DrawerButton>
-          <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
-            Consultations
-          </DrawerButton>
+          {ENV === 'development' ? (
+            <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
+              {' '}
+              Consultations
+            </DrawerButton>
+          ) : null}
+
           <DrawerButton className={tab === 'actions' ? 'active' : ''} onClick={() => setTab('actions')}>
             Actions
           </DrawerButton>
