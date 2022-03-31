@@ -330,6 +330,7 @@ export function MedicalFile({ person }) {
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.status) errors.status = 'Le statut est obligatoire';
               if (!values.date) errors.date = 'La date est obligatoire';
+              if (!values.type) errors.type = 'Le type est obligatoire';
               return errors;
             }}
             onSubmit={async (values) => {

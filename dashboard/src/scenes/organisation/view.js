@@ -505,7 +505,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   useEffect(() => {
     setConsultations(organisation.consultations);
   }, [organisation, setConsultations]);
-  console.log('anciennes ? ', organisation.consultations, consultations);
+
   return (
     <>
       <SubTitle>Consultations</SubTitle>
@@ -565,7 +565,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
               });
               handleChange({ target: { value: consultations, name: 'consultations' } });
               setOrganisation({ ...organisation, consultations: newConsultations });
-              toastr.success('Catégorie mise à jour', "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+              toastr.success('Consultation mise à jour', "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
             } else {
               toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
             }
@@ -597,6 +597,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
         <ButtonCustom
           title="Mettre à jour"
           loading={isSubmitting}
+          disabled={JSON.stringify(organisation.consultations) === JSON.stringify(consultations)}
           onClick={() => {
             handleChange({ target: { value: consultations, name: 'consultations' } });
             handleSubmit();
