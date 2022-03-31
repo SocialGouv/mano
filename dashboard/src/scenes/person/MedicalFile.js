@@ -253,10 +253,10 @@ export function MedicalFile({ person }) {
                 _id: uuidv4(),
                 date: new Date(),
                 name: '',
+                type: '',
                 status: 'A FAIRE',
                 user: user._id,
                 onlyVisibleByCreator: false,
-                type: '',
               });
             }}
             color="primary"
@@ -360,16 +360,17 @@ export function MedicalFile({ person }) {
                     <FormGroup>
                       <Label>Type</Label>
                       <SelectCustom
+                        value={{ label: values.type, value: values.type }}
                         onChange={(t) => {
-                          handleChange({ currentTarget: { value: t.value, name: 'consultationType' } });
+                          handleChange({ currentTarget: { value: t.value, name: 'type' } });
                         }}
                         options={organisation.consultations.map((e) => ({ label: e.name, value: e.name }))}
                       />
-                      {touched.consultationType && errors.consultationType && <Error>{errors.consultationType}</Error>}
+                      {touched.type && errors.type && <Error>{errors.type}</Error>}
                     </FormGroup>
                   </Col>
                   {organisation.consultations
-                    .find((e) => e.name === values.consultationType)
+                    .find((e) => e.name === values.type)
                     ?.fields.filter((f) => f.enabled)
                     .map((field) => {
                       return (

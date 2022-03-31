@@ -13,6 +13,9 @@ import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import {
+  consultationTypes,
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
   defaultMedicalCustomFields,
   personFieldsIncludingCustomFieldsSelector,
   personsState,
@@ -495,6 +498,8 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [consultations, setConsultations] = useState([]);
   const [persons] = useRecoilState(personsState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
   const consultationsSortable = useMemo(() => consultations.map((e) => e.name), [consultations]);
   useEffect(() => {
@@ -534,17 +539,16 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
             }
             const newConsultations = consultations.map((e) => (e.name === content ? { ...e, name: newContent } : e));
             setConsultations(newConsultations);
-            persons.filter((person) => person.consultations?.find((consultation) => consultation.name === content));
             const encryptedPersons = await Promise.all(
               persons
-                .filter((person) => person.consultations?.find((consultation) => consultation.name === content))
+                .filter((person) => person.consultations?.find((consultation) => consultation.type === content))
                 .map((person) => ({
                   ...person,
                   consultations: person.consultations.map((consultation) =>
-                    consultation.name === content ? { ...consultation, name: newContent } : consultation
+                    consultation.type === content ? { ...consultation, type: newContent } : consultation
                   ),
                 }))
-                .map(preparePersonForEncryption)
+                .map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial))
                 .map(encryptItem(hashedOrgEncryptionKey))
             );
             const response = await API.put({
@@ -573,8 +577,8 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
         <SelectCustom
           key={JSON.stringify(consultationsSortable || [])}
           creatable
-          options={consultationsSortable
-            .filter((cat) => consultationsSortable.includes(cat))
+          options={consultationTypes
+            .filter((cat) => !consultationsSortable.includes(cat))
             .sort((c1, c2) => c1.localeCompare(c2))
             .map((cat) => ({ value: cat, label: cat }))}
           value={null}
