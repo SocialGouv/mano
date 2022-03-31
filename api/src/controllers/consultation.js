@@ -46,7 +46,7 @@ router.put(
 
     try {
       await sequelize.transaction(async (tx) => {
-        for (let { encrypted, encryptedEntityKey, _id } of persons) {
+        for (const { encrypted, encryptedEntityKey, _id } of persons) {
           await Person.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
 
@@ -54,7 +54,7 @@ router.put(
         await organisation.save({ transaction: tx });
       });
     } catch (e) {
-      capture("error updating category", e);
+      capture("error updating consultation", e);
       throw e;
     }
     return res.status(200).send({ ok: true });
