@@ -288,7 +288,18 @@ export function MedicalFile({ person }) {
             dataKey: 'date',
             render: (e) => (e.date ? formatDateTimeWithNameOfDay(e.date) : ''),
           },
-          { title: 'Description', dataKey: 'name' },
+          {
+            title: 'Description',
+            dataKey: 'name',
+            render: (e) => {
+              return (
+                <>
+                  <div>{e.name}</div>
+                  <small className="text-muted">{e.type}</small>
+                </>
+              );
+            },
+          },
           {
             title: 'Créé par',
             dataKey: 'user',
