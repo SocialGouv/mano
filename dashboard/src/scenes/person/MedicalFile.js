@@ -348,7 +348,6 @@ export function MedicalFile({ person }) {
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
               <React.Fragment>
-                {JSON.stringify(values)}
                 <Row>
                   <Col md={6}>
                     <FormGroup>
