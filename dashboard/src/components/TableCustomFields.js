@@ -24,6 +24,14 @@ const newField = () => ({
 
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
 
+const sanitizeFields = (field) => {
+  const sanitizedField = {};
+  for (const key of Object.keys(field)) {
+    if (![undefined, null].includes(field[key])) sanitizedField[key] = field[key];
+  }
+  return sanitizedField;
+};
+
 const TableCustomFields = ({
   data,
   customFields,
@@ -73,16 +81,8 @@ const TableCustomFields = ({
   };
 
   const handleSubmit = async (newData) => {
-    if (!newData)
-      newData = mutableData
-        .filter((field) => !!field.label.length)
-        .map((field) => {
-          const sanitizedField = {};
-          for (const key of Object.keys(field)) {
-            if (![undefined, null].includes(field[key])) sanitizedField[key] = field[key];
-          }
-          return sanitizedField;
-        });
+    if (!newData) newData = mutableData.filter((field) => !!field.label.length);
+    newData = newData.map(sanitizeFields);
     setIsSubmitting(true);
     try {
       const response = await API.put({
