@@ -15,7 +15,7 @@ const Comment = require("../models/comment");
 const Passage = require("../models/passage");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
-const { looseUuidRegex } = require("../utils");
+const { looseUuidRegex, customFieldSchema } = require("../utils");
 const { capture } = require("../sentry");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
@@ -140,18 +140,6 @@ router.put(
         z.optional(z.string().min(1)).parse(req.body.name);
         z.optional(z.array(z.string().min(1))).parse(req.body.categories);
         z.optional(z.array(z.string().min(1))).parse(req.body.collaborations);
-        const customFieldSchema = z
-          .object({
-            name: z.string().min(1),
-            type: z.string().min(1),
-            label: z.optional(z.string().min(1)),
-            enabled: z.optional(z.boolean()),
-            required: z.optional(z.boolean()),
-            showInStats: z.optional(z.boolean()),
-            onlyHealthcareProfessional: z.optional(z.boolean()),
-            options: z.optional(z.array(z.string())),
-          })
-          .strict();
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsObs);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsSocial);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsMedical);

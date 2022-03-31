@@ -12,7 +12,12 @@ import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { defaultMedicalCustomFields, personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
+import {
+  defaultMedicalCustomFields,
+  personFieldsIncludingCustomFieldsSelector,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState } from '../../recoil/auth';
@@ -486,8 +491,11 @@ const View = () => {
 };
 
 function Consultations({ handleChange, isSubmitting, handleSubmit }) {
-  const organisation = useRecoilValue(organisationState);
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [consultations, setConsultations] = useState([]);
+  const [persons] = useRecoilState(personsState);
+  const API = useApi();
   const consultationsSortable = useMemo(() => consultations.map((e) => e.name), [consultations]);
   useEffect(() => {
     setConsultations(organisation.consultations);
@@ -496,6 +504,10 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   return (
     <>
       <SubTitle>Consultations</SubTitle>
+      <p>Les consultations sont visible dans le dossier médical pour les utilisateurs de type « professionnel de santé »</p>
+      <hr />
+      <SubTitleLevel2>Configuration du type de consultation</SubTitleLevel2>
+
       <FormGroup>
         <Label>Types de consultations</Label>
 
@@ -516,7 +528,43 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
             setConsultations(consultations.filter((e) => e.name !== content));
           }}
           onEditItem={async ({ content, newContent }) => {
-            setConsultations(consultations.map((e) => (e.name === content ? { ...e, name: newContent } : e)));
+            if (!newContent) {
+              toastr.error('Erreur', 'Vous devez saisir un nom pour le type de consultation');
+              return;
+            }
+            const newConsultations = consultations.map((e) => (e.name === content ? { ...e, name: newContent } : e));
+            setConsultations(newConsultations);
+            persons.filter((person) => person.consultations?.find((consultation) => consultation.name === content));
+            const encryptedPersons = await Promise.all(
+              persons
+                .filter((person) => person.consultations?.find((consultation) => consultation.name === content))
+                .map((person) => ({
+                  ...person,
+                  consultations: person.consultations.map((consultation) =>
+                    consultation.name === content ? { ...consultation, name: newContent } : consultation
+                  ),
+                }))
+                .map(preparePersonForEncryption)
+                .map(encryptItem(hashedOrgEncryptionKey))
+            );
+            const response = await API.put({
+              path: `/consultation`,
+              body: {
+                consultations: newConsultations,
+                persons: encryptedPersons,
+              },
+            });
+            if (response.ok) {
+              setRefreshTrigger({
+                status: true,
+                options: { showFullScreen: false, initialLoad: false },
+              });
+              handleChange({ target: { value: consultations, name: 'consultations' } });
+              setOrganisation({ ...organisation, consultations: newConsultations });
+              toastr.success('Catégorie mise à jour', "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+            } else {
+              toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+            }
           }}
         />
       </FormGroup>
@@ -546,13 +594,14 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
           title="Mettre à jour"
           loading={isSubmitting}
           onClick={() => {
-            debugger;
             handleChange({ target: { value: consultations, name: 'consultations' } });
             handleSubmit();
           }}
           width={200}
         />
       </div>
+      <hr />
+      <SubTitleLevel2>Champs personnalisés des consultations</SubTitleLevel2>
       {organisation.consultations.map((consultation) => {
         return (
           <div key={consultation.name}>
@@ -632,6 +681,10 @@ const SubTitle = styled.h3`
     font-style: italic;
     display: block;
   }
+`;
+
+const SubTitleLevel2 = styled.h4`
+  margin: 2rem 0;
 `;
 
 const Drawer = styled.aside`
