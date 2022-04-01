@@ -1,3 +1,10 @@
+## [1.83.1](https://github.com/SocialGouv/mano/compare/v1.83.0...v1.83.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* user should not be able to delete themselves ([#568](https://github.com/SocialGouv/mano/issues/568)) ([1ba98da](https://github.com/SocialGouv/mano/commit/1ba98da11bd89defaadb38c49507f2c07ab549ca))
+
 # [1.83.0](https://github.com/SocialGouv/mano/compare/v1.82.0...v1.83.0) (2022-04-01)
 
 
