@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { Row, Col, FormGroup, Input, Label } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';

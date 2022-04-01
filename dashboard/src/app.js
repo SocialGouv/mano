@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { RecoilRoot, useRecoilValue } from 'recoil';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { fr } from 'date-fns/esm/locale';
@@ -42,18 +41,20 @@ const App = ({ resetRecoil }) => {
   const recoilResetKey = useRecoilValue(recoilResetKeyState);
   useEffect(() => {
     if (!!recoilResetKey) resetRecoil();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [recoilResetKey]);
 
-  const onWindowFocus = (e) => {
+  const onWindowFocus = useCallback((e) => {
     if (tokenCached && e.newState === 'active') API.get({ path: '/check-auth' }); // will force logout if session is expired
-  };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     lifecycle.addEventListener('statechange', onWindowFocus);
     return () => {
       lifecycle.removeEventListener('statechange', onWindowFocus);
     };
-  }, []);
+  }, [onWindowFocus]);
 
   return (
     <div className="main-container">

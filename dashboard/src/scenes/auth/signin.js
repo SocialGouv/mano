@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
@@ -42,7 +41,7 @@ const SignIn = () => {
     } else {
       history.push('/action');
     }
-  }, [organisation, refreshTrigger]);
+  }, [history, organisation, refreshTrigger]);
 
   const onSigninValidated = async () => {
     setRefreshTrigger({
@@ -78,6 +77,7 @@ const SignIn = () => {
 
       return setLoading(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) return <></>;

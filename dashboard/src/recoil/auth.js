@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { atom } from 'recoil';
 
 export const userState = atom({

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Col, Row } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -60,12 +59,13 @@ const List = () => {
       : [];
     const actionsIdsFilterBySearch = [...new Set([...actionsIdsByActionsSearch, ...actionsIdsByActionsCommentsSearch, ...actionIdsByPersonsSearch])];
     return actionsByTeamAndStatus.filter((a) => actionsIdsFilterBySearch.includes(a._id));
-  }, [actionsByTeamAndStatus, commentsForActions, personsForActions, search, actionsIds]);
+  }, [actionsByTeamAndStatus, commentsForActions, personsForActions, search]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('showAs', showAs);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAs]);
   const limit = 20;
 
