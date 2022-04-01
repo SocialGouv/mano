@@ -7,7 +7,7 @@ import { toastr } from 'react-redux-toastr';
 import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import { currentTeamState, teamsState } from '../../recoil/auth';
+import { currentTeamState } from '../../recoil/auth';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
