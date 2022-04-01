@@ -70,7 +70,7 @@
     "react-native-sodium": "^0.4.0",
     "react-native-svg": "^12.1.1",
     "react-native-tab-view": "^2.x",
-    "recoil": "^0.6.0",
+    "recoil": "^0.7.0",
     "recompose": "^0.30.0",
     "styled-components": "^5.2.1",
     "urijs": "^1.19.10"
