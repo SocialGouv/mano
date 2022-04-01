@@ -17,7 +17,7 @@ const newField = () => ({
   name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,
   label: '',
   type: 'text',
-  enabled: false,
+  enabled: true,
   required: false,
   showInStats: false,
 });
