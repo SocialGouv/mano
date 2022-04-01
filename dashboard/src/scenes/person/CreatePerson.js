@@ -1,13 +1,13 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from 'react';
-import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
+import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import { currentTeamState } from '../../recoil/auth';
+import { currentTeamState, teamsState } from '../../recoil/auth';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -17,6 +17,7 @@ import {
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 import useApi from '../../services/api';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
@@ -57,7 +58,7 @@ const CreatePerson = ({ refreshable }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle personne</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '' }}
+            initialValues={{ name: '', assignedTeams: [currentTeam?._id] }}
             onSubmit={async (body, actions) => {
               const existingPerson = persons.find((p) => p.name === body.name);
               if (existingPerson) return toastr.error('Un utilisateur existe déjà à ce nom');
@@ -79,8 +80,20 @@ const CreatePerson = ({ refreshable }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <div>Nom</div>
+                      <Label>Nom</Label>
                       <Input name="name" value={values.name} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label>Équipe(s) en charge</Label>
+                      <SelectTeamMultiple
+                        onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
+                        value={values.assignedTeams}
+                        colored
+                        inputId="person-select-assigned-team"
+                        classNamePrefix="person-select-assigned-team"
+                      />
                     </FormGroup>
                   </Col>
                 </Row>
