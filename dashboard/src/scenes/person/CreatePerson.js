@@ -58,8 +58,9 @@ const CreatePerson = ({ refreshable }) => {
           <Formik
             initialValues={{ name: '' }}
             onSubmit={async (body, actions) => {
+              if (!body.name?.trim()?.length) return toastr.error('Une personne doit avoir un nom');
               const existingPerson = persons.find((p) => p.name === body.name);
-              if (existingPerson) return toastr.error('Un utilisateur existe déjà à ce nom');
+              if (existingPerson) return toastr.error('Une personne existe déjà à ce nom');
               body.followedSince = new Date();
               const response = await API.post({
                 path: '/person',
@@ -87,7 +88,7 @@ const CreatePerson = ({ refreshable }) => {
                 <ButtonCustom
                   color="info"
                   onClick={() => !isSubmitting && handleSubmit()}
-                  disabled={!!isSubmitting}
+                  disabled={!!isSubmitting || !values.name?.trim()?.length}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
                 />
               </React.Fragment>
