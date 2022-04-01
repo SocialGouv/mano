@@ -1,3 +1,36 @@
+## [1.83.1](https://github.com/SocialGouv/mano/compare/v1.83.0...v1.83.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* user should not be able to delete themselves ([#568](https://github.com/SocialGouv/mano/issues/568)) ([1ba98da](https://github.com/SocialGouv/mano/commit/1ba98da11bd89defaadb38c49507f2c07ab549ca))
+
+# [1.83.0](https://github.com/SocialGouv/mano/compare/v1.82.0...v1.83.0) (2022-04-01)
+
+
+### Bug Fixes
+
+* **dashboard:** fix 566 ([3921130](https://github.com/SocialGouv/mano/commit/39211308b98f39612c57c1286d3e2d674eaf9465))
+
+
+### Features
+
+* **app:** update mobile version ([5367191](https://github.com/SocialGouv/mano/commit/53671912a4939829677e8ba17cbbafb9c57f8a78))
+
+# [1.82.0](https://github.com/SocialGouv/mano/compare/v1.81.3...v1.82.0) (2022-04-01)
+
+
+### Features
+
+* **app:** suggest team association when create person ([#560](https://github.com/SocialGouv/mano/issues/560)) ([67af25e](https://github.com/SocialGouv/mano/commit/67af25ead8cf33d34d843bab83a16fc6db626d27))
+
+## [1.81.3](https://github.com/SocialGouv/mano/compare/v1.81.2...v1.81.3) (2022-04-01)
+
+
+### Bug Fixes
+
+* **app:** loose bottom navigation bar ([#546](https://github.com/SocialGouv/mano/issues/546)) ([97c23cd](https://github.com/SocialGouv/mano/commit/97c23cd91219009c31d30060473633a379a634d1))
+
 ## [1.81.2](https://github.com/SocialGouv/mano/compare/v1.81.1...v1.81.2) (2022-03-30)
 
 

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { Row, Col } from 'reactstrap';
 import { theme } from '../config';
@@ -25,6 +24,7 @@ const Documents = ({ person, onUpdateResults }) => {
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(person.documents?.length || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [person.documents?.length]);
 
   return (

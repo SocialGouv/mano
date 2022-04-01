@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import styled from 'styled-components';
@@ -126,6 +125,7 @@ const Actions = ({ search, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   if (!data) return <div />;
@@ -183,6 +183,7 @@ const Persons = ({ search, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   if (!data) return <div />;
@@ -246,10 +247,11 @@ const Comments = ({ search, onUpdateResults }) => {
       }
       return commentPopulated;
     });
-  }, [search, comments]);
+  }, [search, comments, persons, actions]);
 
   useEffect(() => {
     onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   if (!data) return <div />;
@@ -349,6 +351,7 @@ const Territories = ({ search, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   if (!data) return <div />;
@@ -390,6 +393,7 @@ const Places = ({ search, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   if (!data) return <div />;
@@ -450,6 +454,7 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   if (!data) return <div />;

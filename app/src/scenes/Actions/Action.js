@@ -146,11 +146,7 @@ const Action = ({ navigation, route }) => {
     ]);
   };
 
-  const onSearchPerson = () =>
-    navigation.push('Persons', {
-      screen: 'PersonsSearch',
-      params: { fromRoute: 'Action' },
-    });
+  const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'Action' });
 
   const handleBeforeRemove = (e) => {
     if (backRequestHandledRef.current === true) return;

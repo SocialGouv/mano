@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
@@ -25,11 +24,14 @@ const View = () => {
 
   const API = useApi();
 
+  const getTeams = async () => {
+    const { data } = await API.get({ path: `/team/${id}` });
+    setTeam(data);
+  };
+
   useEffect(() => {
-    (async () => {
-      const { data } = await API.get({ path: `/team/${id}` });
-      setTeam(data);
-    })();
+    getTeams();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const deleteData = async () => {

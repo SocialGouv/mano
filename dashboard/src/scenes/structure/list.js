@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
@@ -27,6 +26,7 @@ const List = () => {
   useEffect(() => {
     setPagination({});
     getStructure();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh, search]);
 
   const getStructure = async (p = pagination) => {

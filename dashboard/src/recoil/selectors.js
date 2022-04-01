@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { currentTeamState } from './auth';
 import { personsState } from './persons';
 import { placesState } from './places';

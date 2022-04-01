@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
@@ -18,12 +17,15 @@ const View = () => {
   const history = useHistory();
   const API = useApi();
 
+  const getStructure = async () => {
+    const { data } = await API.get({ path: `/structure/${id}` });
+    setStructure(data);
+  };
+
   useEffect(() => {
-    (async () => {
-      const { data } = await API.get({ path: `/structure/${id}` });
-      setStructure(data);
-    })();
-  }, []);
+    getStructure();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
