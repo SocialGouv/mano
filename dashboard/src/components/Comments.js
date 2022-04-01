@@ -64,14 +64,8 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
       team: currentTeam._id,
       organisation: organisation._id,
     };
-    if (!!personId) {
-      commentBody.person = personId;
-      commentBody.type = 'person';
-    }
-    if (!!actionId) {
-      commentBody.action = actionId;
-      commentBody.type = 'action';
-    }
+    if (!!personId) commentBody.person = personId;
+    if (!!actionId) commentBody.action = actionId;
 
     const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
     if (!response.ok) return;

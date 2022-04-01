@@ -24,14 +24,8 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, writeComment: wr
     const body = {
       comment,
     };
-    if (person) {
-      body.person = person;
-      body.type = 'person';
-    }
-    if (action) {
-      body.action = action;
-      body.type = 'action';
-    }
+    if (person) body.person = person;
+    if (action) body.action = action;
     if (!body.user) body.user = user._id;
     if (!body.team) body.team = currentTeam._id;
     if (!body.organisation) body.organisation = organisation._id;
