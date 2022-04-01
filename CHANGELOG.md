@@ -1,3 +1,10 @@
+## [1.84.1](https://github.com/SocialGouv/mano/compare/v1.84.0...v1.84.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* **dashbboard:** cant create a person with no name; ([#573](https://github.com/SocialGouv/mano/issues/573)) ([99df48c](https://github.com/SocialGouv/mano/commit/99df48c66942d0a6ec50cc60d200f6c9acba9c0d))
+
 # [1.84.0](https://github.com/SocialGouv/mano/compare/v1.83.1...v1.84.0) (2022-04-01)
 
 
