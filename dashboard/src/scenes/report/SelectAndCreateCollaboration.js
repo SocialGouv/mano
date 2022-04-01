@@ -22,7 +22,6 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
   const onCreateOption = async (collab) => {
     toastr.info('Création de la nouvelle collaboration...');
     onChangeRequest([...(values || []), collab]);
-    await new Promise((res) => setTimeout(res, 2000));
     const response = await API.put({
       path: `/organisation/${organisation._id}`,
       body: { collaborations: [...(organisation.collaborations || []), collab].sort((c1, c2) => c1.localeCompare(c2)) },
