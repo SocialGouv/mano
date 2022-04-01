@@ -1,3 +1,15 @@
+# [1.83.0](https://github.com/SocialGouv/mano/compare/v1.82.0...v1.83.0) (2022-04-01)
+
+
+### Bug Fixes
+
+* **dashboard:** fix 566 ([3921130](https://github.com/SocialGouv/mano/commit/39211308b98f39612c57c1286d3e2d674eaf9465))
+
+
+### Features
+
+* **app:** update mobile version ([5367191](https://github.com/SocialGouv/mano/commit/53671912a4939829677e8ba17cbbafb9c57f8a78))
+
 # [1.82.0](https://github.com/SocialGouv/mano/compare/v1.81.3...v1.82.0) (2022-04-01)
 
 
