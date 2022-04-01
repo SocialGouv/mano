@@ -9,7 +9,7 @@ import { getData } from '../services/dataManagement';
 import { organisationState, teamsState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
-import { territoriesState } from '../recoil/territory';
+import { prepareTerritoryForEncryption, territoriesState } from '../recoil/territory';
 import { placesState } from '../recoil/places';
 import { relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { territoryObservationsState } from '../recoil/territoryObservations';
@@ -94,6 +94,48 @@ const Loader = () => {
     /*
     Play organisation internal migrations (things that requires the database to be fully loaded locally).
     */
+
+    if (!organisation.migrations?.includes('territory-observations-in-territories')) {
+      setLoading('Mise à jour des données de votre organisation, veuillez patienter quelques instants...');
+      const allTerritories = await getData({
+        collectionName: 'territory',
+        data: territories,
+        isInitialization: initialLoad,
+        setBatchData: (newTerritories) =>
+          setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
+        API,
+      });
+      const allTerritoriesObservations = await getData({
+        collectionName: 'territory-observation',
+        data: territoryObservations,
+        isInitialization: initialLoad,
+        setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
+        API,
+      });
+      const territoriesToUpdate = [];
+      for (const territory of allTerritories) {
+        const territoryObservations = allTerritoriesObservations
+          .filter((obs) => obs.territory === territory._id)
+          .map(({ createdAt, updatedAt, encryptedEntityKey, entityKey, encrypted, organisation, ...rest }) => rest);
+        if (territoryObservations?.length) {
+          territoriesToUpdate.push({ ...territory, observations: territoryObservations });
+        }
+      }
+      const response = await API.put({
+        path: `/migration/territory-observations-in-territories`,
+        body: {
+          territoriesToUpdate: await Promise.all(territoriesToUpdate.map(prepareTerritoryForEncryption).map(encryptItem(hashedOrgEncryptionKey))),
+        },
+      });
+      if (!response.ok) {
+        if (response.error) {
+          setLoading(response.error);
+          setProgress(1);
+        }
+        return;
+      }
+      setOrganisation(response.organisation);
+    }
 
     if (!organisation.migrations?.includes('passages-from-comments-to-table')) {
       await new Promise((res) => setTimeout(res, 500));

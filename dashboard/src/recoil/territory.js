@@ -5,7 +5,7 @@ export const territoriesState = atom({
   default: [],
 });
 
-const encryptedFields = ['name', 'perimeter', 'types', 'user'];
+const encryptedFields = ['name', 'perimeter', 'types', 'user', 'observations'];
 
 export const prepareTerritoryForEncryption = (territory) => {
   const decrypted = {};

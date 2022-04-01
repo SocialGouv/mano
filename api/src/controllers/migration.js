@@ -12,6 +12,7 @@ const validateEncryptionAndMigrations = require("../middleware/validateEncryptio
 const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
+const Territory = require("../models/territory");
 
 router.put(
   "/:migrationName",
@@ -71,6 +72,30 @@ router.put(
             if (report) {
               report.set({ encrypted, encryptedEntityKey });
               await report.save();
+            }
+          }
+        }
+
+        if (req.params.migrationName === "territory-observations-in-territories") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.territoriesToUpdate);
+          } catch (e) {
+            const error = new Error(`Invalid request in territories update: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.territoriesToUpdate) {
+            const territory = await Territory.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (territory) {
+              territory.set({ encrypted, encryptedEntityKey });
+              await territory.save();
             }
           }
         }
