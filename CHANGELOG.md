@@ -1,3 +1,10 @@
+## [1.81.3](https://github.com/SocialGouv/mano/compare/v1.81.2...v1.81.3) (2022-04-01)
+
+
+### Bug Fixes
+
+* **app:** loose bottom navigation bar ([#546](https://github.com/SocialGouv/mano/issues/546)) ([97c23cd](https://github.com/SocialGouv/mano/commit/97c23cd91219009c31d30060473633a379a634d1))
+
 ## [1.81.2](https://github.com/SocialGouv/mano/compare/v1.81.1...v1.81.2) (2022-03-30)
 
 
