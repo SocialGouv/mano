@@ -132,7 +132,9 @@ const View = () => {
                 </Col>
               </Row>
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
+                {id !== user._id && (
+                  <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
+                )}
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
               </div>
             </React.Fragment>
