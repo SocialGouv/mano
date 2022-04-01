@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useState, useEffect, useMemo } from 'react';
+import React, { useContext, useState, useEffect, useMemo, Fragment } from 'react';
 import { Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -411,14 +411,17 @@ const Places = ({ search, onUpdateResults }) => {
               title: 'Personnes suivies',
               dataKey: 'persons',
               render: (place) => (
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: relsPersonPlace
-                      .filter((rel) => rel.place === place._id)
-                      .map((rel) => persons.find((p) => p._id === rel.person)?.name)
-                      .join('<br/>'),
-                  }}
-                />
+                <p style={{ marginBottom: 0 }}>
+                  {relsPersonPlace
+                    .filter((rel) => rel.place === place._id)
+                    .map((rel) => persons.find((p) => p._id === rel.person))
+                    .map(({ _id, name }, index, arr) => (
+                      <Fragment key={_id}>
+                        {name}
+                        {index < arr.length - 1 && <br />}
+                      </Fragment>
+                    ))}
+                </p>
               ),
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (place) => formatDateWithFullMonth(place.createdAt) },

@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { Fragment, useContext, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -74,14 +74,17 @@ const List = () => {
             title: 'Personnes suivies',
             dataKey: 'persons',
             render: (place) => (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: relsPersonPlace
-                    .filter((rel) => rel.place === place._id)
-                    .map((rel) => persons.find((p) => p._id === rel.person)?.name)
-                    .join('<br/>'),
-                }}
-              />
+              <p style={{ marginBottom: 0 }}>
+                {relsPersonPlace
+                  .filter((rel) => rel.place === place._id)
+                  .map((rel) => persons.find((p) => p._id === rel.person))
+                  .map(({ _id, name }, index, arr) => (
+                    <Fragment key={_id}>
+                      {name}
+                      {index < arr.length - 1 && <br />}
+                    </Fragment>
+                  ))}
+              </p>
             ),
           },
           { title: 'Créée le', dataKey: 'createdAt', render: (place) => formatDateWithFullMonth(place.createdAt) },

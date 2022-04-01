@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React from 'react';
+import React, { Fragment } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
@@ -92,14 +92,17 @@ const View = () => {
                 <Col md={12}>
                   <FormGroup>
                     <Label>Personnes suivies</Label>
-                    <p
-                      dangerouslySetInnerHTML={{
-                        __html: relsPersonPlace
-                          .filter((rel) => rel.place === place._id)
-                          .map((rel) => persons.find((p) => p._id === rel.person)?.name)
-                          .join('<br/>'),
-                      }}
-                    />
+                    <p style={{ marginBottom: 0 }}>
+                      {relsPersonPlace
+                        .filter((rel) => rel.place === place._id)
+                        .map((rel) => persons.find((p) => p._id === rel.person))
+                        .map(({ _id, name }, index, arr) => (
+                          <Fragment key={_id}>
+                            {name}
+                            {index < arr.length - 1 && <br />}
+                          </Fragment>
+                        ))}
+                    </p>
                   </FormGroup>
                 </Col>
               </Row>
