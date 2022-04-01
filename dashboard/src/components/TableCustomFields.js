@@ -32,7 +32,15 @@ const sanitizeFields = (field) => {
   return sanitizedField;
 };
 
-const TableCustomFields = ({ data, customFields, showHealthcareProfessionnalColumn = false }) => {
+const TableCustomFields = ({
+  data,
+  customFields,
+  showHealthcareProfessionnalColumn = false,
+  mergeData = null,
+  extractData = null,
+  keyPrefix = null,
+  hideStats = false,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
@@ -79,12 +87,12 @@ const TableCustomFields = ({ data, customFields, showHealthcareProfessionnalColu
     try {
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { [customFields]: newData },
+        body: { [customFields]: mergeData ? mergeData(newData) : newData },
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
+        setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
-        setMutableData(response.data[customFields]);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
@@ -96,14 +104,15 @@ const TableCustomFields = ({ data, customFields, showHealthcareProfessionnalColu
   const handleSort = async (keys) => {
     setIsSubmitting(true);
     try {
+      const dataForApi = keys.map((key) => mutableData.find((field) => field.name === key));
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { [customFields]: keys.map((key) => mutableData.find((field) => field.name === key)) },
+        body: { [customFields]: mergeData ? mergeData(dataForApi) : dataForApi },
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
+        setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
-        setMutableData(response.data[customFields]);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
@@ -117,7 +126,7 @@ const TableCustomFields = ({ data, customFields, showHealthcareProfessionnalColu
       <Table
         data={mutableData}
         // use this key prop to reset table and reset sortablejs on each element added/removed
-        key={mutableData.length}
+        key={(keyPrefix || customFields) + mutableData.length}
         rowKey="name"
         isSortable
         onSort={handleSort}
@@ -169,17 +178,19 @@ const TableCustomFields = ({ data, customFields, showHealthcareProfessionnalColu
                 dataKey: 'onlyHealthcareProfessional',
                 render: (f) => <input type="checkbox" checked={f.onlyHealthcareProfessional} onChange={onOnlyHealthcareProfessionalChange(f)} />,
               },
-          {
-            title: (
-              <>
-                Voir dans les
-                <br />
-                statistiques
-              </>
-            ),
-            dataKey: 'showInStats',
-            render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
-          },
+          hideStats
+            ? null
+            : {
+                title: (
+                  <>
+                    Voir dans les
+                    <br />
+                    statistiques
+                  </>
+                ),
+                dataKey: 'showInStats',
+                render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
+              },
           {
             title: '',
             dataKey: 'name',

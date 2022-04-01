@@ -154,6 +154,8 @@ export const outOfActiveListReasonOptions = [
   'Autre',
 ];
 
+export const consultationTypes = ['Psychologique', 'Infirmier', 'Médicale'];
+
 export const defaultMedicalCustomFields = [
   {
     name: 'consumptions',

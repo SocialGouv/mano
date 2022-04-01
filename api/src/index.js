@@ -72,6 +72,7 @@ app.use("/encrypt", require("./controllers/encrypt"));
 app.use("/category", require("./controllers/category"));
 app.use("/service", require("./controllers/service"));
 app.use("/migration", require("./controllers/migration"));
+app.use("/consultation", require("./controllers/consultation"));
 
 app.use(errors.sendError);
 
