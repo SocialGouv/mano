@@ -1,3 +1,10 @@
+# [1.82.0](https://github.com/SocialGouv/mano/compare/v1.81.3...v1.82.0) (2022-04-01)
+
+
+### Features
+
+* **app:** suggest team association when create person ([#560](https://github.com/SocialGouv/mano/issues/560)) ([67af25e](https://github.com/SocialGouv/mano/commit/67af25ead8cf33d34d843bab83a16fc6db626d27))
+
 ## [1.81.3](https://github.com/SocialGouv/mano/compare/v1.81.2...v1.81.3) (2022-04-01)
 
 
