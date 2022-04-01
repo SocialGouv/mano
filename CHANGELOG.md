@@ -1,3 +1,10 @@
+# [1.85.0](https://github.com/SocialGouv/mano/compare/v1.84.1...v1.85.0) (2022-04-01)
+
+
+### Features
+
+* custom fields consultation ([#551](https://github.com/SocialGouv/mano/issues/551)) ([ffee784](https://github.com/SocialGouv/mano/commit/ffee784b849634ec87a88c6cfef2f79db04a9d06))
+
 ## [1.84.1](https://github.com/SocialGouv/mano/compare/v1.84.0...v1.84.1) (2022-04-01)
 
 
