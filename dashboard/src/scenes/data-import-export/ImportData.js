@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useMemo, useRef, useState } from 'react';
 import XLSX from 'xlsx';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -44,7 +43,7 @@ const ImportData = () => {
           ...field,
           options: field.name === 'assignedTeams' ? teams.map((team) => team.name) : field.options,
         })),
-    [personFieldsIncludingCustomFields]
+    [personFieldsIncludingCustomFields, teams]
   );
   const importableLabels = useMemo(() => importableFields.map((f) => f.label), [importableFields]);
 

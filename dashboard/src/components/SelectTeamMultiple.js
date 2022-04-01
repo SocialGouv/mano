@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { teamsState } from '../recoil/auth';

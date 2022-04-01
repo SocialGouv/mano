@@ -137,6 +137,7 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
       createdAt: organisation.createdAt,
       updatedAt: organisation.updatedAt,
       categories: organisation.categories,
+      consultations: organisation.consultations,
       encryptionEnabled: organisation.encryptionEnabled,
       encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
       receptionEnabled: organisation.receptionEnabled,

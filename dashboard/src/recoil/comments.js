@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { atom } from 'recoil';
 
 export const commentsState = atom({
@@ -6,7 +5,7 @@ export const commentsState = atom({
   default: [],
 });
 
-const encryptedFields = ['comment', 'type', 'item', 'person', 'action', 'team', 'user', 'date'];
+const encryptedFields = ['comment', 'person', 'action', 'team', 'user', 'date'];
 
 export const prepareCommentForEncryption = (comment) => {
   const decrypted = {};

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
@@ -25,11 +24,14 @@ const List = () => {
   const user = useRecoilValue(userState);
   const API = useApi();
 
+  const getUsers = async () => {
+    const { data } = await API.get({ path: '/user' });
+    setUsers(data);
+  };
+
   useEffect(() => {
-    (async () => {
-      const { data } = await API.get({ path: '/user' });
-      setUsers(data);
-    })();
+    getUsers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
 
   if (!users) return <Loading />;

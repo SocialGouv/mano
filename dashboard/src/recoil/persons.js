@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
@@ -154,6 +153,8 @@ export const outOfActiveListReasonOptions = [
   'Reconduite à la frontière',
   'Autre',
 ];
+
+export const consultationTypes = ['Psychologique', 'Infirmier', 'Médicale'];
 
 export const defaultMedicalCustomFields = [
   {

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
 
@@ -447,6 +446,7 @@ const Actions = ({ person, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   return (
@@ -491,6 +491,7 @@ const Passages = ({ personId, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(personPassages.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [personPassages.length]);
 
   return (

@@ -15,7 +15,7 @@ import {
   genderOptions,
   healthInsuranceOptions,
 } from '../../recoil/persons';
-import { usersState, userState } from '../../recoil/auth';
+import { organisationState, usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, formatDateTimeWithNameOfDay, formatDateWithFullMonth } from '../../services/date';
 import useApi from '../../services/api';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -23,9 +23,11 @@ import CustomFieldInput from '../../components/CustomFieldInput';
 import Table from '../../components/table';
 import SelectStatus from '../../components/SelectStatus';
 import ActionStatus from '../../components/ActionStatus';
+import SelectCustom from '../../components/SelectCustom';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
+  const organisation = useRecoilValue(organisationState);
   const [showAddConsultation, setShowAddConsultation] = useState(false);
   const [showAddTreatment, setShowAddTreatment] = useState(false);
   const [currentConsultation, setCurrentConsultation] = useState(null);
@@ -251,6 +253,7 @@ export function MedicalFile({ person }) {
                 _id: uuidv4(),
                 date: new Date(),
                 name: '',
+                type: '',
                 status: 'A FAIRE',
                 user: user._id,
                 onlyVisibleByCreator: false,
@@ -285,7 +288,18 @@ export function MedicalFile({ person }) {
             dataKey: 'date',
             render: (e) => (e.date ? formatDateTimeWithNameOfDay(e.date) : ''),
           },
-          { title: 'Description', dataKey: 'name' },
+          {
+            title: 'Description',
+            dataKey: 'name',
+            render: (e) => {
+              return (
+                <>
+                  <div>{e.name}</div>
+                  <small className="text-muted">{e.type}</small>
+                </>
+              );
+            },
+          },
           {
             title: 'Créé par',
             dataKey: 'user',
@@ -327,6 +341,7 @@ export function MedicalFile({ person }) {
               if (!values.name) errors.name = 'Le nom est obligatoire';
               if (!values.status) errors.status = 'Le statut est obligatoire';
               if (!values.date) errors.date = 'La date est obligatoire';
+              if (!values.type) errors.type = 'Le type est obligatoire';
               return errors;
             }}
             onSubmit={async (values) => {
@@ -352,6 +367,28 @@ export function MedicalFile({ person }) {
                       {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label>Type</Label>
+                      <SelectCustom
+                        value={{ label: values.type, value: values.type }}
+                        onChange={(t) => {
+                          handleChange({ currentTarget: { value: t.value, name: 'type' } });
+                        }}
+                        options={organisation.consultations.map((e) => ({ label: e.name, value: e.name }))}
+                      />
+                      {touched.type && errors.type && <Error>{errors.type}</Error>}
+                    </FormGroup>
+                  </Col>
+                  {organisation.consultations
+                    .find((e) => e.name === values.type)
+                    ?.fields.filter((f) => f.enabled)
+                    .map((field) => {
+                      return (
+                        <CustomFieldInput colWidth={6} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                      );
+                    })}
+
                   <Col md={6}>
                     <Label>Statut</Label>
                     <SelectStatus

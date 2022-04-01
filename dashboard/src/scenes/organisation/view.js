@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -12,7 +11,15 @@ import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { defaultMedicalCustomFields, personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
+import {
+  consultationTypes,
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  defaultMedicalCustomFields,
+  personFieldsIncludingCustomFieldsSelector,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState } from '../../recoil/auth';
@@ -20,7 +27,7 @@ import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api'
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
-import { theme } from '../../config';
+import { ENV, theme } from '../../config';
 import SortableGrid from '../../components/SortableGrid';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { refreshTriggerState } from '../../components/Loader';
@@ -57,6 +64,13 @@ const View = () => {
           <DrawerButton className={tab === 'persons' ? 'active' : ''} onClick={() => setTab('persons')} disabled={!organisation.encryptionEnabled}>
             Personnes suivies
           </DrawerButton>
+          {ENV === 'development' ? (
+            <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
+              {' '}
+              Consultations
+            </DrawerButton>
+          ) : null}
+
           <DrawerButton className={tab === 'actions' ? 'active' : ''} onClick={() => setTab('actions')}>
             Actions
           </DrawerButton>
@@ -111,14 +125,9 @@ const View = () => {
                         </div>
                       </>
                     );
-                  case 'encryption':
+                  case 'consultations':
                     return (
-                      <>
-                        <SubTitle>Chiffrement</SubTitle>
-                        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
-                          <EncryptionKey isMain />
-                        </div>
-                      </>
+                      <Consultations organisation={values} handleChange={handleChange} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
                     );
                   case 'actions':
                     return (
@@ -487,6 +496,151 @@ const View = () => {
   );
 };
 
+function Consultations({ handleChange, isSubmitting, handleSubmit }) {
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const [consultations, setConsultations] = useState([]);
+  const [persons] = useRecoilState(personsState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const API = useApi();
+  const consultationsSortable = useMemo(() => consultations.map((e) => e.name), [consultations]);
+  useEffect(() => {
+    setConsultations(organisation.consultations);
+  }, [organisation, setConsultations]);
+
+  return (
+    <>
+      <SubTitle>Consultations</SubTitle>
+      <p>Les consultations sont visible dans le dossier médical pour les utilisateurs de type « professionnel de santé »</p>
+      <hr />
+      <SubTitleLevel2>Configuration du type de consultation</SubTitleLevel2>
+
+      <FormGroup>
+        <Label>Types de consultations</Label>
+
+        <SortableGrid
+          list={consultationsSortable}
+          key={JSON.stringify(consultations)}
+          editItemTitle="Changer le nom du type de consultation"
+          onUpdateList={(list) => {
+            const newConsultations = [];
+            for (const item of list) {
+              const consultation = consultations.find((e) => e.name === item);
+              if (consultation) newConsultations.push(consultation);
+              else newConsultations.push({ name: item, fields: [] });
+            }
+            setConsultations(newConsultations);
+          }}
+          onRemoveItem={(content) => {
+            setConsultations(consultations.filter((e) => e.name !== content));
+          }}
+          onEditItem={async ({ content, newContent }) => {
+            if (!newContent) {
+              toastr.error('Erreur', 'Vous devez saisir un nom pour le type de consultation');
+              return;
+            }
+            const newConsultations = consultations.map((e) => (e.name === content ? { ...e, name: newContent } : e));
+            setConsultations(newConsultations);
+            const encryptedPersons = await Promise.all(
+              persons
+                .filter((person) => person.consultations?.find((consultation) => consultation.type === content))
+                .map((person) => ({
+                  ...person,
+                  consultations: person.consultations.map((consultation) =>
+                    consultation.type === content ? { ...consultation, type: newContent } : consultation
+                  ),
+                }))
+                .map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial))
+                .map(encryptItem(hashedOrgEncryptionKey))
+            );
+            const response = await API.put({
+              path: `/consultation`,
+              body: {
+                consultations: newConsultations,
+                persons: encryptedPersons,
+              },
+            });
+            if (response.ok) {
+              setRefreshTrigger({
+                status: true,
+                options: { showFullScreen: false, initialLoad: false },
+              });
+              handleChange({ target: { value: consultations, name: 'consultations' } });
+              setOrganisation({ ...organisation, consultations: newConsultations });
+              toastr.success('Consultation mise à jour', "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+            } else {
+              toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+            }
+          }}
+        />
+      </FormGroup>
+      <FormGroup>
+        <Label>Ajouter un type de consultation</Label>
+        <SelectCustom
+          key={JSON.stringify(consultationsSortable || [])}
+          creatable
+          options={consultationTypes
+            .filter((cat) => !consultationsSortable.includes(cat))
+            .sort((c1, c2) => c1.localeCompare(c2))
+            .map((cat) => ({ value: cat, label: cat }))}
+          value={null}
+          onChange={(cat) => {
+            if (cat && cat.value) {
+              setConsultations([...consultations, { name: cat.value, fields: [] }]);
+            }
+          }}
+          onCreateOption={async (name) => {
+            setConsultations([...consultations, { name, fields: [] }]);
+          }}
+          isClearable
+        />
+      </FormGroup>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '2rem', marginTop: '1rem' }}>
+        <ButtonCustom
+          title="Mettre à jour"
+          loading={isSubmitting}
+          disabled={JSON.stringify(organisation.consultations) === JSON.stringify(consultations)}
+          onClick={() => {
+            handleChange({ target: { value: consultations, name: 'consultations' } });
+            handleSubmit();
+          }}
+          width={200}
+        />
+      </div>
+      <hr />
+      <SubTitleLevel2>Champs personnalisés des consultations</SubTitleLevel2>
+      {organisation.consultations.map((consultation) => {
+        return (
+          <div key={consultation.name}>
+            <h5 style={{ marginTop: '2rem' }}>{consultation.name}</h5>
+
+            <small>
+              Vous pouvez personnaliser les champs disponibles pour les consultations de type <strong>{consultation.name}</strong>.
+            </small>
+            <Row>
+              <TableCustomFields
+                customFields="consultations"
+                hideStats
+                keyPrefix={consultation.name}
+                mergeData={(newData) => {
+                  return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));
+                }}
+                extractData={(data) => {
+                  return data.find((e) => e.name === consultation.name).fields || [];
+                }}
+                data={(() => {
+                  return Array.isArray(consultation.fields) ? consultation.fields : [];
+                })()}
+              />
+            </Row>
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
 const ImportFieldDetails = ({ field }) => {
   if (field.options?.length) {
     return field.options?.map((option, index) => (
@@ -535,6 +689,10 @@ const SubTitle = styled.h3`
     font-style: italic;
     display: block;
   }
+`;
+
+const SubTitleLevel2 = styled.h4`
+  margin: 2rem 0;
 `;
 
 const Drawer = styled.aside`

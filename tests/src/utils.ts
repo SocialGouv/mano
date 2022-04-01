@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid";
 
 const postgresqlUrl = `${process.env.PGBASEURL}/${process.env.PGDATABASE}`;
 
-export async function connectWith(email: string, password: string, orgEncryptionKey: string = "") {
+export async function connectWith(
+  email: string,
+  password: string,
+  orgEncryptionKey: string = ""
+) {
   await page.goto("http://localhost:8090/auth");
   // Ensure not already connected
   try {
@@ -28,7 +32,9 @@ export async function connectWith(email: string, password: string, orgEncryption
 
 // React router seems broken for reason.
 export async function navigateWithReactRouter(path: string = "/search") {
-  return page.$eval("a[href='" + path + "']", (el) => (el as HTMLElement).click());
+  return page.$eval("a[href='" + path + "']", (el) =>
+    (el as HTMLElement).click()
+  );
 }
 
 export async function getInputValue(selector: string) {
@@ -65,7 +71,9 @@ export async function updateUserPassword(email: string, password: string) {
 export async function deleteOrganisation(orgaName: string) {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();
-  await client.query(`DELETE FROM mano."Organisation" WHERE name = $1`, [orgaName]);
+  await client.query(`DELETE FROM mano."Organisation" WHERE name = $1`, [
+    orgaName,
+  ]);
   await client.end();
 }
 
@@ -78,7 +86,9 @@ export async function useSuperAdminAndOrga() {
 
   const date = "2021-01-01";
 
-  await client.query(`delete from mano."Organisation" where name='Default orga'`);
+  await client.query(
+    `delete from mano."Organisation" where name='Default orga'`
+  );
   await client.query(
     `INSERT INTO mano."Organisation" (
       _id,
@@ -145,7 +155,9 @@ export async function useEncryptedOrga() {
 
   const date = "2021-01-01";
 
-  await client.query(`delete from mano."Organisation" where name='Encrypted orga'`);
+  await client.query(
+    `delete from mano."Organisation" where name='Encrypted orga'`
+  );
   await client.query(
     `INSERT INTO mano."Organisation" (
       _id,
@@ -175,7 +187,9 @@ export async function useEncryptedOrga() {
     [orgId, date]
   );
 
-  await client.query(`delete from mano."User" where name='Encrypted Orga Admin'`);
+  await client.query(
+    `delete from mano."User" where name='Encrypted Orga Admin'`
+  );
   await client.query(
     `INSERT INTO mano."User" (
       _id,
@@ -209,7 +223,9 @@ export async function useEncryptedOrga() {
     [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
   );
 
-  await client.query(`delete from mano."Team" where name='Encrypted Orga Team'`);
+  await client.query(
+    `delete from mano."Team" where name='Encrypted Orga Team'`
+  );
   await client.query(
     `INSERT INTO mano."Team" (
       _id,

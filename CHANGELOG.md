@@ -1,3 +1,24 @@
+# [1.85.0](https://github.com/SocialGouv/mano/compare/v1.84.1...v1.85.0) (2022-04-01)
+
+
+### Features
+
+* custom fields consultation ([#551](https://github.com/SocialGouv/mano/issues/551)) ([ffee784](https://github.com/SocialGouv/mano/commit/ffee784b849634ec87a88c6cfef2f79db04a9d06))
+
+## [1.84.1](https://github.com/SocialGouv/mano/compare/v1.84.0...v1.84.1) (2022-04-01)
+
+
+### Bug Fixes
+
+* **dashbboard:** cant create a person with no name; ([#573](https://github.com/SocialGouv/mano/issues/573)) ([99df48c](https://github.com/SocialGouv/mano/commit/99df48c66942d0a6ec50cc60d200f6c9acba9c0d))
+
+# [1.84.0](https://github.com/SocialGouv/mano/compare/v1.83.1...v1.84.0) (2022-04-01)
+
+
+### Features
+
+* **dashboard:** suggest team association when create person ([#559](https://github.com/SocialGouv/mano/issues/559)) ([2eebcb6](https://github.com/SocialGouv/mano/commit/2eebcb62fbb2f55da5f41488e6c870ecf3942f3f))
+
 ## [1.83.1](https://github.com/SocialGouv/mano/compare/v1.83.0...v1.83.1) (2022-04-01)
 
 

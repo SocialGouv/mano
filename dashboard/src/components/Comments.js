@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
@@ -16,10 +15,9 @@ import { Formik } from 'formik';
 import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { dateForDatePicker } from '../services/date';
+import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date';
 import { loadingState } from './Loader';
 import useApi from '../services/api';
-import { formatDateTimeWithNameOfDay } from '../services/date';
 
 const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
@@ -44,6 +42,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(comments.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comments.length]);
 
   const deleteData = async (id) => {
@@ -64,16 +63,8 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
       team: currentTeam._id,
       organisation: organisation._id,
     };
-    if (!!personId) {
-      commentBody.item = personId;
-      commentBody.person = personId;
-      commentBody.type = 'person';
-    }
-    if (!!actionId) {
-      commentBody.item = actionId;
-      commentBody.action = actionId;
-      commentBody.type = 'action';
-    }
+    if (!!personId) commentBody.person = personId;
+    if (!!actionId) commentBody.action = actionId;
 
     const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
     if (!response.ok) return;
