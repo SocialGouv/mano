@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Row } from 'reactstrap';
 import styled from 'styled-components';
@@ -120,6 +119,7 @@ const Reception = () => {
 
   useEffect(() => {
     if (!reportsLoading && !todaysReport && !!currentTeam?._id) createReport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportsLoading, currentTeam?._id]);
 
   const services = todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {};

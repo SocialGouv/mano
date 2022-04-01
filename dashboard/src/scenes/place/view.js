@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 

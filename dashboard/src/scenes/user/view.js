@@ -1,5 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
@@ -25,12 +24,15 @@ const View = () => {
   const organisation = useRecoilValue(organisationState);
   const API = useApi();
 
+  const getData = useCallback(async () => {
+    const { data } = await API.get({ path: `/user/${id}` });
+    setLocalUser(data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
   useEffect(() => {
-    (async () => {
-      const { data } = await API.get({ path: `/user/${id}` });
-      setLocalUser(data);
-    })();
-  }, []);
+    getData();
+  }, [getData, id]);
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');

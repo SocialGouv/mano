@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -43,12 +42,14 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('calendarDate', dayjsInstance(currentDate).format('YYYY-MM-DD'));
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDate]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('calendarTab', activeTab);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const renderActionsTable = (actions, date) => (

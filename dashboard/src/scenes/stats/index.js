@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';

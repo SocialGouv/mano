@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, FormGroup, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
@@ -29,6 +28,7 @@ const Places = ({ personId = '', onUpdateResults }) => {
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   return (

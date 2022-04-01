@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Col, Row } from 'reactstrap';

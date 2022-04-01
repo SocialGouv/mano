@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { Formik } from 'formik';
@@ -30,12 +29,14 @@ const List = () => {
       setUpdateKey((k) => k + 1);
       setRefresh(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
 
   useEffect(() => {
     const sortedDataAscendant = organisations?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
     setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
     setUpdateKey((k) => k + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, sortOrder]);
 
   if (!organisations?.length) return <Loading />;
@@ -44,8 +45,6 @@ const List = () => {
       <Create onChange={() => setRefresh(true)} />
       <Table
         data={organisations}
-        // FIXME: Table is not updating without that key
-        // when we click on sortable arrows, I couldn't find why yet...
         key={updateKey}
         columns={[
           { title: 'Nom', dataKey: 'name', onSortOrder: setSortOrder, onSortBy: setSortBy, sortOrder, sortBy },
