@@ -1,3 +1,10 @@
+## [1.85.1](https://github.com/SocialGouv/mano/compare/v1.85.0...v1.85.1) (2022-04-04)
+
+
+### Bug Fixes
+
+* **dashboard:** display all medical info on print ([bea9b6a](https://github.com/SocialGouv/mano/commit/bea9b6a05881bcbc0620db61241966f7ee734363))
+
 # [1.85.0](https://github.com/SocialGouv/mano/compare/v1.84.1...v1.85.0) (2022-04-01)
 
 
