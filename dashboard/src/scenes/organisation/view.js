@@ -126,6 +126,15 @@ const View = () => {
                         </div>
                       </>
                     );
+                  case 'encryption':
+                    return (
+                      <>
+                        <SubTitle>Chiffrement</SubTitle>
+                        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
+                          <EncryptionKey isMain />
+                        </div>
+                      </>
+                    );
                   case 'consultations':
                     return (
                       <Consultations organisation={values} handleChange={handleChange} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
