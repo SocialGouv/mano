@@ -15,10 +15,47 @@ const Comment = require("../models/comment");
 const Passage = require("../models/passage");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
-const { looseUuidRegex, customFieldSchema } = require("../utils");
+const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../utils");
 const { capture } = require("../sentry");
+const Place = require("../models/place");
+const RelPersonPlace = require("../models/relPersonPlace");
+const TerritoryObservation = require("../models/territoryObservation");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
+
+router.get(
+  "/stats",
+  passport.authenticate("user", { session: false }),
+  validateUser(["superadmin", "admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.query.organisation);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+    } catch (e) {
+      const error = new Error(`Invalid request in stats get: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const query = { where: { organisation: req.query.organisation } };
+    if (Number(req.query.lastRefresh)) {
+      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
+    }
+
+    const places = await Place.count(query);
+    const relsPersonPlace = await RelPersonPlace.count(query);
+    const actions = await Action.count(query);
+    const persons = await Person.count(query);
+    const comments = await Comment.count(query);
+    const passages = await Passage.count(query);
+    const reports = await Report.count(query);
+    const territoryObservations = await TerritoryObservation.count(query);
+    const territories = await Territory.count(query);
+    return res
+      .status(200)
+      .send({ ok: true, data: { actions, comments, passages, persons, places, relsPersonPlace, territories, territoryObservations, reports } });
+  })
+);
 
 router.post(
   "/",
