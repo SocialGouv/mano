@@ -1,3 +1,10 @@
+## [1.85.4](https://github.com/SocialGouv/mano/compare/v1.85.3...v1.85.4) (2022-04-04)
+
+
+### Bug Fixes
+
+* fix organisation creation ([0ac019d](https://github.com/SocialGouv/mano/commit/0ac019d7a39c05bdcf306e51cac01b9247a3a30d))
+
 ## [1.85.3](https://github.com/SocialGouv/mano/compare/v1.85.2...v1.85.3) (2022-04-04)
 
 
