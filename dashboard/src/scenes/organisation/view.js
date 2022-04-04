@@ -22,7 +22,7 @@ import {
 } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
-import { organisationState } from '../../recoil/auth';
+import { organisationState, userState } from '../../recoil/auth';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
@@ -36,6 +36,7 @@ const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const actions = useRecoilValue(actionsState);
   const reports = useRecoilValue(reportsState);
+  const user = useRecoilValue(userState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const API = useApi();
@@ -64,7 +65,7 @@ const View = () => {
           <DrawerButton className={tab === 'persons' ? 'active' : ''} onClick={() => setTab('persons')} disabled={!organisation.encryptionEnabled}>
             Personnes suivies
           </DrawerButton>
-          {ENV === 'development' ? (
+          {ENV === 'development' || user._id === '09ec2a60-8471-4f4a-ad62-74b2424df28b' ? (
             <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
               {' '}
               Consultations

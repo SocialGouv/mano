@@ -101,7 +101,10 @@ const View = () => {
               // This implementation is temporary. Currently, the tabs are not dynamic so we have to hide them when disabled.
               // Also, this is currently only displayed in localhost. Todo: fix me!
               className={`${
-                initTabs[index].toLowerCase() === 'dossier médical' && (ENV !== 'development' || !user.healthcareProfessional) ? 'd-none' : ''
+                initTabs[index].toLowerCase() === 'dossier médical' &&
+                !((user.healthcareProfessional && ENV === 'development') || user._id === '09ec2a60-8471-4f4a-ad62-74b2424df28b')
+                  ? 'd-none'
+                  : ''
               }`}
               key={index}
               style={{ cursor: 'pointer' }}>
