@@ -9,12 +9,14 @@ export default function Index() {
   const [comments, setComments] = useState(0);
 
   const getData = async () => {
-    const response = await fetch(
-      "https://mano.fabrique.social.gouv.fr/public/stats",
-      {
-        headers: { platform: "website" },
-      }
-    ).then((res) => res.json());
+    let url = "https://mano.fabrique.social.gouv.fr/public/stats";
+    if (window.location.hostname === "localhost") {
+      url = "http://localhost:4145/public/stats";
+    }
+
+    const response = await fetch(url, {
+      headers: { platform: "website" },
+    }).then((res) => res.json());
 
     setActions(response.data.actions);
     setPersons(response.data.persons);
@@ -325,7 +327,9 @@ const CompanyLogo = ({ logoName }) => (
 
 const StatisticCard = ({ number, content }) => (
   <div className="text-center">
-    <h4 className="mb-2 text-2xl font-semibold text-shamrock-400">{number}</h4>
+    <h4 className="mb-2 text-2xl font-semibold text-shamrock-400">
+      {number ? Number(number).toLocaleString() : "-"}
+    </h4>
     <p className="text-sm text-black text-medium">{content}</p>
   </div>
 );
