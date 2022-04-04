@@ -76,6 +76,7 @@ const View = () => {
   return (
     <StyledContainer>
       <SmallerHeaderWithBackButton
+        className="noprint"
         onRefresh={() =>
           setRefreshTrigger({
             status: true,
@@ -83,16 +84,16 @@ const View = () => {
           })
         }
       />
-      <Title>
+      <Title className="noprint">
         {`Dossier de ${person?.name}`}
         <UserName id={person.user} wrapper={(name) => ` (créée par ${name})`} />
       </Title>
       {person.outOfActiveList && (
-        <Alert color="warning">
+        <Alert color="warning" className="noprint">
           {person?.name} est en dehors de la file active, pour le motif suivant : <b>{person.outOfActiveListReason}</b>
         </Alert>
       )}
-      <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }}>
+      <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }} className="noprint">
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
           return (

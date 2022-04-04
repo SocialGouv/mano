@@ -24,6 +24,7 @@ import Table from '../../components/table';
 import SelectStatus from '../../components/SelectStatus';
 import ActionStatus from '../../components/ActionStatus';
 import SelectCustom from '../../components/SelectCustom';
+import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -168,7 +169,40 @@ export function MedicalFile({ person }) {
           />
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
+      <div className="printonly">
+        {(person.treatments || []).map((c) => {
+          return (
+            <div key={c._id} style={{ marginBottom: '2rem' }}>
+              <h4>{c.name}</h4>
+              {Object.entries(c)
+                .filter(([key, value]) => value && key !== '_id' && key !== 'name')
+                .map(([key, value]) => {
+                  let field = { type: 'text', label: key };
+                  if (key === 'dosage') field = { type: 'text', label: 'Dosage' };
+                  if (key === 'frequency') field = { type: 'text', label: 'Fréquence' };
+                  if (key === 'indication') field = { type: 'text', label: 'Indication' };
+                  if (key === 'startDate') field = { type: 'date-with-time', label: 'Date de début' };
+                  if (key === 'endDate') field = { type: 'date-with-time', label: 'Date de fin' };
+                  if (key === 'user') {
+                    field = { type: 'text', label: 'Créé par' };
+                    value = users.find((u) => u._id === value)?.name;
+                  }
+
+                  return (
+                    <div>
+                      {field.label}&nbsp;:{' '}
+                      <b>
+                        <CustomFieldDisplay key={key} field={field} value={value} />
+                      </b>
+                    </div>
+                  );
+                })}
+            </div>
+          );
+        })}
+      </div>
       <Table
+        className="noprint"
         data={person.treatments}
         rowKey={'_id'}
         columns={[
@@ -265,7 +299,46 @@ export function MedicalFile({ person }) {
           />
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
+      <div className="printonly">
+        {(person.consultations || [])
+          .filter((e) => !e.onlyVisibleByCreator || e.user === user._id)
+          .map((c) => {
+            return (
+              <div key={c._id} style={{ marginBottom: '2rem' }}>
+                <h4>{c.name}</h4>
+                {Object.entries(c)
+                  .filter(([key, value]) => value && key !== '_id' && key !== 'name')
+                  .map(([key, value]) => {
+                    let field = organisation.consultations
+                      .find((e) => e.name === (c.type || ''))
+                      ?.fields.filter((f) => f.enabled)
+                      .find((e) => e.name === key);
+                    if (!field) {
+                      field = { type: 'text', label: key };
+                      if (key === 'type') field = { type: 'text', label: 'Type' };
+                      if (key === 'status') field = { type: 'text', label: 'Statut' };
+                      if (key === 'date') field = { type: 'date-with-time', label: 'Date' };
+                      if (key === 'user') {
+                        field = { type: 'text', label: 'Créé par' };
+                        value = users.find((u) => u._id === value)?.name;
+                      }
+                    }
+
+                    return (
+                      <div>
+                        {field.label}&nbsp;:{' '}
+                        <b>
+                          <CustomFieldDisplay key={key} field={field} value={value} />
+                        </b>
+                      </div>
+                    );
+                  })}
+              </div>
+            );
+          })}
+      </div>
       <Table
+        className="noprint"
         data={(person.consultations || []).filter((e) => !e.onlyVisibleByCreator || e.user === user._id)}
         rowKey={'_id'}
         columns={[

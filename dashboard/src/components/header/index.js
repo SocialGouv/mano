@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { theme } from '../../config';
 import BackButton from '../backButton';
 
-const Header = ({ title, onRefresh, loading, style = {}, titleStyle = {} }) => {
+const Header = ({ title, onRefresh, loading, style = {}, titleStyle = {}, className = '' }) => {
   return (
-    <HeaderStyled style={style}>
+    <HeaderStyled style={style} className={className}>
       <Title style={titleStyle}>{title}</Title>
       {!!onRefresh && (
         <LinkButton onClick={onRefresh} disabled={loading} color="link" style={{ marginRight: 10 }}>
