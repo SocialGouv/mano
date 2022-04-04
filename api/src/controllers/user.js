@@ -261,10 +261,10 @@ router.post(
     if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
 
     const user = await User.findOne({ where: { email } });
-    if (!user) res.status(200).send({ ok: true });
+    if (!user) return res.status(200).send({ ok: true });
 
     const { password } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
-    if (!password) res.status(200).send({ ok: true });
+    if (!password) return res.status(200).send({ ok: true });
 
     const token = crypto.randomBytes(20).toString("hex");
     user.forgotPasswordResetToken = token;
