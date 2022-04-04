@@ -1,3 +1,10 @@
+## [1.85.2](https://github.com/SocialGouv/mano/compare/v1.85.1...v1.85.2) (2022-04-04)
+
+
+### Bug Fixes
+
+* allow guillaume to test ([923066d](https://github.com/SocialGouv/mano/commit/923066dd2fae001bac477400382ddecc26ef6ade))
+
 ## [1.85.1](https://github.com/SocialGouv/mano/compare/v1.85.0...v1.85.1) (2022-04-04)
 
 
