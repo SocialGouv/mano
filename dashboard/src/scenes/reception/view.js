@@ -126,8 +126,14 @@ const Reception = () => {
 
   const onSelectPerson = (persons) => {
     const searchParams = new URLSearchParams(location.search);
-    searchParams.set('persons', persons.map((p) => p._id).join(','));
-    setSelectedPersons(persons);
+    searchParams.set(
+      'persons',
+      (persons || [])
+        .map((p) => p?._id)
+        .filter(Boolean)
+        .join(',')
+    );
+    setSelectedPersons(persons || []);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
