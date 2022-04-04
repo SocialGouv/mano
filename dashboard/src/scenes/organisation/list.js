@@ -136,7 +136,7 @@ const Create = ({ onChange }) => {
   const API = useApi();
 
   return (
-    <CreateWrapper>
+    <CreateWrapper style={{ marginTop: '1rem' }}>
       <ButtonCustom onClick={() => setOpen(true)} color="primary" title="Créer une nouvelle organisation" />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
