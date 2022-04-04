@@ -24,7 +24,7 @@ const TopBar = () => {
   const API = useApi();
 
   return (
-    <TopBarStyled>
+    <TopBarStyled className="noprint">
       <TopBarOrganistionTeamBox>
         <Organisation>{['superadmin'].includes(user.role) ? 'Support' : organisation?.name}</Organisation>
         {!['superadmin'].includes(user.role) && (
