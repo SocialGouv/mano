@@ -154,17 +154,21 @@ const View = () => {
             />
           </Col>
         </Row>
-        {territory.observations.map((obs) => (
-          <Observation
-            key={obs._id}
-            obs={obs}
-            onDelete={deleteObservation}
-            onClick={() => {
-              setObservation(obs);
-              setOpenObservationModale(true);
-            }}
-          />
-        ))}
+        {[...territory.observations]
+          .sort((a, b) => {
+            return new Date(a.observedAt || a.createdAt).getTime() > new Date(b.observedAt || b.createdAt).getTime() ? -1 : 1;
+          })
+          .map((obs) => (
+            <Observation
+              key={obs._id}
+              obs={obs}
+              onDelete={deleteObservation}
+              onClick={() => {
+                setObservation(obs);
+                setOpenObservationModale(true);
+              }}
+            />
+          ))}
       </Box>
       <Modal isOpen={openObservationModale} toggle={() => setOpenObservationModale(false)} size="lg">
         <ModalHeader toggle={() => setOpenObservationModale(false)}>
