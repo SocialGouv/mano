@@ -1,3 +1,10 @@
+## [1.85.6](https://github.com/SocialGouv/mano/compare/v1.85.5...v1.85.6) (2022-04-04)
+
+
+### Bug Fixes
+
+* mail and copyright on website ([42d00a1](https://github.com/SocialGouv/mano/commit/42d00a1cd4ee9805af0c326e833efc413407c028))
+
 ## [1.85.5](https://github.com/SocialGouv/mano/compare/v1.85.4...v1.85.5) (2022-04-04)
 
 
