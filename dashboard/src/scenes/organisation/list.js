@@ -143,11 +143,16 @@ const Create = ({ onChange }) => {
         <ModalBody>
           <Formik
             initialValues={{ orgName: '', name: '', email: '' }}
+            validate={(values) => {
+              const errors = {};
+              if (!values.name) errors.name = 'Le nom est obligatoire';
+              if (!values.orgName) errors.orgName = "Le nom de l'organisation est obligatoire";
+              if (!values.email) errors.email = "L'email est obligatoire";
+              else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) errors.email = "L'email est invalide";
+              return errors;
+            }}
             onSubmit={async (body, actions) => {
               try {
-                if (!body.orgName) return toastr.error("Veuillez saisir un nom pour l'organisation");
-                if (!body.name) return toastr.error("Veuillez saisir un nom pour l'administrateur");
-                if (!body.email) return toastr.error("Veuillez saisir un email pour l'administrateur");
                 const orgRes = await API.post({ path: '/organisation', skipEncryption: '/organisation', body });
                 actions.setSubmitting(false);
                 if (!orgRes.ok) return;
@@ -159,13 +164,14 @@ const Create = ({ onChange }) => {
                 toastr.error('Erreur!', orgCreationError.message);
               }
             }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
+            {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
               <React.Fragment>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
                       <Label>Nom</Label>
                       <Input name="orgName" value={values.orgName} onChange={handleChange} />
+                      {touched.orgName && errors.orgName && <Error>{errors.orgName}</Error>}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -173,22 +179,16 @@ const Create = ({ onChange }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <div>Détails de l'administrateur</div>
-                    </FormGroup>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Nom</Label>
+                      <Label>Nom de l'administrateur</Label>
                       <Input name="name" value={values.name} onChange={handleChange} />
+                      {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Email</Label>
+                      <Label>Email de l'administrateur</Label>
                       <Input name="email" value={values.email} onChange={handleChange} />
+                      {touched.email && errors.email && <Error>{errors.email}</Error>}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -201,5 +201,9 @@ const Create = ({ onChange }) => {
     </CreateWrapper>
   );
 };
+const Error = styled.span`
+  color: red;
+  font-size: 11px;
+`;
 
 export default List;
