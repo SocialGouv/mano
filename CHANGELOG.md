@@ -1,3 +1,10 @@
+## [1.85.5](https://github.com/SocialGouv/mano/compare/v1.85.4...v1.85.5) (2022-04-04)
+
+
+### Bug Fixes
+
+* fix issue MANO-AX ([f87bc52](https://github.com/SocialGouv/mano/commit/f87bc52bf952a39de3a5ac1574f390ac8a21e997))
+
 ## [1.85.4](https://github.com/SocialGouv/mano/compare/v1.85.3...v1.85.4) (2022-04-04)
 
 
