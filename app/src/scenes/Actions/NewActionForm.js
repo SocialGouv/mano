@@ -83,9 +83,9 @@ const NewActionForm = ({ route, navigation }) => {
         Alert.alert(response.error || response.code);
         return;
       }
-      if (!newAction) newAction = response.data;
+      if (!newAction) newAction = response.decryptedData;
       setActions((actions) => [response.decryptedData, ...actions]);
-      actions.push(response.data);
+      actions.push(response.decryptedData);
     }
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
     backRequestHandledRef.current = true;
