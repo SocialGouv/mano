@@ -111,7 +111,7 @@ const Login = ({ navigation }) => {
         setShowEncryptionKeyInput(true);
         return;
       }
-      if (encryptionKey) {
+      if (showEncryptionKeyInput) {
         const keyIsValid = await API.setOrgEncryptionKey(encryptionKey);
         if (!keyIsValid) {
           setLoading(false);
