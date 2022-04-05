@@ -232,6 +232,22 @@ const View = () => {
                       <Input type="textarea" name="description" value={values.description} onChange={handleChange} />
                     </FormGroup>
                   </Col>
+                  <Col md={12}>
+                    <FormGroup>
+                      <Label>
+                        <input
+                          type="checkbox"
+                          id="create-action-urgent"
+                          style={{ marginRight: '0.5rem' }}
+                          name="urgent"
+                          checked={values.urgent}
+                          onChange={handleChange}
+                        />
+                        Action prioritaire <br />
+                        <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
+                      </Label>
+                    </FormGroup>
+                  </Col>
                 </Row>
                 <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                   <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />

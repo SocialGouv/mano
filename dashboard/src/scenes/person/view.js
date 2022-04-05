@@ -52,6 +52,7 @@ import { ENV } from '../../config';
 import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
 import Passage from '../../components/Passage';
+import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -460,10 +461,18 @@ const Actions = ({ person, onUpdateResults }) => {
         <CreateAction person={person._id} />
       </div>
       <StyledTable
-        data={data}
+        data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         columns={[
+          {
+            title: '',
+            dataKey: 'urgent',
+            small: true,
+            render: (action) => {
+              return action.urgent ? <ExclamationMarkButton /> : null;
+            },
+          },
           { title: 'À faire le', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
           {
             title: 'Heure',

@@ -45,6 +45,7 @@ import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
 import Passage from '../../components/Passage';
+import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -330,10 +331,18 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
             date
           )}`}
           noData={`Pas d'action ${status === CANCEL ? 'annulée' : 'faite'} ce jour`}
-          data={data}
+          data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
           columns={[
+            {
+              title: '',
+              dataKey: 'urgent',
+              small: true,
+              render: (action) => {
+                return action.urgent ? <ExclamationMarkButton /> : null;
+              },
+            },
             { title: 'À faire le ', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
             {
               title: 'Heure',
@@ -389,10 +398,18 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
           className="Table"
           title={`Action${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'action créée ce jour"
-          data={data}
+          data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
           columns={[
+            {
+              title: '',
+              dataKey: 'urgent',
+              small: true,
+              render: (action) => {
+                return action.urgent ? <ExclamationMarkButton /> : null;
+              },
+            },
             { title: 'À faire le ', dataKey: 'dueAt', render: (d) => <DateBloc date={d.dueAt} /> },
             {
               title: 'Heure',

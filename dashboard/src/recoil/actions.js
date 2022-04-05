@@ -5,7 +5,7 @@ export const actionsState = atom({
   default: [],
 });
 
-const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user'];
+const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];
 
 export const prepareActionForEncryption = (action) => {
   const decrypted = {};

@@ -83,6 +83,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
               status: !!completedAt ? DONE : TODO,
               categories: [],
               description: '',
+              urgent: false,
             }}
             onSubmit={async (values, actions) => {
               if (!values.name) return toastr.error('Erreur!', 'Le nom est obligatoire');
@@ -98,6 +99,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                 status: values.status,
                 categories: values.categories,
                 description: values.description,
+                urgent: values.urgent,
                 user: user._id,
               };
               if (typeof values.person === 'string') {
@@ -209,6 +211,22 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                     <FormGroup>
                       <Label>Description</Label>
                       <Input id="create-action-description" type="textarea" name="description" value={values.description} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+                  <Col md={12}>
+                    <FormGroup>
+                      <Label>
+                        <input
+                          type="checkbox"
+                          id="create-action-urgent"
+                          style={{ marginRight: '0.5rem' }}
+                          name="urgent"
+                          checked={values.urgent}
+                          onChange={handleChange}
+                        />
+                        Action prioritaire <br />
+                        <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
+                      </Label>
                     </FormGroup>
                   </Col>
                 </Row>
