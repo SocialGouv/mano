@@ -33,7 +33,7 @@ create table if not exists "mano"."Organisation"
     "createdAt"                timestamp with time zone not null,
     "updatedAt"                timestamp with time zone not null,
     categories                 text[],
-"consultations"            jsonb default '[{ "name": "Médicale", "fields": [{ "name": "description", "type": "textarea", "label": "Description", "enabled": true, "showInStats": false }] }]'::jsonb,
+    "consultations"            jsonb default '[{ "name": "Médicale", "fields": [{ "name": "description", "type": "textarea", "label": "Description", "enabled": true, "showInStats": false }] }]'::jsonb,
     "encryptionEnabled"        boolean default false,
     "encryptionLastUpdateAt"   timestamp with time zone,
     encrypting                 boolean default false,
