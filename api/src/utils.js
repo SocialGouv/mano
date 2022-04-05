@@ -45,6 +45,10 @@ const customFieldSchema = z
   })
   .strict();
 
+function sanitizeAll(text) {
+  return sanitizeHtml(text || "", { allowedTags: [], allowedAttributes: {} });
+}
+
 module.exports = {
   validatePassword,
   comparePassword,
@@ -54,4 +58,5 @@ module.exports = {
   cryptoHexRegex,
   jwtRegex,
   customFieldSchema,
+  sanitizeAll,
 };
