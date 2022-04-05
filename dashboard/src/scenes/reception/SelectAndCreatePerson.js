@@ -11,6 +11,7 @@ import {
 } from '../../recoil/persons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import useApi from '../../services/api';
+import { formatBirthDate } from '../../services/date';
 
 const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, classNamePrefix }) => {
   const [persons, setPersons] = useRecoilState(personsState);
@@ -50,6 +51,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
           <span>
             {!!person.alertness && <Alertness>!</Alertness>}
             {person.name}
+            {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
           </span>
         );
       }}
