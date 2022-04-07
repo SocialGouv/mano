@@ -2,13 +2,14 @@ import React from 'react';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { Alert } from 'react-native';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
 import API from '../../services/api';
 import { userState } from '../../recoil/auth';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
+import { MMKV } from '../../services/dataManagement';
 
 const hitSlop = {
   top: 20,
@@ -51,11 +52,11 @@ const computeCustomFieldDisplay = (field, value) => {
 const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOptions, id }) => {
   const user = useRecoilValue(userState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-  const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
+  const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
 
   const onPressRequest = async () => {
     const options = ['Supprimer', 'Annuler'];
-    if (onUpdate && observation.user._id === user._id) options.unshift('Modifier');
+    if (onUpdate && observation.user === user._id) options.unshift('Modifier');
     showActionSheetWithOptions(
       {
         options,
@@ -87,20 +88,21 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
     const response = await API.delete({ path: `/territory-observation/${observation._id}` });
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
-      setTerritoryObservations((territoryObservations) =>
-        territoryObservations.filter((p) => {
-          return p._id !== observation._id;
-        })
+      setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== observation._id));
+      await MMKV.setMapAsync(
+        'territory-observation',
+        allTerritoryOservations.filter((p) => p._id !== observation._id)
       );
     }
   };
 
-  const { createdAt } = observation;
+  const { observedAt, createdAt } = observation;
 
   return (
     <Container>
       <CaptionsContainer>
         {customFieldsObs
+          .filter((f) => f)
           .filter((f) => f.enabled)
           .map((field) => {
             const { name, label } = field;
@@ -113,7 +115,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
         <CreationDate>
           {!!observation?.user && <UserName caption="Observation faite par" id={observation.user?._id || observation.user} />}
           {'\u000A'}
-          {new Date(createdAt).getLocaleDateAndTime('fr')}
+          {new Date(observedAt || createdAt).getLocaleDateAndTime('fr')}
         </CreationDate>
       </CaptionsContainer>
       <OnMoreContainer hitSlop={hitSlop} onPress={onPressRequest}>

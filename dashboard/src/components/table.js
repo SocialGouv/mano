@@ -1,8 +1,28 @@
-import React from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
+import Sortable from 'sortablejs';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', className, title, noData }) => {
+const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', className, title, noData, isSortable, onSort }) => {
+  const gridRef = useRef(null);
+  const sortableJsRef = useRef(null);
+
+  const onListChange = useCallback(() => {
+    onSort(
+      [...gridRef.current.children].map((i) => i.dataset.key),
+      data
+    );
+  }, [onSort, data]);
+
+  useEffect(() => {
+    if (!!isSortable && !!data.length) {
+      sortableJsRef.current = new Sortable(gridRef.current, {
+        animation: 150,
+        onEnd: onListChange,
+      });
+    }
+  }, [onListChange, isSortable, data.length]);
+
   if (!data.length && noData) {
     return (
       <TableWrapper className={className}>
@@ -21,9 +41,8 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
       </TableWrapper>
     );
   }
-
   return (
-    <TableWrapper className={className} withPointer={Boolean(onRowClick)}>
+    <TableWrapper className={className} withPointer={Boolean(onRowClick)} isSortable={isSortable}>
       <thead>
         {!!title && (
           <tr>
@@ -40,7 +59,7 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
               <td
                 onClick={!!onSortBy ? onNameClick : null}
                 className={`column-header ${column.left && 'align-left'} ${!!onSortBy && 'clickable'}`}
-                key={column.title || dataKey}>
+                key={String(dataKey) + String(column.title)}>
                 <span>{column.title}</span>
                 {(sortBy === sortableKey || sortBy === dataKey) && (
                   <>
@@ -53,20 +72,22 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
           })}
         </tr>
       </thead>
-      <tbody>
-        {data.map((item) => {
-          return (
-            <tr onClick={() => (onRowClick ? onRowClick(item) : null)} key={item[rowKey] || item._id}>
-              {columns.map((column) => {
-                return (
-                  <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
-                    {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
-                  </td>
-                );
-              })}
-            </tr>
-          );
-        })}
+      <tbody ref={gridRef}>
+        {data
+          .filter((e) => e)
+          .map((item) => {
+            return (
+              <tr onClick={() => (onRowClick ? onRowClick(item) : null)} key={item[rowKey] || item._id} data-key={item[rowKey] || item._id}>
+                {columns.map((column) => {
+                  return (
+                    <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
+                      {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
       </tbody>
     </TableWrapper>
   );
@@ -76,7 +97,6 @@ const TableWrapper = styled.table`
   width: 100%;
   padding: 16px;
   background: ${theme.white};
-  box-shadow: 0 4px 8px rgba(29, 32, 33, 0.02);
   border-radius: 8px;
   -fs-table-paginate: paginate;
 
@@ -84,11 +104,22 @@ const TableWrapper = styled.table`
     display: table-header-group;
   }
 
+  tbody {
+    box-shadow: 0 4px 8px rgba(29, 32, 33, 0.05);
+    border-radius: 10px;
+  }
+
   tr {
     height: 56px;
-    border-radius: 4px;
     ${(props) => !props.withPointer && 'cursor: auto;'}
   }
+  ${(props) =>
+    props.isSortable &&
+    `
+  tbody > tr {
+    cursor: move;
+  }
+  `}
 
   tbody > tr:nth-child(odd) {
     background-color: ${theme.black05};
@@ -120,7 +151,6 @@ const TableWrapper = styled.table`
 
   td {
     padding: 5px 0;
-    /* padding-left: 20px; */
     font-size: 14px;
     &.small {
       min-width: 50px;
@@ -148,14 +178,21 @@ const TableWrapper = styled.table`
   .table-cell {
     text-align: center;
   }
-
-  td:first-child {
-    border-top-left-radius: 10px;
-    border-bottom-left-radius: 10px;
+  tr:last-child {
+    td:first-child {
+      border-bottom-left-radius: 10px;
+    }
+    td:last-child {
+      border-bottom-right-radius: 10px;
+    }
   }
-  td:last-child {
-    border-bottom-right-radius: 10px;
-    border-top-right-radius: 10px;
+  tr:first-child {
+    td:first-child {
+      border-top-left-radius: 10px;
+    }
+    td:last-child {
+      border-top-right-radius: 10px;
+    }
   }
 `;
 

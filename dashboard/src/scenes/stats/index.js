@@ -1,7 +1,6 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Col, Container, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
+import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Header from '../../components/header';
 import Loading from '../../components/loading';
@@ -13,7 +12,6 @@ import {
   ressourcesOptions,
   filterPersonsBase,
   personsState,
-  usePersons,
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
 } from '../../recoil/persons';
@@ -22,97 +20,96 @@ import DateRangePickerWithPresets from '../../components/DateRangePickerWithPres
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { actionsState, useActions } from '../../recoil/actions';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { actionsState } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
-import { useTerritories } from '../../recoil/territory';
-import { passagesNonAnonymousPerDatePerTeamSelector } from '../../recoil/selectors';
-import { dayjsInstance } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
+import { territoriesState } from '../../recoil/territory';
+import { getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
+import { passagesState } from '../../recoil/passages';
 
-const getDataForPeriod = (data, { startDate, endDate }, filters = []) => {
+const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
   if (!startDate || !endDate) {
     return data;
   }
-  return data.filter((item) => dayjsInstance(item.createdAt).isBetween(startDate, endDate));
+  const offsetHours = !!viewAllOrganisationData ? 0 : currentTeam?.nightSession ? 12 : 0;
+
+  return data.filter((item) =>
+    getIsDayWithinHoursOffsetOfPeriod(item[field] || item.createdAt, { referenceStartDay: startDate, referenceEndDay: endDate }, offsetHours)
+  );
 };
 
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
-
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const teams = useRecoilValue(teamsState);
 
-  const { loading: personsLoading } = usePersons();
   const allPersons = useRecoilValue(personsState);
-  const { loading: actionsLoading } = useActions();
   const allActions = useRecoilValue(actionsState);
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
+  const allPassages = useRecoilValue(passagesState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const { territories } = useTerritories();
+  const territories = useRecoilValue(territoriesState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const [loading, setLoading] = useState(false);
+  const loading = useRecoilValue(loadingState);
   const [territory, setTerritory] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(false);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
-  const nonAnonymousPassages = useRecoilValue(
-    passagesNonAnonymousPerDatePerTeamSelector({
-      filterCurrentTeam: !viewAllOrganisationData,
-      date: {
-        startDate: period.startDate,
-        endDate: period.endDate,
-      },
-    })
-  );
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
   };
-
-  useEffect(() => {
-    if (loading) {
-      setRefreshTrigger({
-        status: true,
-        method: 'refresh',
-        options: [],
-      });
-    }
-  }, [loading]);
-
-  useEffect(() => {
-    if (!personsLoading && !actionsLoading) setLoading(false);
-  }, [personsLoading, actionsLoading]);
 
   if (loading) return <Loading />;
 
   const persons = getDataForPeriod(
     allPersons.filter((e) => viewAllOrganisationData || (e.assignedTeams || []).includes(currentTeam._id)),
     period,
-    filterPersons
+    currentTeam,
+    viewAllOrganisationData,
+    { filters: filterPersons }
   );
   const actions = getDataForPeriod(
     allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
-    period
+    period,
+    currentTeam,
+    viewAllOrganisationData
   );
   const observations = getDataForPeriod(
     allObservations
       .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
       .filter((e) => !territory?._id || e.territory === territory._id),
-    period
+    period,
+    currentTeam,
+    viewAllOrganisationData,
+    { field: 'observedAt' }
   );
+  const passages = getDataForPeriod(
+    allPassages.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
+    period,
+    currentTeam,
+    viewAllOrganisationData,
+    { field: 'date' }
+  );
+
   const reports = getDataForPeriod(
     allreports.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
-    period
+    period,
+    currentTeam,
+    viewAllOrganisationData,
+    { field: 'date' }
   );
+
   const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
 
   // Add enabled custom fields in filters.
@@ -123,7 +120,7 @@ const Stats = () => {
   ];
 
   return (
-    <Container>
+    <>
       <Header
         title={
           <>
@@ -141,17 +138,24 @@ const Stats = () => {
           </>
         }
         titleStyle={{ fontWeight: 400 }}
-        onRefresh={() => setLoading(true)}
+        onRefresh={() =>
+          setRefreshTrigger({
+            status: true,
+            options: { initialLoad: false, showFullScreen: false },
+          })
+        }
       />
-      <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center' }}>
-        <Col md={4}>
+      <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
+        <Col md={4} style={{ flexShrink: 0, minWidth: '15rem', padding: 0 }}>
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
         </Col>
-        <Col md={4}>
-          <label>
-            <input type="checkbox" style={{ marginRight: '1rem' }} onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)} />
-            Statistiques de toute l'organisation
-          </label>
+        <Col md={4} style={{ flexShrink: 0 }}>
+          {teams.length > 1 && (
+            <label>
+              <input type="checkbox" style={{ marginRight: '1rem' }} onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)} />
+              Statistiques de toute l'organisation
+            </label>
+          )}
         </Col>
         {['admin'].includes(user.role) && (
           <Col md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
@@ -185,10 +189,7 @@ const Stats = () => {
           <TabPane tabId={1}>
             <Title>Statistiques de l'accueil</Title>
             <Row>
-              <Block
-                data={reports.reduce((passages, rep) => passages + (rep.passages || 0), 0) + (nonAnonymousPassages?.length || 0)}
-                title="Nombre de passages"
-              />
+              <Block data={passages.length} title="Nombre de passages" />
               {organisation.services?.map((service) => (
                 <Block
                   key={service}
@@ -289,6 +290,7 @@ const Stats = () => {
               return (
                 <React.Fragment key={key}>
                   {customFields
+                    .filter((f) => f)
                     .filter((f) => f.enabled)
                     .filter((f) => f.showInStats)
                     .filter((field) => ['number'].includes(field.type))
@@ -298,6 +300,7 @@ const Stats = () => {
                       </Col>
                     ))}
                   {customFields
+                    .filter((f) => f)
                     .filter((f) => f.enabled)
                     .filter((f) => f.showInStats)
                     .filter((field) => ['date', 'date-with-time'].includes(field.type))
@@ -307,6 +310,7 @@ const Stats = () => {
                       </Col>
                     ))}
                   {customFields
+                    .filter((f) => f)
                     .filter((f) => f.enabled)
                     .filter((f) => f.showInStats)
                     .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
@@ -340,6 +344,7 @@ const Stats = () => {
           </div>
           <Row>
             {customFieldsObs
+              .filter((f) => f)
               .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['number'].includes(field.type))
@@ -349,6 +354,7 @@ const Stats = () => {
                 </Col>
               ))}
             {customFieldsObs
+              .filter((f) => f)
               .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['date', 'date-with-time'].includes(field.type))
@@ -358,6 +364,7 @@ const Stats = () => {
                 </Col>
               ))}
             {customFieldsObs
+              .filter((f) => f)
               .filter((f) => f.enabled)
               .filter((f) => f.showInStats)
               .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
@@ -378,7 +385,7 @@ const Stats = () => {
           />
         </TabPane>
       </TabContent>
-    </Container>
+    </>
   );
 };
 

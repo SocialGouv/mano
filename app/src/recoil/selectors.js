@@ -5,47 +5,10 @@ import { commentsState } from './comments';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
-import { reportsState } from './reports';
 import { territoriesState } from './territory';
-import { getIsDayWithinHoursOffsetOfDay, isComingInDays, isOnSameDay, isPassed, isToday, isTomorrow, today } from '../services/date';
+import { getIsDayWithinHoursOffsetOfDay, isComingInDays, isPassed, isToday, isTomorrow } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { filterBySearch, filterData } from '../utils/search';
-
-export const currentTeamReportsSelector = selector({
-  key: 'currentTeamReportsSelector',
-  get: ({ get }) => {
-    const reports = get(reportsState);
-    const currentTeam = get(currentTeamState);
-    return reports.filter((a) => a.team === currentTeam?._id);
-  },
-});
-
-export const todaysReportSelector = selector({
-  key: 'todaysReportSelector',
-  get: ({ get }) => {
-    const teamsReports = get(currentTeamReportsSelector);
-    return teamsReports.find((rep) => isOnSameDay(new Date(rep.date), today()));
-  },
-});
-
-export const lastReportSelector = selector({
-  key: 'lastReportSelector',
-  get: ({ get }) => {
-    const teamsReports = get(currentTeamReportsSelector);
-    const todays = get(todaysReportSelector);
-    return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
-  },
-});
-
-export const reportPerDateSelector = selectorFamily({
-  key: 'reportPerDateSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const teamsReports = get(currentTeamReportsSelector);
-      return teamsReports.find((rep) => isOnSameDay(new Date(rep.date), new Date(date)));
-    },
-});
 
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
@@ -115,7 +78,7 @@ export const personsSearchSelector = selectorFamily({
     ({ search = '' }) =>
     ({ get }) => {
       const persons = get(personsState);
-      if (!search?.length) return [];
+      if (!search?.length) return persons;
       return filterBySearch(search, persons);
     },
 });
@@ -224,6 +187,16 @@ export const actionsDoneSelector = selector({
   },
 });
 
+export const actionsDoneSelectorSliced = selectorFamily({
+  key: 'actionsDoneSelectorSliced',
+  get:
+    ({ limit }) =>
+    ({ get }) => {
+      const actionsDone = get(actionsDoneSelector);
+      return actionsDone.filter((_, index) => index < limit);
+    },
+});
+
 export const actionsTodoSelector = selector({
   key: 'actionsTodoSelector',
   get: ({ get }) => {
@@ -240,6 +213,38 @@ export const actionsCanceledSelector = selector({
   },
 });
 
+export const actionsCanceledSelectorSliced = selectorFamily({
+  key: 'actionsCanceledSelectorSliced',
+  get:
+    ({ limit }) =>
+    ({ get }) => {
+      const actionsCanceled = get(actionsCanceledSelector);
+      return actionsCanceled.filter((_, index) => index < limit);
+    },
+});
+
+export const actionsByStatusSelector = selectorFamily({
+  key: 'actionsByStatusSelector',
+  get:
+    ({ status, limit }) =>
+    ({ get }) => {
+      if (status === DONE) return get(actionsDoneSelectorSliced({ limit }));
+      if (status === TODO) return get(actionsTodoSelector);
+      if (status === CANCEL) return get(actionsCanceledSelectorSliced({ limit }));
+    },
+});
+
+export const totalActionsByStatusSelector = selectorFamily({
+  key: 'totalActionsByStatusSelector',
+  get:
+    ({ status }) =>
+    ({ get }) => {
+      if (status === DONE) return get(actionsDoneSelector).length;
+      if (status === TODO) return get(actionsTodoSelector).length;
+      if (status === CANCEL) return get(actionsCanceledSelector).length;
+    },
+});
+
 export const actionsSearchSelector = selectorFamily({
   key: 'actionsSearchSelector',
   get:
@@ -248,34 +253,6 @@ export const actionsSearchSelector = selectorFamily({
       const actions = get(actionsState);
       if (!search?.length) return [];
       return filterBySearch(search, actions);
-    },
-});
-
-export const actionsFullSearchSelector = selectorFamily({
-  key: 'actionsFullSearchSelector',
-  get:
-    ({ status, search = '' }) =>
-    ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
-      let actionsFiltered = actions;
-      if (status) actionsFiltered = actionsFiltered.filter((a) => a.status === status);
-      if (search?.length) {
-        const actionsFilteredIds = actionsFiltered.map((p) => p._id);
-        const comments = get(commentsState);
-        const persons = get(personsWithPlacesSelector);
-        const personsOfFilteredActions = persons.filter((a) => actionsFilteredIds.includes(a.person));
-        const commentsOfFilteredActions = comments.filter((c) => actionsFilteredIds.includes(c.action));
-        const actionsIdsFilteredByActionsSearch = filterBySearch(search, actionsFiltered).map((a) => a._id);
-        const actionsIdsFilteredByActionsCommentsSearch = filterBySearch(search, commentsOfFilteredActions).map((c) => c.action);
-        const personIdsFilteredByPersonsSearch = filterBySearch(search, personsOfFilteredActions).map((p) => p._id);
-        const actionIdsFilteredByPersonsSearch = actionsFiltered.filter((a) => personIdsFilteredByPersonsSearch.includes(a.person));
-
-        const actionsIdsFilterBySearch = [
-          ...new Set([...actionsIdsFilteredByActionsSearch, ...actionsIdsFilteredByActionsCommentsSearch, ...actionIdsFilteredByPersonsSearch]),
-        ];
-        actionsFiltered = actionsFiltered.filter((a) => actionsIdsFilterBySearch.includes(a._id));
-      }
-      return actionsFiltered;
     },
 });
 
@@ -322,66 +299,5 @@ export const territoriesSearchSelector = selectorFamily({
       const territories = get(territoriesState);
       if (!search?.length) return territories;
       return filterBySearch(search, territories);
-    },
-});
-
-export const territoriesFullSearchSelector = selectorFamily({
-  key: 'territoriesFullSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const territories = get(territoriesState);
-      if (!search.length) return territories;
-
-      const territoryObservations = get(onlyFilledObservationsTerritories);
-
-      const territoriesIdsByTerritoriesSearch = filterBySearch(search, territories).map((t) => t._id);
-      const territoriesIdsFilteredByObsSearch = filterBySearch(search, territoryObservations).map((obs) => obs.territory);
-
-      const territoriesIdsFilterBySearch = [...new Set([...territoriesIdsByTerritoriesSearch, ...territoriesIdsFilteredByObsSearch])];
-      return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id));
-    },
-});
-
-export const passagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'passagesNonAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const currentTeam = get(currentTeamState);
-      const comments = get(commentsState);
-      const persons = get(personsState);
-      return comments
-        .filter((c) => c.team === currentTeam._id)
-        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-        .filter((c) => !!c.comment.includes('Passage enregistré'))
-        .map((passage) => {
-          const commentPopulated = { ...passage };
-          if (passage.person) {
-            commentPopulated.person = persons.find((p) => p._id === passage?.person);
-            commentPopulated.type = 'person';
-          }
-          return commentPopulated;
-        });
-    },
-});
-
-export const numberOfPassagesNonAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'numberOfPassagesNonAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const nonAnonymousPassages = get(passagesNonAnonymousPerDatePerTeamSelector({ date }));
-      return nonAnonymousPassages?.length || 0;
-    },
-});
-
-export const numberOfPassagesAnonymousPerDatePerTeamSelector = selectorFamily({
-  key: 'numberOfPassagesAnonymousPerDatePerTeamSelector',
-  get:
-    ({ date }) =>
-    ({ get }) => {
-      const todaysReports = get(reportPerDateSelector({ date }));
-      return todaysReports?.passages || 0;
     },
 });

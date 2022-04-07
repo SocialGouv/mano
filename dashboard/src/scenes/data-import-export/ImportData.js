@@ -1,26 +1,25 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useRef, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import XLSX from 'xlsx';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toastr } from 'react-redux-toastr';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
-
 import ButtonCustom from '../../components/ButtonCustom';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
+  personFieldsIncludingCustomFieldsSelector,
   personsState,
   preparePersonForEncryption,
-  usePersons,
 } from '../../recoil/persons';
 import { teamsState, userState } from '../../recoil/auth';
-import { isNullOrUndefined, typeOptions } from '../../utils';
+import { isNullOrUndefined } from '../../utils';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import { formatDateWithFullMonth, now } from '../../services/date';
+import { sanitizeFieldValue } from './importSanitizer';
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
-  const { personFieldsIncludingCustomFields } = usePersons();
+  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const fileDialogRef = useRef(null);
   const setAllPersons = useSetRecoilState(personsState);
   const teams = useRecoilValue(teamsState);
@@ -36,8 +35,17 @@ const ImportData = () => {
   const [ignoredFields, setIgnoredFields] = useState([]);
   const [reloadKey, setReloadKey] = useState(0); // because input type 'file' doesn't trigger 'onChange' for uploading twice the same file
 
-  const importableFields = personFieldsIncludingCustomFields().filter((f) => f.importable);
-  const importableLabels = importableFields.map((f) => f.label);
+  const importableFields = useMemo(
+    () =>
+      personFieldsIncludingCustomFields
+        .filter((field) => field.importable)
+        .map((field) => ({
+          ...field,
+          options: field.name === 'assignedTeams' ? teams.map((team) => team.name) : field.options,
+        })),
+    [personFieldsIncludingCustomFields, teams]
+  );
+  const importableLabels = useMemo(() => importableFields.map((f) => f.label), [importableFields]);
 
   const onParseData = async (event) => {
     try {
@@ -73,32 +81,24 @@ const ImportData = () => {
       setIgnoredFields(fieldsToIgnore);
 
       const headersCellsToImport = headerCells.filter((headerKey) => importableLabels.includes(personsSheet[headerKey].v?.trim()));
-      const headerColumnsAndFieldname = headersCellsToImport.map((cell) => {
+      const headerColumnsAndField = headersCellsToImport.map((cell) => {
         const column = cell.replace('1', ''); // ['A', 'B'...]
         const field = importableFields.find((f) => f.label === personsSheet[cell].v?.trim()); // { name: type: label: importable: options: }
-        const fieldname = field.name; // 'name', 'gender', ...
-        const type = typeOptions.find((typeOption) => typeOption.value === field.type); // { value: label: validator: }
-        if (fieldname === 'assignedTeams') {
-          field.options = teams.map((team) => team.name);
-        }
-        const validator = field.options ? type.validator(field.options) : type.validator;
-        return [column, fieldname, validator];
-      }); // [['C', 'name], ['D', birthdate]]
+        return [column, field];
+      });
       setImportedFields(headersCellsToImport.map((headerKey) => personsSheet[headerKey].v?.trim()));
-
-      // .replace(/[^a-zA-Z]+/g, '')
       const lastRow = parseInt(personsSheet['!ref'].split(':')[1].replace(/\D+/g, ''), 10);
 
       const persons = [];
       for (let i = 2; i <= lastRow; i++) {
         const person = {};
-        for (const [column, fieldname, validator] of headerColumnsAndFieldname) {
+        for (const [column, field] of headerColumnsAndField) {
           if (!personsSheet[`${column}${i}`]) continue;
-          const value = validator(personsSheet[`${column}${i}`]);
+          const value = sanitizeFieldValue(field, personsSheet[`${column}${i}`]);
           if (!isNullOrUndefined(value)) {
-            person[fieldname] = value;
-            if (fieldname === 'assignedTeams' && value.length > 0) {
-              person[fieldname] = value.map((teamName) => teams.find((team) => team.name === teamName)?._id).filter((a) => a);
+            person[field.name] = value;
+            if (field.name === 'assignedTeams' && value.length > 0) {
+              person[field.name] = value.map((teamName) => teams.find((team) => team.name === teamName)?._id).filter((a) => a);
             }
           }
         }

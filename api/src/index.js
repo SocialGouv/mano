@@ -41,6 +41,14 @@ app.use(express.json({ limit: "50mb" }));
 app.use(helmet());
 app.use(cookieParser());
 
+// Add header with API version to compare with client.
+app.use((_req, res, next) => {
+  res.header("X-API-VERSION", VERSION);
+  // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
+  res.header("Access-Control-Expose-Headers", "X-API-VERSION");
+  next();
+});
+
 // Routes
 
 require("./passport")(app);
@@ -51,6 +59,7 @@ app.use("/person", require("./controllers/person"));
 app.use("/action", require("./controllers/action"));
 app.use("/structure", require("./controllers/structure"));
 app.use("/comment", require("./controllers/comment"));
+app.use("/passage", require("./controllers/passage"));
 app.use("/report", require("./controllers/report"));
 app.use("/place", require("./controllers/place"));
 app.use("/relPersonPlace", require("./controllers/relPersonPlace"));
@@ -61,6 +70,11 @@ app.use("/organisation", require("./controllers/organisation"));
 app.use("/public", require("./controllers/public"));
 app.use("/encrypt", require("./controllers/encrypt"));
 app.use("/ldap", require("./controllers/ldapAuth"));
+app.use("/category", require("./controllers/category"));
+app.use("/service", require("./controllers/service"));
+app.use("/migration", require("./controllers/migration"));
+app.use("/consultation", require("./controllers/consultation"));
+
 app.use(errors.sendError);
 
 // Start the server

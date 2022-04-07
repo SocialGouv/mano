@@ -6,8 +6,8 @@ import { MyText } from './MyText';
 import { ActivityIndicator, View } from 'react-native';
 import colors from '../utils/colors';
 
-const Row = ({ loading, onPress, caption, withNextButton, center, onBack }) => (
-  <RowContainer onPress={onPress} center={center || loading} disabled={loading} onBack={onBack}>
+const Row = ({ loading, onPress, caption, withNextButton, center, onBack, testID }) => (
+  <RowContainer onPress={onPress} center={center || loading} disabled={loading} onBack={onBack} testID={testID}>
     {Boolean(onBack) && <ButtonRight onPress={onPress} caption="<" />}
     <Caption loading={loading} as={loading ? View : MyText}>
       {loading ? <ActivityIndicator size="small" color={colors.app.secondary} /> : caption}

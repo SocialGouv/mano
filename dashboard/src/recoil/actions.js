@@ -1,141 +1,9 @@
-import { atom, useRecoilState, useRecoilValue } from 'recoil';
-import { userState } from '../recoil/auth';
-import useApi from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
-import { now } from '../services/date';
-import { capture } from '../services/sentry';
-import { useComments } from './comments';
+import { atom } from 'recoil';
 
 export const actionsState = atom({
   key: 'actionsState',
   default: [],
 });
-
-export const actionsLoadingState = atom({
-  key: 'actionsLoadingState',
-  default: true,
-});
-
-export const useActions = () => {
-  const { comments, addComment, deleteComment } = useComments();
-  const user = useRecoilValue(userState);
-  const API = useApi();
-
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [loading, setLoading] = useRecoilState(actionsLoadingState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-actions', 0);
-
-  const setActionsFullState = (newActions) => {
-    if (newActions) setActions(newActions);
-    setLoading(false);
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newActions) => setActions((actions) => [...actions, ...newActions]);
-
-  const refreshActions = async (setProgress, initialLoad) => {
-    setLoading(true);
-    try {
-      setActionsFullState(
-        await getData({
-          collectionName: 'action',
-          data: actions,
-          isInitialization: initialLoad,
-          setProgress,
-          lastRefresh,
-          setBatchData,
-          API,
-        })
-      );
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      setLoading(false);
-      return false;
-    }
-  };
-
-  const deleteAction = async (id) => {
-    const res = await API.delete({ path: `/action/${id}` });
-    if (res.ok) {
-      setActions((actions) => actions.filter((a) => a._id !== id));
-      for (let comment of comments.filter((c) => c.action === id)) {
-        await deleteComment(comment._id);
-      }
-    }
-    return res;
-  };
-
-  const addAction = async (action) => {
-    try {
-      const response = await API.post({ path: '/action', body: prepareActionForEncryption(action) });
-      if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
-      return response;
-    } catch (error) {
-      capture('error in creating action' + error, { extra: { error, action } });
-      return { ok: false, error: error.message };
-    }
-  };
-
-  const updateAction = async (action, { oldAction = null } = {}) => {
-    let response = null;
-    if (!oldAction) oldAction = actions.find((a) => a._id === action._id);
-    const statusChanged = action.status && oldAction.status !== action.status;
-    try {
-      if (statusChanged) {
-        if ([DONE, CANCEL].includes(action.status)) {
-          action.completedAt = now();
-        } else {
-          action.completedAt = null;
-        }
-      }
-      response = await API.put({
-        path: `/action/${action._id}`,
-        body: prepareActionForEncryption(action),
-      });
-      if (response.ok) {
-        setActions((actions) =>
-          actions.map((a) => {
-            if (a._id === response.decryptedData._id) return response.decryptedData;
-            return a;
-          })
-        );
-      }
-      return response;
-    } catch (error) {
-      capture(error, { extra: { message: 'error in updating action', action } });
-      return { ok: false, error: error.message };
-    } finally {
-      if (response.ok) {
-        const newAction = response.decryptedData;
-        if (statusChanged) {
-          const comment = {
-            comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
-            type: 'action',
-            item: oldAction._id,
-            action: oldAction._id,
-            team: oldAction.team,
-          };
-          const response = await addComment(comment);
-          if (!response.ok) {
-            capture(response.error, {
-              extra: { message: 'error in creating comment for action update', action, comment },
-            });
-          }
-        }
-      }
-    }
-  };
-
-  return {
-    refreshActions,
-    deleteAction,
-    updateAction,
-    addAction,
-    actions,
-    loading,
-  };
-};
 
 const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user'];
 
@@ -156,8 +24,6 @@ export const prepareActionForEncryption = (action) => {
 
     decrypted,
     entityKey: action.entityKey,
-
-    ...action,
   };
 };
 

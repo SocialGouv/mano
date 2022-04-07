@@ -2,119 +2,141 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
-
+const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const Comment = require("../models/comment");
-const encryptedTransaction = require("../utils/encryptedTransaction");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
+const validateUser = require("../middleware/validateUser");
+const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const newComment = {};
+  validateUser(["admin", "normal"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      const error = new Error(`Invalid request in comment creation: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
 
-    newComment.organisation = req.user.organisation;
-    newComment.user = req.user._id;
-    newComment.team = req.body.team;
+    const data = await Comment.create(
+      {
+        organisation: req.user.organisation,
+        encrypted: req.body.encrypted,
+        encryptedEntityKey: req.body.encryptedEntityKey,
+      },
+      { returning: true }
+    );
 
-    if (!newComment.team) return res.status(400).send({ ok: false, error: "Team is required" });
-    if (!newComment.user) return res.status(400).send({ ok: false, error: "User is required" });
-
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("comment")) newComment.comment = req.body.comment || null;
-    if (req.body.hasOwnProperty("type")) newComment.type = req.body.type || null;
-    if (req.body.hasOwnProperty("item")) newComment.item = req.body.item || null;
-    if (req.body.hasOwnProperty("person")) newComment.person = req.body.person || null;
-    if (req.body.hasOwnProperty("action")) newComment.action = req.body.action || null;
-    if (req.body.hasOwnProperty("encrypted")) newComment.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) newComment.encryptedEntityKey = req.body.encryptedEntityKey || null;
-
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await Comment.create(newComment, { returning: true, transaction: tx });
-      return data;
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: data._id,
+        encrypted: data.encrypted,
+        encryptedEntityKey: data.encryptedEntityKey,
+        organisation: data.organisation,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
     });
-
-    return res.status(status).send({ ok, data, error });
   })
 );
 
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+    } catch (e) {
+      const error = new Error(`Invalid request in comment get: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const { limit, page, lastRefresh } = req.query;
+
     const query = {
-      where: {
-        organisation: req.user.organisation,
-      },
+      where: { organisation: req.user.organisation },
       order: [["createdAt", "DESC"]],
     };
-    if (req.query.lastRefresh) {
-      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-    }
 
     const total = await Comment.count(query);
-    const limit = parseInt(req.query.limit, 10);
-    if (!!req.query.limit) query.limit = limit;
-    if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
+    if (limit) query.limit = Number(limit);
+    if (page) query.offset = Number(page) * limit;
+    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
 
     const data = await Comment.findAll({
       ...query,
-      attributes: [
-        // Generic fields
-        "_id",
-        "encrypted",
-        "encryptedEntityKey",
-        "organisation",
-        "createdAt",
-        "updatedAt",
-      ],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
     });
-    return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
+    return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
 );
 
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    if (!req.body.comment) return res.status(400).send({ ok: false, error: "Comment is missing" });
-
+  validateUser(["admin", "normal"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      const error = new Error(`Invalid request in comment put: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
     const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
     const comment = await Comment.findOne(query);
     if (!comment) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const updateComment = {};
+    const { encrypted, encryptedEntityKey } = req.body;
 
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("comment")) updateComment.comment = req.body.comment || null;
-    if (req.body.hasOwnProperty("user")) updateComment.user = req.body.user || null;
-    if (req.body.hasOwnProperty("encrypted")) updateComment.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("createdAt") && !!req.body.createdAt) {
-      comment.changed("createdAt", true);
-      updateComment.createdAt = new Date(req.body.createdAt);
-    }
-    if (req.body.hasOwnProperty("encryptedEntityKey")) updateComment.encryptedEntityKey = req.body.encryptedEntityKey || null;
+    const updateComment = {
+      encrypted: encrypted,
+      encryptedEntityKey: encryptedEntityKey,
+    };
 
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await Comment.update(updateComment, query, { silent: false, transaction: tx });
-      const newComment = await Comment.findOne(query);
-      return newComment;
+    await Comment.update(updateComment, query, { silent: false });
+    const newComment = await Comment.findOne(query);
+
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: newComment._id,
+        encrypted: newComment.encrypted,
+        encryptedEntityKey: newComment.encryptedEntityKey,
+        organisation: newComment.organisation,
+        createdAt: newComment.createdAt,
+        updatedAt: newComment.updatedAt,
+      },
     });
-
-    return res.status(status).send({ ok, data, error });
   })
 );
 
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const query = {
-      where: {
-        _id: req.params._id,
-        organisation: req.user.organisation,
-      },
-    };
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      const error = new Error(`Invalid request in comment delete: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
     const comment = await Comment.findOne(query);
     if (!comment) return res.status(200).send({ ok: true });

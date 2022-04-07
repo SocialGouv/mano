@@ -8,15 +8,15 @@ import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
+import { apiVersionState } from '../recoil/apiVersion';
 const fetch = fetchRetry(window.fetch);
 
-const getUrl = (path, query) => {
+const getUrl = (path, query = {}) => {
   return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
 };
 
 /* encryption */
 export let hashedOrgEncryptionKey = null;
-let orgEncryptionKeyCacheForDebug = null; // TO BE REMOVED WHEN WE ARE HAPPY WITH ENCRYPTION
 let enableEncrypt = false;
 let blockEncrypt = false;
 let sendCaptureError = 0; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryptionVerificationKey`
@@ -34,11 +34,9 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
       toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
       return false;
     }
-    capture(`Pour orga ${name} ${_id}: ${orgEncryptionKey}`);
   }
   hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
   enableEncrypt = true;
-  orgEncryptionKeyCacheForDebug = orgEncryptionKey; // for debug only
   sendCaptureError = 0;
   wrongKeyWarned = false;
   blockEncrypt = false;
@@ -93,7 +91,6 @@ const decryptDBItem = async (item, { logout, debug = false, encryptedVerificatio
         extra: {
           message: 'ERROR DECRYPTING ITEM',
           item,
-          orgEncryptionKeyCacheForDebug,
           hashedOrgEncryptionKey,
         },
       });
@@ -133,14 +130,14 @@ export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0
 const useApi = () => {
   const organisation = useRecoilValue(organisationState);
   const setRecoilResetKey = useSetRecoilState(recoilResetKeyState);
+  const setApiVersion = useSetRecoilState(apiVersionState);
   const history = useHistory();
 
-  const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey } = organisation;
+  const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
 
   const reset = () => {
     hashedOrgEncryptionKey = null;
     enableEncrypt = false;
-    orgEncryptionKeyCacheForDebug = null;
     tokenCached = null;
     sendCaptureError = 0;
     wrongKeyWarned = false;
@@ -180,7 +177,7 @@ const useApi = () => {
       body: formData,
       headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version },
     };
-    const url = getUrl(path, {});
+    const url = getUrl(path);
     const response = await fetch(url, options);
     const json = await response.json();
     return { ...json, encryptedEntityKey };
@@ -194,7 +191,7 @@ const useApi = () => {
       credentials: 'include',
       headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
-    const url = getUrl(path, {});
+    const url = getUrl(path);
     const response = await fetch(url, options);
     const blob = await response.blob();
     const decrypted = await decryptFile(blob, encryptedEntityKey, hashedOrgEncryptionKey);
@@ -208,7 +205,7 @@ const useApi = () => {
       credentials: 'include',
       headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
-    const url = getUrl(path, {});
+    const url = getUrl(path);
     const response = await fetch(url, options);
     return await response.json();
   };
@@ -234,6 +231,7 @@ const useApi = () => {
         query = {
           encryptionLastUpdateAt,
           encryptionEnabled,
+          migrationLastUpdateAt,
           ...query,
         };
       }
@@ -243,6 +241,9 @@ const useApi = () => {
 
       const url = getUrl(path, query);
       const response = await fetch(url, options);
+      if (response.headers.has('x-api-version')) {
+        setApiVersion(response.headers.get('x-api-version'));
+      }
 
       if (!response.ok && response.status === 401) {
         if (!['/user/logout', '/user/signin-token'].includes(path)) logout();
@@ -283,7 +284,14 @@ const useApi = () => {
           headers,
         },
       });
-      toastr.error(errorExecuteApi, 'Désolé une erreur est survenue');
+      if (typeof errorExecuteApi === 'string') {
+        toastr.error(errorExecuteApi, 'Désolé une erreur est survenue');
+      } else if (errorExecuteApi?.message) {
+        toastr.error(errorExecuteApi.message, 'Désolé une erreur est survenue');
+      } else {
+        toastr.error('Une erreur est survenue', 'Désolé une erreur est survenue');
+      }
+
       throw errorExecuteApi;
     }
   };
@@ -299,7 +307,7 @@ const useApi = () => {
         let query = { ...args.query, limit, page };
         const response = await execute({ method: 'GET', ...args, query });
         if (!response.ok) {
-          capture('error getting batch', { extra: { response } });
+          capture('error getting batch', { extra: { response, args } });
           return { ok: false, data: [] };
         }
         data.push(...response.data);

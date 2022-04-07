@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useCallback, useMemo, useRef } from 'react';
 import { Alert, findNodeHandle, Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
@@ -9,6 +9,7 @@ import InputLabelled from '../../components/InputLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ActionRow from '../Actions/ActionRow';
 import CommentRow from '../Comments/CommentRow';
+import PlaceRow from '../Places/PlaceRow';
 import SubList from '../../components/SubList';
 import ButtonDelete from '../../components/ButtonDelete';
 import DateAndTimeInput, { displayBirthDate } from '../../components/DateAndTimeInput';
@@ -26,6 +27,7 @@ import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
+import { MMKV } from '../../services/dataManagement';
 
 const PersonSummary = ({
   navigation,
@@ -35,6 +37,7 @@ const PersonSummary = ({
   onUpdatePerson,
   onChange,
   updating,
+  deleting,
   editable,
   onEdit,
   isUpdateDisabled,
@@ -65,6 +68,10 @@ const PersonSummary = ({
           const response = await API.delete({ path: `/relPersonPlace/${relPersPlace?._id}` });
           if (response.ok) {
             setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id));
+            await MMKV.setMapAsync(
+              'relPersonPlace',
+              relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id)
+            );
           }
           if (!response.ok) return Alert.alert(response.error);
         }
@@ -81,10 +88,7 @@ const PersonSummary = ({
   };
 
   const onAddActionRequest = () => {
-    navigation.push('Actions', {
-      screen: 'NewActionForm',
-      params: { person: personDB?._id, fromRoute: 'Person' },
-    });
+    navigation.push('NewActionForm', { fromRoute: 'Person', person: personDB?._id });
   };
 
   const scrollViewRef = useRef(null);
@@ -131,8 +135,16 @@ const PersonSummary = ({
 
   const teams = useRecoilValue(teamsState);
 
+  const onActionPress = useCallback(
+    (action) => {
+      Sentry.setContext('action', { _id: action._id });
+      navigation.push('Action', { _id: action._id, fromRoute: 'Person' });
+    },
+    [navigation]
+  );
+
   return (
-    <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
+    <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
       {person.outOfActiveList && (
         <AlterOutOfActiveList>
           <Text style={{ color: colors.app.colorWhite }}>
@@ -169,15 +181,15 @@ const PersonSummary = ({
       {editable ? (
         <DateAndTimeInput
           label="Suivi(e) depuis / Créé(e) le"
-          setDate={(createdAt) => onChange({ createdAt })}
-          date={person.createdAt}
+          setDate={(followedSince) => onChange({ followedSince })}
+          date={person.followedSince}
           editable={editable}
           showYear
         />
       ) : (
         <InputLabelled
           label="Suivi(e) depuis / Créé(e) le"
-          value={displayBirthDate(person.createdAt, {
+          value={displayBirthDate(person.followedSince, {
             reverse: true,
             roundHalf: true,
           })}
@@ -251,11 +263,11 @@ const PersonSummary = ({
       />
       {!editable && <Spacer />}
       <ButtonsContainer>
-        <ButtonDelete onPress={onDeleteRequest} />
+        <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />
         <Button
           caption={editable ? 'Mettre à jour' : 'Modifier'}
           onPress={editable ? onUpdatePerson : onEdit}
-          disabled={editable ? isUpdateDisabled : false}
+          disabled={editable ? isUpdateDisabled : deleting}
           loading={updating}
         />
       </ButtonsContainer>
@@ -264,44 +276,24 @@ const PersonSummary = ({
           caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
           onPress={() => (person.outOfActiveList ? onGetBackToActiveList() : onRemoveFromActiveList())}
           color={colors.warning.color}
+          disabled={editable ? isUpdateDisabled : deleting}
         />
       </ButtonsContainer>
 
       <SubList
         label="Actions"
         onAdd={onAddActionRequest}
+        testID="person-actions-list"
         data={actions}
         renderItem={(action, index) => (
-          <ActionRow
-            key={index}
-            action={action}
-            showStatus
-            withTeamName
-            onActionPress={() => {
-              Sentry.setContext('action', { _id: action._id });
-              navigation.push('Actions', {
-                screen: 'Action',
-                params: { _id: action._id, fromRoute: 'Person' },
-              });
-            }}
-          />
+          <ActionRow key={index} action={action} showStatus withTeamName testID="person-action" onActionPress={onActionPress} />
         )}
         ifEmpty="Pas encore d'action"
       />
       <SubList
         label="Commentaires"
         data={comments}
-        renderItem={(comment, index) => (
-          <CommentRow
-            key={index}
-            comment={comment.comment}
-            id={comment._id}
-            user={comment.user}
-            createdAt={comment.createdAt}
-            onUpdate={comment.team ? () => onCommentUpdate(comment) : null}
-            metaCaption="Commentaire de"
-          />
-        )}
+        renderItem={(comment) => <CommentRow key={comment._id} comment={comment} onUpdate={comment.team ? () => onCommentUpdate(comment) : null} />}
         ifEmpty="Pas encore de commentaire">
         <NewCommentInput
           forwardRef={newCommentRef}
@@ -314,18 +306,9 @@ const PersonSummary = ({
         label="Lieux fréquentés"
         onAdd={onAddPlaceRequest}
         data={relsPersonPlace}
-        renderItem={(rel, index) => {
-          const place = { ...places.find((pl) => pl._id === rel.place), ...rel };
-          return (
-            <CommentRow
-              key={index}
-              comment={place.name}
-              createdAt={place.createdAt}
-              user={place.user}
-              onPress={() => onPlaceMore(place)}
-              metaCaption="Lieu ajouté par"
-            />
-          );
+        renderItem={(relPersonPlace, index) => {
+          const place = places.find((pl) => pl._id === relPersonPlace.place);
+          return <PlaceRow key={index} place={place} relPersonPlace={relPersonPlace} personDB={personDB} />;
         }}
         ifEmpty="Pas encore de lieu"
       />

@@ -12,13 +12,13 @@ import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import SelectTeam from '../../components/SelectTeam';
 import SelectPerson from '../../components/SelectPerson';
 import ButtonCustom from '../../components/ButtonCustom';
-import { DONE, TODO, useActions } from '../../recoil/actions';
+import { actionsState, DONE, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import SelectStatus from '../../components/SelectStatus';
 import { organisationState, teamsState, userState } from '../../recoil/auth';
-import { useRefresh } from '../../recoil/refresh';
 import SelectCustom from '../../components/SelectCustom';
 import { dateForDatePicker, formatDateWithFullMonth } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
+import useApi from '../../services/api';
 
 const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon }) => {
   const [open, setOpen] = useState(false);
@@ -26,16 +26,18 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
-  const { addAction } = useActions();
-  const { loading } = useRefresh();
+  const setActions = useSetRecoilState(actionsState);
+  const loading = useRecoilValue(loadingState);
   const history = useHistory();
+  const API = useApi();
 
   title = title || 'Créer une nouvelle action' + (Boolean(completedAt) ? ` faite le ${formatDateWithFullMonth(completedAt)}` : '');
 
   const onAddAction = async (body) => {
     if (body.status !== TODO) body.completedAt = completedAt || Date.now();
-    const res = await addAction(body);
-    return res;
+    const response = await API.post({ path: '/action', body: prepareActionForEncryption(body) });
+    if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
+    return response;
   };
 
   const Wrapper = buttonOnly ? React.Fragment : CreateStyle;
@@ -51,8 +53,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
           onClick={() => {
             setRefreshTrigger({
               status: true,
-              method: 'actionsRefresher',
-              options: [],
+              options: { showFullScreen: false, initialLoad: false },
             });
           }}
           disabled={!!loading}
@@ -134,7 +135,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                   <Col md={6}>
                     <FormGroup>
                       <Label>Nom de l'action</Label>
-                      <Input name="name" value={values.name} onChange={handleChange} />
+                      <Input id="create-action-name" name="name" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -144,17 +145,24 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                         teams={user.role === 'admin' ? teams : user.teams}
                         teamId={values.team}
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                        inputId="create-action-team-select"
                       />
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <SelectPerson value={values.person} onChange={handleChange} isMulti={isMulti} />
+                      <SelectPerson value={values.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <Label>Statut</Label>
-                    <SelectStatus name="status" value={values.status || ''} onChange={handleChange} />
+                    <SelectStatus
+                      name="status"
+                      value={values.status || ''}
+                      onChange={handleChange}
+                      inputId="new-action-select-status"
+                      classNamePrefix="new-action-select-status"
+                    />
                   </Col>
                   <Col lg={3} md={6}>
                     <FormGroup>
@@ -163,6 +171,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                         <DatePicker
                           locale="fr"
                           className="form-control"
+                          id="create-action-dueat"
                           selected={dateForDatePicker(values.dueAt)}
                           onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
                           timeInputLabel="Heure :"
@@ -174,7 +183,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                   </Col>
                   <Col lg={3} md={6}>
                     <FormGroup>
-                      <Label>Afficher l'heure</Label>
+                      <Label />
                       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                         <span>Montrer l'heure</span>
                         <Input type="checkbox" name="withTime" checked={values.withTime} onChange={handleChange} />
@@ -190,7 +199,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                         onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
                         isClearable={false}
                         isMulti
-                        value={values.categories}
+                        value={values.categories || []}
                         getOptionValue={(i) => i}
                         getOptionLabel={(i) => i}
                       />
@@ -199,7 +208,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                   <Col lg={12} md={6}>
                     <FormGroup>
                       <Label>Description</Label>
-                      <Input type="textarea" name="description" value={values.description} onChange={handleChange} />
+                      <Input id="create-action-description" type="textarea" name="description" value={values.description} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                 </Row>

@@ -79,12 +79,14 @@ const FileSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, 
         <WhyHomelessMultiCheckBoxes values={person.reasons} onChange={(reasons) => onChange({ reasons })} editable={editable} />
         {!editable && <Spacer />}
         {(customFieldsPersonsSocial || [])
+          .filter((f) => f)
           .filter((f) => f.enabled)
           .map((field) => {
             const { label, name } = field;
             return (
               <CustomFieldInput
                 label={label}
+                key={field._id}
                 field={field}
                 value={person[name]}
                 handleChange={(newValue) => onChange({ [name]: newValue })}

@@ -1,5 +1,6 @@
 const passwordValidator = require("password-validator");
 const bcrypt = require("bcryptjs");
+const { z } = require("zod");
 
 function validatePassword(password) {
   const schema = new passwordValidator();
@@ -18,16 +19,6 @@ function validatePassword(password) {
   return schema.validate(password);
 }
 
-function generatePassword() {
-  let length = 6;
-  let charset = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-  let retVal = "";
-  for (let i = 0, n = charset.length; i < length; ++i) {
-    retVal += charset.charAt(Math.floor(Math.random() * n));
-  }
-  return retVal;
-}
-
 async function comparePassword(password, expected) {
   return bcrypt.compare(password, expected);
 }
@@ -36,9 +27,31 @@ function hashPassword(password) {
   return bcrypt.hash(password, 10);
 }
 
+const looseUuidRegex = /^[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}$/;
+const cryptoHexRegex = /^[A-Fa-f0-9]{16,128}$/;
+const positiveIntegerRegex = /^\d+$/;
+const jwtRegex = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
+
+const customFieldSchema = z
+  .object({
+    name: z.string().min(1),
+    type: z.string().min(1),
+    label: z.optional(z.string().min(1)),
+    enabled: z.optional(z.boolean()),
+    required: z.optional(z.boolean()),
+    showInStats: z.optional(z.boolean()),
+    onlyHealthcareProfessional: z.optional(z.boolean()),
+    options: z.optional(z.array(z.string())),
+  })
+  .strict();
+
 module.exports = {
   validatePassword,
   comparePassword,
   hashPassword,
-  generatePassword,
+  looseUuidRegex,
+  positiveIntegerRegex,
+  cryptoHexRegex,
+  jwtRegex,
+  customFieldSchema,
 };

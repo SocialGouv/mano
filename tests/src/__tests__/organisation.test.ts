@@ -1,4 +1,5 @@
 import "expect-puppeteer";
+import { setDefaultOptions } from "expect-puppeteer";
 import {
   deleteOrganisation,
   deleteUser,
@@ -8,7 +9,8 @@ import {
   updateUserPassword,
 } from "../utils";
 
-jest.setTimeout(30000);
+jest.setTimeout(60000);
+setDefaultOptions({ timeout: 60000 });
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {
@@ -22,17 +24,12 @@ describe("Organisation CRUD", () => {
     await connectWith("superadmin@example.org", "secret");
     await expect(page).toMatch("Support");
     await expect(page).toClick("button[type=submit]");
-    await expect(page).toMatch(
-      "Créer une nouvelle organisation et un administrateur"
-    );
+    await expect(page).toMatch("Créer une nouvelle organisation et un administrateur");
     await expect(page).toFill("input[name=orgName]", "My First Orga");
     await expect(page).toClick(".modal-body button[type=submit]");
     await expect(page).toMatch("Veuillez saisir un nom pour l'administrateur");
     await expect(page).toFill("input[name=name]", "Test First Orga");
-    await expect(page).toFill(
-      "input[name=email]",
-      "test+firstorga@example.org"
-    );
+    await expect(page).toFill("input[name=email]", "test+firstorga@example.org");
     await expect(page).toClick(".modal-body button[type=submit]");
     await new Promise((resolve) => setTimeout(resolve, 1000));
     await expect(page).toMatch("Création réussie !");

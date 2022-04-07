@@ -1,13 +1,19 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
-import { Col, Container, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
-import { addOneDay, formatDateWithFullMonth, formatTime, getIsDayWithinHoursOffsetOfDay, startOfToday } from '../../services/date';
+import {
+  addOneDay,
+  formatDateWithFullMonth,
+  formatTime,
+  getIsDayWithinHoursOffsetOfDay,
+  getIsDayWithinHoursOffsetOfPeriod,
+  startOfToday,
+} from '../../services/date';
 import DateBloc from '../../components/DateBloc';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
 import Box from '../../components/Box';
@@ -16,7 +22,7 @@ import Table from '../../components/table';
 import CreateAction from '../action/CreateAction';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import { CANCEL, DONE, useActions } from '../../recoil/actions';
+import { actionsState, CANCEL, DONE } from '../../recoil/actions';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
@@ -27,17 +33,18 @@ import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionName from '../../components/ActionName';
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { useComments } from '../../recoil/comments';
-import { usePersons } from '../../recoil/persons';
-import { useReports } from '../../recoil/reports';
+import { commentsState } from '../../recoil/comments';
+import { personsState } from '../../recoil/persons';
+import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
-import ActionPersonName from '../../components/ActionPersonName';
-import { useRecoilValue } from 'recoil';
-import {
-  numberOfPassagesAnonymousPerDatePerTeamSelector,
-  numberOfPassagesNonAnonymousPerDatePerTeamSelector,
-  passagesNonAnonymousPerDatePerTeamSelector,
-} from '../../recoil/selectors';
+import PersonName from '../../components/PersonName';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { currentTeamReportsSelector } from '../../recoil/selectors';
+import Incrementor from '../../components/Incrementor';
+import { refreshTriggerState } from '../../components/Loader';
+import useApi from '../../services/api';
+import { passagesState } from '../../recoil/passages';
+import Passage from '../../components/Passage';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -52,27 +59,30 @@ const View = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
-  const { reports, deleteReport } = useReports();
+  const setReports = useSetRecoilState(reportsState);
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || !!organisation.receptionEnabled ? 0 : 1));
+  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (!!organisation.receptionEnabled ? 0 : 1)));
   const [tabsContents, setTabsContents] = useState(tabs);
+  const API = useApi();
 
-  const reportIndex = reports.findIndex((r) => r._id === id);
+  const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
 
-  const report = reports[reportIndex];
+  const report = currentTeamReports[reportIndex];
 
-  const onPreviousReport = () => {
-    if (reportIndex === reports.length - 1) return;
-    const prevReport = reports[reportIndex + 1];
+  const onFirstBeforeReport = () => {
+    if (reportIndex === currentTeamReports.length - 1) return;
+    const prevReport = currentTeamReports[reportIndex + 1];
     if (!prevReport) return;
     history.push(`/report/${prevReport._id}`);
   };
-  const onNextReport = () => {
+  const onFirstLaterReport = () => {
     if (reportIndex === 0) return;
-    const nextReport = reports[reportIndex - 1];
+    const nextReport = currentTeamReports[reportIndex - 1];
     if (!nextReport) return;
     history.push(`/report/${nextReport._id}`);
   };
@@ -80,16 +90,19 @@ const View = () => {
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deleteReport(id);
-      if (!res.ok) return;
-      toastr.success('Suppression réussie');
-      history.goBack();
+      const res = await API.delete({ path: `/report/${id}` });
+      if (res.ok) {
+        setReports((reports) => reports.filter((p) => p._id !== id));
+        toastr.success('Suppression réussie');
+        history.goBack();
+      }
     }
   };
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
 
   useEffect(() => {
     if (report && report.team !== currentTeam._id) history.goBack();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentTeam._id]);
 
   useEffect(() => {
@@ -104,74 +117,31 @@ const View = () => {
 
   if (!report) return <Loading />;
 
-  const renderPrintOnly = () => (
-    <div className="printonly">
-      <Description report={report} />
-      <Reception report={report} />
-      <ActionCompletedAt date={report.date} status={DONE} />
-      <ActionCreatedAt date={report.date} />
-      <ActionCompletedAt date={report.date} status={CANCEL} />
-      <CommentCreatedAt date={report.date} />
-      <PassagesCreatedAt date={report.date} />
-      <TerritoryObservationsCreatedAt date={report.date} />
-    </div>
-  );
+  const renderPrintOnly = () => {
+    if (process.env.REACT_APP_TEST === 'true') return null;
+    return (
+      <div className="printonly">
+        <div style={{ fontSize: 24, lineHeight: '32px', fontWeight: 'bold', padding: '16px 32px' }}>
+          {`Compte rendu de l'équipe ${currentTeam?.name || ''}`}
+          <br />
+          {getPeriodTitle(report.date, currentTeam?.nightSession)}
+        </div>
+        <DescriptionAndCollaborations report={report} key={report._id} />
+        <Reception report={report} />
+        <ActionCompletedAt date={report.date} status={DONE} />
+        <ActionCreatedAt date={report.date} />
+        <ActionCompletedAt date={report.date} status={CANCEL} />
+        <CommentCreatedAt date={report.date} />
+        <PassagesCreatedAt date={report.date} report={report} />
+        <TerritoryObservationsCreatedAt date={report.date} />
+      </div>
+    );
+  };
 
   const renderScreenOnly = () => (
     <div className="noprint">
-      <Description report={report} />
-      <Nav tabs fill style={{ marginBottom: 20 }}>
-        {tabsContents.map((tabCaption, index) => {
-          if (!organisation.receptionEnabled && index === 0) return null;
-          return (
-            <NavItem key={index} style={{ cursor: 'pointer' }}>
-              <NavLink
-                key={index}
-                className={`${activeTab === index && 'active'}`}
-                onClick={() => {
-                  const searchParams = new URLSearchParams(location.search);
-                  searchParams.set('tab', index);
-                  history.replace({ pathname: location.pathname, search: searchParams.toString() });
-                  setActiveTab(index);
-                }}>
-                {tabCaption}
-              </NavLink>
-            </NavItem>
-          );
-        })}
-      </Nav>
-      <TabContent activeTab={activeTab}>
-        {!!organisation.receptionEnabled && (
-          <TabPane tabId={0}>
-            <Reception report={report} />
-          </TabPane>
-        )}
-        <TabPane tabId={1}>
-          <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(1, `Actions complétées (${total})`)} />
-        </TabPane>
-        <TabPane tabId={2}>
-          <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(2, `Actions créées (${total})`)} />
-        </TabPane>
-        <TabPane tabId={3}>
-          <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(3, `Actions annulées (${total})`)} />
-        </TabPane>
-        <TabPane tabId={4}>
-          <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
-        </TabPane>
-        <TabPane tabId={5}>
-          <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} />
-        </TabPane>
-        <TabPane tabId={6}>
-          <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
-        </TabPane>
-      </TabContent>
-    </div>
-  );
-
-  return (
-    <Container className="report-container" style={{ padding: '40px 0' }}>
-      <Header
-        style={{ width: '100%' }}
+      <SmallerHeaderWithBackButton
+        style={{ width: '100%', padding: 0 }}
         titleStyle={{ width: '100%' }}
         title={
           <div style={{ minWidth: '100%', width: '100%' }}>
@@ -185,11 +155,22 @@ const View = () => {
                 <ButtonCustom
                   color="link"
                   className="noprint"
-                  title="Précédent"
-                  disabled={reportIndex === reports.length - 1}
-                  onClick={onPreviousReport}
+                  title="Rafraichir"
+                  onClick={() =>
+                    setRefreshTrigger({
+                      status: true,
+                      options: { initialLoad: false, showFullScreen: false },
+                    })
+                  }
                 />
-                <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onNextReport} />
+                <ButtonCustom
+                  color="link"
+                  className="noprint"
+                  title="Précédent"
+                  disabled={reportIndex === currentTeamReports.length - 1}
+                  onClick={onFirstBeforeReport}
+                />
+                <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onFirstLaterReport} />
               </div>
             </div>
             <div>
@@ -200,30 +181,101 @@ const View = () => {
           </div>
         }
       />
+      <div className="noprint">
+        <DescriptionAndCollaborations report={report} key={report._id} />
+        <Nav tabs fill style={{ marginBottom: 20 }}>
+          {tabsContents.map((tabCaption, index) => {
+            if (!organisation.receptionEnabled && index === 0) return null;
+            return (
+              <NavItem key={index} style={{ cursor: 'pointer' }}>
+                <NavLink
+                  key={index}
+                  className={`${activeTab === index && 'active'}`}
+                  onClick={() => {
+                    const searchParams = new URLSearchParams(location.search);
+                    searchParams.set('tab', index);
+                    history.replace({ pathname: location.pathname, search: searchParams.toString() });
+                    setActiveTab(index);
+                  }}>
+                  {tabCaption}
+                </NavLink>
+              </NavItem>
+            );
+          })}
+        </Nav>
+        <TabContent activeTab={activeTab}>
+          {!!organisation.receptionEnabled && (
+            <TabPane tabId={0}>
+              <Reception report={report} />
+            </TabPane>
+          )}
+          <TabPane tabId={1}>
+            <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(1, `Actions complétées (${total})`)} />
+          </TabPane>
+          <TabPane tabId={2}>
+            <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(2, `Actions créées (${total})`)} />
+          </TabPane>
+          <TabPane tabId={3}>
+            <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(3, `Actions annulées (${total})`)} />
+          </TabPane>
+          <TabPane tabId={4}>
+            <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
+          </TabPane>
+          <TabPane tabId={5}>
+            <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} />
+          </TabPane>
+          <TabPane tabId={6}>
+            <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
+          </TabPane>
+        </TabContent>
+      </div>
+    </div>
+  );
+
+  return (
+    <>
       {renderPrintOnly()}
       {renderScreenOnly()}
-    </Container>
+    </>
   );
 };
 
 const Reception = ({ report }) => {
   const organisation = useRecoilValue(organisationState);
-  const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: report.date }));
-  const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: report.date }));
 
-  const passages = numberOfNonAnonymousPassages + numberOfAnonymousPassages;
+  const setReports = useSetRecoilState(reportsState);
+  const API = useApi();
+
+  const services = report?.services?.length ? JSON.parse(report?.services) : {};
+
+  const onServiceUpdate = async (service, newCount) => {
+    const reportUpdate = {
+      ...report,
+      services: JSON.stringify({
+        ...services,
+        [service]: newCount,
+      }),
+    };
+    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+    if (res.ok) {
+      setReports((reports) =>
+        reports.map((a) => {
+          if (a._id === report._id) return res.decryptedData;
+          return a;
+        })
+      );
+    }
+  };
 
   if (!organisation.receptionEnabled) return null;
 
   const renderServices = () => {
-    if (!report.services) return null;
-    const services = JSON.parse(report.services) || {};
+    if (!organisation.services) return null;
+    const services = JSON.parse(report.services || '{}') || {};
     return (
       <>
-        {organisation.services.map((service) => (
-          <Col md={4} key={service} style={{ marginBottom: 20 }}>
-            <Card title={service} count={services[service] || 0} />
-          </Col>
+        {organisation?.services?.map((service) => (
+          <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
         ))}
       </>
     );
@@ -231,32 +283,32 @@ const Reception = ({ report }) => {
 
   return (
     <StyledBox>
-      <TabTitle>Accueil</TabTitle>
-      <Row style={{ marginBottom: 20, flexShrink: 0 }}>
-        <Col md={4} />
-        <Col md={4} style={{ marginBottom: 20 }}>
-          <Card title="Nombre de passages" count={passages} unit={`passage${passages > 1 ? 's' : ''}`} />
-        </Col>
-        <Col md={4} />
+      <TabTitle>Services effectués ce jour</TabTitle>
+      <div style={{ display: 'flex', flexWrap: 'wrap', margin: '20px 0', flexShrink: 0, gap: 5, justifyContent: 'space-evenly' }}>
         {renderServices()}
-      </Row>
+      </div>
     </StyledBox>
   );
 };
 
 const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const history = useHistory();
-  const { actions: allActions } = useActions();
   const currentTeam = useRecoilValue(currentTeamState);
+  const allActions = useRecoilValue(actionsState);
 
-  const data = allActions
-    ?.filter((a) => a.team === currentTeam._id)
-    .filter((a) => a.status === status)
-    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
+  const data = useMemo(
+    () =>
+      allActions
+        ?.filter((a) => a.team === currentTeam._id)
+        .filter((a) => a.status === status)
+        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0)),
+    [allActions, currentTeam._id, currentTeam?.nightSession, status, date]
+  );
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [date]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -295,7 +347,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => <ActionPersonName action={action} />,
+              render: (action) => <PersonName item={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -310,17 +362,22 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
 const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
-  const { actions } = useActions();
   const currentTeam = useRecoilValue(currentTeamState);
+  const actions = useRecoilValue(actionsState);
 
-  const data = actions
-    ?.filter((a) => a.team === currentTeam._id)
-    .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-    .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0));
+  const data = useMemo(
+    () =>
+      actions
+        ?.filter((a) => a.team === currentTeam._id)
+        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0)),
+    [date, actions, currentTeam?._id, currentTeam?.nightSession]
+  );
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [date]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -349,7 +406,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
             {
               title: 'Personne suivie',
               dataKey: 'person',
-              render: (action) => <ActionPersonName action={action} />,
+              render: (action) => <PersonName item={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt) },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -364,33 +421,40 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
 const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
-  const { comments } = useComments();
-  const { persons } = usePersons();
-  const { actions } = useActions();
+  const comments = useRecoilValue(commentsState);
+  const persons = useRecoilValue(personsState);
+  const actions = useRecoilValue(actionsState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const data = comments
-    .filter((c) => c.team === currentTeam._id)
-    .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-    .filter((c) => !c.comment.includes('Passage enregistré'))
-    .map((comment) => {
-      const commentPopulated = { ...comment };
-      if (comment.person) {
-        commentPopulated.person = persons.find((p) => p._id === comment?.person);
-        commentPopulated.type = 'person';
-      }
-      if (comment.action) {
-        const action = actions.find((p) => p._id === comment?.action);
-        commentPopulated.action = action;
-        commentPopulated.person = persons.find((p) => p._id === action?.person);
-        commentPopulated.type = 'action';
-      }
-      return commentPopulated;
-    });
+  const data = useMemo(
+    () =>
+      comments
+        .filter((c) => c.team === currentTeam._id)
+        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .map((comment) => {
+          const commentPopulated = { ...comment };
+          if (comment.person) {
+            const id = comment?.person;
+            commentPopulated.person = persons.find((p) => p._id === id);
+            commentPopulated.type = 'person';
+          }
+          if (comment.action) {
+            const id = comment?.action;
+            const action = actions.find((p) => p._id === id);
+            commentPopulated.action = action;
+            commentPopulated.person = persons.find((p) => p._id === action?.person);
+            commentPopulated.type = 'action';
+          }
+          return commentPopulated;
+        }),
+    [comments, currentTeam._id, currentTeam?.nightSession, date, persons, actions]
+  );
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [date]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
+
   if (!data) return <div />;
 
   return (
@@ -398,7 +462,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
       <StyledBox>
         <Table
           className="Table"
-          title={`Commentaires' ajoutés le ${formatDateWithFullMonth(date)}`}
+          title={`Commentaires ajoutés le ${formatDateWithFullMonth(date)}`}
           data={data}
           noData="Pas de commentaire ajouté ce jour"
           onRowClick={(comment) => {
@@ -470,96 +534,112 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
-  const history = useHistory();
+const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
+  const allPassages = useRecoilValue(passagesState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
+  const [passageToEdit, setPassageToEdit] = useState(null);
 
-  const nonAnonymousPassages = useRecoilValue(passagesNonAnonymousPerDatePerTeamSelector({ date: { startDate: date, endDate: date } }));
-  const numberOfNonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date }));
-  const numberOfAnonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date }));
+  const passages = useMemo(
+    () =>
+      allPassages
+        .filter((p) => p.team === currentTeam._id)
+        .filter((p) =>
+          getIsDayWithinHoursOffsetOfPeriod(
+            p.date,
+            {
+              referenceStartDay: date,
+              referenceEndDay: date,
+            },
+            currentTeam?.nightSession ? 12 : 0
+          )
+        ),
+    [allPassages, currentTeam._id, currentTeam?.nightSession, date]
+  );
 
   useEffect(() => {
-    onUpdateResults(numberOfNonAnonymousPassages + numberOfAnonymousPassages);
-  }, [numberOfNonAnonymousPassages, numberOfAnonymousPassages]);
+    onUpdateResults(passages.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [passages.length]);
+
+  const numberOfAnonymousPassages = useMemo(() => passages.filter((p) => !p.person)?.length, [passages]);
+  const numberOfNonAnonymousPassages = useMemo(() => passages.filter((p) => !!p.person)?.length, [passages]);
 
   return (
     <>
       <StyledBox>
-        <TabTitle>Passages</TabTitle>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+          <TabTitle>Passages enregistrés le {formatDateWithFullMonth(date)}</TabTitle>
+          <ButtonCustom
+            title="Ajouter un passage ce jour"
+            style={{ marginLeft: 'auto', marginBottom: '10px' }}
+            onClick={() =>
+              setPassageToEdit({
+                date: dayjs(date),
+                user: user._id,
+                team: currentTeam._id,
+              })
+            }
+          />
+        </div>
         <Row style={{ marginBottom: 20 }}>
           <Col md={2} />
           <Col md={4}>
-            <Card title="Nombre de passages anonymes" count={numberOfAnonymousPassages} unit={`passage${numberOfAnonymousPassages > 1 ? 's' : ''}`} />
+            <Card
+              countId="report-passages-anonymous-count"
+              title="Nombre de passages anonymes"
+              count={numberOfAnonymousPassages}
+              unit={`passage${numberOfAnonymousPassages > 1 ? 's' : ''}`}
+            />
           </Col>
           <Col md={4}>
             <Card
+              countId="report-passages-non-anonymous-count"
               title="Nombre de passages non-anonymes"
               count={numberOfNonAnonymousPassages}
               unit={`passage${numberOfNonAnonymousPassages > 1 ? 's' : ''}`}
             />
           </Col>
         </Row>
-        <Table
-          className="Table"
-          title={`Passages non-anonymes ajoutés le ${formatDateWithFullMonth(date)}`}
-          data={nonAnonymousPassages}
-          noData="Pas de passage ce jour"
-          onRowClick={(passage) => {
-            try {
-              history.push(`/person/${passage.person._id}`);
-            } catch (errorLoadingPassage) {
-              capture(errorLoadingPassage, { extra: { message: 'error loading passage from report', passage, date } });
-            }
-          }}
-          rowKey="_id"
-          columns={[
-            {
-              title: 'Heure',
-              dataKey: 'createdAt',
-              render: (comment) => <span>{dayjs(comment.createdAt).format('HH:mm')}</span>,
-            },
-            {
-              title: 'Utilisateur',
-              dataKey: 'user',
-              render: (comment) => <UserName id={comment.user} />,
-            },
-            {
-              title: 'Type',
-              dataKey: 'type',
-              render: () => <span>Personne suivie</span>,
-            },
-            {
-              title: 'Nom',
-              dataKey: 'person',
-              render: (comment) => (
-                <>
-                  <b></b>
-                  <b>{comment.person?.name || ''}</b>
-                </>
-              ),
-            },
-            {
-              title: 'Commentaire',
-              dataKey: 'comment',
-              render: (passage) => {
-                return (
-                  <p>
-                    {passage.comment
-                      ? passage.comment.split('\n').map((c, i, a) => {
-                          if (i === a.length - 1) return c;
-                          return (
-                            <React.Fragment key={i}>
-                              {c}
-                              <br />
-                            </React.Fragment>
-                          );
-                        })
-                      : ''}
-                  </p>
-                );
+        <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+        {!!passages.length && (
+          <Table
+            className="Table"
+            onRowClick={setPassageToEdit}
+            data={passages}
+            rowKey={'_id'}
+            columns={[
+              {
+                title: 'Heure',
+                dataKey: 'date',
+                render: (passage) => {
+                  const time = dayjs(passage.date).format('HH:mm');
+                  // anonymous comment migrated from `report.passages`
+                  // have no time
+                  // have no user assigned either
+                  if (time === '00:00' && !passage.user) return null;
+                  return <span>{time}</span>;
+                },
               },
-            },
-          ]}
-        />
+              {
+                title: 'Personne suivie',
+                dataKey: 'person',
+                render: (passage) =>
+                  passage.person ? (
+                    <PersonName item={passage} redirectToTab="passages" />
+                  ) : (
+                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
+                  ),
+              },
+              {
+                title: 'Enregistré par',
+                dataKey: 'user',
+                render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+              },
+              { title: 'Commentaire', dataKey: 'comment' },
+            ]}
+          />
+        )}
       </StyledBox>
     </>
   );
@@ -573,13 +653,18 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   const territories = useRecoilValue(territoriesState);
   const territoryObservations = useRecoilValue(territoryObservationsState);
 
-  const data = territoryObservations
-    .filter((o) => o.team === currentTeam._id)
-    .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0));
+  const data = useMemo(
+    () =>
+      territoryObservations
+        .filter((o) => o.team === currentTeam._id)
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0)),
+    [currentTeam._id, currentTeam?.nightSession, date, territoryObservations]
+  );
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [date]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -621,8 +706,9 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   );
 };
 
-const Description = ({ report }) => {
-  const { updateReport } = useReports();
+const DescriptionAndCollaborations = ({ report }) => {
+  const setReports = useSetRecoilState(reportsState);
+  const API = useApi();
 
   return (
     <>
@@ -635,8 +721,14 @@ const Description = ({ report }) => {
               ...report,
               ...body,
             };
-            const res = await updateReport(reportUpdate);
+            const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
             if (res.ok) {
+              setReports((reports) =>
+                reports.map((a) => {
+                  if (a._id === report._id) return res.decryptedData;
+                  return a;
+                })
+              );
               toastr.success('Mis à jour !');
             }
           }}>
@@ -672,31 +764,39 @@ const Description = ({ report }) => {
                 </FormGroup>
               </Col>
               <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                <ButtonCustom
+                  title={'Mettre à jour'}
+                  loading={isSubmitting}
+                  disabled={JSON.stringify(report.collaborations) === JSON.stringify(values.collaborations)}
+                  onClick={handleSubmit}
+                  width={200}
+                />
               </Col>
             </Row>
           )}
         </Formik>
       </DescriptionBox>
-      <DescriptionBox className="printonly" report={report}>
-        {!!report?.collaborations?.length && (
-          <>
-            <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
-            <p>{report?.collaborations.join(', ')}</p>
-          </>
-        )}
-        <Title>Description</Title>
-        <p>
-          {!report?.description
-            ? 'Pas de description'
-            : report?.description?.split('\n').map((sentence, index) => (
-                <React.Fragment key={index}>
-                  {sentence}
-                  <br />
-                </React.Fragment>
-              ))}
-        </p>
-      </DescriptionBox>
+      {process.env.REACT_APP_TEST !== 'true' && (
+        <DescriptionBox className="printonly" report={report}>
+          {!!report?.collaborations?.length && (
+            <>
+              <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
+              <p>{report?.collaborations.join(', ')}</p>
+            </>
+          )}
+          <Title>Description</Title>
+          <p>
+            {!report?.description
+              ? 'Pas de description'
+              : report?.description?.split('\n').map((sentence, index) => (
+                  <React.Fragment key={index}>
+                    {sentence}
+                    <br />
+                  </React.Fragment>
+                ))}
+          </p>
+        </DescriptionBox>
+      )}
     </>
   );
 };
@@ -743,7 +843,7 @@ const StyledBox = styled(Box)`
 const DescriptionBox = styled(StyledBox)`
   @media screen {
     padding: 0;
-    margin-top: -40px;
+    margin-top: 10px;
     margin-bottom: 40px;
   }
   @media print {

@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
@@ -16,8 +15,8 @@ import { formatDateWithFullMonth } from '../../services/date';
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
   const [updateKey, setUpdateKey] = useState(null);
-  const [sortBy, setSortBy] = useState('createdAt');
-  const [sortOrder, setSortOrder] = useState('ASC');
+  const [sortBy, setSortBy] = useState('countersTotal');
+  const [sortOrder, setSortOrder] = useState('DESC');
   const [refresh, setRefresh] = useState(true);
   const API = useApi();
 
@@ -26,26 +25,26 @@ const List = () => {
       if (!refresh) return;
       const { data } = await API.get({ path: '/organisation', query: { withCounters: true } });
       const sortedDataAscendant = data?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-      setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
+      setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
       setUpdateKey((k) => k + 1);
       setRefresh(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
 
   useEffect(() => {
     const sortedDataAscendant = organisations?.sort((org1, org2) => (org1[sortBy] > org2[sortBy] ? 1 : -1));
-    setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...sortedDataAscendant].reverse());
+    setOrganisations(sortOrder === 'ASC' ? sortedDataAscendant : [...(sortedDataAscendant || [])].reverse());
     setUpdateKey((k) => k + 1);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [sortBy, sortOrder]);
 
   if (!organisations?.length) return <Loading />;
   return (
-    <Container style={{ padding: '40px 0' }}>
+    <>
       <Create onChange={() => setRefresh(true)} />
       <Table
         data={organisations}
-        // FIXME: Table is not updating without that key
-        // when we click on sortable arrows, I couldn't find why yet...
         key={updateKey}
         columns={[
           { title: 'Nom', dataKey: 'name', onSortOrder: setSortOrder, onSortBy: setSortBy, sortOrder, sortBy },
@@ -77,12 +76,14 @@ const List = () => {
                   <br />
                   <span>Comptes-rendus: {o.counters.reports || 0}</span>
                   <br />
+                  <span>Commentaires: {o.counters.comments || 0}</span>
+                  <br />
                 </StyledCounters>
               );
             },
           },
           {
-            title: 'Encryption activée',
+            title: 'Chiffrement activé',
             dataKey: 'encryptionEnabled',
             onSortOrder: setSortOrder,
             onSortBy: setSortBy,
@@ -119,7 +120,7 @@ const List = () => {
         rowKey={'_id'}
         onRowClick={null}
       />
-    </Container>
+    </>
   );
 };
 
@@ -135,18 +136,23 @@ const Create = ({ onChange }) => {
   const API = useApi();
 
   return (
-    <CreateWrapper>
+    <CreateWrapper style={{ marginTop: '1rem' }}>
       <ButtonCustom onClick={() => setOpen(true)} color="primary" title="Créer une nouvelle organisation" />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={{ orgName: '', name: '', email: '' }}
+            validate={(values) => {
+              const errors = {};
+              if (!values.name) errors.name = 'Le nom est obligatoire';
+              if (!values.orgName) errors.orgName = "Le nom de l'organisation est obligatoire";
+              if (!values.email) errors.email = "L'email est obligatoire";
+              else if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(values.email)) errors.email = "L'email est invalide";
+              return errors;
+            }}
             onSubmit={async (body, actions) => {
               try {
-                if (!body.orgName) return toastr.error("Veuillez saisir un nom pour l'organisation");
-                if (!body.name) return toastr.error("Veuillez saisir un nom pour l'administrateur");
-                if (!body.email) return toastr.error("Veuillez saisir un email pour l'administrateur");
                 const orgRes = await API.post({ path: '/organisation', skipEncryption: '/organisation', body });
                 actions.setSubmitting(false);
                 if (!orgRes.ok) return;
@@ -158,13 +164,14 @@ const Create = ({ onChange }) => {
                 toastr.error('Erreur!', orgCreationError.message);
               }
             }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
+            {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
               <React.Fragment>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
                       <Label>Nom</Label>
                       <Input name="orgName" value={values.orgName} onChange={handleChange} />
+                      {touched.orgName && errors.orgName && <Error>{errors.orgName}</Error>}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -172,22 +179,16 @@ const Create = ({ onChange }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <div>Détails de l'administrateur</div>
-                    </FormGroup>
-                  </Col>
-                </Row>
-
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label>Nom</Label>
+                      <Label>Nom de l'administrateur</Label>
                       <Input name="name" value={values.name} onChange={handleChange} />
+                      {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Email</Label>
+                      <Label>Email de l'administrateur</Label>
                       <Input name="email" value={values.email} onChange={handleChange} />
+                      {touched.email && errors.email && <Error>{errors.email}</Error>}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -200,5 +201,9 @@ const Create = ({ onChange }) => {
     </CreateWrapper>
   );
 };
+const Error = styled.span`
+  color: red;
+  font-size: 11px;
+`;
 
 export default List;

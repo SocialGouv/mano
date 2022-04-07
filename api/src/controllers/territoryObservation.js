@@ -1,144 +1,139 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-
+const { z } = require("zod");
+const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 const { catchErrors } = require("../errors");
-const Organisation = require("../models/organisation");
 const TerritoryObservation = require("../models/territoryObservation");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 const { Op } = require("sequelize");
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
+const validateUser = require("../middleware/validateUser");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const newObs = {};
-
-    newObs.organisation = req.user.organisation;
-
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-
-    // Todo: ignore fields that are encrypted.
-    if (!organisation.encryptionEnabled) {
-      newObs.user = req.user._id;
-      newObs.team = req.body.team;
-      if (!newObs.team) return res.status(400).send({ ok: false, error: "Team is required" });
-      if (req.body.hasOwnProperty("personsMale")) newObs.personsMale = req.body.personsMale || null;
-      if (req.body.hasOwnProperty("personsFemale")) newObs.personsFemale = req.body.personsFemale || null;
-      if (req.body.hasOwnProperty("police")) newObs.police = req.body.police || null;
-      if (req.body.hasOwnProperty("material")) newObs.material = req.body.material || null;
-      if (req.body.hasOwnProperty("atmosphere")) newObs.atmosphere = req.body.atmosphere || null;
-      if (req.body.hasOwnProperty("mediation")) newObs.mediation = req.body.mediation || null;
-      if (req.body.hasOwnProperty("comment")) newObs.comment = req.body.comment || null;
-      if (req.body.hasOwnProperty("territory")) newObs.territory = req.body.territory || null;
+  validateUser(["admin", "normal"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      const error = new Error(`Invalid request in observation creation: ${e}`);
+      error.status = 400;
+      return next(error);
     }
+    const newObs = {
+      organisation: req.user.organisation,
+      encrypted: req.body.encrypted,
+      encryptedEntityKey: req.body.encryptedEntityKey,
+    };
 
-    if (req.body.hasOwnProperty("createdAt")) newObs.createdAt = req.body.createdAt || null;
-    if (req.body.hasOwnProperty("encrypted")) newObs.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) newObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
-
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await TerritoryObservation.create(newObs, { returning: true, transaction: tx });
-      return data;
+    const data = await TerritoryObservation.create(newObs, { returning: true });
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: data._id,
+        encrypted: data.encrypted,
+        encryptedEntityKey: data.encryptedEntityKey,
+        organisation: data.organisation,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
     });
-
-    return res.status(status).send({ ok, data, error });
   })
 );
 
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+    } catch (e) {
+      const error = new Error(`Invalid request in observation get: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const { limit, page, lastRefresh } = req.query;
+
     const query = {
-      where: {
-        organisation: req.user.organisation,
-      },
+      where: { organisation: req.user.organisation },
       order: [["createdAt", "DESC"]],
     };
 
-    const attributes = [
-      // Generic fields
-      "_id",
-      "encrypted",
-      "encryptedEntityKey",
-      "organisation",
-      "createdAt",
-      "updatedAt",
-      // Old fields (that are now all custom fields, should have been already encrypted)
-    ];
-
-    if (req.query.lastRefresh) {
-      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      const data = await TerritoryObservation.findAll({ ...query, attributes });
-      return res.status(200).send({ ok: true, data });
-    }
-
     const total = await TerritoryObservation.count(query);
-    const limit = parseInt(req.query.limit, 10);
-    if (!!req.query.limit) query.limit = limit;
-    if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
+    if (limit) query.limit = Number(limit);
+    if (page) query.offset = Number(page) * limit;
+    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
 
-    const data = await TerritoryObservation.findAll({ ...query, attributes });
-    return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
+    const data = await TerritoryObservation.findAll({
+      ...query,
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
+    });
+    return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
 );
 
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const query = {
-      where: {
-        _id: req.params._id,
-        organisation: req.user.organisation,
-      },
+  validateUser(["admin", "normal"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      const error = new Error(`Invalid request in observation put: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
+    const territoryObservation = await TerritoryObservation.findOne(query);
+    if (!territoryObservation) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    const { encrypted, encryptedEntityKey } = req.body;
+    const updatedTerritoryObservation = {
+      encrypted: encrypted,
+      encryptedEntityKey: encryptedEntityKey,
     };
-    const updateObs = {};
 
-    const observation = await TerritoryObservation.findOne(query);
-    if (!observation) return res.status(404).send({ ok: false, error: "Not found" });
+    await TerritoryObservation.update(updatedTerritoryObservation, query, { silent: false });
+    const newTerritoryObservation = await TerritoryObservation.findOne(query);
 
-    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-
-    if (!organisation.encryptionEnabled) {
-      if (req.body.hasOwnProperty("personsMale")) updateObs.personsMale = req.body.personsMale || null;
-      if (req.body.hasOwnProperty("personsFemale")) updateObs.personsFemale = req.body.personsFemale || null;
-      if (req.body.hasOwnProperty("police")) updateObs.police = req.body.police || null;
-      if (req.body.hasOwnProperty("material")) updateObs.material = req.body.material || null;
-      if (req.body.hasOwnProperty("atmosphere")) updateObs.atmosphere = req.body.atmosphere || null;
-      if (req.body.hasOwnProperty("mediation")) updateObs.mediation = req.body.mediation || null;
-      if (req.body.hasOwnProperty("comment")) updateObs.comment = req.body.comment || null;
-    }
-
-    if (req.body.hasOwnProperty("createdAt")) {
-      observation.changed("createdAt", true);
-      updateObs.createdAt = req.body.createdAt || null;
-    }
-
-    if (req.body.hasOwnProperty("encrypted")) updateObs.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) updateObs.encryptedEntityKey = req.body.encryptedEntityKey || null;
-
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      await TerritoryObservation.update(updateObs, query, { silent: false, transaction: tx });
-      const newObservation = await TerritoryObservation.findOne(query);
-      return newObservation;
+    res.status(200).send({
+      ok: true,
+      data: {
+        _id: newTerritoryObservation._id,
+        encrypted: newTerritoryObservation.encrypted,
+        encryptedEntityKey: newTerritoryObservation.encryptedEntityKey,
+        organisation: newTerritoryObservation.organisation,
+        createdAt: newTerritoryObservation.createdAt,
+        updatedAt: newTerritoryObservation.updatedAt,
+      },
     });
-
-    return res.status(status).send({ ok, data, error });
   })
 );
 
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const query = {
-      where: {
-        _id: req.params._id,
-        organisation: req.user.organisation,
-      },
-    };
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      const error = new Error(`Invalid request in observation delete: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
     let observation = await TerritoryObservation.findOne(query);
     if (!observation) return res.status(404).send({ ok: false, error: "Not Found" });

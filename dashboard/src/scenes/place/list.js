@@ -1,10 +1,9 @@
-import React, { useContext, useState } from 'react';
-import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton } from 'reactstrap';
+import React, { Fragment, useContext, useState } from 'react';
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
-
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
@@ -14,12 +13,13 @@ import PaginationContext from '../../contexts/pagination';
 import Page from '../../components/pagination';
 import { filterBySearch } from '../search/utils';
 import { currentTeamState, organisationState } from '../../recoil/auth';
-import { usePersons } from '../../recoil/persons';
-import { useRelsPerson } from '../../recoil/relPersonPlace';
-import { usePlaces } from '../../recoil/places';
+import { personsState } from '../../recoil/persons';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateWithFullMonth } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
+import useApi from '../../services/api';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -29,10 +29,10 @@ const filterPlaces = (places, { page, limit, search }) => {
 };
 
 const List = () => {
-  const { places } = usePlaces();
-  const { relsPersonPlace } = useRelsPerson();
-  const { persons } = usePersons();
+  const places = useRecoilValue(placesState);
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const organisation = useRecoilValue(organisationState);
+  const persons = useRecoilValue(personsState);
   const history = useHistory();
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
@@ -44,8 +44,8 @@ const List = () => {
   const { data, total } = filterPlaces(places, { page, limit, search });
 
   return (
-    <Container>
-      <Header
+    <>
+      <SmallerHeaderWithBackButton
         titleStyle={{ fontWeight: 400 }}
         title={
           <>
@@ -74,21 +74,24 @@ const List = () => {
             title: 'Personnes suivies',
             dataKey: 'persons',
             render: (place) => (
-              <span
-                dangerouslySetInnerHTML={{
-                  __html: relsPersonPlace
-                    .filter((rel) => rel.place === place._id)
-                    .map((rel) => persons.find((p) => p._id === rel.person)?.name)
-                    .join('<br/>'),
-                }}
-              />
+              <p style={{ marginBottom: 0 }}>
+                {relsPersonPlace
+                  .filter((rel) => rel.place === place._id)
+                  .map((rel) => persons.find((p) => p._id === rel.person))
+                  .map(({ _id, name }, index, arr) => (
+                    <Fragment key={_id}>
+                      {name}
+                      {index < arr.length - 1 && <br />}
+                    </Fragment>
+                  ))}
+              </p>
             ),
           },
           { title: 'Créée le', dataKey: 'createdAt', render: (place) => formatDateWithFullMonth(place.createdAt) },
         ]}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
-    </Container>
+    </>
   );
 };
 
@@ -96,7 +99,10 @@ const Create = () => {
   const [open, setOpen] = useState(false);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const { addPlace, loading } = usePlaces();
+  const loading = useRecoilValue(loadingState);
+  const setPlaces = useSetRecoilState(placesState);
+  const API = useApi();
+
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
       <LinkButton
@@ -104,8 +110,7 @@ const Create = () => {
         onClick={() => {
           setRefreshTrigger({
             status: true,
-            method: 'placesAndRelationsRefresher',
-            options: [],
+            options: { initialLoad: false, showFullScreen: false },
           });
         }}
         color="link"
@@ -120,18 +125,19 @@ const Create = () => {
         padding="12px 24px"
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
-        <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau lieux frequenté</ModalHeader>
+        <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau lieu frequenté</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={{ name: '', organisation: '' }}
             onSubmit={async (body, actions) => {
-              const response = await addPlace(body);
-              actions.setSubmitting(false);
+              const response = await API.post({ path: '/place', body: preparePlaceForEncryption(body) });
               if (response.ok) {
+                setPlaces((places) => [response.decryptedData, ...places].sort((p1, p2) => p1.name.localeCompare(p2.name)));
                 toastr.success('Création réussie !');
               } else {
                 toastr.error('Erreur!', response.error);
               }
+              actions.setSubmitting(false);
               setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -140,12 +146,12 @@ const Create = () => {
                   <Col md={6}>
                     <FormGroup>
                       <div>Nom</div>
-                      <Input name="name" value={values.name} onChange={handleChange} />
+                      <Input name="name" id="create-place-name" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom loading={isSubmitting} color="info" onClick={handleSubmit} title="Créer" />
+                <ButtonCustom id="create-place-button" loading={isSubmitting} color="info" onClick={handleSubmit} title="Créer" />
               </React.Fragment>
             )}
           </Formik>

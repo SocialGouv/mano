@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -15,7 +14,7 @@ import {
 import Table from './table';
 import ActionStatus from './ActionStatus';
 import ActionName from './ActionName';
-import ActionPersonName from './ActionPersonName';
+import PersonName from './PersonName';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Status'] }) => {
   const history = useHistory();
@@ -32,7 +31,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   const [activeTab, setActiveTab] = useState(Number(new URLSearchParams(location.search)?.get('calendarTab') || 2));
 
   useEffect(() => {
-    if (!currentDate || !actions?.length) return;
+    if (!currentDate) return;
     const filteredActions = actions.filter((a) => a.dueAt);
     setTheDayBeforeActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, subtractOneDay(currentDate))));
     setTheDayAfterActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, addOneDay(currentDate))));
@@ -43,12 +42,14 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('calendarDate', dayjsInstance(currentDate).format('YYYY-MM-DD'));
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentDate]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('calendarTab', activeTab);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const renderActionsTable = (actions, date) => (
@@ -75,7 +76,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
         {
           title: 'Personne suivie',
           dataKey: 'person',
-          render: (action) => <ActionPersonName action={action} />,
+          render: (action) => <PersonName item={action} />,
         },
         { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
         { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },

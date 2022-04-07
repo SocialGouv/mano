@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useState, useEffect } from 'react';
-import { Container, Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
+import React, { useContext, useState, useEffect, useMemo, Fragment } from 'react';
+import { Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import DateBloc from '../../components/DateBloc';
@@ -16,22 +15,19 @@ import PaginationContext, { PaginationProvider } from '../../contexts/pagination
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
 import { teamsState } from '../../recoil/auth';
-import { useActions } from '../../recoil/actions';
-import { usePersons } from '../../recoil/persons';
-import { useRelsPerson } from '../../recoil/relPersonPlace';
+import { actionsState } from '../../recoil/actions';
+import { personsState } from '../../recoil/persons';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import {
-  actionsSearchSelector,
-  commentsSearchSelector,
-  personsSearchSelector,
-  placesSearchSelector,
-  territoriesObservationsSearchSelector,
-  territoriesSearchSelector,
-} from '../../recoil/selectors';
-import ActionPersonName from '../../components/ActionPersonName';
+import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
+import PersonName from '../../components/PersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
+import { placesState } from '../../recoil/places';
+import { filterBySearch } from './utils';
+import { commentsState } from '../../recoil/comments';
+import { territoryObservationsState } from '../../recoil/territoryObservations';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -97,15 +93,14 @@ const View = () => {
   };
 
   return (
-    <Container>
+    <>
       <Header
         titleStyle={{ fontWeight: '400' }}
         title="Rechercher"
         onRefresh={() => {
           setRefreshTrigger({
             status: true,
-            method: 'refresh',
-            options: [],
+            options: { initialLoad: false, showFullScreen: false },
           });
         }}
       />
@@ -115,18 +110,23 @@ const View = () => {
         </Col>
       </Row>
       {renderContent()}
-    </Container>
+    </>
   );
 };
 
 const Actions = ({ search, onUpdateResults }) => {
   const history = useHistory();
+  const actions = useRecoilValue(actionsState);
 
-  const data = useRecoilValue(actionsSearchSelector({ search }));
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, actions);
+  }, [search, actions]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -153,7 +153,7 @@ const Actions = ({ search, onUpdateResults }) => {
               },
             },
             { title: 'Nom', dataKey: 'name' },
-            { title: 'Personne suivie', dataKey: 'person', render: (action) => <ActionPersonName action={action} /> },
+            { title: 'Personne suivie', dataKey: 'person', render: (action) => <PersonName item={action} /> },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
             { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
@@ -174,12 +174,17 @@ const Alertness = styled.span`
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
+  const persons = useRecoilValue(personsState);
 
-  const data = useRecoilValue(personsSearchSelector({ search }));
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, persons);
+  }, [search, persons]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -210,7 +215,7 @@ const Persons = ({ search, onUpdateResults }) => {
               render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
-            { title: 'Suivi(e) depuis le', dataKey: 'createdAt', render: (p) => formatDateWithFullMonth(p.createdAt || '') },
+            { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },
           ]}
         />
       </StyledBox>
@@ -222,27 +227,32 @@ const Persons = ({ search, onUpdateResults }) => {
 const Comments = ({ search, onUpdateResults }) => {
   const history = useHistory();
 
-  const { persons } = usePersons();
-  const { actions } = useActions();
+  const persons = useRecoilValue(personsState);
+  const actions = useRecoilValue(actionsState);
+  const comments = useRecoilValue(commentsState);
 
-  const data = useRecoilValue(commentsSearchSelector({ search })).map((comment) => {
-    const commentPopulated = { ...comment };
-    if (comment.person) {
-      commentPopulated.person = persons.find((p) => p._id === comment?.person);
-      commentPopulated.type = 'person';
-    }
-    if (comment.action) {
-      const action = actions.find((p) => p._id === comment?.action);
-      commentPopulated.action = action;
-      commentPopulated.person = persons.find((p) => p._id === action?.person);
-      commentPopulated.type = 'action';
-    }
-    return commentPopulated;
-  });
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, comments).map((comment) => {
+      const commentPopulated = { ...comment };
+      if (comment.person) {
+        commentPopulated.person = persons.find((p) => p._id === comment?.person);
+        commentPopulated.type = 'person';
+      }
+      if (comment.action) {
+        const action = actions.find((p) => p._id === comment?.action);
+        commentPopulated.action = action;
+        commentPopulated.person = persons.find((p) => p._id === action?.person);
+        commentPopulated.type = 'action';
+      }
+      return commentPopulated;
+    });
+  }, [search, comments, persons, actions]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -266,9 +276,14 @@ const Comments = ({ search, onUpdateResults }) => {
           rowKey="_id"
           columns={[
             {
-              title: 'Heure',
-              dataKey: 'createdAt',
-              render: (comment) => <span>{dayjs(comment.createdAt).format('HH:mm')}</span>,
+              title: 'Date',
+              dataKey: 'date',
+              render: (comment) => (
+                <span>
+                  {dayjs(comment.date || comment.createdAt).format('ddd DD/MM/YY')}
+                  <br />à {dayjs(comment.date || comment.createdAt).format('HH:mm')}
+                </span>
+              ),
             },
             {
               title: 'Utilisateur',
@@ -327,12 +342,17 @@ const Comments = ({ search, onUpdateResults }) => {
 
 const Territories = ({ search, onUpdateResults }) => {
   const history = useHistory();
+  const territories = useRecoilValue(territoriesState);
 
-  const data = useRecoilValue(territoriesSearchSelector({ search }));
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, territories);
+  }, [search, territories]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -362,14 +382,19 @@ const Territories = ({ search, onUpdateResults }) => {
 
 const Places = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const { relsPersonPlace } = useRelsPerson();
-  const { persons } = usePersons();
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
+  const persons = useRecoilValue(personsState);
+  const places = useRecoilValue(placesState);
 
-  const data = useRecoilValue(placesSearchSelector({ search }));
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    return filterBySearch(search, places);
+  }, [search, places]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -390,14 +415,17 @@ const Places = ({ search, onUpdateResults }) => {
               title: 'Personnes suivies',
               dataKey: 'persons',
               render: (place) => (
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: relsPersonPlace
-                      .filter((rel) => rel.place === place._id)
-                      .map((rel) => persons.find((p) => p._id === rel.person)?.name)
-                      .join('<br/>'),
-                  }}
-                />
+                <p style={{ marginBottom: 0 }}>
+                  {relsPersonPlace
+                    .filter((rel) => rel.place === place._id)
+                    .map((rel) => persons.find((p) => p._id === rel.person))
+                    .map(({ _id, name }, index, arr) => (
+                      <Fragment key={_id}>
+                        {name}
+                        {index < arr.length - 1 && <br />}
+                      </Fragment>
+                    ))}
+                </p>
               ),
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (place) => formatDateWithFullMonth(place.createdAt) },
@@ -413,14 +441,24 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const territories = useRecoilValue(territoriesState);
 
-  const data = useRecoilValue(territoriesObservationsSearchSelector({ search })).map((obs) => ({
-    ...obs,
-    territory: territories.find((t) => t._id === obs.territory),
-  }));
+  const onlyFilledObservations = useRecoilValue(onlyFilledObservationsTerritories);
+  const observations = useRecoilValue(territoryObservationsState);
+
+  const data = useMemo(() => {
+    if (!search?.length) return [];
+    const obsIds = filterBySearch(search, onlyFilledObservations).map((obs) => obs._id);
+    return observations
+      .filter((obs) => obsIds.includes(obs._id))
+      .map((obs) => ({
+        ...obs,
+        territory: territories.find((t) => t._id === obs.territory),
+      }));
+  }, [search, territories, observations, onlyFilledObservations]);
 
   useEffect(() => {
     onUpdateResults(data.length);
-  }, [search]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -437,9 +475,14 @@ const TerritoryObservations = ({ search, onUpdateResults }) => {
           rowKey="_id"
           columns={[
             {
-              title: 'Heure',
-              dataKey: 'createdAt',
-              render: (obs) => <span>{dayjs(obs.createdAt).format('HH:mm')}</span>,
+              title: 'Date',
+              dataKey: 'observedAt',
+              render: (obs) => (
+                <span>
+                  {dayjs(obs.observedAt || obs.createdAt).format('ddd DD/MM/YY')}
+                  <br />à {dayjs(obs.observedAt || obs.createdAt).format('HH:mm')}
+                </span>
+              ),
             },
             {
               title: 'Utilisateur',

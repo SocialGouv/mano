@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState } from 'react';
-import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
+import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -8,18 +7,27 @@ import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState } from '../../recoil/auth';
-import { usePersons } from '../../recoil/persons';
-import { useRefresh } from '../../recoil/refresh';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { refreshTriggerState } from '../../components/Loader';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  personsState,
+  preparePersonForEncryption,
+} from '../../recoil/persons';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
+import useApi from '../../services/api';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
-  const { addPerson, persons } = usePersons();
-  const { loading } = useRefresh();
+  const [persons, setPersons] = useRecoilState(personsState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const loading = useRecoilValue(loadingState);
+  const API = useApi();
 
   return (
     <>
@@ -28,8 +36,7 @@ const CreatePerson = ({ refreshable }) => {
           onClick={() => {
             setRefreshTrigger({
               status: true,
-              method: 'personsRefresher',
-              options: [],
+              options: { initialLoad: false, showFullScreen: false },
             });
           }}
           disabled={!!loading}
@@ -50,25 +57,43 @@ const CreatePerson = ({ refreshable }) => {
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle personne</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ name: '' }}
+            initialValues={{ name: '', assignedTeams: [currentTeam?._id] }}
             onSubmit={async (body, actions) => {
-              const res = await addPerson(body);
-              actions.setSubmitting(false);
+              if (!body.name?.trim()?.length) return toastr.error('Une personne doit avoir un nom');
               const existingPerson = persons.find((p) => p.name === body.name);
-              if (existingPerson) return toastr.error('Un utilisateur existe déjà à ce nom');
-              if (res.ok) {
+              if (existingPerson) return toastr.error('Une personne existe déjà à ce nom');
+              body.followedSince = new Date();
+              const response = await API.post({
+                path: '/person',
+                body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
+              });
+              if (response.ok) {
+                setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
                 toastr.success('Création réussie !');
                 setOpen(false);
-                history.push(`/person/${res.data._id}`);
+                history.push(`/person/${response.decryptedData._id}`);
               }
+              actions.setSubmitting(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <div>Nom</div>
+                      <Label>Nom</Label>
                       <Input name="name" value={values.name} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label>Équipe(s) en charge</Label>
+                      <SelectTeamMultiple
+                        onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
+                        value={values.assignedTeams}
+                        colored
+                        inputId="person-select-assigned-team"
+                        classNamePrefix="person-select-assigned-team"
+                      />
                     </FormGroup>
                   </Col>
                 </Row>
@@ -76,7 +101,7 @@ const CreatePerson = ({ refreshable }) => {
                 <ButtonCustom
                   color="info"
                   onClick={() => !isSubmitting && handleSubmit()}
-                  disabled={!!isSubmitting}
+                  disabled={!!isSubmitting || !values.name?.trim()?.length}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
                 />
               </React.Fragment>

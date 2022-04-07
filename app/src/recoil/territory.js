@@ -1,46 +1,9 @@
-import { atom, useRecoilState } from 'recoil';
-import API from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
+import { atom } from 'recoil';
 
 export const territoriesState = atom({
   key: 'territoriesState',
   default: [],
 });
-
-export const useTerritories = () => {
-  const [territories, setTerritories] = useRecoilState(territoriesState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-territories', 0);
-
-  const setTerritoriesFullState = (newTerritories) => {
-    if (newTerritories) setTerritories(newTerritories);
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newTerritories) => setTerritories((territories) => [...territories, ...newTerritories]);
-
-  const refreshTerritories = async (setProgress, initialLoad) => {
-    try {
-      setTerritoriesFullState(
-        await getData({
-          collectionName: 'territory',
-          data: territories,
-          isInitialization: initialLoad,
-          setProgress,
-          lastRefresh,
-          setBatchData,
-          API,
-        })
-      );
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      return false;
-    }
-  };
-
-  return refreshTerritories;
-};
 
 const encryptedFields = ['name', 'perimeter', 'types', 'user'];
 
@@ -57,8 +20,6 @@ export const prepareTerritoryForEncryption = (territory) => {
 
     decrypted,
     entityKey: territory.entityKey,
-
-    ...territory,
   };
 };
 

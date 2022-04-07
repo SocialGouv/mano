@@ -53,7 +53,19 @@ const formatDate = (date, withTime) => {
   return newDate.toISOString();
 };
 
-const DateAndTimeInput = ({ required, withTime, setWithTime, label, date, editable = true, setDate, showTime, showDay, showYear = false }) => {
+const DateAndTimeInput = ({
+  required,
+  withTime,
+  setWithTime,
+  label,
+  date,
+  editable = true,
+  setDate,
+  showTime,
+  showDay,
+  showYear = false,
+  testID = '',
+}) => {
   const [mode, setMode] = React.useState('date');
   const [visible, setVisible] = React.useState(false);
 
@@ -119,6 +131,8 @@ const DateAndTimeInput = ({ required, withTime, setWithTime, label, date, editab
 
   const renderDate = () => {
     if (!date) return 'JJ-MM-AAAA';
+    // eslint-disable-next-line eqeqeq
+    if (new Date(date) == 'Invalid Date') return 'JJ-MM-AAAA';
     if (showYear) return new Date(date).getLongDate('fr');
     return new Date(date).getLocaleDate('fr');
   };
@@ -128,7 +142,7 @@ const DateAndTimeInput = ({ required, withTime, setWithTime, label, date, editab
       <InputContainer>
         {label && <Label bold label={label} />}
         <Inputs>
-          <InputSubContainer onPress={onDateChooseRequest}>
+          <InputSubContainer onPress={onDateChooseRequest} testID={testID}>
             <Input asPlaceholder={!date?.length}>{renderDate()}</Input>
             {!required && Boolean(date?.length) && <ButtonReset onPress={onClearDate} />}
           </InputSubContainer>

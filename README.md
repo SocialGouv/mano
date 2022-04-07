@@ -1,5 +1,5 @@
 # Mano
-![Mobile version](https://img.shields.io/badge/mobile%20app%20version-2.10.0-blue)
+![Mobile version](https://img.shields.io/badge/mobile%20app%20version-2.17.0-blue)
 [![Maintainability](https://api.codeclimate.com/v1/badges/223e4185a3e13f1ef5d0/maintainability)](https://codeclimate.com/github/SocialGouv/mano/maintainability)
 
 Code source de [Mano](https://mano-app.fabrique.social.gouv.fr/), organisé en plusieurs services : 
@@ -18,4 +18,4 @@ Voir le `README.md` de chacun des services.
 
 Plus d'information sur Mano ici : https://www.fabrique.social.gouv.fr/startups/mano/
 
-Pour contacter l’équipe : g.demirhan@aurore.asso.fr ou m.grimbert@aurore.asso.fr
+Pour contacter l’équipe : g.demirhan@aurore.asso.fr ou nathan.fradin.mano@gmail.com

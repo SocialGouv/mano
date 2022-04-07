@@ -4,11 +4,13 @@ import { toastr } from 'react-redux-toastr';
 
 import ButtonCustom from './ButtonCustom';
 import { Formik } from 'formik';
-import { useReports } from '../recoil/reports';
+import { prepareReportForEncryption, reportsState } from '../recoil/reports';
+import useApi from '../services/api';
+import { useSetRecoilState } from 'recoil';
 
 const ReportDescriptionModale = ({ report }) => {
-  const { updateReport } = useReports();
-
+  const setReports = useSetRecoilState(reportsState);
+  const API = useApi();
   const [open, setOpen] = useState(false);
 
   return (
@@ -29,8 +31,14 @@ const ReportDescriptionModale = ({ report }) => {
                 ...report,
                 ...body,
               };
-              const res = await updateReport(reportUpdate);
+              const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
               if (res.ok) {
+                setReports((reports) =>
+                  reports.map((a) => {
+                    if (a._id === report._id) return res.decryptedData;
+                    return a;
+                  })
+                );
                 toastr.success('Mis à jour !');
                 setOpen(false);
               }

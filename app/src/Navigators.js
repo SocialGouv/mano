@@ -49,6 +49,13 @@ const ActionsNavigator = () => {
       <ActionsStack.Screen name="Action" component={Action} />
       <ActionsStack.Screen name="NewActionForm" component={NewActionForm} />
       <ActionsStack.Screen name="ActionComment" component={Comment} />
+
+      <ActionsStack.Screen name="Person" component={Person} />
+      <ActionsStack.Screen name="PersonsSearch" component={PersonsSearch} />
+      <ActionsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
+      <ActionsStack.Screen name="PersonPlace" component={Place} />
+      <ActionsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
+      <ActionsStack.Screen name="PersonComment" component={Comment} />
     </ActionsStack.Navigator>
   );
 };
@@ -66,6 +73,10 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="PersonPlace" component={Place} />
       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
+
+      <PersonsStack.Screen name="Action" component={Action} />
+      <PersonsStack.Screen name="NewActionForm" component={NewActionForm} />
+      <PersonsStack.Screen name="ActionComment" component={Comment} />
     </PersonsStack.Navigator>
   );
 };
@@ -126,6 +137,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <AgendaIcon size={size} color={color} />,
         tabBarLabel: 'AGENDA',
+        tabBarTestID: 'tab-bar-actions',
       }}
     />
     <Tab.Screen
@@ -134,6 +146,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <TerritoryIcon size={size} color={color} />,
         tabBarLabel: 'TERRITOIRES',
+        tabBarTestID: 'tab-bar-territories',
       }}
     />
     <Tab.Screen
@@ -142,6 +155,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <PersonIcon size={size} color={color} />,
         tabBarLabel: 'USAGERS',
+        tabBarTestID: 'tab-bar-persons',
       }}
     />
     <Tab.Screen
@@ -150,6 +164,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <StructuresIcon size={size} color={color} />,
         tabBarLabel: 'STRUCTURES',
+        tabBarTestID: 'tab-bar-structures',
       }}
     />
     <Tab.Screen
@@ -158,6 +173,7 @@ const TabNavigator = ({ navigation }) => (
       options={{
         tabBarIcon: ({ size, color }) => <MenuIcon size={size} color={color} />,
         tabBarLabel: 'PROFIL',
+        tabBarTestID: 'tab-bar-profil',
       }}
     />
   </Tab.Navigator>
@@ -205,8 +221,6 @@ const App = () => {
           <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
             <AppStack.Screen name="LoginStack" component={LoginNavigator} />
             <AppStack.Screen name="Home" component={TabNavigator} />
-            <AppStack.Screen name="Persons" component={PersonsNavigator} />
-            <AppStack.Screen name="Actions" component={ActionsNavigator} />
           </AppStack.Navigator>
           <Loader />
           <EnvironmentIndicator />

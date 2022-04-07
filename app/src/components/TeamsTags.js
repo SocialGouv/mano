@@ -16,7 +16,9 @@ const TeamsTags = ({ teams = [] }) => {
     <TeamsContainer>
       {teams?.map((teamId) => {
         if (!teamId) return;
+        if (!allTeams?.length) return;
         const teamIndex = allTeams.findIndex((t) => t._id === teamId);
+        if (teamIndex === -1) return;
         const team = allTeams[teamIndex];
         const backgroundColor = allTeams.map((t) => t._id).includes(teamId) ? teamsColors[teamIndex % allTeams.length] : '#000';
         return (

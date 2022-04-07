@@ -2,10 +2,11 @@ import React from 'react';
 import { Button as LinkButton } from 'reactstrap';
 import styled from 'styled-components';
 import { theme } from '../../config';
+import BackButton from '../backButton';
 
-const Header = ({ title, onRefresh, loading, style = {}, titleStyle = {} }) => {
+const Header = ({ title, onRefresh, loading, style = {}, titleStyle = {}, className = '' }) => {
   return (
-    <HeaderStyled style={style}>
+    <HeaderStyled style={style} className={className}>
       <Title style={titleStyle}>{title}</Title>
       {!!onRefresh && (
         <LinkButton onClick={onRefresh} disabled={loading} color="link" style={{ marginRight: 10 }}>
@@ -14,6 +15,10 @@ const Header = ({ title, onRefresh, loading, style = {}, titleStyle = {} }) => {
       )}
     </HeaderStyled>
   );
+};
+
+export const SmallerHeaderWithBackButton = (props) => {
+  return <Header style={{ padding: '16px 0', ...props.style }} title={<BackButton />} {...props} />;
 };
 
 const HeaderStyled = styled.div`

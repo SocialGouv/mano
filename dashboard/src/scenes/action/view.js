@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
-import { Container, Row, Col, FormGroup, Input, Label } from 'reactstrap';
+import { Row, Col, FormGroup, Input, Label } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
@@ -9,9 +8,8 @@ import DatePicker from 'react-datepicker';
 
 import SelectPerson from '../../components/SelectPerson';
 
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
-import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
 
 import ButtonCustom from '../../components/ButtonCustom';
@@ -22,19 +20,26 @@ import SelectStatus from '../../components/SelectStatus';
 import SelectCustom from '../../components/SelectCustom';
 import SelectTeam from '../../components/SelectTeam';
 
-import { organisationState, teamsState, userState } from '../../recoil/auth';
-import { useActions, CANCEL, DONE } from '../../recoil/actions';
-import { useRecoilValue } from 'recoil';
-import { dateForDatePicker } from '../../services/date';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption } from '../../recoil/actions';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { dateForDatePicker, now } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import useApi from '../../services/api';
 
 const View = () => {
   const { id } = useParams();
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [comments, setComments] = useRecoilState(commentsState);
 
-  const { deleteAction, updateAction, actions, refreshActions } = useActions();
   const history = useHistory();
+  const API = useApi();
 
   const action = actions.find((a) => a._id === id);
 
@@ -43,8 +48,15 @@ const View = () => {
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deleteAction(id);
-      if (!res.ok) return;
+      const actionRes = await API.delete({ path: `/action/${action._id}` });
+      if (actionRes.ok) {
+        setActions((actions) => actions.filter((a) => a._id !== action._id));
+        for (let comment of comments.filter((c) => c.action === action._id)) {
+          const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+          if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
+        }
+      }
+      if (!actionRes.ok) return;
       toastr.success('Suppression réussie');
       history.goBack();
     }
@@ -53,8 +65,15 @@ const View = () => {
   const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title={<BackButton />} />
+    <>
+      <SmallerHeaderWithBackButton
+        onRefresh={() =>
+          setRefreshTrigger({
+            status: true,
+            options: { showFullScreen: false, initialLoad: false },
+          })
+        }
+      />
       <Title>
         {`${action?.name}`}
         <UserName id={action.user} wrapper={(name) => ` (créée par ${name})`} />
@@ -63,10 +82,48 @@ const View = () => {
         <Formik
           initialValues={action}
           onSubmit={async (body) => {
-            const res = await updateAction(body);
-            if (res.ok) {
-              toastr.success('Mis à jour !');
-              refreshActions();
+            const statusChanged = body.status && action.status !== body.status;
+            if (statusChanged) {
+              if ([DONE, CANCEL].includes(body.status)) {
+                // When status changed to finished (done, cancel) completedAt we set it to now if not set.
+                body.completedAt = body.completedAt || now();
+              } else {
+                // When status just changed to "todo" we set completedAt to null (since it's not done yet).
+                body.completedAt = null;
+              }
+            }
+            const actionResponse = await API.put({
+              path: `/action/${body._id}`,
+              body: prepareActionForEncryption(body),
+            });
+            if (actionResponse.ok) {
+              const newAction = actionResponse.decryptedData;
+              setActions((actions) =>
+                actions.map((a) => {
+                  if (a._id === newAction._id) return newAction;
+                  return a;
+                })
+              );
+              if (statusChanged) {
+                const comment = {
+                  comment: `${user.name} a changé le status de l'action: ${
+                    mappedIdsToLabels.find((status) => status._id === newAction.status)?.name
+                  }`,
+                  type: 'action',
+                  item: action._id,
+                  action: action._id,
+                  team: currentTeam._id,
+                  user: user._id,
+                  organisation: organisation._id,
+                };
+                const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+                if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
+              }
+              toastr.success('Mise à jour !');
+              setRefreshTrigger({
+                status: true,
+                options: { showFullScreen: false, initialLoad: false },
+              });
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => {
@@ -81,7 +138,13 @@ const View = () => {
                   </Col>
                   <Col md={3}>
                     <Label>Statut</Label>
-                    <SelectStatus name="status" value={values.status || ''} onChange={handleChange} />
+                    <SelectStatus
+                      name="status"
+                      value={values.status || ''}
+                      onChange={handleChange}
+                      inputId="update-action-select-status"
+                      classNamePrefix="update-action-select-status"
+                    />
                   </Col>
                   <Col md={3}>
                     <FormGroup>
@@ -110,7 +173,7 @@ const View = () => {
                   </Col>
                   <Col md={4}>
                     <FormGroup>
-                      <Label>Afficher l'heure</Label>
+                      <Label />
                       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                         <span>Afficher l'heure</span>
                         <Input
@@ -157,7 +220,7 @@ const View = () => {
                         onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
                         isClearable={false}
                         isMulti
-                        value={values.categories}
+                        value={values.categories || []}
                         getOptionValue={(i) => i}
                         getOptionLabel={(i) => i}
                       />
@@ -180,7 +243,7 @@ const View = () => {
         </Formik>
       </Box>
       <Comments actionId={action._id} />
-    </Container>
+    </>
   );
 };
 

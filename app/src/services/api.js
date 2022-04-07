@@ -1,13 +1,57 @@
 import URI from 'urijs';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
 import { capture } from './sentry';
+import ReactNativeBlobUtil from 'react-native-blob-util';
+import {
+  getApiLevel,
+  getBrand,
+  getCarrier,
+  getDevice,
+  getDeviceId,
+  getFreeDiskStorage,
+  getHardware,
+  getManufacturer,
+  getMaxMemory,
+  getModel,
+  getProduct,
+  getReadableVersion,
+  getSystemName,
+  getSystemVersion,
+  getBuildId,
+  getTotalDiskCapacity,
+  getTotalMemory,
+  getUserAgent,
+  isTablet,
+} from 'react-native-device-info';
 
 class ApiService {
-  getUrl = (path, query) => {
+  getUrl = (path, query = {}) => {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
   };
+
+  getUserDebugInfos = async () => ({
+    apilevel: await getApiLevel(), // 30
+    brand: getBrand(), // "google"
+    carrier: await getCarrier(), // "Android"
+    device: await getDevice(), // "emulator_arm64"
+    deviceid: getDeviceId(), // "goldfish_arm64"
+    freediskstorage: await getFreeDiskStorage(), // 4580667392
+    hardware: await getHardware(), // "ranchu"
+    manufacturer: await getManufacturer(), // "Google"
+    maxmemory: await getMaxMemory(), // 201326592
+    model: getModel(), // "sdk_gphone_arm64"
+    product: await getProduct(), // "sdk_gphone_arm64"
+    readableversion: getReadableVersion(), // "2.15.0.3"
+    systemname: getSystemName(), // "Android"
+    systemversion: getSystemVersion(), // "11"
+    buildid: await getBuildId(), // "RSR1.201216.001"
+    totaldiskcapacity: await getTotalDiskCapacity(), // 6983450624
+    totalmemory: await getTotalMemory(), // 2079838208
+    useragent: await getUserAgent(), // "Mozilla/5.0 (Linux, Android 11, ..."
+    tablet: isTablet(), // false
+  });
 
   execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
     try {
@@ -32,6 +76,7 @@ class ApiService {
         query = {
           encryptionLastUpdateAt: this.organisation?.encryptionLastUpdateAt,
           encryptionEnabled: this.organisation?.encryptionEnabled,
+          migrationLastUpdateAt: this.organisation?.migrationLastUpdateAt,
           ...query,
         };
       }
@@ -44,8 +89,8 @@ class ApiService {
       const response = await this.fetch(url, options);
 
       if (!response.ok && response.status === 401) {
-        if (this.handleLogoutError) this.handleLogoutError();
         if (this.logout) this.logout('401');
+        if (this.handleLogoutError) this.handleLogoutError();
         return response;
       }
 
@@ -210,6 +255,41 @@ class ApiService {
       this.blockEncrypt = this.enableEncrypt && errorDecrypt.message.includes('FAILURE');
     }
     return item;
+  };
+
+  // Upload a file to a path.
+  upload = async ({ file, path }) => {
+    // Prepare file.
+    const { encryptedEntityKey, encryptedFile } = await encryptFile(file.base64, this.hashedOrgEncryptionKey);
+
+    // https://github.com/RonRadtke/react-native-blob-util#multipartform-data-example-post-form-data-with-file-and-data
+
+    const url = this.getUrl(path);
+    const response = await ReactNativeBlobUtil.fetch(
+      'POST',
+      url,
+      { 'Content-Type': 'multipart/form-data', Authorization: `JWT ${this.token}`, Accept: 'application/json', platform: 'app', version },
+      [
+        // element with property `filename` will be transformed into `file` in form data
+        { name: 'file', filename: file.fileName, mime: file.type, type: file.type, data: encryptedFile },
+        // custom content type
+        // { name: 'avatar-png', filename: 'avatar-png.png', type: 'image/png', data: binaryDataInBase64 },
+        // // part file from storage
+        // { name: 'avatar-foo', filename: 'avatar-foo.png', type: 'image/foo', data: ReactNativeBlobUtil.wrap(path_to_a_file) },
+        // // elements without property `filename` will be sent as plain text
+        // { name: 'name', data: 'user' },
+        // {
+        //   name: 'info',
+        //   data: JSON.stringify({
+        //     mail: 'example@example.com',
+        //     tel: '12345678',
+        //   }),
+        // },
+      ]
+    );
+
+    const json = await response.json();
+    return { ...json, encryptedEntityKey };
   };
 }
 

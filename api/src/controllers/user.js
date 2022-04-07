@@ -4,22 +4,20 @@ const passport = require("passport");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { Op } = require("sequelize");
-
+const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const { validatePassword } = require("../utils");
+const { validatePassword, looseUuidRegex, jwtRegex } = require("../utils");
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
-const { comparePassword, generatePassword } = require("../utils");
+const { comparePassword } = require("../utils");
 const User = require("../models/user");
-const Action = require("../models/action");
-const Person = require("../models/person");
-const Comment = require("../models/comment");
 const RelUserTeam = require("../models/relUserTeam");
 const Team = require("../models/team");
+const validateUser = require("../middleware/validateUser");
+const { capture } = require("../sentry");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
-const ACOUNT_NOT_ACTIVATED = "ACOUNT_NOT_ACTIVATED";
 
 const passwordCheckError =
   "Le mot de passe n'est pas valide. Il doit comprendre 6 caractères, au moins une lettre, un chiffre et un caractère spécial";
@@ -43,21 +41,134 @@ function logoutCookieOptions() {
   }
 }
 
+function updateUserDebugInfos(req, user) {
+  if (req.headers.platform === "android") {
+    try {
+      z.optional(z.number()).parse(req.body.apilevel);
+      z.optional(z.string()).parse(req.body.brand);
+      z.optional(z.string()).parse(req.body.carrier);
+      z.optional(z.string()).parse(req.body.device);
+      z.optional(z.string()).parse(req.body.deviceid);
+      z.optional(z.number()).parse(req.body.freediskstorage);
+      z.optional(z.string()).parse(req.body.hardware);
+      z.optional(z.string()).parse(req.body.manufacturer);
+      z.optional(z.number()).parse(req.body.maxmemory);
+      z.optional(z.string()).parse(req.body.model);
+      z.optional(z.string()).parse(req.body.product);
+      z.optional(z.string()).parse(req.body.readableversion);
+      z.optional(z.string()).parse(req.body.systemname);
+      z.optional(z.string()).parse(req.body.systemversion);
+      z.optional(z.string()).parse(req.body.buildid);
+      z.optional(z.number()).parse(req.body.totaldiskcapacity);
+      z.optional(z.number()).parse(req.body.totalmemory);
+      z.optional(z.string()).parse(req.body.useragent);
+      z.optional(z.boolean()).parse(req.body.tablet);
+    } catch (e) {
+      capture(e, { extra: { body: req.body }, user });
+      return;
+    }
+    user.debugApp = {
+      apilevel: req.body.apilevel,
+      brand: req.body.brand,
+      carrier: req.body.carrier,
+      device: req.body.device,
+      deviceid: req.body.deviceid,
+      freediskstorage: req.body.freediskstorage,
+      hardware: req.body.hardware,
+      manufacturer: req.body.manufacturer,
+      maxmemory: req.body.maxmemory,
+      model: req.body.model,
+      product: req.body.product,
+      readableversion: req.body.readableversion,
+      systemname: req.body.systemname,
+      systemversion: req.body.systemversion,
+      buildid: req.body.buildid,
+      totaldiskcapacity: req.body.totaldiskcapacity,
+      totalmemory: req.body.totalmemory,
+      useragent: req.body.useragent,
+      tablet: req.body.tablet,
+    };
+  }
+  if (req.headers.platform === "dashboard") {
+    try {
+      z.optional(z.string()).parse(req.body.browsertype);
+      z.optional(z.string()).parse(req.body.browsername);
+      z.optional(z.string()).parse(req.body.browserversion);
+      z.optional(z.string()).parse(req.body.browseros);
+    } catch (e) {
+      capture(e, { extra: { body: req.body }, user });
+      return;
+    }
+    user.debugDashboard = {
+      browserType: req.body.browsertype,
+      browserName: req.body.browsername,
+      browserVersion: req.body.browserversion,
+      browserOs: req.body.browseros,
+    };
+  }
+}
+
+function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
+  return {
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    createdAt: user.createdAt,
+    updatedAt: user.updatedAt,
+    role: user.role,
+    healthcareProfessional: user.healthcareProfessional,
+    lastChangePasswordAt: user.lastChangePasswordAt,
+    termsAccepted: user.termsAccepted,
+    teams: teams.map((t) => ({
+      _id: t._id,
+      name: t.name,
+      organisation: t.organisation,
+      createdAt: t.createdAt,
+      updatedAt: t.updatedAt,
+      nightSession: t.nightSession,
+    })),
+    organisation: {
+      _id: organisation._id,
+      name: organisation.name,
+      createdAt: organisation.createdAt,
+      updatedAt: organisation.updatedAt,
+      categories: organisation.categories,
+      consultations: organisation.consultations,
+      encryptionEnabled: organisation.encryptionEnabled,
+      encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
+      receptionEnabled: organisation.receptionEnabled,
+      services: organisation.services,
+      collaborations: organisation.collaborations,
+      customFieldsObs: organisation.customFieldsObs,
+      encryptedVerificationKey: organisation.encryptedVerificationKey,
+      customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
+      customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
+      migrations: organisation.migrations,
+      migrationLastUpdateAt: organisation.migrationLastUpdateAt,
+    },
+  };
+}
+
 router.get(
   "/me",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal", "superadmin"]),
+  catchErrors(async (req, res, next) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
     const teams = await user.getTeams();
     const organisation = await user.getOrganisation();
-    return res.status(200).send({ ok: true, user: { ...user.toJSON(), teams, organisation } });
+    return res.status(200).send({
+      ok: true,
+      user: serializeUserWithTeamsAndOrganisation(user, teams, organisation),
+    });
   })
 );
 
 router.post(
   "/logout",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal", "superadmin"]),
+  catchErrors(async (_req, res) => {
     res.clearCookie("jwt", logoutCookieOptions());
     return res.status(200).send({ ok: true });
   })
@@ -65,10 +176,22 @@ router.post(
 
 router.post(
   "/signin",
-  catchErrors(async (req, res) => {
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().parse(req.body.password);
+      z.string()
+        .email()
+        .parse((req.body.email || "").trim().toLowerCase());
+    } catch (e) {
+      const error = new Error(`Invalid request in signin: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
     let { password, email } = req.body;
     if (!password || !email) return res.status(400).send({ ok: false, error: "Missing password" });
     email = (email || "").trim().toLowerCase();
+
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
 
@@ -77,6 +200,8 @@ router.post(
     const match = await comparePassword(password, expectedPassword);
     if (!match) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
     user.lastLoginAt = new Date();
+
+    updateUserDebugInfos(req, user);
 
     await user.save();
 
@@ -88,14 +213,22 @@ router.post(
     const token = jwt.sign({ _id: user._id }, config.SECRET, { expiresIn: JWT_MAX_AGE });
     res.cookie("jwt", token, cookieOptions());
 
-    return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
+    return res.status(200).send({ ok: true, token, user: serializeUserWithTeamsAndOrganisation(user, teams, organisation) });
   })
 );
 
 router.get(
   "/signin-token",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal", "superadmin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(jwtRegex).parse(req.cookies.jwt);
+    } catch (e) {
+      const error = new Error(`Invalid request in signin token: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
     const token = req.cookies.jwt;
     const user = await User.findOne({ where: { _id: req.user._id } });
 
@@ -104,21 +237,30 @@ router.get(
     const userTeams = await RelUserTeam.findAll({ where: { user: user._id, team: { [Op.in]: orgTeams.map((t) => t._id) } } });
     const teams = userTeams.map((rel) => orgTeams.find((t) => t._id === rel.team));
 
-    return res.status(200).send({ ok: true, token, user: { ...user.toJSON(), teams, organisation } });
+    return res.status(200).send({ ok: true, token, user: serializeUserWithTeamsAndOrganisation(user, teams, organisation) });
   })
 );
 
 router.post(
   "/forgot_password",
-  catchErrors(async ({ body: { email } }, res, cta) => {
+  catchErrors(async ({ body: { email } }, res) => {
+    try {
+      z.string()
+        .email()
+        .parse((email || "").trim().toLowerCase());
+    } catch (e) {
+      const error = new Error(`Invalid request in forget password: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
     if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
 
     const user = await User.findOne({ where: { email } });
-    if (!user) return res.status(403).send({ ok: false, error: "E-mail ou mot de passe incorrect", code: EMAIL_OR_PASSWORD_INVALID });
+    if (!user) return res.status(200).send({ ok: true });
 
     const { password } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
-    if (!password)
-      return res.status(403).send({ ok: false, error: "Compte inactif, veuillez contacter l'administrateur", code: ACOUNT_NOT_ACTIVATED });
+    if (!password) return res.status(200).send({ ok: true });
 
     const token = crypto.randomBytes(20).toString("hex");
     user.forgotPasswordResetToken = token;
@@ -141,6 +283,15 @@ Si vous en êtes à l'origine, vous pouvez cliquer sur ce lien: ${link}`;
 router.post(
   "/forgot_password_reset",
   catchErrors(async ({ body: { token, password } }, res) => {
+    try {
+      z.string().min(1).parse(token);
+      z.string().min(1).parse(password);
+    } catch (e) {
+      const error = new Error(`Invalid request in forget password reset: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
     if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
     const user = await User.findOne({ where: { forgotPasswordResetToken: token, forgotPasswordResetExpires: { [Op.gte]: new Date() } } });
 
@@ -159,43 +310,47 @@ router.post(
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") {
-      capture("attempt of creating a user with no admin role", { user: req.user });
-      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
+  validateUser("admin"),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().min(1).parse(req.body.name);
+      z.string().email().parse(req.body.email);
+      z.boolean().parse(req.body.healthcareProfessional);
+      z.array(z.string().regex(looseUuidRegex)).parse(req.body.team);
+      z.enum(["admin", "normal"]).parse(req.body.role);
+    } catch (e) {
+      const error = new Error(`Invalid request in user creation: ${e}`);
+      error.status = 400;
+      return next(error);
     }
-    if (!req.body.name) return res.status(403).send({ ok: false, error: "A name is required" });
-    if (!req.body.email) return res.status(403).send({ ok: false, error: "An email is required" });
-    if (!req.body.organisation) return res.status(403).send({ ok: false, error: "An organisation is required" });
-    if (!req.body.role) return res.status(403).send({ ok: false, error: "A role is required" });
-    const newUser = {};
-    newUser.name = req.body.name;
-    newUser.email = req.body.email.trim().toLowerCase();
-    newUser.password = generatePassword();
-    newUser.organisation = req.body.organisation;
-    newUser.role = req.body.role;
+
+    const { name, email, role, team, healthcareProfessional } = req.body;
     const token = crypto.randomBytes(20).toString("hex");
-    newUser.forgotPasswordResetToken = token;
-    newUser.forgotPasswordResetExpires = new Date(Date.now() + JWT_MAX_AGE * 1000);
+    const newUser = {
+      name,
+      role,
+      healthcareProfessional,
+      email: email.trim().toLowerCase(),
+      password: crypto.randomBytes(60).toString("hex"), // A useless password.
+      organisation: req.user.organisation,
+      forgotPasswordResetToken: token,
+      forgotPasswordResetExpires: new Date(Date.now() + JWT_MAX_AGE * 1000),
+    };
 
     const prevUser = await User.findOne({ where: { email: newUser.email } });
-    if (!!prevUser) return res.status(400).send({ ok: false, error: "A user already exists with this email" });
+    if (prevUser) return res.status(400).send({ ok: false, error: "A user already exists with this email" });
 
     const data = await User.create(newUser, { returning: true });
 
-    if (req.body.hasOwnProperty("team")) {
-      const user = await User.findOne({ where: { _id: data._id } });
-      const tx = await User.sequelize.transaction();
-      const team = req.body.team;
-      if (team && Array.isArray(team)) {
-        await RelUserTeam.bulkCreate(
-          team.map((teamId) => ({ user: data._id, team: teamId })),
-          { transaction: tx }
-        );
-      }
-      await tx.commit();
-      await user.save({ transaction: tx });
-    }
+    const user = await User.findOne({ where: { _id: data._id } });
+    const teams = await Team.findAll({ where: { organisation: req.user.organisation, _id: { [Op.in]: team } } });
+    const tx = await User.sequelize.transaction();
+    await RelUserTeam.bulkCreate(
+      teams.map((t) => ({ user: data._id, team: t._id })),
+      { transaction: tx }
+    );
+    await tx.commit();
+    await user.save({ transaction: tx });
 
     const subject = "Bienvenue dans Mano 👋";
     const body = `Bonjour ${data.name} !
@@ -216,14 +371,36 @@ Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 1
 `;
     await mailservice.sendEmail(data.email, subject, body);
 
-    return res.status(200).send({ ok: true, data });
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: data._id,
+        name: data.name,
+        email: data.email,
+        role: data.role,
+        healthcareProfessional: data.healthcareProfessional,
+        organisation: data.organisation,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
+    });
   })
 );
 
 router.post(
   "/reset_password",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal", "superadmin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().min(1).parse(req.body.password);
+      z.string().min(1).parse(req.body.newPassword);
+      z.string().min(1).parse(req.body.verifyPassword);
+    } catch (e) {
+      const error = new Error(`Invalid request in reset password: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
     const _id = req.user._id;
     const { password, newPassword, verifyPassword } = req.body;
 
@@ -245,32 +422,72 @@ router.post(
 
     const userWithoutPassword = await User.findOne({ where: { _id } });
 
-    return res.status(200).send({ ok: true, user: userWithoutPassword });
+    return res.status(200).send({
+      ok: true,
+      user: {
+        _id: userWithoutPassword._id,
+        name: userWithoutPassword.name,
+        email: userWithoutPassword.email,
+        createdAt: userWithoutPassword.createdAt,
+        updatedAt: userWithoutPassword.updatedAt,
+        role: userWithoutPassword.role,
+        healthcareProfessional: userWithoutPassword.healthcareProfessional,
+        lastChangePasswordAt: userWithoutPassword.lastChangePasswordAt,
+        termsAccepted: userWithoutPassword.termsAccepted,
+      },
+    });
   })
 );
 
 router.get(
-  "/:id",
+  "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const query = { where: { _id: req.params.id } };
+  validateUser("admin"),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      const error = new Error(`Invalid request in get user by id: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const query = { where: { _id: req.params._id } };
     query.where.organisation = req.user.organisation;
     const user = await User.findOne(query);
     const team = await user.getTeams({ raw: true, attributes: ["_id"] });
-    let data = user.toJSON();
-    data.team = team.map((t) => t._id);
-    return res.status(200).send({ ok: true, data });
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
+        lastChangePasswordAt: user.lastChangePasswordAt,
+        termsAccepted: user.termsAccepted,
+        team: team.map((t) => t._id),
+      },
+    });
   })
 );
 
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const where = {};
-    where.organisation = req.user.organisation;
+  validateUser(["admin", "normal", "superadmin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.optional(z.literal("true")).parse(req.query.minimal);
+    } catch (e) {
+      const error = new Error(`Invalid request in get users: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
 
-    const users = await User.findAll({ where });
+    const users = await User.findAll({ where: { organisation: req.user.organisation } });
     const data = [];
 
     if (req.user.role !== "admin" || req.query.minimal === "true") {
@@ -282,7 +499,26 @@ router.get(
 
     for (let user of users) {
       const teams = await user.getTeams();
-      data.push({ ...user.toJSON(), teams });
+      data.push({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
+        lastChangePasswordAt: user.lastChangePasswordAt,
+        termsAccepted: user.termsAccepted,
+        lastLoginAt: user.lastLoginAt,
+        teams: teams.map((t) => ({
+          _id: t._id,
+          name: t.name,
+          organisation: t.organisation,
+          createdAt: t.createdAt,
+          updatedAt: t.updatedAt,
+          nightSession: t.nightSession,
+        })),
+      });
     }
     return res.status(200).send({ ok: true, data });
   })
@@ -291,18 +527,39 @@ router.get(
 router.put(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal", "superadmin"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.optional(z.string().min(1)).parse(req.body.name);
+      z.string()
+        .email()
+        .optional()
+        .or(z.literal(""))
+        .parse((req.body.email || "").trim().toLowerCase());
+      z.optional(z.string().min(1)).parse(req.body.password);
+      z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
+      if (req.body.termsAccepted) z.preprocess((input) => new Date(input), z.date()).parse(req.body.termsAccepted);
+    } catch (e) {
+      const error = new Error(`Invalid request in put user by id: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
     const _id = req.user._id;
     const { name, email, password, team, termsAccepted } = req.body;
 
     const user = await User.findOne({ where: { _id } });
     if (!user) return res.status(404).send({ ok: false, error: "Utilisateur non trouvé" });
-    const tx = await User.sequelize.transaction();
 
     if (name) user.name = name;
-    if (email) user.email = email;
+    if (email) user.email = email.trim().toLowerCase();
     if (termsAccepted) user.termsAccepted = termsAccepted;
-    if (password) user.password = password;
+    if (password) {
+      if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
+      user.password = password;
+    }
+
+    const tx = await User.sequelize.transaction();
     if (team && Array.isArray(team)) {
       await RelUserTeam.destroy({ where: { user: _id }, transaction: tx });
       await RelUserTeam.bulkCreate(
@@ -310,34 +567,61 @@ router.put(
         { transaction: tx }
       );
     }
-
     await user.save({ transaction: tx });
-
     await tx.commit();
-    return res.status(200).send({ ok: true, user });
+
+    return res.status(200).send({
+      ok: true,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
+        lastChangePasswordAt: user.lastChangePasswordAt,
+        termsAccepted: user.termsAccepted,
+      },
+    });
   })
 );
 
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const _id = req.params._id;
+  validateUser("admin"),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.optional(z.string().min(1)).parse(req.body.name);
 
-    if (req.user.role !== "admin") {
-      capture("attempt of updating a user with no admin role", { user: req.user });
-      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
+      z.string()
+        .email()
+        .optional()
+        .or(z.literal(""))
+        .parse((req.body.email || "").trim().toLowerCase());
+      z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
+      z.optional(z.boolean()).parse(req.body.healthcareProfessional);
+      z.optional(z.enum(["admin", "normal"])).parse(req.body.role);
+    } catch (e) {
+      const error = new Error(`Invalid request in put user by id: ${e}`);
+      error.status = 400;
+      return next(error);
     }
-    const { name, email, team, role } = req.body;
+
+    const _id = req.params._id;
+    const { name, email, team, role, healthcareProfessional } = req.body;
 
     const user = await User.findOne({ where: { _id, organisation: req.user.organisation } });
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
-    const tx = await User.sequelize.transaction();
 
     if (name) user.name = name;
     if (email) user.email = email.trim().toLowerCase();
+    if (healthcareProfessional !== undefined) user.healthcareProfessional = healthcareProfessional;
     if (role) user.role = role;
 
+    const tx = await User.sequelize.transaction();
     if (team && Array.isArray(team)) {
       await RelUserTeam.destroy({ where: { user: _id }, transaction: tx });
       await RelUserTeam.bulkCreate(
@@ -345,40 +629,45 @@ router.put(
         { transaction: tx }
       );
     }
-
     await user.save({ transaction: tx });
-
     await tx.commit();
 
-    return res.status(200).send({ ok: true, user });
+    return res.status(200).send({
+      ok: true,
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        role: user.role,
+        healthcareProfessional: user.healthcareProfessional,
+        lastChangePasswordAt: user.lastChangePasswordAt,
+        termsAccepted: user.termsAccepted,
+      },
+    });
   })
 );
 
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    if (req.user.role !== "admin") {
-      capture("attempt of deleting a user with no admin role", { user: req.user });
-      return res.status(403).send({ ok: false, error: "Action interdite ! Veuillez contacter un administrateur" });
+  validateUser("admin"),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      const error = new Error(`Invalid request in delete user by id: ${e}`);
+      error.status = 400;
+      return next(error);
     }
-
     const userId = req.params._id;
-
-    const fkQuery = { where: { user: userId } };
-    await Comment.update({ user: null }, fkQuery);
-    await Action.update({ user: null }, fkQuery);
-    await Person.update({ user: null }, fkQuery);
-    // Todo: there are missing tables, such as territory observations.
-
-    const query = { where: { _id: userId } };
-    query.where.organisation = req.user.organisation;
+    const query = { where: { _id: userId, organisation: req.user.organisation } };
 
     let user = await User.findOne(query);
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
 
     let tx = await User.sequelize.transaction();
-
     await Promise.all([User.destroy({ ...query, transaction: tx }), RelUserTeam.destroy({ where: { user: userId }, transaction: tx })]);
     await user.destroy({ transaction: tx });
     await tx.commit();

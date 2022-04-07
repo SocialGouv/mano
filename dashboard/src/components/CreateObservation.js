@@ -6,15 +6,16 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import 'react-datepicker/dist/react-datepicker.css';
 
-import { useTerritoryObservations } from '../recoil/territoryObservations';
+import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
 import SelectTeam from './SelectTeam';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import CustomFieldInput from './CustomFieldInput';
 import { userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../services/date';
+import useApi from '../services/api';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
 
@@ -26,8 +27,31 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   }, [forceOpen]);
 
   const user = useRecoilValue(userState);
-  const { addTerritoryObs, updateTerritoryObs, customFieldsObs } = useTerritoryObservations();
   const territories = useRecoilValue(territoriesState);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const setTerritoryObs = useSetRecoilState(territoryObservationsState);
+  const API = useApi();
+
+  const addTerritoryObs = async (obs) => {
+    const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
+    if (res.ok) {
+      setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
+    }
+    return res;
+  };
+
+  const updateTerritoryObs = async (obs) => {
+    const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
+    if (res.ok) {
+      setTerritoryObs((territoryObservations) =>
+        territoryObservations.map((a) => {
+          if (a._id === obs._id) return res.decryptedData;
+          return a;
+        })
+      );
+    }
+    return res;
+  };
 
   return (
     <CreateStyle>
@@ -41,13 +65,13 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               if (!values.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
               if (!values.territory) return toastr.error('Erreur!', 'Le territoire est obligatoire');
               const body = {
-                createdAt: values.createdAt,
+                observedAt: values.observedAt,
                 team: values.team,
-                user: user._id,
+                user: values.user || user._id,
                 territory: values.territory,
                 _id: observation._id,
               };
-              for (const customField of customFieldsObs.filter((f) => f.enabled)) {
+              for (const customField of customFieldsObs.filter((f) => f).filter((f) => f.enabled)) {
                 body[customField.name] = values[customField.name];
               }
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
@@ -61,9 +85,10 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               <React.Fragment>
                 <Row>
                   {customFieldsObs
+                    .filter((f) => f)
                     .filter((f) => f.enabled)
                     .map((field) => (
-                      <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                      <CustomFieldInput model="observation" values={values} handleChange={handleChange} field={field} key={field.name} />
                     ))}
                   <Col md={6}>
                     <FormGroup>
@@ -72,11 +97,12 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          selected={dateForDatePicker(values.createdAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                          selected={dateForDatePicker((values.observedAt || values.createdAt) ?? new Date())}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'observedAt' } })}
                           timeInputLabel="Heure :"
-                          dateFormat="dd/MM/yyyy hh:mm"
+                          dateFormat="dd/MM/yyyy HH:mm"
                           showTimeInput
+                          id="observation-observedat"
                         />
                       </div>
                     </FormGroup>
@@ -89,6 +115,8 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                         teamId={values.team}
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                         colored
+                        inputId="observation-select-team"
+                        classNamePrefix="observation-select-team"
                       />
                     </FormGroup>
                   </Col>
@@ -103,6 +131,8 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                         value={territories.find((i) => i._id === values.territory)}
                         getOptionValue={(i) => i._id}
                         getOptionLabel={(i) => i.name}
+                        inputId="observation-select-territory"
+                        classNamePrefix="observation-select-territory"
                       />
                     </FormGroup>
                   </Col>

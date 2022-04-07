@@ -30,11 +30,14 @@ function capture(err, context = {}) {
   if (!!context.extra && typeof context.extra !== "string") {
     try {
       const newExtra = {};
-      for (let extraKey of Object.keys(context.extra)) {
-        if (typeof context.extra[extraKey] === "string") {
-          newExtra[extraKey] = context.extra[extraKey];
+      for (const [extraKey, extraValue] of Object.entries(context.extra)) {
+        if (typeof extraValue === "string") {
+          newExtra[extraKey] = extraValue;
         } else {
-          newExtra[extraKey] = JSON.stringify(context.extra[extraKey]);
+          if (extraValue?.password) {
+            extraValue.password = "******";
+          }
+          newExtra[extraKey] = JSON.stringify(extraValue);
         }
       }
       context.extra = newExtra;

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import ButtonRight from '../../components/ButtonRight';
@@ -9,17 +9,26 @@ import TeamsTags from '../../components/TeamsTags';
 import { personsState } from '../../recoil/persons';
 import { DONE } from '../../recoil/actions';
 
-const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName }) => {
+const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName, testID = 'action' }) => {
   const persons = useRecoilValue(personsState);
 
   const name = action?.name;
   const status = action?.status;
   const withTime = action?.withTime;
-  const pseudo = action?.personName || action?.person ? persons?.find((p) => p._id === action.person)?.name : null;
+  const person = useMemo(() => (action?.person ? persons?.find((p) => p._id === action.person) : null), [persons, action.person]);
+  const pseudo = useMemo(() => action?.personName || person?.name, [action, person?.name]);
   const dueAt = action?.dueAt ? new Date(action?.dueAt) : null;
 
+  const onPseudoContainerPress = useCallback(() => {
+    onPseudoPress(person);
+  }, [person, onPseudoPress]);
+
+  const onRowPress = useCallback(() => {
+    onActionPress(action);
+  }, [action, onActionPress]);
+
   return (
-    <RowContainer onPress={onActionPress}>
+    <RowContainer onPress={onRowPress} testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
       <DateContainer>
         {Boolean(dueAt) && (
           <>
@@ -39,7 +48,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
             <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>
           </StatusContainer>
         ) : pseudo ? (
-          <PseudoContainer onPress={onPseudoPress}>
+          <PseudoContainer onPress={onPseudoContainerPress} testID={`${testID}-row-person-${pseudo?.split(' ').join('-').toLowerCase()}-button`}>
             <Pseudo>Pour {pseudo}</Pseudo>
           </PseudoContainer>
         ) : null}
