@@ -30,7 +30,7 @@ import useApi, { recoilResetKeyState, tokenCached } from './services/api';
 import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
-
+import Ldap from './scenes/ldap';
 const store = createStore(combineReducers({ toastr }));
 
 registerLocale('fr', fr);
@@ -63,6 +63,7 @@ const App = ({ resetRecoil }) => {
         <ScrollToTop />
         <Switch>
           <Route path="/auth" component={Auth} />
+          <Route path="/ldap" component={Ldap} />
           <RestrictedRoute path="/charte" component={Charte} />
           <RestrictedRoute path="/account" component={Account} />
           <RestrictedRoute path="/user" component={User} />
