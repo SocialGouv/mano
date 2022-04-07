@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 var passport = require('passport');
-var LdapStrategy = require('passport-ldapauth').Strategy;
 var bodyParser = require('body-parser')
 const { Op } = require("sequelize");
 const jwt = require("jsonwebtoken");
@@ -12,10 +11,12 @@ const { catchErrors } = require("../errors");
 const User = require("../models/user");
 const Team = require("../models/team");
 const RelUserTeam = require("../models/relUserTeam");
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({extended: false}));
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 const COOKIE_MAX_AGE = JWT_MAX_AGE * 1000;
+
 function cookieOptions() {
   if (config.ENVIRONMENT === "development" || config.ENVIRONMENT === "test") {
     return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, sameSite: "None" };
