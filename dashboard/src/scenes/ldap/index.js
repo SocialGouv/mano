@@ -1,10 +1,10 @@
 import React from "react";
 import { Route, Switch } from "react-router-dom";
-import Oidc from "./oidc"
+import Ldap from "./ldap"
 const Router = () => {
   return (
     <Switch>
-      <Route path="/ldap" component={Oidc} />
+      <Route path="/ldap" component={Ldap} />
     </Switch>
   );
 };
