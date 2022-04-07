@@ -1,7 +1,2 @@
-const sequelize = require("../sequelize");
-
-sequelize.query(`
-  ALTER TABLE "mano"."Report"
-  ADD COLUMN IF NOT EXISTS "collaborations" text[],
-  DROP COLUMN IF EXISTS "collaboration";
-`);
+// This migration would have generated conflicts and has been emptied.
+// Check GIT history for more information.

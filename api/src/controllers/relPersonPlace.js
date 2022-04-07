@@ -2,82 +2,98 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
+const { z } = require("zod");
 const { catchErrors } = require("../errors");
-
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
+const validateUser = require("../middleware/validateUser");
 const RelPersonPlace = require("../models/relPersonPlace");
-const encryptedTransaction = require("../utils/encryptedTransaction");
+const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const { person, place } = req.body;
-    if (!person || !place) return res.status(400).send({ ok: false, error: "Missing place or person" });
+  validateUser(["admin", "normal"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      const error = new Error(`Invalid request in relPersonPlace creation: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
 
-    const newRelPersonPlace = {};
+    const data = await RelPersonPlace.create(
+      {
+        organisation: req.user.organisation,
+        encrypted: req.body.encrypted,
+        encryptedEntityKey: req.body.encryptedEntityKey,
+      },
+      { returning: true }
+    );
 
-    newRelPersonPlace.organisation = req.user.organisation;
-    newRelPersonPlace.user = req.user._id;
-
-    // Todo: ignore fields that are encrypted.
-    newRelPersonPlace.person = req.body.person || null;
-    newRelPersonPlace.place = req.body.place || null;
-
-    if (req.body.hasOwnProperty("encrypted")) newRelPersonPlace.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) newRelPersonPlace.encryptedEntityKey = req.body.encryptedEntityKey || null;
-
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      const data = await RelPersonPlace.create(newRelPersonPlace, { returning: true, transaction: tx });
-      return data;
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: data._id,
+        encrypted: data.encrypted,
+        encryptedEntityKey: data.encryptedEntityKey,
+        organisation: data.organisation,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
     });
-
-    return res.status(status).send({ ok, data, error });
   })
 );
 
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+    } catch (e) {
+      const error = new Error(`Invalid request in relPersonPlace get: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const { limit, page, lastRefresh } = req.query;
+
     const query = {
-      where: {
-        organisation: req.user.organisation,
-      },
+      where: { organisation: req.user.organisation },
       order: [["createdAt", "DESC"]],
     };
-    if (req.query.lastRefresh) {
-      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-    }
 
     const total = await RelPersonPlace.count(query);
-    const limit = parseInt(req.query.limit, 10);
-    if (!!req.query.limit) query.limit = limit;
-    if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
+    if (limit) query.limit = Number(limit);
+    if (page) query.offset = Number(page) * limit;
+    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
 
     const data = await RelPersonPlace.findAll({
       ...query,
-      attributes: [
-        // Generic fields
-        "_id",
-        "encrypted",
-        "encryptedEntityKey",
-        "organisation",
-        "createdAt",
-        "updatedAt",
-        // Not yet encrypted. Should it be?
-        "user",
-      ],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
     });
-    return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
+    return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
 );
 
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const { _id } = req.params;
-    await RelPersonPlace.destroy({ where: { _id } });
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      const error = new Error(`Invalid request in relPersonPlace delete: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    await RelPersonPlace.destroy({ where: { _id: req.params._id, organisation: req.user.organisation } });
     res.status(200).send({ ok: true });
   })
 );

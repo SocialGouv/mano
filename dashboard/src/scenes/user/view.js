@@ -1,16 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
-import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
-import BackButton from '../../components/backButton';
 import Box from '../../components/Box';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectCustom from '../../components/SelectCustom';
@@ -26,12 +24,15 @@ const View = () => {
   const organisation = useRecoilValue(organisationState);
   const API = useApi();
 
+  const getData = useCallback(async () => {
+    const { data } = await API.get({ path: `/user/${id}` });
+    setLocalUser(data);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
+
   useEffect(() => {
-    (async () => {
-      const { data } = await API.get({ path: `/user/${id}` });
-      setLocalUser(data);
-    })();
-  }, []);
+    getData();
+  }, [getData, id]);
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
@@ -46,11 +47,17 @@ const View = () => {
   if (!localUser) return <Loading />;
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title={<BackButton />} />
+    <>
+      <SmallerHeaderWithBackButton />
       <Box>
         <Formik
-          initialValues={localUser}
+          initialValues={{
+            name: localUser.name,
+            email: localUser.email,
+            team: localUser.team,
+            role: localUser.role,
+            healthcareProfessional: localUser.healthcareProfessional,
+          }}
           onSubmit={async (body, actions) => {
             try {
               if (!body.team?.length) return toastr.error('Erreur !', 'Au moins une équipe est obligatoire');
@@ -108,16 +115,35 @@ const View = () => {
                     />
                   </FormGroup>
                 </Col>
+                <Col md={12}>
+                  <Label style={{ marginBottom: 0 }}>
+                    <input
+                      type="checkbox"
+                      style={{ marginRight: '0.5rem' }}
+                      name="healthcareProfessional"
+                      checked={values.healthcareProfessional}
+                      onChange={() => {
+                        handleChange({ target: { value: !values.healthcareProfessional, name: 'healthcareProfessional' } });
+                      }}
+                    />
+                    Professionnel de santé
+                  </Label>
+                  <div>
+                    <small className="text-muted">Un professionnel de santé à accès au dossier médical complet des personnes.</small>
+                  </div>
+                </Col>
               </Row>
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
+                {id !== user._id && (
+                  <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
+                )}
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
               </div>
             </React.Fragment>
           )}
         </Formik>
       </Box>
-    </Container>
+    </>
   );
 };
 

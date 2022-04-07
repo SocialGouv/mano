@@ -27,17 +27,19 @@ const ScreenTitle = ({
   saving,
   children,
   parentScroll,
+  testID = '',
+  forceTop = false,
 }) => {
   const showRightButton = Boolean(onAdd) || Boolean(onEdit) || Boolean(onSave);
   const showLeftButton = showRightButton || Boolean(onBack);
 
   return (
     <>
-      <AnimatedSafeAreaView style={[styles.color(backgroundColor), styles.wrapper(parentScroll)]}>
+      <AnimatedSafeAreaView style={[styles.color(backgroundColor), styles.wrapper(parentScroll, forceTop)]}>
         <StatusBar backgroundColor={backgroundColor} />
-        <Animated.View style={[styles.color(backgroundColor), styles.container]}>
-          <Animated.View style={styles.titleContainer(parentScroll)}>
-            <Animated.View style={[styles.buttonsContainer]} />
+        <Animated.View style={[styles.color(backgroundColor), styles.container(forceTop)]}>
+          <Animated.View style={styles.titleContainer(parentScroll, forceTop)}>
+            {!forceTop && <Animated.View style={[styles.buttonsContainer]} />}
             <Animated.View style={styles.titleCaptionContainer}>
               <Title heavy ellipsizeMode="tail" color={color}>
                 {title}
@@ -52,7 +54,7 @@ const ScreenTitle = ({
           <View style={[styles.buttonsContainer, styles.buttonsContainerFixed]}>
             {!!showLeftButton && (
               <Animated.View style={styles.buttonContainer(Boolean(onBack))} pointerEvents={onBack ? 'auto' : 'none'}>
-                <TouchableOpacity hitSlop={hitSlop} onPress={onBack}>
+                <TouchableOpacity hitSlop={hitSlop} onPress={onBack} testID={`${testID}-back-button`}>
                   <ArrowLeftExtended color="#fff" size={20} />
                 </TouchableOpacity>
               </Animated.View>
@@ -100,13 +102,15 @@ const ButtonText = styled(MyText)`
 `;
 
 const styles = StyleSheet.create({
-  wrapper: (parentScroll) => ({
+  wrapper: (parentScroll, forceTop) => ({
     overflow: 'visible',
     zIndex: 100,
-    marginTop: parentScroll?.interpolate ? -90 : 0,
+    marginTop: forceTop ? 0 : parentScroll?.interpolate ? -90 : 0,
     transform: [
       {
-        translateY: parentScroll?.interpolate
+        translateY: forceTop
+          ? 0
+          : parentScroll?.interpolate
           ? parentScroll.interpolate({
               inputRange: [0, 100],
               outputRange: [90, 0],
@@ -116,12 +120,14 @@ const styles = StyleSheet.create({
       },
     ],
   }),
-  titleContainer: (parentScroll) => ({
+  titleContainer: (parentScroll, forceTop) => ({
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
     transform: [
       {
-        translateY: parentScroll?.interpolate
+        translateY: forceTop
+          ? 0
+          : parentScroll?.interpolate
           ? parentScroll.interpolate({
               inputRange: [0, 100],
               outputRange: [0, -90],
@@ -134,11 +140,11 @@ const styles = StyleSheet.create({
   color: (backgroundColor) => ({
     backgroundColor,
   }),
-  container: {
+  container: (forceTop) => ({
     paddingHorizontal: 15,
-    paddingTop: '5%',
-    paddingBottom: '5%',
-  },
+    paddingTop: forceTop ? 0 : '5%',
+    paddingBottom: forceTop ? 0 : '5%',
+  }),
   buttonsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',

@@ -7,6 +7,7 @@ buildscript {
         compileSdkVersion = 30
         targetSdkVersion = 30
         ndkVersion = "20.1.5948944"
+        kotlinVersion = '1.3.10' // (check what the latest version is!)
     }
     repositories {
         google()
@@ -14,8 +15,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:4.2.2")
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
     }
 }
 
@@ -31,8 +31,33 @@ allprojects {
             // Android JSC is installed from npm
             url("$rootDir/../node_modules/jsc-android/dist")
         }
+        maven {
+            // Android JSC is installed from npm
+            url("$rootDir/../node_modules/detox/Detox-android")
+        }
 
         google()
         maven { url 'https://www.jitpack.io' }
+    }
+}
+
+// https://github.com/wix/Detox/issues/2712#issuecomment-1027937545
+subprojects {
+    ext {
+        compileSdk = rootProject.ext.compileSdkVersion
+        minSdk = rootProject.ext.minSdkVersion
+        targetSdk = rootProject.ext.targetSdkVersion
+    }
+    afterEvaluate { subproject ->
+        if((subproject.plugins.hasPlugin('android') || subproject.plugins.hasPlugin('android-library'))) {
+            android {
+                compileSdkVersion rootProject.ext.compileSdkVersion
+                buildToolsVersion rootProject.ext.buildToolsVersion
+                defaultConfig {
+                    minSdkVersion rootProject.ext.minSdkVersion
+                    targetSdkVersion rootProject.ext.targetSdkVersion
+                }
+            }
+        }
     }
 }

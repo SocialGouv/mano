@@ -6,21 +6,19 @@ import Spinner from '../../components/Spinner';
 import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyContainer';
 import Search from '../../components/Search';
 import FlatListStyled from '../../components/FlatListStyled';
-import { useRefresh } from '../../recoil/refresh';
-import { useRecoilValue } from 'recoil';
-import { personsFullSearchSelector } from '../../recoil/selectors';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { personsSearchSelector } from '../../recoil/selectors';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
 
 const PersonsSearch = ({ navigation, route }) => {
-  const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
-  const { loading, personsRefresher } = useRefresh();
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
+  const loading = useRecoilState(loadingState);
 
-  const filteredPersons = useRecoilValue(personsFullSearchSelector({ search }));
+  const filteredPersons = useRecoilValue(personsSearchSelector({ search }));
 
   const onRefresh = async () => {
-    setRefreshing(true);
-    await personsRefresher();
-    setRefreshing(false);
+    setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   };
 
   const onCreatePersonRequest = () => {
@@ -52,12 +50,13 @@ const PersonsSearch = ({ navigation, route }) => {
       <ScreenTitle title="Choisissez une personne" onBack={onBack} onAdd={onCreatePersonRequest} />
       <Search placeholder="Rechercher une personne..." onChange={setSearch} />
       <FlatListStyled
-        refreshing={refreshing}
+        refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
         data={filteredPersons}
         extraData={filteredPersons}
         renderItem={renderPersonRow}
         keyExtractor={keyExtractor}
+        initialNumToRender={10}
         ListEmptyComponent={loading ? Spinner : ListEmptyPersons}
         ListFooterComponent={ListFooterComponent}
       />

@@ -1,25 +1,22 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
-import { Container, FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
+import React, { useEffect, useMemo, useState } from 'react';
+import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
-import BackButton from '../../components/backButton';
 import CreateAction from '../action/CreateAction';
 import Comments from '../../components/Comments';
 import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import {
-  usePersons,
   addressDetails,
   addressDetailsFixedFields,
   employmentOptions,
@@ -30,26 +27,42 @@ import {
   reasonsOptions,
   ressourcesOptions,
   yesNoOptions,
+  personsState,
+  customFieldsPersonsSocialSelector,
+  customFieldsPersonsMedicalSelector,
+  preparePersonForEncryption,
+  commentForUpdatePerson,
 } from '../../recoil/persons';
-import { useActions } from '../../recoil/actions';
+import { actionsState } from '../../recoil/actions';
 import UserName from '../../components/UserName';
 import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
 import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
-import { organisationState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
-import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, formatTime } from '../../services/date';
+import { refreshTriggerState } from '../../components/Loader';
+import useApi from '../../services/api';
+import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import DeletePerson from './DeletePerson';
+import { MedicalFile } from './MedicalFile';
+import { ENV } from '../../config';
+import { passagesState } from '../../recoil/passages';
+import DateBloc from '../../components/DateBloc';
+import Passage from '../../components/Passage';
 
-const initTabs = ['Résumé', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
+const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
 const View = () => {
   const { id } = useParams();
   const location = useLocation();
   const history = useHistory();
-  const { persons } = usePersons();
+  const persons = useRecoilValue(personsState);
+  const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [tabsContents, setTabsContents] = useState(initTabs);
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(
@@ -61,25 +74,43 @@ const View = () => {
   const person = persons.find((p) => p._id === id) || {};
 
   return (
-    <StyledContainer style={{ padding: '40px 0' }}>
-      <Header title={<BackButton />} />
-      <Title>
+    <StyledContainer>
+      <SmallerHeaderWithBackButton
+        className="noprint"
+        onRefresh={() =>
+          setRefreshTrigger({
+            status: true,
+            options: { initialLoad: false, showFullScreen: false },
+          })
+        }
+      />
+      <Title className="noprint">
         {`Dossier de ${person?.name}`}
         <UserName id={person.user} wrapper={(name) => ` (créée par ${name})`} />
       </Title>
       {person.outOfActiveList && (
-        <Alert color="warning">
+        <Alert color="warning" className="noprint">
           {person?.name} est en dehors de la file active, pour le motif suivant : <b>{person.outOfActiveListReason}</b>
         </Alert>
       )}
-      <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }}>
+      <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }} className="noprint">
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
           return (
-            <NavItem key={index} style={{ cursor: 'pointer' }}>
+            <NavItem
+              // This implementation is temporary. Currently, the tabs are not dynamic so we have to hide them when disabled.
+              // Also, this is currently only displayed in localhost. Todo: fix me!
+              className={`${
+                initTabs[index].toLowerCase() === 'dossier médical' &&
+                !((user.healthcareProfessional && ENV === 'development') || user._id === '09ec2a60-8471-4f4a-ad62-74b2424df28b')
+                  ? 'd-none'
+                  : ''
+              }`}
+              key={index}
+              style={{ cursor: 'pointer' }}>
               <NavLink
                 key={index}
-                className={`${activeTab === index && 'active'}`}
+                className={`${activeTab === index ? 'active' : ''}`}
                 onClick={() => {
                   const searchParams = new URLSearchParams(location.search);
                   searchParams.set('tab', initTabs[index].toLowerCase());
@@ -97,37 +128,35 @@ const View = () => {
           <Summary person={person} />
         </TabPane>
         <TabPane tabId={1}>
-          <Actions person={person} onUpdateResults={(total) => updateTabContent(1, `Actions (${total})`)} />
+          <MedicalFile person={person} />
         </TabPane>
         <TabPane tabId={2}>
-          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(2, `Commentaires (${total})`)} />
+          <Actions person={person} onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
         </TabPane>
         <TabPane tabId={3}>
-          <Comments personId={person?._id} forPassages onUpdateResults={(total) => updateTabContent(3, `Passages (${total})`)} />
+          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Commentaires (${total})`)} />
         </TabPane>
         <TabPane tabId={4}>
-          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Lieux (${total})`)} />
+          <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
-        <TabPane tabId={5}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(5, `Documents (${total})`)} />}</TabPane>
+        <TabPane tabId={5}>
+          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
+        </TabPane>
+        <TabPane tabId={6}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)} />}</TabPane>
       </TabContent>
     </StyledContainer>
   );
 };
 
 const Summary = ({ person }) => {
-  const history = useHistory();
-  const { updatePerson, deletePerson, customFieldsPersonsMedical, customFieldsPersonsSocial } = usePersons();
-
-  const deleteData = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const res = await deletePerson(person._id);
-      if (res?.ok) {
-        toastr.success('Suppression réussie');
-        history.goBack();
-      }
-    }
-  };
+  const setPersons = useSetRecoilState(personsState);
+  const setComments = useSetRecoilState(commentsState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+  const API = useApi();
 
   return (
     <>
@@ -137,12 +166,33 @@ const Summary = ({ person }) => {
         </Col>
       </Row>
       <Formik
+        enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
-          if (!body.createdAt) body.createdAt = person.createdAt;
+          if (!body.followedSince) body.followedSince = person.createdAt;
           body.entityKey = person.entityKey;
-          const res = await updatePerson(body);
-          if (res.ok) {
+          const response = await API.put({
+            path: `/person/${person._id}`,
+            body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
+          });
+          if (response.ok) {
+            const newPerson = response.decryptedData;
+            setPersons((persons) =>
+              persons.map((p) => {
+                if (p._id === person._id) return newPerson;
+                return p;
+              })
+            );
+            const comment = commentForUpdatePerson({ newPerson, oldPerson: person });
+            if (comment) {
+              comment.user = user._id;
+              comment.team = currentTeam._id;
+              comment.organisation = organisation._id;
+              const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+              if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
+            }
+          }
+          if (response.ok) {
             toastr.success('Mis à jour !');
           }
         }}>
@@ -164,7 +214,14 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <Label>Genre</Label>
-                  <SelectAsInput options={genderOptions} name="gender" value={values.gender || ''} onChange={handleChange} />
+                  <SelectAsInput
+                    options={genderOptions}
+                    name="gender"
+                    value={values.gender || ''}
+                    onChange={handleChange}
+                    inputId="person-select-gender"
+                    classNamePrefix="person-select-gender"
+                  />
                 </Col>
 
                 <Col md={4}>
@@ -177,6 +234,7 @@ const Summary = ({ person }) => {
                         selected={dateForDatePicker(values.birthdate)}
                         onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
                         dateFormat="dd/MM/yyyy"
+                        id="person-birthdate"
                       />
                     </div>
                   </FormGroup>
@@ -191,20 +249,22 @@ const Summary = ({ person }) => {
                         selected={dateForDatePicker(values.wanderingAt)}
                         onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
                         dateFormat="dd/MM/yyyy"
+                        id="person-wanderingAt"
                       />
                     </div>
                   </FormGroup>
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Suivi(e) depuis le / Créé le</Label>
+                    <Label>Suivi(e) depuis le / Créé(e) le</Label>
                     <div>
                       <DatePicker
                         locale="fr"
                         className="form-control"
-                        selected={dateForDatePicker(values.createdAt)}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                        selected={dateForDatePicker(values.followedSince || values.createdAt)}
+                        onChange={(date) => handleChange({ target: { value: date, name: 'followedSince' } })}
                         dateFormat="dd/MM/yyyy"
+                        id="person-followedSince"
                       />
                     </div>
                   </FormGroup>
@@ -217,16 +277,18 @@ const Summary = ({ person }) => {
                         onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
                         value={values.assignedTeams}
                         colored
+                        inputId="person-select-assigned-team"
+                        classNamePrefix="person-select-assigned-team"
                       />
                     </div>
                   </FormGroup>
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Personne très vulnérable</Label>
+                    <Label />
                     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                       <span>Personne très vulnérable, ou ayant besoin d'une attention particulière</span>
-                      <Input type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
+                      <Input id="person-alertness-checkbox" type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
                     </div>
                   </FormGroup>
                 </Col>
@@ -253,6 +315,8 @@ const Summary = ({ person }) => {
                     name="personalSituation"
                     value={values.personalSituation || ''}
                     onChange={handleChange}
+                    inputId="person-select-personalSituation"
+                    classNamePrefix="person-select-personalSituation"
                   />
                 </Col>
                 <Col md={4}>
@@ -264,13 +328,27 @@ const Summary = ({ person }) => {
                 <Col md={4}>
                   <FormGroup>
                     <Label>Avec animaux</Label>
-                    <SelectAsInput options={yesNoOptions} name="hasAnimal" value={values.hasAnimal || ''} onChange={handleChange} />
+                    <SelectAsInput
+                      options={yesNoOptions}
+                      name="hasAnimal"
+                      value={values.hasAnimal || ''}
+                      onChange={handleChange}
+                      inputId="person-select-animals"
+                      classNamePrefix="person-select-animals"
+                    />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
                   <FormGroup>
                     <Label>Hébergement</Label>
-                    <SelectAsInput options={yesNoOptions} name="address" value={values.address || ''} onChange={handleChange} />
+                    <SelectAsInput
+                      options={yesNoOptions}
+                      name="address"
+                      value={values.address || ''}
+                      onChange={handleChange}
+                      inputId="person-select-address"
+                      classNamePrefix="person-select-address"
+                    />
                   </FormGroup>
                 </Col>
 
@@ -284,13 +362,22 @@ const Summary = ({ person }) => {
                       name="nationalitySituation"
                       value={values.nationalitySituation || ''}
                       onChange={handleChange}
+                      inputId="person-select-nationalitySituation"
+                      classNamePrefix="person-select-nationalitySituation"
                     />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
                   <FormGroup>
                     <Label>Emploi</Label>
-                    <SelectAsInput options={employmentOptions} name="employment" value={values.employment || ''} onChange={handleChange} />
+                    <SelectAsInput
+                      options={employmentOptions}
+                      name="employment"
+                      value={values.employment || ''}
+                      onChange={handleChange}
+                      inputId="person-select-employment"
+                      classNamePrefix="person-select-employment"
+                    />
                   </FormGroup>
                 </Col>
 
@@ -304,7 +391,7 @@ const Summary = ({ person }) => {
                 {customFieldsPersonsSocial
                   .filter((f) => f.enabled)
                   .map((field) => (
-                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                   ))}
               </Row>
 
@@ -318,6 +405,8 @@ const Summary = ({ person }) => {
                     name="healthInsurance"
                     value={values.healthInsurance || ''}
                     onChange={handleChange}
+                    inputId="person-select-healthInsurance"
+                    classNamePrefix="person-select-healthInsurance"
                   />
                 </Col>
                 <Col md={4}>
@@ -328,8 +417,9 @@ const Summary = ({ person }) => {
                 </Col>
                 {customFieldsPersonsMedical
                   .filter((f) => f.enabled)
+                  .filter((f) => !f.onlyHealthcareProfessional || user.healthcareProfessional)
                   .map((field) => (
-                    <CustomFieldInput values={values} handleChange={handleChange} field={field} key={field.name} />
+                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                   ))}
               </Row>
 
@@ -337,7 +427,7 @@ const Summary = ({ person }) => {
 
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
                 <OutOfActiveList person={person} />
-                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
+                <DeletePerson person={person} />
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
               </div>
             </React.Fragment>
@@ -349,7 +439,7 @@ const Summary = ({ person }) => {
 };
 
 const Actions = ({ person, onUpdateResults }) => {
-  const { actions } = useActions();
+  const actions = useRecoilValue(actionsState);
   const [data, setData] = useState([]);
   const history = useHistory();
 
@@ -360,6 +450,7 @@ const Actions = ({ person, onUpdateResults }) => {
 
   useEffect(() => {
     onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.length]);
 
   return (
@@ -373,8 +464,7 @@ const Actions = ({ person, onUpdateResults }) => {
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         columns={[
-          { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
-          { title: 'À faire le', dataKey: 'dueAt', render: (action) => formatDateWithFullMonth(action.dueAt) },
+          { title: 'À faire le', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
           {
             title: 'Heure',
             dataKey: '_id',
@@ -383,6 +473,7 @@ const Actions = ({ person, onUpdateResults }) => {
               return formatTime(action.dueAt);
             },
           },
+          { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
           { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           {
             title: 'Équipe',
@@ -395,7 +486,70 @@ const Actions = ({ person, onUpdateResults }) => {
   );
 };
 
-const StyledContainer = styled(Container)`
+const Passages = ({ personId, onUpdateResults }) => {
+  const passages = useRecoilValue(passagesState);
+  const personPassages = useMemo(() => passages.filter((passage) => passage.person === personId), [personId, passages]);
+  const [passageToEdit, setPassageToEdit] = useState(null);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
+  useEffect(() => {
+    onUpdateResults(personPassages.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [personPassages.length]);
+
+  return (
+    <React.Fragment>
+      <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
+        <Title>Passages</Title>
+        <ButtonCustom
+          title="Ajouter un passage"
+          style={{ marginLeft: 'auto', marginBottom: '10px' }}
+          onClick={() =>
+            setPassageToEdit({
+              user: user._id,
+              team: currentTeam._id,
+              person: personId,
+            })
+          }
+        />
+      </div>
+      <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+      <Table
+        data={personPassages}
+        rowKey={'_id'}
+        onRowClick={(passage) => setPassageToEdit(passage)}
+        columns={[
+          {
+            title: 'Date',
+            dataKey: 'date',
+            render: (passage) => {
+              return <DateBloc date={passage.date} />;
+            },
+          },
+          {
+            title: 'Heure',
+            dataKey: 'time',
+            render: (passage) => formatTime(passage.date),
+          },
+          {
+            title: 'Équipe',
+            dataKey: 'team',
+            render: (passage) => <TagTeam key={passage.team} teamId={passage.team} />,
+          },
+          {
+            title: 'Enregistré par',
+            dataKey: 'user',
+            render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+          },
+          { title: 'Commentaire', dataKey: 'comment' },
+        ]}
+      />
+    </React.Fragment>
+  );
+};
+
+const StyledContainer = styled.div`
   div.row {
     padding: 10px 0;
   }
@@ -449,6 +603,8 @@ const AddressDetails = ({ values, onChange }) => {
             value={computeValue(values.addressDetail)}
             options={addressDetails}
             onChange={onChange}
+            inputId="person-select-addressDetail"
+            classNamePrefix="person-select-addressDetail"
           />
         </FormGroup>{' '}
       </Col>
@@ -476,6 +632,8 @@ const Reasons = ({ value, onChange }) => (
       value={value}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
+      inputId="person-select-reasons"
+      classNamePrefix="person-select-reasons"
     />
   </FormGroup>
 );
@@ -492,6 +650,8 @@ const Ressources = ({ value, onChange }) => (
       value={value}
       getOptionValue={(i) => i}
       getOptionLabel={(i) => i}
+      inputId="person-select-resources"
+      classNamePrefix="person-select-resources"
     />
   </FormGroup>
 );

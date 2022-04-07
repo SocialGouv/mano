@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import Select from 'react-select';
 import CreatableSelect from 'react-select/creatable';
@@ -6,6 +5,7 @@ import { theme } from '../config';
 
 const SelectCustom = ({ creatable, ...props }) => {
   const Component = creatable ? CreatableSelect : Select;
+
   return (
     <Component
       styles={filterStyles}

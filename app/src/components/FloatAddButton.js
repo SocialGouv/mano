@@ -4,9 +4,9 @@ import styled from 'styled-components';
 import { Plus } from '../icons';
 import colors from '../utils/colors';
 
-const FloatAddButton = ({ onPress, color = colors.app.secondary }) => {
+const FloatAddButton = ({ onPress, color = colors.app.secondary, testID }) => {
   return (
-    <TouchableWithoutFeedback onPress={onPress}>
+    <TouchableWithoutFeedback onPress={onPress} testID={testID}>
       <Button color={color}>
         <Plus name="add" size={20} color="white" />
       </Button>

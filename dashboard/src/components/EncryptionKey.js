@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -21,7 +21,8 @@ import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../rec
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
 import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
-import { useRefresh } from '../recoil/refresh';
+import { loadingState } from './Loader';
+import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -36,13 +37,13 @@ const EncryptionKey = ({ isMain }) => {
   const [encryptionKey, setEncryptionKey] = useState('');
   const [encryptingStatus, setEncryptingStatus] = useState('');
   const [encryptingProgress, setEncryptingProgress] = useState(0);
-  const [cancellingEncryption, setCancellingEncryption] = useState(false);
 
   const user = useRecoilValue(userState);
 
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
+  const passages = useRecoilValue(passagesState);
   const territories = useRecoilValue(territoriesState);
   const observations = useRecoilValue(territoryObservationsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
@@ -51,13 +52,14 @@ const EncryptionKey = ({ isMain }) => {
   const places = useRecoilValue(placesState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const reports = useRecoilValue(reportsState);
-  const { loading } = useRefresh();
+  const loading = useRecoilValue(loadingState);
   const API = useApi();
 
   const totalToEncrypt =
     persons.length +
     actions.length +
     comments.length +
+    passages.length +
     territories.length +
     observations.length +
     relsPersonPlace.length +
@@ -75,11 +77,6 @@ const EncryptionKey = ({ isMain }) => {
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
-      capture('debug: setting encryption key', {
-        extra: { orgEncryptionKey: values.encryptionKey.trim(), hashedOrgEncryptionKey, organisation },
-        user,
-      });
-
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
       const encryptedPersons = await Promise.all(
@@ -88,6 +85,7 @@ const EncryptionKey = ({ isMain }) => {
 
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedPassages = await Promise.all(passages.map(preparePassageForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedTerritories = await Promise.all(territories.map(prepareTerritoryForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedTerritoryObservations = await Promise.all(
         observations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem(hashedOrgEncryptionKey))
@@ -112,6 +110,7 @@ const EncryptionKey = ({ isMain }) => {
           persons: encryptedPersons,
           actions: encryptedActions,
           comments: encryptedComments,
+          passages: encryptedPassages,
           territories: encryptedTerritories,
           observations: encryptedTerritoryObservations,
           places: encryptedPlaces,
@@ -186,15 +185,6 @@ const EncryptionKey = ({ isMain }) => {
     </ModalBody>
   );
 
-  const cancelEncryption = async () => {
-    setCancellingEncryption(true);
-    const res = await API.post({ path: '/encrypt/cancel' });
-    if (res.ok) {
-      toastr.success('Encryption retirée !', 'Veuillez vous reconnecter');
-      API.logout();
-    }
-  };
-
   const renderForm = () => (
     <ModalBody>
       <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
@@ -254,11 +244,6 @@ const EncryptionKey = ({ isMain }) => {
 
   return (
     <>
-      {!!organisation.encryptionEnabled && (
-        <LinkButton onClick={cancelEncryption} disabled={!!cancellingEncryption} color="link" style={{ marginRight: 10 }}>
-          Retirer le chiffrement
-        </LinkButton>
-      )}
       <ButtonCustom
         title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
         type="button"

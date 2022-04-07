@@ -1,24 +1,30 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect } from 'react';
 import { Row, Col } from 'reactstrap';
 import { theme } from '../config';
 import { Field, Formik } from 'formik';
 import styled from 'styled-components';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Table from './table';
 import UserName from './UserName';
 import { download } from '../utils';
-import { usePersons } from '../recoil/persons';
+import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState, preparePersonForEncryption } from '../recoil/persons';
 import { userState } from '../recoil/auth';
 import ButtonCustom from './ButtonCustom';
 import { formatDateWithFullMonth } from '../services/date';
+import { capture } from '../services/sentry';
+import { toastr } from 'react-redux-toastr';
+import useApi from '../services/api';
 
 const Documents = ({ person, onUpdateResults }) => {
-  const { updatePerson, uploadDocument, downloadDocument, deleteDocument } = usePersons();
   const user = useRecoilValue(userState);
+  const setPersons = useSetRecoilState(personsState);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const API = useApi();
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(person.documents?.length || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [person.documents?.length]);
 
   return (
@@ -39,21 +45,45 @@ const Documents = ({ person, onUpdateResults }) => {
                 name="file"
                 hidden
                 onChange={async (e) => {
-                  const { data: file, encryptedEntityKey } = await uploadDocument(e.target.files[0], person);
-                  await updatePerson({
-                    ...person,
-                    documents: [
-                      ...(person.documents || []),
-                      {
-                        _id: file.filename,
-                        name: file.originalname,
-                        encryptedEntityKey,
-                        createdAt: new Date(),
-                        createdBy: user._id,
-                        file,
-                      },
-                    ],
+                  const docResponse = await API.upload({
+                    path: `/person/${person._id}/document`,
+                    file: e.target.files[0],
                   });
+                  if (!docResponse.ok || !docResponse.data) {
+                    capture('Error uploading document', { extra: { docResponse } });
+                    toastr.error('Erreur', "Une erreur est survenue lors de l'envoi du document");
+                    return;
+                  }
+                  const { data: file, encryptedEntityKey } = docResponse;
+                  const personResponse = await API.put({
+                    path: `/person/${person._id}`,
+                    body: preparePersonForEncryption(
+                      customFieldsPersonsMedical,
+                      customFieldsPersonsSocial
+                    )({
+                      ...person,
+                      documents: [
+                        ...(person.documents || []),
+                        {
+                          _id: file.filename,
+                          name: file.originalname,
+                          encryptedEntityKey,
+                          createdAt: new Date(),
+                          createdBy: user._id,
+                          file,
+                        },
+                      ],
+                    }),
+                  });
+                  if (personResponse.ok) {
+                    const newPerson = personResponse.decryptedData;
+                    setPersons((persons) =>
+                      persons.map((p) => {
+                        if (p._id === person._id) return newPerson;
+                        return p;
+                      })
+                    );
+                  }
                 }}
               />
             </FileWrapper>
@@ -79,8 +109,11 @@ const Documents = ({ person, onUpdateResults }) => {
                     title="Télécharger"
                     style={{ margin: '0 auto 0.5rem' }}
                     onClick={async () => {
-                      const doc = await downloadDocument(person, document);
-                      download(doc, document.name);
+                      const file = await API.download({
+                        path: `/person/${person._id}/document/${document.file.filename}`,
+                        encryptedEntityKey: document.encryptedEntityKey,
+                      });
+                      download(file, document.name);
                     }}
                   />
                   <ButtonCustom
@@ -89,11 +122,26 @@ const Documents = ({ person, onUpdateResults }) => {
                     style={{ margin: 'auto' }}
                     onClick={async () => {
                       if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-                      await deleteDocument(person, document);
-                      await updatePerson({
-                        ...person,
-                        documents: person.documents.filter((d) => d._id !== document._id),
+                      await API.delete({ path: `/person/${person._id}/document/${document.file.filename}` });
+                      const personResponse = await API.put({
+                        path: `/person/${person._id}`,
+                        body: preparePersonForEncryption(
+                          customFieldsPersonsMedical,
+                          customFieldsPersonsSocial
+                        )({
+                          ...person,
+                          documents: person.documents.filter((d) => d._id !== document._id),
+                        }),
                       });
+                      if (personResponse.ok) {
+                        const newPerson = personResponse.decryptedData;
+                        setPersons((persons) =>
+                          persons.map((p) => {
+                            if (p._id === person._id) return newPerson;
+                            return p;
+                          })
+                        );
+                      }
                       onUpdateResults(person.documents.length);
                     }}
                   />

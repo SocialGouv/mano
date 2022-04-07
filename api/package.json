@@ -1,7 +1,7 @@
 {
   "name": "api_mano",
-  "mobileAppVersion": "2.10.0",
-  "version": "1.53.2",
+  "version": "1.85.8",
+  "mobileAppVersion": "2.17.0",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,8 +16,8 @@
     "printWidth": 150
   },
   "dependencies": {
-    "@sentry/node": "^5.30.0",
-    "@sentry/tracing": "^6.7.2",
+    "@sentry/node": "^6.17.6",
+    "@sentry/tracing": "^6.17.6",
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
@@ -32,7 +32,8 @@
     "password-validator": "^5.1.0",
     "pg": "^8.5.1",
     "pg-hstore": "^2.3.3",
-    "sequelize": "^6.3.5"
+    "sequelize": "^6.3.5",
+    "zod": "^3.13.4"
   },
   "devDependencies": {
     "@types/jsonwebtoken": "^8.5.6",

@@ -1,15 +1,25 @@
 const express = require("express");
 const router = express.Router();
 const passport = require("passport");
-const { Op, where, fn, col } = require("sequelize");
-
+const { Op } = require("sequelize");
+const { z } = require("zod");
+const { looseUuidRegex } = require("../utils");
 const { catchErrors } = require("../errors");
+const validateUser = require("../middleware/validateUser");
 const Structure = require("../models/structure");
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().min(1).parse(req.body.name);
+    } catch (e) {
+      const error = new Error(`Invalid request in structure creation: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
     const name = req.body.name;
     const organisation = req.user.organisation;
 
@@ -21,25 +31,31 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const search = req.query.search;
-    let condition = "";
-    if (search && search.length) {
-      // Todo: fix or explain this.
-      // Search should not be an SQL injection.
-      condition = search
-        .trim()
-        .replace("/&/g", "")
-        .split(" ")
-        .map((k) => k.normalize("NFD").toLowerCase().trim())
-        .filter((s) => !!s)
-        .map((s) => s + ":*")
-        .join(" | ");
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.optional(z.string()).parse(req.body.search);
+    } catch (e) {
+      const error = new Error(`Invalid request in structure get: ${e}`);
+      error.status = 400;
+      return next(error);
     }
-
+    const search = req.query.search;
     let query = { order: [["createdAt", "ASC"]] };
-    if (condition) query.where = { name: where(fn("to_tsvector", fn("LOWER", col("name"))), "@@", fn("to_tsquery", condition)) };
-
+    if (search && search.length) {
+      const terms = search
+        .split(" ")
+        .map((e) => e.trim())
+        .filter((e) => e)
+        .map((e) => `%${e}%`);
+      query.where = {
+        name: {
+          [Op.iLike]: {
+            [Op.any]: terms,
+          },
+        },
+      };
+    }
     const data = await Structure.findAll(query);
     return res.status(200).send({ ok: true, data });
   })
@@ -48,7 +64,15 @@ router.get(
 router.get(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      const error = new Error(`Invalid request in structure get by id: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
     const _id = req.params._id;
     const data = await Structure.findOne({ where: { _id } });
     if (!data) return res.status(404).send({ ok: false, error: "Not Found" });
@@ -59,10 +83,31 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.string().min(1).parse(req.body.name);
+      z.optional(z.string()).parse(req.body.description);
+      z.optional(z.string()).parse(req.body.city);
+      z.optional(z.string()).parse(req.body.postcode);
+      z.optional(z.string()).parse(req.body.adresse);
+      z.optional(z.string()).parse(req.body.phone);
+    } catch (e) {
+      const error = new Error(`Invalid request in structure put: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
     const _id = req.params._id;
-    const body = req.body;
-    const [count, array] = await Structure.update(body, { where: { _id }, returning: true });
+    const updatedStructure = {
+      name: req.body.name,
+    };
+    if (req.body.hasOwnProperty("description")) updatedStructure.description = req.body.description;
+    if (req.body.hasOwnProperty("city")) updatedStructure.city = req.body.city;
+    if (req.body.hasOwnProperty("postcode")) updatedStructure.postcode = req.body.postcode;
+    if (req.body.hasOwnProperty("adresse")) updatedStructure.adresse = req.body.adresse;
+    if (req.body.hasOwnProperty("phone")) updatedStructure.phone = req.body.phone;
+    const [count, array] = await Structure.update(updatedStructure, { where: { _id }, returning: true });
     if (!count) return res.status(404).send({ ok: false, error: "Not Found" });
     const data = array[0];
     return res.status(200).send({ ok: true, data });
@@ -72,7 +117,15 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      const error = new Error(`Invalid request in structure delete: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
     const _id = req.params._id;
     await Structure.destroy({ where: { _id } });
     res.status(200).send({ ok: true });

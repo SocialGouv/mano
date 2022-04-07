@@ -1,7 +1,9 @@
 import "expect-puppeteer";
+import { setDefaultOptions } from "expect-puppeteer";
 import { connectWith, useEncryptedOrga } from "../utils";
 
-jest.setTimeout(20000)
+jest.setTimeout(60000);
+setDefaultOptions({ timeout: 60000 });
 
 describe("Encryption", () => {
   beforeEach(async () => {
@@ -24,30 +26,31 @@ describe("Encryption", () => {
 
   it("should allow an admin to change the encryption key", async () => {
     await useEncryptedOrga();
-    await connectWith("adminEncrypted@example.org", "secret", "plouf")
-    await new Promise((resolve) => setTimeout(resolve, 3000));
-    await expect(page).toMatch("Encrypted orga");
+    await connectWith("adminEncrypted@example.org", "secret", "plouf");
+    await expect(page).toMatch("Encrypted orga", { timeout: 4000 });
     /* Create a person */
-    await expect(page).toClick("a", { text: 'Personnes suivies' });
-    await expect(page).toMatch("Personnes suivies par l'organisation");
-    await expect(page).toClick("button", { text: 'Créer une nouvelle personne' });
+    await new Promise((resolve) => setTimeout(resolve, 3000));
+    await expect(page).toClick("a", { text: "Personnes suivies" });
+    await expect(page).toMatch("Personnes suivies par l'organisation", { timeout: 4000 });
+    await expect(page).toClick("button", { text: "Créer une nouvelle personne" });
     await expect(page).toFill('input[name="name"]', "Ma première personne");
-    await expect(page).toClick("button", { text: 'Sauvegarder' });
+    await expect(page).toClick("button", { text: "Sauvegarder" });
     await expect(page).toMatch("Dossier de Ma première personne");
     /* Change the key */
-    await expect(page).toClick("a", { text: 'Organisation' });
+    await expect(page).toClick("a", { text: "Organisation" });
+    await expect(page).toClick("button", { text: "Chiffrement" });
     await expect(page).toMatch("Changer la clé de chiffrement");
-    await expect(page).toClick("button", { text: 'Changer la clé de chiffrement' });
+    await expect(page).toClick("button", { text: "Changer la clé de chiffrement" });
     await expect(page).toMatch("Confirmez la clé de chiffrement");
     await expect(page).toFill('input[name="encryptionKey"]', "plaf");
     await expect(page).toFill('input[name="encryptionKeyConfirm"]', "plaf");
     await expect(page).toClick("button[type=submit]", { text: "Changer la clé de chiffrement" });
     await page.reload();
-    await connectWith("adminEncrypted@example.org", "secret", "plaf")
+    await connectWith("adminEncrypted@example.org", "secret", "plaf");
     await new Promise((resolve) => setTimeout(resolve, 3000));
     await expect(page).toMatch("Encrypted orga");
     /* Check the person */
-    await expect(page).toClick("a", { text: 'Personnes suivies' });
+    await expect(page).toClick("a", { text: "Personnes suivies" });
     await expect(page).toMatch("Ma première personne");
   });
 });

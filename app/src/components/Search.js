@@ -17,7 +17,11 @@ const Search = ({ path, onSearchStart, onSearchClear, onChange, withOrg, onSearc
   const onSearch = async (search) => {
     if (onChange) {
       setSearch(search);
-      return onChange(search);
+      clearTimeout(searchTimeout.current);
+      searchTimeout.current = setTimeout(() => {
+        onChange(search);
+      }, 300);
+      return;
     }
     onSearchStart(search);
     setSearch(search);

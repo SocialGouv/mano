@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useState, useEffect } from 'react';
 import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
@@ -7,19 +6,20 @@ import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { detect } from 'detect-browser';
 import { version } from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
-import { theme } from '../../config';
+import { DEFAULT_ORGANISATION_KEY, theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import useApi, { setOrgEncryptionKey, hashedOrgEncryptionKey } from '../../services/api';
-import { encryptVerificationKey } from '../../services/encryption';
-import { AppSentry, capture } from '../../services/sentry';
-import { refreshTriggerState } from '../../components/Loader';
+import useApi, { setOrgEncryptionKey } from '../../services/api';
+import { AppSentry } from '../../services/sentry';
+import { refreshTriggerState, loadingState } from '../../components/Loader';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
+  const setGlobalLoading = useSetRecoilState(loadingState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
@@ -34,28 +34,21 @@ const SignIn = () => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const API = useApi();
 
-  // temporary migration : until all organisations have an `encryptedVerificationKey`
-  const setEncryptionVerificationKey = async (organisation, user) => {
-    if (!organisation.encryptionEnabled) return;
-    if (!organisation.encryptedVerificationKey) {
-      capture(`setting encryptedVerificationKey : ${organisation.name}`);
-      const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
-      const orgRes = await API.put({ path: `/organisation/${organisation._id}`, body: { encryptedVerificationKey } });
-      if (orgRes.ok) setOrganisation(orgRes.data);
-    }
-  };
-
-  const onSigninValidated = async (organisation, user) => {
-    setRefreshTrigger({
-      status: true,
-      method: 'refresh',
-      options: [{ initialLoad: true, showFullScreen: true }, () => setEncryptionVerificationKey(organisation, user)],
-    });
+  useEffect(() => {
+    if (refreshTrigger.status !== true) return;
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
-      history.push('/');
+      history.push('/action');
     }
+  }, [history, organisation, refreshTrigger]);
+
+  const onSigninValidated = async () => {
+    setRefreshTrigger({
+      status: true,
+      options: { initialLoad: true, showFullScreen: true },
+    });
+    setGlobalLoading('Initialisation...');
   };
 
   const onLogout = async () => {
@@ -84,6 +77,7 @@ const SignIn = () => {
 
       return setLoading(false);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   if (loading) return <></>;
@@ -99,7 +93,7 @@ const SignIn = () => {
               title={team.name}
               onClick={() => {
                 setCurrentTeam(team);
-                onSigninValidated(organisation, user);
+                onSigninValidated();
               }}
             />
           ))}
@@ -112,13 +106,21 @@ const SignIn = () => {
     <AuthWrapper>
       <Title>{userName ? `Bienvenue ${userName?.split(' ')?.[0]} !` : 'Bienvenue !'}</Title>
       <Formik
-        initialValues={{ email: '', password: '', orgEncryptionKey: '' }}
+        initialValues={{ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' }}
         onSubmit={async (values, actions) => {
           try {
             const body = {
               email: values.email,
               password: values.password,
             };
+            const browser = detect();
+            if (browser) {
+              body.browsertype = browser.type;
+              body.browsername = browser.name;
+              body.browserversion = browser.version;
+              body.browseros = browser.os;
+            }
+
             const { user, token, ok } = authViaCookie
               ? await API.get({
                   path: '/user/signin-token',
@@ -141,21 +143,21 @@ const SignIn = () => {
               const encryptionIsValid = await setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
               if (!encryptionIsValid) return;
             }
+            setUser(user);
+            AppSentry.setUser(user);
+            // now login !
+            // superadmin
+            if (['superadmin'].includes(user.role)) {
+              actions.setSubmitting(false);
+              history.push('/organisation');
+              return;
+            }
             const teamResponse = await API.get({ path: '/team' });
             const teams = teamResponse.data;
             const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
             const users = usersResponse.data;
             setTeams(teams);
             setUsers(users);
-            setUser(user);
-            AppSentry.setUser(user);
-            actions.setSubmitting(false);
-            // now login !
-            // superadmin
-            if (['superadmin'].includes(user.role)) {
-              history.push('/organisation');
-              return;
-            }
             // onboarding
             if (!organisation.encryptionEnabled && ['admin'].includes(user.role)) {
               history.push(`/organisation/${organisation._id}`);
@@ -168,7 +170,7 @@ const SignIn = () => {
             // basic login
             if (user.teams.length === 1) {
               setCurrentTeam(user.teams[0]);
-              onSigninValidated(organisation, user);
+              onSigninValidated();
               return;
             }
             setShowSelectTeam(true);

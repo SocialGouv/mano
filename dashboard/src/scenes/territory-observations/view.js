@@ -1,12 +1,12 @@
 import React from 'react';
 import styled from 'styled-components';
-import dayjs from 'dayjs';
 import { Button as CloseButton } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import UserName from '../../components/UserName';
-import { useTerritoryObservations } from '../../recoil/territoryObservations';
+import { customFieldsObsSelector } from '../../recoil/territoryObservations';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import { teamsState } from '../../recoil/auth';
+import { formatDateTimeWithNameOfDay } from '../../services/date';
 
 const fieldIsEmpty = (value) => {
   if (value === null) return true;
@@ -18,7 +18,7 @@ const fieldIsEmpty = (value) => {
 
 const View = ({ obs, onDelete, onClick, noBorder }) => {
   const teams = useRecoilValue(teamsState);
-  const { customFieldsObs } = useTerritoryObservations();
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   return (
     <StyledObservation noBorder={noBorder}>
@@ -27,9 +27,10 @@ const View = ({ obs, onDelete, onClick, noBorder }) => {
         <UserName id={obs.user} wrapper={(name) => <span className="author">{name}</span>} />
         <i style={{ marginLeft: 10 }}>(équipe {teams.find((t) => obs.team === t._id)?.name})</i>
       </div>
-      <div className="time">{dayjs(obs.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
+      <div className="time">{formatDateTimeWithNameOfDay(obs.observedAt || obs.createdAt)}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
         {customFieldsObs
+          .filter((f) => f)
           .filter((f) => f.enabled)
           .map((field) => {
             const { name, label } = field;

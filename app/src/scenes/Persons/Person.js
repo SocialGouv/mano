@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Platform } from 'react-native';
+import { Alert, Platform, Modal } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -22,6 +22,12 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
+import { MMKV } from '../../services/dataManagement';
+import ScrollContainer from '../../components/ScrollContainer';
+import InputLabelled from '../../components/InputLabelled';
+import ButtonsContainer from '../../components/ButtonsContainer';
+import ButtonDelete from '../../components/ButtonDelete';
+import { SubTitle } from '../../components/Title';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -42,6 +48,9 @@ const Person = ({ route, navigation }) => {
   const organisation = useRecoilValue(organisationState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
 
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [nameConfirm, setNameConfirm] = useState('');
+
   const personDB = useMemo(() => persons.find((p) => p._id === route.params?._id), [persons, route.params?._id]);
 
   const castToPerson = useCallback(
@@ -60,6 +69,7 @@ const Person = ({ route, navigation }) => {
         birthdate: person.birthdate || null,
         alertness: person.alertness || false,
         wanderingAt: person.wanderingAt || null,
+        followedSince: person.followedSince || person.createdAt,
         createdAt: person.createdAt,
         gender: person.gender || genders[0],
         phone: person.phone?.trim() || '',
@@ -81,6 +91,7 @@ const Person = ({ route, navigation }) => {
         entityKey: person.entityKey || '',
         outOfActiveList: person.outOfActiveList || false,
         outOfActiveListReason: person.outOfActiveListReason || '',
+        documents: person.documents || [],
       };
     },
     [customFieldsPersonsMedical, customFieldsPersonsSocial]
@@ -90,6 +101,7 @@ const Person = ({ route, navigation }) => {
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
   const [updating, setUpdating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const backRequestHandledRef = useRef(null);
   useEffect(() => {
@@ -155,60 +167,93 @@ const Person = ({ route, navigation }) => {
     return true;
   };
 
-  const onDeleteRequest = () => {
-    Alert.alert('Voulez-vous vraiment supprimer cette personne ?', 'Cette opération est irréversible.', [
-      {
-        text: 'Supprimer',
-        style: 'destructive',
-        onPress: onDelete,
-      },
-      {
-        text: 'Annuler',
-        style: 'cancel',
-      },
-    ]);
+  const onDeleteRequest = () => setShowConfirmDelete(true);
+  const onDeleteConfirm = () => {
+    if (!nameConfirm) return Alert.alert('Le nom est obligatoire');
+    if (nameConfirm.trim().toLocaleLowerCase() !== personDB?.name.trim().toLocaleLowerCase()) {
+      return Alert.alert('Le nom de la personne est incorrect');
+    }
+    if (nameConfirm.trim() !== personDB?.name.trim()) {
+      return Alert.alert('Veuillez respecter les minuscules/majuscules');
+    }
+    onDelete();
   };
 
   const onDelete = async () => {
-    setUpdating(true);
+    setDeleting(true);
     const res = await API.delete({ path: `/person/${personDB._id}` });
     if (res.error) {
-      Alert.alert(res.error);
-      return;
+      if (res.error === 'Not Found') {
+        setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
+        await MMKV.setMapAsync(
+          'person',
+          persons.filter((p) => p._id !== personDB._id)
+        );
+      } else {
+        Alert.alert(res.error);
+        return;
+      }
     }
     for (const action of actions.filter((a) => a.person === personDB._id)) {
       const actionRes = await API.delete({ path: `/action/${action._id}` });
       if (actionRes.ok) {
         setActions((actions) => actions.filter((a) => a._id !== action._id));
+        await MMKV.setMapAsync(
+          'action',
+          actions.filter((a) => a._id !== action._id)
+        );
         for (let comment of comments.filter((c) => c.action === action._id)) {
           const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-          if (commentRes.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
-          return commentRes;
+          if (commentRes.ok) {
+            setComments((comments) => comments.filter((p) => p._id !== comment._id));
+            await MMKV.setMapAsync(
+              'comment',
+              comments.filter((p) => p._id !== comment._id)
+            );
+          }
         }
       }
     }
     for (let comment of comments.filter((c) => c.person === personDB._id)) {
       const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-      if (commentRes.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
-      return commentRes;
+      if (commentRes.ok) {
+        setComments((comments) => comments.filter((p) => p._id !== comment._id));
+        await MMKV.setMapAsync(
+          'comment',
+          comments.filter((p) => p._id !== comment._id)
+        );
+      }
     }
     for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === personDB._id)) {
       const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-      if (res.ok) setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+      if (res.ok) {
+        setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+        await MMKV.setMapAsync(
+          'relPersonPlace',
+          relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id)
+        );
+      }
     }
     setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
+    await MMKV.setMapAsync(
+      'person',
+      persons.filter((p) => p._id !== personDB._id)
+    );
+    setShowConfirmDelete(false);
+    setDeleting(false);
     Alert.alert('Personne supprimée !');
     onBack();
   };
 
   const isUpdateDisabled = useMemo(() => {
+    if (deleting) return true;
     const newPerson = {
       ...personDB,
       ...castToPerson(person),
     };
     if (JSON.stringify(castToPerson(personDB)) !== JSON.stringify(castToPerson(newPerson))) return false;
     return true;
-  }, [personDB, castToPerson, person]);
+  }, [personDB, castToPerson, person, deleting]);
 
   const onBack = () => {
     backRequestHandledRef.current = true;
@@ -257,64 +302,93 @@ const Person = ({ route, navigation }) => {
   };
 
   return (
-    <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}>
-      <ScreenTitle
-        title={person.name}
-        onBack={onGoBackRequested}
-        onEdit={!editable ? onEdit : null}
-        onSave={!editable || isUpdateDisabled ? null : onUpdatePerson}
-        saving={updating}
-        backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-      />
-      <TabNavigator.Navigator
-        tabBar={(props) => (
-          <Tabs
-            numberOfTabs={2}
-            {...props}
-            backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
-          />
-        )}
-        lazy
-        removeClippedSubviews={Platform.OS === 'android'}
-        swipeEnabled>
-        <TabNavigator.Screen name="Summary" options={{ tabBarLabel: 'Résumé' }}>
-          {() => (
-            <PersonSummary
-              navigation={navigation}
-              route={route}
-              person={person}
-              personDB={personDB}
-              backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-              onChange={onChange}
-              onUpdatePerson={onUpdatePerson}
-              writeComment={setWritingComment}
-              onEdit={onEdit}
-              isUpdateDisabled={isUpdateDisabled}
-              onDeleteRequest={onDeleteRequest}
-              updating={updating}
-              editable={editable}
+    <>
+      <SceneContainer backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey} testID="person">
+        <ScreenTitle
+          title={person.name}
+          onBack={onGoBackRequested}
+          onEdit={!editable ? onEdit : null}
+          onSave={!editable || isUpdateDisabled ? null : onUpdatePerson}
+          saving={updating}
+          backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+          testID="person"
+        />
+        <TabNavigator.Navigator
+          tabBar={(props) => (
+            <Tabs
+              numberOfTabs={2}
+              {...props}
+              backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
             />
           )}
-        </TabNavigator.Screen>
-        <TabNavigator.Screen name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
-          {() => (
-            <FoldersNavigator
-              navigation={navigation}
-              route={route}
-              person={person}
-              backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
-              onChange={onChange}
-              onUpdatePerson={onUpdatePerson}
-              onEdit={onEdit}
-              isUpdateDisabled={isUpdateDisabled}
-              onDeleteRequest={onDeleteRequest}
-              editable={editable}
-              updating={updating}
+          lazy
+          removeClippedSubviews={Platform.OS === 'android'}
+          swipeEnabled>
+          <TabNavigator.Screen name="Summary" options={{ tabBarLabel: 'Résumé' }}>
+            {() => (
+              <PersonSummary
+                navigation={navigation}
+                route={route}
+                person={person}
+                personDB={personDB}
+                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+                onChange={onChange}
+                onUpdatePerson={onUpdatePerson}
+                writeComment={setWritingComment}
+                onEdit={onEdit}
+                isUpdateDisabled={isUpdateDisabled}
+                onDeleteRequest={onDeleteRequest}
+                updating={updating}
+                deleting={deleting}
+                editable={editable}
+              />
+            )}
+          </TabNavigator.Screen>
+          <TabNavigator.Screen name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
+            {() => (
+              <FoldersNavigator
+                navigation={navigation}
+                route={route}
+                person={person}
+                personDB={personDB}
+                backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
+                onChange={onChange}
+                onUpdatePerson={onUpdatePerson}
+                onEdit={onEdit}
+                isUpdateDisabled={isUpdateDisabled}
+                onDeleteRequest={onDeleteRequest}
+                editable={editable}
+                updating={updating}
+                deleting={deleting}
+              />
+            )}
+          </TabNavigator.Screen>
+        </TabNavigator.Navigator>
+      </SceneContainer>
+      <Modal animationType="fade" visible={!!showConfirmDelete}>
+        <SceneContainer>
+          <ScreenTitle title={`Voulez-vous vraiment supprimer ${personDB?.name} ?`} onBack={() => setShowConfirmDelete(false)} />
+          <ScrollContainer>
+            <SubTitle>
+              Cette opération est irréversible et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;: {'\n'}actions,
+              commentaires, lieux visités, passages, documents...
+            </SubTitle>
+            <SubTitle>Veuillez taper le nom de la personne pour confirmer en respectant les majuscules, minuscules ou accents</SubTitle>
+            <InputLabelled
+              label="Nom"
+              value={nameConfirm}
+              onChangeText={setNameConfirm}
+              placeholder={personDB?.name}
+              editable
+              onSubmitEditing={onDeleteConfirm}
             />
-          )}
-        </TabNavigator.Screen>
-      </TabNavigator.Navigator>
-    </SceneContainer>
+            <ButtonsContainer>
+              <ButtonDelete onPress={onDeleteConfirm} deleting={deleting} />
+            </ButtonsContainer>
+          </ScrollContainer>
+        </SceneContainer>
+      </Modal>
+    </>
   );
 };
 

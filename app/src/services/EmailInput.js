@@ -10,7 +10,7 @@ const validateEmail = (email) => {
   return emailValidatorRE.test(String(email).toLowerCase());
 };
 
-const EmailInput = ({ innerRef, onChange, onFocus, onSubmitEditing }) => {
+const EmailInput = ({ innerRef, onChange, onFocus, onSubmitEditing, testID = 'email' }) => {
   const [email, setEmail] = useState('');
   const onInputChange = (email) => {
     email = email.trim();
@@ -44,6 +44,7 @@ const EmailInput = ({ innerRef, onChange, onFocus, onSubmitEditing }) => {
       textContentType="emailAddress"
       returnKeyType="next"
       onSubmitEditing={onSubmitEditing}
+      testID={testID}
     />
   );
 };

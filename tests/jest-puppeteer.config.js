@@ -8,6 +8,10 @@ if (!process.env.PGHOST || !process.env.PGDATABASE || !process.env.PGPORT) {
 module.exports = {
   launch: {
     headless: process.env.CI === "true",
+    defaultViewport: {
+      width: 1200,
+      height: 764,
+    },
   },
   server: [
     {
@@ -19,9 +23,7 @@ module.exports = {
     {
       command: `PORT=8091 PGHOST=${process.env.PGHOST || '""'} PGDATABASE=${
         process.env.PGDATABASE || '""'
-      } PGPORT=${process.env.PGPORT || '""'} PGUSER=${
-        process.env.PGUSER || '""'
-      } PGPASSWORD=${
+      } PGPORT=${process.env.PGPORT || '""'} PGUSER=${process.env.PGUSER || '""'} PGPASSWORD=${
         process.env.PGPASSWORD || '""'
       } yarn --cwd ../api start:test`,
       port: 8091,

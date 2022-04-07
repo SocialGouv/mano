@@ -27,21 +27,25 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
+import { MMKV } from '../../services/dataManagement';
 
-const castToAction = (action = {}) => ({
-  name: action.name?.trim() || '',
-  description: action.description?.trim()?.split('\\n').join('\u000A') || '',
-  person: action.person || null,
-  categories: action.categories || [],
-  user: action.user || null,
-  status: action.status || TODO,
-  dueAt: action.dueAt || null,
-  withTime: action.withTime || false,
-  completedAt: action.completedAt || null,
-  entityKey: action.entityKey || '',
-  team: action.team || null,
-  structure: action.structure || null,
-});
+const castToAction = (action) => {
+  if (!action) action = {};
+  return {
+    name: action.name?.trim() || '',
+    description: action.description?.trim()?.split('\\n').join('\u000A') || '',
+    person: action.person || null,
+    categories: action.categories || [],
+    user: action.user || null,
+    status: action.status || TODO,
+    dueAt: action.dueAt || null,
+    withTime: action.withTime || false,
+    completedAt: action.completedAt || null,
+    entityKey: action.entityKey || '',
+    team: action.team || null,
+    structure: action.structure || null,
+  };
+};
 
 const Action = ({ navigation, route }) => {
   const [actions, setActions] = useRecoilState(actionsState);
@@ -53,7 +57,7 @@ const Action = ({ navigation, route }) => {
 
   const actionDB = useMemo(() => {
     const existingAction = actions.find((a) => a._id === route.params?._id);
-    if (!existingAction) return null;
+    if (!existingAction) return {};
     return Object.assign({}, castToAction(existingAction), { _id: existingAction._id });
   }, [actions, route.params]);
 
@@ -61,6 +65,16 @@ const Action = ({ navigation, route }) => {
   const [updating, setUpdating] = useState(false);
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
+
+  useEffect(() => {
+    if (route?.params?.duplicate) {
+      Alert.alert(
+        "L'action est dupliquée, vous pouvez la modifier !",
+        "Les commentaires de l'action aussi sont dupliqués. L'action originale est annulée"
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const isUpdateDisabled = useMemo(() => {
     const newAction = { ...actionDB, ...castToAction(action) };
@@ -132,11 +146,7 @@ const Action = ({ navigation, route }) => {
     ]);
   };
 
-  const onSearchPerson = () =>
-    navigation.push('Persons', {
-      screen: 'PersonsSearch',
-      params: { fromRoute: 'Action' },
-    });
+  const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'Action' });
 
   const handleBeforeRemove = (e) => {
     if (backRequestHandledRef.current === true) return;
@@ -175,7 +185,6 @@ const Action = ({ navigation, route }) => {
         path: `/action/${oldAction._id}`,
         body: prepareActionForEncryption(action),
       });
-      console.log(response);
       if (response.ok) {
         setActions((actions) =>
           actions.map((a) => {
@@ -187,11 +196,12 @@ const Action = ({ navigation, route }) => {
       if (!response?.ok) return response;
       const newAction = response.decryptedData;
       if (!statusChanged) return response;
+
       const comment = {
         comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
         type: 'action',
-        item: actionDB._id,
-        action: actionDB._id,
+        item: actionDB?._id,
+        action: actionDB?._id,
         team: currentTeam._id,
         user: user._id,
         organisation: organisation._id,
@@ -208,6 +218,11 @@ const Action = ({ navigation, route }) => {
   const onUpdateActionRequest = async () => {
     setUpdating(true);
     const multipleActions = route?.params?.actions?.length > 1;
+    if (!action.name.trim()) {
+      Alert.alert("Vous devez rentrer un nom d'action");
+      setUpdating(false);
+      return false;
+    }
     if (!action.dueAt) {
       Alert.alert("Vous devez rentrer une date d'échéance");
       setUpdating(false);
@@ -232,7 +247,7 @@ const Action = ({ navigation, route }) => {
           {},
           castToAction(action),
           { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
-          { _id: actionDB._id, team: currentTeam._id }
+          { _id: actionDB?._id, team: currentTeam._id }
         )
       );
     }
@@ -257,18 +272,28 @@ const Action = ({ navigation, route }) => {
     }
   };
 
+  useEffect(() => {
+    if (!editable) {
+      if (action.status !== actionDB.status) onUpdateActionRequest();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editable, action.status]);
+
   const onDuplicate = async () => {
     setUpdating(true);
-    const { name, person, dueAt, withTime } = action;
+    const { name, person, dueAt, withTime, description, categories } = action;
     const response = await API.post({
       path: '/action',
       body: prepareActionForEncryption({
         name,
         person,
         team: currentTeam._id,
+        user: user._id,
         dueAt,
         withTime,
         status: TODO,
+        description,
+        categories,
       }),
     });
     if (!response.ok) {
@@ -276,12 +301,29 @@ const Action = ({ navigation, route }) => {
       return;
     }
     setActions((actions) => [response.decryptedData, ...actions]);
-    Sentry.setContext('action', { _id: response.data._id });
+    for (let c of comments.filter((c) => c.action === actionDB._id).filter((c) => !c.comment.includes('a changé le status'))) {
+      const body = {
+        comment: c.comment,
+        action: response.decryptedData._id,
+        item: response.decryptedData._id,
+        type: 'action',
+        user: c.user,
+        team: c.team,
+        organisation: c.organisation,
+      };
+      const res = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+      if (res.ok) {
+        setComments((comments) => [res.decryptedData, ...comments]);
+        await MMKV.setMapAsync('comment', [res.decryptedData, ...comments]);
+      }
+    }
+    Sentry.setContext('action', { _id: response.decryptedData._id });
     backRequestHandledRef.current = true;
     navigation.replace('Action', {
-      ...response.data,
+      ...response.decryptedData,
       fromRoute: 'ActionsList',
       editable: true,
+      duplicate: true,
     });
   };
 
@@ -305,10 +347,19 @@ const Action = ({ navigation, route }) => {
       setActions((actions) => actions.filter((a) => a._id !== id));
       for (let comment of comments.filter((c) => c.action === id)) {
         const res = await API.delete({ path: `/comment/${comment._id}` });
-        if (res.ok) setComments((comments) => comments.filter((p) => p._id !== comment._id));
-        return res;
+        if (res.ok) {
+          setComments((comments) => comments.filter((p) => p._id !== comment._id));
+          await MMKV.setMapAsync(
+            'comment',
+            comments.filter((p) => p._id !== comment._id)
+          );
+        }
       }
     }
+    await MMKV.setMapAsync(
+      'action',
+      actions.filter((a) => a._id !== id)
+    );
     return res;
   };
 
@@ -362,11 +413,12 @@ const Action = ({ navigation, route }) => {
   return (
     <SceneContainer>
       <ScreenTitle
-        title={persons?.length && persons.length === 1 ? `${name} - ${persons[0].name}` : name}
+        title={persons?.length && persons.length === 1 ? `${name} - ${persons[0]?.name}` : name}
         onBack={onGoBackRequested}
-        onEdit={!editable ? setEditable(true) : null}
+        onEdit={!editable ? () => setEditable(true) : null}
         onSave={!editable || isUpdateDisabled ? null : onUpdateActionRequest}
         saving={updating}
+        testID="action"
       />
       <ScrollContainer ref={scrollViewRef}>
         {!!action.user && <UserName metaCaption="Action ajoutée par" id={action.user?._id || action.user} />}
@@ -376,6 +428,7 @@ const Action = ({ navigation, route }) => {
           value={name}
           placeholder="Nom de l’action"
           editable={editable}
+          testID="action-name"
         />
         {persons.length < 2 ? (
           <InputFromSearchList
@@ -399,7 +452,6 @@ const Action = ({ navigation, route }) => {
           onSelect={(status) => setAction((a) => ({ ...a, status }))}
           onSelectAndSave={(status) => {
             setAction((a) => ({ ...a, status }));
-            onUpdateActionRequest();
           }}
           value={status}
           editable={editable}
@@ -434,23 +486,19 @@ const Action = ({ navigation, route }) => {
           <ButtonDelete onPress={onDeleteRequest} />
           <Button
             caption={editable ? 'Mettre à jour' : 'Modifier'}
-            onPress={editable ? onUpdateActionRequest : setEditable(true)}
+            onPress={editable ? onUpdateActionRequest : () => setEditable(true)}
             disabled={editable ? isUpdateDisabled : false}
             loading={updating}
           />
         </ButtonsContainer>
         <SubList
           label="Commentaires"
-          key={actionDB._id}
-          data={comments.filter((c) => c.action === actionDB._id)}
-          renderItem={(comment, index) => (
+          key={actionDB?._id}
+          data={comments.filter((c) => c.action === actionDB?._id)}
+          renderItem={(comment) => (
             <CommentRow
-              key={index}
-              comment={comment.comment}
-              id={comment._id}
-              createdAt={comment.createdAt}
-              user={comment.user}
-              metaCaption="Commentaire de"
+              key={comment._id}
+              comment={comment}
               onUpdate={
                 comment.team
                   ? () =>
@@ -468,7 +516,7 @@ const Action = ({ navigation, route }) => {
             <NewCommentInput
               forwardRef={newCommentRef}
               onFocus={() => _scrollToInput(newCommentRef)}
-              action={actionDB._id}
+              action={actionDB?._id}
               writeComment={setWritingComment}
             />
           )}

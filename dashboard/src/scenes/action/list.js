@@ -1,47 +1,72 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useContext, useEffect, useState } from 'react';
-import { Col, Container, Row } from 'reactstrap';
+import React, { useContext, useEffect, useMemo, useState } from 'react';
+import { Col, Row } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
-
-import Header from '../../components/header';
+import { useRecoilValue } from 'recoil';
+import CreateAction from './CreateAction';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
 import SelectStatus from '../../components/SelectStatus';
 import Loading from '../../components/loading';
-import CreateAction from './CreateAction';
 import Table from '../../components/table';
 import ActionStatus from '../../components/ActionStatus';
-
 import DateBloc from '../../components/DateBloc';
-
 import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
-import { actionsFullSearchSelector } from '../../recoil/selectors';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
-import { currentTeamState } from '../../recoil/auth';
-import { useRecoilState, useRecoilValue } from 'recoil';
-import ActionPersonName from '../../components/ActionPersonName';
+import PersonName from '../../components/PersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
+import { actionsState } from '../../recoil/actions';
+import { commentsState } from '../../recoil/comments';
+import { currentTeamState } from '../../recoil/auth';
+import { personsWithPlacesSelector } from '../../recoil/selectors';
+import { filterBySearch } from '../search/utils';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
-  const [currentTeam] = useRecoilState(currentTeamState);
-
-  const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
   const history = useHistory();
   const location = useLocation();
-
+  const currentTeam = useRecoilValue(currentTeamState);
+  const actions = useRecoilValue(actionsState);
+  const comments = useRecoilValue(commentsState);
+  const persons = useRecoilValue(personsWithPlacesSelector);
+  const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
   const [showAs, setShowAs] = useState(new URLSearchParams(location.search)?.get('showAs') || showAsOptions[0]); // calendar, list
+  // List of actions filtered by current team and selected status.
+  const actionsByTeamAndStatus = useMemo(
+    () => (status ? actions.filter((action) => action.team === currentTeam._id && action.status === status) : []),
+    [actions, currentTeam, status]
+  );
+  // The next memos are used to filter by search (empty array when search is empty).
+  const actionsIds = useMemo(() => (search?.length ? actionsByTeamAndStatus.map((action) => action._id) : []), [actionsByTeamAndStatus, search]);
+  const personsForActions = useMemo(
+    () => (actionsIds?.length ? persons.filter((person) => actionsIds.includes(person.action)) : []),
+    [actionsIds, persons]
+  );
+  const commentsForActions = useMemo(
+    () => (actionsIds?.length ? comments.filter((comment) => actionsIds.includes(comment.action)) : []),
+    [actionsIds, comments]
+  );
+  const actionsFiltered = useMemo(() => {
+    if (!search?.length) return actionsByTeamAndStatus;
+    const actionsIdsByActionsSearch = actionsByTeamAndStatus?.length ? filterBySearch(search, actionsByTeamAndStatus).map((a) => a._id) : [];
+    const actionsIdsByActionsCommentsSearch = commentsForActions?.length ? filterBySearch(search, commentsForActions).map((c) => c.action) : [];
+    const personIdsByPersonsSearch = personsForActions?.length ? filterBySearch(search, personsForActions).map((p) => p._id) : [];
+    const actionIdsByPersonsSearch = personIdsByPersonsSearch?.length
+      ? actionsByTeamAndStatus.filter((a) => personIdsByPersonsSearch.includes(a.person))
+      : [];
+    const actionsIdsFilterBySearch = [...new Set([...actionsIdsByActionsSearch, ...actionsIdsByActionsCommentsSearch, ...actionIdsByPersonsSearch])];
+    return actionsByTeamAndStatus.filter((a) => actionsIdsFilterBySearch.includes(a._id));
+  }, [actionsByTeamAndStatus, commentsForActions, personsForActions, search]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
     searchParams.set('showAs', showAs);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAs]);
-
-  const actionsFiltered = useRecoilValue(actionsFullSearchSelector({ status, search }));
   const limit = 20;
 
   if (!actionsFiltered) return <Loading />;
@@ -50,8 +75,8 @@ const List = () => {
   const total = actionsFiltered.length;
 
   return (
-    <Container>
-      <Header
+    <>
+      <SmallerHeaderWithBackButton
         titleStyle={{ fontWeight: '400' }}
         title={
           <span>
@@ -59,8 +84,8 @@ const List = () => {
           </span>
         }
       />
-      <Row style={{ marginBottom: 40, justifyContent: 'center' }}>
-        <Col>
+      <Row style={{ marginBottom: 20, justifyContent: 'center' }}>
+        <Col md={12}>
           <CreateAction disabled={!currentTeam} isMulti refreshable />
         </Col>
       </Row>
@@ -75,7 +100,7 @@ const List = () => {
             <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
           </div>
         </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+        <Col md={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Afficher par : </span>
           <div style={{ width: 300 }}>
             <SelectCustom
@@ -90,6 +115,7 @@ const List = () => {
           </div>
         </Col>
       </Row>
+
       {showAs === showAsOptions[0] && (
         <div style={{ minHeight: '100vh' }}>
           {' '}
@@ -107,7 +133,7 @@ const List = () => {
                 title: 'À faire le',
                 dataKey: 'dueAt' || '_id',
                 render: (action) => {
-                  return <DateBloc date={action.dueAt} withTime={action.withTime} />;
+                  return <DateBloc date={action.dueAt} />;
                 },
               },
               {
@@ -126,7 +152,7 @@ const List = () => {
               {
                 title: 'Personne suivie',
                 dataKey: 'person',
-                render: (action) => <ActionPersonName action={action} />,
+                render: (action) => <PersonName item={action} />,
               },
               { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
               { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
@@ -135,7 +161,7 @@ const List = () => {
           <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
         </>
       )}
-    </Container>
+    </>
   );
 };
 

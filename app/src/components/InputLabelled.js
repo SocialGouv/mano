@@ -5,69 +5,39 @@ import Label from './Label';
 import InputMultilineAutoAdjust from './InputMultilineAutoAdjust';
 import { MyText, MyTextInput } from './MyText';
 import colors from '../utils/colors';
-import Button from './Button';
 import Spacer from './Spacer';
 
-const InputLabelled = React.forwardRef(
-  (
-    {
-      error,
-      label,
-      multiline,
-      editable = true,
-      onClear,
-      noMargin,
-      EndIcon,
-      onEndIconPress,
-      buttonCaption,
-      buttonValue,
-      buttonColor,
-      buttonBg,
-      onButtonPress,
-      ...props
-    },
-    ref
-  ) => {
-    if (!editable) {
-      const value = String(props.value || '')
-        .split('\\n')
-        .join('\u000A');
-      return (
-        <FieldContainer noMargin={noMargin}>
-          {!!label && <InlineLabel bold>{`${label} : `}</InlineLabel>}
-          <Row>
-            <Content ref={ref}>{value}</Content>
-            <Spacer grow />
-            {!!buttonCaption && (
-              <Button
-                onPress={() => onButtonPress(buttonValue)}
-                caption={buttonCaption}
-                backgroundColor={buttonBg}
-                color={buttonColor}
-                buttonSize={20}
-              />
-            )}
-          </Row>
-        </FieldContainer>
-      );
-    }
+const InputLabelled = React.forwardRef(({ error, label, multiline, editable = true, onClear, noMargin, EndIcon, onEndIconPress, ...props }, ref) => {
+  if (!editable) {
+    const value = String(props.value || '')
+      .split('\\n')
+      .join('\u000A');
     return (
-      <InputContainer>
-        {label && <Label label={label} />}
-        {multiline ? <InputMultilineAutoAdjust ref={ref} {...props} /> : <Input ref={ref} {...props} value={String(props.value || '')} />}
-        {Boolean(EndIcon) && Boolean(props?.value?.length) && (
-          <TouchableWithoutFeedback onPress={onEndIconPress}>
-            <IconWrapper>
-              <EndIcon size={20} color={colors.app.color} />
-            </IconWrapper>
-          </TouchableWithoutFeedback>
-        )}
-        {/* {Boolean(onClear) && Boolean(props?.value?.length) && <ButtonReset onPress={onClear} />} */}
-        {!!error && <Error>{error}</Error>}
-      </InputContainer>
+      <FieldContainer noMargin={noMargin}>
+        {!!label && <InlineLabel bold>{`${label} : `}</InlineLabel>}
+        <Row>
+          <Content ref={ref}>{value}</Content>
+          <Spacer grow />
+        </Row>
+      </FieldContainer>
     );
   }
-);
+  return (
+    <InputContainer>
+      {label && <Label label={label} />}
+      {multiline ? <InputMultilineAutoAdjust ref={ref} {...props} /> : <Input ref={ref} {...props} value={String(props.value || '')} />}
+      {Boolean(EndIcon) && Boolean(props?.value?.length) && (
+        <TouchableWithoutFeedback onPress={onEndIconPress}>
+          <IconWrapper>
+            <EndIcon size={20} color={colors.app.color} />
+          </IconWrapper>
+        </TouchableWithoutFeedback>
+      )}
+      {/* {Boolean(onClear) && Boolean(props?.value?.length) && <ButtonReset onPress={onClear} />} */}
+      {!!error && <Error>{error}</Error>}
+    </InputContainer>
+  );
+});
 
 const FieldContainer = styled.View`
   flex-grow: 1;

@@ -1,16 +1,14 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Container, FormGroup, Input, Label, Row, Col } from 'reactstrap';
+import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
-import BackButton from '../../components/backButton';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, teamsState } from '../../recoil/auth';
 import useApi from '../../services/api';
@@ -26,11 +24,14 @@ const View = () => {
 
   const API = useApi();
 
+  const getTeams = async () => {
+    const { data } = await API.get({ path: `/team/${id}` });
+    setTeam(data);
+  };
+
   useEffect(() => {
-    (async () => {
-      const { data } = await API.get({ path: `/team/${id}` });
-      setTeam(data);
-    })();
+    getTeams();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const deleteData = async () => {
@@ -47,8 +48,8 @@ const View = () => {
   if (!team) return <Loading />;
 
   return (
-    <Container style={{ padding: '40px 0' }}>
-      <Header title={<BackButton />} />
+    <>
+      <SmallerHeaderWithBackButton />
       <Box>
         <Formik
           initialValues={team}
@@ -82,12 +83,11 @@ const View = () => {
                 <Col md={6} />
                 <Col md={12}>
                   <FormGroup>
-                    <Label>
-                      Maraude de nuit <NightSessionModale />
-                    </Label>
-                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                    <Label />
+                    <div style={{ display: 'flex', marginLeft: 20, width: '80%' }}>
                       <span>Maraude de nuit</span>
                       <Input type="checkbox" name="nightSession" checked={values.nightSession} onChange={handleChange} />
+                      <NightSessionModale />
                     </div>
                   </FormGroup>
                 </Col>
@@ -100,7 +100,7 @@ const View = () => {
           )}
         </Formik>
       </Box>
-    </Container>
+    </>
   );
 };
 

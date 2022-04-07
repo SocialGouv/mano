@@ -1,7 +1,4 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { atom, selector, useRecoilState } from 'recoil';
-import API from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
+import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
 
@@ -32,40 +29,6 @@ export const customFieldsPersonsSocialSelector = selector({
     return [];
   },
 });
-
-export const usePersons = () => {
-  const [persons, setPersons] = useRecoilState(personsState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-persons', 0);
-
-  const setPersonsFullState = (newPersons) => {
-    if (newPersons) setPersons(newPersons.sort(sortPersons));
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newPersons) => setPersons((persons) => [...persons, ...newPersons]);
-
-  const refreshPersons = async (setProgress, initialLoad = false) => {
-    try {
-      setPersonsFullState(
-        await getData({
-          collectionName: 'person',
-          data: persons,
-          isInitialization: initialLoad,
-          setProgress,
-          lastRefresh,
-          setBatchData,
-          API,
-        })
-      );
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      return false;
-    }
-  };
-
-  return refreshPersons;
-};
 
 /*
 Choices on selects
@@ -172,6 +135,7 @@ export const outOfActiveListReasonOptions = [
   'Perdu de vue',
   'Hospitalisation',
   'Reconduite à la frontière',
+  'Autre',
 ];
 
 export const defaultMedicalCustomFields = [
@@ -251,7 +215,15 @@ export const personFields = [
   { name: 'structureMedical', type: 'text', label: 'Structure de suivi médical', encrypted: true, importable: true, filterable: true },
   { name: 'employment', type: 'enum', label: 'Emploi', encrypted: true, importable: true, options: employmentOptions, filterable: true },
   { name: 'address', type: 'yes-no', label: 'Hébergement', encrypted: true, importable: true, options: yesNoOptions, filterable: true },
-  { name: 'addressDetail', type: 'text', label: "Type d'hébergement", encrypted: true, importable: true, filterable: true },
+  {
+    name: 'addressDetail',
+    type: 'enum',
+    label: "Type d'hébergement",
+    encrypted: true,
+    options: [...addressDetailsFixedFields, 'Autre'],
+    importable: true,
+    filterable: true,
+  },
   { name: 'resources', type: 'multi-choice', label: 'Ressources', encrypted: true, importable: true, options: ressourcesOptions, filterable: true },
   {
     name: 'reasons',
@@ -293,7 +265,8 @@ export const personFields = [
   { name: 'assignedTeams', label: '', encrypted: true, importable: false, filterable: false },
   { name: '_id', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'organisation', label: '', encrypted: false, importable: false, filterable: false },
-  { name: 'createdAt', type: 'date', label: 'Suivi(e) depuis le / Créé le', encrypted: false, importable: true, filterable: true },
+  { name: 'followedSince', type: 'date', label: 'Suivi(e) depuis le / Créé le', encrypted: true, importable: true, filterable: true },
+  { name: 'createdAt', type: 'date', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'updatedAt', type: 'date', label: '', encrypted: false, importable: false, filterable: false },
   {
     name: 'outOfActiveList',
@@ -331,11 +304,8 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
 
     decrypted,
     entityKey: person.entityKey,
-    ...person,
   };
 };
-
-const sortPersons = (p1, p2) => p1.name.localeCompare(p2.name);
 
 export const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
   try {

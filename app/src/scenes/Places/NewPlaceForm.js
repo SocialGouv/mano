@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert } from 'react-native';
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -11,8 +11,9 @@ import { ListEmptyPlaceWithName } from '../../components/ListEmptyContainer';
 import Row from '../../components/Row';
 import Spacer from '../../components/Spacer';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
-import { useRefresh } from '../../recoil/refresh';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import { userState } from '../../recoil/auth';
+import { refreshTriggerState } from '../../components/Loader';
 
 const NewPlaceForm = ({ route, navigation }) => {
   const [name, setName] = useState('');
@@ -20,6 +21,7 @@ const NewPlaceForm = ({ route, navigation }) => {
 
   const [places, setPlaces] = useRecoilState(placesState);
   const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
+  const user = useRecoilValue(userState);
   const data = useMemo(() => {
     if (!name) return places;
     return places.filter((p) => p.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()));
@@ -27,7 +29,7 @@ const NewPlaceForm = ({ route, navigation }) => {
 
   const { person } = route.params;
 
-  const { placesAndRelationsRefresher } = useRefresh();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const backRequestHandledRef = useRef(null);
   const handleBeforeRemove = (e) => {
@@ -62,7 +64,10 @@ const NewPlaceForm = ({ route, navigation }) => {
   const onSubmit = async (place) => {
     setPosting(true);
 
-    const response = await API.post({ path: '/relPersonPlace', body: prepareRelPersonPlaceForEncryption({ place: place._id, person: person._id }) });
+    const response = await API.post({
+      path: '/relPersonPlace',
+      body: prepareRelPersonPlaceForEncryption({ place: place._id, person: person._id, user: user._id }),
+    });
     if (response.error) {
       setPosting(false);
       Alert.alert(response.error);
@@ -70,7 +75,7 @@ const NewPlaceForm = ({ route, navigation }) => {
     }
     if (response.ok) {
       setRelsPersonPlace((relsPersonPlace) => [response.decryptedData, ...relsPersonPlace]);
-      placesAndRelationsRefresher();
+      setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
       onBack();
     }
   };

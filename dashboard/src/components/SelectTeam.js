@@ -1,8 +1,7 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import SelectCustom from './SelectCustom';
 
-const SelectTeam = ({ onChange = () => null, teamId = null, teams = null, style = null }) => {
+const SelectTeam = ({ onChange = () => null, teamId = null, teams = null, style = null, inputId = '' }) => {
   if (!teams) return <div />;
 
   return (
@@ -21,6 +20,8 @@ const SelectTeam = ({ onChange = () => null, teamId = null, teams = null, style 
         getOptionValue={(id) => id}
         getOptionLabel={(id) => teams.find((team) => team._id === id)?.name}
         isClearable={false}
+        inputId={inputId}
+        classNamePrefix={inputId}
       />
     </div>
   );

@@ -1,10 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { teamsState } from '../recoil/auth';
 import SelectCustom from './SelectCustom';
 
-const SelectTeamMultiple = ({ onChange, value = [] }) => {
+const SelectTeamMultiple = ({ onChange, value = [], inputId, classNamePrefix }) => {
   const teams = useRecoilValue(teamsState);
   return (
     <SelectCustom
@@ -14,7 +13,8 @@ const SelectTeamMultiple = ({ onChange, value = [] }) => {
       getOptionValue={(id) => id}
       getOptionLabel={(id) => teams.find((team) => team._id === id)?.name}
       isMulti
-      // isClearable
+      inputId={inputId}
+      classNamePrefix={classNamePrefix}
     />
   );
 };

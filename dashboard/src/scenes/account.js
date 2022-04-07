@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Container, FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
+import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import { useRecoilState } from 'recoil';
@@ -19,53 +19,51 @@ const Account = () => {
   if (!user) return <Loading />;
 
   return (
-    <div>
+    <>
       <Header title={user.name} />
-      <Container style={{ padding: '40px 0' }}>
-        <Formik
-          initialValues={user}
-          onSubmit={async (body) => {
-            try {
-              const response = await API.put({ path: '/user', body });
-              if (response.ok) {
-                toastr.success('Mis à jour !');
-                const { user } = await API.get({ path: '/user/me' });
-                setUser(user);
-                AppSentry.setUser(user);
-              }
-            } catch (userUpdateError) {
-              console.log('error in user update', userUpdateError);
-              toastr.error('Erreur!', userUpdateError.message);
+      <Formik
+        initialValues={user}
+        onSubmit={async (body) => {
+          try {
+            const response = await API.put({ path: '/user', body });
+            if (response.ok) {
+              toastr.success('Mis à jour !');
+              const { user } = await API.get({ path: '/user/me' });
+              setUser(user);
+              AppSentry.setUser(user);
             }
-          }}>
-          {({ values, handleChange, handleSubmit, isSubmitting }) => (
-            <React.Fragment>
-              <Row>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label>Nom</Label>
-                    <Input name="name" value={values.name} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                {/* <Col md={6} /> */}
-                <Col md={6}>
-                  <FormGroup>
-                    <Label>Email</Label>
-                    <Input disabled name="email" value={values.email} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                {/* <Col md={6} /> */}
-              </Row>
-              <hr />
-              <Row style={{ display: 'flex', justifyContent: 'center' }}>
-                <LinkToChangePassword />
-                <ButtonCustom width="250" title="Mettre à jour" loading={isSubmitting} color="info" onClick={handleSubmit} />
-              </Row>
-            </React.Fragment>
-          )}
-        </Formik>
-      </Container>
-    </div>
+          } catch (userUpdateError) {
+            console.log('error in user update', userUpdateError);
+            toastr.error('Erreur!', userUpdateError.message);
+          }
+        }}>
+        {({ values, handleChange, handleSubmit, isSubmitting }) => (
+          <React.Fragment>
+            <Row>
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Nom</Label>
+                  <Input name="name" value={values.name} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              {/* <Col md={6} /> */}
+              <Col md={6}>
+                <FormGroup>
+                  <Label>Email</Label>
+                  <Input disabled name="email" value={values.email} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              {/* <Col md={6} /> */}
+            </Row>
+            <hr />
+            <Row style={{ display: 'flex', justifyContent: 'center' }}>
+              <LinkToChangePassword />
+              <ButtonCustom width="250" title="Mettre à jour" loading={isSubmitting} color="info" onClick={handleSubmit} />
+            </Row>
+          </React.Fragment>
+        )}
+      </Formik>
+    </>
   );
 };
 

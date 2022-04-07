@@ -57,11 +57,7 @@ const NewActionForm = ({ route, navigation }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation, route?.params?.person]);
 
-  const onSearchPerson = () =>
-    navigation.push('Persons', {
-      screen: 'PersonsSearch',
-      params: { fromRoute: 'NewActionForm' },
-    });
+  const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'NewActionForm' });
 
   const onCreateAction = async () => {
     setPosting(true);
@@ -154,10 +150,10 @@ const NewActionForm = ({ route, navigation }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title="Nouvelle action" onBack={onGoBackRequested} />
-      <ScrollContainer keyboardShouldPersistTaps="handled">
+      <ScreenTitle title="Nouvelle action" onBack={onGoBackRequested} testID="new-action" />
+      <ScrollContainer keyboardShouldPersistTaps="handled" testID="new-action-form">
         <View>
-          <InputLabelled label="Nom de l’action" onChangeText={setName} value={name} placeholder="Rdv chez le dentiste" />
+          <InputLabelled label="Nom de l’action" onChangeText={setName} value={name} placeholder="Rdv chez le dentiste" testID="new-action-name" />
           {forCurrentPerson ? (
             <InputFromSearchList
               label="Personne concernée"
@@ -177,10 +173,19 @@ const NewActionForm = ({ route, navigation }) => {
               />
             </>
           )}
-          <ActionStatusSelect onSelect={setStatus} value={status} editable />
-          <DateAndTimeInput label="Échéance" setDate={setDueAt} date={dueAt} showTime showDay withTime={withTime} setWithTime={setWithTime} />
+          <ActionStatusSelect onSelect={setStatus} value={status} editable testID="new-action-status" />
+          <DateAndTimeInput
+            label="Échéance"
+            setDate={setDueAt}
+            date={dueAt}
+            showTime
+            showDay
+            withTime={withTime}
+            setWithTime={setWithTime}
+            testID="new-action-dueAt"
+          />
           <ActionCategoriesMultiCheckboxes onChange={setCategories} values={categories} editable />
-          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateAction} loading={posting} />
+          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateAction} loading={posting} testID="new-action-create" />
         </View>
       </ScrollContainer>
     </SceneContainer>

@@ -1,16 +1,14 @@
 import React, { useState } from 'react';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
-import styled from 'styled-components';
 import 'react-datepicker/dist/react-datepicker.css';
-
-import { theme } from '../config';
+import QuestionMarkButton from './QuestionMarkButton';
 
 const NightSessionModale = () => {
   const [open, setOpen] = useState(false);
 
   return (
     <>
-      <QuestionMarkButton onClick={() => setOpen(true)}>?</QuestionMarkButton>
+      <QuestionMarkButton onClick={() => setOpen(true)} />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
         <ModalHeader toggle={() => setOpen(false)}>Maraude de nuit</ModalHeader>
         <ModalBody>
@@ -29,19 +27,5 @@ const NightSessionModale = () => {
     </>
   );
 };
-
-const QuestionMarkButton = styled.button`
-  width: 20px;
-  height: 20px;
-  border-radius: 20px;
-  margin-left: 10px;
-  box-shadow: none;
-  border: 1px solid ${theme.main};
-  color: ${theme.main};
-  font-size: 14px;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-`;
 
 export default NightSessionModale;

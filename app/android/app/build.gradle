@@ -140,7 +140,9 @@ android {
         targetSdkVersion rootProject.ext.targetSdkVersion
         multiDexEnabled true
         versionCode 3
-        versionName "2.10.0"
+        versionName "2.17.0"
+        testBuildType System.getProperty('testBuildType', 'debug')  // This will later be used to control the test apk build type
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
     packagingOptions {
        pickFirst 'lib/x86/libc++_shared.so'
@@ -171,12 +173,6 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
-        preproduction {
-            storeFile file('debug.keystore')
-            storePassword 'android'
-            keyAlias 'androiddebugkey'
-            keyPassword 'android'
-        }
     }
     buildTypes {
         debug {
@@ -187,7 +183,11 @@ android {
             // see https://reactnative.dev/docs/signed-apk-android.
             signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
-            proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
+
+            // Typical pro-guard definitions
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Detox-specific additions to pro-guard
+            proguardFile "${rootProject.projectDir}/../node_modules/detox/android/detox/proguard-rules-app.pro"
         }
     }
 
@@ -244,6 +244,8 @@ dependencies {
     } else {
         implementation jscFlavor
     }
+    androidTestImplementation('com.wix:detox:+')
+    androidTestImplementation('com.linkedin.testbutler:test-butler-library:2.2.1')
 }
 
 // Run this once to be able to run the application with BUCK

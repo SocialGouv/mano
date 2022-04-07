@@ -37,6 +37,20 @@ export async function navigateWithReactRouter(path: string = "/search") {
   );
 }
 
+export async function getInputValue(selector: string) {
+  return page
+    .$(selector)
+    .then((input) => input?.getProperty("value"))
+    .then((value) => value?.jsonValue());
+}
+
+export async function getInnerText(selector: string) {
+  return page
+    .$(selector)
+    .then((input) => input?.getProperty("innerText"))
+    .then((value) => value?.jsonValue());
+}
+
 export async function deleteUser(email: string) {
   const client = new pg.Client(postgresqlUrl);
   await client.connect();
@@ -153,7 +167,10 @@ export async function useEncryptedOrga() {
       categories,
       "encryptionEnabled",
       "encryptionLastUpdateAt",
-      "encryptedVerificationKey"
+      "encryptedVerificationKey",
+      services,
+      "receptionEnabled",
+      collaborations
     ) VALUES (
       $1,
       'Encrypted orga',
@@ -162,7 +179,10 @@ export async function useEncryptedOrga() {
       null,
       true,
       $2,
-      'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0='
+      'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0=',
+      '{Café,Douche,Repas,Kit,"Don chaussures","Distribution seringue"}',
+      true,
+      '{"Ma première collab"}'
     );`,
     [orgId, date]
   );
@@ -247,7 +267,7 @@ export async function scrollDown() {
   return page.evaluate(async (_) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        document?.querySelector(".main > div")?.scrollBy(0, 3000000);
+        document?.querySelector(".main")?.scrollBy(0, 3000000);
         resolve("ok");
       }, 500);
     });
@@ -258,7 +278,7 @@ export async function scrollTop() {
   return page.evaluate(async (_) => {
     return new Promise((resolve) => {
       setTimeout(() => {
-        document?.querySelector(".main > div")?.scrollBy(0, -3000000);
+        document?.querySelector(".main-content > div")?.scrollBy(0, -3000000);
         resolve("ok");
       }, 500);
     });

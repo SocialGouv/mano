@@ -1,8 +1,5 @@
 import { organisationState } from './auth';
-import API from '../services/api';
-import { getData, useStorage } from '../services/dataManagement';
-import { capture } from '../services/sentry';
-import { atom, selector, useRecoilState } from 'recoil';
+import { atom, selector } from 'recoil';
 
 export const territoryObservationsState = atom({
   key: 'territoryObservationsState',
@@ -17,39 +14,6 @@ export const customFieldsObsSelector = selector({
     return defaultCustomFields;
   },
 });
-
-export const useTerritoryObservations = () => {
-  const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh-observations', 0);
-
-  const setTerritoryObsFullState = (newTerritoryObservations) => {
-    if (newTerritoryObservations) setTerritoryObs(newTerritoryObservations);
-    setLastRefresh(Date.now());
-  };
-
-  const setBatchData = (newObs) => setTerritoryObs((territoryObservations) => [...territoryObservations, ...newObs]);
-
-  const refreshTerritoryObs = async (setProgress) => {
-    try {
-      const data = await getData({
-        collectionName: 'territory-observation',
-        data: territoryObservations,
-        isInitialization: true,
-        setProgress,
-        setBatchData,
-        lastRefresh,
-        API,
-      });
-      setTerritoryObsFullState(data);
-      return true;
-    } catch (e) {
-      capture(e.message, { extra: { response: e.response } });
-      return false;
-    }
-  };
-
-  return refreshTerritoryObs;
-};
 
 export const defaultCustomFields = [
   {
@@ -111,7 +75,7 @@ export const defaultCustomFields = [
   },
 ];
 
-const compulsoryEncryptedFields = ['territory', 'user', 'team'];
+const compulsoryEncryptedFields = ['territory', 'user', 'team', 'observedAt'];
 
 export const prepareObsForEncryption = (customFields) => (obs) => {
   const encryptedFields = [...customFields.map((f) => f.name), ...compulsoryEncryptedFields];
@@ -127,8 +91,6 @@ export const prepareObsForEncryption = (customFields) => (obs) => {
 
     decrypted,
     entityKey: obs.entityKey,
-
-    ...obs,
   };
 };
 

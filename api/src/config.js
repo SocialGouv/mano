@@ -16,6 +16,7 @@ const DASHBOARD_URL = ENVIRONMENT === "development" ? "http://localhost:4145" : 
 const DASHBOARD_PREPROD_URL = ENVIRONMENT === "development" ? "http://localhost:8083" : "https://dashboard-preprod-mano.dev.fabrique.social.gouv.fr";
 const WEBSITE_URL = ENVIRONMENT === "development" ? "http://localhost:3000" : "https://mano-app.fabrique.social.gouv.fr";
 const WEBSITE_PREPROD_URL = ENVIRONMENT === "development" ? "http://localhost:3000" : "https://app-preprod-mano.dev.fabrique.social.gouv.fr/";
+const TAURI_CORS = "tauri://localhost";
 const DASHBBOARD_DOMAIN = `/\.fabrique\.social\.gouv\.fr$/`;
 const DASHBBOARD_PREPROD_DOMAIN = `/\.dev\.fabrique\.social\.gouv\.fr$/`;
 const STORAGE_DIRECTORY = process.env.STORAGE_DIRECTORY;
@@ -23,9 +24,15 @@ const STORAGE_DIRECTORY = process.env.STORAGE_DIRECTORY;
 const X_TIPIMAIL_APIUSER = process.env.X_TIPIMAIL_APIUSER || "";
 const X_TIPIMAIL_APIKEY = process.env.X_TIPIMAIL_APIKEY || "";
 
-const ENCRYPTED_FIELDS_ONLY = process.env.ENCRYPTED_FIELDS_ONLY === "true" ? true : false;
-
-const CORS_ORIGIN_ALLOWED = [DASHBBOARD_DOMAIN, DASHBBOARD_PREPROD_DOMAIN, WEBSITE_URL, DASHBOARD_PREPROD_URL, DASHBOARD_URL, WEBSITE_PREPROD_URL];
+const CORS_ORIGIN_ALLOWED = [
+  DASHBBOARD_DOMAIN,
+  DASHBBOARD_PREPROD_DOMAIN,
+  WEBSITE_URL,
+  DASHBOARD_PREPROD_URL,
+  DASHBOARD_URL,
+  WEBSITE_PREPROD_URL,
+  TAURI_CORS,
+];
 if (ENVIRONMENT === "test") CORS_ORIGIN_ALLOWED.push("http://localhost:8090");
 
 module.exports = {
@@ -41,7 +48,6 @@ module.exports = {
   SENTRY_KEY,
   VERSION,
   MOBILE_APP_VERSION,
-  ENCRYPTED_FIELDS_ONLY,
   X_TIPIMAIL_APIUSER,
   X_TIPIMAIL_APIKEY,
   STORAGE_DIRECTORY,

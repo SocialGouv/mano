@@ -10,20 +10,37 @@ import useApi from '../services/api';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import Table from './table';
+import QuestionMarkButton from './QuestionMarkButton';
 
 const newField = () => ({
   // Todo: I guess could use crypto here.
   name: `custom-${new Date().toISOString().split('.').join('-').split(':').join('-')}`,
   label: '',
   type: 'text',
-  enabled: false,
+  enabled: true,
   required: false,
   showInStats: false,
 });
 
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
 
-const TableCustomFields = ({ data, customFields }) => {
+const sanitizeFields = (field) => {
+  const sanitizedField = {};
+  for (const key of Object.keys(field)) {
+    if (![undefined, null].includes(field[key])) sanitizedField[key] = field[key];
+  }
+  return sanitizedField;
+};
+
+const TableCustomFields = ({
+  data,
+  customFields,
+  showHealthcareProfessionnalColumn = false,
+  mergeData = null,
+  extractData = null,
+  keyPrefix = null,
+  hideStats = false,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
@@ -41,6 +58,11 @@ const TableCustomFields = ({ data, customFields }) => {
     setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, showInStats })));
   };
 
+  const onOnlyHealthcareProfessionalChange = (fieldToUpdate) => (event) => {
+    const onlyHealthcareProfessional = event.target.checked;
+    setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, onlyHealthcareProfessional })));
+  };
+
   const onSaveField = async (editedField) => {
     const isUpdate = !!mutableData.find((f) => f.name === editedField.name);
     const newData = isUpdate ? mutableData.map((field) => (field.name !== editedField.name ? field : editedField)) : [...mutableData, editedField];
@@ -52,7 +74,7 @@ const TableCustomFields = ({ data, customFields }) => {
   const onDelete = (fieldToDelete) => {
     const confirm = window.confirm('Voulez-vous vraiment supprimer ce champ ? Cette opération est irréversible.');
     if (confirm) {
-      const dataToSave = mutableData.filter((f) => f.name !== fieldToDelete.name);
+      const dataToSave = mutableData.filter((f) => f).filter((f) => f.name !== fieldToDelete.name);
       setMutableData(dataToSave);
       handleSubmit(dataToSave);
     }
@@ -60,16 +82,37 @@ const TableCustomFields = ({ data, customFields }) => {
 
   const handleSubmit = async (newData) => {
     if (!newData) newData = mutableData.filter((field) => !!field.label.length);
+    newData = newData.map(sanitizeFields);
     setIsSubmitting(true);
     try {
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
-        body: { [customFields]: newData },
+        body: { [customFields]: mergeData ? mergeData(newData) : newData },
       });
       if (response.ok) {
         toastr.success('Mise à jour !');
+        setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
-        setMutableData(response.data[customFields]);
+      }
+    } catch (orgUpdateError) {
+      console.log('error in updating organisation', orgUpdateError);
+      toastr.error('Erreur!', orgUpdateError.message);
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleSort = async (keys) => {
+    setIsSubmitting(true);
+    try {
+      const dataForApi = keys.map((key) => mutableData.find((field) => field.name === key));
+      const response = await API.put({
+        path: `/organisation/${organisation._id}`,
+        body: { [customFields]: mergeData ? mergeData(dataForApi) : dataForApi },
+      });
+      if (response.ok) {
+        toastr.success('Mise à jour !');
+        setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
+        setOrganisation(response.data);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
@@ -82,7 +125,11 @@ const TableCustomFields = ({ data, customFields }) => {
     <>
       <Table
         data={mutableData}
+        // use this key prop to reset table and reset sortablejs on each element added/removed
+        key={(keyPrefix || customFields) + mutableData.length}
         rowKey="name"
+        isSortable
+        onSort={handleSort}
         noData="Pas de champs personnalisés"
         columns={[
           {
@@ -114,33 +161,54 @@ const TableCustomFields = ({ data, customFields }) => {
             render: (f) => <CellWrapper>{!['enum', 'multi-choice'].includes(f.type) ? null : (f?.options || []).join(', ')}</CellWrapper>,
           },
           { title: 'Activé', dataKey: 'enabled', render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} /> },
-          // {
-          //   title: 'Obligatoire',
-          //   dataKey: 'required',
-          //   render: (f) => <input type="checkbox" checked={f.required} onChange={onRequiredChange(f)} />,
-          // },
-          {
-            title: (
-              <>
-                Voir dans les
-                <br />
-                satistiques
-              </>
-            ),
-            dataKey: 'showInStats',
-            render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
-          },
+          !showHealthcareProfessionnalColumn
+            ? null
+            : {
+                title: (
+                  <div>
+                    Professionnel
+                    <br /> santé
+                    <QuestionMarkButton
+                      onClick={() => {
+                        alert('Le champ ne sera visible que par les comptes de type "professionnel de santé" dans un onglet dédié.');
+                      }}
+                    />
+                  </div>
+                ),
+                dataKey: 'onlyHealthcareProfessional',
+                render: (f) => <input type="checkbox" checked={f.onlyHealthcareProfessional} onChange={onOnlyHealthcareProfessionalChange(f)} />,
+              },
+          hideStats
+            ? null
+            : {
+                title: (
+                  <>
+                    Voir dans les
+                    <br />
+                    statistiques
+                  </>
+                ),
+                dataKey: 'showInStats',
+                render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
+              },
           {
             title: '',
             dataKey: 'name',
             small: true,
             render: (f) => <ButtonCustom title="Supprimer" loading={isSubmitting} onClick={() => onDelete(f)} width={75} color="danger" />,
           },
-        ]}
+          // Remove null fields
+        ].filter((e) => e)}
       />
       <ButtonsWrapper>
         <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={() => setIsNewField(true)} width={200} />
-        <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={() => handleSubmit()} width={200} />
+        <ButtonCustom
+          title="Mettre à jour"
+          loading={isSubmitting}
+          onClick={() => handleSubmit()}
+          disabled={JSON.stringify(mutableData) === JSON.stringify(data)}
+          width={200}
+        />
       </ButtonsWrapper>
       <EditCustomField
         editingField={editingField}
@@ -190,7 +258,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                           <Label>Choix</Label>
                           <SelectCustom
                             creatable
-                            options={[...((editingField || field).options || [])]
+                            options={[...(editingField?.options || field?.options || [])]
                               .sort((c1, c2) => c1.localeCompare(c2))
                               .map((opt) => ({ value: opt, label: opt }))}
                             value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}
@@ -222,7 +290,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                   <br />
                   <ButtonCustom
                     color="info"
-                    disabled={isSubmitting}
+                    disabled={isSubmitting || !field.label}
                     loading={isSubmitting}
                     onClick={() => !isSubmitting && handleSubmit()}
                     title="Enregistrer"

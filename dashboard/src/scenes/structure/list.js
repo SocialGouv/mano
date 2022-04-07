@@ -1,9 +1,8 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useEffect, useState } from 'react';
-import { Col, Container, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
@@ -27,6 +26,7 @@ const List = () => {
   useEffect(() => {
     setPagination({});
     getStructure();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh, search]);
 
   const getStructure = async (p = pagination) => {
@@ -38,32 +38,30 @@ const List = () => {
   if (!structures) return <Loading />;
 
   return (
-    <div>
-      <Container>
-        <Header titleStyle={{ fontWeight: 400 }} title="Structures" />
-        <Row style={{ marginBottom: 20 }}>
-          <Col>
-            <Create onChange={() => setRefresh(true)} />
-          </Col>
-        </Row>
-        <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-            <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
-            <Search placeholder="Par nom de la structure" value={search} onChange={setSearch} />
-          </Col>
-        </Row>
-        <Table
-          data={structures}
-          rowKey={'_id'}
-          onRowClick={(i) => history.push(`/structure/${i._id}`)}
-          columns={[
-            { title: 'Nom', dataKey: 'name' },
-            { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
-          ]}
-        />
-        <Page {...pagination} onChange={getStructure} />
-      </Container>
-    </div>
+    <>
+      <SmallerHeaderWithBackButton titleStyle={{ fontWeight: 400 }} title="Structures" />
+      <Row style={{ marginBottom: 20 }}>
+        <Col>
+          <Create onChange={() => setRefresh(true)} />
+        </Col>
+      </Row>
+      <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
+        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
+          <Search placeholder="Par nom de la structure" value={search} onChange={setSearch} />
+        </Col>
+      </Row>
+      <Table
+        data={structures}
+        rowKey={'_id'}
+        onRowClick={(i) => history.push(`/structure/${i._id}`)}
+        columns={[
+          { title: 'Nom', dataKey: 'name' },
+          { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
+        ]}
+      />
+      <Page {...pagination} onChange={getStructure} />
+    </>
   );
 };
 

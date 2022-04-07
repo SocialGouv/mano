@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, View } from 'react-native';
+import { Alert, Keyboard, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -14,13 +14,18 @@ import {
   preparePersonForEncryption,
 } from '../../recoil/persons';
 import API from '../../services/api';
+import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
+import { currentTeamState, teamsState } from '../../recoil/auth';
 
 const NewPersonForm = ({ navigation, route }) => {
   const [persons, setPersons] = useRecoilState(personsState);
+  const currentTeam = useRecoilValue(currentTeamState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const teams = useRecoilValue(teamsState);
 
   const [name, setName] = useState('');
+  const [assignedTeams, setAssignedTeams] = useState([currentTeam._id]);
   const [posting, setPosting] = useState(false);
 
   const backRequestHandledRef = useRef(null);
@@ -39,6 +44,7 @@ const NewPersonForm = ({ navigation, route }) => {
   }, []);
 
   const onCreateUserRequest = async () => {
+    Keyboard.dismiss();
     const response = await onCreateUser();
     if (response.ok) {
       backRequestHandledRef.current = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
@@ -59,7 +65,7 @@ const NewPersonForm = ({ navigation, route }) => {
     if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
     const response = await API.post({
       path: '/person',
-      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name }),
+      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name, followedSince: new Date(), assignedTeams }),
     });
     if (response.ok) {
       setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
@@ -110,12 +116,26 @@ const NewPersonForm = ({ navigation, route }) => {
   };
 
   return (
-    <SceneContainer>
-      <ScreenTitle title="Ajouter une personne" onBack={onGoBackRequested} />
+    <SceneContainer testID="new-person-form">
+      <ScreenTitle title="Ajouter une personne" onBack={onGoBackRequested} testID="new-person" />
       <ScrollContainer keyboardShouldPersistTaps="handled">
         <View>
-          <InputLabelled label="Pseudo" onChangeText={setName} value={name} placeholder="Monsieur X" autoCapitalize="words" />
-          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateUserRequest} loading={posting} />
+          <InputLabelled
+            label="Pseudo"
+            onChangeText={setName}
+            value={name}
+            placeholder="Monsieur X"
+            autoCapitalize="words"
+            testID="new-person-pseudo"
+          />
+          <TeamsMultiCheckBoxes
+            editable
+            values={teams.filter((t) => assignedTeams.includes(t._id)).map((t) => t.name)}
+            onChange={(newAssignedTeams) => {
+              setAssignedTeams(newAssignedTeams.map((teamName) => teams.find((t) => t.name === teamName)?._id));
+            }}
+          />
+          <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateUserRequest} loading={posting} testID="new-person-create" />
         </View>
       </ScrollContainer>
     </SceneContainer>

@@ -30,9 +30,9 @@ const notFound = (req, res, next) => {
   In development we show good error messages so if we hit a syntax error or any other previously un-handled error, we can show good info on what happened
 */
 const sendError = (err, req, res, next) => {
-  const { body, query, user, params, route, method } = req;
-
-  capture(err, { extra: { body, query, params, route, method }, user });
+  const { body, query, user, params, route, method, originalUrl, headers } = req;
+  const { version, platform } = headers;
+  capture(err, { extra: { body, query, params, route, method, originalUrl, version, platform }, user });
 
   return res
     .status(err.status || 500)

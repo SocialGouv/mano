@@ -1,17 +1,10 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
-import { Col, Container, Row } from 'reactstrap';
+import React, { useEffect, useMemo, useState } from 'react';
+import { Col, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
-import Header from '../../components/header';
-import { formatDateWithNameOfDay, now, startOfToday } from '../../services/date';
-import {
-  actionsByStatusSelector,
-  lastReportSelector,
-  numberOfPassagesAnonymousPerDatePerTeamSelector,
-  numberOfPassagesNonAnonymousPerDatePerTeamSelector,
-  todaysReportSelector,
-} from '../../recoil/selectors';
+import { SmallerHeaderWithBackButton } from '../../components/header';
+import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
+import { currentTeamReportsSelector } from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
@@ -20,37 +13,95 @@ import SelectAndCreatePerson from './SelectAndCreatePerson';
 import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectStatus from '../../components/SelectStatus';
-import { TODO } from '../../recoil/actions';
-import { currentTeamState, organisationState } from '../../recoil/auth';
-import { usePersons } from '../../recoil/persons';
-import { useReports } from '../../recoil/reports';
-import { useRecoilValue } from 'recoil';
-import { useComments } from '../../recoil/comments';
+import { actionsState, TODO } from '../../recoil/actions';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { personsState } from '../../recoil/persons';
+import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
+import { selector, selectorFamily, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { collectionsToLoadState } from '../../components/Loader';
+import useApi from '../../services/api';
+import dayjs from 'dayjs';
+import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
+
+export const actionsForCurrentTeamSelector = selector({
+  key: 'actionsForCurrentTeamSelector',
+  get: ({ get }) => {
+    const actions = get(actionsState);
+    const currentTeam = get(currentTeamState);
+    return actions.filter((a) => a.team === currentTeam?._id);
+  },
+});
+
+export const actionsByStatusSelector = selectorFamily({
+  key: 'actionsByStatusSelector',
+  get:
+    ({ status }) =>
+    ({ get }) => {
+      const actions = get(actionsForCurrentTeamSelector);
+      return actions.filter((a) => a.status === status);
+    },
+});
+
+const todaysReportSelector = selector({
+  key: 'todaysReportSelector',
+  get: ({ get }) => {
+    const teamsReports = get(currentTeamReportsSelector);
+    return teamsReports.find((rep) => isToday(rep.date));
+  },
+});
+
+const lastReportSelector = selector({
+  key: 'lastReportSelector',
+  get: ({ get }) => {
+    const teamsReports = get(currentTeamReportsSelector);
+    const todays = get(todaysReportSelector);
+    return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
+  },
+});
+
+const todaysPassagesSelector = selector({
+  key: 'todaysPassagesSelector',
+  get: ({ get }) => {
+    const passages = get(passagesState);
+    const currentTeam = get(currentTeamState);
+    return passages
+      .filter((p) => p.team === currentTeam._id)
+      .filter((p) =>
+        getIsDayWithinHoursOffsetOfPeriod(
+          p.date,
+          {
+            referenceStartDay: dayjs(),
+            referenceEndDay: dayjs(),
+          },
+          currentTeam?.nightSession ? 12 : 0
+        )
+      );
+  },
+});
 
 const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const { loading: reportsLoading, addReport, updateReport } = useReports();
+  const [reports, setReports] = useRecoilState(reportsState);
+  const setPassages = useSetRecoilState(passagesState);
+  const passages = useRecoilValue(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const todaysReport = useRecoilValue(todaysReportSelector);
   const lastReport = useRecoilValue(lastReportSelector);
-  const { addComment } = useComments();
+  const user = useRecoilValue(userState);
+  const collectionsToLoad = useRecoilValue(collectionsToLoadState);
+  const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
+  const API = useApi();
 
-  const anonymousPassages = useRecoilValue(numberOfPassagesAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
-  const nonAnonymousPassages = useRecoilValue(numberOfPassagesNonAnonymousPerDatePerTeamSelector({ date: startOfToday() }));
+  const persons = useRecoilValue(personsState);
 
-  const { persons } = usePersons();
   const history = useHistory();
   const location = useLocation();
 
   // for better UX when increase passage
-  const [passages, setPassages] = useState(todaysReport?.passages || 0);
   const [addingPassage, setAddingPassage] = useState(false);
-  useEffect(() => {
-    setPassages(anonymousPassages + nonAnonymousPassages);
-  }, [anonymousPassages, nonAnonymousPassages]);
 
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
@@ -58,19 +109,45 @@ const Reception = () => {
     return params.map((id) => persons.find((p) => p._id === id));
   });
 
-  const createReport = () => addReport(startOfToday(), currentTeam._id);
+  const createReport = async () => {
+    const existingReport = reports.find((r) => r.date === startOfToday() && r.team === currentTeam._id);
+    if (!!existingReport) return;
+    const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: startOfToday() }) });
+    if (!res.ok) return;
+    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+  };
 
   useEffect(() => {
     if (!reportsLoading && !todaysReport && !!currentTeam?._id) createReport();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reportsLoading, currentTeam?._id]);
 
   const services = todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {};
 
   const onSelectPerson = (persons) => {
     const searchParams = new URLSearchParams(location.search);
-    searchParams.set('persons', persons.map((p) => p._id).join(','));
-    setSelectedPersons(persons);
+    searchParams.set(
+      'persons',
+      (persons || [])
+        .map((p) => p?._id)
+        .filter(Boolean)
+        .join(',')
+    );
+    setSelectedPersons(persons || []);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
+  };
+
+  const updateReport = async (report) => {
+    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(report) });
+    if (res.ok) {
+      setReports((reports) =>
+        reports.map((a) => {
+          if (a._id === report._id) return res.decryptedData;
+          return a;
+        })
+      );
+    }
+    return res;
   };
 
   const onServiceUpdate = async (service, newCount) => {
@@ -84,35 +161,52 @@ const Reception = () => {
     await updateReport(reportUpdate);
   };
 
-  const incrementPassage = async (report, { newValue = null } = {}) => {
-    const res = await updateReport({
-      ...report,
-      passages: newValue,
-    });
-    return res;
+  const onAddAnonymousPassage = async () => {
+    const optimisticId = Date.now();
+    const newPassage = {
+      user: user._id,
+      team: currentTeam._id,
+      date: new Date(),
+      optimisticId,
+    };
+    // optimistic UI
+    setPassages((passages) => [newPassage, ...passages]);
+    const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
+    if (response.ok) {
+      setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
+    }
   };
 
   const onAddPassageForPersons = async () => {
     if (!selectedPersons.length) return;
     setAddingPassage(true);
-    for (const person of selectedPersons) {
-      const commentBody = {
-        comment: 'Passage enregistré',
-        item: person._id,
+    const newPassages = [];
+    for (const [index, person] of Object.entries(selectedPersons)) {
+      newPassages.push({
         person: person._id,
-        type: 'person',
-      };
-      await addComment(commentBody);
+        user: user._id,
+        team: currentTeam._id,
+        date: new Date(),
+        optimisticId: index,
+      });
+    }
+    // optimistic UI
+    setPassages((passages) => [...newPassages, ...passages]);
+    for (const [index, passage] of Object.entries(newPassages)) {
+      const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
+      if (response.ok) {
+        setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
+      }
     }
     setAddingPassage(false);
   };
 
-  const onGoToFile = () => history.push(`/person/${selectedPersons[0]._id}`);
-  const onGoToLastReport = () => history.push(`/report/${lastReport._id}`);
+  const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
+  const onGoToPrevReport = () => history.push(lastReport?._id ? `/report/${lastReport._id}` : '/report');
 
   return (
-    <Container style={{ padding: 0 }}>
-      <Header
+    <>
+      <SmallerHeaderWithBackButton
         titleStyle={{ fontWeight: '400' }}
         title={
           <span>
@@ -126,9 +220,9 @@ const Reception = () => {
           md={3}
           style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'column', borderRight: '1px solid #ddd' }}>
           <ButtonCustom
-            onClick={onGoToLastReport}
+            onClick={onGoToPrevReport}
             color="link"
-            title="Accéder au dernier compte-rendu"
+            title="Accéder au compte-rendu précédent"
             padding="12px 24px"
             disabled={!lastReport?._id}
           />
@@ -137,7 +231,13 @@ const Reception = () => {
           md={5}
           style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'column', borderRight: '1px solid #ddd' }}>
           <div style={{ flexShrink: 0, width: '100%' }}>
-            <SelectAndCreatePerson value={selectedPersons} onChange={onSelectPerson} autoCreate />
+            <SelectAndCreatePerson
+              value={selectedPersons}
+              onChange={onSelectPerson}
+              autoCreate
+              inputId="person-select-and-create-reception"
+              classNamePrefix="person-select-and-create-reception"
+            />
           </div>
           <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
             <CreateAction noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
@@ -154,53 +254,31 @@ const Reception = () => {
           </div>
         </Col>
         <Col md={4}>
-          <Card
-            title="Nombre de passages"
-            count={passages}
-            unit={`passage${passages > 1 ? 's' : ''}`}
-            onChange={async (newValue) => {
-              setAddingPassage(true);
-              setPassages(newValue);
-              await incrementPassage(todaysReport, { newValue });
-              setAddingPassage(false);
-            }}>
+          <Card title="Nombre de passages" count={passages.length} countId="number-of-passages" unit={`passage${passages.length > 1 ? 's' : ''}`}>
             <ButtonCustom
-              onClick={async () => {
-                setAddingPassage(true);
-                setPassages((p) => p + 1);
-                await incrementPassage(todaysReport, { newValue: anonymousPassages + 1 });
-                setAddingPassage(false);
-              }}
+              onClick={onAddAnonymousPassage}
               color="link"
               title="Ajouter un passage anonyme"
               padding="0px"
+              id="add-anonymous-passage"
               disabled={addingPassage}
             />
             <ButtonCustom
-              onClick={async () => {
-                setAddingPassage(true);
-                if (!anonymousPassages) return;
-                setPassages((p) => p - 1);
-                await incrementPassage(todaysReport, { newValue: anonymousPassages - 1 });
-                setAddingPassage(false);
-              }}
+              onClick={() => history.push(`/report/${todaysReport._id}?tab=5`)}
               color="link"
-              title="Retirer un passage anonyme"
+              title="Modifier les passages"
               padding="0px"
-              disabled={addingPassage || !anonymousPassages}
             />
           </Card>
         </Col>
       </Row>
-      <Row style={{ paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid #ddd' }}>
+      <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
         <Col md={8} style={{ paddingBottom: 20, marginBottom: 20, borderRight: '1px solid #ddd' }}>
-          <Container>
-            <SectionTitle>Actions</SectionTitle>
-            <div style={{ margin: '15px' }}>
-              <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
-            </div>
-            <ActionsCalendar actions={actionsByStatus} columns={['Heure', 'Nom', 'Personne suivie', 'Status']} />
-          </Container>
+          <SectionTitle>Actions</SectionTitle>
+          <div style={{ margin: '15px' }}>
+            <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
+          </div>
+          <ActionsCalendar actions={actionsByStatus} columns={['Heure', 'Nom', 'Personne suivie', 'Status']} />
         </Col>
         <Col md={4}>
           <SectionTitle style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Services</SectionTitle>
@@ -209,7 +287,7 @@ const Reception = () => {
           ))}
         </Col>
       </Row>
-    </Container>
+    </>
   );
 };
 

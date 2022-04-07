@@ -1,7 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
-import dayjs from 'dayjs';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
@@ -14,53 +12,81 @@ import SelectUser from './SelectUser';
 import { theme } from '../config';
 import Loading from './loading';
 import { Formik } from 'formik';
-import { userState } from '../recoil/auth';
-import { useComments } from '../recoil/comments';
-import { useRecoilValue } from 'recoil';
-import { commentsFilteredSelector } from '../recoil/selectors';
-import { dateForDatePicker } from '../services/date';
+import { currentTeamState, organisationState, userState } from '../recoil/auth';
+import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date';
+import { loadingState } from './Loader';
+import useApi from '../services/api';
 
-const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateResults }) => {
+const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
-  const { deleteComment, addComment, updateComment, loading } = useComments();
+  const API = useApi();
+  const [allComments, setComments] = useRecoilState(commentsState);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
 
-  const comments = useRecoilValue(commentsFilteredSelector({ personId, actionId, forPassages }));
+  const loading = useRecoilValue(loadingState);
+
+  const comments = useMemo(
+    () =>
+      allComments.filter((c) => {
+        if (!!personId) return c.person === personId;
+        if (!!actionId) return c.action === actionId;
+        return false;
+      }),
+    [personId, actionId, allComments]
+  );
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(comments.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comments.length]);
 
   const deleteData = async (id) => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await deleteComment(id);
+      const res = await API.delete({ path: `/comment/${id}` });
+      if (res.ok) setComments((comments) => comments.filter((p) => p._id !== id));
       if (!res.ok) return;
       toastr.success('Suppression réussie');
     }
   };
 
   const addData = async ({ comment }) => {
-    const commentBody = { comment };
-    if (!!personId) {
-      commentBody.item = personId;
-      commentBody.person = personId;
-      commentBody.type = 'person';
-    }
-    if (!!actionId) {
-      commentBody.item = actionId;
-      commentBody.action = actionId;
-      commentBody.type = 'action';
-    }
-    const res = await addComment(commentBody);
-    if (!res.ok) return;
+    const commentBody = {
+      comment,
+      user: user._id,
+      date: new Date(),
+      team: currentTeam._id,
+      organisation: organisation._id,
+    };
+    if (!!personId) commentBody.person = personId;
+    if (!!actionId) commentBody.action = actionId;
+
+    const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
+    if (!response.ok) return;
+    setComments((comments) => [response.decryptedData, ...comments]);
     toastr.success('Commentaire ajouté !');
     setClearNewCommentKey((k) => k + 1);
   };
 
   const updateData = async (comment) => {
-    const res = await updateComment(comment);
-    if (!res.ok) return;
+    const response = await API.put({
+      path: `/comment/${comment._id}`,
+      body: prepareCommentForEncryption(comment),
+    });
+    if (response.ok) {
+      setComments((comments) =>
+        comments.map((c) => {
+          if (c._id === comment._id) return response.decryptedData;
+          return c;
+        })
+      );
+    }
+    if (!response.ok) return;
     toastr.success('Commentaire mis-à-jour');
     setEditing(null);
   };
@@ -69,7 +95,7 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
     <React.Fragment>
       <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
         <Col md={4}>
-          <Title>{!forPassages ? 'Commentaires' : 'Passages'}</Title>
+          <Title>Commentaires</Title>
         </Col>
       </Row>
       <Box>
@@ -77,14 +103,14 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
           <Loading />
         ) : (
           <>
-            <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment forPassages={forPassages} />
+            <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment />
             {comments.map((comment) => {
               return (
                 <StyledComment key={comment._id}>
                   <CloseButton close onClick={() => deleteData(comment._id)} />
                   <UserName id={comment.user} wrapper={(name) => <div className="author">{name}</div>} />
                   <div className="user"></div>
-                  <div className="time">{dayjs(comment.createdAt).format('MMM DD, YYYY | hh:mm A')}</div>
+                  <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                   <div className="content">
                     <p onClick={() => setEditing(comment._id)}>
                       {comment.comment
@@ -112,13 +138,12 @@ const Comments = ({ personId = '', actionId = '', forPassages = false, onUpdateR
         value={comments.find((c) => c._id === editingId)}
         onSubmit={updateData}
         onCancel={() => setEditing(null)}
-        forPassages={forPassages}
       />
     </React.Fragment>
   );
 };
 
-const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment, forPassages }) => {
+const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment }) => {
   const user = useRecoilValue(userState);
   const [open, setOpen] = useState(false);
 
@@ -133,15 +158,15 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment,
 
   return (
     <>
-      {!!newComment && !forPassages && <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />}
+      {!!newComment && <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />}
       <Modal isOpen={!!open} toggle={onCancelRequest} size="lg">
-        <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créér un' : 'Éditer le'} commentaire</ModalHeader>
+        <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={value}
             onSubmit={async (body, actions) => {
               if (!body.user && !newComment) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
-              if (!body.createdAt && !newComment) return toastr.error('Erreur!', 'La date est obligatoire');
+              if (!body.date && !newComment) return toastr.error('Erreur!', 'La date est obligatoire');
               if (!body.comment) return toastr.error('Erreur!', 'Le commentaire est obligatoire');
               await onSubmit({ ...value, ...body });
               actions.setSubmitting(false);
@@ -168,8 +193,8 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment,
                             <DatePicker
                               locale="fr"
                               className="form-control"
-                              selected={dateForDatePicker(values.createdAt ?? new Date())}
-                              onChange={(date) => handleChange({ target: { value: date, name: 'createdAt' } })}
+                              selected={dateForDatePicker((values.date || values.createdAt) ?? new Date())}
+                              onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
                               timeInputLabel="Heure :"
                               dateFormat="dd/MM/yyyy HH:mm"
                               showTimeInput

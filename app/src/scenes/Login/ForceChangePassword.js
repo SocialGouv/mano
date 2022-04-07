@@ -6,15 +6,15 @@ import colors from '../../utils/colors';
 import { ChangePasswordBody } from './ChangePassword';
 import { MyText } from '../../components/MyText';
 import { currentTeamState, userState } from '../../recoil/auth';
-import { useRefresh } from '../../recoil/refresh';
+import { refreshTriggerState } from '../../components/Loader';
 
 const ForceChangePassword = ({ navigation }) => {
   const user = useRecoilState(userState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
-  const { refresh } = useRefresh();
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const onOk = () => {
     if (user.teams?.length === 1) {
-      refresh({ initialLoad: true });
+      setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: true } });
       setCurrentTeam(user.teams[0]);
       navigation.navigate('Home');
     } else {

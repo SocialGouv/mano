@@ -2,112 +2,133 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
-
+const { z } = require("zod");
+const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 const { catchErrors } = require("../errors");
-
+const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
+const validateUser = require("../middleware/validateUser");
 const Report = require("../models/report");
-const encryptedTransaction = require("../utils/encryptedTransaction");
 
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const query = {
-      where: {
-        organisation: req.user.organisation,
-      },
-    };
-
-    const attributes = [
-      // Generic fields
-      "_id",
-      "encrypted",
-      "encryptedEntityKey",
-      "organisation",
-      "createdAt",
-      "updatedAt",
-    ];
-
-    if (req.query.lastRefresh) {
-      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
-      const data = await Report.findAll({ ...query, attributes });
-      return res.status(200).send({ ok: true, data });
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+    } catch (e) {
+      const error = new Error(`Invalid request in report get: ${e}`);
+      error.status = 400;
+      return next(error);
     }
+    const { limit, page, lastRefresh } = req.query;
+
+    const query = { where: { organisation: req.user.organisation } };
 
     const total = await Report.count(query);
-    const limit = parseInt(req.query.limit, 10);
-    if (!!req.query.limit) query.limit = limit;
-    if (req.query.page) query.offset = parseInt(req.query.page, 10) * limit;
+    if (limit) query.limit = Number(limit);
+    if (page) query.offset = Number(page) * limit;
+    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
 
-    const data = await Report.findAll({ ...query, attributes });
-
-    return res.status(200).send({ ok: true, data, hasMore: data.length === limit, total });
+    const data = await Report.findAll({
+      ...query,
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
+    });
+    return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
 );
 
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const { team, date } = req.body;
-
-    // Todo: ignore fields that are encrypted.
-    if (!team) return res.status(400).send({ ok: false, error: "Team is required" });
-    if (!date) return res.status(400).send({ ok: false, error: "Date is required" });
-    if (req.user.role !== "admin" && !req.user.teams.map((t) => t._id).includes(req.body.team)) {
-      capture("not permission creating report", { user: req.user });
-      return res.send(403).send({ ok: false, error: "not permission creating report" });
+  validateUser(["admin", "normal"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      const error = new Error(`Invalid request in report creation: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
-    // Todo: this will not work as is anymore if we remove fields.
-    // We should update all reports with an "ID" which is its date.
-    const existingReport = await Report.findOne({ where: { team, date, organisation: req.user.organisation } });
-    if (existingReport) return res.status(200).send({ ok: true, data: existingReport });
-
-    const data = await Report.create({ team, date, organisation: req.user.organisation });
-    return res.status(200).send({ ok: true, data });
+    const data = await Report.create(
+      {
+        organisation: req.user.organisation,
+        encrypted: req.body.encrypted,
+        encryptedEntityKey: req.body.encryptedEntityKey,
+      },
+      { returning: true }
+    );
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: data._id,
+        encrypted: data.encrypted,
+        encryptedEntityKey: data.encryptedEntityKey,
+        organisation: data.organisation,
+        createdAt: data.createdAt,
+        updatedAt: data.updatedAt,
+      },
+    });
   })
 );
 
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const where = { _id: req.params._id };
-    if (req.user.role !== "admin") where.team = req.user.teams.map((e) => e._id);
-
-    const report = await Report.findOne({ where });
+  validateUser(["admin", "normal"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.string().parse(req.body.encrypted);
+      z.string().parse(req.body.encryptedEntityKey);
+    } catch (e) {
+      const error = new Error(`Invalid request in report put: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
+    const report = await Report.findOne(query);
     if (!report) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const updatedReport = {};
-    // Todo: ignore fields that are encrypted.
-    if (req.body.hasOwnProperty("description")) updatedReport.description = req.body.description || null;
-    if (req.body.hasOwnProperty("collaborations")) updatedReport.collaborations = req.body.collaborations || [];
-    if (req.body.hasOwnProperty("passages")) updatedReport.passages = req.body.passages || null;
-    if (req.body.hasOwnProperty("services")) updatedReport.services = req.body.services || null;
-    if (req.body.hasOwnProperty("encrypted")) updatedReport.encrypted = req.body.encrypted || null;
-    if (req.body.hasOwnProperty("encryptedEntityKey")) updatedReport.encryptedEntityKey = req.body.encryptedEntityKey || null;
-
-    const { ok, data, error, status } = await encryptedTransaction(req)(async (tx) => {
-      report.set(updatedReport);
-      await report.save({ transaction: tx });
-      return report;
+    const { encrypted, encryptedEntityKey } = req.body;
+    report.set({
+      encrypted: encrypted,
+      encryptedEntityKey: encryptedEntityKey,
     });
-
-    return res.status(status).send({ ok, data, error });
+    await report.save();
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: report._id,
+        encrypted: report.encrypted,
+        encryptedEntityKey: report.encryptedEntityKey,
+        organisation: report.organisation,
+        createdAt: report.createdAt,
+        updatedAt: report.updatedAt,
+      },
+    });
   })
 );
 
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  catchErrors(async (req, res) => {
-    const query = {
-      where: {
-        _id: req.params._id,
-        organisation: req.user.organisation,
-      },
-    };
+  validateUser(["admin", "normal"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.params._id);
+    } catch (e) {
+      const error = new Error(`Invalid request in report delete: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
 
     const report = await Report.findOne(query);
     if (!report) return res.status(200).send({ ok: true });
