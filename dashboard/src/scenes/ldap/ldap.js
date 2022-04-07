@@ -13,7 +13,7 @@ import { encryptVerificationKey } from '../../services/encryption';
 import ButtonCustom from '../../components/ButtonCustom';
 import PasswordInput from '../../components/PasswordInput';
 
-const Oidc = () => {
+const Ldap = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const [password, setPassword] = useState('');
@@ -49,7 +49,6 @@ const Oidc = () => {
       onSigninValidated(organisation, user);
       return;
     })
-    //console.log(response);
     event.preventDefault();
   }
 
@@ -151,4 +150,4 @@ const Submit = styled(ButtonCustom)`
   font-size: 16px;
   min-height: 42px;
 `;
-export default Oidc;
+export default Ldap;
