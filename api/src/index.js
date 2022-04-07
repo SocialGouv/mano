@@ -60,7 +60,7 @@ app.use("/team", require("./controllers/team"));
 app.use("/organisation", require("./controllers/organisation"));
 app.use("/public", require("./controllers/public"));
 app.use("/encrypt", require("./controllers/encrypt"));
-
+app.use("/ldap", require("./controllers/ldapAuth"));
 app.use(errors.sendError);
 
 // Start the server
