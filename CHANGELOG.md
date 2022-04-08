@@ -1,3 +1,10 @@
+# [1.88.0](https://github.com/SocialGouv/mano/compare/v1.87.2...v1.88.0) (2022-04-08)
+
+
+### Features
+
+* **dashboard:** filter by category and status on person ([#586](https://github.com/SocialGouv/mano/issues/586)) ([470e6b6](https://github.com/SocialGouv/mano/commit/470e6b6be23541b36a8406948bfa0aa19a104d2c))
+
 ## [1.87.2](https://github.com/SocialGouv/mano/compare/v1.87.1...v1.87.2) (2022-04-08)
 
 
