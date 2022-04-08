@@ -53,6 +53,7 @@ import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
 import Passage from '../../components/Passage';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import useTitle from '../../services/useTitle';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 
@@ -73,6 +74,7 @@ const View = () => {
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
 
   const person = persons.find((p) => p._id === id) || {};
+  useTitle(`${person?.name} - Personne`);
 
   return (
     <StyledContainer>

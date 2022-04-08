@@ -20,10 +20,12 @@ import { formatDateWithFullMonth } from '../../services/date';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { filterBySearch } from '../search/utils';
+import useTitle from '../../services/useTitle';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
+  useTitle('Territoires');
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
 

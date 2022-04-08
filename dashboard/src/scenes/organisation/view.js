@@ -31,6 +31,20 @@ import { ENV, theme } from '../../config';
 import SortableGrid from '../../components/SortableGrid';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { refreshTriggerState } from '../../components/Loader';
+import useTitle from '../../services/useTitle';
+
+const getSettingTitle = (tabId) => {
+  if (tabId === 'infos') return 'Infos';
+  if (tabId === 'encryption') return 'Chiffrement';
+  if (tabId === 'reception') return 'Accueil';
+  if (tabId === 'persons') return 'Personnes';
+  if (tabId === 'consultations') return 'Consultations';
+  if (tabId === 'actions') return 'Actions';
+  if (tabId === 'territories') return 'Territoires';
+  if (tabId === 'export') return 'Export';
+  if (tabId === 'import') return 'Import';
+  return '';
+};
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -42,6 +56,7 @@ const View = () => {
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
+  useTitle(`Organisation - ${getSettingTitle(tab)}`);
 
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });

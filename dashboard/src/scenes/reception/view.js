@@ -22,6 +22,7 @@ import { collectionsToLoadState } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
+import useTitle from '../../services/useTitle';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -94,7 +95,7 @@ const Reception = () => {
   const collectionsToLoad = useRecoilValue(collectionsToLoadState);
   const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
   const API = useApi();
-
+  useTitle('Accueil');
   const persons = useRecoilValue(personsState);
 
   const history = useHistory();

@@ -13,11 +13,13 @@ import { refreshTriggerState, loadingState } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
+import useTitle from '../../services/useTitle';
 
 const List = () => {
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const loading = useRecoilValue(loadingState);
   const currentTeam = useRecoilValue(currentTeamState);
+  useTitle('Comptes rendus');
 
   return (
     <>

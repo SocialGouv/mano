@@ -15,10 +15,12 @@ import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
 import OnboardingEndModal from '../../components/OnboardingEndModal';
 import { formatDateWithFullMonth } from '../../services/date';
+import useTitle from '../../services/useTitle';
 
 const List = () => {
   const teams = useRecoilValue(teamsState);
   const history = useHistory();
+  useTitle('Équipes');
 
   return (
     <>

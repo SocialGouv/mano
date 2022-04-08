@@ -27,6 +27,7 @@ import { dateForDatePicker, now } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import useApi from '../../services/api';
+import useTitle from '../../services/useTitle';
 
 const View = () => {
   const { id } = useParams();
@@ -42,6 +43,8 @@ const View = () => {
   const API = useApi();
 
   const action = actions.find((a) => a._id === id);
+
+  useTitle(`${action?.name} - Action`);
 
   if (!action) return <Loading />;
 

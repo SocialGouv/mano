@@ -20,6 +20,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateWithFullMonth } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
+import useTitle from '../../services/useTitle';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -34,6 +35,7 @@ const List = () => {
   const organisation = useRecoilValue(organisationState);
   const persons = useRecoilValue(personsState);
   const history = useHistory();
+  useTitle('Lieux fréquentés');
 
   const { search, setSearch, page, setPage } = useContext(PaginationContext);
 

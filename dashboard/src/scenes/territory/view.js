@@ -18,6 +18,7 @@ import { useRecoilState, useSetRecoilState } from 'recoil';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
+import useTitle from '../../services/useTitle';
 
 const View = () => {
   const { id } = useParams();
@@ -27,6 +28,8 @@ const View = () => {
   const territory = territories.find((t) => t._id === id);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const API = useApi();
+
+  useTitle(`${territory?.name} - Territoire`);
 
   const deleteData = async () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
