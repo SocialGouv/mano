@@ -27,7 +27,6 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Créer une nouvelle organisation et un administrateur");
     await expect(page).toFill("input[name=orgName]", "My First Orga");
     await expect(page).toClick(".modal-body button[type=submit]");
-    await expect(page).toMatch("Veuillez saisir un nom pour l'administrateur");
     await expect(page).toFill("input[name=name]", "Test First Orga");
     await expect(page).toFill("input[name=email]", "test+firstorga@example.org");
     await expect(page).toClick(".modal-body button[type=submit]");
