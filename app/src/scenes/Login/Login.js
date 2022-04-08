@@ -106,7 +106,7 @@ const Login = ({ navigation }) => {
       API.organisation = response.user.organisation;
       setUser(response.user);
       setOrganisation(response.user.organisation);
-      if (!!response.user.organisation?.encryptionEnabled && !showEncryptionKeyInput) {
+      if (!showEncryptionKeyInput) {
         setLoading(false);
         setShowEncryptionKeyInput(true);
         return;
