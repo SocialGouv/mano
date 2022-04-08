@@ -441,7 +441,6 @@ const Summary = ({ person }) => {
 
 const Actions = ({ person, onUpdateResults }) => {
   const actions = useRecoilValue(actionsState);
-  const [data, setData] = useState([]);
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
   const [filterCategories, setFilterCategories] = useState([]);
@@ -449,10 +448,10 @@ const Actions = ({ person, onUpdateResults }) => {
 
   const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
 
-  useEffect(() => {
-    if (!person) return;
-    setData(actions.filter((a) => a.person === person._id));
-  }, [actions, person]);
+  const data = useMemo(() => {
+    if (!person) return [];
+    return actions.filter((a) => a.person === person._id);
+  }, [person, actions]);
 
   const filteredData = useMemo(() => {
     let actionsToSet = data;
@@ -460,10 +459,9 @@ const Actions = ({ person, onUpdateResults }) => {
       actionsToSet = actionsToSet.filter((a) => filterCategories.some((c) => (a.categories || []).includes(c)));
     }
     if (filterStatus.length) {
-      console.log(filterStatus);
       actionsToSet = actionsToSet.filter((a) => filterStatus.some((s) => a.status === s));
     }
-    return actionsToSet.sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1));
+    return actionsToSet.sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)).map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a));
   }, [data, filterCategories, filterStatus]);
 
   useEffect(() => {
@@ -511,7 +509,7 @@ const Actions = ({ person, onUpdateResults }) => {
       ) : null}
 
       <StyledTable
-        data={filteredData.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}1
+        data={filteredData}
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         noData={data.length && !filteredData.length ? 'Aucune action trouvée' : 'Aucune action'}
