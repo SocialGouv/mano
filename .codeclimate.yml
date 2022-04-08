@@ -18,3 +18,6 @@ checks:
   identical-code:
     config:
       threshold: 70
+plugins:
+  duplication:
+    enabled: false
