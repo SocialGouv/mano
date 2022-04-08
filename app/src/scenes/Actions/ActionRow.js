@@ -15,6 +15,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
   const name = action?.name;
   const status = action?.status;
   const withTime = action?.withTime;
+  const urgent = action?.urgent;
   const person = useMemo(() => (action?.person ? persons?.find((p) => p._id === action.person) : null), [persons, action.person]);
   const pseudo = useMemo(() => action?.personName || person?.name, [action, person?.name]);
   const dueAt = action?.dueAt ? new Date(action?.dueAt) : null;
@@ -52,6 +53,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
             <Pseudo>Pour {pseudo}</Pseudo>
           </PseudoContainer>
         ) : null}
+        {urgent ? <Urgent bold>❗ Action prioritaire</Urgent> : null}
       </CaptionsContainer>
       <ButtonRight onPress={onActionPress} caption=">" />
     </RowContainer>
@@ -67,6 +69,13 @@ const CaptionsContainer = styled.View`
 const Name = styled(MyText)`
   font-weight: bold;
   font-size: 17px;
+`;
+
+const Urgent = styled(MyText)`
+  font-weight: bold;
+  font-size: 17px;
+  margin-top: 10px;
+  color: red;
 `;
 
 const StatusContainer = styled.View`

@@ -18,6 +18,7 @@ import { currentTeamState, userState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
 import API from '../../services/api';
 import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
+import CheckboxLabelled from '../../components/CheckboxLabelled';
 
 const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
@@ -27,6 +28,7 @@ const NewActionForm = ({ route, navigation }) => {
   const [name, setName] = useState('');
   const [dueAt, setDueAt] = useState(null);
   const [withTime, setWithTime] = useState(false);
+  const [urgent, setUrgent] = useState(false);
   const [persons, setPersons] = useState(route.params?.person ? [route.params?.person] : []);
   const [categories, setCategories] = useState([]);
   const forCurrentPerson = useRef(!!route.params?.person).current;
@@ -72,6 +74,7 @@ const NewActionForm = ({ route, navigation }) => {
           team: currentTeam._id,
           dueAt,
           withTime,
+          urgent,
           status,
           categories,
           user: user._id,
@@ -185,6 +188,12 @@ const NewActionForm = ({ route, navigation }) => {
             testID="new-action-dueAt"
           />
           <ActionCategoriesMultiCheckboxes onChange={setCategories} values={categories} editable />
+          <CheckboxLabelled
+            label="Action prioritaire (cette action sera mise en avant par rapport aux autres)"
+            alone
+            onPress={() => setUrgent(!urgent)}
+            value={urgent}
+          />
           <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateAction} loading={posting} testID="new-action-create" />
         </View>
       </ScrollContainer>

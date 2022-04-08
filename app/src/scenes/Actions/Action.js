@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, findNodeHandle } from 'react-native';
 import * as Sentry from '@sentry/react-native';
+import styled from 'styled-components';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -28,6 +29,7 @@ import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
 import { MMKV } from '../../services/dataManagement';
+import CheckboxLabelled from '../../components/CheckboxLabelled';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -40,6 +42,7 @@ const castToAction = (action) => {
     status: action.status || TODO,
     dueAt: action.dueAt || null,
     withTime: action.withTime || false,
+    urgent: action.urgent || false,
     completedAt: action.completedAt || null,
     entityKey: action.entityKey || '',
     team: action.team || null,
@@ -281,7 +284,7 @@ const Action = ({ navigation, route }) => {
 
   const onDuplicate = async () => {
     setUpdating(true);
-    const { name, person, dueAt, withTime, description, categories } = action;
+    const { name, person, dueAt, withTime, description, categories, urgent } = action;
     const response = await API.post({
       path: '/action',
       body: prepareActionForEncryption({
@@ -294,6 +297,7 @@ const Action = ({ navigation, route }) => {
         status: TODO,
         description,
         categories,
+        urgent,
       }),
     });
     if (!response.ok) {
@@ -408,7 +412,7 @@ const Action = ({ navigation, route }) => {
 
   const canComment = !route?.params?.actions || route?.params?.actions?.length <= 1;
 
-  const { name, dueAt, withTime, description, categories, status } = action;
+  const { name, dueAt, withTime, description, categories, status, urgent } = action;
 
   return (
     <SceneContainer>
@@ -422,6 +426,7 @@ const Action = ({ navigation, route }) => {
       />
       <ScrollContainer ref={scrollViewRef}>
         {!!action.user && <UserName metaCaption="Action ajoutée par" id={action.user?._id || action.user} />}
+        {!editable && urgent ? <Urgent bold>❗ Action prioritaire</Urgent> : null}
         <InputLabelled
           label="Nom de l’action"
           onChangeText={(name) => setAction((a) => ({ ...a, name }))}
@@ -481,6 +486,15 @@ const Action = ({ navigation, route }) => {
           values={categories}
           editable={editable}
         />
+        {editable ? (
+          <CheckboxLabelled
+            label="Action prioritaire (cette action sera mise en avant par rapport aux autres)"
+            alone
+            onPress={() => setAction((a) => ({ ...a, urgent: !a.urgent }))}
+            value={urgent}
+          />
+        ) : null}
+
         {!editable && <Spacer />}
         <ButtonsContainer>
           <ButtonDelete onPress={onDeleteRequest} />
@@ -525,5 +539,13 @@ const Action = ({ navigation, route }) => {
     </SceneContainer>
   );
 };
+
+const Urgent = styled(MyText)`
+  font-weight: bold;
+  font-size: 17px;
+  padding: 2px 5px;
+  margin: 0 auto 20px;
+  color: red;
+`;
 
 export default Action;

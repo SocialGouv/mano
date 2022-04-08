@@ -22,6 +22,7 @@ import { commentsState } from '../../recoil/comments';
 import { currentTeamState } from '../../recoil/auth';
 import { personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
+import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
@@ -125,10 +126,18 @@ const List = () => {
       {showAs === showAsOptions[1] && (
         <>
           <Table
-            data={data}
+            data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
             rowKey={'_id'}
             onRowClick={(action) => history.push(`/action/${action._id}`)}
             columns={[
+              {
+                title: '',
+                dataKey: 'urgent',
+                small: true,
+                render: (action) => {
+                  return action.urgent ? <ExclamationMarkButton /> : null;
+                },
+              },
               {
                 title: 'À faire le',
                 dataKey: 'dueAt' || '_id',
