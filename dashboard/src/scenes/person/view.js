@@ -33,7 +33,7 @@ import {
   preparePersonForEncryption,
   commentForUpdatePerson,
 } from '../../recoil/persons';
-import { actionsState } from '../../recoil/actions';
+import { actionsState, mappedIdsToLabels } from '../../recoil/actions';
 import UserName from '../../components/UserName';
 import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -441,13 +441,28 @@ const Summary = ({ person }) => {
 
 const Actions = ({ person, onUpdateResults }) => {
   const actions = useRecoilValue(actionsState);
-  const [data, setData] = useState([]);
   const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
+  const [filterCategories, setFilterCategories] = useState([]);
+  const [filterStatus, setFilterStatus] = useState([]);
 
-  useEffect(() => {
-    if (!person) return;
-    setData(actions.filter((a) => a.person === person._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)));
-  }, [actions, person]);
+  const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
+
+  const data = useMemo(() => {
+    if (!person) return [];
+    return actions.filter((a) => a.person === person._id);
+  }, [person, actions]);
+
+  const filteredData = useMemo(() => {
+    let actionsToSet = data;
+    if (filterCategories.length) {
+      actionsToSet = actionsToSet.filter((a) => filterCategories.some((c) => (a.categories || []).includes(c)));
+    }
+    if (filterStatus.length) {
+      actionsToSet = actionsToSet.filter((a) => filterStatus.some((s) => a.status === s));
+    }
+    return actionsToSet.sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)).map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a));
+  }, [data, filterCategories, filterStatus]);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -460,10 +475,44 @@ const Actions = ({ person, onUpdateResults }) => {
         <Title>Actions</Title>
         <CreateAction person={person._id} />
       </div>
+      {data.length ? (
+        <Row>
+          <Col md={6}>
+            <Label>Filtrer par catégorie</Label>
+            <SelectCustom
+              options={catsSelect}
+              name="categories"
+              onChange={(c) => {
+                setFilterCategories(c);
+              }}
+              isClearable
+              isMulti
+              getOptionValue={(c) => c}
+              getOptionLabel={(c) => c}
+            />
+          </Col>
+          <Col md={6}>
+            <Label>Filtrer par statut</Label>
+            <SelectCustom
+              options={mappedIdsToLabels}
+              getOptionValue={(s) => s._id}
+              getOptionLabel={(s) => s.name}
+              name="status"
+              onChange={(s) => {
+                setFilterStatus(s.map((s) => s._id));
+              }}
+              isClearable
+              isMulti
+            />
+          </Col>
+        </Row>
+      ) : null}
+
       <StyledTable
-        data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
+        data={filteredData}
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
+        noData={data.length && !filteredData.length ? 'Aucune action trouvée' : 'Aucune action'}
         columns={[
           {
             title: '',
