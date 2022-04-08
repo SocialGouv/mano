@@ -21,7 +21,7 @@ export default function PersonName({ item, redirectToTab = 'résumé' }) {
 
 const BoldOnHover = styled.span`
   &:hover {
-    font-weight: bold;
+    background-color: yellow;
     cursor: zoom-in;
   }
 `;
