@@ -45,6 +45,7 @@ const TableCustomFields = ({
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
   const [isNewField, setIsNewField] = useState(null);
+  const [tableKey, setTableKey] = useState(0);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const API = useApi();
 
@@ -93,6 +94,7 @@ const TableCustomFields = ({
         toastr.success('Mise à jour !');
         setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
+        setTableKey((k) => k + 1);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
@@ -113,6 +115,7 @@ const TableCustomFields = ({
         toastr.success('Mise à jour !');
         setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
+        setTableKey((k) => k + 1);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
@@ -126,7 +129,7 @@ const TableCustomFields = ({
       <Table
         data={mutableData}
         // use this key prop to reset table and reset sortablejs on each element added/removed
-        key={(keyPrefix || customFields) + mutableData.length}
+        key={(keyPrefix || customFields) + tableKey}
         rowKey="name"
         isSortable
         onSort={handleSort}
