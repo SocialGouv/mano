@@ -42,15 +42,15 @@ const Account = () => {
             <Row>
               <Col md={6}>
                 <FormGroup>
-                  <Label>Nom</Label>
-                  <Input name="name" value={values.name} onChange={handleChange} />
+                  <Label htmlFor="name">Nom</Label>
+                  <Input id="name" name="name" value={values.name} onChange={handleChange} />
                 </FormGroup>
               </Col>
               {/* <Col md={6} /> */}
               <Col md={6}>
                 <FormGroup>
-                  <Label>Email</Label>
-                  <Input disabled name="email" value={values.email} onChange={handleChange} />
+                  <Label htmlFor="email">Email</Label>
+                  <Input disabled id="email" name="email" value={values.email} onChange={handleChange} />
                 </FormGroup>
               </Col>
               {/* <Col md={6} /> */}

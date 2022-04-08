@@ -7,6 +7,7 @@ const SelectTeamMultiple = ({ onChange, value = [], inputId, classNamePrefix }) 
   const teams = useRecoilValue(teamsState);
   return (
     <SelectCustom
+      name="name"
       options={teams.map(({ _id }) => _id)}
       onChange={onChange}
       value={value}

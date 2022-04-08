@@ -80,13 +80,13 @@ const CreatePerson = ({ refreshable }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Nom</Label>
-                      <Input name="name" value={values.name} onChange={handleChange} />
+                      <Label htmlFor="name">Nom</Label>
+                      <Input name="name" id="name" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Équipe(s) en charge</Label>
+                      <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
                       <SelectTeamMultiple
                         onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
                         value={values.assignedTeams}

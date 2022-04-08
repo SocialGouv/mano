@@ -69,7 +69,7 @@ const OutOfActiveList = ({ person }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <label>
+                      <label htmlFor="person-select-outOfActiveListReason">
                         Veuillez préciser le motif de sortie
                         <SelectAsInput
                           styles={{ width: '800px' }}

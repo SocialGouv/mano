@@ -147,7 +147,9 @@ const List = () => {
       </Row>
       <Row style={{ marginBottom: 20 }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
+          <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+            Recherche :{' '}
+          </label>
           <Search
             placeholder="Par mot clé, présent dans le nom, la description, un commentaire, une action, ..."
             value={search}
@@ -155,9 +157,10 @@ const List = () => {
           />
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
-          <label style={{ marginLeft: '270px' }}>
+          <label htmlFor="viewAllOrganisationData" style={{ marginLeft: '270px' }}>
             <input
               type="checkbox"
+              id="viewAllOrganisationData"
               style={{ marginRight: 10 }}
               checked={viewAllOrganisationData}
               onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
@@ -166,8 +169,8 @@ const List = () => {
           </label>
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
-          <label style={{ marginLeft: '270px' }}>
-            <input type="checkbox" style={{ marginRight: 10 }} value={alertness} onChange={() => setFilterAlertness(!alertness)} />
+          <label htmlFor="alertness" style={{ marginLeft: '270px' }}>
+            <input type="checkbox" style={{ marginRight: 10 }} id="alertness" value={alertness} onChange={() => setFilterAlertness(!alertness)} />
             N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
           </label>
         </Col>

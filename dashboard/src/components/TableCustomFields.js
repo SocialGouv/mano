@@ -241,14 +241,15 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                   <Row>
                     <Col md={12}>
                       <FormGroup>
-                        <Label>Nom</Label>
-                        <Input type="textarea" name="label" value={field.label} onChange={handleChange} />
+                        <Label htmlFor="label">Nom</Label>
+                        <Input type="textarea" id="label" name="label" value={field.label} onChange={handleChange} />
                       </FormGroup>
                     </Col>
                     <Col md={6}>
                       <FormGroup>
-                        <Label>Type</Label>
+                        <Label htmlFor="type">Type</Label>
                         <SelectCustom
+                          inputId="type"
                           options={typeOptions}
                           value={getValueFromType(field.type)}
                           onChange={({ value }) => handleChange({ currentTarget: { value, name: 'type' } })}
@@ -258,8 +259,9 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                     <Col md={6}>
                       {!!['enum', 'multi-choice'].includes(field.type) && (
                         <FormGroup>
-                          <Label>Choix</Label>
+                          <Label htmlFor="options">Choix</Label>
                           <SelectCustom
+                            inputId="options"
                             creatable
                             options={[...(editingField?.options || field?.options || [])]
                               .sort((c1, c2) => c1.localeCompare(c2))
@@ -273,19 +275,19 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                     </Col>
                     <Col md={6}>
                       <FormGroup>
-                        <Label></Label>
+                        <Label />
                         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                          <span>Activé</span>
-                          <Input type="checkbox" name="enabled" checked={field.enabled} onChange={handleChange} />
+                          <label htmlFor="enabled">Activé</label>
+                          <Input id="enabled" type="checkbox" name="enabled" checked={field.enabled} onChange={handleChange} />
                         </div>
                       </FormGroup>
                     </Col>
                     <Col md={6}>
                       <FormGroup>
-                        <Label></Label>
+                        <Label />
                         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                          <span>Voir dans les satistiques</span>
-                          <Input type="checkbox" name="showInStats" checked={field.showInStats} onChange={handleChange} />
+                          <label htmlFor="showInStats">Voir dans les satistiques</label>
+                          <Input type="checkbox" id="showInStats" name="showInStats" checked={field.showInStats} onChange={handleChange} />
                         </div>
                       </FormGroup>
                     </Col>

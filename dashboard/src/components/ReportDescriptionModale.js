@@ -47,8 +47,8 @@ const ReportDescriptionModale = ({ report }) => {
               <Row>
                 <Col md={12}>
                   <FormGroup>
-                    <Label>Description</Label>
-                    <Input name="description" type="textarea" value={values.description} onChange={handleChange} />
+                    <Label htmlFor="description">Description</Label>
+                    <Input id="description" name="description" type="textarea" value={values.description} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>

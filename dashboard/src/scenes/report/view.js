@@ -760,7 +760,7 @@ const DescriptionAndCollaborations = ({ report }) => {
                       alignItems: report?.description?.length ? 'center' : 'flex-start',
                       justifyContent: 'flex-start',
                     }}>
-                    <Label>Description</Label>
+                    <Label htmlFor="description">Description</Label>
                     <ReportDescriptionModale report={report} />
                   </div>
                   <p>
@@ -776,7 +776,7 @@ const DescriptionAndCollaborations = ({ report }) => {
               <Col md={2} />
               <Col md={5}>
                 <FormGroup>
-                  <Label>Collaboration</Label>
+                  <Label htmlFor="report-select-collaboration">Collaboration</Label>
                   <SelectAndCreateCollaboration values={values.collaborations} onChange={handleChange} />
                 </FormGroup>
               </Col>

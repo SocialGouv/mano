@@ -76,8 +76,8 @@ const View = () => {
               <Row>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Nom</Label>
-                    <Input name="name" value={values.name} onChange={handleChange} />
+                    <Label htmlFor="name">Nom</Label>
+                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={6} />
@@ -85,8 +85,8 @@ const View = () => {
                   <FormGroup>
                     <Label />
                     <div style={{ display: 'flex', marginLeft: 20, width: '80%' }}>
-                      <span>Maraude de nuit</span>
-                      <Input type="checkbox" name="nightSession" checked={values.nightSession} onChange={handleChange} />
+                      <label htmlFor="nightSession">Maraude de nuit</label>
+                      <Input type="checkbox" name="nightSession" id="nightSession" checked={values.nightSession} onChange={handleChange} />
                       <NightSessionModale />
                     </div>
                   </FormGroup>

@@ -1,5 +1,5 @@
 import React, { Fragment, useContext, useState } from 'react';
-import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton } from 'reactstrap';
+import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
@@ -60,7 +60,9 @@ const List = () => {
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
+          <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+            Recherche :{' '}
+          </label>
           <Search placeholder="Par nom du lieu" value={search} onChange={setSearch} />
         </Col>
       </Row>
@@ -145,7 +147,7 @@ const Create = () => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <div>Nom</div>
+                      <Label htmlFor="create-place-name">Nom</Label>
                       <Input name="name" id="create-place-name" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>

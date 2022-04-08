@@ -4,7 +4,7 @@ import { Label } from 'reactstrap';
 import useApi from '../services/api';
 import SelectCustom from './SelectCustom';
 
-const SelectStructure = ({ value = '', onChange, name }) => {
+const SelectStructure = ({ value = '', onChange, name = 'structure' }) => {
   const [data, setData] = useState(null);
   const API = useApi();
 
@@ -19,8 +19,9 @@ const SelectStructure = ({ value = '', onChange, name }) => {
 
   return (
     <>
-      <Label>Structure</Label>
+      <Label htmlFor={name}>Structure</Label>
       <SelectCustom
+        inputId={name}
         options={data}
         name={name || ''}
         value={data.find((o) => o._id === value)}

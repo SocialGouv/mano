@@ -86,7 +86,7 @@ export function MedicalFile({ person }) {
               <Row>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Date de naissance</Label>
+                    <Label htmlFor="person-birthdate">Date de naissance</Label>
                     <div>
                       <DatePicker
                         locale="fr"
@@ -100,7 +100,7 @@ export function MedicalFile({ person }) {
                   </FormGroup>
                 </Col>
                 <Col md={4}>
-                  <Label>Genre</Label>
+                  <Label htmlFor="person-select-gender">Genre</Label>
                   <SelectAsInput
                     options={genderOptions}
                     name="gender"
@@ -112,12 +112,12 @@ export function MedicalFile({ person }) {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Structure de suivi médical</Label>
-                    <Input name="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
+                    <Label htmlFor="structureMedical">Structure de suivi médical</Label>
+                    <Input name="structureMedical" id="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
-                  <Label>Couverture médicale</Label>
+                  <Label htmlFor="person-select-healthInsurance">Couverture médicale</Label>
                   <SelectAsInput
                     options={healthInsuranceOptions}
                     name="healthInsurance"
@@ -128,8 +128,8 @@ export function MedicalFile({ person }) {
                   />
                 </Col>
                 <Col md={4}>
-                  <Label>Numéro de sécurité sociale</Label>
-                  <Input name="numeroSecuriteSociale" value={values.numeroSecuriteSociale || ''} onChange={handleChange} />
+                  <Label htmlFor="numeroSecuriteSociale">Numéro de sécurité sociale</Label>
+                  <Input name="numeroSecuriteSociale" id="numeroSecuriteSociale" value={values.numeroSecuriteSociale || ''} onChange={handleChange} />
                 </Col>
               </Row>
               <Row>
@@ -435,15 +435,16 @@ export function MedicalFile({ person }) {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Nom</Label>
+                      <Label htmlFor="create-action-name">Nom</Label>
                       <Input id="create-action-name" name="name" value={values.name} onChange={handleChange} />
                       {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Type</Label>
+                      <Label htmlFor="type">Type</Label>
                       <SelectCustom
+                        id="type"
                         value={{ label: values.type, value: values.type }}
                         onChange={(t) => {
                           handleChange({ currentTarget: { value: t.value, name: 'type' } });
@@ -463,7 +464,7 @@ export function MedicalFile({ person }) {
                     })}
 
                   <Col md={6}>
-                    <Label>Statut</Label>
+                    <Label htmlFor="new-action-select-status">Statut</Label>
                     <SelectStatus
                       name="status"
                       value={values.status || ''}
@@ -475,7 +476,7 @@ export function MedicalFile({ person }) {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Date</Label>
+                      <Label htmlFor="create-action-dueat">Date</Label>
                       <div>
                         <DatePicker
                           locale="fr"
@@ -493,7 +494,7 @@ export function MedicalFile({ person }) {
                   </Col>
                   <Col md={12}>
                     <FormGroup>
-                      <Label>
+                      <Label htmlFor="create-action-onlyme">
                         <input
                           type="checkbox"
                           id="create-action-onlyme"
@@ -555,37 +556,38 @@ export function MedicalFile({ person }) {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Nom</Label>
-                      <Input placeholder="Amoxicilline" name="name" value={values.name} onChange={handleChange} />
+                      <Label htmlFor="medicine-name">Nom</Label>
+                      <Input placeholder="Amoxicilline" name="name" id="medicine-name" value={values.name} onChange={handleChange} />
                       {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Dosage</Label>
-                      <Input placeholder="1mg" name="dosage" value={values.dosage} onChange={handleChange} />
+                      <Label htmlFor="dosage">Dosage</Label>
+                      <Input placeholder="1mg" name="dosage" id="dosage" value={values.dosage} onChange={handleChange} />
                       {touched.dosage && errors.dosage && <Error>{errors.dosage}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Fréquence</Label>
-                      <Input placeholder="1 fois par jour" name="frequency" value={values.frequency} onChange={handleChange} />
+                      <Label htmlFor="frequency">Fréquence</Label>
+                      <Input placeholder="1 fois par jour" name="frequency" id="frequency" value={values.frequency} onChange={handleChange} />
                       {touched.frequency && errors.frequency && <Error>{errors.frequency}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Indication</Label>
-                      <Input placeholder="Angine" name="indication" value={values.indication} onChange={handleChange} />
+                      <Label htmlFor="indication">Indication</Label>
+                      <Input placeholder="Angine" name="indication" id="indication" value={values.indication} onChange={handleChange} />
                       {touched.indication && errors.indication && <Error>{errors.indication}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Date de début</Label>
+                      <Label htmlFor="startDate">Date de début</Label>
                       <div>
                         <DatePicker
+                          id="startDate"
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.startDate)}
@@ -598,9 +600,10 @@ export function MedicalFile({ person }) {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Date de fin</Label>
+                      <Label htmlFor="endDate">Date de fin</Label>
                       <div>
                         <DatePicker
+                          id="endDate"
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.endDate)}

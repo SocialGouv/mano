@@ -92,10 +92,11 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                     ))}
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Observation faite le</Label>
+                      <Label htmlFor="observation-observedat">Observation faite le</Label>
                       <div>
                         <DatePicker
                           locale="fr"
+                          name="observedAt"
                           className="form-control"
                           selected={dateForDatePicker((values.observedAt || values.createdAt) ?? new Date())}
                           onChange={(date) => handleChange({ target: { value: date, name: 'observedAt' } })}
@@ -109,8 +110,9 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Sous l'équipe</Label>
+                      <Label htmlFor="observation-select-team">Sous l'équipe</Label>
                       <SelectTeam
+                        name="team"
                         teams={user.teams}
                         teamId={values.team}
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
@@ -122,7 +124,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Territoire</Label>
+                      <Label htmlFor="observation-select-territory">Territoire</Label>
                       <SelectCustom
                         options={territories}
                         name="place"

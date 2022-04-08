@@ -4,15 +4,16 @@ import { useRecoilValue } from 'recoil';
 import { personsState } from '../recoil/persons';
 import SelectCustom from './SelectCustom';
 
-const SelectPerson = ({ value = '', onChange, isMulti = false, noLabel = false, isClearable = false, ...props }) => {
+const SelectPerson = ({ value = '', onChange, isMulti = false, noLabel = false, isClearable = false, inputId = 'person', ...props }) => {
   const persons = useRecoilValue(personsState);
 
   return (
     <>
-      {!noLabel && <Label>{isMulti ? 'Personnes(s) suivie(s)' : 'Personne suivie'}</Label>}
+      {!noLabel && <Label htmlFor={inputId}>{isMulti ? 'Personnes(s) suivie(s)' : 'Personne suivie'}</Label>}
       <SelectCustom
         options={persons}
         name="person"
+        inputId={inputId}
         isMulti={isMulti}
         isClearable={isClearable}
         isSearchable
