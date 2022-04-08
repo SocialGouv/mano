@@ -1,3 +1,11 @@
+## [1.89.1](https://github.com/SocialGouv/mano/compare/v1.89.0...v1.89.1) (2022-04-08)
+
+
+### Bug Fixes
+
+* **dashboard:** table custom field mutations ([#594](https://github.com/SocialGouv/mano/issues/594)) ([3d14a36](https://github.com/SocialGouv/mano/commit/3d14a362325612fcaef6597fe181496a8bad6a36))
+* send only public data in public route ([#590](https://github.com/SocialGouv/mano/issues/590)) ([9900a60](https://github.com/SocialGouv/mano/commit/9900a60231cc443bc073631f2296e55035c73d85))
+
 # [1.89.0](https://github.com/SocialGouv/mano/compare/v1.88.0...v1.89.0) (2022-04-08)
 
 
