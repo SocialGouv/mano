@@ -1,3 +1,10 @@
+# [1.86.0](https://github.com/SocialGouv/mano/compare/v1.85.9...v1.86.0) (2022-04-08)
+
+
+### Features
+
+* **dashboard:** display birthdate on reception ([#584](https://github.com/SocialGouv/mano/issues/584)) ([e03960c](https://github.com/SocialGouv/mano/commit/e03960cc7489d4a34bda9f2262955fc2a0658f80))
+
 ## [1.85.9](https://github.com/SocialGouv/mano/compare/v1.85.8...v1.85.9) (2022-04-08)
 
 
