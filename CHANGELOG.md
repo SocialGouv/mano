@@ -1,3 +1,10 @@
+## [1.87.2](https://github.com/SocialGouv/mano/compare/v1.87.1...v1.87.2) (2022-04-08)
+
+
+### Bug Fixes
+
+* **app:** can update an obs that does not belong to me ([#592](https://github.com/SocialGouv/mano/issues/592)) ([f8030e2](https://github.com/SocialGouv/mano/commit/f8030e2ee3ec6b58161af7a0080f3e037b3455b0))
+
 ## [1.87.1](https://github.com/SocialGouv/mano/compare/v1.87.0...v1.87.1) (2022-04-08)
 
 
