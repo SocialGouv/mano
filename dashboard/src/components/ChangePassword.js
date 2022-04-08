@@ -90,11 +90,12 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
           <div autoComplete="off">
             {!!withCurrentPassword && (
               <FormGroup>
-                <Label>Mot de passe</Label>
+                <Label htmlFor="password">Mot de passe</Label>
                 <PasswordInput
                   InputComponent={Input}
                   value={values.password}
                   name="password"
+                  id="password"
                   onChange={handleChange}
                   showPassword={showPassword}
                   setShowPassword={setShowPassword}
@@ -102,10 +103,11 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
               </FormGroup>
             )}
             <FormGroup>
-              <Label>Nouveau mot de passe</Label>
+              <Label htmlFor="newPassword">Nouveau mot de passe</Label>
               <PasswordInput
                 InputComponent={Input}
                 name="newPassword"
+                id="newPassword"
                 value={values.newPassword}
                 onChange={handleChange}
                 showPassword={showPassword}
@@ -123,11 +125,12 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
               })}
             </FormGroup>
             <FormGroup>
-              <Label>Confirmez le nouveau mot de passe</Label>
+              <Label htmlFor="verifyPassword">Confirmez le nouveau mot de passe</Label>
               <PasswordInput
                 InputComponent={Input}
                 value={values.verifyPassword}
                 name="verifyPassword"
+                id="verifyPassword"
                 onChange={handleChange}
                 showPassword={showPassword}
                 setShowPassword={setShowPassword}

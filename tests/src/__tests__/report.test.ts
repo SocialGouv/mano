@@ -251,6 +251,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toFill('textarea[name="description"]', "Ceci est une description");
     await expect(page).toClick("button", { text: "Enregistrer" });
     await expect(page).toClick("div.close-toastr");
+    await expect(page).toMatch("Description", { timeout: 1000 });
     await expect(page).toMatch("Ceci est une description");
   });
 });

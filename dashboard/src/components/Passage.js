@@ -88,9 +88,10 @@ const Passage = ({ passage, onFinished }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Date</Label>
+                      <Label htmlFor="date">Date</Label>
                       <div>
                         <DatePicker
+                          id="date"
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.date)}
@@ -109,13 +110,13 @@ const Passage = ({ passage, onFinished }) => {
                   </Col>
                   <Col md={12}>
                     <FormGroup>
-                      <Label>Commentaire</Label>
+                      <Label htmlFor="update-passage-comment">Commentaire</Label>
                       <Input name="comment" type="textarea" value={values.comment} onChange={handleChange} id="update-passage-comment" />
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Créé par</Label>
+                      <Label htmlFor="update-passage-user-select">Créé par</Label>
                       <SelectUser
                         inputId="update-passage-user-select"
                         value={values.user || user._id}
@@ -125,7 +126,7 @@ const Passage = ({ passage, onFinished }) => {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Sous l'équipe</Label>
+                      <Label htmlFor="update-passage-team-select">Sous l'équipe</Label>
                       <SelectTeam
                         teams={user.role === 'admin' ? teams : user.teams}
                         teamId={values.team}

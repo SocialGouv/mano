@@ -92,17 +92,23 @@ const List = () => {
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Recherche : </span>
+          <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+            Recherche :{' '}
+          </label>
           <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Filtrer par status : </span>
+          <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+            Filtrer par status :{' '}
+          </label>
           <div style={{ width: 300 }}>
-            <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
+            <SelectStatus inputId="filter-by-status" noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
           </div>
         </Col>
         <Col md={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <span style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Afficher par : </span>
+          <label htmlFor="actions-show-as" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+            Afficher par :{' '}
+          </label>
           <div style={{ width: 300 }}>
             <SelectCustom
               onChange={setShowAs}
@@ -110,6 +116,7 @@ const List = () => {
               options={showAsOptions}
               isClearable={false}
               isMulti={false}
+              inputId="actions-show-as"
               getOptionValue={(i) => i}
               getOptionLabel={(i) => i}
             />

@@ -81,19 +81,19 @@ const View = () => {
               <Row>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Nom</Label>
-                    <Input name="name" value={values.name} onChange={handleChange} />
+                    <Label htmlFor="name">Nom</Label>
+                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Email</Label>
-                    <Input name="email" value={values.email} onChange={handleChange} />
+                    <Label htmlFor="email">Email</Label>
+                    <Input name="email" id="email" value={values.email} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Équipes</Label>
+                    <Label htmlFor="team">Équipes</Label>
                     <div>
                       <SelectTeamMultiple
                         onChange={(team) => handleChange({ target: { value: team || [], name: 'team' } })}
@@ -101,24 +101,27 @@ const View = () => {
                         value={values.team || []}
                         colored
                         required
+                        inputId="team"
                       />
                     </div>
                   </FormGroup>
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Role</Label>
+                    <Label htmlFor="role">Role</Label>
                     <SelectCustom
                       options={['normal', 'admin'].map((role) => ({ value: role, label: role }))}
                       onChange={({ value }) => handleChange({ target: { value, name: 'role' } })}
                       value={{ value: values.role, label: values.role }}
+                      inputId="role"
                     />
                   </FormGroup>
                 </Col>
                 <Col md={12}>
-                  <Label style={{ marginBottom: 0 }}>
+                  <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
                     <input
                       type="checkbox"
+                      id="healthcareProfessional"
                       style={{ marginRight: '0.5rem' }}
                       name="healthcareProfessional"
                       checked={values.healthcareProfessional}

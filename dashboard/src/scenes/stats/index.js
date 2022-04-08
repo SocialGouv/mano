@@ -151,8 +151,13 @@ const Stats = () => {
         </Col>
         <Col md={4} style={{ flexShrink: 0 }}>
           {teams.length > 1 && (
-            <label>
-              <input type="checkbox" style={{ marginRight: '1rem' }} onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)} />
+            <label htmlFor="viewAllOrganisationData">
+              <input
+                id="viewAllOrganisationData"
+                type="checkbox"
+                style={{ marginRight: '1rem' }}
+                onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+              />
               Statistiques de toute l'organisation
             </label>
           )}
@@ -329,7 +334,7 @@ const Stats = () => {
         <TabPane tabId={4}>
           <Title>Statistiques des observations de territoire</Title>
           <div style={{ maxWidth: '350px', marginBottom: '2rem' }}>
-            <Label>Filter par territoire</Label>
+            <Label htmlFor="filter-territory">Filter par territoire</Label>
             <SelectCustom
               options={territories}
               name="place"
@@ -338,6 +343,7 @@ const Stats = () => {
                 setTerritory(t);
               }}
               isClearable={true}
+              inputId="filter-territory"
               getOptionValue={(i) => i._id}
               getOptionLabel={(i) => i.name}
             />

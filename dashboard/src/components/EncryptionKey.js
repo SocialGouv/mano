@@ -212,16 +212,16 @@ const EncryptionKey = ({ isMain }) => {
               <Col md={3} />
               <Col md={6}>
                 <FormGroup>
-                  <Label>Clé de chiffrement</Label>
-                  <Input name="encryptionKey" value={values.encryptionKey} onChange={handleChange} />
+                  <Label htmlFor="encryptionKey">Clé de chiffrement</Label>
+                  <Input id="encryptionKey" name="encryptionKey" value={values.encryptionKey} onChange={handleChange} />
                 </FormGroup>
               </Col>
               <Col md={3} />
               <Col md={3} />
               <Col md={6}>
                 <FormGroup>
-                  <Label>Confirmez la clé de chiffrement</Label>
-                  <Input name="encryptionKeyConfirm" value={values.encryptionKeyConfirm} onChange={handleChange} />
+                  <Label htmlFor="encryptionKeyConfirm">Confirmez la clé de chiffrement</Label>
+                  <Input id="encryptionKeyConfirm" name="encryptionKeyConfirm" value={values.encryptionKeyConfirm} onChange={handleChange} />
                 </FormGroup>
               </Col>
               <Col md={3} />

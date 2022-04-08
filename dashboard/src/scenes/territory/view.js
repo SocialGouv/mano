@@ -83,14 +83,14 @@ const View = () => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Nom</Label>
-                      <Input name="name" value={values.name} onChange={handleChange} />
+                      <Label htmlFor="name">Nom</Label>
+                      <Input name="name" id="name" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>
 
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Types</Label>
+                      <Label htmlFor="territory-select-types">Types</Label>
                       <SelectCustom
                         options={territoryTypes}
                         name="types"
@@ -109,8 +109,8 @@ const View = () => {
 
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Périmètre</Label>
-                      <Input name="perimeter" value={values.perimeter} onChange={handleChange} />
+                      <Label htmlFor="perimeter">Périmètre</Label>
+                      <Input name="perimeter" id="perimeter" value={values.perimeter} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                 </Row>

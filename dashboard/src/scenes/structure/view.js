@@ -54,14 +54,14 @@ const View = () => {
               <Row>
                 <Col md={12}>
                   <FormGroup>
-                    <Label>Nom</Label>
-                    <Input name="name" value={values.name} onChange={handleChange} />
+                    <Label htmlFor="name">Nom</Label>
+                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={12}>
                   <FormGroup>
-                    <Label>Description</Label>
-                    <Input type="textarea" name="description" value={values.description} onChange={handleChange} />
+                    <Label htmlFor="description">Description</Label>
+                    <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
                   </FormGroup>
                 </Col>
               </Row>

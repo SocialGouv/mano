@@ -178,8 +178,9 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                     <>
                       <Col md={6}>
                         <FormGroup>
-                          <Label>Créé par</Label>
+                          <Label htmlFor="user">Créé par</Label>
                           <SelectUser
+                            inputId="user"
                             isDisabled={newComment}
                             value={values.user || user._id}
                             onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
@@ -188,10 +189,12 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                       </Col>
                       <Col md={6}>
                         <FormGroup>
-                          <Label>Créé le / Concerne le</Label>
+                          <Label htmlFor="date">Créé le / Concerne le</Label>
                           <div>
                             <DatePicker
                               locale="fr"
+                              name="date"
+                              id="date"
                               className="form-control"
                               selected={dateForDatePicker((values.date || values.createdAt) ?? new Date())}
                               onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
@@ -206,8 +209,8 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                   )}
                   <Col md={12}>
                     <FormGroup>
-                      <Label>Commentaire</Label>
-                      <Input name="comment" type="textarea" value={values.comment} onChange={handleChange} />
+                      <Label htmlFor="comment">Commentaire</Label>
+                      <Input id="comment" name="comment" type="textarea" value={values.comment} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                 </Row>

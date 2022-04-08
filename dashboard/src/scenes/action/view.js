@@ -132,12 +132,12 @@ const View = () => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Nom</Label>
-                      <Input name="name" type="textarea" value={values.name} onChange={handleChange} />
+                      <Label htmlFor="name">Nom</Label>
+                      <Input name="name" id="name" type="textarea" value={values.name} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                   <Col md={3}>
-                    <Label>Statut</Label>
+                    <Label htmlFor="update-action-select-status">Statut</Label>
                     <SelectStatus
                       name="status"
                       value={values.status || ''}
@@ -148,19 +148,21 @@ const View = () => {
                   </Col>
                   <Col md={3}>
                     <FormGroup>
-                      <Label>Sous l'équipe</Label>
+                      <Label htmlFor="team">Sous l'équipe</Label>
                       <SelectTeam
                         teams={user.role === 'admin' ? teams : user.teams}
                         teamId={values.team}
+                        inputId="team"
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                       />
                     </FormGroup>
                   </Col>
                   <Col md={4}>
                     <FormGroup>
-                      <Label>À faire le</Label>
+                      <Label htmlFor="dueAt">À faire le</Label>
                       <div>
                         <DatePicker
+                          id="dueAt"
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.dueAt ?? new Date())}
@@ -175,9 +177,10 @@ const View = () => {
                     <FormGroup>
                       <Label />
                       <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                        <span>Afficher l'heure</span>
+                        <label htmlFor="withTime">Afficher l'heure</label>
                         <Input
                           type="checkbox"
+                          id="withTime"
                           name="withTime"
                           checked={values.withTime || false}
                           onChange={() => {
@@ -190,10 +193,11 @@ const View = () => {
                   <Col md={4}>
                     {[DONE, CANCEL].includes(values.status) && (
                       <FormGroup>
-                        {values.status === DONE && <Label>Faite le</Label>}
-                        {values.status === CANCEL && <Label>Annulée le</Label>}
+                        {values.status === DONE && <Label htmlFor="completedAt">Faite le</Label>}
+                        {values.status === CANCEL && <Label htmlFor="completedAt">Annulée le</Label>}
                         <div>
                           <DatePicker
+                            id="completedAt"
                             locale="fr"
                             className="form-control"
                             selected={dateForDatePicker(values.completedAt ?? new Date())}
@@ -213,9 +217,10 @@ const View = () => {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label>Catégories</Label>
+                      <Label htmlFor="categories">Catégories</Label>
                       <SelectCustom
                         options={catsSelect}
+                        inputId="categories"
                         name="categories"
                         onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
                         isClearable={false}
@@ -228,20 +233,22 @@ const View = () => {
                   </Col>
                   <Col md={12}>
                     <FormGroup>
-                      <Label>Description</Label>
-                      <Input type="textarea" name="description" value={values.description} onChange={handleChange} />
+                      <Label htmlFor="description">Description</Label>
+                      <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
                     </FormGroup>
                   </Col>
                   <Col md={12}>
                     <FormGroup>
-                      <Label>
+                      <Label htmlFor="create-action-urgent">
                         <input
                           type="checkbox"
                           id="create-action-urgent"
                           style={{ marginRight: '0.5rem' }}
                           name="urgent"
                           checked={values.urgent}
-                          onChange={handleChange}
+                          onChange={() => {
+                            handleChange({ target: { name: 'urgent', checked: Boolean(!values.urgent), value: Boolean(!values.urgent) } });
+                          }}
                         />
                         Action prioritaire <br />
                         <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>

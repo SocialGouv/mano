@@ -84,13 +84,13 @@ const View = () => {
               <Row>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Nom</Label>
-                    <Input name="name" value={values.name} onChange={handleChange} />
+                    <Label htmlFor="name">Nom</Label>
+                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={12}>
                   <FormGroup>
-                    <Label>Personnes suivies</Label>
+                    <Label htmlFor="persons">Personnes suivies</Label>
                     <p style={{ marginBottom: 0 }}>
                       {relsPersonPlace
                         .filter((rel) => rel.place === place._id)

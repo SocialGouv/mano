@@ -1,7 +1,7 @@
 import React from 'react';
 import SelectCustom from './SelectCustom';
 
-const SelectTeam = ({ onChange = () => null, teamId = null, teams = null, style = null, inputId = '' }) => {
+const SelectTeam = ({ name, onChange = () => null, teamId = null, teams = null, style = null, inputId = '' }) => {
   if (!teams) return <div />;
 
   return (
@@ -14,6 +14,7 @@ const SelectTeam = ({ onChange = () => null, teamId = null, teams = null, style 
         ...style,
       }}>
       <SelectCustom
+        name={name}
         options={teams.map(({ _id }) => _id)}
         value={[teamId]}
         onChange={(id) => onChange(teams.find((team) => team._id === id))}

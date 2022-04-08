@@ -203,18 +203,18 @@ const Summary = ({ person }) => {
               <Row>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Nom prénom ou Pseudonyme</Label>
-                    <Input name="name" value={values.name || ''} onChange={handleChange} />
+                    <Label htmlFor="name">Nom prénom ou Pseudonyme</Label>
+                    <Input name="name" id="name" value={values.name || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Autres pseudos</Label>
-                    <Input name="otherNames" value={values.otherNames || ''} onChange={handleChange} />
+                    <Label htmlFor="otherNames">Autres pseudos</Label>
+                    <Input name="otherNames" id="otherNames" value={values.otherNames || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
-                  <Label>Genre</Label>
+                  <Label htmlFor="person-select-gender">Genre</Label>
                   <SelectAsInput
                     options={genderOptions}
                     name="gender"
@@ -227,7 +227,7 @@ const Summary = ({ person }) => {
 
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Date de naissance</Label>
+                    <Label htmlFor="person-birthdate">Date de naissance</Label>
                     <div>
                       <DatePicker
                         locale="fr"
@@ -242,7 +242,7 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>En rue depuis le</Label>
+                    <Label htmlFor="person-wanderingAt">En rue depuis le</Label>
                     <div>
                       <DatePicker
                         locale="fr"
@@ -257,7 +257,7 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Suivi(e) depuis le / Créé(e) le</Label>
+                    <Label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</Label>
                     <div>
                       <DatePicker
                         locale="fr"
@@ -272,7 +272,7 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label>Équipe(s) en charge</Label>
+                    <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
                     <div>
                       <SelectTeamMultiple
                         onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
@@ -288,21 +288,21 @@ const Summary = ({ person }) => {
                   <FormGroup>
                     <Label />
                     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                      <span>Personne très vulnérable, ou ayant besoin d'une attention particulière</span>
+                      <label htmlFor="person-alertness-checkbox">Personne très vulnérable, ou ayant besoin d'une attention particulière</label>
                       <Input id="person-alertness-checkbox" type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
                     </div>
                   </FormGroup>
                 </Col>
                 <Col md={12}>
                   <FormGroup>
-                    <Label>Téléphone</Label>
-                    <Input name="phone" value={values.phone || ''} onChange={handleChange} />
+                    <Label htmlFor="phone">Téléphone</Label>
+                    <Input name="phone" id="phone" value={values.phone || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={12}>
                   <FormGroup>
-                    <Label>Description</Label>
-                    <Input type="textarea" rows={5} name="description" value={values.description || ''} onChange={handleChange} />
+                    <Label htmlFor="description">Description</Label>
+                    <Input type="textarea" rows={5} name="description" id="description" value={values.description || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
               </Row>
@@ -310,7 +310,7 @@ const Summary = ({ person }) => {
               <Title>Dossier social</Title>
               <Row>
                 <Col md={4}>
-                  <Label>Situation personnelle</Label>
+                  <Label htmlFor="person-select-personalSituation">Situation personnelle</Label>
                   <SelectAsInput
                     options={personalSituationOptions}
                     name="personalSituation"
@@ -322,13 +322,13 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Structure de suivi social</Label>
-                    <Input name="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />
+                    <Label htmlFor="structureSocial">Structure de suivi social</Label>
+                    <Input name="structureSocial" id="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Avec animaux</Label>
+                    <Label htmlFor="person-select-animals">Avec animaux</Label>
                     <SelectAsInput
                       options={yesNoOptions}
                       name="hasAnimal"
@@ -341,7 +341,7 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Hébergement</Label>
+                    <Label htmlFor="person-select-address">Hébergement</Label>
                     <SelectAsInput
                       options={yesNoOptions}
                       name="address"
@@ -357,7 +357,7 @@ const Summary = ({ person }) => {
 
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Nationalité</Label>
+                    <Label htmlFor="person-select-nationalitySituation">Nationalité</Label>
                     <SelectAsInput
                       options={nationalitySituationOptions}
                       name="nationalitySituation"
@@ -370,7 +370,7 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Emploi</Label>
+                    <Label htmlFor="person-select-employment">Emploi</Label>
                     <SelectAsInput
                       options={employmentOptions}
                       name="employment"
@@ -400,7 +400,7 @@ const Summary = ({ person }) => {
               <Title>Dossier médical</Title>
               <Row>
                 <Col md={4}>
-                  <Label>Couverture médicale</Label>
+                  <Label htmlFor="person-select-healthInsurance">Couverture médicale</Label>
                   <SelectAsInput
                     options={healthInsuranceOptions}
                     name="healthInsurance"
@@ -412,8 +412,8 @@ const Summary = ({ person }) => {
                 </Col>
                 <Col md={4}>
                   <FormGroup>
-                    <Label>Structure de suivi médical</Label>
-                    <Input name="structureMedical" value={values.structureMedical} onChange={handleChange} />
+                    <Label htmlFor="structureMedical">Structure de suivi médical</Label>
+                    <Input name="structureMedical" id="structureMedical" value={values.structureMedical} onChange={handleChange} />
                   </FormGroup>
                 </Col>
                 {customFieldsPersonsMedical
@@ -478,9 +478,10 @@ const Actions = ({ person, onUpdateResults }) => {
       {data.length ? (
         <Row>
           <Col md={6}>
-            <Label>Filtrer par catégorie</Label>
+            <Label htmlFor="action-select-categories-filter">Filtrer par catégorie</Label>
             <SelectCustom
               options={catsSelect}
+              inputId="action-select-categories-filter"
               name="categories"
               onChange={(c) => {
                 setFilterCategories(c);
@@ -492,8 +493,9 @@ const Actions = ({ person, onUpdateResults }) => {
             />
           </Col>
           <Col md={6}>
-            <Label>Filtrer par statut</Label>
+            <Label htmlFor="action-select-status-filter">Filtrer par statut</Label>
             <SelectCustom
+              inputId="action-select-status-filter"
               options={mappedIdsToLabels}
               getOptionValue={(s) => s._id}
               getOptionLabel={(s) => s.name}
@@ -654,7 +656,7 @@ const AddressDetails = ({ values, onChange }) => {
     <>
       <Col md={4}>
         <FormGroup>
-          <Label>Type d'hébergement</Label>
+          <Label htmlFor="person-select-addressDetail">Type d'hébergement</Label>
           <SelectAsInput
             isDisabled={values.address !== 'Oui'}
             name="addressDetail"
@@ -669,7 +671,7 @@ const AddressDetails = ({ values, onChange }) => {
       <Col md={4}>
         {!!isFreeFieldAddressDetail(values.addressDetail) && (
           <FormGroup>
-            <Label>Autre type d'hébergement</Label>
+            <Label htmlFor="addressDetail">Autre type d'hébergement</Label>
             <Input name="addressDetail" value={values.addressDetail === 'Autre' ? '' : values.addressDetail} onChange={onChangeRequest} />
           </FormGroup>
         )}
@@ -680,7 +682,7 @@ const AddressDetails = ({ values, onChange }) => {
 
 const Reasons = ({ value, onChange }) => (
   <FormGroup>
-    <Label>Motif de la situation en rue</Label>
+    <Label htmlFor="person-select-reasons">Motif de la situation en rue</Label>
     <SelectCustom
       options={reasonsOptions}
       name="reasons"
@@ -698,7 +700,7 @@ const Reasons = ({ value, onChange }) => (
 
 const Ressources = ({ value, onChange }) => (
   <FormGroup>
-    <Label>Ressources</Label>
+    <Label htmlFor="person-select-resources">Ressources</Label>
     <SelectCustom
       options={ressourcesOptions}
       name="resources"

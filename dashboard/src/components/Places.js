@@ -97,7 +97,7 @@ const AddPlace = ({ personId }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <div>Lieu</div>
+                      <label htmlFor="add-place-select-place">Lieu</label>
                       <SelectCustom
                         options={places}
                         name="place"
