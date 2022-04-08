@@ -1,3 +1,11 @@
+## [1.89.2](https://github.com/SocialGouv/mano/compare/v1.89.1...v1.89.2) (2022-04-08)
+
+
+### Bug Fixes
+
+* **dashboard:** aria label on incrementor ([#596](https://github.com/SocialGouv/mano/issues/596)) ([69ce18b](https://github.com/SocialGouv/mano/commit/69ce18bf6ba190e273e46ffeb7cd5f70c79bded5))
+* **dashboard:** label with htmlFor with new sonarlint config ([#597](https://github.com/SocialGouv/mano/issues/597)) ([e32a8e8](https://github.com/SocialGouv/mano/commit/e32a8e8f50cabb08d1d1eafba7dfb48ce5af124a))
+
 ## [1.89.1](https://github.com/SocialGouv/mano/compare/v1.89.0...v1.89.1) (2022-04-08)
 
 
