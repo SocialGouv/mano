@@ -166,7 +166,7 @@ const Loader = () => {
     Get number of data to download to show the appropriate loading progress bar
     */
     const response = await API.get({
-      path: '/public/stats',
+      path: '/organisation/stats',
       query: { organisation: organisationId, lastRefresh },
     });
     if (!response.ok) {
