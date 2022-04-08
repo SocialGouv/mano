@@ -7,7 +7,6 @@ import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
 import API from '../../services/api';
-import { userState } from '../../recoil/auth';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import { MMKV } from '../../services/dataManagement';
 
@@ -49,14 +48,13 @@ const computeCustomFieldDisplay = (field, value) => {
   return JSON.stringify(value);
 };
 
-const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOptions, id }) => {
-  const user = useRecoilValue(userState);
+const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOptions }) => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
 
   const onPressRequest = async () => {
     const options = ['Supprimer', 'Annuler'];
-    if (onUpdate && observation.user === user._id) options.unshift('Modifier');
+    if (onUpdate) options.unshift('Modifier');
     showActionSheetWithOptions(
       {
         options,
