@@ -1,3 +1,11 @@
+## [1.85.9](https://github.com/SocialGouv/mano/compare/v1.85.8...v1.85.9) (2022-04-08)
+
+
+### Bug Fixes
+
+* **app:** display person name when create action for multiple users (use decrypted data) ([#582](https://github.com/SocialGouv/mano/issues/582)) ([529b5cd](https://github.com/SocialGouv/mano/commit/529b5cd08a426037ebe4adc96ede848612f031ee))
+* **security:** empty key on mobile ([#583](https://github.com/SocialGouv/mano/issues/583)) ([9f68b7a](https://github.com/SocialGouv/mano/commit/9f68b7ac106ee8b9545ff0ab7f1c134d13ffc8a7))
+
 ## [1.85.8](https://github.com/SocialGouv/mano/compare/v1.85.7...v1.85.8) (2022-04-05)
 
 
