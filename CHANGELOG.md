@@ -1,3 +1,15 @@
+# [1.87.0](https://github.com/SocialGouv/mano/compare/v1.86.0...v1.87.0) (2022-04-08)
+
+
+### Bug Fixes
+
+* **security:** separate public and private routes ([#576](https://github.com/SocialGouv/mano/issues/576)) ([ea25259](https://github.com/SocialGouv/mano/commit/ea25259997eff28944eea65e0e1105cda6e3c2e2))
+
+
+### Features
+
+* **app, dashboard:** action urgent ([#581](https://github.com/SocialGouv/mano/issues/581)) ([be93ee8](https://github.com/SocialGouv/mano/commit/be93ee8aa6d6317c352fea02b1dfbefff2c20428))
+
 # [1.86.0](https://github.com/SocialGouv/mano/compare/v1.85.9...v1.86.0) (2022-04-08)
 
 
