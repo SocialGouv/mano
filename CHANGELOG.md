@@ -1,3 +1,10 @@
+## [1.87.1](https://github.com/SocialGouv/mano/compare/v1.87.0...v1.87.1) (2022-04-08)
+
+
+### Bug Fixes
+
+* api Op not defined ([5e42c85](https://github.com/SocialGouv/mano/commit/5e42c854122a961b2c4e39ea6e039ae51591fb13))
+
 # [1.87.0](https://github.com/SocialGouv/mano/compare/v1.86.0...v1.87.0) (2022-04-08)
 
 
