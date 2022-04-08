@@ -1,3 +1,10 @@
+# [1.89.0](https://github.com/SocialGouv/mano/compare/v1.88.0...v1.89.0) (2022-04-08)
+
+
+### Features
+
+* new app version ([3252eef](https://github.com/SocialGouv/mano/commit/3252eef19e9842a82ffa23aaab3c6672836c4982))
+
 # [1.88.0](https://github.com/SocialGouv/mano/compare/v1.87.2...v1.88.0) (2022-04-08)
 
 
