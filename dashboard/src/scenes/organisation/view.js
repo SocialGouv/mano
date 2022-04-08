@@ -51,7 +51,7 @@ const View = () => {
     <div style={{ display: 'flex', flexDirection: 'column', margin: '0 -4rem -3rem', height: 'calc(100% + 3rem)' }}>
       <Title>Réglages de l'organisation {organisation.name}</Title>
       <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
-        <Drawer>
+        <Drawer title="Navigation dans les réglages de l'organisation">
           <DrawerButton className={tab === 'infos' ? 'active' : ''} onClick={() => setTab('infos')}>
             Infos
           </DrawerButton>
@@ -712,7 +712,7 @@ const SubTitleLevel2 = styled.h4`
   margin: 2rem 0;
 `;
 
-const Drawer = styled.aside`
+const Drawer = styled.nav`
   padding-top: 20px;
   padding-left: 10px;
   width: 200px;

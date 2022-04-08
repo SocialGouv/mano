@@ -25,7 +25,7 @@ const TopBar = () => {
   const API = useApi();
 
   return (
-    <TopBarStyled className="noprint">
+    <TopBarStyled className="noprint" title="Choix de l'équipe et menu déroulant pour le Profil">
       <TopBarOrganistionTeamBox>
         <Organisation>{['superadmin'].includes(user.role) ? 'Support' : organisation?.name}</Organisation>
         {!['superadmin'].includes(user.role) && (

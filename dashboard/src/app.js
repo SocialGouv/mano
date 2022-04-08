@@ -88,7 +88,7 @@ const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
   const user = useRecoilValue(userState);
   if (!!user && !user?.termsAccepted)
     return (
-      <main className="main">
+      <main className="main" title="Contenus">
         <Route {...rest} path="/auth" component={Charte} />
       </main>
     );
@@ -97,7 +97,7 @@ const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
       {!!user && <TopBar />}
       <div className="main">
         {!!user && !['superadmin'].includes(user.role) && <Drawer />}
-        <main className="main-content">
+        <main className="main-content" title="Contenus">
           <Route {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
         </main>
       </div>

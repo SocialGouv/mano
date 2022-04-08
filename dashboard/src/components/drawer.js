@@ -16,7 +16,7 @@ const Drawer = () => {
   const onboardingForTeams = !teams.length;
 
   return (
-    <Sidebar className="noprint" isOnboarding={onboardingForEncryption || onboardingForTeams}>
+    <Sidebar className="noprint" isOnboarding={onboardingForEncryption || onboardingForTeams} title="Navigation principale">
       <Nav>
         {!['superadmin'].includes(user.role) && (
           <>
@@ -106,7 +106,7 @@ const Drawer = () => {
   );
 };
 
-const Sidebar = styled.aside`
+const Sidebar = styled.nav`
   background-color: ${theme.white};
   flex-shrink: 0;
   max-width: 230px;
