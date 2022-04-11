@@ -37,7 +37,7 @@ const List = () => {
   const [showAs, setShowAs] = useState(new URLSearchParams(location.search)?.get('showAs') || showAsOptions[0]); // calendar, list
   // List of actions filtered by current team and selected status.
   const actionsByTeamAndStatus = useMemo(
-    () => (status ? actions.filter((action) => action.team === currentTeam._id && action.status === status) : []),
+    () => actions.filter((action) => action.team === currentTeam._id && (status ? action.status === status : true)),
     [actions, currentTeam, status]
   );
   // The next memos are used to filter by search (empty array when search is empty).
@@ -99,7 +99,7 @@ const List = () => {
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-            Filtrer par status :{' '}
+            Filtrer par statut :{' '}
           </label>
           <div style={{ width: 300 }}>
             <SelectStatus inputId="filter-by-status" noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
@@ -171,7 +171,7 @@ const List = () => {
                 render: (action) => <PersonName item={action} />,
               },
               { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
-              { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+              { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
             ]}
           />
           <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />

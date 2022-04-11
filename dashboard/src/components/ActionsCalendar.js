@@ -17,7 +17,7 @@ import ActionName from './ActionName';
 import PersonName from './PersonName';
 import ExclamationMarkButton from './ExclamationMarkButton';
 
-const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Status'] }) => {
+const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut'] }) => {
   const history = useHistory();
   const location = useLocation();
   const [theDayBeforeActions, setTheDayBeforeActions] = useState([]);
@@ -89,7 +89,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           render: (action) => <PersonName item={action} />,
         },
         { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
-        { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+        { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
       ].filter((column) => columns.includes(column.title) || column.dataKey === 'urgent')}
     />
   );

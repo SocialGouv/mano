@@ -77,8 +77,9 @@ const Stats = () => {
     period,
     currentTeam,
     viewAllOrganisationData,
-    { filters: filterPersons }
+    { filters: filterPersons, field: 'followedSince' }
   );
+  console.log({ persons });
   const actions = getDataForPeriod(
     allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
     period,
@@ -505,11 +506,11 @@ const StatsCreatedAtRangeBar = ({ persons }) => {
   const categories = ['0-6 mois', '6-12 mois', '1-2 ans', '2-5 ans', '+ 5 ans'];
 
   let data = persons.reduce((newData, person) => {
-    if (!person.createdAt || !person.createdAt.length) {
+    if (!person.followedSince || !person.createdAt || !person.createdAt.length) {
       return newData;
       // newData["Non renseigné"]++;
     }
-    const parsedDate = Date.parse(person.createdAt);
+    const parsedDate = Date.parse(person.followedSince || person.createdAt);
     const fromNowInMonths = (Date.now() - parsedDate) / 1000 / 60 / 60 / 24 / (365.25 / 12);
     if (fromNowInMonths < 6) {
       newData['0-6 mois']++;
@@ -574,8 +575,9 @@ const BlockDateWithTime = ({ data, field }) => {
 };
 
 const BlockCreatedAt = ({ persons }) => {
-  const averageCreatedAt = persons.reduce((total, person) => total + Date.parse(person.createdAt), 0) / (persons.length || 1);
-  const durationFromNowToAverage = Date.now() - averageCreatedAt;
+  const averageFollowedSince =
+    persons.reduce((total, person) => total + Date.parse(person.followedSince || person.createdAt), 0) / (persons.length || 1);
+  const durationFromNowToAverage = Date.now() - averageFollowedSince;
   const [count, unit] = getDuration(durationFromNowToAverage);
 
   return (

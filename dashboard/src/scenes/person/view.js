@@ -6,7 +6,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import { SmallerHeaderWithBackButton } from '../../components/header';
@@ -60,10 +60,13 @@ const View = () => {
   const { id } = useParams();
   const location = useLocation();
   const history = useHistory();
-  const persons = useRecoilValue(personsState);
+  const API = useApi();
+  const [persons, setPersons] = useRecoilState(personsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const [tabsContents, setTabsContents] = useState(initTabs);
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(
@@ -87,7 +90,26 @@ const View = () => {
       />
       <Title className="noprint">
         {`Dossier de ${person?.name}`}
-        <UserName id={person.user} wrapper={(name) => ` (créée par ${name})`} />
+        <UserName
+          id={person.user}
+          wrapper={() => 'créée par '}
+          canAddUser
+          handleChange={async (newUser) => {
+            const response = await API.put({
+              path: `/person/${person._id}`,
+              body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ ...person, user: newUser }),
+            });
+            if (response.ok) {
+              const newPerson = response.decryptedData;
+              setPersons((persons) =>
+                persons.map((p) => {
+                  if (p._id === person._id) return newPerson;
+                  return p;
+                })
+              );
+            }
+          }}
+        />
       </Title>
       {person.outOfActiveList && (
         <Alert color="warning" className="noprint">
@@ -534,7 +556,7 @@ const Actions = ({ person, onUpdateResults }) => {
             },
           },
           { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
-          { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+          { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           {
             title: 'Équipe',
             dataKey: 'team',

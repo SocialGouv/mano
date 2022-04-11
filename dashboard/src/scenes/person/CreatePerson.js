@@ -6,7 +6,7 @@ import { toastr } from 'react-redux-toastr';
 import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import { currentTeamState } from '../../recoil/auth';
+import { currentTeamState, userState } from '../../recoil/auth';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -21,6 +21,7 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
   const [persons, setPersons] = useRecoilState(personsState);
@@ -63,6 +64,7 @@ const CreatePerson = ({ refreshable }) => {
               const existingPerson = persons.find((p) => p.name === body.name);
               if (existingPerson) return toastr.error('Une personne existe déjà à ce nom');
               body.followedSince = new Date();
+              body.user = user._id;
               const response = await API.post({
                 path: '/person',
                 body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
