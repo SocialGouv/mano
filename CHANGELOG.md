@@ -1,3 +1,10 @@
+## [1.89.5](https://github.com/SocialGouv/mano/compare/v1.89.4...v1.89.5) (2022-04-11)
+
+
+### Bug Fixes
+
+* multiple bugs and tiny improvements ([#601](https://github.com/SocialGouv/mano/issues/601)) ([476cdae](https://github.com/SocialGouv/mano/commit/476cdae1847d590df55a040add5e2e18e3661781))
+
 ## [1.89.4](https://github.com/SocialGouv/mano/compare/v1.89.3...v1.89.4) (2022-04-11)
 
 
