@@ -15,11 +15,19 @@ export const PaginationProvider = ({ children }) => {
   const [state, setState] = useState({
     page: searchParams.get('search') || 0,
     search: searchParams.get('search') || '',
-    status: TODO,
+    status: searchParams.get('status') === null ? TODO : searchParams.get('status'),
     filterTeams: [],
   });
 
-  const setStatus = (status) => setState((oldState) => ({ ...oldState, status, page: 0 }));
+  const setStatus = (status, changeParams = true) => {
+    if (!!window && changeParams) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('status', status || '');
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+      // returns the existing query string: '?type=fiction&author=fahid'
+    }
+    setState((oldState) => ({ ...oldState, status, page: 0 }));
+  };
   const setPage = (page, changeParams = false) => {
     if (!!window && changeParams) {
       const searchParams = new URLSearchParams(location.search);

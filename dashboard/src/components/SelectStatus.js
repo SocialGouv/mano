@@ -12,6 +12,7 @@ const SelectStatus = ({ onChange, value, name = 'status', inputId = '', classNam
       getOptionLabel={(i) => mappedIdsToLabels.find((o) => o._id === i._id)?.name}
       inputId={inputId}
       classNamePrefix={classNamePrefix}
+      isClearable
     />
   );
 };
