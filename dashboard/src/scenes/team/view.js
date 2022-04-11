@@ -24,13 +24,13 @@ const View = () => {
 
   const API = useApi();
 
-  const getTeams = async () => {
+  const getTeam = async () => {
     const { data } = await API.get({ path: `/team/${id}` });
     setTeam(data);
   };
 
   useEffect(() => {
-    getTeams();
+    getTeam();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
