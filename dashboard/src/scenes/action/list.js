@@ -171,7 +171,7 @@ const List = () => {
                 render: (action) => <PersonName item={action} />,
               },
               { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
-              { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+              { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
             ]}
           />
           <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />

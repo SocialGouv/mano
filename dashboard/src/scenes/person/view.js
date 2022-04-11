@@ -534,7 +534,7 @@ const Actions = ({ person, onUpdateResults }) => {
             },
           },
           { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
-          { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+          { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           {
             title: 'Équipe',
             dataKey: 'team',

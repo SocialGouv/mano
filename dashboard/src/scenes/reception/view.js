@@ -285,7 +285,7 @@ const Reception = () => {
           <div style={{ margin: '15px' }}>
             <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
           </div>
-          <ActionsCalendar actions={actionsByStatus} columns={['Heure', 'Nom', 'Personne suivie', 'Status']} />
+          <ActionsCalendar actions={actionsByStatus} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
         </Col>
         <Col md={4}>
           <SectionTitle style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Services</SectionTitle>

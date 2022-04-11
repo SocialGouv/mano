@@ -359,7 +359,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
               render: (action) => <PersonName item={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
-            { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
         />
       </StyledBox>
@@ -426,7 +426,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
               render: (action) => <PersonName item={action} />,
             },
             { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt) },
-            { title: 'Status', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
         />
       </StyledBox>
