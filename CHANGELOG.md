@@ -1,3 +1,10 @@
+## [1.89.4](https://github.com/SocialGouv/mano/compare/v1.89.3...v1.89.4) (2022-04-11)
+
+
+### Bug Fixes
+
+* debug sentry https://sentry.io/share/issue/da76d06d6f664ce59a163a3a8f9d97de/ ([5a7c714](https://github.com/SocialGouv/mano/commit/5a7c7144a707f611651ae7df343dcbef63c56540))
+
 ## [1.89.3](https://github.com/SocialGouv/mano/compare/v1.89.2...v1.89.3) (2022-04-11)
 
 
