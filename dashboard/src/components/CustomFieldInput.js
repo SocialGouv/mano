@@ -18,8 +18,6 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) 
     if (['multi-choice'].includes(field.type)) return `${model}-custom-select-${field.name}`;
   }, [field, model]);
 
-  console.log(values);
-
   return (
     <Col md={colWidth} key={field.name}>
       <FormGroup>

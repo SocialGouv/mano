@@ -55,9 +55,9 @@ export const filterData = (data, filters) => {
   return data;
 };
 
-const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
+const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams = false }) => {
   filters = !!filters.length ? filters : [{}];
-  const onAddFilter = () => onChange([...filters, {}]);
+  const onAddFilter = () => onChange([...filters, {}], saveInURLParams);
 
   return (
     <Container>
@@ -77,9 +77,21 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
           const filterValues = !!field ? [...(base.find((filter) => filter.field === field)?.options || []), 'Non renseigné'] : [];
           const { type } = base.find((filter) => filter.field === field) || {};
 
-          const onChangeField = (newField) => onChange(filters.map((f, i) => (i === index ? { field: newField, value: null, type } : f)));
-          const onChangeValue = (newValue) => onChange(filters.map((f, i) => (i === index ? { field, value: newValue, type } : f)));
-          const onRemoveFilter = () => onChange(filters.filter((f, i) => i !== index));
+          const onChangeField = (newField) =>
+            onChange(
+              filters.map((f, i) => (i === index ? { field: newField, value: null, type } : f)),
+              saveInURLParams
+            );
+          const onChangeValue = (newValue) =>
+            onChange(
+              filters.map((f, i) => (i === index ? { field, value: newValue, type } : f)),
+              saveInURLParams
+            );
+          const onRemoveFilter = () =>
+            onChange(
+              filters.filter((f, i) => i !== index),
+              saveInURLParams
+            );
 
           return (
             <Row style={{ marginBottom: 10 }} key={field || 'empty'}>
@@ -106,7 +118,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
   );
 };
 
-function ValueSelector({ field, filterValues, value, onChangeValue, base }) {
+const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
   const [dateComparator, setDateComparator] = React.useState(null);
   if (!field) return <></>;
   const { type, field: name } = base.find((filter) => filter.field === field);
@@ -176,7 +188,7 @@ function ValueSelector({ field, filterValues, value, onChangeValue, base }) {
       isClearable={!value}
     />
   );
-}
+};
 
 const Title = styled.span`
   display: block;

@@ -17,8 +17,18 @@ export const PaginationProvider = ({ children }) => {
     search: searchParams.get('search') || '',
     status: searchParams.get('status') === null ? TODO : searchParams.get('status'),
     filterTeams: [],
+    filters: JSON.parse(searchParams.get('filters') || '[]'),
   });
 
+  const setFilters = (filters, changeParams = false) => {
+    if (!!window && changeParams) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('filters', JSON.stringify(filters));
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+      // returns the existing query string: '?type=fiction&author=fahid'
+    }
+    setState((oldState) => ({ ...oldState, filters, page: 0 }));
+  };
   const setStatus = (status, changeParams = true) => {
     if (!!window && changeParams) {
       const searchParams = new URLSearchParams(location.search);
@@ -63,6 +73,7 @@ export const PaginationProvider = ({ children }) => {
         setPage,
         setSearch,
         setFilterTeams,
+        setFilters,
         setFilterAlertness,
         setFilterOutOfActiveList,
       }}>

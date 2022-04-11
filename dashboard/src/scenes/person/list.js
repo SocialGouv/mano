@@ -23,12 +23,12 @@ import { commentsState } from '../../recoil/comments';
 import { filterBySearch } from '../search/utils';
 
 const List = () => {
-  const [filters, setFilters] = useState([]);
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(true);
-  const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
+  const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams, filters, setFilters } =
+    useContext(PaginationContext);
 
   const persons = useRecoilValue(personsWithPlacesSelector);
   const personsFiltered = useMemo(() => {
@@ -175,7 +175,7 @@ const List = () => {
           </label>
         </Col>
       </Row>
-      <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " />
+      <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " saveInURLParams />
       <Table
         data={data}
         rowKey={'_id'}
