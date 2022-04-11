@@ -1,3 +1,10 @@
+## [1.89.3](https://github.com/SocialGouv/mano/compare/v1.89.2...v1.89.3) (2022-04-11)
+
+
+### Bug Fixes
+
+* update team in dashboard ([878d8fe](https://github.com/SocialGouv/mano/commit/878d8fe3ff0251ad844c46ba31d31ec6e083b501))
+
 ## [1.89.2](https://github.com/SocialGouv/mano/compare/v1.89.1...v1.89.2) (2022-04-08)
 
 
