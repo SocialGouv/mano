@@ -22,6 +22,8 @@ import { collectionsToLoadState } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
+import { capture } from '../../services/sentry';
+import { toastr } from 'react-redux-toastr';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -178,27 +180,32 @@ const Reception = () => {
   };
 
   const onAddPassageForPersons = async () => {
-    if (!selectedPersons.length) return;
-    setAddingPassage(true);
-    const newPassages = [];
-    for (const [index, person] of Object.entries(selectedPersons)) {
-      newPassages.push({
-        person: person._id,
-        user: user._id,
-        team: currentTeam._id,
-        date: new Date(),
-        optimisticId: index,
-      });
-    }
-    // optimistic UI
-    setPassages((passages) => [...newPassages, ...passages]);
-    for (const [index, passage] of Object.entries(newPassages)) {
-      const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
-      if (response.ok) {
-        setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
+    try {
+      if (!selectedPersons.length) return;
+      setAddingPassage(true);
+      const newPassages = [];
+      for (const [index, person] of Object.entries(selectedPersons)) {
+        newPassages.push({
+          person: person._id,
+          user: user._id,
+          team: currentTeam._id,
+          date: new Date(),
+          optimisticId: index,
+        });
       }
+      // optimistic UI
+      setPassages((passages) => [...newPassages, ...passages]);
+      for (const [index, passage] of Object.entries(newPassages)) {
+        const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
+        if (response.ok) {
+          setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
+        }
+      }
+      setAddingPassage(false);
+    } catch (e) {
+      capture(e, { extra: { selectedPersons, currentTeam }, user });
+      toastr.error("Désolé une erreur est survenue, l'équipe technique est prévenue");
     }
-    setAddingPassage(false);
   };
 
   const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
