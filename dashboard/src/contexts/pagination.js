@@ -12,13 +12,16 @@ export const PaginationProvider = ({ children }) => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const [state, setState] = useState({
+  const [state, setState] = useState(() => ({
     page: searchParams.get('search') || 0,
     search: searchParams.get('search') || '',
+    outOfActiveList: searchParams.get('outOfActiveList') || false,
+    alertness: searchParams.get('alertness') || false,
+    viewAllOrganisationData: searchParams.get('viewAllOrganisationData') || true,
     status: searchParams.get('status') === null ? TODO : searchParams.get('status'),
     filterTeams: [],
     filters: JSON.parse(searchParams.get('filters') || '[]'),
-  });
+  }));
 
   const setFilters = (filters, changeParams = false) => {
     if (!!window && changeParams) {
@@ -56,9 +59,42 @@ export const PaginationProvider = ({ children }) => {
     }
     setState((oldState) => ({ ...oldState, search, page: 0 }));
   };
-  const setFilterTeams = (filterTeams) => setState((oldState) => ({ ...oldState, filterTeams, page: 0 }));
-  const setFilterAlertness = (alertness) => setState((oldState) => ({ ...oldState, alertness, page: 0 }));
-  const setFilterOutOfActiveList = (outOfActiveList) => setState((oldState) => ({ ...oldState, outOfActiveList, page: 0 }));
+  const setFilterTeams = (filterTeams) => {
+    if (!!window) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('filterTeams', JSON.stringify(filterTeams));
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+      // returns the existing query string: '?type=fiction&author=fahid'
+    }
+    setState((oldState) => ({ ...oldState, filterTeams, page: 0 }));
+  };
+  const setFilterAlertness = (alertness) => {
+    if (!!window) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('alertness', alertness);
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+      // returns the existing query string: '?type=fiction&author=fahid'
+    }
+    setState((oldState) => ({ ...oldState, alertness, page: 0 }));
+  };
+  const setFilterOutOfActiveList = (outOfActiveList) => {
+    if (!!window) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('outOfActiveList', outOfActiveList);
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+      // returns the existing query string: '?type=fiction&author=fahid'
+    }
+    setState((oldState) => ({ ...oldState, outOfActiveList, page: 0 }));
+  };
+  const setViewAllOrganisationData = (viewAllOrganisationData) => {
+    if (!!window) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('viewAllOrganisationData', viewAllOrganisationData);
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+      // returns the existing query string: '?type=fiction&author=fahid'
+    }
+    setState((oldState) => ({ ...oldState, viewAllOrganisationData, page: 0 }));
+  };
   useEffect(() => {
     setPage(0);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -76,6 +112,7 @@ export const PaginationProvider = ({ children }) => {
         setFilters,
         setFilterAlertness,
         setFilterOutOfActiveList,
+        setViewAllOrganisationData,
       }}>
       {children}
     </PaginationContext.Provider>

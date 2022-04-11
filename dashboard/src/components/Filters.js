@@ -10,7 +10,7 @@ export const filterData = (data, filters) => {
     for (let filter of filters) {
       if (!filter.field || !filter.value) continue;
       data = data
-        .map((item) => {
+        .map((item, index) => {
           const itemValue = item[filter.field];
           if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
           if (typeof itemValue === 'boolean') {
@@ -118,6 +118,21 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   );
 };
 
+const dateOptions = [
+  {
+    label: 'Avant',
+    value: 'before',
+  },
+  {
+    label: 'Après',
+    value: 'after',
+  },
+  {
+    label: 'Date exacte',
+    value: 'equals',
+  },
+];
+
 const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
   const [dateComparator, setDateComparator] = React.useState(null);
   if (!field) return <></>;
@@ -142,20 +157,8 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
       <Row>
         <Col sm={6}>
           <SelectCustom
-            options={[
-              {
-                label: 'Avant',
-                value: 'before',
-              },
-              {
-                label: 'Après',
-                value: 'after',
-              },
-              {
-                label: 'Date exacte',
-                value: 'equals',
-              },
-            ]}
+            options={dateOptions}
+            value={dateOptions.find((opt) => opt.value === value?.dateComparator)}
             isClearable={!value}
             onChange={(e) => {
               if (!e) return setDateComparator(null);
