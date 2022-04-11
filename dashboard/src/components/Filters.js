@@ -67,7 +67,9 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :' }) => {
             <Title>{title}</Title>
           </Col>
           <Col md={2}>
-            <AddButton onClick={onAddFilter}>Ajouter</AddButton>
+            <AddButton onClick={onAddFilter} disabled={filters.find((f) => !f.field)}>
+              Ajouter
+            </AddButton>
           </Col>
         </Row>
         {filters.map(({ field, value }, index) => {
