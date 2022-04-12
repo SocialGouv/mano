@@ -45,6 +45,7 @@ const Passage = ({ passage, onFinished }) => {
   };
 
   const isNew = !passage?._id;
+  const isForPerson = !!passage?.person;
 
   return (
     <>
@@ -52,13 +53,14 @@ const Passage = ({ passage, onFinished }) => {
         <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer un passage' : 'Éditer le passage'}</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ ...passage, anonymousNumberOfPassages: 1 }}
+            initialValues={{ ...passage, anonymousNumberOfPassages: 1, persons: passage?.person ? [passage.person] : [] }}
             onSubmit={async (body, actions) => {
               if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
               if (!body.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
-              if (isNew && body.anonymous && !body.anonymousNumberOfPassages)
+              if (body.anonymous && !body.anonymousNumberOfPassages)
                 return toastr.error('Erreur!', 'Veuillez spécifier le nombre de passages anonymes');
+              if (!body.anonymous && !body.persons?.length) return toastr.error('Erreur!', 'Veuillez spécifier une personne');
 
               if (isNew) {
                 const newPassage = {
@@ -79,7 +81,7 @@ const Passage = ({ passage, onFinished }) => {
                     }
                   }
                 } else {
-                  for (const person of body.person) {
+                  for (const person of body.persons) {
                     const response = await API.post({
                       path: '/passage',
                       body: preparePassageForEncryption({ ...newPassage, person }),
@@ -118,7 +120,7 @@ const Passage = ({ passage, onFinished }) => {
               return (
                 <React.Fragment>
                   <Row>
-                    {!!isNew && (
+                    {!!isNew && !isForPerson && (
                       <Col md={12}>
                         <FormGroup>
                           <Label htmlFor="create-anonymous-passages">
@@ -166,8 +168,10 @@ const Passage = ({ passage, onFinished }) => {
                               id="number-of-anonymous-passages"
                             />
                           </>
+                        ) : isNew && !isForPerson ? (
+                          <SelectPerson value={values.persons} onChange={handleChange} isClearable isMulti name="persons" />
                         ) : (
-                          <SelectPerson value={values.person} onChange={handleChange} isClearable={isNew} isMulti={isNew} />
+                          <SelectPerson value={values.person} onChange={handleChange} />
                         )}
                       </FormGroup>
                     </Col>
