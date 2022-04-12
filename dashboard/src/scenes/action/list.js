@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
 import { Col, Label, Row } from 'reactstrap';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import CreateAction from './CreateAction';
 import { SmallerHeaderWithBackButton } from '../../components/header';
@@ -28,16 +28,15 @@ const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
   const history = useHistory();
-  const location = useLocation();
   useTitle('Actions');
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
   const persons = useRecoilValue(personsWithPlacesSelector);
   const organisation = useRecoilValue(organisationState);
-  const catsSelect = [...(organisation.categories || [])];
+  const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
   const { search, setSearch, statuses, setStatuses, page, setPage, categories, setCategories } = useContext(PaginationContext);
-  const [showAs, setShowAs] = useState(new URLSearchParams(location.search)?.get('showAs') || showAsOptions[0]); // calendar, list
+  const [showAs, setShowAs] = useState(window.localStorage.getItem('showAs') || showAsOptions[0]); // calendar, list
   // List of actions filtered by current team and selected statuses.
   const actionsByTeamAndStatus = useMemo(
     () =>
@@ -45,7 +44,7 @@ const List = () => {
         (action) =>
           action.team === currentTeam._id &&
           (!statuses.length || statuses.includes(action.status)) &&
-          (!categories.length || categories.some((c) => action.categories.includes(c)))
+          (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
       ),
     [actions, currentTeam._id, statuses, categories]
   );
@@ -72,9 +71,7 @@ const List = () => {
   }, [actionsByTeamAndStatus, commentsForActions, personsForActions, search]);
 
   useEffect(() => {
-    const searchParams = new URLSearchParams(location.search);
-    searchParams.set('showAs', showAs);
-    history.replace({ pathname: location.pathname, search: searchParams.toString() });
+    window.localStorage.setItem('showAs', showAs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAs]);
   const limit = 20;

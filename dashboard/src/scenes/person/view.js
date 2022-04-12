@@ -470,7 +470,7 @@ const Actions = ({ person, onUpdateResults }) => {
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
 
-  const catsSelect = [...(organisation.categories || [])];
+  const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
   const data = useMemo(() => {
     if (!person) return [];
@@ -480,7 +480,9 @@ const Actions = ({ person, onUpdateResults }) => {
   const filteredData = useMemo(() => {
     let actionsToSet = data;
     if (filterCategories.length) {
-      actionsToSet = actionsToSet.filter((a) => filterCategories.some((c) => (a.categories || []).includes(c)));
+      actionsToSet = actionsToSet.filter((a) =>
+        filterCategories.some((c) => (c === '-- Aucune --' ? a.categories?.length === 0 : a.categories?.includes(c)))
+      );
     }
     if (filterStatus.length) {
       actionsToSet = actionsToSet.filter((a) => filterStatus.some((s) => a.status === s));
