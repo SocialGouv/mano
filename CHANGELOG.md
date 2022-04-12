@@ -1,3 +1,10 @@
+## [1.89.9](https://github.com/SocialGouv/mano/compare/v1.89.8...v1.89.9) (2022-04-12)
+
+
+### Bug Fixes
+
+* **dashboard:** new passages ([#606](https://github.com/SocialGouv/mano/issues/606)) ([e76a29c](https://github.com/SocialGouv/mano/commit/e76a29cd210d548fbeea5f8f91c63d5505e7d6b6))
+
 ## [1.89.8](https://github.com/SocialGouv/mano/compare/v1.89.7...v1.89.8) (2022-04-12)
 
 
