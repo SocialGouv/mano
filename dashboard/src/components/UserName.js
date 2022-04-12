@@ -3,12 +3,10 @@ import { useRecoilValue } from 'recoil';
 import { usersState } from '../recoil/auth';
 import SelectUser from './SelectUser';
 
-const UserName = ({ id, wrapper = (name) => name, canAddUser, handleChange, debug }) => {
+const UserName = ({ id, wrapper = (name) => name, canAddUser, handleChange }) => {
   const users = useRecoilValue(usersState);
 
   const user = users.find((u) => u._id === id);
-
-  if (debug) console.log(id);
 
   if (!user?.name) {
     if (!canAddUser) return null;

@@ -68,7 +68,9 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
           </Col>
           <Col md={2}>
             <AddButton onClick={onAddFilter} disabled={filters.find((f) => !f.field)}>
-              Ajouter
+              + Ajouter
+              <br />
+              un filtre
             </AddButton>
           </Col>
         </Row>
@@ -94,7 +96,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
             );
 
           return (
-            <Row style={{ marginBottom: 10 }} key={field || 'empty'}>
+            <Row style={{ marginBottom: 10 }} key={`${field || 'empty'}${index}`}>
               <Col md={4}>
                 <SelectCustom
                   options={filterFields}
@@ -223,6 +225,9 @@ const AddOrDeleteFilterButton = styled.button`
 
 const AddButton = styled(AddOrDeleteFilterButton)`
   color: green;
+  :disabled {
+    opacity: 0.2;
+  }
 `;
 
 const DeleteButton = styled(AddOrDeleteFilterButton)`
