@@ -99,7 +99,7 @@ const List = () => {
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-            Filtrer par statut :{' '}
+            Filtrer par statut :
           </label>
           <div style={{ width: 300 }}>
             <SelectStatus inputId="filter-by-status" noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
