@@ -1,3 +1,10 @@
+## [1.89.8](https://github.com/SocialGouv/mano/compare/v1.89.7...v1.89.8) (2022-04-12)
+
+
+### Bug Fixes
+
+* **dashboard:** filter add or remove a bit buggy ([#605](https://github.com/SocialGouv/mano/issues/605)) ([aef26ab](https://github.com/SocialGouv/mano/commit/aef26abc9fd1f2622dc1d192d8a5f04b994505ed))
+
 ## [1.89.7](https://github.com/SocialGouv/mano/compare/v1.89.6...v1.89.7) (2022-04-12)
 
 
