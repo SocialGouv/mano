@@ -18,7 +18,8 @@ export const PaginationProvider = ({ children }) => {
     outOfActiveList: searchParams.get('outOfActiveList') || false,
     alertness: searchParams.get('alertness') || false,
     viewAllOrganisationData: searchParams.get('viewAllOrganisationData') || true,
-    status: searchParams.get('status') === null ? TODO : searchParams.get('status'),
+    statuses: searchParams.get('statuses') === null ? [TODO] : searchParams.get('statuses').split(','),
+    categories: searchParams.get('categories') === null ? [] : searchParams.get('categories').split(','),
     filterTeams: [],
     filters: JSON.parse(searchParams.get('filters') || '[]'),
   }));
@@ -32,14 +33,23 @@ export const PaginationProvider = ({ children }) => {
     }
     setState((oldState) => ({ ...oldState, filters, page: 0 }));
   };
-  const setStatus = (status, changeParams = true) => {
-    if (!!window && changeParams) {
+  const setStatuses = (statuses) => {
+    if (!!window) {
       const searchParams = new URLSearchParams(location.search);
-      searchParams.set('status', status || '');
+      searchParams.set('statuses', [...(statuses || [])].join(','));
       history.replace({ pathname: location.pathname, search: searchParams.toString() });
       // returns the existing query string: '?type=fiction&author=fahid'
     }
-    setState((oldState) => ({ ...oldState, status, page: 0 }));
+    setState((oldState) => ({ ...oldState, statuses, page: 0 }));
+  };
+  const setCategories = (categories) => {
+    if (!!window) {
+      const searchParams = new URLSearchParams(location.search);
+      searchParams.set('categories', [...(categories || [])].join(','));
+      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+      // returns the existing query string: '?type=fiction&author=fahid'
+    }
+    setState((oldState) => ({ ...oldState, categories, page: 0 }));
   };
   const setPage = (page, changeParams = false) => {
     if (!!window && changeParams) {
@@ -105,7 +115,8 @@ export const PaginationProvider = ({ children }) => {
       value={{
         ...state,
         setState,
-        setStatus,
+        setStatuses,
+        setCategories,
         setPage,
         setSearch,
         setFilterTeams,

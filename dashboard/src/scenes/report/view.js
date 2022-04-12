@@ -474,8 +474,6 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
 
   if (!data) return <div />;
 
-  console.log({ data });
-
   return (
     <>
       <StyledBox>

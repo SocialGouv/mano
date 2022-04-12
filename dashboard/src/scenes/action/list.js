@@ -1,11 +1,10 @@
 import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Col, Row } from 'reactstrap';
+import { Col, Label, Row } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
 import CreateAction from './CreateAction';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
-import SelectStatus from '../../components/SelectStatus';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ActionStatus from '../../components/ActionStatus';
@@ -17,9 +16,9 @@ import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
 import PersonName from '../../components/PersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
-import { actionsState } from '../../recoil/actions';
+import { actionsState, mappedIdsToLabels } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
-import { currentTeamState } from '../../recoil/auth';
+import { currentTeamState, organisationState } from '../../recoil/auth';
 import { personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
@@ -33,12 +32,20 @@ const List = () => {
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
   const persons = useRecoilValue(personsWithPlacesSelector);
-  const { search, setSearch, status, setStatus, page, setPage } = useContext(PaginationContext);
+  const organisation = useRecoilValue(organisationState);
+  const catsSelect = [...(organisation.categories || [])];
+  const { search, setSearch, statuses, setStatuses, page, setPage, categories, setCategories } = useContext(PaginationContext);
   const [showAs, setShowAs] = useState(new URLSearchParams(location.search)?.get('showAs') || showAsOptions[0]); // calendar, list
-  // List of actions filtered by current team and selected status.
+  // List of actions filtered by current team and selected statuses.
   const actionsByTeamAndStatus = useMemo(
-    () => actions.filter((action) => action.team === currentTeam._id && (status ? action.status === status : true)),
-    [actions, currentTeam, status]
+    () =>
+      actions.filter(
+        (action) =>
+          action.team === currentTeam._id &&
+          (!statuses.length || statuses.includes(action.status)) &&
+          (!categories.length || categories.some((c) => action.categories.includes(c)))
+      ),
+    [actions, currentTeam._id, statuses, categories]
   );
   // The next memos are used to filter by search (empty array when search is empty).
   const actionsIds = useMemo(() => (search?.length ? actionsByTeamAndStatus.map((action) => action._id) : []), [actionsByTeamAndStatus, search]);
@@ -91,23 +98,9 @@ const List = () => {
         </Col>
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-            Recherche :{' '}
-          </label>
-          <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
-        </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-            Filtrer par statut :{' '}
-          </label>
-          <div style={{ width: 300 }}>
-            <SelectStatus inputId="filter-by-status" noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
-          </div>
-        </Col>
         <Col md={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <label htmlFor="actions-show-as" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-            Afficher par :{' '}
+          <label htmlFor="actions-show-as" style={{ marginRight: 10, width: 155, flexShrink: 0 }}>
+            Afficher par&nbsp;:
           </label>
           <div style={{ width: 300 }}>
             <SelectCustom
@@ -119,6 +112,48 @@ const List = () => {
               inputId="actions-show-as"
               getOptionValue={(i) => i}
               getOptionLabel={(i) => i}
+            />
+          </div>
+        </Col>
+        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+          <label htmlFor="search" style={{ marginRight: 10, width: 155, flexShrink: 0 }}>
+            Recherche&nbsp;:
+          </label>
+          <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
+        </Col>
+        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-categories-filter">
+            Filtrer par catégorie&nbsp;:
+          </Label>
+          <div style={{ width: '100%' }}>
+            <SelectCustom
+              options={catsSelect}
+              value={categories}
+              inputId="action-select-categories-filter"
+              name="categories"
+              onChange={(c) => setCategories(c)}
+              isClearable
+              isMulti
+              getOptionValue={(c) => c}
+              getOptionLabel={(c) => c}
+            />
+          </div>
+        </Col>
+        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-status-filter">
+            Filtrer par statut&nbsp;:
+          </Label>
+          <div style={{ width: '100%' }}>
+            <SelectCustom
+              inputId="action-select-status-filter"
+              options={mappedIdsToLabels}
+              getOptionValue={(s) => s._id}
+              getOptionLabel={(s) => s.name}
+              name="statuses"
+              onChange={(s) => setStatuses(s.map((s) => s._id))}
+              isClearable
+              isMulti
+              value={mappedIdsToLabels.filter((s) => statuses.includes(s._id))}
             />
           </div>
         </Col>

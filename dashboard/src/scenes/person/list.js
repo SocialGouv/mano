@@ -41,8 +41,6 @@ const List = () => {
     setViewAllOrganisationData,
   } = useContext(PaginationContext);
 
-  console.log(filters);
-
   const persons = useRecoilValue(personsWithPlacesSelector);
   const personsFiltered = useMemo(() => {
     let pFiltered = persons;
@@ -58,8 +56,6 @@ const List = () => {
     }
     return pFiltered;
   }, [persons, filterTeams, filters, alertness]);
-
-  console.log({ alertness });
 
   // The next memos are used to filter by search (empty array when search is empty).
   const personsFilteredIds = useMemo(() => personsFiltered.map((p) => p._id), [personsFiltered]);

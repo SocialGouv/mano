@@ -21,7 +21,7 @@ import { CustomResponsiveBar, CustomResponsivePie } from '../../components/chart
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsState } from '../../recoil/actions';
+import { actionsState, DONE, mappedIdsToLabels } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
@@ -65,6 +65,7 @@ const Stats = () => {
   const [filterPersons, setFilterPersons] = useState([]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
+  const [actionsStatuses, setActionsStatuses] = useState(DONE);
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
@@ -79,7 +80,7 @@ const Stats = () => {
     viewAllOrganisationData,
     { filters: filterPersons, field: 'followedSince' }
   );
-  console.log({ persons });
+
   const actions = getDataForPeriod(
     allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
     period,
@@ -208,19 +209,39 @@ const Stats = () => {
         )}
         <TabPane tabId={2}>
           <Title>Statistiques des actions</Title>
+          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+              Filtrer par statut :
+            </label>
+            <div style={{ width: 300 }}>
+              <SelectCustom
+                inputId="action-select-status-filter"
+                options={mappedIdsToLabels}
+                getOptionValue={(s) => s._id}
+                getOptionLabel={(s) => s.name}
+                name="status"
+                onChange={(s) => setActionsStatuses(s.map((s) => s._id))}
+                isClearable
+                isMulti
+                value={mappedIdsToLabels.filter((s) => actionsStatuses.includes(s._id))}
+              />
+            </div>
+          </Col>
           <CustomResponsivePie
             title="Répartition des actions par catégorie"
             data={getPieData(
-              actions.reduce((actionsSplitsByCategories, action) => {
-                if (!!action.categories?.length) {
-                  for (const category of action.categories) {
-                    actionsSplitsByCategories.push({ ...action, category });
+              actions
+                .filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status))
+                .reduce((actionsSplitsByCategories, action) => {
+                  if (!!action.categories?.length) {
+                    for (const category of action.categories) {
+                      actionsSplitsByCategories.push({ ...action, category });
+                    }
+                  } else {
+                    actionsSplitsByCategories.push(action);
                   }
-                } else {
-                  actionsSplitsByCategories.push(action);
-                }
-                return actionsSplitsByCategories;
-              }, []),
+                  return actionsSplitsByCategories;
+                }, []),
               'category',
               { options: organisation.categories }
             )}
