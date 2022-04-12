@@ -14,6 +14,7 @@ import Search from '../../components/search';
 import { currentTeamState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
+import useTitle from '../../services/useTitle';
 
 const List = () => {
   const [structures, setStructures] = useState(null);
@@ -21,6 +22,7 @@ const List = () => {
   const [pagination, setPagination] = useState();
   const [refresh, setRefresh] = useState(false);
   const [search, setSearch] = useState('');
+  useTitle('Structures');
   const API = useApi();
 
   useEffect(() => {

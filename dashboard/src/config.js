@@ -1,5 +1,6 @@
 import { version } from '../package.json';
 const theme = {
+  // main: '#0C8669', // higher contrast
   main: '#49C3A6',
   main75: '#55D6BD',
   main50: '#8AE1D0',

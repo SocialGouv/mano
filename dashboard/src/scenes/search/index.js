@@ -28,6 +28,7 @@ import { placesState } from '../../recoil/places';
 import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
+import useTitle from '../../services/useTitle';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -39,6 +40,7 @@ const View = () => {
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(initTabs.findIndex((value) => value.toLowerCase() === searchParams.get('tab')) || 0);
+  useTitle('Recherche');
 
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
 

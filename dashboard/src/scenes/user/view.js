@@ -15,6 +15,7 @@ import SelectCustom from '../../components/SelectCustom';
 import { organisationState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
+import useTitle from '../../services/useTitle';
 
 const View = () => {
   const [localUser, setLocalUser] = useState(null);
@@ -23,6 +24,7 @@ const View = () => {
   const [user, setUser] = useRecoilState(userState);
   const organisation = useRecoilValue(organisationState);
   const API = useApi();
+  useTitle(`Utilisateur ${user?.name}`);
 
   const getData = useCallback(async () => {
     const { data } = await API.get({ path: `/user/${id}` });

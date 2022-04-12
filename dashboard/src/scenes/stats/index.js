@@ -29,6 +29,7 @@ import { territoriesState } from '../../recoil/territory';
 import { getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { passagesState } from '../../recoil/passages';
+import useTitle from '../../services/useTitle';
 
 const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -48,6 +49,7 @@ const Stats = () => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
+  useTitle('Statistiques');
 
   const allPersons = useRecoilValue(personsState);
   const allActions = useRecoilValue(actionsState);

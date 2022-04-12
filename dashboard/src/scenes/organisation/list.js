@@ -11,6 +11,7 @@ import CreateWrapper from '../../components/createWrapper';
 import useApi from '../../services/api';
 import DeleteOrganisation from '../../components/DeleteOrganisation';
 import { formatDateWithFullMonth } from '../../services/date';
+import useTitle from '../../services/useTitle';
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
@@ -18,6 +19,7 @@ const List = () => {
   const [sortBy, setSortBy] = useState('countersTotal');
   const [sortOrder, setSortOrder] = useState('DESC');
   const [refresh, setRefresh] = useState(true);
+  useTitle('Organisations');
   const API = useApi();
 
   useEffect(() => {

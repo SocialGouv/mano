@@ -10,6 +10,7 @@ import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import Box from '../../components/Box';
 import useApi from '../../services/api';
+import useTitle from '../../services/useTitle';
 
 const View = () => {
   const [structure, setStructure] = useState(null);
@@ -35,6 +36,8 @@ const View = () => {
       history.goBack();
     }
   };
+
+  useTitle(`${structure?.name} - Structure`);
 
   if (!structure) return <Loading />;
 

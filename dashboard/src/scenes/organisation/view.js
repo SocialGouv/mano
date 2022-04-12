@@ -31,6 +31,20 @@ import { ENV, theme } from '../../config';
 import SortableGrid from '../../components/SortableGrid';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { refreshTriggerState } from '../../components/Loader';
+import useTitle from '../../services/useTitle';
+
+const getSettingTitle = (tabId) => {
+  if (tabId === 'infos') return 'Infos';
+  if (tabId === 'encryption') return 'Chiffrement';
+  if (tabId === 'reception') return 'Accueil';
+  if (tabId === 'persons') return 'Personnes';
+  if (tabId === 'consultations') return 'Consultations';
+  if (tabId === 'actions') return 'Actions';
+  if (tabId === 'territories') return 'Territoires';
+  if (tabId === 'export') return 'Export';
+  if (tabId === 'import') return 'Import';
+  return '';
+};
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -42,6 +56,7 @@ const View = () => {
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
+  useTitle(`Organisation - ${getSettingTitle(tab)}`);
 
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });
@@ -51,7 +66,7 @@ const View = () => {
     <div style={{ display: 'flex', flexDirection: 'column', margin: '0 -4rem -3rem', height: 'calc(100% + 3rem)' }}>
       <Title>Réglages de l'organisation {organisation.name}</Title>
       <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
-        <Drawer>
+        <Drawer title="Navigation dans les réglages de l'organisation">
           <DrawerButton className={tab === 'infos' ? 'active' : ''} onClick={() => setTab('infos')}>
             Infos
           </DrawerButton>
@@ -712,7 +727,7 @@ const SubTitleLevel2 = styled.h4`
   margin: 2rem 0;
 `;
 
-const Drawer = styled.aside`
+const Drawer = styled.nav`
   padding-top: 20px;
   padding-left: 10px;
   width: 200px;

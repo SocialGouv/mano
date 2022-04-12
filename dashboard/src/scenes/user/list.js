@@ -16,12 +16,14 @@ import TagTeam from '../../components/TagTeam';
 import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
+import useTitle from '../../services/useTitle';
 
 const List = () => {
   const [users, setUsers] = useState(null);
   const history = useHistory();
   const [refresh, setRefresh] = useState(false);
   const user = useRecoilValue(userState);
+  useTitle('Utilisateurs');
   const API = useApi();
 
   const getUsers = async () => {

@@ -22,12 +22,14 @@ import { currentTeamState, organisationState } from '../../recoil/auth';
 import { personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import useTitle from '../../services/useTitle';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
   const history = useHistory();
   const location = useLocation();
+  useTitle('Actions');
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);

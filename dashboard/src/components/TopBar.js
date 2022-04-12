@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import logo from '../assets/logo-green.png';
+import openNewWindow from '../assets/icons/open-in-new-window.svg';
 
 import SelectTeam from './SelectTeam';
 
@@ -24,7 +25,7 @@ const TopBar = () => {
   const API = useApi();
 
   return (
-    <TopBarStyled className="noprint">
+    <TopBarStyled className="noprint" title="Choix de l'équipe et menu déroulant pour le Profil">
       <TopBarOrganistionTeamBox>
         <Organisation>{['superadmin'].includes(user.role) ? 'Support' : organisation?.name}</Organisation>
         {!['superadmin'].includes(user.role) && (
@@ -68,7 +69,7 @@ const TopBar = () => {
             </DropdownItem>
             <DropdownItem divider />
             <DropdownItem tag="a" href="https://mano-app.fabrique.social.gouv.fr/faq/" target="_blank" rel="noreferrer">
-              Besoin d'aide ?
+              Besoin d'aide ? <OpenNewWindowIcon />
             </DropdownItem>
             <DropdownItem divider />
             <DropdownItem
@@ -76,16 +77,16 @@ const TopBar = () => {
               target="_blank"
               rel="noreferrer"
               href="https://framaforms.org/nouveau-questionnaire-de-satisfaction-de-mano-1627635427">
-              Donner mon avis sur Mano
+              Donner mon avis sur Mano <OpenNewWindowIcon />
             </DropdownItem>
             <DropdownItem tag="a" href={charte} target="_blank" rel="noreferrer">
-              Charte des Utilisateurs
+              Charte des Utilisateurs <OpenNewWindowIcon />
             </DropdownItem>
             <DropdownItem tag="a" href={legal} target="_blank" rel="noreferrer">
-              Mentions Légales
+              Mentions Légales <OpenNewWindowIcon />
             </DropdownItem>
             <DropdownItem tag="a" href={privacy} target="_blank" rel="noreferrer">
-              Politique de Confidentialité
+              Politique de Confidentialité <OpenNewWindowIcon />
             </DropdownItem>
           </DropdownMenu>
         </ButtonDropdown>
@@ -174,6 +175,17 @@ const Burger = styled.div`
     background-color: #fff;
     display: block;
   }
+`;
+
+const OpenNewWindowIcon = styled.div`
+  color: currentColor;
+  opacity: 0.4;
+  background-image: url(${openNewWindow});
+  background-size: contain;
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-left: 15px;
 `;
 
 export default TopBar;

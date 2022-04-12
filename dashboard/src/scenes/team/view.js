@@ -13,11 +13,13 @@ import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, teamsState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { useRecoilState } from 'recoil';
+import useTitle from '../../services/useTitle';
 
 const View = () => {
   const [team, setTeam] = useState(null);
   const { id } = useParams();
   const history = useHistory();
+  useTitle(`Équipes ${team?.name}`);
 
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
   const [teams, setTeams] = useRecoilState(teamsState);

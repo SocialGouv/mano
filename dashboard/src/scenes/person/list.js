@@ -21,8 +21,10 @@ import { placesState } from '../../recoil/places';
 import { actionsState } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
 import { filterBySearch } from '../search/utils';
+import useTitle from '../../services/useTitle';
 
 const List = () => {
+  useTitle('Personnes');
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);

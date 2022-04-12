@@ -46,6 +46,7 @@ import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
 import Passage from '../../components/Passage';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import useTitle from '../../services/useTitle';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 
@@ -74,6 +75,7 @@ const View = () => {
   const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
 
   const report = currentTeamReports[reportIndex];
+  useTitle(report.date ? `${dayjs(report.date).format('DD-MM-YYYY')} - Compte rendu` : 'Compte rendu');
 
   const onFirstBeforeReport = () => {
     if (reportIndex === currentTeamReports.length - 1) return;
