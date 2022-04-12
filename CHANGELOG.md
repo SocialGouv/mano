@@ -1,3 +1,10 @@
+# [1.90.0](https://github.com/SocialGouv/mano/compare/v1.89.10...v1.90.0) (2022-04-12)
+
+
+### Features
+
+* **dashboard:** can filter by no category ([#607](https://github.com/SocialGouv/mano/issues/607)) ([3b4de4a](https://github.com/SocialGouv/mano/commit/3b4de4ac2ed515efceb2edfcc50109954746d9d0))
+
 ## [1.89.10](https://github.com/SocialGouv/mano/compare/v1.89.9...v1.89.10) (2022-04-12)
 
 
