@@ -8185,10 +8185,10 @@ react-native-keychain@^6.2.0:
   resolved "https://registry.yarnpkg.com/react-native-keychain/-/react-native-keychain-6.2.0.tgz#8f4cff503aad367141db5aea0189ead9240c28ff"
   integrity sha512-U6fnOQRJPq+c0Abl+FoYy9v0H3kQU587tMamU/o+MoBSUScFLE3DQpkyT1PW4NF5IObgiGuqQdmjC2KgtBpjGA==
 
-react-native-mmkv-storage@^0.6.12:
-  version "0.6.12"
-  resolved "https://registry.yarnpkg.com/react-native-mmkv-storage/-/react-native-mmkv-storage-0.6.12.tgz#e9e052e26c3dea6818211919d2586cb260ee8e24"
-  integrity sha512-9gJlnGSAJkeWanNE24GPqEn4NMiNFVBpPsTZAQ5YDEKEX/gG7bGdHCTNkXc6L826QxLEPKjpPmf9ZqgPM2G8TQ==
+react-native-mmkv-storage@^0.7.0:
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/react-native-mmkv-storage/-/react-native-mmkv-storage-0.7.0.tgz#16c268af19247bcc8b5f189833cd5873f877b00d"
+  integrity sha512-WzVl3OwgpEyi+82FYOhEOlER0fTseaQzolY1j0Qtdmlp+Md9m64p3P6A2x2mFe0heuonbq5OvOOC+VbPICkjLw==
 
 react-native-pdf@^6.3.0:
   version "6.4.0"

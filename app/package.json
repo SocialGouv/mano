@@ -61,7 +61,7 @@
     "react-native-image-picker": "^4.7.3",
     "react-native-intent-launcher": "^0.2.1",
     "react-native-keychain": "^6.2.0",
-    "react-native-mmkv-storage": "^0.6.12",
+    "react-native-mmkv-storage": "^0.7.0",
     "react-native-pdf": "^6.3.0",
     "react-native-permissions": "^3.3.0",
     "react-native-reanimated": "^2.3.1",
