@@ -1,3 +1,10 @@
+## [1.89.6](https://github.com/SocialGouv/mano/compare/v1.89.5...v1.89.6) (2022-04-12)
+
+
+### Bug Fixes
+
+* **api:** save dashboard version in user for debug ([ea7a27b](https://github.com/SocialGouv/mano/commit/ea7a27b63f638dbb4005e44b7a6dde06c2c65d88))
+
 ## [1.89.5](https://github.com/SocialGouv/mano/compare/v1.89.4...v1.89.5) (2022-04-11)
 
 
