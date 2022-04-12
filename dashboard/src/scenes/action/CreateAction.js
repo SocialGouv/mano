@@ -44,7 +44,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
 
   const wrapperProps = buttonOnly ? {} : { className: 'noprint' };
 
-  const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
+  const catsSelect = [...(organisation.categories || [])];
 
   return (
     <Wrapper {...wrapperProps}>

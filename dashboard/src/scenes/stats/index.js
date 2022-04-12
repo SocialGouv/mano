@@ -21,7 +21,7 @@ import { CustomResponsiveBar, CustomResponsivePie } from '../../components/chart
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsState, DONE } from '../../recoil/actions';
+import { actionsState, DONE, mappedIdsToLabels } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
@@ -29,7 +29,6 @@ import { territoriesState } from '../../recoil/territory';
 import { getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { passagesState } from '../../recoil/passages';
-import SelectStatus from '../../components/SelectStatus';
 
 const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -66,7 +65,7 @@ const Stats = () => {
   const [filterPersons, setFilterPersons] = useState([]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
-  const [actionsStatus, setActionsStatus] = useState(DONE);
+  const [actionsStatuses, setActionsStatuses] = useState(DONE);
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
@@ -215,11 +214,16 @@ const Stats = () => {
               Filtrer par statut :
             </label>
             <div style={{ width: 300 }}>
-              <SelectStatus
-                inputId="filter-stats-by-status"
-                noTitle
-                onChange={(event) => setActionsStatus(event.target.value)}
-                value={actionsStatus}
+              <SelectCustom
+                inputId="action-select-status-filter"
+                options={mappedIdsToLabels}
+                getOptionValue={(s) => s._id}
+                getOptionLabel={(s) => s.name}
+                name="status"
+                onChange={(s) => setActionsStatuses(s.map((s) => s._id))}
+                isClearable
+                isMulti
+                value={mappedIdsToLabels.filter((s) => actionsStatuses.includes(s._id))}
               />
             </div>
           </Col>
@@ -227,7 +231,7 @@ const Stats = () => {
             title="Répartition des actions par catégorie"
             data={getPieData(
               actions
-                .filter((a) => !actionsStatus || a.status === actionsStatus)
+                .filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status))
                 .reduce((actionsSplitsByCategories, action) => {
                   if (!!action.categories?.length) {
                     for (const category of action.categories) {

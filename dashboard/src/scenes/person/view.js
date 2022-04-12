@@ -468,7 +468,7 @@ const Actions = ({ person, onUpdateResults }) => {
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
 
-  const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
+  const catsSelect = [...(organisation.categories || [])];
 
   const data = useMemo(() => {
     if (!person) return [];

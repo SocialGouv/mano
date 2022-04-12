@@ -62,7 +62,7 @@ const View = () => {
     }
   };
 
-  const catsSelect = [...(organisation.categories || [])].sort((c1, c2) => c1.localeCompare(c2));
+  const catsSelect = [...(organisation.categories || [])];
 
   return (
     <>
