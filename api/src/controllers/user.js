@@ -95,6 +95,7 @@ function updateUserDebugInfos(req, user) {
       z.optional(z.string()).parse(req.body.browsername);
       z.optional(z.string()).parse(req.body.browserversion);
       z.optional(z.string()).parse(req.body.browseros);
+      z.optional(z.string()).parse(req.headers.version);
     } catch (e) {
       capture(e, { extra: { body: req.body }, user });
       return;
@@ -104,6 +105,7 @@ function updateUserDebugInfos(req, user) {
       browserName: req.body.browsername,
       browserVersion: req.body.browserversion,
       browserOs: req.body.browseros,
+      version: req.headers.version,
     };
   }
 }
