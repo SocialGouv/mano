@@ -44,8 +44,15 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) 
         )}
         {!!['boolean'].includes(field.type) && (
           <CheckboxContainer>
-            <span>{field.label}</span>
-            <Input type="checkbox" id={id} required={field.required} name={field.name} checked={values[field.name]} onChange={handleChange} />
+            <label htmlFor={id}>{field.label}</label>
+            <Input
+              type="checkbox"
+              id={id}
+              required={field.required}
+              name={field.name}
+              checked={values[field.name]}
+              onChange={() => handleChange({ target: { value: !values[field.name], name: field.name } })}
+            />
           </CheckboxContainer>
         )}
         {!!['yes-no'].includes(field.type) && (

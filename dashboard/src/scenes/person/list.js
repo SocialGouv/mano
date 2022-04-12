@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useContext, useEffect, useMemo } from 'react';
 import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -24,13 +24,24 @@ import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 
 const List = () => {
-  const [filters, setFilters] = useState([]);
   useTitle('Personnes');
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(true);
-  const { search, setSearch, page, setPage, filterTeams, alertness, setFilterAlertness, setFilterTeams } = useContext(PaginationContext);
+  const {
+    search,
+    setSearch,
+    page,
+    setPage,
+    filterTeams,
+    alertness,
+    setFilterAlertness,
+    setFilterTeams,
+    filters,
+    setFilters,
+    viewAllOrganisationData,
+    setViewAllOrganisationData,
+  } = useContext(PaginationContext);
 
   const persons = useRecoilValue(personsWithPlacesSelector);
   const personsFiltered = useMemo(() => {
@@ -165,6 +176,7 @@ const List = () => {
               id="viewAllOrganisationData"
               style={{ marginRight: 10 }}
               checked={viewAllOrganisationData}
+              value={viewAllOrganisationData}
               onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
             />
             Afficher les personnes de toute l'organisation
@@ -172,12 +184,19 @@ const List = () => {
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
           <label htmlFor="alertness" style={{ marginLeft: '270px' }}>
-            <input type="checkbox" style={{ marginRight: 10 }} id="alertness" value={alertness} onChange={() => setFilterAlertness(!alertness)} />
+            <input
+              type="checkbox"
+              style={{ marginRight: 10 }}
+              id="alertness"
+              checked={alertness}
+              value={alertness}
+              onChange={() => setFilterAlertness(!alertness)}
+            />
             N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
           </label>
         </Col>
       </Row>
-      <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " />
+      <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " saveInURLParams />
       <Table
         data={data}
         rowKey={'_id'}

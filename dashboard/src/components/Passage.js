@@ -52,99 +52,170 @@ const Passage = ({ passage, onFinished }) => {
         <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer un passage' : 'Éditer le passage'}</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={passage}
+            initialValues={{ ...passage, anonymousNumberOfPassages: 1 }}
             onSubmit={async (body, actions) => {
               if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
               if (!body.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
+              if (isNew && body.anonymous && !body.anonymousNumberOfPassages)
+                return toastr.error('Erreur!', 'Veuillez spécifier le nombre de passages anonymes');
 
-              const response = isNew
-                ? await API.post({
-                    path: '/passage',
-                    body: preparePassageForEncryption(body),
-                  })
-                : await API.put({
-                    path: `/passage/${passage._id}`,
-                    body: preparePassageForEncryption(body),
-                  });
+              if (isNew) {
+                const newPassage = {
+                  date: body.date,
+                  team: body.team,
+                  user: body.user,
+                  comment: body.comment,
+                };
+
+                if (body.anonymous) {
+                  for (let i = 0; i < body.anonymousNumberOfPassages; i++) {
+                    const response = await API.post({
+                      path: '/passage',
+                      body: preparePassageForEncryption(newPassage),
+                    });
+                    if (response.ok) {
+                      setPassages((passages) => [response.decryptedData, ...passages]);
+                    }
+                  }
+                } else {
+                  for (const person of body.person) {
+                    const response = await API.post({
+                      path: '/passage',
+                      body: preparePassageForEncryption({ ...newPassage, person }),
+                    });
+                    if (response.ok) {
+                      setPassages((passages) => [response.decryptedData, ...passages]);
+                    }
+                  }
+                }
+
+                setOpen(false);
+                onFinished();
+                toastr.success(body.person.length > 1 ? 'Passage enregistré' : 'Passages enregistrés');
+                actions.setSubmitting(false);
+                return;
+              }
+              const response = await API.put({
+                path: `/passage/${passage._id}`,
+                body: preparePassageForEncryption(body),
+              });
               if (response.ok) {
                 setPassages((passages) =>
-                  isNew
-                    ? [response.decryptedData, ...passages]
-                    : passages.map((p) => {
-                        if (p._id === passage._id) return response.decryptedData;
-                        return p;
-                      })
+                  passages.map((p) => {
+                    if (p._id === passage._id) return response.decryptedData;
+                    return p;
+                  })
                 );
               }
               if (!response.ok) return;
               setOpen(false);
               onFinished();
-              toastr.success(isNew ? 'Passage enregistré' : 'Passage mis à jour');
+              toastr.success('Passage mis à jour');
               actions.setSubmitting(false);
             }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
-              <React.Fragment>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="date">Date</Label>
-                      <div>
-                        <DatePicker
-                          id="date"
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.date)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
-                          timeInputLabel="Heure :"
-                          dateFormat="dd/MM/yyyy HH:mm"
-                          showTimeInput
+            {({ values, handleChange, handleSubmit, isSubmitting }) => {
+              return (
+                <React.Fragment>
+                  <Row>
+                    {!!isNew && (
+                      <Col md={12}>
+                        <FormGroup>
+                          <Label htmlFor="create-anonymous-passages">
+                            <input
+                              type="checkbox"
+                              id="create-anonymous-passages"
+                              style={{ marginRight: '0.5rem' }}
+                              name="anonymous"
+                              checked={values.anonymous}
+                              onChange={() => handleChange({ target: { value: !values.anonymous, name: 'anonymous' } })}
+                            />
+                            Passage(s) anonyme(s) <br />
+                            <small className="text-muted">Cochez cette case pour enregistrer plutôt des passages anonymes</small>
+                          </Label>
+                        </FormGroup>
+                      </Col>
+                    )}
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label htmlFor="date">Date</Label>
+                        <div>
+                          <DatePicker
+                            id="date"
+                            locale="fr"
+                            className="form-control"
+                            selected={dateForDatePicker(values.date)}
+                            onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
+                            timeInputLabel="Heure :"
+                            dateFormat="dd/MM/yyyy HH:mm"
+                            showTimeInput
+                          />
+                        </div>
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        {values.anonymous ? (
+                          <>
+                            <Label htmlFor="number-of-anonymous-passages">Nombre de passages anonymes</Label>
+                            <Input
+                              name="anonymousNumberOfPassages"
+                              type="number"
+                              value={values.anonymousNumberOfPassages}
+                              onChange={handleChange}
+                              id="number-of-anonymous-passages"
+                            />
+                          </>
+                        ) : (
+                          <SelectPerson value={values.person} onChange={handleChange} isClearable={isNew} isMulti={isNew} />
+                        )}
+                      </FormGroup>
+                    </Col>
+                    <Col md={12}>
+                      <FormGroup>
+                        <Label htmlFor="update-passage-comment">Commentaire</Label>
+                        <Input name="comment" type="textarea" value={values.comment} onChange={handleChange} id="update-passage-comment" />
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label htmlFor="update-passage-user-select">Créé par</Label>
+                        <SelectUser
+                          inputId="update-passage-user-select"
+                          value={values.user || user._id}
+                          onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
                         />
-                      </div>
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <SelectPerson value={values.person} onChange={handleChange} isClearable />
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label htmlFor="update-passage-comment">Commentaire</Label>
-                      <Input name="comment" type="textarea" value={values.comment} onChange={handleChange} id="update-passage-comment" />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="update-passage-user-select">Créé par</Label>
-                      <SelectUser
-                        inputId="update-passage-user-select"
-                        value={values.user || user._id}
-                        onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
+                      </FormGroup>
+                    </Col>
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label htmlFor="update-passage-team-select">Sous l'équipe</Label>
+                        <SelectTeam
+                          teams={user.role === 'admin' ? teams : user.teams}
+                          teamId={values.team}
+                          onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                          inputId="update-passage-team-select"
+                        />
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                  <br />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                    {!isNew && (
+                      <ButtonCustom
+                        title="Supprimer"
+                        type="button"
+                        style={{ marginRight: 10 }}
+                        color="danger"
+                        onClick={onDeletePassage}
+                        width={200}
                       />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="update-passage-team-select">Sous l'équipe</Label>
-                      <SelectTeam
-                        teams={user.role === 'admin' ? teams : user.teams}
-                        teamId={values.team}
-                        onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
-                        inputId="update-passage-team-select"
-                      />
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <br />
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  {!isNew && (
-                    <ButtonCustom title="Supprimer" type="button" style={{ marginRight: 10 }} color="danger" onClick={onDeletePassage} width={200} />
-                  )}
-                  <ButtonCustom title="Enregistrer" loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} width={200} />
-                </div>
-              </React.Fragment>
-            )}
+                    )}
+                    <ButtonCustom title="Enregistrer" loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} width={200} />
+                  </div>
+                </React.Fragment>
+              );
+            }}
           </Formik>
         </ModalBody>
       </Modal>

@@ -17,8 +17,8 @@ const SelectUser = ({ value, onChange, ...props }) => {
       onInputChange={setSearch}
       isSearchable
       onChange={(v) => {
-        setSearch(v._name);
-        onChange(v._id);
+        setSearch(v?._name);
+        onChange(v?._id);
       }}
       value={users.filter((i) => i._id === value)[0]}
       placeholder={' -- Choisir un utilisateur -- '}

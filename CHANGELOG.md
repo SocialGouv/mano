@@ -1,3 +1,53 @@
+## [1.89.8](https://github.com/SocialGouv/mano/compare/v1.89.7...v1.89.8) (2022-04-12)
+
+
+### Bug Fixes
+
+* **dashboard:** filter add or remove a bit buggy ([#605](https://github.com/SocialGouv/mano/issues/605)) ([aef26ab](https://github.com/SocialGouv/mano/commit/aef26abc9fd1f2622dc1d192d8a5f04b994505ed))
+
+## [1.89.7](https://github.com/SocialGouv/mano/compare/v1.89.6...v1.89.7) (2022-04-12)
+
+
+### Bug Fixes
+
+* stats passages actions ([#604](https://github.com/SocialGouv/mano/issues/604)) ([3af4910](https://github.com/SocialGouv/mano/commit/3af4910800f93f041d4555fe1cb2f421f3442699))
+
+## [1.89.6](https://github.com/SocialGouv/mano/compare/v1.89.5...v1.89.6) (2022-04-12)
+
+
+### Bug Fixes
+
+* **api:** save dashboard version in user for debug ([ea7a27b](https://github.com/SocialGouv/mano/commit/ea7a27b63f638dbb4005e44b7a6dde06c2c65d88))
+
+## [1.89.5](https://github.com/SocialGouv/mano/compare/v1.89.4...v1.89.5) (2022-04-11)
+
+
+### Bug Fixes
+
+* multiple bugs and tiny improvements ([#601](https://github.com/SocialGouv/mano/issues/601)) ([476cdae](https://github.com/SocialGouv/mano/commit/476cdae1847d590df55a040add5e2e18e3661781))
+
+## [1.89.4](https://github.com/SocialGouv/mano/compare/v1.89.3...v1.89.4) (2022-04-11)
+
+
+### Bug Fixes
+
+* debug sentry https://sentry.io/share/issue/da76d06d6f664ce59a163a3a8f9d97de/ ([5a7c714](https://github.com/SocialGouv/mano/commit/5a7c7144a707f611651ae7df343dcbef63c56540))
+
+## [1.89.3](https://github.com/SocialGouv/mano/compare/v1.89.2...v1.89.3) (2022-04-11)
+
+
+### Bug Fixes
+
+* update team in dashboard ([878d8fe](https://github.com/SocialGouv/mano/commit/878d8fe3ff0251ad844c46ba31d31ec6e083b501))
+
+## [1.89.2](https://github.com/SocialGouv/mano/compare/v1.89.1...v1.89.2) (2022-04-08)
+
+
+### Bug Fixes
+
+* **dashboard:** aria label on incrementor ([#596](https://github.com/SocialGouv/mano/issues/596)) ([69ce18b](https://github.com/SocialGouv/mano/commit/69ce18bf6ba190e273e46ffeb7cd5f70c79bded5))
+* **dashboard:** label with htmlFor with new sonarlint config ([#597](https://github.com/SocialGouv/mano/issues/597)) ([e32a8e8](https://github.com/SocialGouv/mano/commit/e32a8e8f50cabb08d1d1eafba7dfb48ce5af124a))
+
 ## [1.89.1](https://github.com/SocialGouv/mano/compare/v1.89.0...v1.89.1) (2022-04-08)
 
 
