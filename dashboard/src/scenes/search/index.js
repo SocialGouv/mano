@@ -1,7 +1,7 @@
-import React, { useContext, useState, useEffect, useMemo, Fragment } from 'react';
+import React, { useState, useEffect, useMemo, Fragment } from 'react';
 import { Row, Col, TabContent, TabPane, Nav, NavItem, NavLink } from 'reactstrap';
 import styled from 'styled-components';
-import { useHistory, useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import DateBloc from '../../components/DateBloc';
 import Header from '../../components/header';
 import Box from '../../components/Box';
@@ -11,7 +11,6 @@ import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
-import PaginationContext, { PaginationProvider } from '../../contexts/pagination';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
 import { teamsState } from '../../recoil/auth';
@@ -29,18 +28,18 @@ import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
+import useSearchParamState from '../../services/useSearchParamState';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
 const View = () => {
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const { search, setSearch } = useContext(PaginationContext);
-  const [tabsContents, setTabsContents] = useState(initTabs);
-  const location = useLocation();
-  const history = useHistory();
-  const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(initTabs.findIndex((value) => value.toLowerCase() === searchParams.get('tab')) || 0);
   useTitle('Recherche');
+
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+
+  const [search, setSearch] = useSearchParamState('search', '');
+  const [activeTab, setActiveTab] = useSearchParamState('tab', 0);
+  const [tabsContents, setTabsContents] = useState(initTabs);
 
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
 
@@ -56,21 +55,13 @@ const View = () => {
         <Nav tabs fill style={{ marginBottom: 20 }}>
           {tabsContents.map((tabCaption, index) => (
             <NavItem key={index} style={{ cursor: 'pointer' }}>
-              <NavLink
-                key={index}
-                className={`${activeTab === index && 'active'}`}
-                onClick={() => {
-                  const searchParams = new URLSearchParams(location.search);
-                  searchParams.set('tab', initTabs[index].toLowerCase());
-                  history.replace({ pathname: location.pathname, search: searchParams.toString() });
-                  setActiveTab(index);
-                }}>
+              <NavLink key={index} className={`${Number(activeTab) === index && 'active'}`} onClick={() => setActiveTab(index)}>
                 {tabCaption}
               </NavLink>
             </NavItem>
           ))}
         </Nav>
-        <TabContent activeTab={activeTab}>
+        <TabContent activeTab={Number(activeTab)}>
           <TabPane tabId={0}>
             <Actions search={search} onUpdateResults={(total) => updateTabContent(0, `Actions (${total})`)} />
           </TabPane>
@@ -513,10 +504,4 @@ const StyledBox = styled(Box)`
   }
 `;
 
-const ViewWithPagination = () => (
-  <PaginationProvider>
-    <View />
-  </PaginationProvider>
-);
-
-export default ViewWithPagination;
+export default View;

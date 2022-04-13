@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from 'react';
+import React, { Fragment, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -9,7 +9,6 @@ import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
 import Search from '../../components/search';
-import PaginationContext from '../../contexts/pagination';
 import Page from '../../components/pagination';
 import { filterBySearch } from '../search/utils';
 import { currentTeamState, organisationState } from '../../recoil/auth';
@@ -21,6 +20,7 @@ import { formatDateWithFullMonth } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
+import useSearchParamState from '../../services/useSearchParamState';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -30,14 +30,17 @@ const filterPlaces = (places, { page, limit, search }) => {
 };
 
 const List = () => {
+  useTitle('Lieux fréquentés');
+
+  const history = useHistory();
+
   const places = useRecoilValue(placesState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const organisation = useRecoilValue(organisationState);
   const persons = useRecoilValue(personsState);
-  const history = useHistory();
-  useTitle('Lieux fréquentés');
 
-  const { search, setSearch, page, setPage } = useContext(PaginationContext);
+  const [page, setPage] = useSearchParamState('page', 0);
+  const [search, setSearch] = useSearchParamState('search', '');
 
   const limit = 20;
 

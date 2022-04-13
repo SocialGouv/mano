@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Label, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -9,7 +9,6 @@ import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ActionStatus from '../../components/ActionStatus';
 import DateBloc from '../../components/DateBloc';
-import PaginationContext from '../../contexts/pagination';
 import Search from '../../components/search';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
@@ -23,6 +22,7 @@ import { personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
+import useSearchParamState from '../../services/useSearchParamState';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
@@ -35,7 +35,12 @@ const List = () => {
   const persons = useRecoilValue(personsWithPlacesSelector);
   const organisation = useRecoilValue(organisationState);
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
-  const { search, setSearch, statuses, setStatuses, page, setPage, categories, setCategories } = useContext(PaginationContext);
+
+  const [search, setSearch] = useSearchParamState('search', '');
+  const [page, setPage] = useSearchParamState('page', 0);
+  const [statuses, setStatuses] = useSearchParamState('statuses', []);
+  const [categories, setCategories] = useSearchParamState('categories', []);
+
   const [showAs, setShowAs] = useState(window.localStorage.getItem('showAs') || showAsOptions[0]); // calendar, list
   // List of actions filtered by current team and selected statuses.
   const actionsByTeamAndStatus = useMemo(
