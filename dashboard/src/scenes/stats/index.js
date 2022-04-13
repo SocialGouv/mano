@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -26,7 +26,7 @@ import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesState } from '../../recoil/territory';
-import { getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
+import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { passagesState } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
@@ -43,13 +43,12 @@ const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrga
   );
 };
 
-const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Observations', 'Comptes-rendus'];
+const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Observations', 'Comptes-rendus'];
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
-  useTitle('Statistiques');
 
   const allPersons = useRecoilValue(personsState);
   const allActions = useRecoilValue(actionsState);
@@ -69,11 +68,11 @@ const Stats = () => {
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
   const [actionsStatuses, setActionsStatuses] = useState(DONE);
 
+  useTitle(`${tabs[activeTab]} - Statistiques`);
+
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
   };
-
-  if (loading) return <Loading />;
 
   const persons = getDataForPeriod(
     allPersons.filter((e) => viewAllOrganisationData || (e.assignedTeams || []).includes(currentTeam._id)),
@@ -105,6 +104,27 @@ const Stats = () => {
     viewAllOrganisationData,
     { field: 'date' }
   );
+  const personsInPassagesBeforePeriod = useMemo(() => {
+    if (!period?.startDate) return [];
+    const passagesIds = passages.map((p) => p._id);
+    const passagesNotIncludedInPeriod = allPassages
+      .filter((p) => !passagesIds.includes(p._id))
+      .filter((p) => dayjsInstance(p.date).isBefore(period.startDate));
+    return passagesNotIncludedInPeriod.reduce((personsIds, passage) => {
+      if (!passage.person) return personsIds;
+      if (personsIds.includes(passage.person)) return personsIds;
+      return [...personsIds, passage.person];
+    }, []);
+  }, [allPassages, passages, period.startDate]);
+  const personsInPassagesOfPeriod = useMemo(
+    () =>
+      passages.reduce((personsIds, passage) => {
+        if (!passage.person) return personsIds;
+        if (personsIds.includes(passage.person)) return personsIds;
+        return [...personsIds, passage.person];
+      }, []),
+    [passages]
+  );
 
   const reports = getDataForPeriod(
     allreports.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
@@ -122,6 +142,8 @@ const Stats = () => {
     ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
   ];
+
+  if (loading) return <Loading />;
 
   return (
     <>
@@ -356,6 +378,21 @@ const Stats = () => {
           }
         </TabPane>
         <TabPane tabId={4}>
+          <Title>Statistiques des passages</Title>
+          <Row>
+            <Block data={passages.length} title="Nombre de passages" />
+            <Block data={passages.filter((p) => !p.person).length} title="Nombre de passages anonymes" />
+            <Block data={passages.filter((p) => !!p.person).length} title="Nombre de passages non anonymes" />
+          </Row>
+          <Row>
+            <Block data={personsInPassagesOfPeriod.length} title="Nombre de personnes différentes passées (passages anonymes exclus)" />
+            <Block
+              data={personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)).length}
+              title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
+            />
+          </Row>
+        </TabPane>
+        <TabPane tabId={5}>
           <Title>Statistiques des observations de territoire</Title>
           <div style={{ maxWidth: '350px', marginBottom: '2rem' }}>
             <Label htmlFor="filter-territory">Filter par territoire</Label>
@@ -407,7 +444,7 @@ const Stats = () => {
               ))}
           </Row>
         </TabPane>
-        <TabPane tabId={5}>
+        <TabPane tabId={6}>
           <Title>Statistiques des comptes-rendus</Title>
           <CustomResponsivePie
             title="Répartition des comptes-rendus par collaboration"
