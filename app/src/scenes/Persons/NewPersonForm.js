@@ -62,7 +62,11 @@ const NewPersonForm = ({ navigation, route }) => {
   const onCreateUser = async () => {
     setPosting(true);
     const existingPerson = persons.find((p) => p.name === name);
-    if (existingPerson) return { ok: false, error: 'Un utilisateur existe déjà à ce nom' };
+    if (existingPerson) {
+      Alert.alert('Une personne suivie existe déjà avec ce nom', 'Veuillez choisir un autre nom');
+      setPosting(false);
+      return false;
+    }
     const response = await API.post({
       path: '/person',
       body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name, followedSince: new Date(), assignedTeams }),
