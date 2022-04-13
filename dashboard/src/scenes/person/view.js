@@ -48,7 +48,6 @@ import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import DeletePerson from './DeletePerson';
 import { MedicalFile } from './MedicalFile';
-import { ENV } from '../../config';
 import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
 import Passage from '../../components/Passage';
@@ -121,18 +120,9 @@ const View = () => {
       <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }} className="noprint">
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
+          if (!user.healthcareProfessional && tabCaption.includes('Dossier Médical')) return null;
           return (
-            <NavItem
-              // This implementation is temporary. Currently, the tabs are not dynamic so we have to hide them when disabled.
-              // Also, this is currently only displayed in localhost. Todo: fix me!
-              className={`${
-                initTabs[index].toLowerCase() === 'dossier médical' &&
-                !((user.healthcareProfessional && ENV === 'development') || user._id === '09ec2a60-8471-4f4a-ad62-74b2424df28b')
-                  ? 'd-none'
-                  : ''
-              }`}
-              key={index}
-              style={{ cursor: 'pointer' }}>
+            <NavItem key={index} style={{ cursor: 'pointer' }}>
               <NavLink
                 key={index}
                 className={`${activeTab === index ? 'active' : ''}`}
