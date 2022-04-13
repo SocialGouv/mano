@@ -1,3 +1,10 @@
+# [1.91.0](https://github.com/SocialGouv/mano/compare/v1.90.1...v1.91.0) (2022-04-13)
+
+
+### Features
+
+* **dashboard:** stats for passages ([#614](https://github.com/SocialGouv/mano/issues/614)) ([7bc04ef](https://github.com/SocialGouv/mano/commit/7bc04ef15944a86ca2415eefc13eff01cddf39ed))
+
 ## [1.90.1](https://github.com/SocialGouv/mano/compare/v1.90.0...v1.90.1) (2022-04-13)
 
 
