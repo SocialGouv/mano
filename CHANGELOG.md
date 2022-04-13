@@ -1,3 +1,11 @@
+## [1.90.1](https://github.com/SocialGouv/mano/compare/v1.90.0...v1.90.1) (2022-04-13)
+
+
+### Bug Fixes
+
+* **dashboard:** bug with useTitle in report ([#612](https://github.com/SocialGouv/mano/issues/612)) ([6594ea2](https://github.com/SocialGouv/mano/commit/6594ea231fb0223eae9968da32cb2ab35737d819))
+* **dashboard:** prevent clear action status on crud ([#613](https://github.com/SocialGouv/mano/issues/613)) ([03e432e](https://github.com/SocialGouv/mano/commit/03e432ee6ed5c538a0c543fbcd899fa2bd8d9f5d))
+
 # [1.90.0](https://github.com/SocialGouv/mano/compare/v1.89.10...v1.90.0) (2022-04-12)
 
 
