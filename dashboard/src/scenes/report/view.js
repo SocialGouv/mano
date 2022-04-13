@@ -75,7 +75,7 @@ const View = () => {
   const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
 
   const report = currentTeamReports[reportIndex];
-  useTitle(report.date ? `${dayjs(report.date).format('DD-MM-YYYY')} - Compte rendu` : 'Compte rendu');
+  useTitle(report?.date ? `${dayjs(report.date).format('DD-MM-YYYY')} - Compte rendu` : 'Compte rendu');
 
   const onFirstBeforeReport = () => {
     if (reportIndex === currentTeamReports.length - 1) return;
