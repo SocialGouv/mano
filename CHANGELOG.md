@@ -1,3 +1,10 @@
+# [1.92.0](https://github.com/SocialGouv/mano/compare/v1.91.0...v1.92.0) (2022-04-13)
+
+
+### Features
+
+* **dashboard,app:** new charte and new html chart for dashboard ([#615](https://github.com/SocialGouv/mano/issues/615)) ([ce7e4ab](https://github.com/SocialGouv/mano/commit/ce7e4abc81217147250b17ace39b057d357f4ca1))
+
 # [1.91.0](https://github.com/SocialGouv/mano/compare/v1.90.1...v1.91.0) (2022-04-13)
 
 
