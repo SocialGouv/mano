@@ -45,12 +45,12 @@ describe("Organisation CRUD", () => {
 
   it("should be able to connect as a new user", async () => {
     await connectWith("test+firstorga@example.org", "secret");
-    await expect(page).toMatch("Charte des Utilisateurs de Mano");
+    await expect(page).toMatch("Charte d'Utilisation de Mano");
     await new Promise((resolve) => setTimeout(resolve, 3000));
     await page.evaluate(async (_) => {
       return new Promise((resolve) => {
         setTimeout(() => {
-          document?.querySelector(".main > div")?.scrollBy(0, 3000000);
+          document?.getElementById("charte")?.scrollBy(0, 3000000);
           resolve("ok");
         }, 500);
       });
