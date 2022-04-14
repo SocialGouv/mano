@@ -1,3 +1,10 @@
+## [1.94.1](https://github.com/SocialGouv/mano/compare/v1.94.0...v1.94.1) (2022-04-14)
+
+
+### Bug Fixes
+
+* **website:** download height page ([41ef994](https://github.com/SocialGouv/mano/commit/41ef9943166df832b9e0c94628bdffa54e3a9075))
+
 # [1.94.0](https://github.com/SocialGouv/mano/compare/v1.93.0...v1.94.0) (2022-04-14)
 
 
