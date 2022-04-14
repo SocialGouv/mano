@@ -7,18 +7,17 @@ const mobileAppVersion = require('./package.json').version;
 // To authenticate, please run `gh auth login`.
 
 const publishAppToLatestTag = async () => {
-  const result = await exec(`gh release create m${mobileAppVersion} ./android/app/build/outputs/apk/release/app-release.apk`);
+  const result = await exec(
+    `gh release create m${mobileAppVersion} ./android/app/build/outputs/apk/release/app-release.apk ./app.json --target main`
+  );
 
   if (result.stderr?.length) {
     console.log(chalk.red('Error uploading app:'), chalk.bgRed(result.stderr));
     return;
   }
   if (result.stdout?.length) {
-    console.log(chalk.green('Success uploading app:'), chalk.bgRed(result.stdout));
-    return;
+    console.log(chalk.green('Success uploading app:'), chalk.green(result.stdout));
   }
-
-  await exec(`gh release upload m${mobileAppVersion} ./app.json`);
 
   console.log(chalk.yellow('Transfer completed 😬: https://mano-app.fabrique.social.gouv.fr/download'));
 };
