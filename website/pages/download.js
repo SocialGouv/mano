@@ -8,7 +8,7 @@ export default function Download() {
     <div>
       <Header />
       <div className="w-full h-18"></div>
-      <section className="relative h-[50vw] flex items-center">
+      <section className="relative h-[50vh] flex items-center">
         <a
           className="mx-auto py-4 px-12 space-x-2 text-white transition-all bg-shamrock-400 rounded-xl bg-opacity-100 hover:bg-opacity-30 inline-flex justify-between items-center text-center"
           download
