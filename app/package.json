@@ -1,6 +1,6 @@
 {
   "name": "mano",
-  "version": "2.18.0",
+  "version": "2.18.1",
   "private": true,
   "scripts": {
     "get-ip": "./get-ip.sh",
@@ -21,7 +21,8 @@
     "deploy:android": "./upload.sh",
     "build-and-deploy:android": "npm run build:android-apk && ./upload.sh",
     "build-and-deploy-preprod:android": "npm run build:android-apk-preproduction && ./upload-preprod.sh",
-    "update-mobile-app-version": "node ./update-mobile-app-version.js"
+    "update-mobile-app-version": "node ./update-mobile-app-version.js",
+    "publish-release-to-github": "node ./publish-release-to-github.js"
   },
   "dependencies": {
     "@expo/react-native-action-sheet": "^3.9.0",
@@ -79,12 +80,14 @@
     "@babel/core": "^7.12.9",
     "@babel/runtime": "^7.12.5",
     "@react-native-community/eslint-config": "^2.0.0",
+    "chalk": "^4.1.2",
     "detox": "^19.4.5",
     "eslint": "7.32.0",
     "jest": "^27.0.4",
     "jest-circus": "^27.5.1",
     "metro-react-native-babel-preset": "^0.64.0",
-    "semver": "^7.3.5"
+    "semver": "^7.3.5",
+    "simple-git": "^3.6.0"
   },
   "jest": {
     "preset": "react-native",
