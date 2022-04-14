@@ -1,3 +1,10 @@
+# [1.94.0](https://github.com/SocialGouv/mano/compare/v1.93.0...v1.94.0) (2022-04-14)
+
+
+### Features
+
+* release apk in mano-app website ([#619](https://github.com/SocialGouv/mano/issues/619)) ([88ecef2](https://github.com/SocialGouv/mano/commit/88ecef219a91aeb141d130c29e0bb69706685cc6))
+
 # [1.93.0](https://github.com/SocialGouv/mano/compare/v1.92.0...v1.93.0) (2022-04-14)
 
 
