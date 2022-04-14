@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -35,14 +35,6 @@ const List = () => {
   const [filters, setFilters] = useSearchParamState('filters', []);
   const [page, setPage] = useSearchParamState('page', 0);
   const currentTeam = useRecoilValue(currentTeamState);
-  const currentTeamRef = useRef(currentTeam._id);
-  useEffect(() => {
-    if (currentTeamRef.current !== currentTeam._id) {
-      setPage(0);
-      currentTeamRef.current = currentTeam._id;
-    }
-  }, [currentTeam._id, setPage]);
-
   const persons = useRecoilValue(personsWithPlacesSelector);
   const personsFiltered = useMemo(() => {
     let pFiltered = persons;
@@ -109,7 +101,9 @@ const List = () => {
   const history = useHistory();
 
   useEffect(() => {
-    setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id]);
+    // its not possible to update two different URLSearchParams very quickly, the second one cancels the first one
+    setPage(0); // internal state
+    setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id], { sideEffect: ['page', 0] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewAllOrganisationData, currentTeam, teams]);
 

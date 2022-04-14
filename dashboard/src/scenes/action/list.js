@@ -37,11 +37,12 @@ const List = () => {
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
   const [search, setSearch] = useSearchParamState('search', '');
-  const [page, setPage] = useSearchParamState('page', 0);
+  const [page, setPage] = useSearchParamState('page', 0, { resetOnValueChange: currentTeam._id });
   const [statuses, setStatuses] = useSearchParamState('statuses', []);
   const [categories, setCategories] = useSearchParamState('categories', []);
 
   const [showAs, setShowAs] = useState(window.localStorage.getItem('showAs') || showAsOptions[0]); // calendar, list
+
   // List of actions filtered by current team and selected statuses.
   const actionsByTeamAndStatus = useMemo(
     () =>
