@@ -206,6 +206,7 @@ const SignIn = () => {
                         name="email"
                         type="email"
                         id="email"
+                        autoComplete="email"
                         value={values.email}
                         onChange={handleChangeRequest}
                       />
@@ -220,6 +221,7 @@ const SignIn = () => {
                         validate={(v) => validator.isEmpty(v) && 'Ce champ est obligatoire'}
                         name="password"
                         id="password"
+                        autoComplete="current-password"
                         value={values.password}
                         onChange={handleChangeRequest}
                         setShowPassword={setShowPassword}

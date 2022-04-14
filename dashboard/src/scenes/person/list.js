@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -11,7 +11,6 @@ import Table from '../../components/table';
 import CreatePerson from './CreatePerson';
 import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, filterPersonsBase } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
-import PaginationContext from '../../contexts/pagination';
 import Filters, { filterData } from '../../components/Filters';
 import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
 import { personsWithPlacesSelector } from '../../recoil/selectors';
@@ -22,27 +21,20 @@ import { actionsState } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
+import useSearchParamState from '../../services/useSearchParamState';
 
 const List = () => {
   useTitle('Personnes');
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
-  const {
-    search,
-    setSearch,
-    page,
-    setPage,
-    filterTeams,
-    alertness,
-    setFilterAlertness,
-    setFilterTeams,
-    filters,
-    setFilters,
-    viewAllOrganisationData,
-    setViewAllOrganisationData,
-  } = useContext(PaginationContext);
-
+  const [search, setSearch] = useSearchParamState('search', '');
+  const [alertness, setFilterAlertness] = useSearchParamState('alertness', false);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrganisationData', []);
+  const [filterTeams, setFilterTeams] = useSearchParamState('filterTeams', []);
+  const [filters, setFilters] = useSearchParamState('filters', []);
+  const [page, setPage] = useSearchParamState('page', 0);
+  const currentTeam = useRecoilValue(currentTeamState);
   const persons = useRecoilValue(personsWithPlacesSelector);
   const personsFiltered = useMemo(() => {
     let pFiltered = persons;
@@ -106,11 +98,12 @@ const List = () => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const organisation = useRecoilValue(organisationState);
-  const currentTeam = useRecoilValue(currentTeamState);
   const history = useHistory();
 
   useEffect(() => {
-    setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id]);
+    // its not possible to update two different URLSearchParams very quickly, the second one cancels the first one
+    setPage(0); // internal state
+    setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id], { sideEffect: ['page', 0] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewAllOrganisationData, currentTeam, teams]);
 
