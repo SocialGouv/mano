@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -29,11 +29,19 @@ const List = () => {
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
   const [search, setSearch] = useSearchParamState('search', '');
-  const [page, setPage] = useSearchParamState('page', 0);
   const [alertness, setFilterAlertness] = useSearchParamState('alertness', false);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrganisationData', []);
   const [filterTeams, setFilterTeams] = useSearchParamState('filterTeams', []);
   const [filters, setFilters] = useSearchParamState('filters', []);
+  const [page, setPage] = useSearchParamState('page', 0);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const currentTeamRef = useRef(currentTeam._id);
+  useEffect(() => {
+    if (currentTeamRef.current !== currentTeam._id) {
+      setPage(0);
+      currentTeamRef.current = currentTeam._id;
+    }
+  }, [currentTeam._id, setPage]);
 
   const persons = useRecoilValue(personsWithPlacesSelector);
   const personsFiltered = useMemo(() => {
@@ -98,7 +106,6 @@ const List = () => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const organisation = useRecoilValue(organisationState);
-  const currentTeam = useRecoilValue(currentTeamState);
   const history = useHistory();
 
   useEffect(() => {

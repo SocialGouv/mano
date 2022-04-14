@@ -3,6 +3,8 @@ import { useHistory, useLocation } from 'react-router-dom';
 
 const setDataAsSearchParam = (data) => {
   if (typeof data === 'string') return data;
+  if (typeof data === 'number') return data;
+  if (typeof data === 'boolean') return data;
   return JSON.stringify(data);
 };
 
@@ -11,6 +13,7 @@ const getDataAsSearchParam = (data, defaultValue) => {
   // handle objects
   if (typeof defaultValue === 'string') return data;
   if (typeof defaultValue === 'number') return Number(data);
+  if (typeof defaultValue === 'boolean') return Boolean(data);
   try {
     return JSON.parse(data);
   } catch (e) {
