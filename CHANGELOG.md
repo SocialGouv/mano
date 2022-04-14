@@ -1,3 +1,10 @@
+# [1.93.0](https://github.com/SocialGouv/mano/compare/v1.92.0...v1.93.0) (2022-04-14)
+
+
+### Features
+
+* **dashboard:** enable dossier medical ([#616](https://github.com/SocialGouv/mano/issues/616)) ([815e2f4](https://github.com/SocialGouv/mano/commit/815e2f48dabad1483ecb144ce4b665ad29d7e0c1))
+
 # [1.92.0](https://github.com/SocialGouv/mano/compare/v1.91.0...v1.92.0) (2022-04-13)
 
 
