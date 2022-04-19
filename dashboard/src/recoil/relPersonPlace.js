@@ -1,8 +1,21 @@
+import localforage from 'localforage';
 import { atom } from 'recoil';
 
+const collectionName = 'relPersonPlace';
 export const relsPersonPlaceState = atom({
-  key: 'relsPersonPlaceState',
+  key: collectionName,
+  /* default: new Promise(async (resolve) => {
+    const cache = await localforage.getItem(collectionName);
+    resolve(cache || []);
+  }), */
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet(async (newValue) => {
+        await localforage.setItem(collectionName, newValue);
+      });
+    },
+  ],
 });
 
 const encryptedFields = ['place', 'person', 'user'];

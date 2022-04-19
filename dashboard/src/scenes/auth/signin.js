@@ -14,13 +14,15 @@ import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import useApi, { setOrgEncryptionKey } from '../../services/api';
 import { AppSentry } from '../../services/sentry';
-import { refreshTriggerState, loadingState } from '../../components/Loader';
+import { refreshTriggerState, loadingState, lastRefreshState } from '../../components/Loader';
+import { clearCache } from '../../services/dataManagement';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const setGlobalLoading = useSetRecoilState(loadingState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
+  const setLastRefresh = useSetRecoilState(lastRefreshState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
   const [user, setUser] = useRecoilState(userState);
@@ -70,6 +72,11 @@ const SignIn = () => {
       if (ok && token && user) {
         setAuthViaCookie(true);
         const { organisation } = user;
+        if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
+          clearCache();
+          setLastRefresh(0);
+        }
+        window.localStorage.setItem('mano-organisationId', organisation._id);
         setOrganisation(organisation);
         setUserName(user.name);
         if (!!organisation.encryptionEnabled && !['superadmin'].includes(user.role)) setShowEncryption(true);
@@ -138,6 +145,11 @@ const SignIn = () => {
               return actions.setSubmitting(false);
             }
             if (token) API.setToken(token);
+            if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
+              clearCache();
+              setLastRefresh(0);
+            }
+            window.localStorage.setItem('mano-organisationId', organisation._id);
             setOrganisation(organisation);
             if (!!values.orgEncryptionKey) {
               const encryptionIsValid = await setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);

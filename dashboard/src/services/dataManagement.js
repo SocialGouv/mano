@@ -1,6 +1,5 @@
 /* eslint-disable no-throw-literal */
-import { useState } from 'react';
-// import MMKVStorage from 'react-native-mmkv-storage';
+import localforage from 'localforage';
 
 export const mergeNewUpdatedData = (newData, oldData) => {
   const oldDataIds = oldData.map((p) => p._id);
@@ -18,18 +17,18 @@ export const mergeNewUpdatedData = (newData, oldData) => {
   ].filter((p) => !deletedItemsIds.includes(p._id));
 };
 
-// export const useStorage = (key, defaultValue) => {
-//   const [value, setValue] = useMMKVStorage(key, MMKV, defaultValue);
-//   return [value, setValue];
-// };
+localforage.config({
+  name: 'mano-dashboard',
+  version: 1.0,
+  storeName: 'mano_cache', // Should be alphanumeric, with underscores.
+  description: 'save Mano organisation data to cache to make the app faster',
+});
 
-// app feature only
-export const MMKV = null;
-
-export const useStorage = (key, defaultValue) => {
-  const [value, setValue] = useState(defaultValue);
-  return [value, setValue];
-};
+export function clearCache() {
+  console.log('CLEAR');
+  localforage?.clear();
+  window.localStorage?.clear();
+}
 
 // Get data from server (no cache yet).
 export async function getData({
@@ -39,8 +38,11 @@ export async function getData({
   isInitialization = false,
   setProgress = () => {},
   setBatchData = null,
-  lastRefresh = null,
+  lastRefresh = 0,
 }) {
+  if (isInitialization) {
+    data = (await localforage.getItem(collectionName)) || [];
+  }
   const response = await API.get({
     path: `/${collectionName}`,
     batch: 1000,
@@ -48,10 +50,11 @@ export async function getData({
     query: { after: lastRefresh, withDeleted: Boolean(lastRefresh) },
     setBatchData,
   });
+
   if (!response.ok) console.log({ message: `Error getting ${collectionName} data`, response });
-  if (response.ok && response.decryptedData && response.decryptedData.length) {
-    data = mergeNewUpdatedData(response.decryptedData, data);
-  }
-  // await MMKV.setMapAsync(collectionName, data);
+  if (!response.decryptedData.length && !isInitialization) return null;
+
+  data = mergeNewUpdatedData(response.decryptedData, data);
+  await localforage.setItem(collectionName, data);
   return data;
 }
