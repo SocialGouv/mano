@@ -175,7 +175,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
             dateFormat="dd/MM/yyyy"
             className="form-control"
             name={name}
-            selected={value?.date}
+            selected={value?.date ? new Date(value?.date) : null}
             onChange={(date) => onChangeValue({ date, dateComparator })}
           />
         </Col>

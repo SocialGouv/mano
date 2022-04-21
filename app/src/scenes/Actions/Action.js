@@ -202,8 +202,6 @@ const Action = ({ navigation, route }) => {
 
       const comment = {
         comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
-        type: 'action',
-        item: actionDB?._id,
         action: actionDB?._id,
         team: currentTeam._id,
         user: user._id,
@@ -309,8 +307,6 @@ const Action = ({ navigation, route }) => {
       const body = {
         comment: c.comment,
         action: response.decryptedData._id,
-        item: response.decryptedData._id,
-        type: 'action',
         user: c.user,
         team: c.team,
         organisation: c.organisation,

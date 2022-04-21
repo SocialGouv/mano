@@ -465,7 +465,8 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
             commentPopulated.type = 'action';
           }
           return commentPopulated;
-        }),
+        })
+        .filter((c) => c.action || c.person),
     [comments, currentTeam._id, currentTeam?.nightSession, date, persons, actions]
   );
 

@@ -310,8 +310,6 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
 export const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
   try {
     const commentbody = {
-      type: 'person',
-      item: newPerson._id,
       person: newPerson._id,
     };
     const notifyChange = (field, before, now) => `Changement ${field}:

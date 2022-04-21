@@ -91,7 +91,7 @@ const ExportData = () => {
         report[key] = r[key];
       }
       const reportServices = JSON.parse(r.services || '{}');
-      for (const service of organisation.services) {
+      for (const service of organisation.services || []) {
         report[service] = reportServices[service];
       }
       return report;

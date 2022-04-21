@@ -112,8 +112,6 @@ const View = () => {
                   comment: `${user.name} a changé le status de l'action: ${
                     mappedIdsToLabels.find((status) => status._id === newAction.status)?.name
                   }`,
-                  type: 'action',
-                  item: action._id,
                   action: action._id,
                   team: currentTeam._id,
                   user: user._id,
