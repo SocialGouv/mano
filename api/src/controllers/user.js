@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const { Op } = require("sequelize");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const { validatePassword, looseUuidRegex, jwtRegex } = require("../utils");
+const { validatePassword, looseUuidRegex, jwtRegex, sanitizeAll } = require("../utils");
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
 const { comparePassword } = require("../utils");
@@ -155,7 +155,7 @@ router.get(
   "/me",
   passport.authenticate("user", { session: false }),
   validateUser(["admin", "normal", "superadmin"]),
-  catchErrors(async (req, res, next) => {
+  catchErrors(async (req, res) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
     const teams = await user.getTeams();
     const organisation = await user.getOrganisation();
@@ -329,10 +329,10 @@ router.post(
     const { name, email, role, team, healthcareProfessional } = req.body;
     const token = crypto.randomBytes(20).toString("hex");
     const newUser = {
-      name,
+      name: sanitizeAll(name),
       role,
       healthcareProfessional,
-      email: email.trim().toLowerCase(),
+      email: sanitizeAll(email.trim().toLowerCase()),
       password: crypto.randomBytes(60).toString("hex"), // A useless password.
       organisation: req.user.organisation,
       forgotPasswordResetToken: token,
@@ -553,8 +553,8 @@ router.put(
     const user = await User.findOne({ where: { _id } });
     if (!user) return res.status(404).send({ ok: false, error: "Utilisateur non trouvé" });
 
-    if (name) user.name = name;
-    if (email) user.email = email.trim().toLowerCase();
+    if (name) user.name = sanitizeAll(name);
+    if (email) user.email = sanitizeAll(email.trim().toLowerCase());
     if (termsAccepted) user.termsAccepted = termsAccepted;
     if (password) {
       if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
@@ -618,8 +618,8 @@ router.put(
     const user = await User.findOne({ where: { _id, organisation: req.user.organisation } });
     if (!user) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    if (name) user.name = name;
-    if (email) user.email = email.trim().toLowerCase();
+    if (name) user.name = sanitizeAll(name);
+    if (email) user.email = sanitizeAll(email.trim().toLowerCase());
     if (healthcareProfessional !== undefined) user.healthcareProfessional = healthcareProfessional;
     if (role) user.role = role;
 
