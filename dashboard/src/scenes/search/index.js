@@ -226,20 +226,22 @@ const Comments = ({ search, onUpdateResults }) => {
 
   const data = useMemo(() => {
     if (!search?.length) return [];
-    return filterBySearch(search, comments).map((comment) => {
-      const commentPopulated = { ...comment };
-      if (comment.person) {
-        commentPopulated.person = persons.find((p) => p._id === comment?.person);
-        commentPopulated.type = 'person';
-      }
-      if (comment.action) {
-        const action = actions.find((p) => p._id === comment?.action);
-        commentPopulated.action = action;
-        commentPopulated.person = persons.find((p) => p._id === action?.person);
-        commentPopulated.type = 'action';
-      }
-      return commentPopulated;
-    });
+    return filterBySearch(search, comments)
+      .map((comment) => {
+        const commentPopulated = { ...comment };
+        if (comment.person) {
+          commentPopulated.person = persons.find((p) => p._id === comment?.person);
+          commentPopulated.type = 'person';
+        }
+        if (comment.action) {
+          const action = actions.find((p) => p._id === comment?.action);
+          commentPopulated.action = action;
+          commentPopulated.person = persons.find((p) => p._id === action?.person);
+          commentPopulated.type = 'action';
+        }
+        return commentPopulated;
+      })
+      .filter((c) => c.action || c.person);
   }, [search, comments, persons, actions]);
 
   useEffect(() => {
