@@ -26,7 +26,7 @@ jobs:
 
       - name: Create image labels and tags
         id: docker_meta
-        uses: "crazy-max/ghaction-docker-meta@2e1a5c7fa42123697f82d479b551a1bbdb1bef88"
+        uses: crazy-max/ghaction-docker-meta@0950af0d7cc44517c4cf423a732b5ad02d839439
         with:
           images: ghcr.io/socialgouv/${{ env.project }}/website
           labels: |
@@ -81,7 +81,7 @@ jobs:
 
       - name: Create image labels and tags
         id: docker_meta
-        uses: "crazy-max/ghaction-docker-meta@2e1a5c7fa42123697f82d479b551a1bbdb1bef88"
+        uses: crazy-max/ghaction-docker-meta@0950af0d7cc44517c4cf423a732b5ad02d839439
         with:
           images: ghcr.io/socialgouv/${{ env.project }}/dashboard
           labels: |
@@ -136,7 +136,7 @@ jobs:
 
       - name: Create image labels and tags
         id: docker_meta
-        uses: "crazy-max/ghaction-docker-meta@2e1a5c7fa42123697f82d479b551a1bbdb1bef88"
+        uses: crazy-max/ghaction-docker-meta@0950af0d7cc44517c4cf423a732b5ad02d839439
         with:
           images: ghcr.io/socialgouv/${{ env.project }}/api
           labels: |
