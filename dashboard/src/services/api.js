@@ -306,10 +306,7 @@ const useApi = () => {
       while (hasMore) {
         let query = { ...args.query, limit, page };
         const response = await execute({ method: 'GET', ...args, query });
-        if (!response.ok) {
-          capture('error getting batch', { extra: { response, args } });
-          return { ok: false, data: [] };
-        }
+        if (!response.ok) return { ok: false, data: [] };
         data.push(...response.data);
         decryptedData.push(...(response.decryptedData || []));
         hasMore = response.hasMore;
