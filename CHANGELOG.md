@@ -1,3 +1,10 @@
+## [1.94.2](https://github.com/SocialGouv/mano/compare/v1.94.1...v1.94.2) (2022-04-21)
+
+
+### Bug Fixes
+
+* **security:** add sanitizer, sanitize name and email before returning ([#577](https://github.com/SocialGouv/mano/issues/577)) ([31027e5](https://github.com/SocialGouv/mano/commit/31027e5a749a83877a28bb50c0712fa5d3b3a60c))
+
 ## [1.94.1](https://github.com/SocialGouv/mano/compare/v1.94.0...v1.94.1) (2022-04-14)
 
 
