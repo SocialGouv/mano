@@ -4,10 +4,6 @@ import { atom } from 'recoil';
 const collectionName = 'place';
 export const placesState = atom({
   key: collectionName,
-  /* default: new Promise(async (resolve) => {
-    const cache = await localforage.getItem(collectionName);
-    resolve(cache || []);
-  }), */
   default: [],
   effects: [
     ({ onSet }) => {
