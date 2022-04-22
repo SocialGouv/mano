@@ -246,6 +246,7 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to use add a description", async () => {
+    await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Ajouter une description" });
     await expect(page).toMatch("Description", { timeout: 4000 });
     await expect(page).toFill('textarea[name="description"]', "Ceci est une description");

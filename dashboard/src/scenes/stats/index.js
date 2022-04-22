@@ -14,6 +14,7 @@ import {
   personsState,
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
+  genderOptions,
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
@@ -98,7 +99,13 @@ const Stats = () => {
     { field: 'observedAt' }
   );
   const passages = getDataForPeriod(
-    allPassages.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
+    allPassages
+      .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
+      .map((p) => ({ ...p, type: !!p.person ? 'Non-anonyme' : 'Anonyme' }))
+      .map((passage) => ({
+        ...passage,
+        gender: !passage.person ? null : allPersons.find((person) => person._id === passage.person)?.gender || 'Non précisé',
+      })),
     period,
     currentTeam,
     viewAllOrganisationData,
@@ -110,20 +117,24 @@ const Stats = () => {
     const passagesNotIncludedInPeriod = allPassages
       .filter((p) => !passagesIds.includes(p._id))
       .filter((p) => dayjsInstance(p.date).isBefore(period.startDate));
-    return passagesNotIncludedInPeriod.reduce((personsIds, passage) => {
-      if (!passage.person) return personsIds;
-      if (personsIds.includes(passage.person)) return personsIds;
-      return [...personsIds, passage.person];
-    }, []);
-  }, [allPassages, passages, period.startDate]);
-  const personsInPassagesOfPeriod = useMemo(
-    () =>
-      passages.reduce((personsIds, passage) => {
+    return passagesNotIncludedInPeriod
+      .reduce((personsIds, passage) => {
         if (!passage.person) return personsIds;
         if (personsIds.includes(passage.person)) return personsIds;
         return [...personsIds, passage.person];
-      }, []),
-    [passages]
+      }, [])
+      .map((personId) => allPersons.find((p) => p._id === personId) || { _id: personId, gender: 'Non précisé' });
+  }, [allPassages, passages, period.startDate, allPersons]);
+  const personsInPassagesOfPeriod = useMemo(
+    () =>
+      passages
+        .reduce((personsIds, passage) => {
+          if (!passage.person) return personsIds;
+          if (personsIds.includes(passage.person)) return personsIds;
+          return [...personsIds, passage.person];
+        }, [])
+        .map((personId) => allPersons.find((p) => p._id === personId) || { _id: personId, gender: 'Non précisé' }),
+    [passages, allPersons]
   );
 
   const reports = getDataForPeriod(
@@ -380,15 +391,30 @@ const Stats = () => {
         <TabPane tabId={4}>
           <Title>Statistiques des passages</Title>
           <Row>
-            <Block data={passages.length} title="Nombre de passages" />
-            <Block data={passages.filter((p) => !p.person).length} title="Nombre de passages anonymes" />
-            <Block data={passages.filter((p) => !!p.person).length} title="Nombre de passages non anonymes" />
-          </Row>
-          <Row>
-            <Block data={personsInPassagesOfPeriod.length} title="Nombre de personnes différentes passées (passages anonymes exclus)" />
-            <Block
-              data={personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)).length}
+            <CustomResponsivePie title="Nombre de passages" data={getPieData(passages, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
+            <CustomResponsivePie
+              title="Répartition des passages non-anonymes"
+              data={getPieData(
+                passages.filter((p) => !!p.gender),
+                'gender',
+                { options: [...genderOptions, 'Non précisé'] }
+              )}
+            />
+            <CustomResponsivePie
+              title="Nombre de personnes différentes passées (passages anonymes exclus)"
+              data={getPieData(
+                personsInPassagesOfPeriod.filter((p) => !!p.gender),
+                'gender',
+                { options: [...genderOptions, 'Non précisé'] }
+              )}
+            />
+            <CustomResponsivePie
               title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
+              data={getPieData(
+                personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)).filter((p) => !!p.gender),
+                'gender',
+                { options: [...genderOptions, 'Non précisé'] }
+              )}
             />
           </Row>
         </TabPane>
