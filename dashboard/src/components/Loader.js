@@ -56,7 +56,6 @@ export const refreshTriggerState = atom({
 export const lastRefreshState = atom({
   key: 'lastRefreshState',
   default: window.localStorage.getItem('mano-last-refresh') || 0,
-  // default: 0,
   effects: [
     ({ onSet }) => {
       onSet((newValue) => {
