@@ -1,3 +1,10 @@
+## [1.94.4](https://github.com/SocialGouv/mano/compare/v1.94.3...v1.94.4) (2022-04-22)
+
+
+### Bug Fixes
+
+* **app,dashboard:** rename Dossier in Informations ([#632](https://github.com/SocialGouv/mano/issues/632)) ([adaacfc](https://github.com/SocialGouv/mano/commit/adaacfc8a5349b809a3c722b15a6730be03fec01))
+
 ## [1.94.3](https://github.com/SocialGouv/mano/compare/v1.94.2...v1.94.3) (2022-04-22)
 
 
