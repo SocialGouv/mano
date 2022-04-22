@@ -407,7 +407,7 @@ const View = () => {
                       <>
                         {organisation.encryptionEnabled ? (
                           <>
-                            <SubTitle>Réglage des champs personnalisés des personnes suivies (dossier social)</SubTitle>
+                            <SubTitle>Réglage des champs personnalisés des personnes suivies (informations sociales)</SubTitle>
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsPersonsSocial"
@@ -418,7 +418,7 @@ const View = () => {
                                 })()}
                               />
                             </Row>
-                            <SubTitle>Réglage des champs personnalisés des personnes suivies (dossier médical)</SubTitle>
+                            <SubTitle>Réglage des champs personnalisés des personnes suivies (informations médicales)</SubTitle>
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsPersonsMedical"

@@ -40,7 +40,7 @@ const FileSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, 
 
   return (
     <>
-      <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Dossier social" />
+      <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Informations sociales" />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
         <PersonalSituationSelect
           value={person.personalSituation}

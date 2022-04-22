@@ -34,7 +34,7 @@ const FileMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, i
 
   return (
     <>
-      <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Dossier médical" />
+      <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Informations médicales" />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
         <View>
           <HealthInsuranceSelect value={person.healthInsurance} onSelect={(healthInsurance) => onChange({ healthInsurance })} editable={editable} />

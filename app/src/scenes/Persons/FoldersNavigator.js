@@ -24,8 +24,8 @@ export default FoldersNavigator;
 const FoldersSummary = ({ navigation, backgroundColor }) => (
   <ScrollContainer noPadding backgroundColor={backgroundColor || colors.app.color}>
     <Spacer />
-    <Row withNextButton caption="Dossier social" onPress={() => navigation.navigate('FileSocial')} />
-    <Row withNextButton caption="Dossier médical" onPress={() => navigation.navigate('FileMedical')} />
+    <Row withNextButton caption="Informations sociales" onPress={() => navigation.navigate('FileSocial')} />
+    <Row withNextButton caption="Informations médicales" onPress={() => navigation.navigate('FileMedical')} />
     <Row withNextButton caption="Documents" onPress={() => navigation.navigate('Documents')} />
   </ScrollContainer>
 );

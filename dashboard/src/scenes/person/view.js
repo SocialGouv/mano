@@ -321,7 +321,7 @@ const Summary = ({ person }) => {
                 </Col>
               </Row>
               <hr />
-              <Title>Dossier social</Title>
+              <Title>Informations sociales</Title>
               <Row>
                 <Col md={4}>
                   <Label htmlFor="person-select-personalSituation">Situation personnelle</Label>
@@ -411,7 +411,7 @@ const Summary = ({ person }) => {
               </Row>
 
               <hr />
-              <Title>Dossier médical</Title>
+              <Title>Informations médicales</Title>
               <Row>
                 <Col md={4}>
                   <Label htmlFor="person-select-healthInsurance">Couverture médicale</Label>
