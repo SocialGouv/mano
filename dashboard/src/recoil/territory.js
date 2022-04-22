@@ -4,10 +4,6 @@ import { atom } from 'recoil';
 const collectionName = 'territory';
 export const territoriesState = atom({
   key: collectionName,
-  /* default: new Promise(async (resolve) => {
-    const cache = await localforage.getItem(collectionName);
-    resolve(cache || []);
-  }), */
   default: [],
   effects: [
     ({ onSet }) => {
