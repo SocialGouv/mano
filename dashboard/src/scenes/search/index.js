@@ -147,7 +147,6 @@ const Actions = ({ search, onUpdateResults }) => {
             },
             { title: 'Nom', dataKey: 'name' },
             { title: 'Personne suivie', dataKey: 'person', render: (action) => <PersonName item={action} /> },
-            { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
             { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           ]}
         />
