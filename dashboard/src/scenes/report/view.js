@@ -449,7 +449,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
     () =>
       comments
         .filter((c) => c.team === currentTeam._id)
-        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
         .map((comment) => {
           const commentPopulated = { ...comment };
           if (comment.person) {
@@ -496,8 +496,8 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
           columns={[
             {
               title: 'Heure',
-              dataKey: 'createdAt',
-              render: (comment) => <span>{dayjs(comment.createdAt).format('HH:mm')}</span>,
+              dataKey: 'date',
+              render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('HH:mm')}</span>,
             },
             {
               title: 'Utilisateur',
@@ -554,7 +554,7 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const PassagesCreatedAt = ({ date, report, onUpdateResults = () => null }) => {
+const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const allPassages = useRecoilValue(passagesState);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
@@ -677,7 +677,7 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
     () =>
       territoryObservations
         .filter((o) => o.team === currentTeam._id)
-        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0)),
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, date, currentTeam?.nightSession ? 12 : 0)),
     [currentTeam._id, currentTeam?.nightSession, date, territoryObservations]
   );
 
@@ -707,8 +707,8 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
           columns={[
             {
               title: 'Heure',
-              dataKey: 'createdAt',
-              render: (obs) => <span>{dayjs(obs.createdAt).format('HH:mm')}</span>,
+              dataKey: 'observedAt',
+              render: (obs) => <span>{dayjs(obs.observedAt || obs.createdAt).format('HH:mm')}</span>,
             },
             {
               title: 'Utilisateur',
