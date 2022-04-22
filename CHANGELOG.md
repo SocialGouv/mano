@@ -1,3 +1,10 @@
+## [1.94.3](https://github.com/SocialGouv/mano/compare/v1.94.2...v1.94.3) (2022-04-22)
+
+
+### Bug Fixes
+
+* relaunch the deployment ([d6f804e](https://github.com/SocialGouv/mano/commit/d6f804ee12b6da39dd828d717b72bbfee0f3ce7b))
+
 ## [1.94.2](https://github.com/SocialGouv/mano/compare/v1.94.1...v1.94.2) (2022-04-21)
 
 
