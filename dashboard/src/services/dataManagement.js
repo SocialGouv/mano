@@ -25,7 +25,6 @@ localforage.config({
 });
 
 export function clearCache() {
-  console.log('CLEAR');
   localforage?.clear();
   window.localStorage?.clear();
 }
