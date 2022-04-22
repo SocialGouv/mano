@@ -1,3 +1,10 @@
+## [1.94.5](https://github.com/SocialGouv/mano/compare/v1.94.4...v1.94.5) (2022-04-22)
+
+
+### Bug Fixes
+
+* **dashboard:** show date instead of createdAt in reports ([#634](https://github.com/SocialGouv/mano/issues/634)) ([602f246](https://github.com/SocialGouv/mano/commit/602f24689fa92ada03f5ada796bac0e7a1101576))
+
 ## [1.94.4](https://github.com/SocialGouv/mano/compare/v1.94.3...v1.94.4) (2022-04-22)
 
 
