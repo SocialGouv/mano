@@ -55,7 +55,7 @@ const mergeItems = (oldItems, newItems) => {
 
 const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh', 0);
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh--cache-version-2022-04-25', null);
   const [loading, setLoading] = useRecoilState(loadingState);
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);

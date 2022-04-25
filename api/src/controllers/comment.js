@@ -62,7 +62,7 @@ router.get(
       error.status = 400;
       return next(error);
     }
-    const { limit, page, lastRefresh } = req.query;
+    const { limit, page, lastRefresh, after, withDeleted } = req.query;
 
     const query = {
       where: { organisation: req.user.organisation },
@@ -73,8 +73,13 @@ router.get(
     if (limit) query.limit = Number(limit);
     if (page) query.offset = Number(page) * limit;
     if (lastRefresh) {
-      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }, { deletedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
-      query.paranoid = false;
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+    }
+    if (withDeleted === true) query.paranoid = false;
+    if (after && !isNaN(Number(after)) && withDeleted) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(after)) } }, { deletedAt: { [Op.gte]: new Date(Number(deletedAfter)) } }];
+    } else if (after && !isNaN(Number(after))) {
+      query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
     }
 
     const data = await Comment.findAll({

@@ -39,9 +39,15 @@ export async function getData({
   isInitialization = false,
   setProgress = () => {},
   setBatchData = null,
-  lastRefresh = 0,
+  lastRefresh = null,
 }) {
-  const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
+  const response = await API.get({
+    path: `/${collectionName}`,
+    batch: 1000,
+    setProgress,
+    query: { after: lastRefresh, withDeleted: Boolean(lastRefresh) },
+    setBatchData,
+  });
   if (!response.ok) console.log({ message: `Error getting ${collectionName} data`, response });
   if (response.ok && response.decryptedData && response.decryptedData.length) {
     data = mergeNewUpdatedData(response.decryptedData, data);

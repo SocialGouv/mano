@@ -29,12 +29,25 @@ export function clearCache() {
 }
 
 // Get data from cache or fetch from server.
-export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
+export async function getData({
+  collectionName,
+  data = [],
+  isInitialization = false,
+  setProgress = () => {},
+  setBatchData = null,
+  lastRefresh = null,
+}) {
   if (isInitialization) {
     data = (await MMKV.getMapAsync(collectionName)) || [];
   }
 
-  const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
+  const response = await API.get({
+    path: `/${collectionName}`,
+    batch: 1000,
+    setProgress,
+    query: { after: lastRefresh, withDeleted: Boolean(lastRefresh) },
+    setBatchData,
+  });
   if (!response.ok) throw { message: `Error getting ${collectionName} data`, response };
 
   // avoid sending data if no new data, to avoid big useless `map` calculations in selectors

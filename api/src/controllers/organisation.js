@@ -40,15 +40,19 @@ router.get(
     const query = { where: { organisation: req.query.organisation } };
     const { lastRefresh } = req.query;
     if (lastRefresh) {
-      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }, { deletedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
-      query.paranoid = false;
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+    }
+    if (withDeleted === true) query.paranoid = false;
+    if (after && !isNaN(Number(after)) && withDeleted) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(after)) } }, { deletedAt: { [Op.gte]: new Date(Number(deletedAfter)) } }];
+    } else if (after && !isNaN(Number(after))) {
+      query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
     }
 
     const places = await Place.count(query);
     const relsPersonPlace = await RelPersonPlace.count(query);
     const actions = await Action.count(query);
     const persons = await Person.count(query);
-    console.log(query, new Date(Number(lastRefresh)), persons);
     const comments = await Comment.count(query);
     const passages = await Passage.count(query);
     const reports = await Report.count(query);
