@@ -1,3 +1,10 @@
+## [1.94.7](https://github.com/SocialGouv/mano/compare/v1.94.6...v1.94.7) (2022-04-25)
+
+
+### Bug Fixes
+
+* **app,website:** mano download url ([#621](https://github.com/SocialGouv/mano/issues/621)) ([86f9a44](https://github.com/SocialGouv/mano/commit/86f9a44a5796732c98d94d0869282eda354dfd1f))
+
 ## [1.94.6](https://github.com/SocialGouv/mano/compare/v1.94.5...v1.94.6) (2022-04-25)
 
 
