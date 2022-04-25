@@ -3,28 +3,37 @@ import Embed from "./embed";
 
 const Mobile = () => (
   <div className="space-y-2">
-    <Dropdown title="Comment MANO peut-il répondre aux besoins d'équipes si différentes, dont la mienne ?" defaultOpen={false}>
+    <Dropdown
+      title="Comment MANO peut-il répondre aux besoins d'équipes si différentes, dont la mienne ?"
+      defaultOpen={false}>
       <ul className="mb-4 list-card">
         <li>
-          Toutes les équipes de maraude et en charge d'accueils de jour que nous avons rencontré ont leurs spécificités. Souvent, elles ont des besoins uniques, qu'aucune autre équipe ne présente.
+          Toutes les équipes de maraude et en charge d'accueils de jour que nous avons rencontré ont
+          leurs spécificités. Souvent, elles ont des besoins uniques, qu'aucune autre équipe ne
+          présente.
         </li>
         <li>
-          MANO propose une série de fonctionnalités (dossiers de suivi de personnes, système d'actions, observations de territoires...). Leur complémentarité assure que chaque équipe peut utiliser MANO d'une manière différente, qui lui permet de répondre spécifiquement à ses besoins.
+          MANO propose une série de fonctionnalités (dossiers de suivi de personnes, système
+          d'actions, observations de territoires...). Leur complémentarité assure que chaque équipe
+          peut utiliser MANO d'une manière différente, qui lui permet de répondre spécifiquement à
+          ses besoins.
         </li>
         <li>
-          Aucune équipe ne doit se débrouiller avec MANO pour trouver comment l'utiliser à son image. Notre équipe vous accompagne le temps qu'il faut pour déterminer avec vous l'usage qui vous conviendra le mieux !
+          Aucune équipe ne doit se débrouiller avec MANO pour trouver comment l'utiliser à son
+          image. Notre équipe vous accompagne le temps qu'il faut pour déterminer avec vous l'usage
+          qui vous conviendra le mieux !
         </li>
       </ul>
     </Dropdown>
-    
+
     <Dropdown title="Comment se connecter pour la première fois à MANO ?" defaultOpen={false}>
       <h4 className="mb-6 text-base font-semibold text-shamrock-400">Dans tous les cas</h4>
       <p className="mb-6 font-semibold">
         1. Se rendre à l’adresse{" "}
         <a
           className="transition-all text-shamrock-400 hover:text-shamrock-500"
-          href="https://dev.ambroselli.io/mano">
-          https://dev.ambroselli.io/mano
+          href="https://mano-app.fabrique.social.gouv.fr/download">
+          https://mano-app.fabrique.social.gouv.fr/download
         </a>{" "}
         et télécharger MANO.
       </p>
@@ -96,18 +105,21 @@ const Mobile = () => (
         thumbnail_path="thumbnails/mano_login_andro.jpg"
       />
 
-      <h4 className="mb-6 text-base font-semibold text-shamrock-400">Puis, si votre organisation utilise le chiffrement côté client</h4>
+      <h4 className="mb-6 text-base font-semibold text-shamrock-400">
+        Puis, si votre organisation utilise le chiffrement côté client
+      </h4>
 
       <ul className="mb-6 list-none list-card">
         <li>
-          Si un nouveau champ apparaît vous demandant votre “Clé de chiffrement d'organisation”, il s’agit d’une phrase de passe commune à toute votre organisation que votre chef.fe de service ou coordinateur.rice doit vous avoir transmis à l’oral.
+          Si un nouveau champ apparaît vous demandant votre “Clé de chiffrement d'organisation”, il
+          s’agit d’une phrase de passe commune à toute votre organisation que votre chef.fe de
+          service ou coordinateur.rice doit vous avoir transmis à l’oral.
         </li>
       </ul>
 
       <p className="mb-6 font-semibold">
         Taper cette phrase de passe d’équipe puis cliquez sur “Se connecter” !
       </p>
-
     </Dropdown>
 
     <Dropdown title="Pourquoi est-ce que l’installation de MANO, le changement de mot de passe ou une autre fonctionnalité ne fonctionne pas ?">
@@ -127,8 +139,8 @@ const Mobile = () => (
 
     <Dropdown title="Comment créer le dossier de suivi d'une personne ?">
       <p className="mb-6 font-semibold">
-        1. Se rendre dans la section “Personnes suivies” grâce au menu du bas, puis toucher le bouton “+” en
-        bas à droite.
+        1. Se rendre dans la section “Personnes suivies” grâce au menu du bas, puis toucher le
+        bouton “+” en bas à droite.
       </p>
 
       <Embed
@@ -180,8 +192,8 @@ const Mobile = () => (
 
       <ul className="mb-6 list-none list-card">
         <li>
-          Dans ce cas, pour associer une action à une personne suivie il faut le faire manuellement à l’aide
-          du champ prévu à cet effet.
+          Dans ce cas, pour associer une action à une personne suivie il faut le faire manuellement
+          à l’aide du champ prévu à cet effet.
         </li>
       </ul>
 
@@ -201,7 +213,10 @@ const Mobile = () => (
       </p>
 
       <ul className="mb-6 list-card">
-        <li>Dans ce cas, l’action est par défaut associée à une personne suivie dont on consulte la fiche.</li>
+        <li>
+          Dans ce cas, l’action est par défaut associée à une personne suivie dont on consulte la
+          fiche.
+        </li>
       </ul>
       <p className="mb-3">
         Les seuls champs obligatoires d’une action sont le nom et la date. Tous les autres champs
@@ -236,7 +251,8 @@ const Mobile = () => (
       <ul className="mb-6 list-card">
         <li>
           On peut ajouter un commentaire à l'aide de la case "commentaire" présente dans les
-          dossiers des personnes suivies (accessibles lorsqu'on clique sur le nom d'une personne suivie).
+          dossiers des personnes suivies (accessibles lorsqu'on clique sur le nom d'une personne
+          suivie).
         </li>
         <li>
           On peut aussi ajouter un commentaire sur une action à l'aide d'une case qui porte le même
@@ -244,7 +260,8 @@ const Mobile = () => (
         </li>
         <li>
           Dans les deux cas, les commentaires successifs sont conservés et permettent d’effectuer
-          des transmissions. Mais ils apparaissent séparément, respectivement tout en bas du dossier d'une personne suivie ou des détails d’une action.
+          des transmissions. Mais ils apparaissent séparément, respectivement tout en bas du dossier
+          d'une personne suivie ou des détails d’une action.
         </li>
         <li>
           On retrouve également ces deux types de commentaires dans le compte-rendu quotidien de
@@ -296,8 +313,8 @@ const Mobile = () => (
       <hr className="mb-6 border-gray-100" />
 
       <p className="mb-3 font-semibold">
-        3. Accéder à la liste des personnes suivies ou à l’agenda grâce au menu du bas puis tirer vers le bas
-        avec son doigt pour recharger la liste.
+        3. Accéder à la liste des personnes suivies ou à l’agenda grâce au menu du bas puis tirer
+        vers le bas avec son doigt pour recharger la liste.
       </p>
 
       <Embed
@@ -310,7 +327,9 @@ const Mobile = () => (
     <Dropdown title="Comment mettre en place le chiffrement et comment ça marche ?">
       <ul className="mb-3 list-none list-card">
         <li>
-          La mise en place initiale du chiffrement s’effectue sur l’interface web et non sur l’application Android. Cliquez sur "Sur l'interface web" en haut de la page pour découvrir comment faire.
+          La mise en place initiale du chiffrement s’effectue sur l’interface web et non sur
+          l’application Android. Cliquez sur "Sur l'interface web" en haut de la page pour découvrir
+          comment faire.
         </li>
       </ul>
     </Dropdown>
