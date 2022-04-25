@@ -303,7 +303,13 @@ const Summary = ({ person }) => {
                     <Label />
                     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                       <label htmlFor="person-alertness-checkbox">Personne très vulnérable, ou ayant besoin d'une attention particulière</label>
-                      <Input id="person-alertness-checkbox" type="checkbox" name="alertness" checked={values.alertness} onChange={handleChange} />
+                      <Input
+                        id="person-alertness-checkbox"
+                        type="checkbox"
+                        name="alertness"
+                        checked={values.alertness}
+                        onChange={() => handleChange({ target: { value: !values.alertness, name: 'alertness' } })}
+                      />
                     </div>
                   </FormGroup>
                 </Col>
