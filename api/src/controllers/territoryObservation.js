@@ -39,6 +39,7 @@ router.post(
         organisation: data.organisation,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        deletedAt: data.deletedAt,
       },
     });
   })
@@ -68,11 +69,14 @@ router.get(
     const total = await TerritoryObservation.count(query);
     if (limit) query.limit = Number(limit);
     if (page) query.offset = Number(page) * limit;
-    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
+    if (lastRefresh) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }, { deletedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+      query.paranoid = false;
+    }
 
     const data = await TerritoryObservation.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -116,6 +120,7 @@ router.put(
         organisation: newTerritoryObservation.organisation,
         createdAt: newTerritoryObservation.createdAt,
         updatedAt: newTerritoryObservation.updatedAt,
+        deletedAt: newTerritoryObservation.deletedAt,
       },
     });
   })
@@ -137,6 +142,9 @@ router.delete(
 
     let observation = await TerritoryObservation.findOne(query);
     if (!observation) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    observation.set({ encrypted: null, encryptedEntityKey: null });
+    await observation.save();
 
     await observation.destroy();
     res.status(200).send({ ok: true });

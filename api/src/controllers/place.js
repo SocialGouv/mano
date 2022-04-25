@@ -41,6 +41,7 @@ router.post(
         organisation: data.organisation,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        deletedAt: data.deletedAt,
       },
     });
   })
@@ -70,11 +71,14 @@ router.get(
     const total = await Place.count(query);
     if (limit) query.limit = Number(limit);
     if (page) query.offset = Number(page) * limit;
-    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
+    if (lastRefresh) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }, { deletedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+      query.paranoid = false;
+    }
 
     const data = await Place.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -115,6 +119,7 @@ router.put(
         organisation: place.organisation,
         createdAt: place.createdAt,
         updatedAt: place.updatedAt,
+        deletedAt: place.deletedAt,
       },
     });
   })
@@ -136,6 +141,9 @@ router.delete(
 
     const place = await Place.findOne(query);
     if (!place) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    place.set({ encrypted: null, encryptedEntityKey: null });
+    await place.save();
 
     await place.destroy();
     res.status(200).send({ ok: true });

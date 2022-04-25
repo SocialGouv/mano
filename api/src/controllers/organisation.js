@@ -38,14 +38,17 @@ router.get(
     }
 
     const query = { where: { organisation: req.query.organisation } };
-    if (Number(req.query.lastRefresh)) {
-      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
+    const { lastRefresh } = req.query;
+    if (lastRefresh) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }, { deletedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+      query.paranoid = false;
     }
 
     const places = await Place.count(query);
     const relsPersonPlace = await RelPersonPlace.count(query);
     const actions = await Action.count(query);
     const persons = await Person.count(query);
+    console.log(query, new Date(Number(lastRefresh)), persons);
     const comments = await Comment.count(query);
     const passages = await Passage.count(query);
     const reports = await Report.count(query);

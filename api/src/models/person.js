@@ -11,6 +11,6 @@ const schema = {
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
 
-Person.init(schema, { sequelize, modelName: "Person", freezeTableName: true });
+Person.init(schema, { sequelize, modelName: "Person", freezeTableName: true, timestamps: true, paranoid: true });
 
 module.exports = Person;

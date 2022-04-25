@@ -16,6 +16,6 @@ const schema = {
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
 
-Action.init(schema, { sequelize, modelName: "Action", freezeTableName: true });
+Action.init(schema, { sequelize, modelName: "Action", freezeTableName: true, timestamps: true, paranoid: true });
 
 module.exports = Action;

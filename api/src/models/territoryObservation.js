@@ -10,6 +10,6 @@ const schema = {
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
 
-TerritoryObservation.init(schema, { sequelize, modelName: "TerritoryObservation", freezeTableName: true });
+TerritoryObservation.init(schema, { sequelize, modelName: "TerritoryObservation", freezeTableName: true, timestamps: true, paranoid: true });
 
 module.exports = TerritoryObservation;

@@ -10,6 +10,6 @@ const schema = {
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
 
-Report.init(schema, { sequelize, modelName: "Report", freezeTableName: true });
+Report.init(schema, { sequelize, modelName: "Report", freezeTableName: true, timestamps: true, paranoid: true });
 
 module.exports = Report;

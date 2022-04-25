@@ -42,6 +42,7 @@ router.post(
         organisation: data.organisation,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        deletedAt: data.deletedAt,
       },
     });
   })
@@ -71,11 +72,14 @@ router.get(
     const total = await Comment.count(query);
     if (limit) query.limit = Number(limit);
     if (page) query.offset = Number(page) * limit;
-    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
+    if (lastRefresh) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }, { deletedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+      query.paranoid = false;
+    }
 
     const data = await Comment.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -119,6 +123,7 @@ router.put(
         organisation: newComment.organisation,
         createdAt: newComment.createdAt,
         updatedAt: newComment.updatedAt,
+        deletedAt: newComment.deletedAt,
       },
     });
   })
@@ -140,6 +145,9 @@ router.delete(
 
     const comment = await Comment.findOne(query);
     if (!comment) return res.status(200).send({ ok: true });
+
+    comment.set({ encrypted: null, encryptedEntityKey: null });
+    await comment.save();
 
     await comment.destroy();
     res.status(200).send({ ok: true });

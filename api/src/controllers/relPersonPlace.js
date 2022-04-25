@@ -42,6 +42,7 @@ router.post(
         organisation: data.organisation,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        deletedAt: data.deletedAt,
       },
     });
   })
@@ -71,11 +72,14 @@ router.get(
     const total = await RelPersonPlace.count(query);
     if (limit) query.limit = Number(limit);
     if (page) query.offset = Number(page) * limit;
-    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
+    if (lastRefresh) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }, { deletedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+      query.paranoid = false;
+    }
 
     const data = await RelPersonPlace.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -93,7 +97,15 @@ router.delete(
       error.status = 400;
       return next(error);
     }
-    await RelPersonPlace.destroy({ where: { _id: req.params._id, organisation: req.user.organisation } });
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
+
+    const relPersonPlace = await RelPersonPlace.findOne(query);
+    if (!relPersonPlace) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    relPersonPlace.set({ encrypted: null, encryptedEntityKey: null });
+    await relPersonPlace.save();
+
+    await relPersonPlace.destroy();
     res.status(200).send({ ok: true });
   })
 );
