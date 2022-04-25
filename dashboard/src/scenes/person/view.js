@@ -33,7 +33,7 @@ import {
   preparePersonForEncryption,
   commentForUpdatePerson,
 } from '../../recoil/persons';
-import { actionsState, mappedIdsToLabels } from '../../recoil/actions';
+import { actionsState, mappedIdsToLabels, TODO } from '../../recoil/actions';
 import UserName from '../../components/UserName';
 import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -464,7 +464,7 @@ const Actions = ({ person, onUpdateResults }) => {
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
   const [filterCategories, setFilterCategories] = useState([]);
-  const [filterStatus, setFilterStatus] = useState([]);
+  const [filterStatus, setFilterStatus] = useState([TODO]);
 
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
@@ -522,11 +522,10 @@ const Actions = ({ person, onUpdateResults }) => {
               getOptionValue={(s) => s._id}
               getOptionLabel={(s) => s.name}
               name="status"
-              onChange={(s) => {
-                setFilterStatus(s.map((s) => s._id));
-              }}
+              onChange={(s) => setFilterStatus(s.map((s) => s._id))}
               isClearable
               isMulti
+              value={mappedIdsToLabels.filter((s) => filterStatus.includes(s._id))}
             />
           </Col>
         </Row>

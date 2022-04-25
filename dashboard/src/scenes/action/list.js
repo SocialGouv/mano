@@ -15,7 +15,7 @@ import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
 import PersonName from '../../components/PersonName';
 import { formatDateWithFullMonth, formatTime } from '../../services/date';
-import { actionsState, mappedIdsToLabels } from '../../recoil/actions';
+import { actionsState, mappedIdsToLabels, TODO } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
 import { currentTeamState, organisationState } from '../../recoil/auth';
 import { personsWithPlacesSelector } from '../../recoil/selectors';
@@ -38,7 +38,7 @@ const List = () => {
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [page, setPage] = useSearchParamState('page', 0, { resetOnValueChange: currentTeam._id });
-  const [statuses, setStatuses] = useSearchParamState('statuses', []);
+  const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
   const [categories, setCategories] = useSearchParamState('categories', []);
 
   const [showAs, setShowAs] = useState(window.localStorage.getItem('showAs') || showAsOptions[0]); // calendar, list
