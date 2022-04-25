@@ -1,3 +1,11 @@
+## [1.94.8](https://github.com/SocialGouv/mano/compare/v1.94.7...v1.94.8) (2022-04-25)
+
+
+### Bug Fixes
+
+* **dashboard:** show todo first ([#645](https://github.com/SocialGouv/mano/issues/645)) ([de590d8](https://github.com/SocialGouv/mano/commit/de590d89057b026763f50b41bbe8590798cad2ce))
+* **website:** images ([#646](https://github.com/SocialGouv/mano/issues/646)) ([c54baf3](https://github.com/SocialGouv/mano/commit/c54baf310b56fb36065d3d018b43cf219bb535f7))
+
 ## [1.94.7](https://github.com/SocialGouv/mano/compare/v1.94.6...v1.94.7) (2022-04-25)
 
 
