@@ -1,3 +1,11 @@
+## [1.94.6](https://github.com/SocialGouv/mano/compare/v1.94.5...v1.94.6) (2022-04-25)
+
+
+### Bug Fixes
+
+* **dashboard:** can change team while whatching dashboard; ([10b2deb](https://github.com/SocialGouv/mano/commit/10b2debd715ac35d5eb3c6079589f3d470df0a04))
+* **dashboard:** can toggle alertness checkbox ([083aeb8](https://github.com/SocialGouv/mano/commit/083aeb8128d2622e92b840667c8e86f2f9b36185))
+
 ## [1.94.5](https://github.com/SocialGouv/mano/compare/v1.94.4...v1.94.5) (2022-04-22)
 
 
