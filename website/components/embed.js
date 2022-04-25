@@ -5,7 +5,7 @@ const Embed = ({ link, subtitle, thumbnail_path }) => (
         <a
           className="absolute top-0 left-0 w-full h-full  hover:fill-current hover:text-red-500"
           href={link}>
-          <img src={thumbnail_path} class="object-contain" target="_blank" />
+          <img src={`/${thumbnail_path}`} class="object-contain" target="_blank" />
           <svg
             height="68px"
             className="absolute inset-0 m-auto"
