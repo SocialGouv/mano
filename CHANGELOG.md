@@ -1,3 +1,10 @@
+## [1.96.1](https://github.com/SocialGouv/mano/compare/v1.96.0...v1.96.1) (2022-04-26)
+
+
+### Bug Fixes
+
+* **api:** action instead of data ([fda5a92](https://github.com/SocialGouv/mano/commit/fda5a92d61db880787918736bf65069858f8a3ab))
+
 # [1.96.0](https://github.com/SocialGouv/mano/compare/v1.95.0...v1.96.0) (2022-04-26)
 
 
