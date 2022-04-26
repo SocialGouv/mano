@@ -1,3 +1,10 @@
+# [1.98.0](https://github.com/SocialGouv/mano/compare/v1.97.0...v1.98.0) (2022-04-26)
+
+
+### Features
+
+* cache in dashboard ([#623](https://github.com/SocialGouv/mano/issues/623)) ([4c25165](https://github.com/SocialGouv/mano/commit/4c2516553e979b66902e1a4cbc080e66ee595a44))
+
 # [1.97.0](https://github.com/SocialGouv/mano/compare/v1.96.1...v1.97.0) (2022-04-26)
 
 
