@@ -12,6 +12,6 @@ const schema = {
 
 class Place extends Model {}
 
-Place.init(schema, { sequelize, modelName: "Place", freezeTableName: true });
+Place.init(schema, { sequelize, modelName: "Place", freezeTableName: true, timestamps: true, paranoid: true });
 
 module.exports = Place;

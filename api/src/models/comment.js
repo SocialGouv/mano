@@ -11,6 +11,6 @@ const schema = {
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
 
-Comment.init(schema, { sequelize, modelName: "Comment", freezeTableName: true });
+Comment.init(schema, { sequelize, modelName: "Comment", freezeTableName: true, timestamps: true, paranoid: true });
 
 module.exports = Comment;

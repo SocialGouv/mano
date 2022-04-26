@@ -52,6 +52,7 @@ router.post(
         organisation: data.organisation,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        deletedAt: data.deletedAt,
         status: data.status,
         dueAt: data.dueAt,
         completedAt: data.completedAt,
@@ -69,12 +70,14 @@ router.get(
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+      z.optional(z.enum(["true", "false"])).parse(req.query.withDeleted);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.after);
     } catch (e) {
       const error = new Error(`Invalid request in action get: ${e}`);
       error.status = 400;
       return next(error);
     }
-    const { limit, page, lastRefresh } = req.query;
+    const { limit, page, lastRefresh, after, withDeleted } = req.query;
 
     const query = {
       where: { organisation: req.user.organisation },
@@ -88,7 +91,15 @@ router.get(
     const total = await Action.count(query);
     if (limit) query.limit = Number(limit);
     if (page) query.offset = Number(page) * limit;
-    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
+    if (lastRefresh) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+    }
+    if (withDeleted === "true") query.paranoid = false;
+    if (after && !isNaN(Number(after)) && withDeleted === "true") {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(after)) } }, { deletedAt: { [Op.gte]: new Date(Number(after)) } }];
+    } else if (after && !isNaN(Number(after))) {
+      query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
+    }
 
     const sortDoneOrCancel = (a, b) => {
       if (!a.dueAt) return -1;
@@ -107,6 +118,7 @@ router.get(
         "organisation",
         "createdAt",
         "updatedAt",
+        "deletedAt",
         // Specific fields that are not encrypted
         "status",
         "dueAt",
@@ -168,6 +180,7 @@ router.put(
         organisation: action.organisation,
         createdAt: action.createdAt,
         updatedAt: action.updatedAt,
+        deletedAt: data.deletedAt,
         status: action.status,
         dueAt: action.dueAt,
         completedAt: action.completedAt,
@@ -196,6 +209,10 @@ router.delete(
       },
     });
     if (!action) return res.status(200).send({ ok: true });
+
+    action.set({ encrypted: null, encryptedEntityKey: null });
+    await action.save();
+
     await action.destroy();
 
     res.status(200).send({ ok: true });

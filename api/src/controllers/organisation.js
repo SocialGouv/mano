@@ -31,6 +31,8 @@ router.get(
     try {
       z.string().regex(looseUuidRegex).parse(req.query.organisation);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+      z.optional(z.enum(["true", "false"])).parse(req.query.withDeleted);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.after);
     } catch (e) {
       const error = new Error(`Invalid request in stats get: ${e}`);
       error.status = 400;
@@ -38,8 +40,15 @@ router.get(
     }
 
     const query = { where: { organisation: req.query.organisation } };
-    if (Number(req.query.lastRefresh)) {
-      query.where.updatedAt = { [Op.gte]: new Date(Number(req.query.lastRefresh)) };
+    const { lastRefresh, after, withDeleted } = req.query;
+    if (lastRefresh) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+    }
+    if (withDeleted === "true") query.paranoid = false;
+    if (after && !isNaN(Number(after)) && withDeleted === "true") {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(after)) } }, { deletedAt: { [Op.gte]: new Date(Number(after)) } }];
+    } else if (after && !isNaN(Number(after))) {
+      query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
     }
 
     const places = await Place.count(query);

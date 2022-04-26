@@ -42,6 +42,7 @@ router.post(
         organisation: data.organisation,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
+        deletedAt: data.deletedAt,
       },
     });
   })
@@ -56,12 +57,14 @@ router.get(
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.lastRefresh);
+      z.optional(z.enum(["true", "false"])).parse(req.query.withDeleted);
+      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.after);
     } catch (e) {
       const error = new Error(`Invalid request in relPersonPlace get: ${e}`);
       error.status = 400;
       return next(error);
     }
-    const { limit, page, lastRefresh } = req.query;
+    const { limit, page, lastRefresh, after, withDeleted } = req.query;
 
     const query = {
       where: { organisation: req.user.organisation },
@@ -71,11 +74,19 @@ router.get(
     const total = await RelPersonPlace.count(query);
     if (limit) query.limit = Number(limit);
     if (page) query.offset = Number(page) * limit;
-    if (lastRefresh) query.where.updatedAt = { [Op.gte]: new Date(Number(lastRefresh)) };
+    if (lastRefresh) {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(lastRefresh)) } }];
+    }
+    if (withDeleted === "true") query.paranoid = false;
+    if (after && !isNaN(Number(after)) && withDeleted === "true") {
+      query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(after)) } }, { deletedAt: { [Op.gte]: new Date(Number(after)) } }];
+    } else if (after && !isNaN(Number(after))) {
+      query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
+    }
 
     const data = await RelPersonPlace.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -93,7 +104,15 @@ router.delete(
       error.status = 400;
       return next(error);
     }
-    await RelPersonPlace.destroy({ where: { _id: req.params._id, organisation: req.user.organisation } });
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
+
+    const relPersonPlace = await RelPersonPlace.findOne(query);
+    if (!relPersonPlace) return res.status(404).send({ ok: false, error: "Not Found" });
+
+    relPersonPlace.set({ encrypted: null, encryptedEntityKey: null });
+    await relPersonPlace.save();
+
+    await relPersonPlace.destroy();
     res.status(200).send({ ok: true });
   })
 );

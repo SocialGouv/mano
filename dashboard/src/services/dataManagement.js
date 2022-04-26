@@ -6,6 +6,8 @@ export const mergeNewUpdatedData = (newData, oldData) => {
   const oldDataIds = oldData.map((p) => p._id);
   const updatedItems = newData.filter((p) => oldDataIds.includes(p._id));
   const newItems = newData.filter((p) => !oldDataIds.includes(p._id));
+  const deletedItemsIds = newData.filter((p) => !!p.deletedAt).map((p) => p._id);
+
   return [
     ...newItems,
     ...oldData.map((person) => {
@@ -13,7 +15,7 @@ export const mergeNewUpdatedData = (newData, oldData) => {
       if (updatedItem) return updatedItem;
       return person;
     }),
-  ];
+  ].filter((p) => !deletedItemsIds.includes(p._id));
 };
 
 // export const useStorage = (key, defaultValue) => {
@@ -37,9 +39,15 @@ export async function getData({
   isInitialization = false,
   setProgress = () => {},
   setBatchData = null,
-  lastRefresh = 0,
+  lastRefresh = null,
 }) {
-  const response = await API.get({ path: `/${collectionName}`, batch: 1000, setProgress, query: { lastRefresh }, setBatchData });
+  const response = await API.get({
+    path: `/${collectionName}`,
+    batch: 1000,
+    setProgress,
+    query: { after: lastRefresh, withDeleted: Boolean(lastRefresh) },
+    setBatchData,
+  });
   if (!response.ok) console.log({ message: `Error getting ${collectionName} data`, response });
   if (response.ok && response.decryptedData && response.decryptedData.length) {
     data = mergeNewUpdatedData(response.decryptedData, data);
