@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { Dimensions } from 'react-native';
 import API from '../services/api';
@@ -55,7 +55,7 @@ const mergeItems = (oldItems, newItems) => {
 
 const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh--cache-version-2022-04-25', null);
+  const [lastRefresh, setLastRefresh] = useStorage('last-refresh--cache-version-2022-04-26', 0);
   const [loading, setLoading] = useRecoilState(loadingState);
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
@@ -71,14 +71,14 @@ const Loader = () => {
   const [comments, setComments] = useRecoilState(commentsState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
 
-  useEffect(() => {
-    if (refreshTrigger.status === true) {
-      refresh();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger.status]);
+  // to prevent auto-refresh to trigger on the first render
+  const initialLoadDone = useRef(null);
+  const autoRefreshInterval = useRef(null);
 
   const refresh = async () => {
+    clearInterval(autoRefreshInterval.current);
+    autoRefreshInterval.current = null;
+
     const { showFullScreen, initialLoad } = refreshTrigger.options;
     setLoading('Chargement...');
     setFullScreen(showFullScreen);
@@ -231,6 +231,7 @@ const Loader = () => {
     /*
     Reset refresh trigger
     */
+    initialLoadDone.current = true;
     await new Promise((res) => setTimeout(res, 150));
     setLastRefresh(Date.now());
     setLoading('');
@@ -241,6 +242,43 @@ const Loader = () => {
       options: { showFullScreen: false, initialLoad: false },
     });
   };
+
+  useEffect(() => {
+    if (refreshTrigger.status === true) {
+      refresh();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [refreshTrigger.status]);
+
+  useEffect(() => {
+    if (!autoRefreshInterval.current && initialLoadDone.current) {
+      autoRefreshInterval.current = setInterval(async () => {
+        const response = await API.get({
+          path: '/organisation/stats',
+          query: { organisation: organisationId, lastRefresh },
+        });
+        if (!response.ok) return;
+
+        let total =
+          response.data.actions +
+          response.data.persons +
+          response.data.territories +
+          response.data.territoryObservations +
+          response.data.places +
+          response.data.comments +
+          response.data.passages +
+          response.data.reports +
+          response.data.relsPersonPlace;
+
+        if (total) {
+          setRefreshTrigger({
+            status: true,
+            options: { showFullScreen: false, initialLoad: false },
+          });
+        }
+      }, 2 * 60 * 1000);
+    }
+  }, [lastRefresh, organisationId, setRefreshTrigger]);
 
   useEffect(() => {
     setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
