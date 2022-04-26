@@ -52,9 +52,8 @@ export async function getData({
 
   if (!response.ok) console.log({ message: `Error getting ${collectionName} data`, response });
   if (!response.decryptedData.length && !isInitialization) return null;
-  if (response.ok && response.decryptedData && response.decryptedData.length) {
-    data = mergeNewUpdatedData(response.decryptedData, data);
-    await localforage.setItem(collectionName, data);
-    return data;
-  }
+
+  data = mergeNewUpdatedData(response.decryptedData, data, collectionName === 'action');
+  await localforage.setItem(collectionName, data);
+  return data;
 }
