@@ -1,3 +1,10 @@
+# [1.95.0](https://github.com/SocialGouv/mano/compare/v1.94.8...v1.95.0) (2022-04-26)
+
+
+### Features
+
+* soft delete ([#642](https://github.com/SocialGouv/mano/issues/642)) ([2998209](https://github.com/SocialGouv/mano/commit/2998209615d06be9c2bcf5f08b4853caead81108))
+
 ## [1.94.8](https://github.com/SocialGouv/mano/compare/v1.94.7...v1.94.8) (2022-04-25)
 
 
