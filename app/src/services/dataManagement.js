@@ -29,14 +29,7 @@ export function clearCache() {
 }
 
 // Get data from cache or fetch from server.
-export async function getData({
-  collectionName,
-  data = [],
-  isInitialization = false,
-  setProgress = () => {},
-  setBatchData = null,
-  lastRefresh = null,
-}) {
+export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
   if (isInitialization) {
     data = (await MMKV.getMapAsync(collectionName)) || [];
   }
