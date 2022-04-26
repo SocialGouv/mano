@@ -1,9 +1,18 @@
 import { organisationState } from './auth';
 import { atom, selector } from 'recoil';
+import localforage from 'localforage';
 
+const collectionName = 'territory-observation';
 export const territoryObservationsState = atom({
-  key: 'territoryObservationsState',
+  key: collectionName,
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet(async (newValue) => {
+        await localforage.setItem(collectionName, newValue);
+      });
+    },
+  ],
 });
 
 export const customFieldsObsSelector = selector({

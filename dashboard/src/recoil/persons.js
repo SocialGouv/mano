@@ -1,10 +1,19 @@
+import localforage from 'localforage';
 import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
 
+const collectionName = 'person';
 export const personsState = atom({
-  key: 'personsState',
+  key: collectionName,
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet(async (newValue) => {
+        await localforage.setItem(collectionName, newValue);
+      });
+    },
+  ],
 });
 
 export const customFieldsPersonsMedicalSelector = selector({

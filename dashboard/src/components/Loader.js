@@ -53,9 +53,16 @@ export const refreshTriggerState = atom({
   },
 });
 
-const lastRefreshState = atom({
+export const lastRefreshState = atom({
   key: 'lastRefreshState',
-  default: 0,
+  default: window.localStorage.getItem('mano-last-refresh-2022-04-26') || 0,
+  effects: [
+    ({ onSet }) => {
+      onSet((newValue) => {
+        window.localStorage.setItem('mano-last-refresh-2022-04-26', newValue);
+      });
+    },
+  ],
 });
 
 const mergeItems = (oldItems, newItems) => {
@@ -196,8 +203,13 @@ const Loader = () => {
       response.data.passages +
       response.data.reports +
       response.data.relsPersonPlace;
+    if (initialLoad) {
+      const numberOfCollections = 9;
+      total = total + numberOfCollections; // for the progress bar to be beautiful
+    }
 
     if (!total) {
+      // if nothing to load, just show a beautiful progress bar
       setLoading('');
       setProgress(1);
       await new Promise((res) => setTimeout(res, 500));
@@ -205,7 +217,7 @@ const Loader = () => {
     /*
     Get persons
     */
-    if (response.data.persons) {
+    if (response.data.persons || initialLoad) {
       setLoading('Chargement des personnes');
       const refreshedPersons = await getData({
         collectionName: 'person',
@@ -235,7 +247,7 @@ const Loader = () => {
     QUICK WIN: filter those reports from recoil state
     */
 
-    if (response.data.reports) {
+    if (response.data.reports || initialLoad) {
       setLoading('Chargement des comptes-rendus');
       const refreshedReports = await getData({
         collectionName: 'report',
@@ -257,7 +269,7 @@ const Loader = () => {
     /*
     Get passages
     */
-    if (response.data.passages) {
+    if (response.data.passages || initialLoad) {
       setLoading('Chargement des passages');
       const refreshedPassages = await getData({
         collectionName: 'passage',
@@ -280,7 +292,7 @@ const Loader = () => {
     /*
     Get actions
     */
-    if (response.data.actions) {
+    if (response.data.actions || initialLoad) {
       setLoading('Chargement des actions');
       const refreshedActions = await getData({
         collectionName: 'action',
@@ -297,7 +309,7 @@ const Loader = () => {
     /*
     Get territories
     */
-    if (response.data.territories) {
+    if (response.data.territories || initialLoad) {
       setLoading('Chargement des territoires');
       const refreshedTerritories = await getData({
         collectionName: 'territory',
@@ -316,7 +328,7 @@ const Loader = () => {
     /*
     Get places
     */
-    if (response.data.places) {
+    if (response.data.places || initialLoad) {
       setLoading('Chargement des lieux');
       const refreshedPlaces = await getData({
         collectionName: 'place',
@@ -329,7 +341,7 @@ const Loader = () => {
       });
       if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
     }
-    if (response.data.relsPersonPlace) {
+    if (response.data.relsPersonPlace || initialLoad) {
       const refreshedRelPersonPlaces = await getData({
         collectionName: 'relPersonPlace',
         data: relsPersonPlace,
@@ -346,7 +358,7 @@ const Loader = () => {
     /*
     Get observations territories
     */
-    if (response.data.territoryObservations) {
+    if (response.data.territoryObservations || initialLoad) {
       setLoading('Chargement des observations');
       const refreshedObs = await getData({
         collectionName: 'territory-observation',
@@ -363,7 +375,7 @@ const Loader = () => {
     /*
     Get comments
     */
-    if (response.data.comments) {
+    if (response.data.comments || initialLoad) {
       setLoading('Chargement des commentaires');
       const refreshedComments = await getData({
         collectionName: 'comment',

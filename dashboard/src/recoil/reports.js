@@ -1,8 +1,17 @@
+import localforage from 'localforage';
 import { atom } from 'recoil';
 
+const collectionName = 'report';
 export const reportsState = atom({
-  key: 'reportsState',
+  key: collectionName,
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet(async (newValue) => {
+        await localforage.setItem(collectionName, newValue);
+      });
+    },
+  ],
 });
 
 const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations'];

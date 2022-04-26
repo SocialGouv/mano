@@ -31,7 +31,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch(
       `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`
     );
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     await expect(page).toClick("button#add-anonymous-passage");
     await page.waitForTimeout(500);
     expect(await getInnerText("span#number-of-passages")).toBe("1");
@@ -241,12 +241,20 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("div.report-select-collaboration__option");
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
+    await expect(page).toMatch("Description", { timeout: 2000 });
     await expect(page).toClick("div.close-toastr");
+    await expect(page).toMatch("Description", { timeout: 2000 });
     await expect(page).toMatch("Ma deuxième collab");
   });
 
   it("should be able to use add a description", async () => {
+    await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
+    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
+    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D MMMM YYYY") });
+    await page.waitForTimeout(500);
+    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
+    await page.waitForTimeout(500);
     await expect(page).toClick("button", { text: "Ajouter une description" });
     await expect(page).toMatch("Description", { timeout: 4000 });
     await expect(page).toFill('textarea[name="description"]', "Ceci est une description");

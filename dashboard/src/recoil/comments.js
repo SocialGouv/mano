@@ -1,8 +1,17 @@
+import localforage from 'localforage';
 import { atom } from 'recoil';
 
+const collectionName = 'comment';
 export const commentsState = atom({
-  key: 'commentsState',
+  key: collectionName,
   default: [],
+  effects: [
+    ({ onSet }) => {
+      onSet(async (newValue) => {
+        await localforage.setItem(collectionName, newValue);
+      });
+    },
+  ],
 });
 
 const encryptedFields = ['comment', 'person', 'action', 'team', 'user', 'date'];
