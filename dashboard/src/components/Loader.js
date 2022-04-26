@@ -55,11 +55,11 @@ export const refreshTriggerState = atom({
 
 export const lastRefreshState = atom({
   key: 'lastRefreshState',
-  default: window.localStorage.getItem('mano-last-refresh') || 0,
+  default: window.localStorage.getItem('mano-last-refresh-2022-04-26') || 0,
   effects: [
     ({ onSet }) => {
       onSet((newValue) => {
-        window.localStorage.setItem('mano-last-refresh', newValue);
+        window.localStorage.setItem('mano-last-refresh-2022-04-26', newValue);
       });
     },
   ],
