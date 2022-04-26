@@ -1,3 +1,10 @@
+# [1.96.0](https://github.com/SocialGouv/mano/compare/v1.95.0...v1.96.0) (2022-04-26)
+
+
+### Features
+
+* **dashboard:** stats for passages with genders ([#633](https://github.com/SocialGouv/mano/issues/633)) ([9214639](https://github.com/SocialGouv/mano/commit/92146393665d17f6a119aa354bb7b98a47e645dc))
+
 # [1.95.0](https://github.com/SocialGouv/mano/compare/v1.94.8...v1.95.0) (2022-04-26)
 
 
