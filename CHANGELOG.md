@@ -1,3 +1,10 @@
+# [1.97.0](https://github.com/SocialGouv/mano/compare/v1.96.1...v1.97.0) (2022-04-26)
+
+
+### Features
+
+* **dashboard,app:** auto refresh ([#648](https://github.com/SocialGouv/mano/issues/648)) ([8403603](https://github.com/SocialGouv/mano/commit/8403603ee197c4a74a375e02f0622cde6fb2aed8))
+
 ## [1.96.1](https://github.com/SocialGouv/mano/compare/v1.96.0...v1.96.1) (2022-04-26)
 
 
