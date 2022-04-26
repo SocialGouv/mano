@@ -180,7 +180,7 @@ router.put(
         organisation: action.organisation,
         createdAt: action.createdAt,
         updatedAt: action.updatedAt,
-        deletedAt: data.deletedAt,
+        deletedAt: action.deletedAt,
         status: action.status,
         dueAt: action.dueAt,
         completedAt: action.completedAt,
