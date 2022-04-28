@@ -1,0 +1,23 @@
+app-www:
+  containerPort: 8080
+  enabled: true
+  imagePackage: www
+
+app-api:
+  enabled: true
+  containerPort: 3000
+  imagePackage: api
+  env:
+    name: STORAGE_DIRECTORY
+    value: "/mnt/files"
+
+app-dashboard:
+  enabled: true
+  containerPort: 8080
+  imagePackage: dashboard
+
+metabase:
+  enabled: false
+
+oauth2-proxy:
+  enabled: false

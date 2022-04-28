@@ -1,0 +1,11 @@
+app-api:
+  addVolumes:
+    - files
+  envFrom:
+    - secretRef:
+        name: api
+    - secretRef:
+        name: azure-mano-volume
+
+app-www:
+  host: "mano-app-preprod.dev.fabrique.social.gouv.fr"

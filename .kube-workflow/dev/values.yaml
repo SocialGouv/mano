@@ -1,0 +1,27 @@
+app-www:
+  needs: [app-api]
+
+app-api:
+  needs: [seed]
+  volumes:
+    - name: files
+      emptyDir: {}
+  volumeMounts:
+    - mountPath: /mnt/files
+      name: files
+
+jobs:
+  runs:
+    - name: db
+      use: SocialGouv/kube-workflow/jobs/create-db@v1
+      with:
+        pgAdminSecretRefName: azure-pg-admin-user
+    - name: seed
+      checkout: false # no need to checkout the repo as we use the docker image
+      needs: [db]
+      shell: sh
+      image: "{{ .Values.global.registry }}/{{ .Values.global.imageRepository }}/api:{{ .Values.global.imageTag }}"
+      run: "yarn initdb"
+      envFrom:
+        - secretRef:
+            name: "pg-user-{{ .Values.global.branchSlug }}"
