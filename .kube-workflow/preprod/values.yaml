@@ -3,7 +3,6 @@ app-www:
 
 app-api:
   host: "mano-preprod.dev.fabrique.social.gouv.fr"
-
   addVolumes:
     - files
   envFrom:
