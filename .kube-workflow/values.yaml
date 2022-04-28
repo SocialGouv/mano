@@ -1,9 +1,11 @@
 app-www:
+  host: "mano-app-{{ .Values.global.host }}"
   containerPort: 8080
   enabled: true
   imagePackage: www
 
 app-api:
+  host: "mano-{{ .Values.global.host }}"
   enabled: true
   containerPort: 3000
   imagePackage: api
@@ -16,6 +18,7 @@ app-api:
         name: "{{ .Values.global.pgSecretName }}"
 
 app-dashboard:
+  host: "dashboard-mano-{{ .Values.global.host }}"
   enabled: true
   containerPort: 8080
   imagePackage: dashboard
