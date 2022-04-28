@@ -6,7 +6,7 @@ const { capture } = require("../sentry");
 const sequelizeConfig = {
   host: config.PGHOST,
   dialect: "postgres",
-  schema: "mano",
+  schema: "public",
   timezone: "Europe/Paris",
   logging: false,
   define: {
