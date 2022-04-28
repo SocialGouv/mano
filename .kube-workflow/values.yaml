@@ -7,6 +7,7 @@ app-api:
   enabled: true
   containerPort: 3000
   imagePackage: api
+  probesPath: /healthz
   env:
     - name: STORAGE_DIRECTORY
       value: "/mnt/files"
