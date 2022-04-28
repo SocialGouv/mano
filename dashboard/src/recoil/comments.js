@@ -1,17 +1,11 @@
-import localforage from 'localforage';
+import { manoCacheStorage } from '../services/dataManagement';
 import { atom } from 'recoil';
 
 const collectionName = 'comment';
 export const commentsState = atom({
   key: collectionName,
   default: [],
-  effects: [
-    ({ onSet }) => {
-      onSet(async (newValue) => {
-        await localforage.setItem(collectionName, newValue);
-      });
-    },
-  ],
+  effects: [({ onSet }) => onSet(async (newValue) => manoCacheStorage?.setItem(collectionName, newValue))],
 });
 
 const encryptedFields = ['comment', 'person', 'action', 'team', 'user', 'date'];

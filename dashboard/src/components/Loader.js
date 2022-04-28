@@ -5,7 +5,7 @@ import picture1 from '../assets/MANO_livraison_elements-07_green.png';
 import picture2 from '../assets/MANO_livraison_elements-08_green.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { getData } from '../services/dataManagement';
+import { getData, manoCacheStorage } from '../services/dataManagement';
 import { organisationState, teamsState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
@@ -59,7 +59,11 @@ export const lastRefreshState = atom({
   effects: [
     ({ onSet }) => {
       onSet((newValue) => {
-        window.localStorage.setItem('mano-last-refresh-2022-04-26', newValue);
+        if (!!manoCacheStorage) {
+          window.localStorage.setItem('mano-last-refresh-2022-04-26', newValue);
+        } else {
+          window.localStorage.removeItem('mano-last-refresh-2022-04-26');
+        }
       });
     },
   ],
