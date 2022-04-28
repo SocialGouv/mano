@@ -6,6 +6,8 @@ app-api:
         name: api
     - secretRef:
         name: azure-mano-volume
+    - secretRef:
+        name: "{{ .Values.global.pgSecretName }}"
 
 app-www:
   host: "mano-app-preprod.dev.fabrique.social.gouv.fr"

@@ -14,6 +14,8 @@ app-api:
         name: api
     - secretRef:
         name: azure-mano-volume
+    - secretRef:
+        name: "{{ .Values.global.pgSecretName }}"
 
 app-dashboard:
   host: "dashboard-mano.fabrique.social.gouv.fr"

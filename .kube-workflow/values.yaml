@@ -11,6 +11,9 @@ app-api:
   env:
     - name: STORAGE_DIRECTORY
       value: "/mnt/files"
+  envFrom:
+    - secretRef:
+        name: "{{ .Values.global.pgSecretName }}"
 
 app-dashboard:
   enabled: true
