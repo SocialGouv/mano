@@ -8,8 +8,8 @@ app-api:
   containerPort: 3000
   imagePackage: api
   env:
-    name: STORAGE_DIRECTORY
-    value: "/mnt/files"
+    - name: STORAGE_DIRECTORY
+      value: "/mnt/files"
 
 app-dashboard:
   enabled: true
