@@ -26,6 +26,24 @@ export const reportPerDateSelector = selectorFamily({
     },
 });
 
+export const consultationsSelector = selector({
+  key: 'consultationsSelector',
+  get: ({ get }) => {
+    const persons = get(personsState);
+    const consultations = [];
+    for (const person of persons) {
+      if (person.consultations?.length) {
+        for (const consultation of person.consultations) {
+          consultations.push({ ...consultation, person: person._id });
+        }
+      }
+    }
+    return consultations
+      .map((c) => ({ ...c, dueAt: c.date, withTime: true, isConsultation: true })) // to list within actions
+      .sort((a, b) => new Date(b.date) - new Date(a.date));
+  },
+});
+
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
   get: ({ get }) => {

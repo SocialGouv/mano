@@ -5,7 +5,6 @@ import { useRecoilValue } from 'recoil';
 import CreateAction from './CreateAction';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
-import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ActionStatus from '../../components/ActionStatus';
 import DateBloc from '../../components/DateBloc';
@@ -14,26 +13,29 @@ import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
 import PersonName from '../../components/PersonName';
-import { formatDateWithFullMonth, formatTime } from '../../services/date';
+import { formatTime } from '../../services/date';
 import { actionsState, mappedIdsToLabels, TODO } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
-import { currentTeamState, organisationState } from '../../recoil/auth';
-import { personsWithPlacesSelector } from '../../recoil/selectors';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { consultationsSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
+import ConsultationButton from '../../components/ConsultationButton';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
   const history = useHistory();
-  useTitle('Actions');
+  useTitle('Agenda');
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);
+  const consultations = useRecoilValue(consultationsSelector);
   const comments = useRecoilValue(commentsState);
   const persons = useRecoilValue(personsWithPlacesSelector);
   const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
   const [search, setSearch] = useSearchParamState('search', '');
@@ -54,6 +56,15 @@ const List = () => {
       ),
     [actions, currentTeam._id, statuses, categories]
   );
+  // List of consultations filtered by current team and selected statuses.
+  const consultationsByStatusAndAuthorization = useMemo(() => {
+    if (!user.healthcareProfessional) return [];
+
+    return consultations.filter(
+      (consult) => (!consult.onlyVisibleByCreator || consult.user === user._id) && (!statuses.length || statuses.includes(consult.status))
+    );
+  }, [consultations, statuses, user]);
+
   // The next memos are used to filter by search (empty array when search is empty).
   const actionsIds = useMemo(() => (search?.length ? actionsByTeamAndStatus.map((action) => action._id) : []), [actionsByTeamAndStatus, search]);
   const personsForActions = useMemo(
@@ -76,16 +87,28 @@ const List = () => {
     return actionsByTeamAndStatus.filter((a) => actionsIdsFilterBySearch.includes(a._id));
   }, [actionsByTeamAndStatus, commentsForActions, personsForActions, search]);
 
+  const consultationsFiltered = useMemo(() => {
+    if (!search?.length) return consultationsByStatusAndAuthorization;
+    if (!consultationsByStatusAndAuthorization?.length) return [];
+    return filterBySearch(search, consultationsByStatusAndAuthorization);
+  }, [search, consultationsByStatusAndAuthorization]);
+
   useEffect(() => {
     window.localStorage.setItem('showAs', showAs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAs]);
   const limit = 20;
 
-  if (!actionsFiltered) return <Loading />;
+  const dataConsolidated = useMemo(
+    () => [...actionsFiltered, ...consultationsFiltered].sort((a, b) => new Date(b.dueAt || b.date) - new Date(a.dueAt || a.date)),
+    [actionsFiltered, consultationsFiltered]
+  );
 
-  const data = actionsFiltered.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  const total = actionsFiltered.length;
+  const dataConsolidatedPaginated = useMemo(
+    () => dataConsolidated.filter((_, index) => index < (page + 1) * limit && index >= page * limit),
+    [dataConsolidated, page]
+  );
+  const total = dataConsolidated.length;
 
   return (
     <>
@@ -93,7 +116,7 @@ const List = () => {
         titleStyle={{ fontWeight: '400' }}
         title={
           <span>
-            Actions de l'équipe <b>{currentTeam?.name || ''}</b>
+            Agenda de l'équipe <b>{currentTeam?.name || ''}</b>
           </span>
         }
       />
@@ -166,23 +189,34 @@ const List = () => {
 
       {showAs === showAsOptions[0] && (
         <div style={{ minHeight: '100vh' }}>
-          {' '}
-          <ActionsCalendar actions={actionsFiltered} />
+          <ActionsCalendar actions={dataConsolidated} />
         </div>
       )}
       {showAs === showAsOptions[1] && (
         <>
           <Table
-            data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
+            data={dataConsolidatedPaginated.map((a) => {
+              if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+              if (a.isConsultation) return { ...a, style: { backgroundColor: '#C6F0E7' } };
+              return a;
+            })}
             rowKey={'_id'}
-            onRowClick={(action) => history.push(`/action/${action._id}`)}
+            onRowClick={(actionOrConsultation) => {
+              if (actionOrConsultation.isConsultation) {
+                history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`);
+              } else {
+                history.push(`/action/${actionOrConsultation._id}`);
+              }
+            }}
             columns={[
               {
                 title: '',
-                dataKey: 'urgent',
+                dataKey: 'urgentOrConsultation',
                 small: true,
                 render: (action) => {
-                  return action.urgent ? <ExclamationMarkButton /> : null;
+                  if (action.urgent) return <ExclamationMarkButton />;
+                  if (action.isConsultation) return <ConsultationButton />;
+                  return null;
                 },
               },
               {

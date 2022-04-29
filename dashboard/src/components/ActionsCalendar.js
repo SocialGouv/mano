@@ -1,21 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
-import {
-  addOneDay,
-  dayjsInstance,
-  formatCalendarDate,
-  formatDateTimeWithNameOfDay,
-  formatDateWithFullMonth,
-  formatTime,
-  isOnSameDay,
-  subtractOneDay,
-} from '../services/date';
+import { addOneDay, dayjsInstance, formatCalendarDate, formatDateTimeWithNameOfDay, formatTime, isOnSameDay, subtractOneDay } from '../services/date';
 import Table from './table';
 import ActionStatus from './ActionStatus';
 import ActionName from './ActionName';
 import PersonName from './PersonName';
 import ExclamationMarkButton from './ExclamationMarkButton';
+import ConsultationButton from './ConsultationButton';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut'] }) => {
   const history = useHistory();
@@ -57,16 +49,29 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
     <Table
       className="Table"
       noData={`Pas d'action à faire le ${formatDateTimeWithNameOfDay(date)}`}
-      data={actions.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
-      onRowClick={(action) => history.push(`/action/${action._id}`)}
+      data={actions.map((a) => {
+        if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+        if (a.isConsultation) return { ...a, style: { backgroundColor: '#C6F0E7' } };
+        return a;
+      })}
+      onRowClick={(actionOrConsultation) => {
+        if (actionOrConsultation.isConsultation) {
+          history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`);
+        } else {
+          history.push(`/action/${actionOrConsultation._id}`);
+        }
+      }}
       rowKey="_id"
       columns={[
         {
           title: '',
           dataKey: 'urgent',
           small: true,
-          render: (action) => {
-            return action.urgent ? <ExclamationMarkButton /> : null;
+          render: (actionOrConsult) => {
+            console.log({ actionOrConsult });
+            if (actionOrConsult.urgent) return <ExclamationMarkButton />;
+            if (actionOrConsult.isConsultation) return <ConsultationButton />;
+            return null;
           },
         },
         {
