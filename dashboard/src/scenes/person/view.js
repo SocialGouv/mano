@@ -438,7 +438,7 @@ const Summary = ({ person }) => {
                 </Col>
                 {customFieldsPersonsMedical
                   .filter((f) => f.enabled)
-                  .filter((f) => !f.onlyHealthcareProfessional || user.healthcareProfessional)
+                  .filter((f) => !f.onlyHealthcareProfessional)
                   .map((field) => (
                     <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                   ))}
