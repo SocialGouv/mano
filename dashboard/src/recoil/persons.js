@@ -168,6 +168,7 @@ export const defaultMedicalCustomFields = [
     enabled: true,
     required: false,
     showInStats: true,
+    onlyHealthcareProfessional: false,
   },
   {
     name: 'vulnerabilities',
@@ -177,6 +178,7 @@ export const defaultMedicalCustomFields = [
     enabled: true,
     required: false,
     showInStats: true,
+    onlyHealthcareProfessional: false,
   },
   {
     name: 'caseHistoryTypes',
@@ -186,6 +188,7 @@ export const defaultMedicalCustomFields = [
     enabled: true,
     required: false,
     showInStats: true,
+    onlyHealthcareProfessional: false,
   },
   {
     name: 'caseHistoryDescription',
@@ -195,6 +198,17 @@ export const defaultMedicalCustomFields = [
     enabled: true,
     required: false,
     showInStats: true,
+    onlyHealthcareProfessional: false,
+  },
+  {
+    name: 'numeroSecuriteSociale',
+    label: 'Numéro de sécurité sociale',
+    type: 'text',
+    options: null,
+    enabled: true,
+    required: false,
+    showInStats: false,
+    onlyHealthcareProfessional: true,
   },
 ];
 
@@ -301,13 +315,6 @@ export const personFields = [
     name: 'treatments',
     type: 'treatments',
     label: 'Traitements en cours',
-    encrypted: true,
-    importable: false,
-  },
-  {
-    name: 'numeroSecuriteSociale',
-    type: 'text',
-    label: 'Numéro de sécurité sociale',
     encrypted: true,
     importable: false,
   },
