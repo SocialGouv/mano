@@ -1,3 +1,10 @@
+## [1.99.1](https://github.com/SocialGouv/mano/compare/v1.99.0...v1.99.1) (2022-04-29)
+
+
+### Bug Fixes
+
+* **dashboard:** rearrange consultations columns ([#657](https://github.com/SocialGouv/mano/issues/657)) ([fdca38d](https://github.com/SocialGouv/mano/commit/fdca38d14fed79d6f1d71722df8e8b32b6be61f4))
+
 # [1.99.0](https://github.com/SocialGouv/mano/compare/v1.98.0...v1.99.0) (2022-04-29)
 
 
