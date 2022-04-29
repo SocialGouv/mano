@@ -155,7 +155,7 @@ export function MedicalFile({ person }) {
               setCurrentTreatment({
                 _id: uuidv4(),
                 startDate: new Date(),
-                endDate: new Date(),
+                endDate: null,
                 name: '',
                 dosage: '',
                 frequency: '',
@@ -248,12 +248,15 @@ export function MedicalFile({ person }) {
             title: 'Dates',
             dataKey: 'endDate',
             render: (e) => {
-              return (
-                <div style={{ fontSize: '12px' }}>
-                  Du {formatDateWithFullMonth(e.startDate)}
-                  <br /> au {formatDateWithFullMonth(e.endDate)}
-                </div>
-              );
+              if (!!e.endDate) {
+                return (
+                  <p style={{ fontSize: '12px', margin: 0 }}>
+                    Du {formatDateWithFullMonth(e.startDate)}
+                    <br /> au {formatDateWithFullMonth(e.endDate)}
+                  </p>
+                );
+              }
+              return <p style={{ fontSize: '12px', margin: 0 }}>À partir du {formatDateWithFullMonth(e.startDate)}</p>;
             },
           },
           {
@@ -534,8 +537,7 @@ export function MedicalFile({ person }) {
               if (!values.dosage) errors.dosage = 'Le dosage est obligatoire';
               if (!values.frequency) errors.frequency = 'La fréquence est obligatoire';
               if (!values.indication) errors.indication = "L'indication est obligatoire";
-              if (!values.endDate) errors.endDate = 'La date de fin est obligatoire';
-              if (!values.startDate) errors.startDate = 'La date de fin est obligatoire';
+              if (!values.startDate) errors.startDate = 'La date de début est obligatoire';
               return errors;
             }}
             onSubmit={async (values) => {
