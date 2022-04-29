@@ -1,3 +1,18 @@
+# [1.99.0](https://github.com/SocialGouv/mano/compare/v1.98.0...v1.99.0) (2022-04-29)
+
+
+### Bug Fixes
+
+* **dashboard:** disable cache when not available ([#651](https://github.com/SocialGouv/mano/issues/651)) ([dd862d7](https://github.com/SocialGouv/mano/commit/dd862d7179482f45ade25f801f4c063b46dbbff1))
+* **dashboard:** hide createdAt column in actions tables ([#635](https://github.com/SocialGouv/mano/issues/635)) ([fb82068](https://github.com/SocialGouv/mano/commit/fb82068d2b5031e85947c0b22959a38f7843e80a))
+* **dashboard:** securite sociale optional ([#652](https://github.com/SocialGouv/mano/issues/652)) ([a40d5d0](https://github.com/SocialGouv/mano/commit/a40d5d08c11aeb2b33f7381f882c9af2856072da))
+* **dashboard:** sort consultations by date ([#655](https://github.com/SocialGouv/mano/issues/655)) ([f730e03](https://github.com/SocialGouv/mano/commit/f730e0370c16237eff603d279c5197c3ce1f8b0e))
+
+
+### Features
+
+* **dashboard:** show medical infos for professional only on dossier medical ([#656](https://github.com/SocialGouv/mano/issues/656)) ([1f8f82a](https://github.com/SocialGouv/mano/commit/1f8f82a3a3550675ce76728b75aecc611b7a42f7))
+
 # [1.98.0](https://github.com/SocialGouv/mano/compare/v1.97.0...v1.98.0) (2022-04-26)
 
 
