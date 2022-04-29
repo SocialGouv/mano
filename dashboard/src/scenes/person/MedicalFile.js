@@ -392,7 +392,12 @@ export function MedicalFile({ person }) {
                 disabled={false}
                 onClick={async () => {
                   if (!window.confirm('Voulez-vous supprimer cette consultation ?')) return;
-                  await updatePerson({ consultations: (person.consultations || []).filter((c) => c._id !== e._id) }, 'Consultation supprimée !');
+                  await updatePerson(
+                    {
+                      consultations: (person.consultations || []).filter((c) => c._id !== e._id).sort((a, b) => new Date(b.date) - new Date(a.date)),
+                    },
+                    'Consultation supprimée !'
+                  );
                 }}
                 color="danger"
                 title={'Supprimer'}
@@ -427,6 +432,7 @@ export function MedicalFile({ person }) {
               } else {
                 consultations = [...consultations, values];
               }
+              consultations = consultations.sort((a, b) => new Date(b.date) - new Date(a.date));
               await updatePerson({ consultations }, 'Consultation mise à jour !');
               setShowAddConsultation(false);
             }}>
