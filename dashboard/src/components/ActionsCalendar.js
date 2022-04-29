@@ -88,7 +88,6 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           dataKey: 'person',
           render: (action) => <PersonName item={action} />,
         },
-        { title: 'Créée le', dataKey: 'createdAt', render: (action) => formatDateWithFullMonth(action.createdAt || '') },
         { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
       ].filter((column) => columns.includes(column.title) || column.dataKey === 'urgent')}
     />
