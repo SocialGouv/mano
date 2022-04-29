@@ -16,7 +16,7 @@ import {
   healthInsuranceOptions,
 } from '../../recoil/persons';
 import { organisationState, usersState, userState } from '../../recoil/auth';
-import { dateForDatePicker, formatDateTimeWithNameOfDay, formatDateWithFullMonth } from '../../services/date';
+import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
 import SelectAsInput from '../../components/SelectAsInput';
 import CustomFieldInput from '../../components/CustomFieldInput';
@@ -25,6 +25,7 @@ import SelectStatus from '../../components/SelectStatus';
 import ActionStatus from '../../components/ActionStatus';
 import SelectCustom from '../../components/SelectCustom';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
+import DateBloc from '../../components/DateBloc';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -361,17 +362,35 @@ export function MedicalFile({ person }) {
           },
           {
             title: 'Date',
-            dataKey: 'date',
-            render: (e) => (e.date ? formatDateTimeWithNameOfDay(e.date) : ''),
+            dataKey: 'dueAt' || '_id',
+            render: (e) => {
+              return <DateBloc date={e.date} />;
+            },
           },
           {
-            title: 'Description',
+            title: 'Heure',
+            dataKey: '_id',
+            render: (e) => formatTime(e.date),
+          },
+          {
+            title: 'Nom',
             dataKey: 'name',
             render: (e) => {
               return (
                 <>
                   <div>{e.name}</div>
                   <small className="text-muted">{e.type}</small>
+                </>
+              );
+            },
+          },
+          {
+            title: 'Description',
+            dataKey: 'description',
+            render: (e) => {
+              return (
+                <>
+                  <p>{e.description}</p>
                 </>
               );
             },
