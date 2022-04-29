@@ -1,3 +1,10 @@
+## [1.99.2](https://github.com/SocialGouv/mano/compare/v1.99.1...v1.99.2) (2022-04-29)
+
+
+### Bug Fixes
+
+* **dashboard:** dont show only todo actions in person ([18e47bb](https://github.com/SocialGouv/mano/commit/18e47bb8d1077ecf1ae31b362b751f18ea0ddf8b))
+
 ## [1.99.1](https://github.com/SocialGouv/mano/compare/v1.99.0...v1.99.1) (2022-04-29)
 
 
