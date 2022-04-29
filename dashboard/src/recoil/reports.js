@@ -1,17 +1,11 @@
-import localforage from 'localforage';
+import { manoCacheStorage } from '../services/dataManagement';
 import { atom } from 'recoil';
 
 const collectionName = 'report';
 export const reportsState = atom({
   key: collectionName,
   default: [],
-  effects: [
-    ({ onSet }) => {
-      onSet(async (newValue) => {
-        await localforage.setItem(collectionName, newValue);
-      });
-    },
-  ],
+  effects: [({ onSet }) => onSet(async (newValue) => manoCacheStorage?.setItem(collectionName, newValue))],
 });
 
 const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations'];

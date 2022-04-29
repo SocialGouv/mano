@@ -1,18 +1,12 @@
 import { organisationState } from './auth';
 import { atom, selector } from 'recoil';
-import localforage from 'localforage';
+import { manoCacheStorage } from '../services/dataManagement';
 
 const collectionName = 'territory-observation';
 export const territoryObservationsState = atom({
   key: collectionName,
   default: [],
-  effects: [
-    ({ onSet }) => {
-      onSet(async (newValue) => {
-        await localforage.setItem(collectionName, newValue);
-      });
-    },
-  ],
+  effects: [({ onSet }) => onSet(async (newValue) => manoCacheStorage?.setItem(collectionName, newValue))],
 });
 
 export const customFieldsObsSelector = selector({
