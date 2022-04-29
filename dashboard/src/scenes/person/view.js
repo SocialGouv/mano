@@ -464,7 +464,7 @@ const Actions = ({ person, onUpdateResults }) => {
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
   const [filterCategories, setFilterCategories] = useState([]);
-  const [filterStatus, setFilterStatus] = useState([TODO]);
+  const [filterStatus, setFilterStatus] = useState([]);
 
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
