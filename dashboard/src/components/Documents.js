@@ -119,7 +119,7 @@ const FileWrapper = styled.label`
   box-shadow: none;
   border: none;
   cursor: pointer;
-  padding: 8px 15px;
+  padding: 12px 24px;
   margin: 0;
 `;
 

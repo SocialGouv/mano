@@ -104,14 +104,16 @@ export function MedicalFile({ person }) {
   );
 
   const allMedicalDocuments = useMemo(() => {
-    const ordonnances = person.treatments
-      .map((treatment) => treatment.documents?.map((doc) => ({ ...doc, type: 'treatment', treatment })))
-      .filter(Boolean)
-      .flat();
-    const consultationsDocs = person.consultations
-      .map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
-      .filter(Boolean)
-      .flat();
+    const ordonnances =
+      person.treatments
+        ?.map((treatment) => treatment.documents?.map((doc) => ({ ...doc, type: 'treatment', treatment })))
+        .filter(Boolean)
+        .flat() || [];
+    const consultationsDocs =
+      person.consultations
+        ?.map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        .filter(Boolean)
+        .flat() || [];
     const otherDocs = person.documentsMedical || [];
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [person.consultations, person.documentsMedical, person.treatments]);
@@ -358,44 +360,46 @@ export function MedicalFile({ person }) {
           />
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
-      <Row className="noprint" style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-categories-filter">
-            Filtrer par catégorie&nbsp;:
-          </Label>
-          <div style={{ width: '100%' }}>
-            <SelectCustom
-              inputId="consultations-select-type-filter"
-              options={organisation.consultations.map((e) => ({ _id: e.name, name: e.name }))}
-              getOptionValue={(s) => s._id}
-              getOptionLabel={(s) => s.name}
-              name="types"
-              onChange={(selectedTypes) => setConsultationTypes(selectedTypes.map((t) => t._id))}
-              isClearable
-              isMulti
-              value={organisation.consultations.map((e) => ({ _id: e.name, name: e.name })).filter((s) => consultationTypes.includes(s._id))}
-            />
-          </div>
-        </Col>
-        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-status-filter">
-            Filtrer par statut&nbsp;:
-          </Label>
-          <div style={{ width: '100%' }}>
-            <SelectCustom
-              inputId="consultations-select-status-filter"
-              options={mappedIdsToLabels}
-              getOptionValue={(s) => s._id}
-              getOptionLabel={(s) => s.name}
-              name="statuses"
-              onChange={(s) => setConsultationStatuses(s.map((s) => s._id))}
-              isClearable
-              isMulti
-              value={mappedIdsToLabels.filter((s) => consultationStatuses.includes(s._id))}
-            />
-          </div>
-        </Col>
-      </Row>
+      {!!consultations.length && (
+        <Row className="noprint" style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
+          <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-categories-filter">
+              Filtrer par catégorie&nbsp;:
+            </Label>
+            <div style={{ width: '100%' }}>
+              <SelectCustom
+                inputId="consultations-select-type-filter"
+                options={organisation.consultations.map((e) => ({ _id: e.name, name: e.name }))}
+                getOptionValue={(s) => s._id}
+                getOptionLabel={(s) => s.name}
+                name="types"
+                onChange={(selectedTypes) => setConsultationTypes(selectedTypes.map((t) => t._id))}
+                isClearable
+                isMulti
+                value={organisation.consultations.map((e) => ({ _id: e.name, name: e.name })).filter((s) => consultationTypes.includes(s._id))}
+              />
+            </div>
+          </Col>
+          <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-status-filter">
+              Filtrer par statut&nbsp;:
+            </Label>
+            <div style={{ width: '100%' }}>
+              <SelectCustom
+                inputId="consultations-select-status-filter"
+                options={mappedIdsToLabels}
+                getOptionValue={(s) => s._id}
+                getOptionLabel={(s) => s.name}
+                name="statuses"
+                onChange={(s) => setConsultationStatuses(s.map((s) => s._id))}
+                isClearable
+                isMulti
+                value={mappedIdsToLabels.filter((s) => consultationStatuses.includes(s._id))}
+              />
+            </div>
+          </Col>
+        </Row>
+      )}
       <div className="printonly">
         {consultations.map((c) => {
           return (
