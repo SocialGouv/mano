@@ -112,7 +112,7 @@ export function MedicalFile({ person }) {
       .map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
       .filter(Boolean)
       .flat();
-    const otherDocs = person.documentsMedical;
+    const otherDocs = person.documentsMedical || [];
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.date) - new Date(a.date));
   }, [person.consultations, person.documentsMedical, person.treatments]);
 
