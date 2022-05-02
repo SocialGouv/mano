@@ -26,13 +26,20 @@ import ActionStatus from '../../components/ActionStatus';
 import SelectCustom from '../../components/SelectCustom';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import DateBloc from '../../components/DateBloc';
+import useSearchParamState from '../../services/useSearchParamState';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
   const organisation = useRecoilValue(organisationState);
-  const [showAddConsultation, setShowAddConsultation] = useState(false);
+
+  const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null, { resetOnValueChange: true });
+  const [currentConsultation, setCurrentConsultation] = useState(
+    !currentConsultationId ? null : person.consultations.find((c) => c._id === currentConsultationId)
+  );
+
+  const [showAddConsultation, setShowAddConsultation] = useState(!!currentConsultation);
+  const [isNewConsultation, setIsNewConsultation] = useState(false);
   const [showAddTreatment, setShowAddTreatment] = useState(false);
-  const [currentConsultation, setCurrentConsultation] = useState(null);
   const [currentTreatment, setCurrentTreatment] = useState(null);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
@@ -57,6 +64,12 @@ export function MedicalFile({ person }) {
     );
     toastr.success(message);
   }
+
+  const resetCurrentConsultation = () => {
+    setIsNewConsultation(false);
+    setCurrentConsultationId(null);
+    setShowAddConsultation(false);
+  };
 
   return (
     <>
@@ -283,8 +296,11 @@ export function MedicalFile({ person }) {
             disabled={false}
             onClick={() => {
               setShowAddConsultation(true);
+              setIsNewConsultation(true);
+              const _id = uuidv4();
+              setCurrentConsultationId(_id);
               setCurrentConsultation({
-                _id: uuidv4(),
+                _id,
                 date: new Date(),
                 name: '',
                 type: '',
@@ -341,21 +357,13 @@ export function MedicalFile({ person }) {
         className="noprint"
         data={(person.consultations || []).filter((e) => !e.onlyVisibleByCreator || e.user === user._id)}
         rowKey={'_id'}
+        onRowClick={(consultation) => {
+          setShowAddConsultation(true);
+          setIsNewConsultation(false);
+          setCurrentConsultation(consultation);
+          setCurrentConsultationId(consultation._id);
+        }}
         columns={[
-          {
-            dataKey: '_id',
-            render: (consultation) => (
-              <EditButton
-                className="noprint"
-                onClick={() => {
-                  setShowAddConsultation(true);
-                  setCurrentConsultation(consultation);
-                }}>
-                &#9998;
-              </EditButton>
-            ),
-            small: true,
-          },
           {
             title: 'Date',
             dataKey: 'dueAt' || '_id',
@@ -376,17 +384,6 @@ export function MedicalFile({ person }) {
                 <>
                   <div>{e.name}</div>
                   <small className="text-muted">{e.type}</small>
-                </>
-              );
-            },
-          },
-          {
-            title: 'Description',
-            dataKey: 'description',
-            render: (e) => {
-              return (
-                <>
-                  <p>{e.description}</p>
                 </>
               );
             },
@@ -425,8 +422,8 @@ export function MedicalFile({ person }) {
         ]}
         noData="Aucune consultation enregistrée"
       />
-      <Modal isOpen={showAddConsultation} toggle={() => setShowAddConsultation(false)} size="lg">
-        <ModalHeader toggle={() => setShowAddConsultation(false)}>Ajouter une consultation</ModalHeader>
+      <Modal isOpen={showAddConsultation} toggle={resetCurrentConsultation} size="lg">
+        <ModalHeader toggle={resetCurrentConsultation}>{isNewConsultation ? 'Ajouter une consultation' : currentConsultation?.name}</ModalHeader>
         <ModalBody>
           <Formik
             enableReinitialize
@@ -452,7 +449,7 @@ export function MedicalFile({ person }) {
               }
               consultations = consultations.sort((a, b) => new Date(b.date) - new Date(a.date));
               await updatePerson({ consultations }, 'Consultation mise à jour !');
-              setShowAddConsultation(false);
+              resetCurrentConsultation();
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
               <React.Fragment>

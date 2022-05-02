@@ -90,6 +90,6 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Personnes suivies par l'organisation");
 
     await navigateWithReactRouter("/action");
-    await expect(page).toMatch("Actions de l'équipe ");
+    await expect(page).toMatch("Agenda de l'équipe ");
   });
 });

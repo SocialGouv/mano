@@ -73,7 +73,7 @@ const Drawer = () => {
             </li>
             <li>
               <NavLink to="/action" activeClassName="active">
-                Actions
+                Agenda
               </NavLink>
             </li>
             <li>

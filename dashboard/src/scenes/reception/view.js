@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
-import { currentTeamReportsSelector } from '../../recoil/selectors';
+import { consultationsSelector, currentTeamReportsSelector } from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
@@ -35,6 +35,17 @@ export const actionsForCurrentTeamSelector = selector({
   },
 });
 
+export const consultationsByAuthorizationSelector = selector({
+  key: 'consultationsByAuthorizationSelector',
+  get: ({ get }) => {
+    const user = get(userState);
+    const consultations = get(consultationsSelector);
+
+    if (!user.healthcareProfessional) return [];
+    return consultations.filter((consult) => !consult.onlyVisibleByCreator || consult.user === user._id);
+  },
+});
+
 export const actionsByStatusSelector = selectorFamily({
   key: 'actionsByStatusSelector',
   get:
@@ -42,6 +53,16 @@ export const actionsByStatusSelector = selectorFamily({
     ({ get }) => {
       const actions = get(actionsForCurrentTeamSelector);
       return actions.filter((a) => a.status === status);
+    },
+});
+
+export const consultationsByStatusSelector = selectorFamily({
+  key: 'consultationsByStatusSelector',
+  get:
+    ({ status }) =>
+    ({ get }) => {
+      const consultations = get(consultationsByAuthorizationSelector);
+      return consultations.filter((a) => a.status === status);
     },
 });
 
@@ -91,6 +112,13 @@ const Reception = () => {
   const passages = useRecoilValue(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
+  const consultationsByStatus = useRecoilValue(consultationsByStatusSelector({ status }));
+
+  const dataConsolidated = useMemo(
+    () => [...actionsByStatus, ...consultationsByStatus].sort((a, b) => new Date(b.dueAt || b.date) - new Date(a.dueAt || a.date)),
+    [actionsByStatus, consultationsByStatus]
+  );
+
   const todaysReport = useRecoilValue(todaysReportSelector);
   const lastReport = useRecoilValue(lastReportSelector);
   const user = useRecoilValue(userState);
@@ -282,11 +310,11 @@ const Reception = () => {
       </Row>
       <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
         <Col md={8} style={{ paddingBottom: 20, marginBottom: 20, borderRight: '1px solid #ddd' }}>
-          <SectionTitle>Actions</SectionTitle>
+          <SectionTitle>Agenda</SectionTitle>
           <div style={{ margin: '15px' }}>
             <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
           </div>
-          <ActionsCalendar actions={actionsByStatus} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
+          <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
         </Col>
         <Col md={4}>
           <SectionTitle style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Services</SectionTitle>
