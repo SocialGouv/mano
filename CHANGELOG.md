@@ -1,3 +1,10 @@
+# [1.100.0](https://github.com/SocialGouv/mano/compare/v1.99.3...v1.100.0) (2022-05-02)
+
+
+### Features
+
+* **dashboard:** show consultations within actions ([#658](https://github.com/SocialGouv/mano/issues/658)) ([a017302](https://github.com/SocialGouv/mano/commit/a017302b7956171ab2e0260c3a51954c5e2d6a86))
+
 ## [1.99.3](https://github.com/SocialGouv/mano/compare/v1.99.2...v1.99.3) (2022-05-02)
 
 
