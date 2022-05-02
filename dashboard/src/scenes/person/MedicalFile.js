@@ -35,7 +35,7 @@ export function MedicalFile({ person }) {
 
   const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null, { resetOnValueChange: true });
   const [currentConsultation, setCurrentConsultation] = useState(
-    !currentConsultationId ? null : person.consultations.find((c) => c._id === currentConsultationId)
+    !currentConsultationId ? null : person.consultations?.find((c) => c._id === currentConsultationId)
   );
   const [showAddConsultation, setShowAddConsultation] = useState(!!currentConsultation);
   const [isNewConsultation, setIsNewConsultation] = useState(false);
@@ -327,6 +327,7 @@ export function MedicalFile({ person }) {
                 status: 'A FAIRE',
                 user: user._id,
                 onlyVisibleByCreator: false,
+                createdAt: new Date(),
               });
             }}
             color="primary"
