@@ -1,3 +1,10 @@
+# [1.101.0](https://github.com/SocialGouv/mano/compare/v1.100.0...v1.101.0) (2022-05-02)
+
+
+### Features
+
+* **dashboard:** can filter consultations by type and status ([#660](https://github.com/SocialGouv/mano/issues/660)) ([bdf35e3](https://github.com/SocialGouv/mano/commit/bdf35e382566631ed858c6b53928dce7e077774e))
+
 # [1.100.0](https://github.com/SocialGouv/mano/compare/v1.99.3...v1.100.0) (2022-05-02)
 
 
