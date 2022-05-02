@@ -28,6 +28,7 @@ import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import DateBloc from '../../components/DateBloc';
 import useSearchParamState from '../../services/useSearchParamState';
 import { mappedIdsToLabels } from '../../recoil/actions';
+import Documents from '../../components/Documents';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -70,10 +71,22 @@ export function MedicalFile({ person }) {
     toastr.success(message);
   }
 
+  const loadConsultation = (consultation) => {
+    setShowAddConsultation(true);
+    setIsNewConsultation(false);
+    setCurrentConsultation(consultation);
+    setCurrentConsultationId(consultation._id);
+  };
+
   const resetCurrentConsultation = () => {
     setIsNewConsultation(false);
     setCurrentConsultationId(null);
     setShowAddConsultation(false);
+  };
+
+  const loadTreatment = (treatment) => {
+    setShowAddTreatment(true);
+    setCurrentTreatment(treatment);
   };
 
   const resetCurrentTreatment = () => {
@@ -89,6 +102,21 @@ export function MedicalFile({ person }) {
         .filter((c) => !consultationTypes.length || consultationTypes.includes(c.type)),
     [consultationStatuses, consultationTypes, person.consultations, user._id]
   );
+
+  const allMedicalDocuments = useMemo(() => {
+    const ordonnances =
+      person.treatments
+        ?.map((treatment) => treatment.documents?.map((doc) => ({ ...doc, type: 'treatment', treatment })))
+        .filter(Boolean)
+        .flat() || [];
+    const consultationsDocs =
+      person.consultations
+        ?.map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
+        .filter(Boolean)
+        .flat() || [];
+    const otherDocs = person.documentsMedical || [];
+    return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.date) - new Date(a.date));
+  }, [person.consultations, person.documentsMedical, person.treatments]);
 
   return (
     <>
@@ -235,21 +263,8 @@ export function MedicalFile({ person }) {
         className="noprint"
         data={person.treatments}
         rowKey={'_id'}
+        onRowClick={loadTreatment}
         columns={[
-          {
-            dataKey: '_id',
-            render: (treatment) => (
-              <EditButton
-                className="noprint"
-                onClick={() => {
-                  setShowAddTreatment(true);
-                  setCurrentTreatment(treatment);
-                }}>
-                &#9998;
-              </EditButton>
-            ),
-            small: true,
-          },
           {
             title: 'Nom',
             dataKey: 'name',
@@ -288,6 +303,16 @@ export function MedicalFile({ person }) {
               }
               return <p style={{ fontSize: '12px', margin: 0 }}>À partir du {formatDateWithFullMonth(e.startDate)}</p>;
             },
+          },
+          {
+            title: 'Documents',
+            dataKey: 'documents',
+            render: (e) =>
+              e.documents?.length || (
+                <small>
+                  <i>Aucun</i>
+                </small>
+              ),
           },
           {
             title: 'Action',
@@ -335,44 +360,46 @@ export function MedicalFile({ person }) {
           />
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
-      <Row className="noprint" style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-categories-filter">
-            Filtrer par catégorie&nbsp;:
-          </Label>
-          <div style={{ width: '100%' }}>
-            <SelectCustom
-              inputId="consultations-select-type-filter"
-              options={organisation.consultations.map((e) => ({ _id: e.name, name: e.name }))}
-              getOptionValue={(s) => s._id}
-              getOptionLabel={(s) => s.name}
-              name="types"
-              onChange={(selectedTypes) => setConsultationTypes(selectedTypes.map((t) => t._id))}
-              isClearable
-              isMulti
-              value={organisation.consultations.map((e) => ({ _id: e.name, name: e.name })).filter((s) => consultationTypes.includes(s._id))}
-            />
-          </div>
-        </Col>
-        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-status-filter">
-            Filtrer par statut&nbsp;:
-          </Label>
-          <div style={{ width: '100%' }}>
-            <SelectCustom
-              inputId="consultations-select-status-filter"
-              options={mappedIdsToLabels}
-              getOptionValue={(s) => s._id}
-              getOptionLabel={(s) => s.name}
-              name="statuses"
-              onChange={(s) => setConsultationStatuses(s.map((s) => s._id))}
-              isClearable
-              isMulti
-              value={mappedIdsToLabels.filter((s) => consultationStatuses.includes(s._id))}
-            />
-          </div>
-        </Col>
-      </Row>
+      {!!consultations.length && (
+        <Row className="noprint" style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
+          <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-categories-filter">
+              Filtrer par catégorie&nbsp;:
+            </Label>
+            <div style={{ width: '100%' }}>
+              <SelectCustom
+                inputId="consultations-select-type-filter"
+                options={organisation.consultations.map((e) => ({ _id: e.name, name: e.name }))}
+                getOptionValue={(s) => s._id}
+                getOptionLabel={(s) => s.name}
+                name="types"
+                onChange={(selectedTypes) => setConsultationTypes(selectedTypes.map((t) => t._id))}
+                isClearable
+                isMulti
+                value={organisation.consultations.map((e) => ({ _id: e.name, name: e.name })).filter((s) => consultationTypes.includes(s._id))}
+              />
+            </div>
+          </Col>
+          <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-status-filter">
+              Filtrer par statut&nbsp;:
+            </Label>
+            <div style={{ width: '100%' }}>
+              <SelectCustom
+                inputId="consultations-select-status-filter"
+                options={mappedIdsToLabels}
+                getOptionValue={(s) => s._id}
+                getOptionLabel={(s) => s.name}
+                name="statuses"
+                onChange={(s) => setConsultationStatuses(s.map((s) => s._id))}
+                isClearable
+                isMulti
+                value={mappedIdsToLabels.filter((s) => consultationStatuses.includes(s._id))}
+              />
+            </div>
+          </Col>
+        </Row>
+      )}
       <div className="printonly">
         {consultations.map((c) => {
           return (
@@ -413,12 +440,7 @@ export function MedicalFile({ person }) {
         className="noprint"
         data={consultations}
         rowKey={'_id'}
-        onRowClick={(consultation) => {
-          setShowAddConsultation(true);
-          setIsNewConsultation(false);
-          setCurrentConsultation(consultation);
-          setCurrentConsultationId(consultation._id);
-        }}
+        onRowClick={loadConsultation}
         columns={[
           {
             title: 'Date',
@@ -450,6 +472,11 @@ export function MedicalFile({ person }) {
             render: (e) => (e.user ? users.find((u) => u._id === e.user)?.name : ''),
           },
           {
+            title: 'Documents',
+            dataKey: 'documents',
+            render: (e) => e.documents?.length,
+          },
+          {
             title: 'Statut',
             dataKey: 'status',
             render: (e) => <ActionStatus status={e.status} />,
@@ -478,38 +505,123 @@ export function MedicalFile({ person }) {
         ]}
         noData="Aucune consultation enregistrée"
       />
+      <Documents
+        title={<Title id="all-medical-documents">Tous les documents médicaux</Title>}
+        documents={allMedicalDocuments}
+        person={person}
+        onRowClick={(document) => {
+          if (document.type === 'treatment') loadTreatment(document.treatment);
+          if (document.type === 'consultation') loadConsultation(document.consultation);
+          return null;
+        }}
+        additionalColumns={[
+          {
+            title: 'Type',
+            render: (doc) => {
+              if (doc.type === 'treatment') return 'Traitement';
+              if (doc.type === 'consultation') return 'Consultation';
+              return '';
+            },
+          },
+        ]}
+        conditionForDelete={(doc) => !doc.type}
+        onAdd={async (docResponse) => {
+          const { data: file, encryptedEntityKey } = docResponse;
+          const personResponse = await API.put({
+            path: `/person/${person._id}`,
+            body: preparePersonForEncryption(
+              customFieldsPersonsMedical,
+              customFieldsPersonsSocial
+            )({
+              ...person,
+              documentsMedical: [
+                ...(person.documentsMedical || []),
+                {
+                  _id: file.filename,
+                  name: file.originalname,
+                  encryptedEntityKey,
+                  createdAt: new Date(),
+                  createdBy: user._id,
+                  file,
+                },
+              ],
+            }),
+          });
+          if (personResponse.ok) {
+            const newPerson = personResponse.decryptedData;
+            setPersons((persons) =>
+              persons.map((p) => {
+                if (p._id === person._id) return newPerson;
+                return p;
+              })
+            );
+          }
+        }}
+        onDelete={async (document) => {
+          const personResponse = await API.put({
+            path: `/person/${person._id}`,
+            body: preparePersonForEncryption(
+              customFieldsPersonsMedical,
+              customFieldsPersonsSocial
+            )({
+              ...person,
+              documentsMedical: person.documentsMedical.filter((d) => d._id !== document._id),
+            }),
+          });
+          if (personResponse.ok) {
+            const newPerson = personResponse.decryptedData;
+            setPersons((persons) =>
+              persons.map((p) => {
+                if (p._id === person._id) return newPerson;
+                return p;
+              })
+            );
+          }
+        }}
+      />
       <div style={{ height: '50vh' }} className="noprint" />
       <Modal isOpen={showAddConsultation} toggle={resetCurrentConsultation} size="lg">
-        <ModalHeader toggle={resetCurrentConsultation}>{isNewConsultation ? 'Ajouter une consultation' : currentConsultation?.name}</ModalHeader>
-        <ModalBody>
-          <Formik
-            enableReinitialize
-            initialValues={currentConsultation}
-            validate={(values) => {
-              const errors = {};
-              if (!values._id) errors._id = "L'identifiant est obligatoire";
-              if (!values.name) errors.name = 'Le nom est obligatoire';
-              if (!values.status) errors.status = 'Le statut est obligatoire';
-              if (!values.date) errors.date = 'La date est obligatoire';
-              if (!values.type) errors.type = 'Le type est obligatoire';
-              return errors;
-            }}
-            onSubmit={async (values) => {
-              let consultations = person.consultations || [];
-              if (consultations.find((t) => t._id === values._id)) {
-                consultations = consultations.map((t) => {
-                  if (t._id === values._id) return values;
-                  return t;
-                });
-              } else {
-                consultations = [...consultations, values];
-              }
-              consultations = consultations.sort((a, b) => new Date(b.date) - new Date(a.date));
-              await updatePerson({ consultations }, 'Consultation mise à jour !');
-              resetCurrentConsultation();
-            }}>
-            {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
-              <React.Fragment>
+        <Formik
+          enableReinitialize
+          initialValues={currentConsultation}
+          validate={(values) => {
+            const errors = {};
+            if (!values._id) errors._id = "L'identifiant est obligatoire";
+            if (!values.name) errors.name = 'Le nom est obligatoire';
+            if (!values.status) errors.status = 'Le statut est obligatoire';
+            if (!values.date) errors.date = 'La date est obligatoire';
+            if (!values.type) errors.type = 'Le type est obligatoire';
+            return errors;
+          }}
+          onSubmit={async (values) => {
+            let consultations = person.consultations || [];
+            if (consultations.find((t) => t._id === values._id)) {
+              consultations = consultations.map((t) => {
+                if (t._id === values._id) return values;
+                return t;
+              });
+            } else {
+              consultations = [...consultations, values];
+            }
+            consultations = consultations.sort((a, b) => new Date(b.date) - new Date(a.date));
+            await updatePerson({ consultations }, 'Consultation mise à jour !');
+            resetCurrentConsultation();
+          }}>
+          {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
+            <React.Fragment>
+              <ModalHeader
+                toggle={async () => {
+                  if (JSON.stringify(values) !== JSON.stringify(currentConsultation)) {
+                    if (window.confirm('Voulez-vous enregistrer vos modifications ?')) {
+                      handleSubmit();
+                    }
+                  } else {
+                    resetCurrentConsultation();
+                  }
+                }}>
+                {isNewConsultation ? 'Ajouter une consultation' : currentConsultation?.name}
+              </ModalHeader>
+              <ModalBody>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
@@ -585,51 +697,96 @@ export function MedicalFile({ person }) {
                       </Label>
                     </FormGroup>
                   </Col>
+                  <Col md={12}>
+                    <Documents
+                      title="Documents"
+                      person={person}
+                      documents={values.documents || []}
+                      onAdd={async (docResponse) => {
+                        const { data: file, encryptedEntityKey } = docResponse;
+                        handleChange({
+                          currentTarget: {
+                            value: [
+                              ...(values.documents || []),
+                              {
+                                _id: file.filename,
+                                name: file.originalname,
+                                encryptedEntityKey,
+                                createdAt: new Date(),
+                                createdBy: user._id,
+                                file,
+                              },
+                            ],
+                            name: 'documents',
+                          },
+                        });
+                      }}
+                      onDelete={async (document) => {
+                        handleChange({
+                          currentTarget: {
+                            value: values.documents.filter((d) => d._id !== document._id),
+                            name: 'documents',
+                          },
+                        });
+                      }}
+                    />
+                  </Col>
                 </Row>
                 <br />
                 <ButtonCustom
                   type="submit"
                   color="info"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentConsultation)}
                   onClick={() => !isSubmitting && handleSubmit()}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
                 />
-              </React.Fragment>
-            )}
-          </Formik>
-        </ModalBody>
+              </ModalBody>
+            </React.Fragment>
+          )}
+        </Formik>
       </Modal>
       <Modal isOpen={showAddTreatment} toggle={resetCurrentTreatment} size="lg">
-        <ModalHeader toggle={resetCurrentTreatment}>{isNewTreatment ? 'Ajouter un traitement' : currentTreatment?.name}</ModalHeader>
-        <ModalBody>
-          <Formik
-            enableReinitialize
-            initialValues={currentTreatment}
-            validate={(values) => {
-              const errors = {};
-              if (!values._id) errors._id = "L'identifiant est obligatoire";
-              if (!values.name) errors.name = 'Le nom est obligatoire';
-              if (!values.dosage) errors.dosage = 'Le dosage est obligatoire';
-              if (!values.frequency) errors.frequency = 'La fréquence est obligatoire';
-              if (!values.indication) errors.indication = "L'indication est obligatoire";
-              if (!values.startDate) errors.startDate = 'La date de début est obligatoire';
-              return errors;
-            }}
-            onSubmit={async (values) => {
-              let treatments = person.treatments || [];
-              if (treatments.find((t) => t._id === values._id)) {
-                treatments = treatments.map((t) => {
-                  if (t._id === values._id) return values;
-                  return t;
-                });
-              } else {
-                treatments = [...treatments, values];
-              }
-              await updatePerson({ treatments }, 'Traitement mise à jour !');
-              setShowAddTreatment(false);
-            }}>
-            {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (
-              <React.Fragment>
+        <Formik
+          enableReinitialize
+          initialValues={currentTreatment}
+          validate={(values) => {
+            const errors = {};
+            if (!values._id) errors._id = "L'identifiant est obligatoire";
+            if (!values.name) errors.name = 'Le nom est obligatoire';
+            if (!values.dosage) errors.dosage = 'Le dosage est obligatoire';
+            if (!values.frequency) errors.frequency = 'La fréquence est obligatoire';
+            if (!values.indication) errors.indication = "L'indication est obligatoire";
+            if (!values.startDate) errors.startDate = 'La date de début est obligatoire';
+            return errors;
+          }}
+          onSubmit={async (values) => {
+            let treatments = person.treatments || [];
+            if (treatments.find((t) => t._id === values._id)) {
+              treatments = treatments.map((t) => {
+                if (t._id === values._id) return values;
+                return t;
+              });
+            } else {
+              treatments = [...treatments, values];
+            }
+            await updatePerson({ treatments }, 'Traitement mise à jour !');
+            resetCurrentTreatment();
+          }}>
+          {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (
+            <React.Fragment>
+              <ModalHeader
+                toggle={async () => {
+                  if (JSON.stringify(values) !== JSON.stringify(currentTreatment)) {
+                    if (window.confirm('Voulez-vous enregistrer vos modifications ?')) {
+                      handleSubmit();
+                    }
+                  } else {
+                    resetCurrentTreatment();
+                  }
+                }}>
+                {isNewTreatment ? 'Ajouter un traitement' : currentTreatment?.name}
+              </ModalHeader>
+              <ModalBody>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
@@ -691,19 +848,53 @@ export function MedicalFile({ person }) {
                       {touched.endDate && errors.endDate && <Error>{errors.endDate}</Error>}
                     </FormGroup>
                   </Col>
+                  <Col md={12}>
+                    <Documents
+                      title="Documents"
+                      person={person}
+                      documents={values.documents || []}
+                      onAdd={async (docResponse) => {
+                        const { data: file, encryptedEntityKey } = docResponse;
+                        handleChange({
+                          currentTarget: {
+                            value: [
+                              ...(values.documents || []),
+                              {
+                                _id: file.filename,
+                                name: file.originalname,
+                                encryptedEntityKey,
+                                createdAt: new Date(),
+                                createdBy: user._id,
+                                file,
+                              },
+                            ],
+                            name: 'documents',
+                          },
+                        });
+                      }}
+                      onDelete={async (document) => {
+                        handleChange({
+                          currentTarget: {
+                            value: values.documents.filter((d) => d._id !== document._id),
+                            name: 'documents',
+                          },
+                        });
+                      }}
+                    />
+                  </Col>
                 </Row>
                 <br />
                 <ButtonCustom
                   type="submit"
                   color="info"
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentTreatment)}
                   onClick={() => !isSubmitting && handleSubmit()}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
                 />
-              </React.Fragment>
-            )}
-          </Formik>
-        </ModalBody>
+              </ModalBody>
+            </React.Fragment>
+          )}
+        </Formik>
       </Modal>
     </>
   );
@@ -739,10 +930,4 @@ const TitleWithButtonsContainer = styled.div`
 const Error = styled.span`
   color: red;
   font-size: 11px;
-`;
-
-const EditButton = styled.button`
-  width: 30px;
-  border: none;
-  background: transparent;
 `;

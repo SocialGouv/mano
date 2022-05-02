@@ -305,6 +305,15 @@ export const personFields = [
   },
   { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
   {
+    name: 'documentsMedical',
+    type: 'files',
+    label: 'Documents',
+    encrypted: true,
+    importable: false,
+    filterable: false,
+    onlyHealthcareProfessional: true,
+  },
+  {
     name: 'consultations',
     type: 'consultations',
     label: 'Historique des consultations',

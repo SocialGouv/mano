@@ -1,113 +1,86 @@
-import React, { useEffect } from 'react';
-import { Row, Col } from 'reactstrap';
+import React, { useState } from 'react';
 import { theme } from '../config';
 import { Field, Formik } from 'formik';
 import styled from 'styled-components';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
 import Table from './table';
 import UserName from './UserName';
 import { download } from '../utils';
-import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState, preparePersonForEncryption } from '../recoil/persons';
-import { userState } from '../recoil/auth';
 import ButtonCustom from './ButtonCustom';
 import { formatDateWithFullMonth } from '../services/date';
 import { capture } from '../services/sentry';
 import { toastr } from 'react-redux-toastr';
 import useApi from '../services/api';
+import { Col, Row } from 'reactstrap';
 
-const Documents = ({ person, onUpdateResults }) => {
-  const user = useRecoilValue(userState);
-  const setPersons = useSetRecoilState(personsState);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+const Documents = ({
+  person,
+  documents,
+  onAdd,
+  onDelete,
+  title,
+  children,
+  additionalColumns = [],
+  conditionForDelete = () => true,
+  onRowClick = null,
+}) => {
   const API = useApi();
-
-  useEffect(() => {
-    if (!!onUpdateResults) onUpdateResults(person.documents?.length || 0);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [person.documents?.length]);
+  const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
 
   return (
     <>
-      <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
-        <Col>
-          <Title>Documents</Title>
-        </Col>
-      </Row>
-
       <Formik initialValues={{ place: null }} onSubmit={async () => {}}>
         {() => (
-          <div style={{ marginLeft: 'auto' }}>
-            <FileWrapper>
-              Ajouter un document
-              <Field
-                type="file"
-                name="file"
-                hidden
-                onChange={async (e) => {
-                  const docResponse = await API.upload({
-                    path: `/person/${person._id}/document`,
-                    file: e.target.files[0],
-                  });
-                  if (!docResponse.ok || !docResponse.data) {
-                    capture('Error uploading document', { extra: { docResponse } });
-                    toastr.error('Erreur', "Une erreur est survenue lors de l'envoi du document");
-                    return;
-                  }
-                  const { data: file, encryptedEntityKey } = docResponse;
-                  const personResponse = await API.put({
-                    path: `/person/${person._id}`,
-                    body: preparePersonForEncryption(
-                      customFieldsPersonsMedical,
-                      customFieldsPersonsSocial
-                    )({
-                      ...person,
-                      documents: [
-                        ...(person.documents || []),
-                        {
-                          _id: file.filename,
-                          name: file.originalname,
-                          encryptedEntityKey,
-                          createdAt: new Date(),
-                          createdBy: user._id,
-                          file,
-                        },
-                      ],
-                    }),
-                  });
-                  if (personResponse.ok) {
-                    const newPerson = personResponse.decryptedData;
-                    setPersons((persons) =>
-                      persons.map((p) => {
-                        if (p._id === person._id) return newPerson;
-                        return p;
-                      })
-                    );
-                  }
-                }}
-              />
-            </FileWrapper>
-          </div>
+          <Row style={{ marginTop: '30px', marginBottom: '5px', alignItems: 'center', justifyContent: 'space-between' }}>
+            {!!title && <Col md={6}>{title}</Col>}
+            <Col md={6} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <FileWrapper>
+                Ajouter un document
+                <Field
+                  key={resetFileInputKey}
+                  type="file"
+                  name="file"
+                  hidden
+                  onChange={async (e) => {
+                    const docResponse = await API.upload({
+                      path: `/person/${person._id}/document`,
+                      file: e.target.files[0],
+                    });
+                    if (!docResponse.ok || !docResponse.data) {
+                      capture('Error uploading document', { extra: { docResponse } });
+                      toastr.error('Erreur', "Une erreur est survenue lors de l'envoi du document");
+                      return;
+                    }
+                    onAdd(docResponse);
+                    setResetFileInputKey((k) => k + 1);
+                  }}
+                />
+              </FileWrapper>
+            </Col>
+          </Row>
         )}
       </Formik>
+      {children}
       <Table
-        data={person.documents}
+        data={documents}
+        noData="Pas de document"
         rowKey={'_id'}
-        onRowClick={() => {}}
+        onRowClick={onRowClick}
         columns={[
           { title: 'Nom', dataKey: 'name', render: (document) => <b>{document.name}</b> },
           { title: 'Ajouté le', dataKey: 'createdAt', render: (document) => formatDateWithFullMonth(document.createdAt) },
           { title: 'Ajouté par', dataKey: 'createdBy', render: (document) => <UserName id={document.createdBy} /> },
+          ...additionalColumns,
           {
             title: 'Action',
             dataKey: 'action',
             render: (document) => {
+              const canDelete = conditionForDelete(document);
               return (
                 <>
                   <ButtonCustom
                     color="primary"
                     title="Télécharger"
-                    style={{ margin: '0 auto 0.5rem' }}
+                    style={{ margin: '0 auto' }}
                     onClick={async () => {
                       const file = await API.download({
                         path: `/person/${person._id}/document/${document.file.filename}`,
@@ -116,35 +89,18 @@ const Documents = ({ person, onUpdateResults }) => {
                       download(file, document.name);
                     }}
                   />
-                  <ButtonCustom
-                    color="danger"
-                    title="Supprimer"
-                    style={{ margin: 'auto' }}
-                    onClick={async () => {
-                      if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-                      await API.delete({ path: `/person/${person._id}/document/${document.file.filename}` });
-                      const personResponse = await API.put({
-                        path: `/person/${person._id}`,
-                        body: preparePersonForEncryption(
-                          customFieldsPersonsMedical,
-                          customFieldsPersonsSocial
-                        )({
-                          ...person,
-                          documents: person.documents.filter((d) => d._id !== document._id),
-                        }),
-                      });
-                      if (personResponse.ok) {
-                        const newPerson = personResponse.decryptedData;
-                        setPersons((persons) =>
-                          persons.map((p) => {
-                            if (p._id === person._id) return newPerson;
-                            return p;
-                          })
-                        );
-                      }
-                      onUpdateResults(person.documents.length);
-                    }}
-                  />
+                  {!!canDelete && (
+                    <ButtonCustom
+                      color="danger"
+                      title="Supprimer"
+                      style={{ margin: '0.5rem auto 0' }}
+                      onClick={async () => {
+                        if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
+                        await API.delete({ path: `/person/${person._id}/document/${document.file.filename}` });
+                        onDelete(document);
+                      }}
+                    />
+                  )}
                 </>
               );
             },
@@ -155,21 +111,16 @@ const Documents = ({ person, onUpdateResults }) => {
   );
 };
 
-const Title = styled.h2`
-  font-size: 20px;
-  font-weight: 800;
-  display: flex;
-  justify-content: space-between;
-`;
-
 const FileWrapper = styled.label`
-  ${(p) => `background: ${theme.main}; color: ${theme.white};`};
+  background: ${theme.main};
+  color: ${theme.white};
   border-radius: 8px;
   font-size: 14px;
   box-shadow: none;
   border: none;
   cursor: pointer;
-  padding: 8px 15px;
+  padding: 12px 24px;
+  margin: 0;
 `;
 
 export default Documents;

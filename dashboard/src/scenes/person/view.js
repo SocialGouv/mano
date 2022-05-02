@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert } from 'reactstrap';
+import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert, Button as LinkButton } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -157,7 +157,23 @@ const View = () => {
         <TabPane tabId={5}>
           <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
         </TabPane>
-        <TabPane tabId={6}>{<Documents person={person} onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)} />}</TabPane>
+        <TabPane tabId={6}>
+          {
+            <PersonDocuments
+              person={person}
+              onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)}
+              onGoToMedicalFiles={async () => {
+                const searchParams = new URLSearchParams(location.search);
+                searchParams.set('tab', 'dossier médical');
+                history.replace({ pathname: location.pathname, search: searchParams.toString() });
+                setActiveTab(1);
+                await new Promise((res) => setTimeout(res, 250));
+                const element = document.getElementById('all-medical-documents');
+                element.scrollIntoView({ behavior: 'smooth' });
+              }}
+            />
+          }
+        </TabPane>
       </TabContent>
     </StyledContainer>
   );
@@ -627,6 +643,86 @@ const Passages = ({ personId, onUpdateResults }) => {
         ]}
       />
     </React.Fragment>
+  );
+};
+
+const PersonDocuments = ({ person, onUpdateResults, onGoToMedicalFiles }) => {
+  const user = useRecoilValue(userState);
+  const setPersons = useSetRecoilState(personsState);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const API = useApi();
+
+  useEffect(() => {
+    if (!!onUpdateResults) onUpdateResults(person.documents?.length || 0);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [person.documents?.length]);
+
+  return (
+    <Documents
+      title={<Title>Documents</Title>}
+      documents={person.documents}
+      person={person}
+      onAdd={async (docResponse) => {
+        const { data: file, encryptedEntityKey } = docResponse;
+        const personResponse = await API.put({
+          path: `/person/${person._id}`,
+          body: preparePersonForEncryption(
+            customFieldsPersonsMedical,
+            customFieldsPersonsSocial
+          )({
+            ...person,
+            documents: [
+              ...(person.documents || []),
+              {
+                _id: file.filename,
+                name: file.originalname,
+                encryptedEntityKey,
+                createdAt: new Date(),
+                createdBy: user._id,
+                file,
+              },
+            ],
+          }),
+        });
+        if (personResponse.ok) {
+          const newPerson = personResponse.decryptedData;
+          setPersons((persons) =>
+            persons.map((p) => {
+              if (p._id === person._id) return newPerson;
+              return p;
+            })
+          );
+        }
+      }}
+      onDelete={async (document) => {
+        const personResponse = await API.put({
+          path: `/person/${person._id}`,
+          body: preparePersonForEncryption(
+            customFieldsPersonsMedical,
+            customFieldsPersonsSocial
+          )({
+            ...person,
+            documents: person.documents.filter((d) => d._id !== document._id),
+          }),
+        });
+        if (personResponse.ok) {
+          const newPerson = personResponse.decryptedData;
+          setPersons((persons) =>
+            persons.map((p) => {
+              if (p._id === person._id) return newPerson;
+              return p;
+            })
+          );
+        }
+        onUpdateResults(person.documents.length);
+      }}>
+      {!!user.healthcareProfessional && (
+        <LinkButton onClick={onGoToMedicalFiles} color="link">
+          Voir les documents médicaux
+        </LinkButton>
+      )}
+    </Documents>
   );
 };
 
