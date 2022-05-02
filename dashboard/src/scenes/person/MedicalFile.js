@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
 import styled from 'styled-components';
@@ -27,6 +27,7 @@ import SelectCustom from '../../components/SelectCustom';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import DateBloc from '../../components/DateBloc';
 import useSearchParamState from '../../services/useSearchParamState';
+import { mappedIdsToLabels } from '../../recoil/actions';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -36,11 +37,15 @@ export function MedicalFile({ person }) {
   const [currentConsultation, setCurrentConsultation] = useState(
     !currentConsultationId ? null : person.consultations.find((c) => c._id === currentConsultationId)
   );
-
   const [showAddConsultation, setShowAddConsultation] = useState(!!currentConsultation);
   const [isNewConsultation, setIsNewConsultation] = useState(false);
+  const [consultationTypes, setConsultationTypes] = useSearchParamState('consultationTypes', []);
+  const [consultationStatuses, setConsultationStatuses] = useSearchParamState('consultationStatuses', []);
+
   const [showAddTreatment, setShowAddTreatment] = useState(false);
   const [currentTreatment, setCurrentTreatment] = useState(null);
+  const [isNewTreatment, setIsNewTreatment] = useState(false);
+
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
@@ -70,6 +75,20 @@ export function MedicalFile({ person }) {
     setCurrentConsultationId(null);
     setShowAddConsultation(false);
   };
+
+  const resetCurrentTreatment = () => {
+    setIsNewTreatment(false);
+    setShowAddTreatment(false);
+  };
+
+  const consultations = useMemo(
+    () =>
+      (person.consultations || [])
+        .filter((c) => !c.onlyVisibleByCreator || c.user === user._id)
+        .filter((c) => !consultationStatuses.length || consultationStatuses.includes(c.status))
+        .filter((c) => !consultationTypes.length || consultationTypes.includes(c.type)),
+    [consultationStatuses, consultationTypes, person.consultations, user._id]
+  );
 
   return (
     <>
@@ -162,6 +181,7 @@ export function MedicalFile({ person }) {
             disabled={false}
             onClick={() => {
               setShowAddTreatment(true);
+              setIsNewTreatment(true);
               setCurrentTreatment({
                 _id: uuidv4(),
                 startDate: new Date(),
@@ -185,7 +205,7 @@ export function MedicalFile({ person }) {
             <div key={c._id} style={{ marginBottom: '2rem' }}>
               <h4>{c.name}</h4>
               {Object.entries(c)
-                .filter(([key, value]) => value && key !== '_id' && key !== 'name')
+                .filter(([key, value]) => value && key !== '_id' && key !== 'name' && key !== 'documents')
                 .map(([key, value]) => {
                   let field = { type: 'text', label: key };
                   if (key === 'dosage') field = { type: 'text', label: 'Dosage' };
@@ -315,47 +335,83 @@ export function MedicalFile({ person }) {
           />
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
+      <Row className="noprint" style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
+        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-categories-filter">
+            Filtrer par catégorie&nbsp;:
+          </Label>
+          <div style={{ width: '100%' }}>
+            <SelectCustom
+              inputId="consultations-select-type-filter"
+              options={organisation.consultations.map((e) => ({ _id: e.name, name: e.name }))}
+              getOptionValue={(s) => s._id}
+              getOptionLabel={(s) => s.name}
+              name="types"
+              onChange={(selectedTypes) => setConsultationTypes(selectedTypes.map((t) => t._id))}
+              isClearable
+              isMulti
+              value={organisation.consultations.map((e) => ({ _id: e.name, name: e.name })).filter((s) => consultationTypes.includes(s._id))}
+            />
+          </div>
+        </Col>
+        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-status-filter">
+            Filtrer par statut&nbsp;:
+          </Label>
+          <div style={{ width: '100%' }}>
+            <SelectCustom
+              inputId="consultations-select-status-filter"
+              options={mappedIdsToLabels}
+              getOptionValue={(s) => s._id}
+              getOptionLabel={(s) => s.name}
+              name="statuses"
+              onChange={(s) => setConsultationStatuses(s.map((s) => s._id))}
+              isClearable
+              isMulti
+              value={mappedIdsToLabels.filter((s) => consultationStatuses.includes(s._id))}
+            />
+          </div>
+        </Col>
+      </Row>
       <div className="printonly">
-        {(person.consultations || [])
-          .filter((e) => !e.onlyVisibleByCreator || e.user === user._id)
-          .map((c) => {
-            return (
-              <div key={c._id} style={{ marginBottom: '2rem' }}>
-                <h4>{c.name}</h4>
-                {Object.entries(c)
-                  .filter(([key, value]) => value && key !== '_id' && key !== 'name')
-                  .map(([key, value]) => {
-                    let field = organisation.consultations
-                      .find((e) => e.name === (c.type || ''))
-                      ?.fields.filter((f) => f.enabled)
-                      .find((e) => e.name === key);
-                    if (!field) {
-                      field = { type: 'text', label: key };
-                      if (key === 'type') field = { type: 'text', label: 'Type' };
-                      if (key === 'status') field = { type: 'text', label: 'Statut' };
-                      if (key === 'date') field = { type: 'date-with-time', label: 'Date' };
-                      if (key === 'user') {
-                        field = { type: 'text', label: 'Créé par' };
-                        value = users.find((u) => u._id === value)?.name;
-                      }
+        {consultations.map((c) => {
+          return (
+            <div key={c._id} style={{ marginBottom: '2rem' }}>
+              <h4>{c.name}</h4>
+              {Object.entries(c)
+                .filter(([key, value]) => value && key !== '_id' && key !== 'name' && key !== 'documents')
+                .map(([key, value]) => {
+                  let field = organisation.consultations
+                    .find((e) => e.name === (c.type || ''))
+                    ?.fields.filter((f) => f.enabled)
+                    .find((e) => e.name === key);
+                  if (!field) {
+                    field = { type: 'text', label: key };
+                    if (key === 'type') field = { type: 'text', label: 'Type' };
+                    if (key === 'status') field = { type: 'text', label: 'Statut' };
+                    if (key === 'date') field = { type: 'date-with-time', label: 'Date' };
+                    if (key === 'user') {
+                      field = { type: 'text', label: 'Créé par' };
+                      value = users.find((u) => u._id === value)?.name;
                     }
+                  }
 
-                    return (
-                      <div>
-                        {field.label}&nbsp;:{' '}
-                        <b>
-                          <CustomFieldDisplay key={key} field={field} value={value} />
-                        </b>
-                      </div>
-                    );
-                  })}
-              </div>
-            );
-          })}
+                  return (
+                    <div key={key}>
+                      {field.label}&nbsp;:{' '}
+                      <b>
+                        <CustomFieldDisplay key={key} field={field} value={value} />
+                      </b>
+                    </div>
+                  );
+                })}
+            </div>
+          );
+        })}
       </div>
       <Table
         className="noprint"
-        data={(person.consultations || []).filter((e) => !e.onlyVisibleByCreator || e.user === user._id)}
+        data={consultations}
         rowKey={'_id'}
         onRowClick={(consultation) => {
           setShowAddConsultation(true);
@@ -366,14 +422,14 @@ export function MedicalFile({ person }) {
         columns={[
           {
             title: 'Date',
-            dataKey: 'dueAt' || '_id',
+            dataKey: 'date-day',
             render: (e) => {
               return <DateBloc date={e.date} />;
             },
           },
           {
             title: 'Heure',
-            dataKey: '_id',
+            dataKey: 'date-hour',
             render: (e) => formatTime(e.date),
           },
           {
@@ -422,6 +478,7 @@ export function MedicalFile({ person }) {
         ]}
         noData="Aucune consultation enregistrée"
       />
+      <div style={{ height: '50vh' }} className="noprint" />
       <Modal isOpen={showAddConsultation} toggle={resetCurrentConsultation} size="lg">
         <ModalHeader toggle={resetCurrentConsultation}>{isNewConsultation ? 'Ajouter une consultation' : currentConsultation?.name}</ModalHeader>
         <ModalBody>
@@ -542,8 +599,8 @@ export function MedicalFile({ person }) {
           </Formik>
         </ModalBody>
       </Modal>
-      <Modal isOpen={showAddTreatment} toggle={() => setShowAddTreatment(false)} size="lg">
-        <ModalHeader toggle={() => setShowAddTreatment(false)}>Ajouter un traitement</ModalHeader>
+      <Modal isOpen={showAddTreatment} toggle={resetCurrentTreatment} size="lg">
+        <ModalHeader toggle={resetCurrentTreatment}>{isNewTreatment ? 'Ajouter un traitement' : currentTreatment?.name}</ModalHeader>
         <ModalBody>
           <Formik
             enableReinitialize
