@@ -128,10 +128,6 @@ export function MedicalFile({ person }) {
                     classNamePrefix="person-select-healthInsurance"
                   />
                 </Col>
-                <Col md={4}>
-                  <Label htmlFor="numeroSecuriteSociale">Numéro de sécurité sociale</Label>
-                  <Input name="numeroSecuriteSociale" id="numeroSecuriteSociale" value={values.numeroSecuriteSociale || ''} onChange={handleChange} />
-                </Col>
               </Row>
               <Row>
                 {customFieldsPersonsMedical
