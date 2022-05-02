@@ -33,7 +33,7 @@ import {
   preparePersonForEncryption,
   commentForUpdatePerson,
 } from '../../recoil/persons';
-import { actionsState, mappedIdsToLabels, TODO } from '../../recoil/actions';
+import { actionsState, mappedIdsToLabels } from '../../recoil/actions';
 import UserName from '../../components/UserName';
 import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
