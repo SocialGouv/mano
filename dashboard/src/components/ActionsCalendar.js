@@ -68,7 +68,6 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           dataKey: 'urgent',
           small: true,
           render: (actionOrConsult) => {
-            console.log({ actionOrConsult });
             if (actionOrConsult.urgent) return <ExclamationMarkButton />;
             if (actionOrConsult.isConsultation) return <ConsultationButton />;
             return null;
