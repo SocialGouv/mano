@@ -11,8 +11,8 @@ const ConsultationButtonStyled = styled.div`
   border-radius: 30px;
   margin-left: 5px;
   box-shadow: none;
-  border: 2px solid #49c3a6;
-  color: #49c3a6;
+  border: 2px solid #0969da;
+  color: #0969da;
   font-size: 20px;
   font-weight: bold;
   display: inline-flex;
