@@ -1,3 +1,10 @@
+# [1.103.0](https://github.com/SocialGouv/mano/compare/v1.102.0...v1.103.0) (2022-05-02)
+
+
+### Features
+
+* **dashboard:** show consultation in report ([#662](https://github.com/SocialGouv/mano/issues/662)) ([2bc2ca3](https://github.com/SocialGouv/mano/commit/2bc2ca38ad1e937c7734d208d2fad613caca4f73))
+
 # [1.102.0](https://github.com/SocialGouv/mano/compare/v1.101.0...v1.102.0) (2022-05-02)
 
 
