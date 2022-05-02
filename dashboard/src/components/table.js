@@ -3,7 +3,19 @@ import Sortable from 'sortablejs';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', className, title, noData, isSortable, onSort }) => {
+const Table = ({
+  columns = [],
+  data = [],
+  rowKey,
+  onRowClick,
+  rowDisabled = () => false,
+  nullDisplay = '',
+  className,
+  title,
+  noData,
+  isSortable,
+  onSort,
+}) => {
   const gridRef = useRef(null);
   const sortableJsRef = useRef(null);
 
@@ -81,7 +93,12 @@ const Table = ({ columns = [], data = [], rowKey, onRowClick, nullDisplay = '', 
                 onClick={() => (onRowClick ? onRowClick(item) : null)}
                 key={item[rowKey] || item._id}
                 data-key={item[rowKey] || item._id}
-                style={item.style || {}}>
+                style={
+                  item.style || {
+                    cursor: rowDisabled(item) ? 'not-allowed' : 'pointer',
+                    pointerEvents: rowDisabled(item) ? 'not-allowed' : 'pointer',
+                  }
+                }>
                 {columns.map((column) => {
                   return (
                     <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>

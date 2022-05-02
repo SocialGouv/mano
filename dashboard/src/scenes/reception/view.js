@@ -2,9 +2,10 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
+import { toastr } from 'react-redux-toastr';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
-import { consultationsSelector, currentTeamReportsSelector } from '../../recoil/selectors';
+import { currentTeamReportsSelector } from '../../recoil/selectors';
 import Card from '../../components/Card';
 import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
@@ -24,7 +25,7 @@ import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
 import { capture } from '../../services/sentry';
-import { toastr } from 'react-redux-toastr';
+import { consultationsState } from '../../recoil/consultations';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -39,10 +40,10 @@ export const consultationsByAuthorizationSelector = selector({
   key: 'consultationsByAuthorizationSelector',
   get: ({ get }) => {
     const user = get(userState);
-    const consultations = get(consultationsSelector);
+    const consultations = get(consultationsState);
 
     if (!user.healthcareProfessional) return [];
-    return consultations.filter((consult) => !consult.onlyVisibleByCreator || consult.user === user._id);
+    return consultations.filter((consult) => !consult.onlyVisibleBy?.length || consult.onlyVisibleBy.includes(user._id));
   },
 });
 

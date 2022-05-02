@@ -49,7 +49,7 @@ import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
-
+import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
 const spaceAfterTab = [0, 3, 4, 5, 6];
@@ -482,13 +482,14 @@ const Consultations = ({ date, onUpdateResults = () => null, status }) => {
   const history = useHistory();
 
   const currentTeam = useRecoilValue(currentTeamState);
-  const consultations = useRecoilValue(consultationsSelector);
+  const consultations = useRecoilValue(consultationsState);
+  const user = useRecoilValue(userState);
 
   const data = useMemo(
     () =>
       consultations
         ?.filter((c) => c.status === status)
-        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date, date, currentTeam?.nightSession ? 12 : 0))
+        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.completedAt, date, currentTeam?.nightSession ? 12 : 0))
         .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
     [consultations, currentTeam?.nightSession, date, status]
   );
@@ -514,6 +515,7 @@ const Consultations = ({ date, onUpdateResults = () => null, status }) => {
           onRowClick={(actionOrConsultation) =>
             history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`)
           }
+          rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
           rowKey="_id"
           columns={[
             {
@@ -522,11 +524,12 @@ const Consultations = ({ date, onUpdateResults = () => null, status }) => {
               small: true,
               render: () => <ConsultationButton />,
             },
+            { title: 'À faire le ', dataKey: 'date', render: (d) => <DateBloc date={d.dueAt} /> },
             {
               title: 'Heure',
-              dataKey: 'date',
+              dataKey: '_id',
               small: true,
-              render: (c) => formatTime(c.date),
+              render: (action) => formatTime(action.dueAt),
             },
             {
               title: 'Nom',
@@ -551,7 +554,8 @@ const ConsultationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const history = useHistory();
 
   const currentTeam = useRecoilValue(currentTeamState);
-  const consultations = useRecoilValue(consultationsSelector);
+  const consultations = useRecoilValue(consultationsState);
+  const user = useRecoilValue(userState);
 
   const data = useMemo(
     () =>
@@ -580,6 +584,7 @@ const ConsultationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
           onRowClick={(actionOrConsultation) =>
             history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`)
           }
+          rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
           rowKey="_id"
           columns={[
             {
@@ -588,15 +593,12 @@ const ConsultationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
               small: true,
               render: () => <ConsultationButton />,
             },
-            { title: 'À faire le ', dataKey: 'date', render: (d) => <DateBloc date={d.date} /> },
+            { title: 'À faire le ', dataKey: 'date', render: (d) => <DateBloc date={d.dueAt} /> },
             {
               title: 'Heure',
               dataKey: '_id',
               small: true,
-              render: (action) => {
-                if (!action.dueAt || !action.withTime) return null;
-                return formatTime(action.dueAt);
-              },
+              render: (action) => formatTime(action.dueAt),
             },
             {
               title: 'Nom',

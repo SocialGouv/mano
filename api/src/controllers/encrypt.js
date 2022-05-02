@@ -8,6 +8,9 @@ const Person = require("../models/person");
 const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const Action = require("../models/action");
+const Consultation = require("../models/consultation");
+const Treatment = require("../models/treatment");
+const MedicalFile = require("../models/medicalFile");
 const Comment = require("../models/comment");
 const Passage = require("../models/passage");
 const Territory = require("../models/territory");
@@ -33,7 +36,19 @@ router.post(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      const objectsKeys = ["actions", "persons", "comments", "territories", "observations", "places", "reports", "relsPersonPlace"];
+      const objectsKeys = [
+        "actions",
+        "consultations",
+        "treatments",
+        "medicalFiles",
+        "persons",
+        "comments",
+        "territories",
+        "observations",
+        "places",
+        "reports",
+        "relsPersonPlace",
+      ];
       for (const objectKey of objectsKeys) {
         z.array(
           z.object({
@@ -62,6 +77,9 @@ router.post(
       await sequelize.transaction(async (tx) => {
         const {
           actions = [],
+          consultations = [],
+          treatments = [],
+          medicalFiles = [],
           persons = [],
           comments = [],
           passages = [],
@@ -84,6 +102,18 @@ router.post(
 
         for (let { encrypted, encryptedEntityKey, _id } of actions) {
           await Action.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        }
+
+        for (let { encrypted, encryptedEntityKey, _id } of consultations) {
+          await Consultation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        }
+
+        for (let { encrypted, encryptedEntityKey, _id } of treatments) {
+          await Treatment.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        }
+
+        for (let { encrypted, encryptedEntityKey, _id } of medicalFiles) {
+          await MedicalFile.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of comments) {

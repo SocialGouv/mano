@@ -10,7 +10,6 @@ import useApi from '../services/api';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import Table from './table';
-import QuestionMarkButton from './QuestionMarkButton';
 
 const newField = () => ({
   // Todo: I guess could use crypto here.
@@ -32,15 +31,7 @@ const sanitizeFields = (field) => {
   return sanitizedField;
 };
 
-const TableCustomFields = ({
-  data,
-  customFields,
-  showHealthcareProfessionnalColumn = false,
-  mergeData = null,
-  extractData = null,
-  keyPrefix = null,
-  hideStats = false,
-}) => {
+const TableCustomFields = ({ data, customFields, mergeData = null, extractData = null, keyPrefix = null, hideStats = false }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
@@ -57,11 +48,6 @@ const TableCustomFields = ({
   const onShowStatsChange = (fieldToUpdate) => (event) => {
     const showInStats = event.target.checked;
     setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, showInStats })));
-  };
-
-  const onOnlyHealthcareProfessionalChange = (fieldToUpdate) => (event) => {
-    const onlyHealthcareProfessional = event.target.checked;
-    setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, onlyHealthcareProfessional })));
   };
 
   const onSaveField = async (editedField) => {
@@ -164,23 +150,6 @@ const TableCustomFields = ({
             render: (f) => <CellWrapper>{!['enum', 'multi-choice'].includes(f.type) ? null : (f?.options || []).join(', ')}</CellWrapper>,
           },
           { title: 'Activé', dataKey: 'enabled', render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} /> },
-          !showHealthcareProfessionnalColumn
-            ? null
-            : {
-                title: (
-                  <div>
-                    Professionnel
-                    <br /> santé
-                    <QuestionMarkButton
-                      onClick={() => {
-                        alert('Le champ ne sera visible que par les comptes de type "professionnel de santé" dans un onglet dédié.');
-                      }}
-                    />
-                  </div>
-                ),
-                dataKey: 'onlyHealthcareProfessional',
-                render: (f) => <input type="checkbox" checked={f.onlyHealthcareProfessional} onChange={onOnlyHealthcareProfessionalChange(f)} />,
-              },
           hideStats
             ? null
             : {

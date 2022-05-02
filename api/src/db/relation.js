@@ -9,6 +9,9 @@ const RelPersonPlace = require("../models/relPersonPlace");
 const RelUserTeam = require("../models/relUserTeam");
 const Structure = require("../models/structure");
 const Action = require("../models/action");
+const Consultation = require("../models/consultation");
+const Treatment = require("../models/treatment");
+const MedicalFile = require("../models/medicalFile");
 const Comment = require("../models/comment");
 const Passage = require("../models/passage");
 const Territory = require("../models/territory");
@@ -63,3 +66,15 @@ Organisation.hasMany(Passage, organisationForeignKey);
 // Action
 Action.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(Action, organisationForeignKey);
+
+// Consultation
+Consultation.belongsTo(Organisation, organisationForeignKey);
+Organisation.hasMany(Consultation, organisationForeignKey);
+
+// Treatment
+Treatment.belongsTo(Organisation, organisationForeignKey);
+Organisation.hasMany(Treatment, organisationForeignKey);
+
+// MedicalFile
+MedicalFile.belongsTo(Organisation, organisationForeignKey);
+Organisation.hasMany(MedicalFile, organisationForeignKey);

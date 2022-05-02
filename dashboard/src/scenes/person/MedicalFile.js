@@ -1,10 +1,10 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
@@ -27,16 +27,22 @@ import SelectCustom from '../../components/SelectCustom';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import DateBloc from '../../components/DateBloc';
 import useSearchParamState from '../../services/useSearchParamState';
-import { mappedIdsToLabels } from '../../recoil/actions';
+import { mappedIdsToLabels, DONE, CANCEL, TODO } from '../../recoil/actions';
 import Documents from '../../components/Documents';
+import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../../recoil/consultations';
+import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
+import { medicalFileState, prepareMedicalFileForEncryption, customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
   const organisation = useRecoilValue(organisationState);
+  const [allConsultations, setAllConsultations] = useRecoilState(consultationsState);
+  const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
+  const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
 
   const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null, { resetOnValueChange: true });
   const [currentConsultation, setCurrentConsultation] = useState(
-    !currentConsultationId ? null : person.consultations?.find((c) => c._id === currentConsultationId)
+    !currentConsultationId ? null : allConsultations?.find((c) => c._id === currentConsultationId)
   );
   const [showAddConsultation, setShowAddConsultation] = useState(!!currentConsultation);
   const [isNewConsultation, setIsNewConsultation] = useState(false);
@@ -49,27 +55,10 @@ export function MedicalFile({ person }) {
 
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const user = useRecoilValue(userState);
   const users = useRecoilValue(usersState);
   const API = useApi();
-
-  async function updatePerson(properties = {}, message = 'Mise à jour effectuée !') {
-    const response = await API.put({
-      path: `/person/${person._id}`,
-      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ ...person, ...properties }),
-    });
-    if (!response.ok) {
-      toastr.success('Erreur lors de la mise à jour');
-      return;
-    }
-    setPersons((persons) =>
-      persons.map((p) => {
-        if (p._id === person._id) return response.decryptedData;
-        return p;
-      })
-    );
-    toastr.success(message);
-  }
 
   const loadConsultation = (consultation) => {
     setShowAddConsultation(true);
@@ -96,32 +85,50 @@ export function MedicalFile({ person }) {
 
   const consultations = useMemo(
     () =>
-      (person.consultations || [])
-        .filter((c) => !c.onlyVisibleByCreator || c.user === user._id)
+      (allConsultations || [])
+        .filter((c) => c.person === person._id)
         .filter((c) => !consultationStatuses.length || consultationStatuses.includes(c.status))
         .filter((c) => !consultationTypes.length || consultationTypes.includes(c.type)),
-    [consultationStatuses, consultationTypes, person.consultations, user._id]
+    [allConsultations, consultationStatuses, consultationTypes, person._id]
   );
+
+  const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
+
+  const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
+
+  useEffect(() => {
+    if (!medicalFile) {
+      (async () => {
+        const response = await API.post({
+          path: '/medical-file',
+          body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ person: person._id, documents: [], organisation: organisation._id }),
+        });
+        if (!response.ok) return;
+        setAllMedicalFiles((medicalFiles) => [...medicalFiles, response.decryptedData]);
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [medicalFile]);
 
   const allMedicalDocuments = useMemo(() => {
     const ordonnances =
-      person.treatments
+      treatments
         ?.map((treatment) => treatment.documents?.map((doc) => ({ ...doc, type: 'treatment', treatment })))
         .filter(Boolean)
         .flat() || [];
     const consultationsDocs =
-      person.consultations
+      consultations
         ?.map((consultation) => consultation.documents?.map((doc) => ({ ...doc, type: 'consultation', consultation })))
         .filter(Boolean)
         .flat() || [];
-    const otherDocs = person.documentsMedical || [];
-    return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.date) - new Date(a.date));
-  }, [person.consultations, person.documentsMedical, person.treatments]);
+    const otherDocs = medicalFile?.documents || [];
+    return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  }, [consultations, medicalFile?.documents, treatments]);
 
   return (
     <>
       <TitleWithButtonsContainer>
-        <Title>Dossier médical</Title>
+        <Title>Informations générales</Title>
         <ButtonsFloatingRight>
           <ButtonCustom
             icon={false}
@@ -139,7 +146,18 @@ export function MedicalFile({ person }) {
         enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
-          await updatePerson(body);
+          const response = await API.put({
+            path: `/person/${person._id}`,
+            body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ ...person, ...body }),
+          });
+          if (!response.ok) return;
+          setPersons((persons) =>
+            persons.map((p) => {
+              if (p._id === person._id) return response.decryptedData;
+              return p;
+            })
+          );
+          toastr.success('Mise à jour effectuée !');
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
           return (
@@ -189,18 +207,60 @@ export function MedicalFile({ person }) {
                   />
                 </Col>
               </Row>
-              <Row>
-                {customFieldsPersonsMedical
-                  .filter((f) => f.enabled)
-                  .map((field) => (
-                    <CustomFieldInput colWidth={4} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                  ))}
-              </Row>
-              <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+              <ButtonCustom
+                title={'Mettre à jour'}
+                disabled={JSON.stringify(person) === JSON.stringify(values)}
+                loading={isSubmitting}
+                onClick={handleSubmit}
+                width={200}
+              />
             </React.Fragment>
           );
         }}
       </Formik>
+      <TitleWithButtonsContainer>
+        <Title>Dossier médical</Title>
+      </TitleWithButtonsContainer>
+      {!!medicalFile && (
+        <Formik
+          enableReinitialize
+          initialValues={medicalFile}
+          onSubmit={async (body) => {
+            const response = await API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...body }),
+            });
+            if (!response.ok) return;
+            setAllMedicalFiles((medicalFiles) =>
+              medicalFiles.map((m) => {
+                if (m._id === medicalFile._id) return response.decryptedData;
+                return m;
+              })
+            );
+            toastr.success('Mise à jour effectuée !');
+          }}>
+          {({ values, handleChange, handleSubmit, isSubmitting }) => {
+            return (
+              <React.Fragment>
+                <Row>
+                  {customFieldsMedicalFile
+                    .filter((f) => f.enabled)
+                    .map((field) => (
+                      <CustomFieldInput colWidth={4} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                    ))}
+                </Row>
+                <ButtonCustom
+                  title={'Mettre à jour'}
+                  disabled={JSON.stringify(medicalFile) === JSON.stringify(values)}
+                  loading={isSubmitting}
+                  onClick={handleSubmit}
+                  width={200}
+                />
+              </React.Fragment>
+            );
+          }}
+        </Formik>
+      )}
       <TitleWithButtonsContainer>
         <Title style={{ marginTop: '2rem' }}>Traitement en cours</Title>
         <ButtonsFloatingRight>
@@ -219,6 +279,8 @@ export function MedicalFile({ person }) {
                 frequency: '',
                 indication: '',
                 user: user._id,
+                person: person._id,
+                organisation: organisation._id,
               });
             }}
             color="primary"
@@ -228,7 +290,7 @@ export function MedicalFile({ person }) {
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
       <div className="printonly">
-        {(person.treatments || []).map((c) => {
+        {(treatments || []).map((c) => {
           return (
             <div key={c._id} style={{ marginBottom: '2rem' }}>
               <h4>{c.name}</h4>
@@ -247,7 +309,7 @@ export function MedicalFile({ person }) {
                   }
 
                   return (
-                    <div>
+                    <div key={key}>
                       {field.label}&nbsp;:{' '}
                       <b>
                         <CustomFieldDisplay key={key} field={field} value={value} />
@@ -261,7 +323,7 @@ export function MedicalFile({ person }) {
       </div>
       <Table
         className="noprint"
-        data={person.treatments}
+        data={treatments}
         rowKey={'_id'}
         onRowClick={loadTreatment}
         columns={[
@@ -316,17 +378,21 @@ export function MedicalFile({ person }) {
           },
           {
             title: 'Action',
-            render: (e) => (
+            render: (treatment) => (
               <ButtonCustom
                 style={{ margin: 'auto' }}
                 icon={false}
                 disabled={false}
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
                   if (!window.confirm('Voulez-vous supprimer ce traitement ?')) return;
-                  await updatePerson({ treatments: (person.treatments || []).filter((c) => c._id !== e._id) }, 'Traitement supprimée !');
+                  const response = await API.delete({ path: `/treatment/${treatment._id}` });
+                  if (!response.ok) return;
+                  setAllTreatments((all) => all.filter((t) => t._id !== treatment._id));
+                  toastr.success('Traitement supprimé !');
                 }}
                 color="danger"
-                title={'Supprimer'}
+                title="Supprimer"
               />
             ),
           },
@@ -346,12 +412,15 @@ export function MedicalFile({ person }) {
               setCurrentConsultationId(_id);
               setCurrentConsultation({
                 _id,
-                date: new Date(),
+                dueAt: new Date(),
+                completedAt: null,
                 name: '',
                 type: '',
-                status: 'A FAIRE',
+                status: TODO,
                 user: user._id,
-                onlyVisibleByCreator: false,
+                person: person._id,
+                organisation: organisation._id,
+                onlyVisibleBy: [],
                 createdAt: new Date(),
               });
             }}
@@ -417,7 +486,7 @@ export function MedicalFile({ person }) {
                     field = { type: 'text', label: key };
                     if (key === 'type') field = { type: 'text', label: 'Type' };
                     if (key === 'status') field = { type: 'text', label: 'Statut' };
-                    if (key === 'date') field = { type: 'date-with-time', label: 'Date' };
+                    if (key === 'dueAt') field = { type: 'date-with-time', label: 'Date' };
                     if (key === 'user') {
                       field = { type: 'text', label: 'Créé par' };
                       value = users.find((u) => u._id === value)?.name;
@@ -445,15 +514,15 @@ export function MedicalFile({ person }) {
         columns={[
           {
             title: 'Date',
-            dataKey: 'date-day',
+            dataKey: 'dueAt-day',
             render: (e) => {
-              return <DateBloc date={e.date} />;
+              return <DateBloc date={e.dueAt} />;
             },
           },
           {
             title: 'Heure',
-            dataKey: 'date-hour',
-            render: (e) => formatTime(e.date),
+            dataKey: 'dueAt-hour',
+            render: (e) => formatTime(e.dueAt),
           },
           {
             title: 'Nom',
@@ -484,22 +553,21 @@ export function MedicalFile({ person }) {
           },
           {
             title: 'Action',
-            render: (e) => (
+            render: (consultation) => (
               <ButtonCustom
                 style={{ margin: 'auto' }}
                 icon={false}
                 disabled={false}
-                onClick={async () => {
+                onClick={async (e) => {
+                  e.stopPropagation();
                   if (!window.confirm('Voulez-vous supprimer cette consultation ?')) return;
-                  await updatePerson(
-                    {
-                      consultations: (person.consultations || []).filter((c) => c._id !== e._id).sort((a, b) => new Date(b.date) - new Date(a.date)),
-                    },
-                    'Consultation supprimée !'
-                  );
+                  const response = await API.delete({ path: `/consultation/${consultation._id}` });
+                  if (!response.ok) return;
+                  setAllConsultations((all) => all.filter((t) => t._id !== consultation._id));
+                  toastr.success('Consultation supprimée !');
                 }}
                 color="danger"
-                title={'Supprimer'}
+                title="Supprimer"
               />
             ),
           },
@@ -528,15 +596,12 @@ export function MedicalFile({ person }) {
         conditionForDelete={(doc) => !doc.type}
         onAdd={async (docResponse) => {
           const { data: file, encryptedEntityKey } = docResponse;
-          const personResponse = await API.put({
-            path: `/person/${person._id}`,
-            body: preparePersonForEncryption(
-              customFieldsPersonsMedical,
-              customFieldsPersonsSocial
-            )({
-              ...person,
-              documentsMedical: [
-                ...(person.documentsMedical || []),
+          const medicalFileResponse = await API.put({
+            path: `/medical-file/${medicalFile._id}`,
+            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+              ...medicalFile,
+              documents: [
+                ...(medicalFile.documents || []),
                 {
                   _id: file.filename,
                   name: file.originalname,
@@ -548,33 +613,30 @@ export function MedicalFile({ person }) {
               ],
             }),
           });
-          if (personResponse.ok) {
-            const newPerson = personResponse.decryptedData;
-            setPersons((persons) =>
-              persons.map((p) => {
-                if (p._id === person._id) return newPerson;
-                return p;
+          if (medicalFileResponse.ok) {
+            const newMedicalFile = medicalFileResponse.decryptedData;
+            setAllMedicalFiles((allMedicalFiles) =>
+              allMedicalFiles.map((m) => {
+                if (m._id === medicalFile._id) return newMedicalFile;
+                return m;
               })
             );
           }
         }}
         onDelete={async (document) => {
-          const personResponse = await API.put({
-            path: `/person/${person._id}`,
-            body: preparePersonForEncryption(
-              customFieldsPersonsMedical,
-              customFieldsPersonsSocial
-            )({
-              ...person,
-              documentsMedical: person.documentsMedical.filter((d) => d._id !== document._id),
+          const medicalFileResponse = await API.put({
+            path: `/medical-file/${medicalFile._id}`,
+            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+              ...medicalFile,
+              documents: medicalFile.documents.filter((d) => d._id !== document._id),
             }),
           });
-          if (personResponse.ok) {
-            const newPerson = personResponse.decryptedData;
-            setPersons((persons) =>
-              persons.map((p) => {
-                if (p._id === person._id) return newPerson;
-                return p;
+          if (medicalFileResponse.ok) {
+            const newMedicalFile = medicalFileResponse.decryptedData;
+            setAllMedicalFiles((allMedicalFiles) =>
+              allMedicalFiles.map((m) => {
+                if (m._id === medicalFile._id) return newMedicalFile;
+                return m;
               })
             );
           }
@@ -590,22 +652,39 @@ export function MedicalFile({ person }) {
             if (!values._id) errors._id = "L'identifiant est obligatoire";
             if (!values.name) errors.name = 'Le nom est obligatoire';
             if (!values.status) errors.status = 'Le statut est obligatoire';
-            if (!values.date) errors.date = 'La date est obligatoire';
+            if (!values.dueAt) errors.dueAt = 'La date est obligatoire';
             if (!values.type) errors.type = 'Le type est obligatoire';
             return errors;
           }}
           onSubmit={async (values) => {
-            let consultations = person.consultations || [];
-            if (consultations.find((t) => t._id === values._id)) {
-              consultations = consultations.map((t) => {
-                if (t._id === values._id) return values;
-                return t;
-              });
+            if ([DONE, CANCEL].includes(values.status)) {
+              if (!currentConsultation.completedAt) values.completedAt = new Date();
             } else {
-              consultations = [...consultations, values];
+              values.completedAt = null;
             }
-            consultations = consultations.sort((a, b) => new Date(b.date) - new Date(a.date));
-            await updatePerson({ consultations }, 'Consultation mise à jour !');
+            const consultationResponse = isNewConsultation
+              ? await API.post({
+                  path: '/consultation',
+                  body: prepareConsultationForEncryption(organisation.consultations)(values),
+                })
+              : await API.put({
+                  path: `/consultation/${currentConsultation._id}`,
+                  body: prepareConsultationForEncryption(organisation.consultations)(values),
+                });
+            if (!consultationResponse.ok) return;
+            const consult = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
+            if (isNewConsultation) {
+              setAllConsultations((all) => [...all, consult].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt)));
+            } else {
+              setAllConsultations((all) =>
+                all
+                  .map((c) => {
+                    if (c._id === currentConsultation._id) return consult;
+                    return c;
+                  })
+                  .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
+              );
+            }
             resetCurrentConsultation();
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
@@ -673,14 +752,14 @@ export function MedicalFile({ person }) {
                           locale="fr"
                           className="form-control"
                           id="create-action-dueat"
-                          selected={dateForDatePicker(values.date)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
+                          selected={dateForDatePicker(values.dueAt)}
+                          onChange={(dueAt) => handleChange({ target: { value: dueAt, name: 'dueAt' } })}
                           timeInputLabel="Heure :"
                           dateFormat={'dd/MM/yyyy HH:mm'}
                           showTimeInput
                         />
                       </div>
-                      {touched.date && errors.date && <Error>{errors.date}</Error>}
+                      {touched.dueAt && errors.dueAt && <Error>{errors.dueAt}</Error>}
                     </FormGroup>
                   </Col>
                   <Col md={12}>
@@ -691,8 +770,10 @@ export function MedicalFile({ person }) {
                           id="create-action-onlyme"
                           style={{ marginRight: '0.5rem' }}
                           name="onlyVisibleByCreator"
-                          checked={values.onlyVisibleByCreator}
-                          onChange={handleChange}
+                          checked={values.onlyVisibleBy?.includes(user._id)}
+                          onChange={() =>
+                            handleChange({ target: { value: values.onlyVisibleBy?.includes(user._id) ? [] : [user._id], name: 'onlyVisibleBy' } })
+                          }
                         />
                         Seulement visible par moi
                       </Label>
@@ -761,16 +842,30 @@ export function MedicalFile({ person }) {
             return errors;
           }}
           onSubmit={async (values) => {
-            let treatments = person.treatments || [];
-            if (treatments.find((t) => t._id === values._id)) {
-              treatments = treatments.map((t) => {
-                if (t._id === values._id) return values;
-                return t;
-              });
+            const treatmentResponse = isNewTreatment
+              ? await API.post({
+                  path: '/treatment',
+                  body: prepareTreatmentForEncryption(values),
+                })
+              : await API.put({
+                  path: `/treatment/${currentTreatment._id}`,
+                  body: prepareTreatmentForEncryption(values),
+                });
+            if (!treatmentResponse.ok) return;
+            if (isNewTreatment) {
+              setAllTreatments((all) => [...all, treatmentResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
+              toastr.success('Traitement créé !');
             } else {
-              treatments = [...treatments, values];
+              setAllTreatments((all) =>
+                all
+                  .map((c) => {
+                    if (c._id === currentTreatment._id) return treatmentResponse.decryptedData;
+                    return c;
+                  })
+                  .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
+              );
+              toastr.success('Traitement mis à jour !');
             }
-            await updatePerson({ treatments }, 'Traitement mise à jour !');
             resetCurrentTreatment();
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (
