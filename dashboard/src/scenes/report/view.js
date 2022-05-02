@@ -212,7 +212,7 @@ const View = () => {
               if (!organisation.receptionEnabled && index === 0) return null;
               return (
                 <React.Fragment key={index + tabCaption}>
-                  <DrawerButton
+                  <DrawerLink
                     className={activeTab === index ? 'active' : ''}
                     onClick={() => {
                       const searchParams = new URLSearchParams(location.search);
@@ -221,7 +221,7 @@ const View = () => {
                       setActiveTab(index);
                     }}>
                     {tabCaption}
-                  </DrawerButton>
+                  </DrawerLink>
                   {spaceAfterTab.includes(index) && <hr />}
                 </React.Fragment>
               );
@@ -1073,8 +1073,9 @@ const Drawer = styled.nav`
   }
 `;
 
-const DrawerButton = styled.button`
+const DrawerLink = styled.a`
   text-decoration: none;
+  cursor: pointer;
   padding: 0px;
   display: block;
   border-radius: 8px;
