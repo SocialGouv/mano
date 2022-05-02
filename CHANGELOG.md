@@ -1,3 +1,10 @@
+# [1.102.0](https://github.com/SocialGouv/mano/compare/v1.101.0...v1.102.0) (2022-05-02)
+
+
+### Features
+
+* **dashboard:** add files to treatments and consultations + random m… ([#661](https://github.com/SocialGouv/mano/issues/661)) ([d7c1f93](https://github.com/SocialGouv/mano/commit/d7c1f932370e379dbd14dda6596e855b2443aacc))
+
 # [1.101.0](https://github.com/SocialGouv/mano/compare/v1.100.0...v1.101.0) (2022-05-02)
 
 
