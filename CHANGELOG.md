@@ -1,3 +1,10 @@
+## [1.99.3](https://github.com/SocialGouv/mano/compare/v1.99.2...v1.99.3) (2022-05-02)
+
+
+### Bug Fixes
+
+* **dashboard:** remove useless numeroSecuriteSociale field ([24afc76](https://github.com/SocialGouv/mano/commit/24afc76c59a083dd2d53093359fa61b1bf3f2194))
+
 ## [1.99.2](https://github.com/SocialGouv/mano/compare/v1.99.1...v1.99.2) (2022-04-29)
 
 
