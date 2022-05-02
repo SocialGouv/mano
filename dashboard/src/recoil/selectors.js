@@ -1,4 +1,4 @@
-import { currentTeamState } from './auth';
+import { currentTeamState, userState } from './auth';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
@@ -30,10 +30,13 @@ export const consultationsSelector = selector({
   key: 'consultationsSelector',
   get: ({ get }) => {
     const persons = get(personsState);
+    const user = get(userState);
     const consultations = [];
+    if (!user.healthcareProfessional) return [];
     for (const person of persons) {
       if (person.consultations?.length) {
         for (const consultation of person.consultations) {
+          if (consultation.onlyVisibleByCreator && consultation.user !== user._id) continue;
           consultations.push({ ...consultation, person: person._id });
         }
       }

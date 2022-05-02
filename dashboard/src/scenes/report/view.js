@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane, FormGroup, Label } from 'reactstrap';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Col, Row, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
@@ -39,7 +39,7 @@ import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { currentTeamReportsSelector } from '../../recoil/selectors';
+import { consultationsSelector, currentTeamReportsSelector } from '../../recoil/selectors';
 import Incrementor from '../../components/Incrementor';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
@@ -47,8 +47,12 @@ import { passagesState } from '../../recoil/passages';
 import Passage from '../../components/Passage';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
+import { theme } from '../../config';
+import ConsultationButton from '../../components/ConsultationButton';
 
 const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
+const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
+const spaceAfterTab = [0, 3, 4, 5, 6];
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -69,7 +73,7 @@ const View = () => {
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (!!organisation.receptionEnabled ? 0 : 1)));
-  const [tabsContents, setTabsContents] = useState(tabs);
+  const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? [...tabs, ...healthcareTabs] : tabs);
   const API = useApi();
 
   const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
@@ -118,6 +122,11 @@ const View = () => {
     };
   });
 
+  const scrollContainer = useRef(null);
+  useEffect(() => {
+    scrollContainer.current.scrollTo({ top: 0 });
+  }, [activeTab]);
+
   if (!report) return <Loading />;
 
   const renderPrintOnly = () => {
@@ -137,12 +146,23 @@ const View = () => {
         <CommentCreatedAt date={report.date} />
         <PassagesCreatedAt date={report.date} report={report} />
         <TerritoryObservationsCreatedAt date={report.date} />
+        {!!user.healthcareProfessional && <Consultations date={report.date} />}
+        {!!user.healthcareProfessional && <ConsultationsCreatedAt date={report.date} />}
+        {!!user.healthcareProfessional && <Consultations date={report.date} status={CANCEL} />}
       </div>
     );
   };
 
   const renderScreenOnly = () => (
-    <div className="noprint">
+    <div
+      className="noprint"
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        margin: '0 -4rem -3rem',
+        height: 'calc(100% + 3rem)',
+        overflow: 'hidden',
+      }}>
       <SmallerHeaderWithBackButton
         style={{ width: '100%', padding: 0 }}
         titleStyle={{ width: '100%' }}
@@ -176,7 +196,7 @@ const View = () => {
                 <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onFirstLaterReport} />
               </div>
             </div>
-            <div>
+            <div style={{ padding: '0 4rem' }}>
               {`Compte rendu de l'équipe ${currentTeam?.name || ''}`}
               <br />
               {getPeriodTitle(report.date, currentTeam?.nightSession)}
@@ -184,53 +204,76 @@ const View = () => {
           </div>
         }
       />
-      <div className="noprint">
-        <DescriptionAndCollaborations report={report} key={report._id} />
-        <Nav tabs fill style={{ marginBottom: 20 }}>
-          {tabsContents.map((tabCaption, index) => {
-            if (!organisation.receptionEnabled && index === 0) return null;
-            return (
-              <NavItem key={index} style={{ cursor: 'pointer' }}>
-                <NavLink
-                  key={index}
-                  className={`${activeTab === index && 'active'}`}
-                  onClick={() => {
-                    const searchParams = new URLSearchParams(location.search);
-                    searchParams.set('tab', index);
-                    history.replace({ pathname: location.pathname, search: searchParams.toString() });
-                    setActiveTab(index);
-                  }}>
-                  {tabCaption}
-                </NavLink>
-              </NavItem>
-            );
-          })}
-        </Nav>
-        <TabContent activeTab={activeTab}>
-          {!!organisation.receptionEnabled && (
-            <TabPane tabId={0}>
-              <Reception report={report} />
-            </TabPane>
-          )}
-          <TabPane tabId={1}>
-            <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(1, `Actions complétées (${total})`)} />
-          </TabPane>
-          <TabPane tabId={2}>
-            <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(2, `Actions créées (${total})`)} />
-          </TabPane>
-          <TabPane tabId={3}>
-            <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(3, `Actions annulées (${total})`)} />
-          </TabPane>
-          <TabPane tabId={4}>
-            <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
-          </TabPane>
-          <TabPane tabId={5}>
-            <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} />
-          </TabPane>
-          <TabPane tabId={6}>
-            <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
-          </TabPane>
-        </TabContent>
+      <DescriptionAndCollaborations report={report} key={report._id} />
+      <div className="noprint" style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
+        <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
+          <Drawer title="Navigation dans les réglages de l'organisation">
+            {tabsContents.map((tabCaption, index) => {
+              if (!organisation.receptionEnabled && index === 0) return null;
+              return (
+                <React.Fragment key={index + tabCaption}>
+                  <DrawerLink
+                    className={activeTab === index ? 'active' : ''}
+                    onClick={() => {
+                      const searchParams = new URLSearchParams(location.search);
+                      searchParams.set('tab', index);
+                      history.replace({ pathname: location.pathname, search: searchParams.toString() });
+                      setActiveTab(index);
+                    }}>
+                    {tabCaption}
+                  </DrawerLink>
+                  {spaceAfterTab.includes(index) && <hr />}
+                </React.Fragment>
+              );
+            })}
+          </Drawer>
+          <div ref={scrollContainer} style={{ display: 'flex', overflow: 'auto', flex: 1 }}>
+            <Box>
+              <div style={activeTab !== 0 ? { display: 'none' } : { overflow: 'auto' }}>
+                <Reception report={report} />
+              </div>
+              <div style={activeTab !== 1 ? { display: 'none' } : { overflow: 'auto' }}>
+                <ActionCompletedAt
+                  date={report.date}
+                  status={DONE}
+                  onUpdateResults={(total) => updateTabContent(1, `Actions complétées (${total})`)}
+                />
+              </div>
+              <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto' }}>
+                <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(2, `Actions créées (${total})`)} />
+              </div>
+              <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto' }}>
+                <ActionCompletedAt
+                  date={report.date}
+                  status={CANCEL}
+                  onUpdateResults={(total) => updateTabContent(3, `Actions annulées (${total})`)}
+                />
+              </div>
+              <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto' }}>
+                <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
+              </div>
+              <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto' }}>
+                <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} />
+              </div>
+              <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto' }}>
+                <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
+              </div>
+              <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto' }}>
+                <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(7, `Consultations faites (${total})`)} status={DONE} />
+              </div>
+              <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto' }}>
+                <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Consultations créées (${total})`)} />
+              </div>
+              <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto' }}>
+                <Consultations
+                  date={report.date}
+                  onUpdateResults={(total) => updateTabContent(9, `Consultations annulées (${total})`)}
+                  status={CANCEL}
+                />
+              </div>
+            </Box>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -421,6 +464,145 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
               },
             },
             { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
+            {
+              title: 'Personne suivie',
+              dataKey: 'person',
+              render: (action) => <PersonName item={action} />,
+            },
+            { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+          ]}
+        />
+      </StyledBox>
+      <hr />
+    </>
+  );
+};
+
+const Consultations = ({ date, onUpdateResults = () => null, status }) => {
+  const history = useHistory();
+
+  const currentTeam = useRecoilValue(currentTeamState);
+  const consultations = useRecoilValue(consultationsSelector);
+
+  const data = useMemo(
+    () =>
+      consultations
+        ?.filter((c) => c.status === status)
+        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date, date, currentTeam?.nightSession ? 12 : 0))
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
+    [consultations, currentTeam?.nightSession, date, status]
+  );
+
+  useEffect(() => {
+    onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
+
+  if (!data) return <div />;
+  const moreThanOne = data.length > 1;
+
+  return (
+    <>
+      <StyledBox>
+        <Table
+          className="Table"
+          title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
+            moreThanOne ? 's' : ''
+          } le ${formatDateWithFullMonth(date)}`}
+          noData={`Pas de consultation ${status === DONE ? 'faite' : 'annulée'} ce jour`}
+          data={data}
+          onRowClick={(actionOrConsultation) =>
+            history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`)
+          }
+          rowKey="_id"
+          columns={[
+            {
+              title: '',
+              dataKey: 'isConsultation',
+              small: true,
+              render: () => <ConsultationButton />,
+            },
+            {
+              title: 'Heure',
+              dataKey: 'date',
+              small: true,
+              render: (c) => formatTime(c.date),
+            },
+            {
+              title: 'Nom',
+              dataKey: 'name',
+              render: (consultation) => <ActionName action={consultation} />,
+            },
+            {
+              title: 'Personne suivie',
+              dataKey: 'person',
+              render: (consultation) => <PersonName item={consultation} />,
+            },
+            { title: 'Statut', dataKey: 'status', render: (consultation) => <ActionStatus status={consultation.status} /> },
+          ]}
+        />
+      </StyledBox>
+      <hr />
+    </>
+  );
+};
+
+const ConsultationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
+  const history = useHistory();
+
+  const currentTeam = useRecoilValue(currentTeamState);
+  const consultations = useRecoilValue(consultationsSelector);
+
+  const data = useMemo(
+    () =>
+      consultations
+        ?.filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
+    [consultations, currentTeam?.nightSession, date]
+  );
+
+  useEffect(() => {
+    onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
+
+  if (!data) return <div />;
+  const moreThanOne = data.length > 1;
+
+  return (
+    <>
+      <StyledBox>
+        <Table
+          className="Table"
+          title={`Consultation${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
+          noData="Pas de consultation créée ce jour"
+          data={data}
+          onRowClick={(actionOrConsultation) =>
+            history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`)
+          }
+          rowKey="_id"
+          columns={[
+            {
+              title: '',
+              dataKey: 'isConsultation',
+              small: true,
+              render: () => <ConsultationButton />,
+            },
+            { title: 'À faire le ', dataKey: 'date', render: (d) => <DateBloc date={d.date} /> },
+            {
+              title: 'Heure',
+              dataKey: '_id',
+              small: true,
+              render: (action) => {
+                if (!action.dueAt || !action.withTime) return null;
+                return formatTime(action.dueAt);
+              },
+            },
+            {
+              title: 'Nom',
+              dataKey: 'name',
+              render: (action) => <ActionName action={action} />,
+            },
             {
               title: 'Personne suivie',
               dataKey: 'person',
@@ -860,14 +1042,53 @@ const StyledBox = styled(Box)`
 
 const DescriptionBox = styled(StyledBox)`
   @media screen {
-    padding: 0;
-    margin-top: 10px;
-    margin-bottom: 40px;
+    padding: 10px 4rem 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0px;
   }
   @media print {
     ${(props) => props.report?.description?.length < 1 && props.report?.collaborations?.length < 1 && 'display: none !important;'}
     margin-bottom: 40px;
     page-break-inside: avoid;
+  }
+`;
+
+const Drawer = styled.nav`
+  padding-top: 20px;
+  padding-left: 10px;
+  width: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  flex-shrink: 0;
+  height: 100%;
+  background-color: ${theme.main}22;
+  overflow: auto;
+  button {
+    text-align: left;
+  }
+  hr {
+    margin-bottom: 0rem;
+    margin-top: 1rem;
+  }
+`;
+
+const DrawerLink = styled.a`
+  text-decoration: none;
+  cursor: pointer;
+  padding: 0px;
+  display: block;
+  border-radius: 8px;
+  color: #565a5b;
+  font-style: normal;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 24px;
+  margin: 2px 0;
+  border: none;
+  background: none;
+  &.active {
+    color: ${theme.main};
   }
 `;
 
