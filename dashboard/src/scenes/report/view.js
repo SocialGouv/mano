@@ -39,7 +39,7 @@ import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { consultationsSelector, currentTeamReportsSelector } from '../../recoil/selectors';
+import { currentTeamReportsSelector } from '../../recoil/selectors';
 import Incrementor from '../../components/Incrementor';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';

@@ -1,4 +1,4 @@
-import { currentTeamState, userState } from './auth';
+import { currentTeamState } from './auth';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';

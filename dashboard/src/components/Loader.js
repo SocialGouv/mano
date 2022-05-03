@@ -271,7 +271,7 @@ const Loader = () => {
         data: consultations,
         isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
         setBatchData: (newConsultations) =>
           setConsultations((oldConsultations) =>
             initialLoad
@@ -296,7 +296,7 @@ const Loader = () => {
         data: treatments,
         isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
         setBatchData: (newTreatments) =>
           setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
         API,
@@ -314,7 +314,7 @@ const Loader = () => {
         data: medicalFiles,
         isInitialization: initialLoad,
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
         setBatchData: (newMedicalFiles) =>
           setMedicalFiles((oldMedicalFiles) =>
             initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)

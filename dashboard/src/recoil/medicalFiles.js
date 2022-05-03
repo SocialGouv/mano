@@ -1,4 +1,3 @@
-import { manoCacheStorage } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
 import { organisationState } from './auth';
 
@@ -6,7 +5,6 @@ const collectionName = 'medical-file';
 export const medicalFileState = atom({
   key: collectionName,
   default: [],
-  effects: [({ onSet }) => onSet(async (newValue) => manoCacheStorage?.setItem(collectionName, newValue))],
 });
 
 export const customFieldsMedicalFileSelector = selector({
