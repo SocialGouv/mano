@@ -80,7 +80,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
         },
         {
           title: 'Heure',
-          dataKey: '_id',
+          dataKey: 'dueAt',
           small: true,
           render: (action) => {
             if (!action.dueAt || !action.withTime) return null;

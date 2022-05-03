@@ -283,7 +283,7 @@ const Loader = () => {
           ),
         API,
       });
-      if (refreshedConsultations) setConsultations(refreshedConsultations);
+      if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
     }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
     /*
