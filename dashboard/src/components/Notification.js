@@ -7,6 +7,7 @@ import { actionsState, TODO } from "../recoil/actions";
 import { currentTeamState } from "../recoil/auth";
 import { personsState } from "../recoil/persons";
 import { formatTime } from "../services/date";
+import ButtonCustom from "./ButtonCustom";
 import DateBloc from "./DateBloc";
 import Table from "./table";
 
@@ -66,6 +67,7 @@ export default function Notification() {
               },
             ]}
           />
+          <ButtonCustom style={{ margin: "1rem auto" }} title="OK, merci" onClick={() => setShowModal(false)} />
         </ModalBody>
       </StyledModal>
     </>
