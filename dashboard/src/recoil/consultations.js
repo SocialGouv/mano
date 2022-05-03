@@ -60,9 +60,9 @@ export const whitelistAllowedData = (consultation, user) => {
 
 export const disableConsultationRow = (actionOrConsultation, user) => {
   if (!actionOrConsultation.isConsultation) return false;
-  if (!user.healthcareProfessional) return false;
+  if (!user.healthcareProfessional) return true;
   if (!actionOrConsultation.onlyVisibleBy?.length) return false;
-  return actionOrConsultation.onlyVisibleBy.includes(user._id);
+  return !actionOrConsultation.onlyVisibleBy.includes(user._id);
 };
 
 export const consultationTypes = ['Psychologique', 'Infirmier', 'Médicale'];

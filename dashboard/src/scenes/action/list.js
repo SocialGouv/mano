@@ -59,10 +59,8 @@ const List = () => {
   );
   // List of consultations filtered by current team and selected statuses.
   const consultationsByStatusAndAuthorization = useMemo(() => {
-    if (!user.healthcareProfessional) return [];
-
     return consultations.filter((consult) => !statuses.length || statuses.includes(consult.status));
-  }, [consultations, statuses, user]);
+  }, [consultations, statuses]);
 
   // The next memos are used to filter by search (empty array when search is empty).
   const actionsIds = useMemo(() => (search?.length ? actionsByTeamAndStatus.map((action) => action._id) : []), [actionsByTeamAndStatus, search]);

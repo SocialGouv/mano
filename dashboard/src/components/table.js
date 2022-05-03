@@ -90,15 +90,13 @@ const Table = ({
           .map((item) => {
             return (
               <tr
-                onClick={() => (onRowClick ? onRowClick(item) : null)}
+                onClick={() => (!rowDisabled(item) && onRowClick ? onRowClick(item) : null)}
                 key={item[rowKey] || item._id}
                 data-key={item[rowKey] || item._id}
-                style={
-                  item.style || {
-                    cursor: rowDisabled(item) ? 'not-allowed' : 'pointer',
-                    pointerEvents: rowDisabled(item) ? 'not-allowed' : 'pointer',
-                  }
-                }>
+                style={{
+                  ...(item.style || {}),
+                  cursor: rowDisabled(item) ? 'not-allowed' : 'pointer',
+                }}>
                 {columns.map((column) => {
                   return (
                     <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
