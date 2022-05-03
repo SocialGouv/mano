@@ -153,10 +153,10 @@ const View = () => {
                       <>
                         {organisation.encryptionEnabled ? (
                           <>
-                            <SubTitle>
-                              Réglage des champs personnalisés du Dossier Médical de personnes suivies (disponible pour les professionnels de santé
-                              seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie)
-                            </SubTitle>
+                            <SubTitle>Réglage des champs personnalisés du Dossier Médical de personnes suivies</SubTitle>
+                            <p>
+                              Disponible pour les professionnels de santé seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
+                            </p>
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsMedicalFile"
