@@ -19,7 +19,7 @@ import { MANO_DOWNLOAD_URL } from '../../config';
 import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import { clearCache, useStorage } from '../../services/dataManagement';
-import { refreshTriggerState } from '../../components/Loader';
+import { lastRefreshState, refreshTriggerState } from '../../components/Loader';
 
 const Login = ({ navigation }) => {
   const [email, setEmail] = useState('');
@@ -31,6 +31,7 @@ const Login = ({ navigation }) => {
   const [showEncryptionKeyInput, setShowEncryptionKeyInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const setUser = useSetRecoilState(userState);
+  const setLastRefresh = useSetRecoilState(lastRefreshState);
   const setOrganisation = useSetRecoilState(organisationState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
@@ -126,6 +127,7 @@ const Login = ({ navigation }) => {
       // We need to reset cache if organisation has changed.
       if (response.user.organisation._id !== storageOrganisationId) {
         clearCache();
+        setLastRefresh(0);
       }
       setStorageOrganisationId(response.user.organisation._id);
       setUsers(users);

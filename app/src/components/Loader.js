@@ -8,7 +8,7 @@ import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
-import { getData, useStorage } from '../services/dataManagement';
+import { getData, MMKV } from '../services/dataManagement';
 import { organisationState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
@@ -47,6 +47,16 @@ export const refreshTriggerState = atom({
   },
 });
 
+export const lastRefreshState = atom({
+  key: 'lastRefreshState',
+  default: MMKV.getIntAsync('last-refresh--cache-version-2022-04-26') || 0,
+  effects: [
+    ({ onSet }) => {
+      onSet((newValue) => MMKV.setInt('mano-last-refresh-2022-04-26', newValue));
+    },
+  ],
+});
+
 const mergeItems = (oldItems, newItems) => {
   const newItemsIds = newItems.map((i) => i._id);
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
@@ -55,7 +65,7 @@ const mergeItems = (oldItems, newItems) => {
 
 const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  const [lastRefresh, setLastRefresh] = useStorage('last-refresh--cache-version-2022-04-26', 0);
+  const [lastRefresh, setLastRefresh] = useRecoilState(lastRefreshState);
   const [loading, setLoading] = useRecoilState(loadingState);
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
