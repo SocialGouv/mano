@@ -84,7 +84,7 @@ export async function getData({
   });
 
   if (!response.ok) console.log({ message: `Error getting ${collectionName} data`, response });
-  if (!response.decryptedData.length && !isInitialization) return null;
+  if (!response.decryptedData?.length && !isInitialization) return null;
 
   data = mergeNewUpdatedData(response.decryptedData, data);
   await manoCacheStorage?.setItem(collectionName, data);

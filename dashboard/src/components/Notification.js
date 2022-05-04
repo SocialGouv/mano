@@ -19,8 +19,8 @@ export default function Notification() {
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
   const actionsFiltered = useMemo(
-    () => actions.filter((action) => action.team === currentTeam._id && action.status === TODO && action.urgent),
-    [actions, currentTeam._id]
+    () => actions.filter((action) => action.team === currentTeam?._id && action.status === TODO && action.urgent),
+    [actions, currentTeam?._id]
   );
   if (!actionsFiltered.length) return null;
   return (

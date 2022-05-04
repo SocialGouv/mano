@@ -108,9 +108,9 @@ const View = () => {
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
 
   useEffect(() => {
-    if (!report || report.team !== currentTeam._id) history.goBack();
+    if (!!currentTeam?._id && (!report || report.team !== currentTeam._id)) history.goBack();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTeam._id]);
+  }, [currentTeam?._id]);
 
   useEffect(() => {
     // for print use only
