@@ -137,7 +137,7 @@ const Reception = () => {
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
     if (!params) return [];
-    return params.map((id) => persons.find((p) => p._id === id));
+    return params.map((id) => persons.find((p) => p._id === id)).filter(Boolean);
   });
 
   const createReport = async () => {
@@ -156,15 +156,16 @@ const Reception = () => {
   const services = todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {};
 
   const onSelectPerson = (persons) => {
+    persons = persons?.filter(Boolean) || [];
     const searchParams = new URLSearchParams(location.search);
     searchParams.set(
       'persons',
-      (persons || [])
+      persons
         .map((p) => p?._id)
         .filter(Boolean)
         .join(',')
     );
-    setSelectedPersons(persons || []);
+    setSelectedPersons(persons);
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
