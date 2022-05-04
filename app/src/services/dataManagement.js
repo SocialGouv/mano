@@ -44,7 +44,7 @@ export async function getData({ collectionName, data = [], isInitialization = fa
   if (!response.ok) throw { message: `Error getting ${collectionName} data`, response };
 
   // avoid sending data if no new data, to avoid big useless `map` calculations in selectors
-  if (!response.decryptedData.length && !isInitialization) return null;
+  if (!response.decryptedData?.length && !isInitialization) return null;
 
   data = mergeNewUpdatedData(response.decryptedData, data);
   await MMKV.setMapAsync(collectionName, data);
