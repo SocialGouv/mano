@@ -1,15 +1,16 @@
-import { useMemo, useState } from "react";
-import { useHistory } from "react-router-dom";
-import { Modal, ModalBody, ModalHeader } from "reactstrap";
-import { useRecoilValue } from "recoil";
-import styled from "styled-components";
-import { actionsState, TODO } from "../recoil/actions";
-import { currentTeamState } from "../recoil/auth";
-import { personsState } from "../recoil/persons";
-import { formatTime } from "../services/date";
-import ButtonCustom from "./ButtonCustom";
-import DateBloc from "./DateBloc";
-import Table from "./table";
+import { useMemo, useState } from 'react';
+import { useHistory } from 'react-router-dom';
+import { Modal, ModalBody, ModalHeader } from 'reactstrap';
+import { useRecoilValue } from 'recoil';
+import styled from 'styled-components';
+import { theme } from '../config';
+import { actionsState, TODO } from '../recoil/actions';
+import { currentTeamState } from '../recoil/auth';
+import { personsState } from '../recoil/persons';
+import { formatTime } from '../services/date';
+import ButtonCustom from './ButtonCustom';
+import DateBloc from './DateBloc';
+import Table from './table';
 
 export default function Notification() {
   const history = useHistory();
@@ -18,23 +19,32 @@ export default function Notification() {
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
   const actionsFiltered = useMemo(
-    () =>
-      actions.filter(
-        (action) =>
-          action.team === currentTeam._id &&
-          action.status === TODO &&
-          action.urgent
-      ),
+    () => actions.filter((action) => action.team === currentTeam._id && action.status === TODO && action.urgent),
     [actions, currentTeam._id]
   );
   if (!actionsFiltered.length) return null;
   return (
     <>
-      <div style={{ alignSelf: "center", display: "flex", cursor: "pointer" }} onClick={() => setShowModal(true)}>
-        <div style={{ fontSize: "1.5rem" }}>🔔</div> <div style={{ marginTop: "10px", marginLeft: "-10px" }}><span className="badge badge-pill badge-danger">{actionsFiltered.length}</span></div>
+      <div style={{ alignSelf: 'center', display: 'flex', cursor: 'pointer' }} onClick={() => setShowModal(true)}>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          style={{ width: '1.5rem', height: '1.5rem' }}
+          stroke={theme.main}
+          strokeWidth={2}>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
+          />
+        </svg>
+        <div style={{ marginTop: '-0.75rem', marginLeft: '-0.75rem' }}>
+          <span className="badge badge-pill badge-danger">{actionsFiltered.length}</span>
+        </div>
       </div>
       <StyledModal isOpen={showModal} toggle={() => setShowModal(false)} size="lg">
-        <ModalHeader toggle={() => setShowModal(false)}>🔔 &nbsp;Actions urgentes et vigilance</ModalHeader>
+        <ModalHeader toggle={() => setShowModal(false)}>Actions urgentes et vigilance</ModalHeader>
         <ModalBody>
           <Table
             data={actionsFiltered}
@@ -67,11 +77,11 @@ export default function Notification() {
               },
             ]}
           />
-          <ButtonCustom style={{ margin: "1rem auto" }} title="OK, merci" onClick={() => setShowModal(false)} />
+          <ButtonCustom style={{ margin: '1rem auto' }} title="OK, merci" onClick={() => setShowModal(false)} />
         </ModalBody>
       </StyledModal>
     </>
-  )
+  );
 }
 const StyledModal = styled(Modal)`
   @media (min-width: 576px) {
