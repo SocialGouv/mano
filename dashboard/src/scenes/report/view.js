@@ -51,7 +51,7 @@ import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 
-const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
+const tabs = ['Résumé', 'Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
 const spaceAfterTab = [0, 1, 4, 5, 6, 7];
 
