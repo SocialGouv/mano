@@ -50,9 +50,9 @@ import useTitle from '../../services/useTitle';
 import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
 
-const tabs = ['Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
+const tabs = ['Résumé', 'Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
-const spaceAfterTab = [0, 3, 4, 5, 6];
+const spaceAfterTab = [0, 1, 4, 5, 6, 7];
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -72,7 +72,7 @@ const View = () => {
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (!!organisation.receptionEnabled ? 0 : 1)));
+  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || 0));
   const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? [...tabs, ...healthcareTabs] : tabs);
   const API = useApi();
 
@@ -153,6 +153,8 @@ const View = () => {
     );
   };
 
+  console.log({ tabsContents });
+
   const renderScreenOnly = () => (
     <div
       className="noprint"
@@ -204,12 +206,11 @@ const View = () => {
           </div>
         }
       />
-      <DescriptionAndCollaborations report={report} key={report._id} />
-      <div className="noprint" style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
+      <div className="noprint" style={{ display: 'flex', overflow: 'hidden', flex: 1, marginTop: '1rem', borderTop: '1px solid #eee' }}>
         <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
           <Drawer title="Navigation dans les réglages de l'organisation">
             {tabsContents.map((tabCaption, index) => {
-              if (!organisation.receptionEnabled && index === 0) return null;
+              if (!organisation.receptionEnabled && index === 1) return null;
               return (
                 <React.Fragment key={index + tabCaption}>
                   <DrawerLink
@@ -230,44 +231,47 @@ const View = () => {
           <div ref={scrollContainer} style={{ display: 'flex', overflow: 'auto', flex: 1 }}>
             <Box>
               <div style={activeTab !== 0 ? { display: 'none' } : { overflow: 'auto' }}>
-                <Reception report={report} />
+                <DescriptionAndCollaborations report={report} key={report._id} />
               </div>
               <div style={activeTab !== 1 ? { display: 'none' } : { overflow: 'auto' }}>
+                <Reception report={report} />
+              </div>
+              <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto' }}>
                 <ActionCompletedAt
                   date={report.date}
                   status={DONE}
-                  onUpdateResults={(total) => updateTabContent(1, `Actions complétées (${total})`)}
+                  onUpdateResults={(total) => updateTabContent(2, `Actions complétées (${total})`)}
                 />
               </div>
-              <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto' }}>
+              <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto' }}>
                 <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(2, `Actions créées (${total})`)} />
               </div>
-              <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto' }}>
+              <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto' }}>
                 <ActionCompletedAt
                   date={report.date}
                   status={CANCEL}
-                  onUpdateResults={(total) => updateTabContent(3, `Actions annulées (${total})`)}
+                  onUpdateResults={(total) => updateTabContent(4, `Actions annulées (${total})`)}
                 />
               </div>
-              <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto' }}>
-                <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(4, `Commentaires (${total})`)} />
-              </div>
               <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto' }}>
-                <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(5, `Passages (${total})`)} />
+                <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Commentaires (${total})`)} />
               </div>
               <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto' }}>
-                <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(6, `Observations (${total})`)} />
+                <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, `Passages (${total})`)} />
               </div>
               <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto' }}>
-                <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(7, `Consultations faites (${total})`)} status={DONE} />
+                <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />
               </div>
               <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto' }}>
-                <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Consultations créées (${total})`)} />
+                <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(8, `Consultations faites (${total})`)} status={DONE} />
               </div>
               <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto' }}>
+                <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, `Consultations créées (${total})`)} />
+              </div>
+              <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto' }}>
                 <Consultations
                   date={report.date}
-                  onUpdateResults={(total) => updateTabContent(9, `Consultations annulées (${total})`)}
+                  onUpdateResults={(total) => updateTabContent(10, `Consultations annulées (${total})`)}
                   status={CANCEL}
                 />
               </div>
@@ -934,7 +938,22 @@ const DescriptionAndCollaborations = ({ report }) => {
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (
             <Row>
-              <Col md={5}>
+              <Col md={12}>
+                <FormGroup>
+                  <Label htmlFor="report-select-collaboration">Collaboration</Label>
+                  <SelectAndCreateCollaboration values={values.collaborations} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+                <ButtonCustom
+                  title={'Mettre à jour'}
+                  loading={isSubmitting}
+                  disabled={JSON.stringify(report.collaborations) === JSON.stringify(values.collaborations)}
+                  onClick={handleSubmit}
+                  width={200}
+                />
+              </Col>
+              <Col md={12}>
                 <FormGroup>
                   <div
                     style={{
@@ -955,22 +974,6 @@ const DescriptionAndCollaborations = ({ report }) => {
                     ))}
                   </p>
                 </FormGroup>
-              </Col>
-              <Col md={2} />
-              <Col md={5}>
-                <FormGroup>
-                  <Label htmlFor="report-select-collaboration">Collaboration</Label>
-                  <SelectAndCreateCollaboration values={values.collaborations} onChange={handleChange} />
-                </FormGroup>
-              </Col>
-              <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ButtonCustom
-                  title={'Mettre à jour'}
-                  loading={isSubmitting}
-                  disabled={JSON.stringify(report.collaborations) === JSON.stringify(values.collaborations)}
-                  onClick={handleSubmit}
-                  width={200}
-                />
               </Col>
             </Row>
           )}
@@ -1043,7 +1046,6 @@ const StyledBox = styled(Box)`
 const DescriptionBox = styled(StyledBox)`
   @media screen {
     padding: 10px 4rem 10px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 0px;
   }
   @media print {
