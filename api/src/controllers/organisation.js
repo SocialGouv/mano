@@ -8,6 +8,9 @@ const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const User = require("../models/user");
 const Action = require("../models/action");
+const Consultation = require("../models/consultation");
+const Treatment = require("../models/treatment");
+const MedicalFile = require("../models/medicalFile");
 const Person = require("../models/person");
 const Territory = require("../models/territory");
 const Report = require("../models/report");
@@ -54,15 +57,32 @@ router.get(
     const places = await Place.count(query);
     const relsPersonPlace = await RelPersonPlace.count(query);
     const actions = await Action.count(query);
+    const consultations = await Consultation.count(query);
+    const treatments = req.user.healthcareProfessional ? await Treatment.count(query) : [];
+    const medicalFiles = req.user.healthcareProfessional ? await MedicalFile.count(query) : [];
     const persons = await Person.count(query);
     const comments = await Comment.count(query);
     const passages = await Passage.count(query);
     const reports = await Report.count(query);
     const territoryObservations = await TerritoryObservation.count(query);
     const territories = await Territory.count(query);
-    return res
-      .status(200)
-      .send({ ok: true, data: { actions, comments, passages, persons, places, relsPersonPlace, territories, territoryObservations, reports } });
+    return res.status(200).send({
+      ok: true,
+      data: {
+        actions,
+        consultations,
+        treatments,
+        comments,
+        passages,
+        medicalFiles,
+        persons,
+        places,
+        relsPersonPlace,
+        territories,
+        territoryObservations,
+        reports,
+      },
+    });
   })
 );
 
@@ -189,6 +209,7 @@ router.put(
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsObs);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsSocial);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsMedical);
+        z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsMedicalFile);
         z.optional(
           z.array(
             z.object({
@@ -236,6 +257,9 @@ router.put(
         typeof req.body.customFieldsPersonsMedical === "string"
           ? JSON.parse(req.body.customFieldsPersonsMedical)
           : req.body.customFieldsPersonsMedical;
+    if (req.body.hasOwnProperty("customFieldsMedicalFile"))
+      updateOrg.customFieldsMedicalFile =
+        typeof req.body.customFieldsMedicalFile === "string" ? JSON.parse(req.body.customFieldsMedicalFile) : req.body.customFieldsMedicalFile;
     if (req.body.hasOwnProperty("consultations"))
       updateOrg.consultations = typeof req.body.consultations === "string" ? JSON.parse(req.body.consultations) : req.body.consultations;
     if (req.body.hasOwnProperty("encryptedVerificationKey")) updateOrg.encryptedVerificationKey = req.body.encryptedVerificationKey;

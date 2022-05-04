@@ -73,6 +73,8 @@ app.use("/category", require("./controllers/category"));
 app.use("/service", require("./controllers/service"));
 app.use("/migration", require("./controllers/migration"));
 app.use("/consultation", require("./controllers/consultation"));
+app.use("/treatment", require("./controllers/treatment"));
+app.use("/medical-file", require("./controllers/medicalFile"));
 
 app.use(errors.sendError);
 

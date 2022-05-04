@@ -1,4 +1,4 @@
-import { currentTeamState, userState } from './auth';
+import { currentTeamState } from './auth';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
@@ -24,27 +24,6 @@ export const reportPerDateSelector = selectorFamily({
       const teamsReports = get(currentTeamReportsSelector);
       return teamsReports.find((rep) => isOnSameDay(rep.date, date));
     },
-});
-
-export const consultationsSelector = selector({
-  key: 'consultationsSelector',
-  get: ({ get }) => {
-    const persons = get(personsState);
-    const user = get(userState);
-    const consultations = [];
-    if (!user.healthcareProfessional) return [];
-    for (const person of persons) {
-      if (person.consultations?.length) {
-        for (const consultation of person.consultations) {
-          if (consultation.onlyVisibleByCreator && consultation.user !== user._id) continue;
-          consultations.push({ ...consultation, person: person._id });
-        }
-      }
-    }
-    return consultations
-      .map((c) => ({ ...c, dueAt: c.date, withTime: true, isConsultation: true })) // to list within actions
-      .sort((a, b) => new Date(b.date) - new Date(a.date));
-  },
 });
 
 export const personsWithPlacesSelector = selector({

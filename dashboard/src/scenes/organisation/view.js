@@ -11,15 +11,7 @@ import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import {
-  consultationTypes,
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  defaultMedicalCustomFields,
-  personFieldsIncludingCustomFieldsSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../recoil/persons';
+import { defaultMedicalCustomFields, personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState } from '../../recoil/auth';
@@ -32,6 +24,8 @@ import SortableGrid from '../../components/SortableGrid';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { refreshTriggerState } from '../../components/Loader';
 import useTitle from '../../services/useTitle';
+import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
+import { defaultMedicalFileCustomFields } from '../../recoil/medicalFiles';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -39,6 +33,7 @@ const getSettingTitle = (tabId) => {
   if (tabId === 'reception') return 'Accueil';
   if (tabId === 'persons') return 'Personnes';
   if (tabId === 'consultations') return 'Consultations';
+  if (tabId === 'medicalFile') return 'Dossier Médical';
   if (tabId === 'actions') return 'Actions';
   if (tabId === 'territories') return 'Territoires';
   if (tabId === 'export') return 'Export';
@@ -78,6 +73,9 @@ const View = () => {
           </DrawerButton>
           <DrawerButton className={tab === 'persons' ? 'active' : ''} onClick={() => setTab('persons')} disabled={!organisation.encryptionEnabled}>
             Personnes suivies
+          </DrawerButton>
+          <DrawerButton className={tab === 'medicalFile' ? 'active' : ''} onClick={() => setTab('medicalFile')}>
+            Dossier Médical
           </DrawerButton>
           <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
             Consultations
@@ -149,6 +147,44 @@ const View = () => {
                   case 'consultations':
                     return (
                       <Consultations organisation={values} handleChange={handleChange} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
+                    );
+                  case 'medicalFile':
+                    return (
+                      <>
+                        {organisation.encryptionEnabled ? (
+                          <>
+                            <SubTitle>Réglage des champs personnalisés du Dossier Médical de personnes suivies</SubTitle>
+                            <p>
+                              Disponible pour les professionnels de santé seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
+                            </p>
+                            <Row>
+                              <TableCustomFields
+                                customFields="customFieldsMedicalFile"
+                                key="customFieldsMedicalFile"
+                                data={(() => {
+                                  if (Array.isArray(organisation.customFieldsMedicalFile)) return organisation.customFieldsMedicalFile;
+                                  return defaultMedicalFileCustomFields;
+                                })()}
+                              />
+                            </Row>
+                          </>
+                        ) : (
+                          <>
+                            <SubTitle>Réglage des champs personnalisés du dossier médical</SubTitle>
+                            <Row>
+                              <Col md={10}>
+                                <p>
+                                  Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour le dossier médical des
+                                  personnes suivies n'existe que pour les organisations chiffrées.
+                                </p>
+                              </Col>
+                            </Row>
+                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                              <EncryptionKey />
+                            </div>
+                          </>
+                        )}
+                      </>
                     );
                   case 'actions':
                     return (
@@ -422,7 +458,6 @@ const View = () => {
                             <Row>
                               <TableCustomFields
                                 customFields="customFieldsPersonsMedical"
-                                showHealthcareProfessionnalColumn
                                 key="customFieldsPersonsMedical"
                                 data={(() => {
                                   if (Array.isArray(organisation.customFieldsPersonsMedical)) return organisation.customFieldsPersonsMedical;
@@ -526,15 +561,14 @@ const View = () => {
 function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const [consultations, setConsultations] = useState([]);
-  const [persons] = useRecoilState(personsState);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const [orgConsultations, setOrgConsultations] = useState([]);
+  const allConsultations = useRecoilValue(consultationsState);
+
   const API = useApi();
-  const consultationsSortable = useMemo(() => consultations.map((e) => e.name), [consultations]);
+  const consultationsSortable = useMemo(() => orgConsultations.map((e) => e.name), [orgConsultations]);
   useEffect(() => {
-    setConsultations(organisation.consultations);
-  }, [organisation, setConsultations]);
+    setOrgConsultations(organisation.consultations);
+  }, [organisation, setOrgConsultations]);
 
   return (
     <>
@@ -548,44 +582,39 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
 
         <SortableGrid
           list={consultationsSortable}
-          key={JSON.stringify(consultations)}
+          key={JSON.stringify(orgConsultations)}
           editItemTitle="Changer le nom du type de consultation"
           onUpdateList={(list) => {
             const newConsultations = [];
             for (const item of list) {
-              const consultation = consultations.find((e) => e.name === item);
+              const consultation = orgConsultations.find((e) => e.name === item);
               if (consultation) newConsultations.push(consultation);
               else newConsultations.push({ name: item, fields: [] });
             }
-            setConsultations(newConsultations);
+            setOrgConsultations(newConsultations);
           }}
           onRemoveItem={(content) => {
-            setConsultations(consultations.filter((e) => e.name !== content));
+            setOrgConsultations(orgConsultations.filter((e) => e.name !== content));
           }}
           onEditItem={async ({ content, newContent }) => {
             if (!newContent) {
               toastr.error('Erreur', 'Vous devez saisir un nom pour le type de consultation');
               return;
             }
-            const newConsultations = consultations.map((e) => (e.name === content ? { ...e, name: newContent } : e));
-            setConsultations(newConsultations);
-            const encryptedPersons = await Promise.all(
-              persons
-                .filter((person) => person.consultations?.find((consultation) => consultation.type === content))
-                .map((person) => ({
-                  ...person,
-                  consultations: person.consultations.map((consultation) =>
-                    consultation.type === content ? { ...consultation, type: newContent } : consultation
-                  ),
-                }))
-                .map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial))
+            const newConsultations = orgConsultations.map((e) => (e.name === content ? { ...e, name: newContent } : e));
+            setOrgConsultations(newConsultations);
+            const encryptedConsultations = await Promise.all(
+              allConsultations
+                .filter((consultation) => consultation.type === content)
+                .map((consultation) => ({ ...consultation, type: newContent }))
+                .map(prepareConsultationForEncryption(newConsultations))
                 .map(encryptItem(hashedOrgEncryptionKey))
             );
             const response = await API.put({
-              path: `/consultation`,
+              path: '/consultation/model',
               body: {
-                consultations: newConsultations,
-                persons: encryptedPersons,
+                organisationsConsultations: newConsultations,
+                consultations: encryptedConsultations,
               },
             });
             if (response.ok) {
@@ -593,7 +622,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
                 status: true,
                 options: { showFullScreen: false, initialLoad: false },
               });
-              handleChange({ target: { value: consultations, name: 'consultations' } });
+              handleChange({ target: { value: orgConsultations, name: 'consultations' } });
               setOrganisation({ ...organisation, consultations: newConsultations });
               toastr.success('Consultation mise à jour', "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
             } else {
@@ -615,11 +644,11 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
           value={null}
           onChange={(cat) => {
             if (cat && cat.value) {
-              setConsultations([...consultations, { name: cat.value, fields: [] }]);
+              setOrgConsultations([...orgConsultations, { name: cat.value, fields: [] }]);
             }
           }}
           onCreateOption={async (name) => {
-            setConsultations([...consultations, { name, fields: [] }]);
+            setOrgConsultations([...orgConsultations, { name, fields: [] }]);
           }}
           isClearable
         />
@@ -628,9 +657,9 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
         <ButtonCustom
           title="Mettre à jour"
           loading={isSubmitting}
-          disabled={JSON.stringify(organisation.consultations) === JSON.stringify(consultations)}
+          disabled={JSON.stringify(organisation.consultations) === JSON.stringify(orgConsultations)}
           onClick={() => {
-            handleChange({ target: { value: consultations, name: 'consultations' } });
+            handleChange({ target: { value: orgConsultations, name: 'consultations' } });
             handleSubmit();
           }}
           width={200}

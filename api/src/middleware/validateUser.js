@@ -5,12 +5,13 @@ const { looseUuidRegex } = require("../utils");
  * Check that the request user has the correct role, return 403 otherwise.
  * @param {string|string[]} roles
  */
-function validateUser(roles = ["admin", "normal"]) {
+function validateUser(roles = ["admin", "normal"], options = { healthcareProfessional: false }) {
   return async (req, res, next) => {
     try {
       if (Array.isArray(roles)) z.enum(roles).parse(req.user.role);
       else z.literal(roles).parse(req.user.role);
       z.string().regex(looseUuidRegex).parse(req.user.organisation);
+      if (options && options.healthcareProfessional) z.literal(true).parse(req.user.healthcareProfessional);
     } catch (e) {
       const error = new Error(`Invalid user: ${e}`);
       error.status = 400;

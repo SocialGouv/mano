@@ -6,7 +6,7 @@ import picture2 from '../assets/MANO_livraison_elements-08_green.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { getData, manoCacheStorage } from '../services/dataManagement';
-import { organisationState, teamsState } from '../recoil/auth';
+import { organisationState, teamsState, userState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
 import { territoriesState } from '../recoil/territory';
@@ -19,6 +19,9 @@ import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
+import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
+import { treatmentsState } from '../recoil/treatments';
+import { medicalFileState } from '../recoil/medicalFiles';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -30,9 +33,23 @@ export const loadingState = atom({
   default: '',
 });
 
+const collections = [
+  'person',
+  'report',
+  'action',
+  'territory',
+  'place',
+  'relPersonPlace',
+  'territory-observation',
+  'comment',
+  'passage',
+  'consultation',
+  'treatment',
+  'medical-file',
+];
 export const collectionsToLoadState = atom({
   key: 'collectionsToLoadState',
-  default: ['person', 'report', 'action', 'territory', 'place', 'relPersonPlace', 'territory-observation', 'comment', 'passage'],
+  default: collections,
 });
 
 const progressState = atom({
@@ -85,10 +102,14 @@ const Loader = () => {
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const teams = useRecoilValue(teamsState);
+  const user = useRecoilValue(userState);
   const organisationId = organisation?._id;
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
+  const [consultations, setConsultations] = useRecoilState(consultationsState);
+  const [treatments, setTreatments] = useRecoilState(treatmentsState);
+  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
   const [passages, setPassages] = useRecoilState(passagesState);
   const [reports, setReports] = useRecoilState(reportsState);
   const [territories, setTerritories] = useRecoilState(territoriesState);
@@ -200,6 +221,9 @@ const Loader = () => {
     let total =
       response.data.actions +
       response.data.persons +
+      response.data.consultations +
+      response.data.treatments +
+      response.data.medicalFiles +
       response.data.territories +
       response.data.territoryObservations +
       response.data.places +
@@ -208,8 +232,7 @@ const Loader = () => {
       response.data.reports +
       response.data.relsPersonPlace;
     if (initialLoad) {
-      const numberOfCollections = 9;
-      total = total + numberOfCollections; // for the progress bar to be beautiful
+      total = total + collections.length; // for the progress bar to be beautiful
     }
 
     if (!total) {
@@ -238,6 +261,69 @@ const Loader = () => {
         );
     }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'person'));
+    /*
+    Get consultations
+    */
+    if (response.data.consultations || initialLoad) {
+      setLoading('Chargement des consultations');
+      const refreshedConsultations = await getData({
+        collectionName: 'consultation',
+        data: consultations,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+        setBatchData: (newConsultations) =>
+          setConsultations((oldConsultations) =>
+            initialLoad
+              ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
+              : mergeItems(
+                  oldConsultations,
+                  newConsultations.map((c) => whitelistAllowedData(c, user))
+                )
+          ),
+        API,
+      });
+      if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
+    /*
+    Get treatments
+    */
+    if (user.healthcareProfessional && (response.data.treatments || initialLoad)) {
+      setLoading('Chargement des traitements');
+      const refreshedTreatments = await getData({
+        collectionName: 'treatment',
+        data: treatments,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+        setBatchData: (newTreatments) =>
+          setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
+        API,
+      });
+      if (refreshedTreatments) setTreatments(refreshedTreatments);
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'treatment'));
+    /*
+    Get medicalFiles
+    */
+    if (user.healthcareProfessional && (response.data.medicalFiles || initialLoad)) {
+      setLoading('Chargement des informations médicales');
+      const refreshedMedicalFiles = await getData({
+        collectionName: 'medical-file',
+        data: medicalFiles,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+        setBatchData: (newMedicalFiles) =>
+          setMedicalFiles((oldMedicalFiles) =>
+            initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
+          ),
+        API,
+      });
+      if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'medical-file'));
     /*
     Get reports
     */

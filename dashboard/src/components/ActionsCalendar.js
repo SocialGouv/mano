@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Nav, NavItem, NavLink, TabContent, TabPane } from 'reactstrap';
 import { useHistory, useLocation } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 import { addOneDay, dayjsInstance, formatCalendarDate, formatDateTimeWithNameOfDay, formatTime, isOnSameDay, subtractOneDay } from '../services/date';
 import Table from './table';
 import ActionStatus from './ActionStatus';
@@ -8,10 +9,13 @@ import ActionName from './ActionName';
 import PersonName from './PersonName';
 import ExclamationMarkButton from './ExclamationMarkButton';
 import ConsultationButton from './ConsultationButton';
+import { userState } from '../recoil/auth';
+import { disableConsultationRow } from '../recoil/consultations';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut'] }) => {
   const history = useHistory();
   const location = useLocation();
+  const user = useRecoilValue(userState);
   const [theDayBeforeActions, setTheDayBeforeActions] = useState([]);
   const [theDayAfterActions, setTheDayAfterActions] = useState([]);
   const [theCurrentDayActions, setTheCurrentDayActions] = useState([]);
@@ -61,6 +65,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           history.push(`/action/${actionOrConsultation._id}`);
         }
       }}
+      rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
       rowKey="_id"
       columns={[
         {
@@ -75,7 +80,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
         },
         {
           title: 'Heure',
-          dataKey: '_id',
+          dataKey: 'dueAt',
           small: true,
           render: (action) => {
             if (!action.dueAt || !action.withTime) return null;
