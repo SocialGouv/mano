@@ -15,6 +15,7 @@ import charte from '../assets/charte.pdf';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import useApi from '../services/api';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import Notification from './Notification';
 
 const TopBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -40,7 +41,9 @@ const TopBar = () => {
       <TopBarLogo>
         <Logo size={60} />
       </TopBarLogo>
+
       <TopBarAccount>
+        <Notification />
         <ButtonDropdown direction="left" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
           <DropdownToggleStyled>
             {user?.name}
