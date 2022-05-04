@@ -1,3 +1,10 @@
+## [1.103.1](https://github.com/SocialGouv/mano/compare/v1.103.0...v1.103.1) (2022-05-04)
+
+
+### Bug Fixes
+
+* **dashboard:** reports layout ([#666](https://github.com/SocialGouv/mano/issues/666)) ([a6a17d4](https://github.com/SocialGouv/mano/commit/a6a17d490ffe5ca2c86bf596c7f1206b24900b8b))
+
 # [1.103.0](https://github.com/SocialGouv/mano/compare/v1.102.0...v1.103.0) (2022-05-02)
 
 
