@@ -1,3 +1,10 @@
+## [1.104.1](https://github.com/SocialGouv/mano/compare/v1.104.0...v1.104.1) (2022-05-04)
+
+
+### Bug Fixes
+
+* small bugs ([#668](https://github.com/SocialGouv/mano/issues/668)) ([a11b0e0](https://github.com/SocialGouv/mano/commit/a11b0e060ad43ae69c5d6623fea84dc3b83fa66d))
+
 # [1.104.0](https://github.com/SocialGouv/mano/compare/v1.103.2...v1.104.0) (2022-05-04)
 
 
