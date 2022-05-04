@@ -214,6 +214,7 @@ const View = () => {
               return (
                 <React.Fragment key={index + tabCaption}>
                   <DrawerLink
+                    id={`report-button-${tabCaption}`}
                     className={activeTab === index ? 'active' : ''}
                     onClick={() => {
                       const searchParams = new URLSearchParams(location.search);
@@ -244,7 +245,7 @@ const View = () => {
                 />
               </div>
               <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto' }}>
-                <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(2, `Actions créées (${total})`)} />
+                <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, `Actions créées (${total})`)} />
               </div>
               <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto' }}>
                 <ActionCompletedAt

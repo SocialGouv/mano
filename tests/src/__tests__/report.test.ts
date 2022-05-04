@@ -8,7 +8,6 @@ import {
   navigateWithReactRouter,
   useEncryptedOrga,
   scrollDown,
-  scrollTop,
   getInputValue,
   getInnerText,
 } from "../utils";
@@ -132,6 +131,7 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to modify services in the report", async () => {
+    await expect(page).toClick("a#report-button-Accueil");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("1");
     await page.waitForTimeout(500);
@@ -220,6 +220,8 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);
+    await expect(page).toClick("a", { text: "Résumé" });
+    await page.waitForTimeout(500);
     await expect(page).toFill("input#report-select-collaboration", "Ma deuxième collab");
     await expect(page).toClick("div.report-select-collaboration__option");
     await expect(page).toClick("button", { text: "Mettre à jour" });
@@ -237,11 +239,12 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);
+    await expect(page).toClick("a", { text: "Résumé" });
+    await page.waitForTimeout(500);
     await expect(page).toClick("input#report-select-collaboration");
     await expect(page).toClick("div.report-select-collaboration__option");
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
-    await expect(page).toMatch("Description", { timeout: 2000 });
     await expect(page).toClick("div.close-toastr");
     await expect(page).toMatch("Description", { timeout: 2000 });
     await expect(page).toMatch("Ma deuxième collab");
@@ -254,6 +257,8 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D MMMM YYYY") });
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
+    await page.waitForTimeout(500);
+    await expect(page).toClick("a", { text: "Résumé" });
     await page.waitForTimeout(500);
     await expect(page).toClick("button", { text: "Ajouter une description" });
     await expect(page).toMatch("Description", { timeout: 4000 });
