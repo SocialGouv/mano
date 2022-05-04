@@ -6,7 +6,7 @@ const crypto = require("crypto");
 const { Op } = require("sequelize");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
-const { validatePassword, looseUuidRegex, jwtRegex, sanitizeAll } = require("../utils");
+const { validatePassword, looseUuidRegex, jwtRegex, sanitizeAll, headerJwtRegex } = require("../utils");
 const mailservice = require("../utils/mailservice");
 const config = require("../config");
 const { comparePassword } = require("../utils");
@@ -15,6 +15,7 @@ const RelUserTeam = require("../models/relUserTeam");
 const Team = require("../models/team");
 const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
+const { ExtractJwt } = require("passport-jwt");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
@@ -225,13 +226,19 @@ router.get(
   validateUser(["admin", "normal", "superadmin"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(jwtRegex).parse(req.cookies.jwt);
+      z.optional(z.string().regex(jwtRegex)).parse(req.cookies.jwt);
+      z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.auth);
+      z.enum(["android", "dashboard"]).parse(req.headers.platform);
     } catch (e) {
       const error = new Error(`Invalid request in signin token: ${e}`);
       error.status = 400;
       return next(error);
     }
-    const token = req.cookies.jwt;
+
+    const { platform } = req.headers;
+
+    const token = platform === "dashboard" ? req.cookies.jwt : platform === "android" ? ExtractJwt.fromAuthHeaderWithScheme("JWT")(req) : null;
+    if (!token) return res.status(400).send({ ok: false });
     const user = await User.findOne({ where: { _id: req.user._id } });
 
     const organisation = await user.getOrganisation();

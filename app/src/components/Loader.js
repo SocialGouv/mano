@@ -49,10 +49,19 @@ export const refreshTriggerState = atom({
 
 export const lastRefreshState = atom({
   key: 'lastRefreshState',
-  default: MMKV.getIntAsync('last-refresh--cache-version-2022-04-26') || 0,
+  default: new Promise(async (resolve) => {
+    const storedLastRefresh = (await MMKV.getIntAsync('last-refresh--cache-version-2022-04-26')) || 0;
+    if (storedLastRefresh) {
+      resolve(storedLastRefresh);
+    } else {
+      resolve(0);
+    }
+  }),
   effects: [
     ({ onSet }) => {
-      onSet((newValue) => MMKV.setInt('mano-last-refresh-2022-04-26', newValue));
+      onSet((newValue) => {
+        MMKV.setInt('last-refresh--cache-version-2022-04-26', newValue);
+      });
     },
   ],
 });

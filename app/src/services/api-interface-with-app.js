@@ -2,6 +2,7 @@ import { Alert, Linking, Platform } from 'react-native';
 import { MANO_DOWNLOAD_URL } from '../config';
 import API from './api';
 import fetchRetry from 'fetch-retry';
+import AsyncStorage from '@react-native-community/async-storage';
 
 API.fetch = fetchRetry(fetch);
 
@@ -24,6 +25,7 @@ API.logout = async (from) => {
     });
   }
   API.token = null;
+  AsyncStorage.removeItem('persistent_token');
   API.enableEncrypt = null;
   API.wrongKeyWarned = null;
   API.hashedOrgEncryptionKey = null;
@@ -53,6 +55,7 @@ API.handleWrongKey = () => {
     API.showTokenExpiredError = false;
     API.navigation = null;
     API.token = null;
+    AsyncStorage.removeItem('persistent_token');
   }
 };
 
