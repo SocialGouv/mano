@@ -1,3 +1,10 @@
+# [1.104.0](https://github.com/SocialGouv/mano/compare/v1.103.2...v1.104.0) (2022-05-04)
+
+
+### Features
+
+* **dashboard:** notification for action urgente ([#663](https://github.com/SocialGouv/mano/issues/663)) ([a5f75c2](https://github.com/SocialGouv/mano/commit/a5f75c26a984de5da62a4424dea0753323faf729))
+
 ## [1.103.2](https://github.com/SocialGouv/mano/compare/v1.103.1...v1.103.2) (2022-05-04)
 
 
