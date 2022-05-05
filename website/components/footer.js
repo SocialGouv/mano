@@ -45,7 +45,7 @@ export default function Footer({ skipFirstParagraph }) {
                 </span>
               </p>
               <button
-                className="mx-auto p-4 px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
+                className="mx-auto p-4 px-6 md:px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
                 onClick={() => {
                   window.location.href = "mailto:" + window && window.atob(nathan);
                 }}>
@@ -55,7 +55,7 @@ export default function Footer({ skipFirstParagraph }) {
                 </span>
               </button>
               <button
-                className="mx-auto p-4 px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
+                className="mx-auto p-4 px-6 md:px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
                 onClick={() => {
                   window.location.href = "mailto:" + window && window.atob(melissa);
                 }}>
@@ -65,7 +65,7 @@ export default function Footer({ skipFirstParagraph }) {
                 </span>
               </button>
               <button
-                className="mx-auto p-4 px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
+                className="mx-auto p-4 px-6 md:px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
                 onClick={() => {
                   window.location.href = "mailto:" + window && window.atob(yoann);
                 }}>
@@ -86,7 +86,7 @@ export default function Footer({ skipFirstParagraph }) {
                 </span>
               </p>
               <button
-                className="mx-auto p-4 px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
+                className="mx-auto p-4 px-6 md:px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
                 onClick={() => {
                   window.location.href = "mailto:" + window && window.atob(guillaume);
                 }}>
