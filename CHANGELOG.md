@@ -1,3 +1,10 @@
+# [1.105.0](https://github.com/SocialGouv/mano/compare/v1.104.1...v1.105.0) (2022-05-05)
+
+
+### Features
+
+* **app:** no need email for login again ([#670](https://github.com/SocialGouv/mano/issues/670)) ([4955b2b](https://github.com/SocialGouv/mano/commit/4955b2bc323aba5bc8d533a2539b455f46fcd9d1))
+
 ## [1.104.1](https://github.com/SocialGouv/mano/compare/v1.104.0...v1.104.1) (2022-05-04)
 
 
