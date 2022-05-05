@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, findNodeHandle } from 'react-native';
+import { Alert } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import styled from 'styled-components';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -28,7 +28,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
-import { MMKV } from '../../services/dataManagement';
+import { storage } from '../../services/dataManagement';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 
 const castToAction = (action) => {
@@ -314,7 +314,7 @@ const Action = ({ navigation, route }) => {
       const res = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
       if (res.ok) {
         setComments((comments) => [res.decryptedData, ...comments]);
-        await MMKV.setMapAsync('comment', [res.decryptedData, ...comments]);
+        storage.set('comment', JSON.stringify([res.decryptedData, ...comments]));
       }
     }
     Sentry.setContext('action', { _id: response.decryptedData._id });
@@ -349,17 +349,11 @@ const Action = ({ navigation, route }) => {
         const res = await API.delete({ path: `/comment/${comment._id}` });
         if (res.ok) {
           setComments((comments) => comments.filter((p) => p._id !== comment._id));
-          await MMKV.setMapAsync(
-            'comment',
-            comments.filter((p) => p._id !== comment._id)
-          );
+          storage.set('comment', JSON.stringify(comments.filter((p) => p._id !== comment._id)));
         }
       }
     }
-    await MMKV.setMapAsync(
-      'action',
-      actions.filter((a) => a._id !== id)
-    );
+    storage.set('action', JSON.stringify(actions.filter((a) => a._id !== id)));
     return res;
   };
 
@@ -388,7 +382,7 @@ const Action = ({ navigation, route }) => {
     if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.current.measureLayout(
-        findNodeHandle(scrollViewRef.current),
+        scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },

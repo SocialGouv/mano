@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Alert, findNodeHandle, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View, Text } from 'react-native';
+import { Alert, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View, Text } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import AsyncStorage from '@react-native-community/async-storage';
 import { version } from '../../../package.json';
@@ -18,8 +18,9 @@ import Title, { SubTitle } from '../../components/Title';
 import { MANO_DOWNLOAD_URL } from '../../config';
 import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import { clearCache, useStorage } from '../../services/dataManagement';
-import { lastRefreshState, refreshTriggerState } from '../../components/Loader';
+import { clearCache } from '../../services/dataManagement';
+import { refreshTriggerState } from '../../components/Loader';
+import { useMMKVNumber, useMMKVString } from 'react-native-mmkv';
 
 const Login = ({ navigation }) => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
@@ -33,12 +34,12 @@ const Login = ({ navigation }) => {
   const [showEncryptionKeyInput, setShowEncryptionKeyInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const setUser = useSetRecoilState(userState);
-  const setLastRefresh = useSetRecoilState(lastRefreshState);
+  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-04-26');
   const setOrganisation = useSetRecoilState(organisationState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
-  const [storageOrganisationId, setStorageOrganisationId] = useStorage('organisationId', 0);
+  const [storageOrganisationId, setStorageOrganisationId] = useMMKVString('organisationId');
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   useEffect(() => {
@@ -46,7 +47,7 @@ const Login = ({ navigation }) => {
       // check version
       const response = await API.get({ path: '/version' });
       if (response.ok && version !== response.data) {
-        RNBootSplash.hide({ duration: 250 });
+        RNBootSplash.hide({ fade: true });
         Alert.alert(
           `La nouvelle version ${response.data} de Mano est disponible !`,
           `Vous avez la version ${version} actuellement sur votre téléphone`,
@@ -213,7 +214,7 @@ const Login = ({ navigation }) => {
     if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.current.measureLayout(
-        findNodeHandle(scrollViewRef.current),
+        scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },

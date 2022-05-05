@@ -8,24 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		00E356F31AD99517003FC87E /* manoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* manoTests.m */; };
-		08067F8F711B4AD88720BD08 /* Nexa-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = 431D2D873CC048798A9EE21B /* Nexa-Bold.otf */; };
-		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
+		0C80B921A6F3F58F76C31292 /* libPods-mano.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5DCACB8F33CDC322A6C60F78 /* libPods-mano.a */; };
+		13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.mm */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1C9C4ED1F2734B778D1433C4 /* Nexa-Heavy-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = F15275064B694725A0332BBA /* Nexa-Heavy-Italic.otf */; };
-		21BD643CF9919E434624FBC7 /* libPods-mano-manoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4FA581AE48D277526832CE8F /* libPods-mano-manoTests.a */; };
-		2DC2DCF525A4472FBC404C9F /* NexaHeavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = E4E09F7F1F284DC38148B282 /* NexaHeavy.otf */; };
-		674EA8E59BBB46268F653A6C /* Nexa-Regular-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 73E1032B0F30406591C942C6 /* Nexa-Regular-Italic.otf */; };
-		757F256606D44967827A78D9 /* Nexa-Black-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 9EE4C600ACE64E8491902E7C /* Nexa-Black-Italic.otf */; };
-		7A2DF2AB005E446ABE5E95F6 /* Nexa-Light-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = AB8742A854C640C8A903219D /* Nexa-Light-Italic.otf */; };
-		89922FC3190DFC88F39B5FA8 /* libPods-mano.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 883556977F4C6B44B85EA3BA /* libPods-mano.a */; };
-		8F28F81B2DE949BCBCBAC66F /* Nexa-Book-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = DEF541F9DE5848D7B1D5937F /* Nexa-Book-Italic.otf */; };
-		9265C9596C3A4583AE439298 /* NexaRegular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 68A06A6DB34643CDA133691D /* NexaRegular.otf */; };
-		BAA5448481E747828439472B /* Nexa-Book.otf in Resources */ = {isa = PBXBuildFile; fileRef = 1240A06B6F024A88B8804145 /* Nexa-Book.otf */; };
-		BEB53108B37E4C7DB2E46F4B /* NexaBlack.otf in Resources */ = {isa = PBXBuildFile; fileRef = 816CFCDCE6234AF5A1BC5461 /* NexaBlack.otf */; };
-		CBEF5AF314B646A2BA7847AB /* Nexa-Bold-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = 598EB27F33FA40F19DE19674 /* Nexa-Bold-Italic.otf */; };
-		E985E8C4E54440B89E0E32C5 /* Nexa-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = 2306E82896AC400BA1483766 /* Nexa-Light.otf */; };
-		F78F3D132603F74D00D6D83A /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F78F3D122603F74D00D6D83A /* BootSplash.storyboard */; };
+		7699B88040F8A987B510C191 /* libPods-mano-manoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-mano-manoTests.a */; };
+		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -42,32 +30,20 @@
 		00E356EE1AD99517003FC87E /* manoTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = manoTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		00E356F11AD99517003FC87E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		00E356F21AD99517003FC87E /* manoTests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = manoTests.m; sourceTree = "<group>"; };
-		1240A06B6F024A88B8804145 /* Nexa-Book.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Book.otf"; path = "../assets/fonts/Nexa-Book.otf"; sourceTree = "<group>"; };
 		13B07F961A680F5B00A75B9A /* mano.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = mano.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		13B07FAF1A68108700A75B9A /* AppDelegate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = AppDelegate.h; path = mano/AppDelegate.h; sourceTree = "<group>"; };
-		13B07FB01A68108700A75B9A /* AppDelegate.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppDelegate.m; path = mano/AppDelegate.m; sourceTree = "<group>"; };
+		13B07FB01A68108700A75B9A /* AppDelegate.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; name = AppDelegate.mm; path = mano/AppDelegate.mm; sourceTree = "<group>"; };
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = mano/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = mano/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = mano/main.m; sourceTree = "<group>"; };
-		2306E82896AC400BA1483766 /* Nexa-Light.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Light.otf"; path = "../assets/fonts/Nexa-Light.otf"; sourceTree = "<group>"; };
-		249B23B7DD5E0F19B1030888 /* Pods-mano.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano.release.xcconfig"; path = "Target Support Files/Pods-mano/Pods-mano.release.xcconfig"; sourceTree = "<group>"; };
-		431D2D873CC048798A9EE21B /* Nexa-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Bold.otf"; path = "../assets/fonts/Nexa-Bold.otf"; sourceTree = "<group>"; };
-		43216A057806073FC0282975 /* Pods-mano-manoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano-manoTests.debug.xcconfig"; path = "Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests.debug.xcconfig"; sourceTree = "<group>"; };
-		4FA581AE48D277526832CE8F /* libPods-mano-manoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mano-manoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		598EB27F33FA40F19DE19674 /* Nexa-Bold-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Bold-Italic.otf"; path = "../assets/fonts/Nexa-Bold-Italic.otf"; sourceTree = "<group>"; };
-		68A06A6DB34643CDA133691D /* NexaRegular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = NexaRegular.otf; path = ../assets/fonts/NexaRegular.otf; sourceTree = "<group>"; };
-		73E1032B0F30406591C942C6 /* Nexa-Regular-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Regular-Italic.otf"; path = "../assets/fonts/Nexa-Regular-Italic.otf"; sourceTree = "<group>"; };
-		816CFCDCE6234AF5A1BC5461 /* NexaBlack.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = NexaBlack.otf; path = ../assets/fonts/NexaBlack.otf; sourceTree = "<group>"; };
-		883556977F4C6B44B85EA3BA /* libPods-mano.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mano.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		9EE4C600ACE64E8491902E7C /* Nexa-Black-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Black-Italic.otf"; path = "../assets/fonts/Nexa-Black-Italic.otf"; sourceTree = "<group>"; };
-		AB8742A854C640C8A903219D /* Nexa-Light-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Light-Italic.otf"; path = "../assets/fonts/Nexa-Light-Italic.otf"; sourceTree = "<group>"; };
-		D84500A85503BB992F9665B5 /* Pods-mano-manoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano-manoTests.release.xcconfig"; path = "Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests.release.xcconfig"; sourceTree = "<group>"; };
-		DEF541F9DE5848D7B1D5937F /* Nexa-Book-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Book-Italic.otf"; path = "../assets/fonts/Nexa-Book-Italic.otf"; sourceTree = "<group>"; };
-		E4E09F7F1F284DC38148B282 /* NexaHeavy.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = NexaHeavy.otf; path = ../assets/fonts/NexaHeavy.otf; sourceTree = "<group>"; };
-		E9B96B215AAE347B58373BA8 /* Pods-mano.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano.debug.xcconfig"; path = "Target Support Files/Pods-mano/Pods-mano.debug.xcconfig"; sourceTree = "<group>"; };
+		19F6CBCC0A4E27FBF8BF4A61 /* libPods-mano-manoTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mano-manoTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		3B4392A12AC88292D35C810B /* Pods-mano.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano.debug.xcconfig"; path = "Target Support Files/Pods-mano/Pods-mano.debug.xcconfig"; sourceTree = "<group>"; };
+		5709B34CF0A7D63546082F79 /* Pods-mano.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano.release.xcconfig"; path = "Target Support Files/Pods-mano/Pods-mano.release.xcconfig"; sourceTree = "<group>"; };
+		5B7EB9410499542E8C5724F5 /* Pods-mano-manoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano-manoTests.debug.xcconfig"; path = "Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests.debug.xcconfig"; sourceTree = "<group>"; };
+		5DCACB8F33CDC322A6C60F78 /* libPods-mano.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mano.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = mano/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		89C6BE57DB24E9ADA2F236DE /* Pods-mano-manoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano-manoTests.release.xcconfig"; path = "Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
-		F15275064B694725A0332BBA /* Nexa-Heavy-Italic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Nexa-Heavy-Italic.otf"; path = "../assets/fonts/Nexa-Heavy-Italic.otf"; sourceTree = "<group>"; };
-		F78F3D122603F74D00D6D83A /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = mano/BootSplash.storyboard; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -75,7 +51,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				21BD643CF9919E434624FBC7 /* libPods-mano-manoTests.a in Frameworks */,
+				7699B88040F8A987B510C191 /* libPods-mano-manoTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -83,7 +59,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				89922FC3190DFC88F39B5FA8 /* libPods-mano.a in Frameworks */,
+				0C80B921A6F3F58F76C31292 /* libPods-mano.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -111,10 +87,10 @@
 			isa = PBXGroup;
 			children = (
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
-				13B07FB01A68108700A75B9A /* AppDelegate.m */,
-				F78F3D122603F74D00D6D83A /* BootSplash.storyboard */,
+				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
+				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
 			name = mano;
@@ -124,40 +100,10 @@
 			isa = PBXGroup;
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
-				883556977F4C6B44B85EA3BA /* libPods-mano.a */,
-				4FA581AE48D277526832CE8F /* libPods-mano-manoTests.a */,
+				5DCACB8F33CDC322A6C60F78 /* libPods-mano.a */,
+				19F6CBCC0A4E27FBF8BF4A61 /* libPods-mano-manoTests.a */,
 			);
 			name = Frameworks;
-			sourceTree = "<group>";
-		};
-		3025209D71E8F90098230244 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				E9B96B215AAE347B58373BA8 /* Pods-mano.debug.xcconfig */,
-				249B23B7DD5E0F19B1030888 /* Pods-mano.release.xcconfig */,
-				43216A057806073FC0282975 /* Pods-mano-manoTests.debug.xcconfig */,
-				D84500A85503BB992F9665B5 /* Pods-mano-manoTests.release.xcconfig */,
-			);
-			path = Pods;
-			sourceTree = "<group>";
-		};
-		757A771C1500464BADC0761C /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-				9EE4C600ACE64E8491902E7C /* Nexa-Black-Italic.otf */,
-				598EB27F33FA40F19DE19674 /* Nexa-Bold-Italic.otf */,
-				431D2D873CC048798A9EE21B /* Nexa-Bold.otf */,
-				DEF541F9DE5848D7B1D5937F /* Nexa-Book-Italic.otf */,
-				1240A06B6F024A88B8804145 /* Nexa-Book.otf */,
-				F15275064B694725A0332BBA /* Nexa-Heavy-Italic.otf */,
-				AB8742A854C640C8A903219D /* Nexa-Light-Italic.otf */,
-				2306E82896AC400BA1483766 /* Nexa-Light.otf */,
-				73E1032B0F30406591C942C6 /* Nexa-Regular-Italic.otf */,
-				816CFCDCE6234AF5A1BC5461 /* NexaBlack.otf */,
-				E4E09F7F1F284DC38148B282 /* NexaHeavy.otf */,
-				68A06A6DB34643CDA133691D /* NexaRegular.otf */,
-			);
-			name = Resources;
 			sourceTree = "<group>";
 		};
 		832341AE1AAA6A7D00B99B32 /* Libraries */ = {
@@ -175,8 +121,7 @@
 				00E356EF1AD99517003FC87E /* manoTests */,
 				83CBBA001A601CBA00E9B192 /* Products */,
 				2D16E6871FA4F8E400B85C8A /* Frameworks */,
-				3025209D71E8F90098230244 /* Pods */,
-				757A771C1500464BADC0761C /* Resources */,
+				BBD78D7AC51CEA395F1C20DB /* Pods */,
 			);
 			indentWidth = 2;
 			sourceTree = "<group>";
@@ -192,6 +137,17 @@
 			name = Products;
 			sourceTree = "<group>";
 		};
+		BBD78D7AC51CEA395F1C20DB /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				3B4392A12AC88292D35C810B /* Pods-mano.debug.xcconfig */,
+				5709B34CF0A7D63546082F79 /* Pods-mano.release.xcconfig */,
+				5B7EB9410499542E8C5724F5 /* Pods-mano-manoTests.debug.xcconfig */,
+				89C6BE57DB24E9ADA2F236DE /* Pods-mano-manoTests.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -199,12 +155,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "manoTests" */;
 			buildPhases = (
-				D8215A353B088157C7653094 /* [CP] Check Pods Manifest.lock */,
+				A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				745244256EFB5BBB261DC428 /* [CP] Embed Pods Frameworks */,
-				D9536629CD064DF43D8BDF60 /* [CP] Copy Pods Resources */,
+				C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */,
+				F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -220,15 +176,14 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "mano" */;
 			buildPhases = (
-				867F816835047E43D2CB183D /* [CP] Check Pods Manifest.lock */,
+				C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				2A3F1BFE85AACF3BBD353911 /* [CP] Embed Pods Frameworks */,
-				567389B152207318899BCB1C /* [CP] Copy Pods Resources */,
-				4CD12E39F532459898A6ABCF /* Upload Debug Symbols to Sentry */,
+				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
+				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -287,20 +242,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				F78F3D132603F74D00D6D83A /* BootSplash.storyboard in Resources */,
-				757F256606D44967827A78D9 /* Nexa-Black-Italic.otf in Resources */,
-				CBEF5AF314B646A2BA7847AB /* Nexa-Bold-Italic.otf in Resources */,
-				08067F8F711B4AD88720BD08 /* Nexa-Bold.otf in Resources */,
-				8F28F81B2DE949BCBCBAC66F /* Nexa-Book-Italic.otf in Resources */,
-				BAA5448481E747828439472B /* Nexa-Book.otf in Resources */,
-				1C9C4ED1F2734B778D1433C4 /* Nexa-Heavy-Italic.otf in Resources */,
-				7A2DF2AB005E446ABE5E95F6 /* Nexa-Light-Italic.otf in Resources */,
-				E985E8C4E54440B89E0E32C5 /* Nexa-Light.otf in Resources */,
-				674EA8E59BBB46268F653A6C /* Nexa-Regular-Italic.otf in Resources */,
-				BEB53108B37E4C7DB2E46F4B /* NexaBlack.otf in Resources */,
-				2DC2DCF525A4472FBC404C9F /* NexaHeavy.otf in Resources */,
-				9265C9596C3A4583AE439298 /* NexaRegular.otf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -319,9 +262,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nset -e\n\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh < /dev/null\n";
+			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
-		2A3F1BFE85AACF3BBD353911 /* [CP] Embed Pods Frameworks */ = {
+		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -338,63 +281,7 @@
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-mano/Pods-mano-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
 		};
-		567389B152207318899BCB1C /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-mano/Pods-mano-resources-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Copy Pods Resources";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-mano/Pods-mano-resources-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-mano/Pods-mano-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		745244256EFB5BBB261DC428 /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		867F816835047E43D2CB183D /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-mano-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-		D8215A353B088157C7653094 /* [CP] Check Pods Manifest.lock */ = {
+		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -416,7 +303,63 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		D9536629CD064DF43D8BDF60 /* [CP] Copy Pods Resources */ = {
+		C38B50BA6285516D6DCD4F65 /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-mano-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C59DA0FBD6956966B86A3779 /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		E235C05ADACE081382539298 /* [CP] Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-mano/Pods-mano-resources-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Copy Pods Resources";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-mano/Pods-mano-resources-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-mano/Pods-mano-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		F6A41C54EA430FDDC6A6ED99 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -452,20 +395,6 @@
 			shellScript = "export RCT_METRO_PORT=\"${RCT_METRO_PORT:=8081}\"\necho \"export RCT_METRO_PORT=${RCT_METRO_PORT}\" > \"${SRCROOT}/../node_modules/react-native/scripts/.packager.env\"\nif [ -z \"${RCT_NO_LAUNCH_PACKAGER+xxx}\" ] ; then\n  if nc -w 5 -z localhost ${RCT_METRO_PORT} ; then\n    if ! curl -s \"http://localhost:${RCT_METRO_PORT}/status\" | grep -q \"packager-status:running\" ; then\n      echo \"Port ${RCT_METRO_PORT} already in use, packager is either not running or not running correctly\"\n      exit 2\n    fi\n  else\n    open \"$SRCROOT/../node_modules/react-native/scripts/launchPackager.command\" || echo \"Can't start packager automatically\"\n  fi\nfi\n";
 			showEnvVarsInLog = 0;
 		};
-		4CD12E39F532459898A6ABCF /* Upload Debug Symbols to Sentry */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			name = "Upload Debug Symbols to Sentry";
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			shellPath = /bin/sh;
-			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
-		};
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -481,7 +410,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
+				13B07FBC1A68108700A75B9A /* AppDelegate.mm in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -499,7 +428,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 43216A057806073FC0282975 /* Pods-mano-manoTests.debug.xcconfig */;
+			baseConfigurationReference = 5B7EB9410499542E8C5724F5 /* Pods-mano-manoTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -518,7 +447,7 @@
 					"-lc++",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.mano";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mano.app/mano";
 			};
@@ -526,7 +455,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = D84500A85503BB992F9665B5 /* Pods-mano-manoTests.release.xcconfig */;
+			baseConfigurationReference = 89C6BE57DB24E9ADA2F236DE /* Pods-mano-manoTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -542,7 +471,7 @@
 					"-lc++",
 					"$(inherited)",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.mano";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/mano.app/mano";
 			};
@@ -550,16 +479,13 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E9B96B215AAE347B58373BA8 /* Pods-mano.debug.xcconfig */;
+			baseConfigurationReference = 3B4392A12AC88292D35C810B /* Pods-mano.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 52FJ92F7JV;
 				ENABLE_BITCODE = NO;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = mano/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -569,7 +495,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.mano";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = mano;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -579,15 +505,12 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 249B23B7DD5E0F19B1030888 /* Pods-mano.release.xcconfig */;
+			baseConfigurationReference = 5709B34CF0A7D63546082F79 /* Pods-mano.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = 52FJ92F7JV;
-				"EXCLUDED_ARCHS[sdk=iphonesimulator*]" = arm64;
 				INFOPLIST_FILE = mano/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 11.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -597,7 +520,7 @@
 					"-ObjC",
 					"-lc++",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.mano";
+				PRODUCT_BUNDLE_IDENTIFIER = "org.reactjs.native.example.$(PRODUCT_NAME:rfc1034identifier)";
 				PRODUCT_NAME = mano;
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -609,7 +532,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -659,12 +582,18 @@
 					"$(inherited)",
 				);
 				LIBRARY_SEARCH_PATHS = (
+					"\"$(SDKROOT)/usr/lib/swift\"",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
-					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DFOLLY_NO_CONFIG",
+					"-DFOLLY_MOBILE=1",
+					"-DFOLLY_USE_LIBCPP=1",
+				);
 				SDKROOT = iphoneos;
 			};
 			name = Debug;
@@ -674,7 +603,7 @@
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = NO;
 				CLANG_ANALYZER_LOCALIZABILITY_NONLOCALIZED = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LANGUAGE_STANDARD = "c++17";
 				CLANG_CXX_LIBRARY = "libc++";
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_ENABLE_OBJC_ARC = YES;
@@ -717,11 +646,17 @@
 					"$(inherited)",
 				);
 				LIBRARY_SEARCH_PATHS = (
+					"\"$(SDKROOT)/usr/lib/swift\"",
 					"\"$(TOOLCHAIN_DIR)/usr/lib/swift/$(PLATFORM_NAME)\"",
-					"\"$(TOOLCHAIN_DIR)/usr/lib/swift-5.0/$(PLATFORM_NAME)\"",
 					"\"$(inherited)\"",
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
+				OTHER_CPLUSPLUSFLAGS = (
+					"$(OTHER_CFLAGS)",
+					"-DFOLLY_NO_CONFIG",
+					"-DFOLLY_MOBILE=1",
+					"-DFOLLY_USE_LIBCPP=1",
+				);
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
 			};

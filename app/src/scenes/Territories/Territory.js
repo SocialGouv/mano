@@ -14,7 +14,7 @@ import TerritoryObservationRow from './TerritoryObservationRow';
 import { useRecoilState } from 'recoil';
 import { prepareTerritoryForEncryption, territoriesState } from '../../recoil/territory';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
-import { MMKV } from '../../services/dataManagement';
+import { storage } from '../../services/dataManagement';
 
 const castToTerritory = (territory = {}) => ({
   name: territory.name?.trim() || '',
@@ -105,16 +105,10 @@ const Territory = ({ route, navigation }) => {
       for (let obs of territoryObservations.filter((o) => o.territory === territoryDB._id)) {
         await API.delete({ path: `/territory-observation/${obs._id}` });
         setTerritoryObservations((obs) => obs.filter((o) => o.territory !== territoryDB._id));
-        await MMKV.setMapAsync(
-          'territory-observation',
-          allTerritoryOservations.filter((o) => o.territory !== territoryDB._id)
-        );
+        storage.set('territory-observation', JSON.stringify(allTerritoryOservations.filter((o) => o.territory !== territoryDB._id)));
       }
       setTerritories((territories) => territories.filter((t) => t._id !== territoryDB._id));
-      await MMKV.setMapAsync(
-        'territory',
-        territories.filter((t) => t._id !== territoryDB._id)
-      );
+      storage.set('territory', JSON.stringify(territories.filter((t) => t._id !== territoryDB._id)));
       Alert.alert('Territoire supprimé !');
       onBack();
     }

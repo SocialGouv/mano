@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Alert, findNodeHandle, TouchableWithoutFeedback, View } from 'react-native';
+import { Alert, TouchableWithoutFeedback, View } from 'react-native';
 import API from '../../services/api';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
@@ -108,7 +108,7 @@ const ChangePasswordBody = ({ onOK, children }) => {
     if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.current.measureLayout(
-        findNodeHandle(scrollViewRef.current),
+        scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
@@ -116,6 +116,7 @@ const ChangePasswordBody = ({ onOK, children }) => {
       );
     }, 250);
   };
+
   return (
     <ScrollContainer ref={scrollViewRef}>
       <View>

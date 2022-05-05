@@ -1,5 +1,4 @@
 import React, { useRef } from 'react';
-import { findNodeHandle } from 'react-native';
 import { useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SubHeader from '../../components/SubHeader';
@@ -29,7 +28,7 @@ const FileSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, 
     if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.measureLayout(
-        findNodeHandle(scrollViewRef.current),
+        scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
@@ -86,7 +85,7 @@ const FileSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, 
             return (
               <CustomFieldInput
                 label={label}
-                key={field._id}
+                key={field.name}
                 field={field}
                 value={person[name]}
                 handleChange={(newValue) => onChange({ [name]: newValue })}

@@ -3,7 +3,7 @@ import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { Alert } from 'react-native';
 import { useRecoilState } from 'recoil';
 import API from '../../services/api';
-import { MMKV } from '../../services/dataManagement';
+import { storage } from '../../services/dataManagement';
 import BubbleRow from '../../components/BubbleRow';
 import { useNavigation } from '@react-navigation/native';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
@@ -51,10 +51,7 @@ const PlaceRow = ({ place, relPersonPlace, personDB, showActionSheetWithOptions 
     const response = await API.delete({ path: `/relPersonPlace/${relPersonPlace?._id}` });
     if (response.ok) {
       setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace?._id));
-      await MMKV.setMapAsync(
-        'relPersonPlace',
-        relsPersonPlace.filter((rel) => rel._id !== relPersonPlace?._id)
-      );
+      storage.set('relPersonPlace', JSON.stringify(relsPersonPlace.filter((rel) => rel._id !== relPersonPlace?._id)));
     }
     if (!response.ok) return Alert.alert(response.error);
   };

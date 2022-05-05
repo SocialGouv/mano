@@ -10,7 +10,7 @@ import ButtonDelete from '../../components/ButtonDelete';
 import { useRecoilState } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
-import { MMKV } from '../../services/dataManagement';
+import { storage } from '../../services/dataManagement';
 
 const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
   const [comments, setComments] = useRecoilState(commentsState);
@@ -56,10 +56,7 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
       setComments((comments) => comments.filter((p) => p._id !== commentDB._id));
-      await MMKV.setMapAsync(
-        'comment',
-        comments.filter((p) => p._id !== commentDB._id)
-      );
+      storage.set('comment', JSON.stringify(comments.filter((p) => p._id !== commentDB._id)));
       Alert.alert('Commentaire supprimé !');
       onBack();
     }
