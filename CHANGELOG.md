@@ -1,3 +1,10 @@
+# [1.106.0](https://github.com/SocialGouv/mano/compare/v1.105.3...v1.106.0) (2022-05-05)
+
+
+### Features
+
+* **dashboard:** urgent comment in dashboard ([#681](https://github.com/SocialGouv/mano/issues/681)) ([8495d6e](https://github.com/SocialGouv/mano/commit/8495d6ebde4a67a89c556cfb2b9093c3b2b5e679))
+
 ## [1.105.3](https://github.com/SocialGouv/mano/compare/v1.105.2...v1.105.3) (2022-05-05)
 
 
