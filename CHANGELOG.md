@@ -1,3 +1,10 @@
+## [1.105.1](https://github.com/SocialGouv/mano/compare/v1.105.0...v1.105.1) (2022-05-05)
+
+
+### Bug Fixes
+
+* **dashboard, api:** split medical data from non medical data ([#665](https://github.com/SocialGouv/mano/issues/665)) ([7422b7d](https://github.com/SocialGouv/mano/commit/7422b7dddb5d19c9e3e86afe0e9aa907c49c900c))
+
 # [1.105.0](https://github.com/SocialGouv/mano/compare/v1.104.1...v1.105.0) (2022-05-05)
 
 
