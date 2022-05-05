@@ -1,3 +1,10 @@
+## [1.105.2](https://github.com/SocialGouv/mano/compare/v1.105.1...v1.105.2) (2022-05-05)
+
+
+### Bug Fixes
+
+* **app:** mmkv effect storage ([#677](https://github.com/SocialGouv/mano/issues/677)) ([179396c](https://github.com/SocialGouv/mano/commit/179396c70413479c5583778977e0b282d5d4a42d))
+
 ## [1.105.1](https://github.com/SocialGouv/mano/compare/v1.105.0...v1.105.1) (2022-05-05)
 
 
