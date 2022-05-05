@@ -5,7 +5,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { commentsState } from '../../recoil/comments';
-import { MMKV } from '../../services/dataManagement';
+import { storage } from '../../services/dataManagement';
 import BubbleRow from '../../components/BubbleRow';
 
 const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions }) => {
@@ -46,10 +46,7 @@ const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions }) => {
     const response = await API.delete({ path: `/comment/${comment._id}` });
     if (!response.ok) return Alert.alert(response.error);
     setComments((comments) => comments.filter((p) => p._id !== comment._id));
-    await MMKV.setMapAsync(
-      'comment',
-      comments.filter((p) => p._id !== comment._id)
-    );
+    storage.set('comment', JSON.stringify(comments.filter((p) => p._id !== comment._id)));
   };
 
   return (

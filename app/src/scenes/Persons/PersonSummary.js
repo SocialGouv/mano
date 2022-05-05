@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Alert, findNodeHandle, Linking, Text } from 'react-native';
+import { Alert, Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import * as Sentry from '@sentry/react-native';
@@ -27,7 +27,7 @@ import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
-import { MMKV } from '../../services/dataManagement';
+import { storage } from '../../services/dataManagement';
 
 const PersonSummary = ({
   navigation,
@@ -68,10 +68,7 @@ const PersonSummary = ({
           const response = await API.delete({ path: `/relPersonPlace/${relPersPlace?._id}` });
           if (response.ok) {
             setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id));
-            await MMKV.setMapAsync(
-              'relPersonPlace',
-              relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id)
-            );
+            storage.set('relPersonPlace', JSON.stringify(relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id)));
           }
           if (!response.ok) return Alert.alert(response.error);
         }
@@ -99,7 +96,7 @@ const PersonSummary = ({
     if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.current.measureLayout(
-        findNodeHandle(scrollViewRef.current),
+        scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },

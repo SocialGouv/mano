@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { useRecoilValue } from 'recoil';
-import { View, findNodeHandle } from 'react-native';
+import { View } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SubHeader from '../../components/SubHeader';
 import HealthInsuranceSelect from '../../components/Selects/HealthInsuranceSelect';
@@ -23,7 +23,7 @@ const FileMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, i
     if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.measureLayout(
-        findNodeHandle(scrollViewRef.current),
+        scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },
