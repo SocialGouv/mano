@@ -10,18 +10,21 @@ import ButtonDelete from '../../components/ButtonDelete';
 import { useRecoilState } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
+import CheckboxLabelled from '../../components/CheckboxLabelled';
 
 const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
   const [comments, setComments] = useRecoilState(commentsState);
   const commentDB = useMemo(() => comments.find((c) => c._id === route.params?._id), [comments, route?.params]);
 
   const [comment, setComment] = useState(route?.params?.comment?.split('\\n').join('\u000A') || '');
+  const [urgent, setUrgent] = useState(route?.params?.urgent || false);
   const [updating, setUpdating] = useState(false);
 
   const isUpdateDisabled = useMemo(() => {
     if (commentDB?.comment !== comment) return false;
+    if (commentDB?.urgent !== urgent) return false;
     return true;
-  }, [comment, commentDB]);
+  }, [comment, commentDB, urgent]);
 
   const onUpdateComment = async () => {
     setUpdating(true);
@@ -30,6 +33,7 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
       body: prepareCommentForEncryption({
         ...commentDB,
         comment: comment.trim(),
+        urgent,
       }),
     });
     if (response.error) {
@@ -127,6 +131,12 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
       <ScrollContainer>
         <View>
           <InputLabelled label="Commentaire" onChangeText={writeComment} value={comment} placeholder="Description" multiline />
+          <CheckboxLabelled
+            label="Commentaire prioritaire (ce commentaire sera mis en avant par rapport aux autres)"
+            alone
+            onPress={() => setUrgent((u) => !u)}
+            value={urgent}
+          />
           <ButtonsContainer>
             <ButtonDelete onPress={onDeleteRequest} />
             <Button caption="Mettre à jour" onPress={onUpdateComment} disabled={isUpdateDisabled} loading={updating} />

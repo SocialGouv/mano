@@ -19,4 +19,5 @@ const ExclamationMarkButtonDiv = styled.button`
   justify-content: center;
   align-items: center;
   background-color: #fef2f2;
+  flex-shrink: 0;
 `;

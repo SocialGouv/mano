@@ -10,9 +10,10 @@ const hitSlop = {
   bottom: 20,
 };
 
-const BubbleRow = ({ onMorePress, caption, date, user, metaCaption }) => (
-  <Container>
+const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent }) => (
+  <Container urgent={urgent}>
     <CaptionsContainer>
+      {urgent ? <Urgent>❗ Prioritaire </Urgent> : null}
       <CommentStyled>{caption?.split('\\n')?.join('\u000A')}</CommentStyled>
       <CreationDate>
         {!!user && <UserName caption={metaCaption} id={user?._id || user} />}
@@ -29,7 +30,7 @@ const BubbleRow = ({ onMorePress, caption, date, user, metaCaption }) => (
 );
 
 const Container = styled.View`
-  background-color: #f4f5f8;
+  background-color: ${(props) => (props.urgent ? '#fecaca' : '#f4f5f8')};
   border-radius: 16px;
   flex-direction: row;
   align-items: center;
@@ -77,6 +78,14 @@ const Dot = styled.View`
   border-radius: 3px;
   background-color: rgba(30, 36, 55, 0.5);
   margin-right: 3px;
+`;
+
+const Urgent = styled(MyText)`
+  margin-left: -10px;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  padding: 2px 5px;
+  color: red;
 `;
 
 export default BubbleRow;
