@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Alert, findNodeHandle, View } from 'react-native';
+import { Alert, View } from 'react-native';
 import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -51,7 +51,7 @@ const ForgetPassword = ({ navigation }) => {
     if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.current.measureLayout(
-        findNodeHandle(scrollViewRef.current),
+        scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },

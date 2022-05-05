@@ -1,6 +1,5 @@
 import { PERMISSIONS } from 'react-native-permissions';
 import getPermissionAsync from './permissions';
-import IntentLauncher from 'react-native-intent-launcher';
 import app from '../../app.json';
 import { Alert, Linking, Platform } from 'react-native';
 
@@ -76,10 +75,7 @@ export const alertPhotosSetting = async (error, requestedAccess = 'images') => {
             onPress: () => {
               Platform.select({
                 ios: Linking.openURL('app-settings:'),
-                android: IntentLauncher.startActivity({
-                  action: 'android.settings.APPLICATION_DETAILS_SETTINGS',
-                  data: `package:${app.bundle.android}`,
-                }),
+                android: Linking.openSettings(),
               });
             },
           },

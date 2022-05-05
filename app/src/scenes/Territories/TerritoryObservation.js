@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, findNodeHandle, View } from 'react-native';
+import { Alert, View } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -13,7 +13,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
-import { MMKV } from '../../services/dataManagement';
+import { storage } from '../../services/dataManagement';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -159,10 +159,7 @@ const TerritoryObservation = ({ route, navigation }) => {
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
       setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obsDB._id));
-      await MMKV.setMapAsync(
-        'territory-observation',
-        allTerritoryOservations.filter((p) => p._id !== obsDB._id)
-      );
+      storage.set('territory-observation', JSON.stringify(allTerritoryOservations.filter((p) => p._id !== obsDB._id)));
       Alert.alert('Observation supprimée !');
       onBack();
     }
@@ -207,7 +204,7 @@ const TerritoryObservation = ({ route, navigation }) => {
     if (!scrollViewRef.current) return;
     setTimeout(() => {
       ref.measureLayout(
-        findNodeHandle(scrollViewRef.current),
+        scrollViewRef.current,
         (x, y, width, height) => {
           scrollViewRef.current.scrollTo({ y: y - 100, animated: true });
         },

@@ -8,7 +8,7 @@ import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
 import API from '../../services/api';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
-import { MMKV } from '../../services/dataManagement';
+import { storage } from '../../services/dataManagement';
 
 const hitSlop = {
   top: 20,
@@ -87,10 +87,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
       setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== observation._id));
-      await MMKV.setMapAsync(
-        'territory-observation',
-        allTerritoryOservations.filter((p) => p._id !== observation._id)
-      );
+      storage.set('territory-observation', JSON.stringify(allTerritoryOservations.filter((p) => p._id !== observation._id)));
     }
   };
 
