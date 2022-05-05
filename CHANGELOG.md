@@ -1,3 +1,10 @@
+## [1.105.3](https://github.com/SocialGouv/mano/compare/v1.105.2...v1.105.3) (2022-05-05)
+
+
+### Bug Fixes
+
+* **website:** design ([6b7b0ee](https://github.com/SocialGouv/mano/commit/6b7b0ee1be6cd341a5cdfdf74af1d24dc106ecd1))
+
 ## [1.105.2](https://github.com/SocialGouv/mano/compare/v1.105.1...v1.105.2) (2022-05-05)
 
 
