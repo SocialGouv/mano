@@ -2,13 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { Alert } from 'react-native';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
 import API from '../../services/api';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
-import { storage } from '../../services/dataManagement';
 
 const hitSlop = {
   top: 20,
@@ -50,7 +49,7 @@ const computeCustomFieldDisplay = (field, value) => {
 
 const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOptions }) => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-  const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
+  const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
 
   const onPressRequest = async () => {
     const options = ['Supprimer', 'Annuler'];
@@ -87,7 +86,6 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
       setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== observation._id));
-      storage.set('territory-observation', JSON.stringify(allTerritoryOservations.filter((p) => p._id !== observation._id)));
     }
   };
 

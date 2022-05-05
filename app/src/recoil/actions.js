@@ -1,8 +1,10 @@
 import { atom } from 'recoil';
+import { storage } from '../services/dataManagement';
 
 export const actionsState = atom({
   key: 'actionsState',
   default: [],
+  effects: [({ onSet }) => onSet(async (newValue) => storage.set('action', JSON.stringify(newValue)))],
 });
 
 const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];

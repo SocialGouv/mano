@@ -1,10 +1,12 @@
 import { atom, selector } from 'recoil';
+import { storage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
 
 export const personsState = atom({
   key: 'personsState',
   default: [],
+  effects: [({ onSet }) => onSet(async (newValue) => storage.set('person', JSON.stringify(newValue)))],
 });
 
 export const personsLoadingState = atom({

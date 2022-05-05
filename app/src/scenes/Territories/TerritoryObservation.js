@@ -13,7 +13,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
-import { storage } from '../../services/dataManagement';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -159,7 +158,6 @@ const TerritoryObservation = ({ route, navigation }) => {
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
       setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obsDB._id));
-      storage.set('territory-observation', JSON.stringify(allTerritoryOservations.filter((p) => p._id !== obsDB._id)));
       Alert.alert('Observation supprimée !');
       onBack();
     }

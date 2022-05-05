@@ -1,8 +1,10 @@
 import { atom } from 'recoil';
+import { storage } from '../services/dataManagement';
 
 export const relsPersonPlaceState = atom({
   key: 'relsPersonPlaceState',
   default: [],
+  effects: [({ onSet }) => onSet(async (newValue) => storage.set('relPersonPlace', JSON.stringify(newValue)))],
 });
 
 const encryptedFields = ['place', 'person', 'user'];

@@ -28,7 +28,6 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
-import { storage } from '../../services/dataManagement';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 
 const castToAction = (action) => {
@@ -314,7 +313,6 @@ const Action = ({ navigation, route }) => {
       const res = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
       if (res.ok) {
         setComments((comments) => [res.decryptedData, ...comments]);
-        storage.set('comment', JSON.stringify([res.decryptedData, ...comments]));
       }
     }
     Sentry.setContext('action', { _id: response.decryptedData._id });
@@ -344,16 +342,14 @@ const Action = ({ navigation, route }) => {
   const deleteAction = async (id) => {
     const res = await API.delete({ path: `/action/${id}` });
     if (res.ok) {
-      setActions((actions) => actions.filter((a) => a._id !== id));
       for (let comment of comments.filter((c) => c.action === id)) {
         const res = await API.delete({ path: `/comment/${comment._id}` });
         if (res.ok) {
           setComments((comments) => comments.filter((p) => p._id !== comment._id));
-          storage.set('comment', JSON.stringify(comments.filter((p) => p._id !== comment._id)));
         }
       }
+      setActions((actions) => actions.filter((a) => a._id !== id));
     }
-    storage.set('action', JSON.stringify(actions.filter((a) => a._id !== id)));
     return res;
   };
 
