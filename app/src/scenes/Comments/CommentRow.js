@@ -53,6 +53,7 @@ const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions }) => {
       caption={comment.comment}
       date={comment.date || comment.createdAt}
       user={comment.user}
+      urgent={comment.urgent}
       metaCaption="Commentaire de"
     />
   );
