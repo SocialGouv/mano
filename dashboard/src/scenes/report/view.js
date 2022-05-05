@@ -654,7 +654,11 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
           }
           return commentPopulated;
         })
-        .filter((c) => c.action || c.person),
+        .filter((c) => c.action || c.person)
+        .map((a) => {
+          if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+          return a;
+        }),
     [comments, currentTeam._id, currentTeam?.nightSession, date, persons, actions]
   );
 
@@ -682,6 +686,15 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
           }}
           rowKey="_id"
           columns={[
+            {
+              title: '',
+              dataKey: 'urgent',
+              small: true,
+              render: (comment) => {
+                if (comment.urgent) return <ExclamationMarkButton />;
+                return null;
+              },
+            },
             {
               title: 'Heure',
               dataKey: 'date',

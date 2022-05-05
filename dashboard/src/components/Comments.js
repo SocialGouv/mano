@@ -18,6 +18,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date';
 import { loadingState } from './Loader';
 import useApi from '../services/api';
+import ExclamationMarkButton from './ExclamationMarkButton';
 
 const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
@@ -55,9 +56,10 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
     }
   };
 
-  const addData = async ({ comment }) => {
+  const addData = async ({ comment, urgent }) => {
     const commentBody = {
       comment,
+      urgent,
       user: user._id,
       date: new Date(),
       team: currentTeam._id,
@@ -106,12 +108,13 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
             <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment />
             {comments.map((comment) => {
               return (
-                <StyledComment key={comment._id}>
+                <StyledComment key={comment._id} urgent={comment.urgent}>
                   <CloseButton close onClick={() => deleteData(comment._id)} />
                   <UserName id={comment.user} wrapper={(name) => <div className="author">{name}</div>} />
                   <div className="user"></div>
                   <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                   <div className="content">
+                    {!!comment.urgent && <ExclamationMarkButton />}
                     <p onClick={() => setEditing(comment._id)}>
                       {comment.comment
                         ? comment.comment.split('\n').map((c, i, a) => {
@@ -213,6 +216,22 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                       <Input id="comment" name="comment" type="textarea" value={values.comment} onChange={handleChange} />
                     </FormGroup>
                   </Col>
+                  <Col md={12}>
+                    <FormGroup>
+                      <Label htmlFor="create-comment-urgent">
+                        <input
+                          type="checkbox"
+                          id="create-comment-urgent"
+                          style={{ marginRight: '0.5rem' }}
+                          name="urgent"
+                          checked={values.urgent}
+                          onChange={handleChange}
+                        />
+                        Commentaire prioritaire <br />
+                        <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
+                      </Label>
+                    </FormGroup>
+                  </Col>
                 </Row>
                 <br />
                 <ButtonCustom
@@ -243,16 +262,27 @@ const StyledComment = styled.div`
   flex-direction: column;
   width: 100%;
   border: 1px solid #000; */
+
   .author {
     font-weight: bold;
     color: ${theme.main};
   }
   .content {
-    padding-top: 8px;
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 1rem;
     font-style: italic;
+    display: flex;
+    align-items: center;
+    p {
+      margin-left: 16px;
+      margin-top: 0;
+      margin-bottom: 0;
+    }
     &:hover {
       cursor: pointer;
     }
+    ${(props) => props.urgent && 'background-color: #fecaca;'}
   }
   .time {
     font-size: 10px;

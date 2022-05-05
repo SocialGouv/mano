@@ -8,7 +8,7 @@ export const commentsState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => manoCacheStorage?.setItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['comment', 'person', 'action', 'team', 'user', 'date'];
+const encryptedFields = ['comment', 'person', 'action', 'team', 'user', 'date', 'urgent'];
 
 export const prepareCommentForEncryption = (comment) => {
   const decrypted = {};
