@@ -23,6 +23,8 @@ import { refreshTriggerState } from '../../components/Loader';
 import { useMMKVNumber, useMMKVString } from 'react-native-mmkv';
 
 const Login = ({ navigation }) => {
+  const [authViaCookie, setAuthViaCookie] = useState(false);
+  const [userName, setUserName] = useState('');
   const [email, setEmail] = useState('');
   const [isValid, setIsValid] = useState(false);
   const [example, setExample] = useState('example@example.com');
@@ -40,28 +42,50 @@ const Login = ({ navigation }) => {
   const [storageOrganisationId, setStorageOrganisationId] = useMMKVString('organisationId');
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
-  const checkVersion = async () => {
-    const response = await API.get({ path: '/version' });
-    if (!response.ok) return;
-    if (version !== response.data) {
-      Alert.alert(
-        `La nouvelle version ${response.data} de Mano est disponible !`,
-        `Vous avez la version ${version} actuellement sur votre téléphone`,
-        [
-          { text: 'Télécharger', onPress: () => Linking.openURL(MANO_DOWNLOAD_URL) },
-          { text: 'Plus tard', style: 'cancel' },
-        ],
-        { cancelable: true }
-      );
-    }
-  };
-
   useEffect(() => {
-    // this.props.context.resetAuth();
     setTimeout(async () => {
-      RNBootSplash.hide({ fade: true });
-      checkVersion();
+      // check version
+      const response = await API.get({ path: '/version' });
+      if (response.ok && version !== response.data) {
+        RNBootSplash.hide({ fade: true });
+        Alert.alert(
+          `La nouvelle version ${response.data} de Mano est disponible !`,
+          `Vous avez la version ${version} actuellement sur votre téléphone`,
+          [
+            { text: 'Télécharger', onPress: () => Linking.openURL(MANO_DOWNLOAD_URL) },
+            { text: 'Plus tard', style: 'cancel' },
+          ],
+          { cancelable: true }
+        );
+        return;
+      }
+      // check token
+      const storedToken = await AsyncStorage.getItem('persistent_token');
+      if (!storedToken) return RNBootSplash.hide({ duration: 250 });
+      API.token = storedToken;
+      const { token, ok, user } = await API.get({
+        path: '/user/signin-token',
+        skipEncryption: '/user/signin-token',
+      });
+      RNBootSplash.hide({ duration: 250 });
+      if (ok && token && user) {
+        setAuthViaCookie(true);
+        const { organisation } = user;
+        if (organisation._id !== storageOrganisationId) {
+          clearCache();
+          setLastRefresh(0);
+        }
+        setStorageOrganisationId(organisation._id);
+        setOrganisation(organisation);
+        setUserName(user.name);
+        if (!!organisation.encryptionEnabled && !['superadmin'].includes(user.role)) setShowEncryptionKeyInput(true);
+      } else {
+        await AsyncStorage.removeItem('persistent_token');
+      }
+
+      return setLoading(false);
     }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleShowPassword = () => setShowPassword((show) => !show);
@@ -72,21 +96,39 @@ const Login = ({ navigation }) => {
     setExample(example);
   };
 
+  const onResetCurrentUser = async () => {
+    await AsyncStorage.removeItem('persistent_email');
+    await AsyncStorage.removeItem('persistent_token');
+    setEmail('');
+    setPassword('');
+    setAuthViaCookie(false);
+    setUserName('');
+    setShowEncryptionKeyInput(false);
+    API.token = null;
+  };
+
   const onForgetPassword = () => navigation.navigate('ForgetPassword');
   const onConnect = async () => {
-    if (!isValid) {
-      Alert.alert("L'email n'est pas valide.", `Il doit être de la forme ${example}`);
-      emailRef.current.focus();
-      return;
-    }
-    if (password === '') {
-      Alert.alert('Mot de passe incorrect', 'Le mot de passe ne peut pas être vide');
-      passwordRef.current.focus();
-      return;
+    if (!authViaCookie) {
+      if (!isValid) {
+        Alert.alert("L'email n'est pas valide.", `Il doit être de la forme ${example}`);
+        emailRef.current.focus();
+        return;
+      }
+      if (password === '') {
+        Alert.alert('Mot de passe incorrect', 'Le mot de passe ne peut pas être vide');
+        passwordRef.current.focus();
+        return;
+      }
     }
     setLoading(true);
     const userDebugInfos = await API.getUserDebugInfos();
-    const response = await API.post({ path: '/user/signin', body: { password, email, ...userDebugInfos }, skipEncryption: true });
+    const response = authViaCookie
+      ? await API.get({
+          path: '/user/signin-token',
+          skipEncryption: '/user/signin-token',
+        })
+      : await API.post({ path: '/user/signin', body: { password, email, ...userDebugInfos }, skipEncryption: true });
     if (response.error) {
       Alert.alert(response.error, null, [{ text: 'OK', onPress: () => passwordRef.current.focus() }], {
         cancelable: true,
@@ -104,6 +146,7 @@ const Login = ({ navigation }) => {
     if (response.ok) {
       Keyboard.dismiss();
       API.token = response.token;
+      await AsyncStorage.setItem('persistent_token', response.token);
       API.showTokenExpiredError = true;
       API.organisation = response.user.organisation;
       setUser(response.user);
@@ -186,31 +229,37 @@ const Login = ({ navigation }) => {
         <ScrollContainer ref={scrollViewRef} keyboardShouldPersistTaps="handled" testID="login-screen">
           <View>
             <StatusBar backgroundColor={colors.app.color} />
-            <Title heavy>Bienvenue !</Title>
-            <SubTitle>Veuillez saisir un e-mail enregistré auprès de votre administrateur</SubTitle>
-            <EmailInput
-              onChange={onEmailChange}
-              ref={emailRef}
-              onFocus={() => _scrollToInput(emailRef)}
-              onSubmitEditing={() => passwordRef.current.focus()}
-              testID="login-email"
-            />
-            <InputLabelled
-              ref={passwordRef}
-              onChangeText={setPassword}
-              label="Mot de passe"
-              placeholder="unSecret23!"
-              onFocus={() => _scrollToInput(passwordRef)}
-              value={password}
-              autoCompleteType="password"
-              autoCapitalize="none"
-              secureTextEntry={!showPassword}
-              returnKeyType="done"
-              onSubmitEditing={onConnect}
-              EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
-              onEndIconPress={toggleShowPassword}
-              testID="login-password"
-            />
+            <Title heavy>{userName ? `Bienvenue ${userName}\u00A0 !` : 'Bienvenue !'}</Title>
+            <SubTitle>
+              Veuillez saisir {authViaCookie ? 'la clé de chiffrement définie par' : 'un e-mail enregistré auprès de'} votre administrateur
+            </SubTitle>
+            {!authViaCookie && (
+              <EmailInput
+                onChange={onEmailChange}
+                ref={emailRef}
+                onFocus={() => _scrollToInput(emailRef)}
+                onSubmitEditing={() => passwordRef.current.focus()}
+                testID="login-email"
+              />
+            )}
+            {!authViaCookie && (
+              <InputLabelled
+                ref={passwordRef}
+                onChangeText={setPassword}
+                label="Mot de passe"
+                placeholder="unSecret23!"
+                onFocus={() => _scrollToInput(passwordRef)}
+                value={password}
+                autoCompleteType="password"
+                autoCapitalize="none"
+                secureTextEntry={!showPassword}
+                returnKeyType="done"
+                onSubmitEditing={onConnect}
+                EndIcon={() => <EyeIcon strikedThrough={showPassword} />}
+                onEndIconPress={toggleShowPassword}
+                testID="login-password"
+              />
+            )}
             {!!showEncryptionKeyInput && (
               <InputLabelled
                 ref={encryptionKeyRef}
@@ -228,9 +277,15 @@ const Login = ({ navigation }) => {
                 testID="login-encryption"
               />
             )}
-            <TouchableWithoutFeedback onPress={onForgetPassword}>
-              <Hint>J'ai oublié mon mot de passe</Hint>
-            </TouchableWithoutFeedback>
+            {authViaCookie ? (
+              <TouchableWithoutFeedback onPress={onResetCurrentUser}>
+                <Hint>Se connecter avec un autre utilisateur</Hint>
+              </TouchableWithoutFeedback>
+            ) : (
+              <TouchableWithoutFeedback onPress={onForgetPassword}>
+                <Hint>J'ai oublié mon mot de passe</Hint>
+              </TouchableWithoutFeedback>
+            )}
             <ButtonsContainer>
               <Button caption="Connecter" onPress={onConnect} loading={loading} disabled={loading} testID="button-connect" />
             </ButtonsContainer>
