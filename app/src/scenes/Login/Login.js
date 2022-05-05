@@ -67,7 +67,6 @@ const Login = ({ navigation }) => {
         path: '/user/signin-token',
         skipEncryption: '/user/signin-token',
       });
-      RNBootSplash.hide({ duration: 250 });
       if (ok && token && user) {
         setAuthViaCookie(true);
         const { organisation } = user;
@@ -82,7 +81,7 @@ const Login = ({ navigation }) => {
       } else {
         await AsyncStorage.removeItem('persistent_token');
       }
-
+      RNBootSplash.hide({ duration: 250 });
       return setLoading(false);
     }, 500);
     // eslint-disable-next-line react-hooks/exhaustive-deps

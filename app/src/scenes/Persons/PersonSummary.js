@@ -27,7 +27,6 @@ import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
-import { storage } from '../../services/dataManagement';
 
 const PersonSummary = ({
   navigation,
@@ -68,7 +67,6 @@ const PersonSummary = ({
           const response = await API.delete({ path: `/relPersonPlace/${relPersPlace?._id}` });
           if (response.ok) {
             setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id));
-            storage.set('relPersonPlace', JSON.stringify(relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id)));
           }
           if (!response.ok) return Alert.alert(response.error);
         }

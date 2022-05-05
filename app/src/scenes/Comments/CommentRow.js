@@ -1,16 +1,15 @@
 import React from 'react';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { Alert } from 'react-native';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { commentsState } from '../../recoil/comments';
-import { storage } from '../../services/dataManagement';
 import BubbleRow from '../../components/BubbleRow';
 
 const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions }) => {
   const user = useRecoilValue(userState);
-  const [comments, setComments] = useRecoilState(commentsState);
+  const setComments = useSetRecoilState(commentsState);
 
   const onMorePress = async () => {
     const options = ['Supprimer', 'Annuler'];
@@ -46,7 +45,6 @@ const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions }) => {
     const response = await API.delete({ path: `/comment/${comment._id}` });
     if (!response.ok) return Alert.alert(response.error);
     setComments((comments) => comments.filter((p) => p._id !== comment._id));
-    storage.set('comment', JSON.stringify(comments.filter((p) => p._id !== comment._id)));
   };
 
   return (
