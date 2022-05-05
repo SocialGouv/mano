@@ -18,3 +18,4 @@ require("./2022-03-17_user_healthcare_professional.js");
 require("./2022-03-21-debug-app-dashboard-user.js");
 require("./2022-03-29_add_consultations_columns.js");
 require("./2022-04-25_soft-delete.js");
+require("./2022-05-03_add_medical_file_tables.js");

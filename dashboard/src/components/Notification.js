@@ -49,9 +49,9 @@ export default function Notification() {
           <Table
             data={actionsFiltered}
             rowKey={'_id'}
-            onRowClick={(actionOrConsultation) => {
+            onRowClick={(action) => {
               setShowModal(false);
-              history.push(`/action/${actionOrConsultation._id}`);
+              history.push(`/action/${action._id}`);
             }}
             columns={[
               {

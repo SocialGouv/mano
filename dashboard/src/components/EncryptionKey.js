@@ -23,6 +23,9 @@ import { capture } from '../services/sentry';
 import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
 import { loadingState } from './Loader';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
+import { consultationsState, prepareConsultationForEncryption } from '../recoil/consultations';
+import { prepareTreatmentForEncryption, treatmentsState } from '../recoil/treatments';
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -42,6 +45,9 @@ const EncryptionKey = ({ isMain }) => {
 
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
+  const consultations = useRecoilValue(consultationsState);
+  const treatments = useRecoilValue(treatmentsState);
+  const medicalFiles = useRecoilValue(medicalFileState);
   const comments = useRecoilValue(commentsState);
   const passages = useRecoilValue(passagesState);
   const territories = useRecoilValue(territoriesState);
@@ -49,6 +55,7 @@ const EncryptionKey = ({ isMain }) => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const places = useRecoilValue(placesState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const reports = useRecoilValue(reportsState);
@@ -58,6 +65,9 @@ const EncryptionKey = ({ isMain }) => {
   const totalToEncrypt =
     persons.length +
     actions.length +
+    consultations.length +
+    treatments.length +
+    medicalFiles.length +
     comments.length +
     passages.length +
     territories.length +
@@ -84,6 +94,13 @@ const EncryptionKey = ({ isMain }) => {
       );
 
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedConsultations = await Promise.all(
+        consultations.map(prepareConsultationForEncryption(organisation.consultations)).map(encryptItem(hashedOrgEncryptionKey))
+      );
+      const encryptedTreatments = await Promise.all(treatments.map(prepareTreatmentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedMedicalFiles = await Promise.all(
+        medicalFiles.map(prepareMedicalFileForEncryption(customFieldsMedicalFile)).map(encryptItem(hashedOrgEncryptionKey))
+      );
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedPassages = await Promise.all(passages.map(preparePassageForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedTerritories = await Promise.all(territories.map(prepareTerritoryForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
@@ -109,6 +126,9 @@ const EncryptionKey = ({ isMain }) => {
         body: {
           persons: encryptedPersons,
           actions: encryptedActions,
+          consultations: encryptedConsultations,
+          treatments: encryptedTreatments,
+          medicalFiles: encryptedMedicalFiles,
           comments: encryptedComments,
           passages: encryptedPassages,
           territories: encryptedTerritories,

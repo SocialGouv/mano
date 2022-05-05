@@ -146,6 +146,7 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
       encryptedVerificationKey: organisation.encryptedVerificationKey,
       customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
       customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
+      customFieldsMedicalFile: organisation.customFieldsMedicalFile,
       migrations: organisation.migrations,
       migrationLastUpdateAt: organisation.migrationLastUpdateAt,
     },

@@ -17,12 +17,13 @@ import { formatTime } from '../../services/date';
 import { actionsState, mappedIdsToLabels, TODO } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { consultationsSelector, personsWithPlacesSelector } from '../../recoil/selectors';
+import { personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ConsultationButton from '../../components/ConsultationButton';
+import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
@@ -31,7 +32,7 @@ const List = () => {
   useTitle('Agenda');
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);
-  const consultations = useRecoilValue(consultationsSelector);
+  const consultations = useRecoilValue(consultationsState);
   const comments = useRecoilValue(commentsState);
   const persons = useRecoilValue(personsWithPlacesSelector);
   const organisation = useRecoilValue(organisationState);
@@ -58,12 +59,8 @@ const List = () => {
   );
   // List of consultations filtered by current team and selected statuses.
   const consultationsByStatusAndAuthorization = useMemo(() => {
-    if (!user.healthcareProfessional) return [];
-
-    return consultations.filter(
-      (consult) => (!consult.onlyVisibleByCreator || consult.user === user._id) && (!statuses.length || statuses.includes(consult.status))
-    );
-  }, [consultations, statuses, user]);
+    return consultations.filter((consult) => !statuses.length || statuses.includes(consult.status));
+  }, [consultations, statuses]);
 
   // The next memos are used to filter by search (empty array when search is empty).
   const actionsIds = useMemo(() => (search?.length ? actionsByTeamAndStatus.map((action) => action._id) : []), [actionsByTeamAndStatus, search]);
@@ -100,7 +97,7 @@ const List = () => {
   const limit = 20;
 
   const dataConsolidated = useMemo(
-    () => [...actionsFiltered, ...consultationsFiltered].sort((a, b) => new Date(b.dueAt || b.date) - new Date(a.dueAt || a.date)),
+    () => [...actionsFiltered, ...consultationsFiltered].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt)),
     [actionsFiltered, consultationsFiltered]
   );
 
@@ -208,6 +205,7 @@ const List = () => {
                 history.push(`/action/${actionOrConsultation._id}`);
               }
             }}
+            rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
             columns={[
               {
                 title: '',

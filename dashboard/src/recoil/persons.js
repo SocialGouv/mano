@@ -28,6 +28,86 @@ export const customFieldsPersonsSocialSelector = selector({
   },
 });
 
+export const defaultMedicalCustomFields = [
+  {
+    name: 'consumptions',
+    label: 'Consommations',
+    type: 'multi-choice',
+    options: [
+      'Alcool',
+      'Amphétamine/MDMA/Ecstasy',
+      'Benzodiazépines',
+      'Buprénorphine/Subutex',
+      'Cocaïne',
+      'Crack',
+      'Cannabis',
+      'Héroïne',
+      'Lyrica',
+      'Méthadone',
+      'Moscantin/Skénan',
+      'Tabac',
+      'Tramadol',
+    ],
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'vulnerabilities',
+    label: 'Vulnérabilités',
+    type: 'multi-choice',
+    options: ['Pathologie chronique', 'Psychologique', 'Injecteur', 'Handicap'],
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'caseHistoryTypes',
+    label: "Catégorie d'antécédents",
+    type: 'multi-choice',
+    options: [
+      'Psychiatrie',
+      'Neurologie',
+      'Dermatologie',
+      'Pulmonaire',
+      'Gastro-enterologie',
+      'Rhumatologie',
+      'Cardio-vasculaire',
+      'Ophtalmologie',
+      'ORL',
+      'Dentaire',
+      'Traumatologie',
+      'Endocrinologie',
+      'Uro-gynéco',
+      'Cancer',
+      'Addiction alcool',
+      'Addiction autres',
+      'Hospitalisation',
+    ],
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'caseHistoryDescription',
+    label: 'Informations complémentaires (antécédents)',
+    type: 'textarea',
+    options: null,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'numeroSecuriteSociale',
+    label: 'Numéro de sécurité sociale',
+    type: 'text',
+    options: null,
+    enabled: true,
+    required: false,
+    showInStats: false,
+  },
+];
+
 export const personFieldsIncludingCustomFieldsSelector = selector({
   key: 'personFieldsIncludingCustomFieldsSelector',
   get: ({ get }) => {
@@ -68,8 +148,6 @@ export const reasonsOptions = [
   'Autre',
 ];
 
-export const vulnerabilitiesOptions = ['Pathologie chronique', 'Psychologique', 'Injecteur', 'Handicap'];
-
 export const ressourcesOptions = [
   'SANS',
   'ARE',
@@ -83,22 +161,6 @@ export const ressourcesOptions = [
   'Mendicité',
   'Autre',
 ];
-
-export const consumptionsOptions = [
-  'Héroïne',
-  'Buprénorphine/Subutex',
-  'Méthadone',
-  'Moscantin/Skénan',
-  'Cocaïne',
-  'Crack',
-  'Amphétamine/MDMA/Ecstasy',
-  'Benzodiazépines',
-  'Cannabis',
-  'Alcool',
-  'Tabac',
-  'Tramadol',
-  'Lyrica',
-].sort((c1, c2) => c1.localeCompare(c2));
 
 export const addressDetailsFixedFields = [
   'Logement',
@@ -125,26 +187,6 @@ export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française'];
 
 export const yesNoOptions = ['Oui', 'Non'];
 
-export const caseHistoryTypesOptions = [
-  'Psychiatrie',
-  'Neurologie',
-  'Dermatologie',
-  'Pulmonaire',
-  'Gastro-enterologie',
-  'Rhumatologie',
-  'Cardio-vasculaire',
-  'Ophtalmologie',
-  'ORL',
-  'Dentaire',
-  'Traumatologie',
-  'Endocrinologie',
-  'Uro-gynéco',
-  'Cancer',
-  'Addiction alcool',
-  'Addiction autres',
-  'Hospitalisation',
-];
-
 export const outOfActiveListReasonOptions = [
   'Relai vers autre structure',
   'Hébergée',
@@ -155,61 +197,6 @@ export const outOfActiveListReasonOptions = [
   'Hospitalisation',
   'Reconduite à la frontière',
   'Autre',
-];
-
-export const consultationTypes = ['Psychologique', 'Infirmier', 'Médicale'];
-
-export const defaultMedicalCustomFields = [
-  {
-    name: 'consumptions',
-    label: 'Consommations',
-    type: 'multi-choice',
-    options: consumptionsOptions,
-    enabled: true,
-    required: false,
-    showInStats: true,
-    onlyHealthcareProfessional: false,
-  },
-  {
-    name: 'vulnerabilities',
-    label: 'Vulnérabilités',
-    type: 'multi-choice',
-    options: vulnerabilitiesOptions,
-    enabled: true,
-    required: false,
-    showInStats: true,
-    onlyHealthcareProfessional: false,
-  },
-  {
-    name: 'caseHistoryTypes',
-    label: "Catégorie d'antécédents",
-    type: 'multi-choice',
-    options: caseHistoryTypesOptions,
-    enabled: true,
-    required: false,
-    showInStats: true,
-    onlyHealthcareProfessional: false,
-  },
-  {
-    name: 'caseHistoryDescription',
-    label: 'Informations complémentaires (antécédents)',
-    type: 'textarea',
-    options: null,
-    enabled: true,
-    required: false,
-    showInStats: true,
-    onlyHealthcareProfessional: false,
-  },
-  {
-    name: 'numeroSecuriteSociale',
-    label: 'Numéro de sécurité sociale',
-    type: 'text',
-    options: null,
-    enabled: true,
-    required: false,
-    showInStats: false,
-    onlyHealthcareProfessional: true,
-  },
 ];
 
 /*
@@ -304,29 +291,6 @@ export const personFields = [
     options: outOfActiveListReasonOptions,
   },
   { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
-  {
-    name: 'documentsMedical',
-    type: 'files',
-    label: 'Documents',
-    encrypted: true,
-    importable: false,
-    filterable: false,
-    onlyHealthcareProfessional: true,
-  },
-  {
-    name: 'consultations',
-    type: 'consultations',
-    label: 'Historique des consultations',
-    encrypted: true,
-    importable: false,
-  },
-  {
-    name: 'treatments',
-    type: 'treatments',
-    label: 'Traitements en cours',
-    encrypted: true,
-    importable: false,
-  },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);

@@ -33,7 +33,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", {
       text: "Créer une nouvelle personne",
     });
-    await expect(page).toFill('input[name="name"]', "Ma première personne");
+    await expect(page).toFill('input[name="name"]', "Ma première personne", { timeout: 2000 });
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");

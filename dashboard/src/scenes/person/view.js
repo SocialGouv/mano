@@ -142,9 +142,11 @@ const View = () => {
         <TabPane tabId={0}>
           <Summary person={person} />
         </TabPane>
-        <TabPane tabId={1}>
-          <MedicalFile person={person} />
-        </TabPane>
+        {!!user.healthcareProfessionnal && (
+          <TabPane tabId={1}>
+            <MedicalFile person={person} />
+          </TabPane>
+        )}
         <TabPane tabId={2}>
           <Actions person={person} onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
         </TabPane>
@@ -454,7 +456,6 @@ const Summary = ({ person }) => {
                 </Col>
                 {customFieldsPersonsMedical
                   .filter((f) => f.enabled)
-                  .filter((f) => !f.onlyHealthcareProfessional)
                   .map((field) => (
                     <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                   ))}

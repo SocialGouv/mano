@@ -19,6 +19,7 @@ Organisation.init(
     customFieldsObs: DataTypes.JSONB,
     customFieldsPersonsSocial: DataTypes.JSONB,
     customFieldsPersonsMedical: DataTypes.JSONB,
+    customFieldsMedicalFile: DataTypes.JSONB,
     migrating: { type: DataTypes.BOOLEAN, default: false },
     migrations: DataTypes.ARRAY(DataTypes.TEXT),
     migrationLastUpdateAt: DataTypes.DATE,
