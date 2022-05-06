@@ -1,3 +1,10 @@
+## [1.106.1](https://github.com/SocialGouv/mano/compare/v1.106.0...v1.106.1) (2022-05-06)
+
+
+### Bug Fixes
+
+* **dashboard:** display back medical file ([8882da1](https://github.com/SocialGouv/mano/commit/8882da152dd8d02a994a162940c263bf1dc6a1a0))
+
 # [1.106.0](https://github.com/SocialGouv/mano/compare/v1.105.3...v1.106.0) (2022-05-05)
 
 
