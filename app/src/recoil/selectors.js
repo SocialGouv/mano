@@ -6,7 +6,7 @@ import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { territoriesState } from './territory';
-import { getIsDayWithinHoursOffsetOfDay, isComingInDays, isPassed, isToday, isTomorrow } from '../services/date';
+import { isComingInDays, isPassed, isToday, isTomorrow } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { filterBySearch, filterData } from '../utils/search';
 

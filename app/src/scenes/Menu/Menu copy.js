@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+Profileimport React, { useState } from 'react';
 import { Linking, TouchableWithoutFeedback } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -19,14 +20,17 @@ const Menu = ({ navigation }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title="Menu" />
+      <ScreenTitle title="Profil" />
       <ScrollContainer noPadding>
-        <Spacer height={30} />
-        <Row withNextButton caption="Structures" onPress={() => navigation.navigate('Structures')} />
+        <Spacer height={50} />
+        <Row withNextButton caption="Donnez votre avis sur l'app" onPress={() => Linking.openURL(FRAMAFORM_MANO)} />
         <Row withNextButton caption="Soliguide" onPress={() => Linking.openURL('https://soliguide.fr')} />
-        <Spacer height={30} />
-        <Row withNextButton caption="Changer d'équipe" onPress={() => navigation.navigate('ChangeTeam')} />
+        <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
+        <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
+        <Row withNextButton caption="Charte des utilisateurs" onPress={() => navigation.navigate('Charte')} />
         <Row withNextButton caption="Changer le mot de passe" onPress={() => navigation.navigate('ChangePassword')} />
+        <Row withNextButton caption="Changer d'équipe" onPress={() => navigation.navigate('ChangeTeam')} />
+        <Row withNextButton caption="Télécharger Mano" onPress={() => Linking.openURL(MANO_DOWNLOAD_URL)} />
         <Row
           withNextButton
           caption="Déconnexion"
@@ -41,14 +45,6 @@ const Menu = ({ navigation }) => {
             resetCurrentTeam();
           }}
         />
-        <Spacer height={30} />
-        <Row withNextButton caption="Donnez votre avis sur l'app" onPress={() => Linking.openURL(FRAMAFORM_MANO)} />
-        <Row withNextButton caption="Télécharger Mano" onPress={() => Linking.openURL(MANO_DOWNLOAD_URL)} />
-        <Spacer height={30} />
-        <Row withNextButton caption="Charte des utilisateurs" onPress={() => navigation.navigate('Charte')} />
-        <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
-        <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
-        <Spacer height={30} />
       </ScrollContainer>
     </SceneContainer>
   );

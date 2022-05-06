@@ -40,6 +40,9 @@ import API from './services/api';
 import Charte from './scenes/Menu/Charte';
 import CharteAcceptance from './scenes/Login/CharteAcceptance';
 import Loader from './components/Loader';
+import BellWithNotifications from './scenes/Notifications/BellWithNotifications';
+import DotsIcon from './icons/DotsIcon';
+import Notifications from './scenes/Notifications/Notifications';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -104,11 +107,22 @@ const TerritoriesNavigator = () => {
   );
 };
 
+const NotificationsStack = createStackNavigator();
+const NotificationsNavigator = () => {
+  return (
+    <NotificationsStack.Navigator headerMode="none" initialRouteName="Notifications">
+      <NotificationsStack.Screen name="Notifications" component={Notifications} />
+      <NotificationsStack.Screen name="ActionComment" component={Comment} />
+      <NotificationsStack.Screen name="PersonComment" component={Comment} />
+    </NotificationsStack.Navigator>
+  );
+};
 const MenuStack = createStackNavigator();
 const MenuNavigator = () => {
   return (
     <MenuStack.Navigator headerMode="none" initialRouteName="Menu">
       <MenuStack.Screen name="Menu" component={Menu} />
+      <MenuStack.Screen name="Structures" component={StructuresNavigator} />
       <MenuStack.Screen name="ChangePassword" component={ChangePassword} />
       <MenuStack.Screen name="ChangeTeam" component={ChangeTeam} />
       <MenuStack.Screen name="Legal" component={Legal} />
@@ -120,7 +134,7 @@ const MenuNavigator = () => {
 
 const Tab = createBottomTabNavigator();
 
-const TabNavigator = ({ navigation }) => (
+const TabNavigator = () => (
   <Tab.Navigator
     lazy
     initialRouteName="Agenda"
@@ -159,20 +173,20 @@ const TabNavigator = ({ navigation }) => (
       }}
     />
     <Tab.Screen
-      name="Structures"
-      component={StructuresNavigator}
+      name="Notifications"
+      component={NotificationsNavigator}
       options={{
-        tabBarIcon: ({ size, color }) => <StructuresIcon size={size} color={color} />,
-        tabBarLabel: 'STRUCTURES',
-        tabBarTestID: 'tab-bar-structures',
+        tabBarIcon: ({ size, color }) => <BellWithNotifications size={size} color={color} />,
+        tabBarLabel: 'PRIORITÉS',
+        tabBarTestID: 'tab-bar-notifications',
       }}
     />
     <Tab.Screen
-      name="Profil"
+      name="Menu"
       component={MenuNavigator}
       options={{
-        tabBarIcon: ({ size, color }) => <MenuIcon size={size} color={color} />,
-        tabBarLabel: 'PROFIL',
+        tabBarIcon: ({ size, color }) => <DotsIcon size={size} color={color} />,
+        tabBarLabel: 'MENU',
         tabBarTestID: 'tab-bar-profil',
       }}
     />

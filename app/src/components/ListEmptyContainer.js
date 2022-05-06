@@ -14,6 +14,7 @@ export const ListEmptyStructures = () => <ListEmptyContainer text="Il n'y a pas 
 export const ListEmptyTerritories = () => <ListEmptyContainer text="Il n'y a pas de territoire à afficher" />;
 export const ListEmptyStructureWithName = (name) => () => <ListEmptyContainer text={`Il n'y a pas de structure incluant ${name}`} />;
 export const ListEmptyPlaceWithName = (name) => () => <ListEmptyContainer text={`Il n'y a pas de lieu incluant ${name}`} />;
+export const ListEmptyUrgent = () => <ListEmptyContainer opaque text="Il n'y a pas d'élément prioritaire à afficher" />;
 
 export const ListNoMoreActions = () => <ListEmptyContainer opaque text="Il n'y a pas d'autre action à afficher" />;
 export const ListNoMorePersons = () => <ListEmptyContainer opaque text="Il n'y a pas d'autre personne à afficher" />;
