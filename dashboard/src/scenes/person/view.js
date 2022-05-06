@@ -142,7 +142,7 @@ const View = () => {
         <TabPane tabId={0}>
           <Summary person={person} />
         </TabPane>
-        {!!user.healthcareProfessionnal && (
+        {!!user.healthcareProfessional && (
           <TabPane tabId={1}>
             <MedicalFile person={person} />
           </TabPane>
