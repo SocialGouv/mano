@@ -1,3 +1,15 @@
+# [1.107.0](https://github.com/SocialGouv/mano/compare/v1.106.1...v1.107.0) (2022-05-09)
+
+
+### Bug Fixes
+
+* **dashboard:** use new sentry ([4189795](https://github.com/SocialGouv/mano/commit/41897958db67ba77b3e26a7d2131d5405ddbe5f6))
+
+
+### Features
+
+* **app:** show urgent actions/comments in specific screen + reorder … ([#682](https://github.com/SocialGouv/mano/issues/682)) ([c70902e](https://github.com/SocialGouv/mano/commit/c70902e97e35e3e46cbd897ddf9760807b7bf460))
+
 ## [1.106.1](https://github.com/SocialGouv/mano/compare/v1.106.0...v1.106.1) (2022-05-06)
 
 
