@@ -63,6 +63,8 @@ const HitMonth = ({ date, debug }) => {
 
   const days = getDaysOfMonth(date).filter((day) => !isAfterToday(day));
 
+  console.log(days);
+
   return (
     <div style={{ width: '100%' }}>
       <MonthButton onClick={() => setIsOpen(!isOpen)} title={`${date.format('MMMM YYYY')}`} />

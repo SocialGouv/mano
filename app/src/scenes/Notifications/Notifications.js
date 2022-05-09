@@ -136,19 +136,16 @@ const Notifications = ({ navigation }) => {
   return (
     <SceneContainer>
       <ScreenTitle title="Priorités" />
-      <ScrollContainer noPadding>
-        <Spacer height={30} />
-        <SectionListStyled
-          refreshing={refreshTrigger.status}
-          onRefresh={onRefresh}
-          sections={sections}
-          initialNumToRender={5}
-          renderItem={renderItem}
-          renderSectionHeader={SectionHeader}
-          keyExtractor={keyExtractor}
-          ListEmptyComponent={ListEmptyUrgent}
-        />
-      </ScrollContainer>
+      <SectionListStyled
+        refreshing={refreshTrigger.status}
+        onRefresh={onRefresh}
+        sections={sections}
+        initialNumToRender={5}
+        renderItem={renderItem}
+        renderSectionHeader={SectionHeader}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={ListEmptyUrgent}
+      />
     </SceneContainer>
   );
 };

@@ -43,6 +43,8 @@ import Loader from './components/Loader';
 import BellWithNotifications from './scenes/Notifications/BellWithNotifications';
 import DotsIcon from './icons/DotsIcon';
 import Notifications from './scenes/Notifications/Notifications';
+import ReportsCalendar from './scenes/Reports/ReportsCalendar';
+import Report from './scenes/Reports/Report';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -117,11 +119,37 @@ const NotificationsNavigator = () => {
     </NotificationsStack.Navigator>
   );
 };
+
+const ReportsStack = createStackNavigator();
+const ReportsNavigator = () => {
+  return (
+    <ReportsStack.Navigator headerMode="none" initialRouteName="ReportsCalendar">
+      <ReportsStack.Screen name="ReportsCalendar" component={ReportsCalendar} />
+      <ReportsStack.Screen name="Report" component={Report} />
+
+      <ReportsStack.Screen name="Action" component={Action} />
+      <ReportsStack.Screen name="NewActionForm" component={NewActionForm} />
+      <ReportsStack.Screen name="ActionComment" component={Comment} />
+
+      <ReportsStack.Screen name="Person" component={Person} />
+      <ReportsStack.Screen name="PersonsSearch" component={PersonsSearch} />
+      <ReportsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
+      <ReportsStack.Screen name="PersonPlace" component={Place} />
+      <ReportsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
+      <ReportsStack.Screen name="PersonComment" component={Comment} />
+
+      <ReportsStack.Screen name="Territory" component={Territory} />
+      <ReportsStack.Screen name="TerritoryObservation" component={TerritoryObservation} />
+    </ReportsStack.Navigator>
+  );
+};
+
 const MenuStack = createStackNavigator();
 const MenuNavigator = () => {
   return (
     <MenuStack.Navigator headerMode="none" initialRouteName="Menu">
       <MenuStack.Screen name="Menu" component={Menu} />
+      <MenuStack.Screen name="Reports" component={ReportsNavigator} />
       <MenuStack.Screen name="Structures" component={StructuresNavigator} />
       <MenuStack.Screen name="ChangePassword" component={ChangePassword} />
       <MenuStack.Screen name="ChangeTeam" component={ChangeTeam} />

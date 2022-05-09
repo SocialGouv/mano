@@ -22,6 +22,7 @@ const Menu = ({ navigation }) => {
       <ScreenTitle title="Menu" />
       <ScrollContainer noPadding>
         <Spacer height={30} />
+        <Row withNextButton caption="Comptes-rendus" onPress={() => navigation.navigate('Reports')} />
         <Row withNextButton caption="Structures" onPress={() => navigation.navigate('Structures')} />
         <Row withNextButton caption="Soliguide" onPress={() => Linking.openURL('https://soliguide.fr')} />
         <Spacer height={30} />

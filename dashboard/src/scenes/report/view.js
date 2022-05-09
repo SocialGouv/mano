@@ -154,8 +154,6 @@ const View = () => {
     );
   };
 
-  console.log({ tabsContents });
-
   const renderScreenOnly = () => (
     <div
       className="noprint"
