@@ -236,7 +236,6 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                 <br />
                 <ButtonCustom
                   type="submit"
-                  color="info"
                   disabled={isSubmitting}
                   onClick={() => !isSubmitting && handleSubmit()}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}

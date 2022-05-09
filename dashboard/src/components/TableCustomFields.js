@@ -263,7 +263,6 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                   </Row>
                   <br />
                   <ButtonCustom
-                    color="info"
                     disabled={isSubmitting || !field.label}
                     loading={isSubmitting}
                     onClick={() => !isSubmitting && handleSubmit()}

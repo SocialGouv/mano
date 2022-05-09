@@ -234,7 +234,6 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
                 <br />
                 <ButtonCustom
                   type="submit"
-                  color="info"
                   disabled={isSubmitting}
                   onClick={() => !isSubmitting && handleSubmit()}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}

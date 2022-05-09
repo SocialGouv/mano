@@ -172,7 +172,7 @@ const CreateTerritory = () => {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom color="info" disabled={isSubmitting} onClick={handleSubmit} title="Sauvegarder" />
+                <ButtonCustom disabled={isSubmitting} onClick={handleSubmit} title="Sauvegarder" />
               </React.Fragment>
             )}
           </Formik>

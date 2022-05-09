@@ -32,6 +32,7 @@ import Documents from '../../components/Documents';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../../recoil/consultations';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
 import { medicalFileState, prepareMedicalFileForEncryption, customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
+import { modalConfirmState } from '../../components/ModalConfirm';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -39,6 +40,7 @@ export function MedicalFile({ person }) {
   const [allConsultations, setAllConsultations] = useRecoilState(consultationsState);
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
+  const setModalConfirmState = useSetRecoilState(modalConfirmState);
 
   const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null, { resetOnValueChange: true });
   const [currentConsultation, setCurrentConsultation] = useState(
@@ -691,13 +693,28 @@ export function MedicalFile({ person }) {
             <React.Fragment>
               <ModalHeader
                 toggle={async () => {
-                  if (JSON.stringify(values) !== JSON.stringify(currentConsultation)) {
-                    if (window.confirm('Voulez-vous enregistrer vos modifications ?')) {
-                      handleSubmit();
-                    }
-                  } else {
-                    resetCurrentConsultation();
-                  }
+                  if (JSON.stringify(values) === JSON.stringify(currentConsultation)) return resetCurrentConsultation();
+                  setModalConfirmState({
+                    open: true,
+                    options: {
+                      title: 'Voulez-vous enregistrer vos modifications ?',
+                      buttons: [
+                        {
+                          text: 'Oui',
+                          onClick: handleSubmit,
+                        },
+                        {
+                          text: 'Non',
+                          style: 'danger',
+                          onClick: resetCurrentConsultation,
+                        },
+                        {
+                          text: 'Annuler',
+                          style: 'cancel',
+                        },
+                      ],
+                    },
+                  });
                 }}>
                 {isNewConsultation ? 'Ajouter une consultation' : currentConsultation?.name}
               </ModalHeader>
@@ -817,7 +834,6 @@ export function MedicalFile({ person }) {
                 <br />
                 <ButtonCustom
                   type="submit"
-                  color="info"
                   disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentConsultation)}
                   onClick={() => !isSubmitting && handleSubmit()}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
@@ -872,13 +888,28 @@ export function MedicalFile({ person }) {
             <React.Fragment>
               <ModalHeader
                 toggle={async () => {
-                  if (JSON.stringify(values) !== JSON.stringify(currentTreatment)) {
-                    if (window.confirm('Voulez-vous enregistrer vos modifications ?')) {
-                      handleSubmit();
-                    }
-                  } else {
-                    resetCurrentTreatment();
-                  }
+                  if (JSON.stringify(values) === JSON.stringify(currentTreatment)) return resetCurrentTreatment();
+                  setModalConfirmState({
+                    open: true,
+                    options: {
+                      title: 'Voulez-vous enregistrer vos modifications ?',
+                      buttons: [
+                        {
+                          text: 'Oui',
+                          onClick: handleSubmit,
+                        },
+                        {
+                          text: 'Non',
+                          style: 'danger',
+                          onClick: resetCurrentTreatment,
+                        },
+                        {
+                          text: 'Annuler',
+                          style: 'cancel',
+                        },
+                      ],
+                    },
+                  });
                 }}>
                 {isNewTreatment ? 'Ajouter un traitement' : currentTreatment?.name}
               </ModalHeader>
@@ -982,7 +1013,6 @@ export function MedicalFile({ person }) {
                 <br />
                 <ButtonCustom
                   type="submit"
-                  color="info"
                   disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentTreatment)}
                   onClick={() => !isSubmitting && handleSubmit()}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}

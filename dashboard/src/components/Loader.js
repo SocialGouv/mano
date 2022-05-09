@@ -14,7 +14,6 @@ import { placesState } from '../recoil/places';
 import { relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { territoryObservationsState } from '../recoil/territoryObservations';
 import { commentsState } from '../recoil/comments';
-import { capture } from '../services/sentry';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import dayjs from 'dayjs';
@@ -210,7 +209,6 @@ const Loader = () => {
       query: { organisation: organisationId, lastRefresh },
     });
     if (!response.ok) {
-      capture('error getting stats', { extra: response });
       setRefreshTrigger({
         status: false,
         options: { showFullScreen: false, initialLoad: false },
@@ -221,9 +219,6 @@ const Loader = () => {
     let total =
       response.data.actions +
       response.data.persons +
-      response.data.consultations +
-      response.data.treatments +
-      response.data.medicalFiles +
       response.data.territories +
       response.data.territoryObservations +
       response.data.places +
@@ -231,6 +226,25 @@ const Loader = () => {
       response.data.passages +
       response.data.reports +
       response.data.relsPersonPlace;
+
+    if (lastRefresh > 0 && user.healthcareProfessional) {
+      // medical data is never saved in cache
+      // so we always have to download all at every page reload
+      // therefore for the loader to be efficient, we need to
+      const medicalDataResponse = await API.get({
+        path: '/organisation/stats',
+        query: { organisation: organisationId, lastRefresh: 0 },
+      });
+      if (!medicalDataResponse.ok) {
+        setRefreshTrigger({
+          status: false,
+          options: { showFullScreen: false, initialLoad: false },
+        });
+        return;
+      }
+      total = total + medicalDataResponse.data.consultations + medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles;
+    }
+
     if (initialLoad) {
       total = total + collections.length; // for the progress bar to be beautiful
     }

@@ -136,7 +136,7 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
                 setShowPassword={setShowPassword}
               />
             </FormGroup>
-            <ButtonCustom title="Mettre à jour" type="submit" color="info" disabled={isSubmitting} onClick={handleSubmit} />
+            <ButtonCustom title="Mettre à jour" type="submit" disabled={isSubmitting} onClick={handleSubmit} />
           </div>
         );
       }}

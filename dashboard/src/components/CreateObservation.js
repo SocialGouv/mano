@@ -140,13 +140,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom
-                  color="info"
-                  disabled={isSubmitting}
-                  loading={isSubmitting}
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  title="Sauvegarder"
-                />
+                <ButtonCustom disabled={isSubmitting} loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} title="Sauvegarder" />
               </React.Fragment>
             )}
           </Formik>
