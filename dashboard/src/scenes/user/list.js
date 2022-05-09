@@ -184,7 +184,7 @@ const Create = ({ onChange }) => {
                 <br />
                 <Row>
                   <Col md={6}>
-                    <ButtonCustom title="Sauvegarder" loading={isSubmitting} color="info" onClick={handleSubmit} />
+                    <ButtonCustom title="Sauvegarder" loading={isSubmitting} onClick={handleSubmit} />
                   </Col>
                 </Row>
               </React.Fragment>

@@ -30,6 +30,7 @@ import useApi, { recoilResetKeyState, tokenCached } from './services/api';
 import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
+import ModalConfirm from './components/ModalConfirm';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -116,6 +117,7 @@ export default function ContextedApp() {
         <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
         <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
         <Loader />
+        <ModalConfirm />
       </Provider>
     </RecoilRoot>
   );

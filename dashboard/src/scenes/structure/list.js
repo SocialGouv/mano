@@ -113,7 +113,7 @@ const Create = ({ onChange }) => {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom loading={isSubmitting} color="info" onClick={handleSubmit} title="Créer" />
+                <ButtonCustom loading={isSubmitting} onClick={handleSubmit} title="Créer" />
               </React.Fragment>
             )}
           </Formik>

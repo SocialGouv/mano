@@ -58,7 +58,7 @@ const Account = () => {
             <hr />
             <Row style={{ display: 'flex', justifyContent: 'center' }}>
               <LinkToChangePassword />
-              <ButtonCustom width="250" title="Mettre à jour" loading={isSubmitting} color="info" onClick={handleSubmit} />
+              <ButtonCustom width="250" title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} />
             </Row>
           </React.Fragment>
         )}

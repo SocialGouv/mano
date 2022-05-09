@@ -69,7 +69,7 @@ const View = () => {
                 </Col>
               </Row>
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <ButtonCustom loading={isSubmitting} color="info" onClick={handleSubmit} title="Mettre à jour" />
+                <ButtonCustom loading={isSubmitting} onClick={handleSubmit} title="Mettre à jour" />
                 <ButtonCustom style={{ marginLeft: 10 }} color="danger" onClick={deleteData} title="Supprimer" />
               </div>
             </React.Fragment>

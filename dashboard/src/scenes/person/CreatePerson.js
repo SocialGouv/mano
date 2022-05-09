@@ -101,7 +101,6 @@ const CreatePerson = ({ refreshable }) => {
                 </Row>
                 <br />
                 <ButtonCustom
-                  color="info"
                   onClick={() => !isSubmitting && handleSubmit()}
                   disabled={!!isSubmitting || !values.name?.trim()?.length}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}

@@ -114,7 +114,6 @@ const AddPlace = ({ personId }) => {
                 </Row>
                 <br />
                 <ButtonCustom
-                  color="info"
                   onClick={() => !isSubmitting && handleSubmit()}
                   disabled={!!isSubmitting}
                   title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}

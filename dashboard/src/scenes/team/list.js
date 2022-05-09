@@ -148,7 +148,7 @@ const Create = () => {
                   <br />
                   <Row>
                     <Col md={3}>
-                      <ButtonCustom id="create-team" title="Créer" loading={isSubmitting} color="info" onClick={handleSubmit} />
+                      <ButtonCustom id="create-team" title="Créer" loading={isSubmitting} onClick={handleSubmit} />
                     </Col>
                   </Row>
                 </React.Fragment>

@@ -158,7 +158,7 @@ const Create = () => {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom id="create-place-button" loading={isSubmitting} color="info" onClick={handleSubmit} title="Créer" />
+                <ButtonCustom id="create-place-button" loading={isSubmitting} onClick={handleSubmit} title="Créer" />
               </React.Fragment>
             )}
           </Formik>
