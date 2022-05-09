@@ -13,7 +13,19 @@
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		7699B88040F8A987B510C191 /* libPods-mano-manoTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 19F6CBCC0A4E27FBF8BF4A61 /* libPods-mano-manoTests.a */; };
-		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		F737FCC8282566A90075BD99 /* BootSplash.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = F737FCC7282566A90075BD99 /* BootSplash.storyboard */; };
+		F737FCED282567AC0075BD99 /* Nexa-Regular-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE1282567AB0075BD99 /* Nexa-Regular-Italic.otf */; };
+		F737FCEE282567AC0075BD99 /* NexaRegular.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE2282567AB0075BD99 /* NexaRegular.otf */; };
+		F737FCEF282567AC0075BD99 /* NexaHeavy.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE3282567AB0075BD99 /* NexaHeavy.otf */; };
+		F737FCF0282567AC0075BD99 /* Nexa-Book-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE4282567AB0075BD99 /* Nexa-Book-Italic.otf */; };
+		F737FCF1282567AC0075BD99 /* NexaBlack.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE5282567AB0075BD99 /* NexaBlack.otf */; };
+		F737FCF2282567AC0075BD99 /* Nexa-Book.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE6282567AB0075BD99 /* Nexa-Book.otf */; };
+		F737FCF3282567AC0075BD99 /* Nexa-Black-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE7282567AB0075BD99 /* Nexa-Black-Italic.otf */; };
+		F737FCF4282567AC0075BD99 /* Nexa-Bold-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE8282567AB0075BD99 /* Nexa-Bold-Italic.otf */; };
+		F737FCF5282567AC0075BD99 /* Nexa-Heavy-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCE9282567AB0075BD99 /* Nexa-Heavy-Italic.otf */; };
+		F737FCF6282567AC0075BD99 /* Nexa-Bold.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCEA282567AB0075BD99 /* Nexa-Bold.otf */; };
+		F737FCF7282567AC0075BD99 /* Nexa-Light-Italic.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCEB282567AB0075BD99 /* Nexa-Light-Italic.otf */; };
+		F737FCF8282567AC0075BD99 /* Nexa-Light.otf in Resources */ = {isa = PBXBuildFile; fileRef = F737FCEC282567AC0075BD99 /* Nexa-Light.otf */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -41,9 +53,21 @@
 		5709B34CF0A7D63546082F79 /* Pods-mano.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano.release.xcconfig"; path = "Target Support Files/Pods-mano/Pods-mano.release.xcconfig"; sourceTree = "<group>"; };
 		5B7EB9410499542E8C5724F5 /* Pods-mano-manoTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano-manoTests.debug.xcconfig"; path = "Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests.debug.xcconfig"; sourceTree = "<group>"; };
 		5DCACB8F33CDC322A6C60F78 /* libPods-mano.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-mano.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = mano/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		89C6BE57DB24E9ADA2F236DE /* Pods-mano-manoTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-mano-manoTests.release.xcconfig"; path = "Target Support Files/Pods-mano-manoTests/Pods-mano-manoTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
+		F737FCC7282566A90075BD99 /* BootSplash.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = BootSplash.storyboard; path = mano/BootSplash.storyboard; sourceTree = "<group>"; };
+		F737FCE1282567AB0075BD99 /* Nexa-Regular-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Regular-Italic.otf"; path = "../assets/fonts/Nexa-Regular-Italic.otf"; sourceTree = "<group>"; };
+		F737FCE2282567AB0075BD99 /* NexaRegular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NexaRegular.otf; path = ../assets/fonts/NexaRegular.otf; sourceTree = "<group>"; };
+		F737FCE3282567AB0075BD99 /* NexaHeavy.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NexaHeavy.otf; path = ../assets/fonts/NexaHeavy.otf; sourceTree = "<group>"; };
+		F737FCE4282567AB0075BD99 /* Nexa-Book-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Book-Italic.otf"; path = "../assets/fonts/Nexa-Book-Italic.otf"; sourceTree = "<group>"; };
+		F737FCE5282567AB0075BD99 /* NexaBlack.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = NexaBlack.otf; path = ../assets/fonts/NexaBlack.otf; sourceTree = "<group>"; };
+		F737FCE6282567AB0075BD99 /* Nexa-Book.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Book.otf"; path = "../assets/fonts/Nexa-Book.otf"; sourceTree = "<group>"; };
+		F737FCE7282567AB0075BD99 /* Nexa-Black-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Black-Italic.otf"; path = "../assets/fonts/Nexa-Black-Italic.otf"; sourceTree = "<group>"; };
+		F737FCE8282567AB0075BD99 /* Nexa-Bold-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Bold-Italic.otf"; path = "../assets/fonts/Nexa-Bold-Italic.otf"; sourceTree = "<group>"; };
+		F737FCE9282567AB0075BD99 /* Nexa-Heavy-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Heavy-Italic.otf"; path = "../assets/fonts/Nexa-Heavy-Italic.otf"; sourceTree = "<group>"; };
+		F737FCEA282567AB0075BD99 /* Nexa-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Bold.otf"; path = "../assets/fonts/Nexa-Bold.otf"; sourceTree = "<group>"; };
+		F737FCEB282567AB0075BD99 /* Nexa-Light-Italic.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Light-Italic.otf"; path = "../assets/fonts/Nexa-Light-Italic.otf"; sourceTree = "<group>"; };
+		F737FCEC282567AC0075BD99 /* Nexa-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; name = "Nexa-Light.otf"; path = "../assets/fonts/Nexa-Light.otf"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -90,7 +114,7 @@
 				13B07FB01A68108700A75B9A /* AppDelegate.mm */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
-				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
+				F737FCC7282566A90075BD99 /* BootSplash.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
 			);
 			name = mano;
@@ -116,6 +140,18 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				F737FCE7282567AB0075BD99 /* Nexa-Black-Italic.otf */,
+				F737FCE8282567AB0075BD99 /* Nexa-Bold-Italic.otf */,
+				F737FCEA282567AB0075BD99 /* Nexa-Bold.otf */,
+				F737FCE4282567AB0075BD99 /* Nexa-Book-Italic.otf */,
+				F737FCE6282567AB0075BD99 /* Nexa-Book.otf */,
+				F737FCE9282567AB0075BD99 /* Nexa-Heavy-Italic.otf */,
+				F737FCEB282567AB0075BD99 /* Nexa-Light-Italic.otf */,
+				F737FCEC282567AC0075BD99 /* Nexa-Light.otf */,
+				F737FCE1282567AB0075BD99 /* Nexa-Regular-Italic.otf */,
+				F737FCE5282567AB0075BD99 /* NexaBlack.otf */,
+				F737FCE3282567AB0075BD99 /* NexaHeavy.otf */,
+				F737FCE2282567AB0075BD99 /* NexaRegular.otf */,
 				13B07FAE1A68108700A75B9A /* mano */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* manoTests */,
@@ -184,6 +220,7 @@
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
 				00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */,
 				E235C05ADACE081382539298 /* [CP] Copy Pods Resources */,
+				1B625404FDE6469EBADAFD2C /* Upload Debug Symbols to Sentry */,
 			);
 			buildRules = (
 			);
@@ -242,7 +279,19 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
+				F737FCED282567AC0075BD99 /* Nexa-Regular-Italic.otf in Resources */,
+				F737FCEE282567AC0075BD99 /* NexaRegular.otf in Resources */,
+				F737FCEF282567AC0075BD99 /* NexaHeavy.otf in Resources */,
+				F737FCF0282567AC0075BD99 /* Nexa-Book-Italic.otf in Resources */,
+				F737FCF1282567AC0075BD99 /* NexaBlack.otf in Resources */,
+				F737FCF2282567AC0075BD99 /* Nexa-Book.otf in Resources */,
+				F737FCF3282567AC0075BD99 /* Nexa-Black-Italic.otf in Resources */,
+				F737FCF4282567AC0075BD99 /* Nexa-Bold-Italic.otf in Resources */,
+				F737FCF5282567AC0075BD99 /* Nexa-Heavy-Italic.otf in Resources */,
+				F737FCF6282567AC0075BD99 /* Nexa-Bold.otf in Resources */,
+				F737FCF7282567AC0075BD99 /* Nexa-Light-Italic.otf in Resources */,
+				F737FCF8282567AC0075BD99 /* Nexa-Light.otf in Resources */,
+				F737FCC8282566A90075BD99 /* BootSplash.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -262,7 +311,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "set -e\n\nexport NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh\n";
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\nexport EXTRA_PACKAGER_ARGS=\"--sourcemap-output $DERIVED_FILE_DIR/main.jsbundle.map\"\nset -e\n\nexport NODE_BINARY=node\n../node_modules/@sentry/cli/bin/sentry-cli react-native xcode ../node_modules/react-native/scripts/react-native-xcode.sh\n";
 		};
 		00EEFC60759A1932668264C0 /* [CP] Embed Pods Frameworks */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -280,6 +329,20 @@
 			shellPath = /bin/sh;
 			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-mano/Pods-mano-frameworks.sh\"\n";
 			showEnvVarsInLog = 0;
+		};
+		1B625404FDE6469EBADAFD2C /* Upload Debug Symbols to Sentry */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Upload Debug Symbols to Sentry";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "export SENTRY_PROPERTIES=sentry.properties\n../node_modules/@sentry/cli/bin/sentry-cli upload-dsym";
 		};
 		A55EABD7B0C7F3A422A6CC61 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;

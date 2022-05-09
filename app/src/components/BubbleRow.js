@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
+import { TouchableOpacity } from 'react-native';
 import colors from '../utils/colors';
 import { MyText } from './MyText';
 import UserName from './UserName';
@@ -10,9 +11,14 @@ const hitSlop = {
   bottom: 20,
 };
 
-const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent }) => (
+const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent, itemName, onItemNamePress }) => (
   <Container urgent={urgent}>
     <CaptionsContainer>
+      {itemName ? (
+        <TouchableOpacity onPress={onItemNamePress}>
+          <ItemNameStyled>{itemName}</ItemNameStyled>
+        </TouchableOpacity>
+      ) : null}
       {urgent ? <Urgent>❗ Prioritaire </Urgent> : null}
       <CommentStyled>{caption?.split('\\n')?.join('\u000A')}</CommentStyled>
       <CreationDate>
@@ -86,6 +92,14 @@ const Urgent = styled(MyText)`
   margin-bottom: 15px;
   padding: 2px 5px;
   color: red;
+`;
+
+const ItemNameStyled = styled(MyText)`
+  font-weight: bold;
+  margin-left: -10px;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  padding: 2px 5px;
 `;
 
 export default BubbleRow;
