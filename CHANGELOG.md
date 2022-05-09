@@ -1,3 +1,10 @@
+## [1.107.2](https://github.com/SocialGouv/mano/compare/v1.107.1...v1.107.2) (2022-05-09)
+
+
+### Bug Fixes
+
+* cant close new consult ([#685](https://github.com/SocialGouv/mano/issues/685)) ([f9554cc](https://github.com/SocialGouv/mano/commit/f9554cc23f24f7ecf6aec0b23bb3e21a44ebdbc3))
+
 ## [1.107.1](https://github.com/SocialGouv/mano/compare/v1.107.0...v1.107.1) (2022-05-09)
 
 
