@@ -1,3 +1,10 @@
+## [1.107.1](https://github.com/SocialGouv/mano/compare/v1.107.0...v1.107.1) (2022-05-09)
+
+
+### Bug Fixes
+
+* **dashboard:** trigger dashboard release ([cf8de19](https://github.com/SocialGouv/mano/commit/cf8de1956a3d0a691b60fe7d28b644145edf575c))
+
 # [1.107.0](https://github.com/SocialGouv/mano/compare/v1.106.1...v1.107.0) (2022-05-09)
 
 
