@@ -63,6 +63,7 @@ const App = ({ resetRecoil }) => {
         <ScrollToTop />
         <Switch>
           <Route path="/auth" component={Auth} />
+          <Route path="/bug" component={() => <button onClick={(e) => ["bugbug"]()}>bug</button>} />
           <RestrictedRoute path="/charte" component={Charte} />
           <RestrictedRoute path="/account" component={Account} />
           <RestrictedRoute path="/user" component={User} />
@@ -77,6 +78,7 @@ const App = ({ resetRecoil }) => {
           <RestrictedRoute path="/reception" component={Reception} />
           <RestrictedRoute path="/search" component={SearchView} />
           <RestrictedRoute path="/report" component={Report} />
+
           <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
         </Switch>
       </Router>
