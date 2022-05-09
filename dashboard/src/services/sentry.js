@@ -4,7 +4,7 @@ const { ENV, VERSION } = require('../config');
 
 if (ENV === 'production') {
   Sentry.init({
-    dsn: 'https://d5bde308505f4860b199e7031dcd17d6@o348403.ingest.sentry.io/5384501',
+    dsn: 'https://35e52183bab54c74914e6acc88097f18@sentry.incubateur.net/32',
     environment: 'dashboard',
     release: VERSION,
     integrations: [new Integrations.BrowserTracing()],
