@@ -7,7 +7,7 @@ import API from '../../services/api';
 import { commentsState } from '../../recoil/comments';
 import BubbleRow from '../../components/BubbleRow';
 
-const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions }) => {
+const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions, itemName, onItemNamePress }) => {
   const user = useRecoilValue(userState);
   const setComments = useSetRecoilState(commentsState);
 
@@ -54,6 +54,8 @@ const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions }) => {
       date={comment.date || comment.createdAt}
       user={comment.user}
       urgent={comment.urgent}
+      itemName={itemName}
+      onItemNamePress={onItemNamePress}
       metaCaption="Commentaire de"
     />
   );
