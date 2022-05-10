@@ -1,3 +1,10 @@
+# [1.108.0](https://github.com/SocialGouv/mano/compare/v1.107.2...v1.108.0) (2022-05-10)
+
+
+### Features
+
+* **ci:** use kube-workflow ([#654](https://github.com/SocialGouv/mano/issues/654)) ([73663cd](https://github.com/SocialGouv/mano/commit/73663cd62a9374f19fc1002a16cd436924e089d0))
+
 ## [1.107.2](https://github.com/SocialGouv/mano/compare/v1.107.1...v1.107.2) (2022-05-09)
 
 
