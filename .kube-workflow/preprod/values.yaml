@@ -1,0 +1,17 @@
+app-www:
+  host: "mano-app-preprod.dev.fabrique.social.gouv.fr"
+
+app-api:
+  host: "mano-preprod.dev.fabrique.social.gouv.fr"
+  addVolumes:
+    - files
+  envFrom:
+    - secretRef:
+        name: api
+    - secretRef:
+        name: azure-mano-volume
+    - secretRef:
+        name: "{{ .Values.global.pgSecretName }}"
+
+app-dashboard:
+  host: "mano-dashboard-preprod.dev.fabrique.social.gouv.fr"

@@ -1,0 +1,43 @@
+app-www:
+  host: "mano-app.fabrique.social.gouv.fr"
+  certSecretName: www-crt
+
+app-api:
+  host: "mano.fabrique.social.gouv.fr"
+  certSecretName: api-crt
+  addVolumes:
+    - files
+  envFrom:
+    - secretRef:
+        name: api
+    - configMapRef:
+        name: api
+    - secretRef:
+        name: azure-mano-volume
+    - secretRef:
+        name: "{{ .Values.global.pgSecretName }}"
+
+app-dashboard:
+  host: "dashboard-mano.fabrique.social.gouv.fr"
+  certSecretName: dashboard-crt
+
+metabase:
+  enabled: true
+  ingress:
+    enabled: false
+  envFrom:
+    - configMapRef:
+        name: metabase-configmap
+    - secretRef:
+        name: metabase-db-user
+
+oauth2-proxy:
+  host: "metabase-mano.fabrique.social.gouv.fr"
+  certSecretName: oauth2-proxy-crt
+  enabled: true
+  upstream: http://metabase
+  envFrom:
+    - configMapRef:
+        name: oauth2-proxy-configmap
+    - secretRef:
+        name: oauth2-proxy-sealed-secret

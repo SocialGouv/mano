@@ -1,0 +1,30 @@
+app-www:
+  host: "app-{{ .Values.global.host }}"
+  containerPort: 8080
+  enabled: true
+  imagePackage: www
+
+app-api:
+  host: "{{ .Values.global.host }}"
+  enabled: true
+  containerPort: 3000
+  imagePackage: api
+  probesPath: /healthz
+  env:
+    - name: STORAGE_DIRECTORY
+      value: "/mnt/files"
+  envFrom:
+    - secretRef:
+        name: "{{ .Values.global.pgSecretName }}"
+
+app-dashboard:
+  host: "dashboard-{{ .Values.global.host }}"
+  enabled: true
+  containerPort: 8080
+  imagePackage: dashboard
+
+metabase:
+  enabled: false
+
+oauth2-proxy:
+  enabled: false
