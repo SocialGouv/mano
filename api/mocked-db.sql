@@ -1,3 +1,5 @@
+CREATE SCHEMA IF NOT EXISTS mano;
+
 drop table if exists "mano"."Comment";
 
 drop table if exists "mano"."Action";
