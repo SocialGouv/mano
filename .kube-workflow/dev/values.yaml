@@ -17,11 +17,7 @@ jobs:
       with:
         pgAdminSecretRefName: azure-pg-admin-user
     - name: seed
-      checkout: false # no need to checkout the repo as we use the docker image
       needs: [db]
-      shell: sh
-      image: "{{ .Values.global.registry }}/{{ .Values.global.imageRepository }}/api:{{ .Values.global.imageTag }}"
-      run: "yarn initdb"
-      envFrom:
-        - secretRef:
-            name: "pg-user-{{ .Values.global.branchSlug }}"
+      use: SocialGouv/kube-workflow/jobs/seed-db@v1
+      with:
+        seedPath: api/test-data.sql
