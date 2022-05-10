@@ -64,7 +64,7 @@ jobs:
   deploy-production:
     name: Deploy production
     runs-on: ubuntu-latest
-    needs: manifests-production
+    needs: [register-api, register-dashboard, register-website]
     environment:
       name: production
       url: https://mano-app.fabrique.social.gouv.fr
