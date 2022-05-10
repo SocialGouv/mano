@@ -17,8 +17,6 @@ const STORAGE_DIRECTORY = process.env.STORAGE_DIRECTORY;
 const X_TIPIMAIL_APIUSER = process.env.X_TIPIMAIL_APIUSER || "";
 const X_TIPIMAIL_APIKEY = process.env.X_TIPIMAIL_APIKEY || "";
 
-if (ENVIRONMENT === "test") CORS_ORIGIN_ALLOWED.push("http://localhost:8090");
-
 module.exports = {
   PORT,
   ENVIRONMENT,
