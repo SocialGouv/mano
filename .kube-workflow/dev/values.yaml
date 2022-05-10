@@ -20,4 +20,4 @@ jobs:
       needs: [db]
       use: SocialGouv/kube-workflow/jobs/seed-db@v1
       with:
-        seedPath: api/test-data.sql
+        seedPath: api/mocked-db.sql
