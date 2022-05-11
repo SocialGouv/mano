@@ -54,9 +54,8 @@ const ModalConfirm = () => {
         <br />
         <Row>
           {buttons.map(({ text, onClick, style }, index) => (
-            <Col md={12 / buttons.length}>
+            <Col md={12 / buttons.length} key={index + text + style + open}>
               <ButtonCustom
-                key={index + text + style + open}
                 color={style}
                 onClick={async () => {
                   onClick?.();
