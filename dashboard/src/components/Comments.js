@@ -108,14 +108,20 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
             <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment />
             {comments.map((comment) => {
               return (
-                <StyledComment key={comment._id} urgent={comment.urgent}>
-                  <CloseButton close onClick={() => deleteData(comment._id)} />
+                <StyledComment key={comment._id} urgent={comment.urgent} onClick={() => setEditing(comment._id)}>
+                  <CloseButton
+                    close
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      deleteData(comment._id);
+                    }}
+                  />
                   <UserName id={comment.user} wrapper={(name) => <div className="author">{name}</div>} />
                   <div className="user"></div>
                   <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                   <div className="content">
                     {!!comment.urgent && <ExclamationMarkButton />}
-                    <p onClick={() => setEditing(comment._id)}>
+                    <p>
                       {comment.comment
                         ? comment.comment.split('\n').map((c, i, a) => {
                             if (i === a.length - 1) return <React.Fragment key={i}>{c}</React.Fragment>;
@@ -225,7 +231,8 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                           style={{ marginRight: '0.5rem' }}
                           name="urgent"
                           checked={values.urgent}
-                          onChange={handleChange}
+                          value={values.urgent}
+                          onChange={() => handleChange({ target: { value: !values.urgent, name: 'urgent' } })}
                         />
                         Commentaire prioritaire <br />
                         <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
@@ -262,6 +269,9 @@ const StyledComment = styled.div`
   width: 100%;
   border: 1px solid #000; */
 
+  &:hover {
+    cursor: pointer;
+  }
   .author {
     font-weight: bold;
     color: ${theme.main};
@@ -277,9 +287,6 @@ const StyledComment = styled.div`
       margin-left: 16px;
       margin-top: 0;
       margin-bottom: 0;
-    }
-    &:hover {
-      cursor: pointer;
     }
     ${(props) => props.urgent && 'background-color: #fecaca;'}
   }
