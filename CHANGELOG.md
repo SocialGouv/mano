@@ -1,3 +1,10 @@
+## [1.108.3](https://github.com/SocialGouv/mano/compare/v1.108.2...v1.108.3) (2022-05-12)
+
+
+### Bug Fixes
+
+* remove auto refresh before we find something better ([4534d29](https://github.com/SocialGouv/mano/commit/4534d2913d28c210570e0c54e9ae8251c36201eb))
+
 ## [1.108.2](https://github.com/SocialGouv/mano/compare/v1.108.1...v1.108.2) (2022-05-10)
 
 
