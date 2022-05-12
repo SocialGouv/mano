@@ -517,35 +517,35 @@ const Loader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status]);
 
-  useEffect(() => {
-    if (!autoRefreshInterval.current && initialLoadDone.current) {
-      autoRefreshInterval.current = setInterval(async () => {
-        const response = await API.get({
-          path: '/organisation/stats',
-          query: { organisation: organisationId, lastRefresh },
-        });
-        if (!response.ok) return;
+  // useEffect(() => {
+  //   if (!autoRefreshInterval.current && initialLoadDone.current) {
+  //     autoRefreshInterval.current = setInterval(async () => {
+  //       const response = await API.get({
+  //         path: '/organisation/stats',
+  //         query: { organisation: organisationId, lastRefresh },
+  //       });
+  //       if (!response.ok) return;
 
-        let total =
-          response.data.actions +
-          response.data.persons +
-          response.data.territories +
-          response.data.territoryObservations +
-          response.data.places +
-          response.data.comments +
-          response.data.passages +
-          response.data.reports +
-          response.data.relsPersonPlace;
+  //       let total =
+  //         response.data.actions +
+  //         response.data.persons +
+  //         response.data.territories +
+  //         response.data.territoryObservations +
+  //         response.data.places +
+  //         response.data.comments +
+  //         response.data.passages +
+  //         response.data.reports +
+  //         response.data.relsPersonPlace;
 
-        if (total) {
-          setRefreshTrigger({
-            status: true,
-            options: { showFullScreen: false, initialLoad: false },
-          });
-        }
-      }, 2 * 60 * 1000);
-    }
-  }, [lastRefresh, organisationId, API, setRefreshTrigger]);
+  //       if (total) {
+  //         setRefreshTrigger({
+  //           status: true,
+  //           options: { showFullScreen: false, initialLoad: false },
+  //         });
+  //       }
+  //     }, 2 * 60 * 1000);
+  //   }
+  // }, [lastRefresh, organisationId, API, setRefreshTrigger]);
 
   useEffect(() => {
     setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
