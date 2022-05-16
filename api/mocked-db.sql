@@ -1,9 +1,9 @@
-
+CREATE SCHEMA IF NOT EXISTS mano;
 --
 -- Name: Action; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Action" (
+CREATE TABLE IF NOT EXISTS mano."Action" (
     _id uuid NOT NULL,
     status text,
     "dueAt" timestamp with time zone,
@@ -23,7 +23,7 @@ ALTER TABLE mano."Action" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Comment; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Comment" (
+CREATE TABLE IF NOT EXISTS mano."Comment" (
     _id uuid NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
@@ -40,7 +40,7 @@ ALTER TABLE mano."Comment" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Consultation; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Consultation" (
+CREATE TABLE IF NOT EXISTS mano."Consultation" (
     _id uuid NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
@@ -61,7 +61,7 @@ ALTER TABLE mano."Consultation" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: MedicalFile; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."MedicalFile" (
+CREATE TABLE IF NOT EXISTS mano."MedicalFile" (
     _id uuid NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
@@ -78,7 +78,7 @@ ALTER TABLE mano."MedicalFile" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Organisation; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Organisation" (
+CREATE TABLE IF NOT EXISTS mano."Organisation" (
     _id uuid NOT NULL,
     name text,
     "createdAt" timestamp with time zone NOT NULL,
@@ -108,7 +108,7 @@ ALTER TABLE mano."Organisation" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Passage; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Passage" (
+CREATE TABLE IF NOT EXISTS mano."Passage" (
     _id uuid NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
@@ -125,7 +125,7 @@ ALTER TABLE mano."Passage" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Person; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Person" (
+CREATE TABLE IF NOT EXISTS mano."Person" (
     _id uuid NOT NULL,
     organisation uuid,
     "createdAt" timestamp with time zone NOT NULL,
@@ -142,7 +142,7 @@ ALTER TABLE mano."Person" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Place; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Place" (
+CREATE TABLE IF NOT EXISTS mano."Place" (
     _id uuid NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
@@ -159,7 +159,7 @@ ALTER TABLE mano."Place" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: RelPersonPlace; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."RelPersonPlace" (
+CREATE TABLE IF NOT EXISTS mano."RelPersonPlace" (
     _id uuid NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
@@ -176,7 +176,7 @@ ALTER TABLE mano."RelPersonPlace" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: RelUserTeam; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."RelUserTeam" (
+CREATE TABLE IF NOT EXISTS mano."RelUserTeam" (
     _id uuid NOT NULL,
     "user" uuid,
     team uuid,
@@ -191,7 +191,7 @@ ALTER TABLE mano."RelUserTeam" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Report; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Report" (
+CREATE TABLE IF NOT EXISTS mano."Report" (
     _id uuid NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
@@ -208,7 +208,7 @@ ALTER TABLE mano."Report" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Structure; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Structure" (
+CREATE TABLE IF NOT EXISTS mano."Structure" (
     _id uuid NOT NULL,
     name text,
     description text,
@@ -229,7 +229,7 @@ ALTER TABLE mano."Structure" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Team; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Team" (
+CREATE TABLE IF NOT EXISTS mano."Team" (
     _id uuid NOT NULL,
     name text,
     organisation uuid,
@@ -245,7 +245,7 @@ ALTER TABLE mano."Team" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Territory; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Territory" (
+CREATE TABLE IF NOT EXISTS mano."Territory" (
     _id uuid NOT NULL,
     organisation uuid,
     "createdAt" timestamp with time zone NOT NULL,
@@ -262,7 +262,7 @@ ALTER TABLE mano."Territory" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: TerritoryObservation; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."TerritoryObservation" (
+CREATE TABLE IF NOT EXISTS mano."TerritoryObservation" (
     _id uuid NOT NULL,
     organisation uuid,
     "createdAt" timestamp with time zone NOT NULL,
@@ -279,7 +279,7 @@ ALTER TABLE mano."TerritoryObservation" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: Treatment; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."Treatment" (
+CREATE TABLE IF NOT EXISTS mano."Treatment" (
     _id uuid NOT NULL,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
@@ -296,7 +296,7 @@ ALTER TABLE mano."Treatment" OWNER TO "user_feat-pen-test-18fpoe";
 -- Name: User; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
 
-CREATE TABLE mano."User" (
+CREATE TABLE IF NOT EXISTS mano."User" (
     _id uuid NOT NULL,
     name text,
     email text NOT NULL,
