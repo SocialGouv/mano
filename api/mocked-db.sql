@@ -16,9 +16,6 @@ CREATE TABLE IF NOT EXISTS mano."Action" (
     "deletedAt" timestamp with time zone
 );
 
-
-ALTER TABLE mano."Action" OWNER TO "user_feat-pen-test-18fpoe";
-
 --
 -- Name: Comment; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
@@ -32,9 +29,6 @@ CREATE TABLE IF NOT EXISTS mano."Comment" (
     "encryptedEntityKey" text,
     "deletedAt" timestamp with time zone
 );
-
-
-ALTER TABLE mano."Comment" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Name: Consultation; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -54,9 +48,6 @@ CREATE TABLE IF NOT EXISTS mano."Consultation" (
     "encryptedEntityKey" text
 );
 
-
-ALTER TABLE mano."Consultation" OWNER TO "user_feat-pen-test-18fpoe";
-
 --
 -- Name: MedicalFile; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
@@ -70,9 +61,6 @@ CREATE TABLE IF NOT EXISTS mano."MedicalFile" (
     encrypted text,
     "encryptedEntityKey" text
 );
-
-
-ALTER TABLE mano."MedicalFile" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Name: Organisation; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -101,9 +89,6 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     "customFieldsMedicalFile" jsonb
 );
 
-
-ALTER TABLE mano."Organisation" OWNER TO "user_feat-pen-test-18fpoe";
-
 --
 -- Name: Passage; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
@@ -117,9 +102,6 @@ CREATE TABLE IF NOT EXISTS mano."Passage" (
     "encryptedEntityKey" text,
     "deletedAt" timestamp with time zone
 );
-
-
-ALTER TABLE mano."Passage" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Name: Person; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -135,9 +117,6 @@ CREATE TABLE IF NOT EXISTS mano."Person" (
     "deletedAt" timestamp with time zone
 );
 
-
-ALTER TABLE mano."Person" OWNER TO "user_feat-pen-test-18fpoe";
-
 --
 -- Name: Place; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
@@ -151,9 +130,6 @@ CREATE TABLE IF NOT EXISTS mano."Place" (
     "encryptedEntityKey" text,
     "deletedAt" timestamp with time zone
 );
-
-
-ALTER TABLE mano."Place" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Name: RelPersonPlace; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -169,9 +145,6 @@ CREATE TABLE IF NOT EXISTS mano."RelPersonPlace" (
     "deletedAt" timestamp with time zone
 );
 
-
-ALTER TABLE mano."RelPersonPlace" OWNER TO "user_feat-pen-test-18fpoe";
-
 --
 -- Name: RelUserTeam; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
@@ -183,9 +156,6 @@ CREATE TABLE IF NOT EXISTS mano."RelUserTeam" (
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL
 );
-
-
-ALTER TABLE mano."RelUserTeam" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Name: Report; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -200,9 +170,6 @@ CREATE TABLE IF NOT EXISTS mano."Report" (
     organisation uuid,
     "deletedAt" timestamp with time zone
 );
-
-
-ALTER TABLE mano."Report" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Name: Structure; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -222,9 +189,6 @@ CREATE TABLE IF NOT EXISTS mano."Structure" (
     "updatedAt" timestamp with time zone NOT NULL
 );
 
-
-ALTER TABLE mano."Structure" OWNER TO "user_feat-pen-test-18fpoe";
-
 --
 -- Name: Team; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
@@ -237,9 +201,6 @@ CREATE TABLE IF NOT EXISTS mano."Team" (
     "updatedAt" timestamp with time zone NOT NULL,
     "nightSession" boolean DEFAULT false
 );
-
-
-ALTER TABLE mano."Team" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Name: Territory; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -255,9 +216,6 @@ CREATE TABLE IF NOT EXISTS mano."Territory" (
     "deletedAt" timestamp with time zone
 );
 
-
-ALTER TABLE mano."Territory" OWNER TO "user_feat-pen-test-18fpoe";
-
 --
 -- Name: TerritoryObservation; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
@@ -272,9 +230,6 @@ CREATE TABLE IF NOT EXISTS mano."TerritoryObservation" (
     "deletedAt" timestamp with time zone
 );
 
-
-ALTER TABLE mano."TerritoryObservation" OWNER TO "user_feat-pen-test-18fpoe";
-
 --
 -- Name: Treatment; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
 --
@@ -288,9 +243,6 @@ CREATE TABLE IF NOT EXISTS mano."Treatment" (
     encrypted text,
     "encryptedEntityKey" text
 );
-
-
-ALTER TABLE mano."Treatment" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Name: User; Type: TABLE; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -314,9 +266,6 @@ CREATE TABLE IF NOT EXISTS mano."User" (
     "debugApp" jsonb,
     "debugDashboard" jsonb
 );
-
-
-ALTER TABLE mano."User" OWNER TO "user_feat-pen-test-18fpoe";
 
 --
 -- Data for Name: Action; Type: TABLE DATA; Schema: mano; Owner: user_feat-pen-test-18fpoe
@@ -623,14 +572,6 @@ dc25074f-4c66-4f48-b231-716bbf7b37f6	Jean PAUL (Educateur)	testmano22+1@gmx.fr	$
 8e892795-f7da-4a32-98b5-ef85a6e2c518	Raphaël Dubuchet	testmano22+6@gmx.fr	$2a$10$M0tYfK4FpcQwlgssaYMiZeaUrXVkJ4YyyuIGxBiPXzstSSFxFEHsC	ea6d308e-6956-488f-b299-fa0b2d7e37b6	\N	2022-05-13 15:16:33.518+00	2022-05-13 15:16:33.518+00	normal	\N	2022-05-13	ade87daff3a53d4b40638b44cb5eeee31fc0ef67	\N	f	\N	\N
 33400b35-7b77-406b-bb4d-da9bc2dc1830	Superadmin	superadmin@mano.fr	$2a$10$GCJTFdyihqRJMHCJqp2UoOxJ5AdY1uHihgQoLVXShetzh5fr9Re.m	00000000-5f5a-89e2-2e60-88fa20cc50bf	2022-05-13 15:24:47.407+00	2021-04-01 09:22:59.162+00	2022-05-13 15:24:47.407+00	superadmin	2022-05-11	2021-11-26	1d957269f0d8763db264a5392b926b299fc1707b	2022-03-24 15:23:33.363+00	t	{"brand": "google", "model": "sdk_gphone64_arm64", "device": "emulator64_arm64", "tablet": false, "buildid": "S2B2.211203.006", "carrier": "T-Mobile", "product": "sdk_gphone64_arm64", "apilevel": 32, "deviceid": "goldfish_arm64", "hardware": "ranchu", "maxmemory": 201326592, "useragent": "Mozilla/5.0 (Linux; Android 12; sdk_gphone64_arm64 Build/S2B2.211203.006; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/91.0.4472.114 Mobile Safari/537.36", "systemname": "Android", "totalmemory": 2061598720, "manufacturer": "Google", "systemversion": "12", "freediskstorage": 4746903552, "readableversion": "2.19.0.3", "totaldiskcapacity": 7032188928}	{"version": "1.108.2", "browserOs": "Mac OS", "browserName": "firefox", "browserType": "browser", "browserVersion": "99.0.0"}
 78256d60-c1cf-4662-8674-bc0af7395a76	Caroline Cavéhors	testmano1@gmx.fr	$2a$10$GCJTFdyihqRJMHCJqp2UoOxJ5AdY1uHihgQoLVXShetzh5fr9Re.m	29ea1d8a-dfb4-4b12-819d-9e51427b5a6b	2022-05-16 09:23:17.514+00	2022-05-13 15:32:23.007+00	2022-05-16 09:23:17.515+00	admin	\N	2022-05-13	ecc97c440e6d7c8467364f4287432918bcf72daf	2022-05-13 15:35:51.535+00	t	\N	{"version": "1.108.2", "browserOs": "Mac OS", "browserName": "firefox", "browserType": "browser", "browserVersion": "99.0.0"}
-\.
-
-
---
--- Data for Name: spatial_ref_sys; Type: TABLE DATA; Schema: public; Owner: manoadmin
---
-
-COPY public.spatial_ref_sys (srid, auth_name, auth_srid, srtext, proj4text) FROM stdin;
 \.
 
 
