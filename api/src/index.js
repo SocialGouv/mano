@@ -6,7 +6,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 
-const { PORT, CORS_ORIGIN_ALLOWED, VERSION } = require("./config");
+const { PORT, VERSION } = require("./config");
 const errors = require("./errors");
 
 const versionCheck = require("./middleware/versionCheck");
@@ -20,7 +20,11 @@ if (process.env.NODE_ENV === "development") {
   app.use(logger("dev"));
 }
 
-app.use(cors({ credentials: true, origin: CORS_ORIGIN_ALLOWED }));
+if (process.env.NODE_ENV === "production") {
+  app.use(cors({ credentials: true, origin: /fabrique\.social\.gouv\.fr$/ }));
+} else {
+  app.use(cors({ credentials: true, origin: ["http://localhost:4145", "http://localhost:8083", "http://localhost:8090"] }));
+}
 
 const now = new Date();
 // kube probe
