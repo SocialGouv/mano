@@ -45,6 +45,10 @@ import DotsIcon from './icons/DotsIcon';
 import Notifications from './scenes/Notifications/Notifications';
 import ReportsCalendar from './scenes/Reports/ReportsCalendar';
 import Report from './scenes/Reports/Report';
+import Actions from './scenes/Reports/Actions';
+import Comments from './scenes/Reports/Comments';
+import Observations from './scenes/Reports/Observations';
+import Collaborations from './scenes/Reports/Collaborations';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -126,6 +130,7 @@ const ReportsNavigator = () => {
     <ReportsStack.Navigator headerMode="none" initialRouteName="ReportsCalendar">
       <ReportsStack.Screen name="ReportsCalendar" component={ReportsCalendar} />
       <ReportsStack.Screen name="Report" component={Report} />
+      <ReportsStack.Screen name="Collaborations" component={Collaborations} />
 
       <ReportsStack.Screen name="Action" component={Action} />
       <ReportsStack.Screen name="NewActionForm" component={NewActionForm} />
@@ -140,6 +145,10 @@ const ReportsNavigator = () => {
 
       <ReportsStack.Screen name="Territory" component={Territory} />
       <ReportsStack.Screen name="TerritoryObservation" component={TerritoryObservation} />
+
+      <ReportsStack.Screen name="Comments" component={Comments} />
+      <ReportsStack.Screen name="Actions" component={Actions} />
+      <ReportsStack.Screen name="Observations" component={Observations} />
     </ReportsStack.Navigator>
   );
 };

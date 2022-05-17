@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import SceneContainer from '../../components/SceneContainer';
-import ActionRow from './ActionRow';
+import ActionRow from '../../components/ActionRow';
 import Spinner from '../../components/Spinner';
 import { ListEmptyActions, ListNoMoreActions } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';

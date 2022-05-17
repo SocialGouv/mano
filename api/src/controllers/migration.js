@@ -23,7 +23,9 @@ router.put(
       z.string().regex(looseUuidRegex).parse(req.user.organisation);
       z.string().min(1).parse(req.params.migrationName);
     } catch (e) {
-      return res.status(400).send({ ok: false, error: "Invalid request" });
+      const error = new Error(`Invalid request in migration: ${e}`);
+      error.status = 400;
+      return next(error);
     }
 
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
@@ -33,7 +35,6 @@ router.put(
 
     try {
       await sequelize.transaction(async (tx) => {
-        // Each migration has its own "if". This is an example.
         if (req.params.migrationName === "passages-from-comments-to-table") {
           try {
             z.array(z.string().regex(looseUuidRegex)).parse(req.body.commentIdsToDelete);
@@ -51,7 +52,7 @@ router.put(
               })
             ).parse(req.body.reportsToMigrate);
           } catch (e) {
-            const error = new Error(`Invalid request in report creation: ${e}`);
+            const error = new Error(`Invalid request in passages-from-comments-to-table migration: ${e}`);
             error.status = 400;
             throw error;
           }
@@ -74,6 +75,28 @@ router.put(
             }
           }
         }
+        if (req.params.migrationName === "reports-from-real-date-to-date-id") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.reportsToMigrate);
+          } catch (e) {
+            const error = new Error(`Invalid request in reports-from-real-date-to-date-id migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.reportsToMigrate) {
+            const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (report) {
+              report.set({ encrypted, encryptedEntityKey });
+              await report.save();
+            }
+          }
+        }
 
         organisation.set({
           migrations: [...(organisation.migrations || []), req.params.migrationName],
@@ -86,7 +109,7 @@ router.put(
       capture("error migrating", e);
       organisation.set({ migrating: false });
       await organisation.save();
-      throw e;
+      return next(e);
     }
     return res.status(200).send({
       ok: true,

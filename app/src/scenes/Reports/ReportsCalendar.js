@@ -1,15 +1,26 @@
 import dayjs from 'dayjs';
-import React, { useState } from 'react';
-import { CalendarList } from 'react-native-calendars';
+import React, { useCallback, useState } from 'react';
+import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
+import { RefreshControl } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
+import ScrollContainer from '../../components/ScrollContainer';
 import { currentTeamState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import API from '../../services/api';
 import { isOnSameDay } from '../../services/dateDayjs';
 import colors from '../../utils/colors';
+import { refreshTriggerState } from '../../components/Loader';
+
+LocaleConfig.locales.fr = {
+  monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
+  monthNamesShort: ['Janv.', 'Févr.', 'Mars', 'Avril', 'Mai', 'Juin', 'Juil.', 'Août', 'Sept.', 'Oct.', 'Nov.', 'Déc.'],
+  dayNames: ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+  dayNamesShort: ['Dim.', 'Lun.', 'Mar.', 'Mer.', 'Jeu.', 'Ven.', 'Sam.'],
+  today: "Aujourd'hui",
+};
+LocaleConfig.defaultLocale = 'fr';
 
 const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
@@ -26,11 +37,7 @@ export const mappedReportsToCalendarDaysSelector = selector({
     const reports = get(currentTeamReportsSelector);
     const dates = {};
     for (const report of reports) {
-      dates[
-        dayjs(report.date || report.createdAt)
-          .startOf('day')
-          .format('YYYY-MM-DD')
-      ] = {
+      dates[report.date] = {
         selected: true,
         startingDay: true,
         endingDay: true,
@@ -46,6 +53,11 @@ const ReportsCalendar = ({ navigation }) => {
   const reports = useRecoilValue(currentTeamReportsSelector);
   const setReports = useSetRecoilState(reportsState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
+  const onRefresh = useCallback(() => {
+    setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
+  }, [setRefreshTrigger]);
+
   const [submiting, setSubmiting] = useState(false);
 
   const onDayPress = async ({ dateString }) => {
@@ -67,23 +79,25 @@ const ReportsCalendar = ({ navigation }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title="Comptes-rendus" onBack={navigation.goBack} />
-      <CalendarContainer>
-        <CalendarList
+      <ScreenTitle title={`Comptes-rendus de l'équipe ${currentTeam.name}`} onBack={navigation.goBack} />
+      <ScrollContainer refreshControl={<RefreshControl refreshing={refreshTrigger.status} onRefresh={onRefresh} />}>
+        <Calendar
           // onVisibleMonthsChange={this.onVisibleMonthsChangeRequest}
           onDayPress={onDayPress}
           pastScrollRange={50}
           futureScrollRange={50}
           scrollEnabled={true}
           showScrollIndicator={true}
-          hideExtraDays={false}
+          hideExtraDays={true}
           showWeekNumbers
+          showSixWeeks
+          enableSwipeMonths
           theme={theme}
           firstDay={1}
           markedDates={JSON.parse(JSON.stringify(dates))}
           markingType="period"
         />
-      </CalendarContainer>
+      </ScrollContainer>
     </SceneContainer>
   );
 };
@@ -92,9 +106,5 @@ const theme = {
   selectedDayBackgroundColor: colors.app.color,
   selectedDayTextColor: '#000',
 };
-
-const CalendarContainer = styled.View`
-  flex: 1;
-`;
 
 export default ReportsCalendar;

@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
-import { Alert } from 'react-native';
+import { Alert, TouchableOpacity } from 'react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { MyText } from '../../components/MyText';
 import colors from '../../utils/colors';
@@ -47,7 +47,7 @@ const computeCustomFieldDisplay = (field, value) => {
   return JSON.stringify(value);
 };
 
-const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOptions }) => {
+const TerritoryObservationRow = ({ onUpdate, observation, territoryToShow, onTerritoryPress, showActionSheetWithOptions }) => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
 
@@ -66,6 +66,8 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
       }
     );
   };
+
+  const onTerritoryPressRequest = () => onTerritoryPress(territoryToShow);
 
   const onObservationDeleteRequest = () => {
     Alert.alert('Voulez-vous supprimer cette observation ?', 'Cette opération est irréversible.', [
@@ -94,6 +96,11 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
   return (
     <Container>
       <CaptionsContainer>
+        {territoryToShow ? (
+          <TouchableOpacity onPress={onTerritoryPressRequest}>
+            <ItemNameStyled>{territoryToShow.name}</ItemNameStyled>
+          </TouchableOpacity>
+        ) : null}
         {customFieldsObs
           .filter((f) => f)
           .filter((f) => f.enabled)
@@ -123,7 +130,6 @@ const TerritoryObservationRow = ({ onUpdate, observation, showActionSheetWithOpt
 const Container = styled.View`
   background-color: #f4f5f8;
   border-radius: 16px;
-  flex-direction: row;
   align-items: center;
   margin-horizontal: 30px;
   margin-vertical: 8px;
@@ -168,6 +174,15 @@ const Dot = styled.View`
   border-radius: 3px;
   background-color: rgba(30, 36, 55, 0.5);
   margin-right: 3px;
+`;
+
+const ItemNameStyled = styled(MyText)`
+  font-weight: bold;
+  width: 100%;
+  margin-right: auto;
+  margin-top: -15px;
+  margin-bottom: 15px;
+  padding: 2px 5px;
 `;
 
 export default connectActionSheet(TerritoryObservationRow);

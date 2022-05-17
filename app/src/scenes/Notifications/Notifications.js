@@ -11,7 +11,7 @@ import Spacer from '../../components/Spacer';
 import ScrollContainer from '../../components/ScrollContainer';
 import { refreshTriggerState } from '../../components/Loader';
 import { SectionListStyled } from '../../components/FlatListStyled';
-import ActionRow from '../Actions/ActionRow';
+import ActionRow from '../../components/ActionRow';
 import CommentRow from '../Comments/CommentRow';
 import styled from 'styled-components';
 import { MyText } from '../../components/MyText';

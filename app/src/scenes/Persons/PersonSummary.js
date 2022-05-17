@@ -7,7 +7,7 @@ import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
 import InputLabelled from '../../components/InputLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
-import ActionRow from '../Actions/ActionRow';
+import ActionRow from '../../components/ActionRow';
 import CommentRow from '../Comments/CommentRow';
 import PlaceRow from '../Places/PlaceRow';
 import SubList from '../../components/SubList';

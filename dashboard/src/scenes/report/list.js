@@ -5,13 +5,12 @@ import { SmallerHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import styled from 'styled-components';
-import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday, isOnSameDay } from '../../services/date';
+import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday } from '../../services/date';
 import { currentTeamState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 import useApi from '../../services/api';
-import dayjs from 'dayjs';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import useTitle from '../../services/useTitle';
 
@@ -40,7 +39,7 @@ const List = () => {
   );
 };
 
-const HitMonth = ({ date, debug }) => {
+const HitMonth = ({ date }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const reports = useRecoilValue(currentTeamReportsSelector);
   const [isOpen, setIsOpen] = useState(true);
@@ -57,13 +56,11 @@ const HitMonth = ({ date, debug }) => {
     if (!!existingReport) return history.push(`/report/${existingReport._id}`);
     const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date }) });
     if (!res.ok) return;
-    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => r1.date.localeCompare(r2.date)));
     history.push(`/report/${res.data._id}`);
   };
 
   const days = getDaysOfMonth(date).filter((day) => !isAfterToday(day));
-
-  console.log(days);
 
   return (
     <div style={{ width: '100%' }}>
@@ -77,12 +74,14 @@ const HitMonth = ({ date, debug }) => {
           flexWrap: 'wrap',
           width: '100%',
         }}>
-        {days.map((day) => {
-          const report = reports.find((rep) => isOnSameDay(rep.date, day));
+        {days.map((dateString) => {
+          const report = reports.find((rep) => rep.date === dateString);
           if (report) {
-            return <FullButton onClick={() => history.push(`/report/${report._id}`)} key={day} title={`${formatDateWithFullMonth(day.toDate())}`} />;
+            return (
+              <FullButton onClick={() => history.push(`/report/${report._id}`)} key={dateString} title={`${formatDateWithFullMonth(dateString)}`} />
+            );
           }
-          return <EmptyButton onClick={() => createReport(day)} key={day} title={`${formatDateWithFullMonth(day.toDate())}`} />;
+          return <EmptyButton onClick={() => createReport(dateString)} key={dateString} title={`${formatDateWithFullMonth(dateString)}`} />;
         })}
       </Collapse>
     </div>

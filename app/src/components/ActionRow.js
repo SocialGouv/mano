@@ -1,13 +1,13 @@
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
-import ButtonRight from '../../components/ButtonRight';
-import RowContainer from '../../components/RowContainer';
-import { MyText } from '../../components/MyText';
-import colors from '../../utils/colors';
-import TeamsTags from '../../components/TeamsTags';
-import { personsState } from '../../recoil/persons';
-import { DONE } from '../../recoil/actions';
+import ButtonRight from './ButtonRight';
+import RowContainer from './RowContainer';
+import { MyText } from './MyText';
+import colors from '../utils/colors';
+import TeamsTags from './TeamsTags';
+import { personsState } from '../recoil/persons';
+import { DONE } from '../recoil/actions';
 
 const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName, testID = 'action' }) => {
   const persons = useRecoilValue(personsState);

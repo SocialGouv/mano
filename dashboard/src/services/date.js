@@ -86,7 +86,7 @@ export function getDaysOfMonth(date) {
   const days = [];
   const firstDayOfTheMonth = dayjs(date).startOf('month');
   for (let i = 0; i < dayjs(date).daysInMonth(); i++) {
-    days.push(firstDayOfTheMonth.add(i, 'day'));
+    days.push(firstDayOfTheMonth.add(i, 'day').format('YYYY-MM-DD'));
   }
   return days;
 }

@@ -8,7 +8,7 @@ export const reportsState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => manoCacheStorage?.setItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations'];
+const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations', 'oldDateSystem'];
 
 export const prepareReportForEncryption = (report) => {
   const decrypted = {};
