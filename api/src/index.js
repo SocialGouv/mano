@@ -26,6 +26,8 @@ if (process.env.NODE_ENV === "production") {
   app.use(cors({ credentials: true, origin: ["http://localhost:4145", "http://localhost:8083", "http://localhost:8090"] }));
 }
 
+console.log("coucou");
+
 const now = new Date();
 // kube probe
 app.get("/healthz", async (req, res) => {
