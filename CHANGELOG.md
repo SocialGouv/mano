@@ -1,3 +1,10 @@
+## [1.110.1](https://github.com/SocialGouv/mano/compare/v1.110.0...v1.110.1) (2022-05-23)
+
+
+### Bug Fixes
+
+* team list for admin in observation creation ([e041501](https://github.com/SocialGouv/mano/commit/e0415015cafc1066a3cbb3004ea739d6b417989f))
+
 # [1.110.0](https://github.com/SocialGouv/mano/compare/v1.109.0...v1.110.0) (2022-05-23)
 
 
