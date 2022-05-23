@@ -298,6 +298,12 @@ const Stats = () => {
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
+            title="Genre"
+            field="gender"
+            data={getPieData(persons, 'gender', { options: genderOptions })}
+          />
+          <CustomResponsivePie
+            onAddFilter={addFilter}
             title="Situation personnelle"
             field="personalSituation"
             data={getPieData(persons, 'personalSituation', { options: personalSituationOptions })}
