@@ -1,3 +1,10 @@
+# [1.109.0](https://github.com/SocialGouv/mano/compare/v1.108.3...v1.109.0) (2022-05-23)
+
+
+### Features
+
+* pen test ([#702](https://github.com/SocialGouv/mano/issues/702)) ([2c2a006](https://github.com/SocialGouv/mano/commit/2c2a0064713f27c1310c3cc80873d4b7540d856a))
+
 ## [1.108.3](https://github.com/SocialGouv/mano/compare/v1.108.2...v1.108.3) (2022-05-12)
 
 
