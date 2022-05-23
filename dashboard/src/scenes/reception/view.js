@@ -51,20 +51,20 @@ export const actionsByStatusSelector = selectorFamily({
   key: 'actionsByStatusSelector',
   get:
     ({ status }) =>
-    ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
-      return actions.filter((a) => a.status === status);
-    },
+      ({ get }) => {
+        const actions = get(actionsForCurrentTeamSelector);
+        return actions.filter((a) => a.status === status);
+      },
 });
 
 export const consultationsByStatusSelector = selectorFamily({
   key: 'consultationsByStatusSelector',
   get:
     ({ status }) =>
-    ({ get }) => {
-      const consultations = get(consultationsByAuthorizationSelector);
-      return consultations.filter((a) => a.status === status);
-    },
+      ({ get }) => {
+        const consultations = get(consultationsByAuthorizationSelector);
+        return consultations.filter((a) => a.status === status);
+      },
 });
 
 const todaysReportSelector = selector({
@@ -148,7 +148,7 @@ const Reception = () => {
       body: prepareReportForEncryption({ team: currentTeam._id, date: startOfToday().format('YYYY-MM-DD') }),
     });
     if (!res.ok) return;
-    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => r1.date.localCompare(r2.date)));
+    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
   };
 
   useEffect(() => {
