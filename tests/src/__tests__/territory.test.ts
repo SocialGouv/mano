@@ -19,7 +19,7 @@ describe("Organisation CRUD", () => {
 
   it("should be able to create a territory", async () => {
     await connectWith("adminEncrypted@example.org", "secret", "plouf");
-    await expect(page).toMatch("Encrypted Orga", { timeout: 4000 });
+    await expect(page).toMatch("Encrypted Orga", { timeout: 10000 });
     await navigateWithReactRouter("/territory");
     await expect(page).toMatch("Territoires de l'organisation Encrypted orga");
     await page.waitForTimeout(1000);
@@ -34,11 +34,15 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");
     await expect(page).toClick("div.close-toastr");
-    expect(await getInputValue('input[name="name"]')).toBe("Mon premier territoire");
-    expect(await getInputValue('input[name="perimeter"]')).toBe("Entre ici et là");
-    expect(await getInnerText("div.territory-select-types__multi-value__label")).toBe(
-      "Lieu de conso"
+    expect(await getInputValue('input[name="name"]')).toBe(
+      "Mon premier territoire"
     );
+    expect(await getInputValue('input[name="perimeter"]')).toBe(
+      "Entre ici et là"
+    );
+    expect(
+      await getInnerText("div.territory-select-types__multi-value__label")
+    ).toBe("Lieu de conso");
   });
 
   it("should be able to create an observation", async () => {
@@ -51,7 +55,9 @@ describe("Organisation CRUD", () => {
     await expect(page).toFill('input[name="mediation"]', "7");
     await expect(page).toFill('textarea[name="comment"]', "No comment");
     await expect(page).toClick("input#observation-custom-select-atmosphere");
-    await expect(page).toClick("div.observation-custom-select-atmosphere__option");
+    await expect(page).toClick(
+      "div.observation-custom-select-atmosphere__option"
+    );
     await expect(page).toFill("input#observation-observedat", "20/04/2019");
     await page.keyboard.press("Escape");
     await expect(page).toClick("input#observation-select-team");
@@ -62,19 +68,25 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");
     await expect(page).toClick("div.close-toastr");
-    await expect(page).toMatch("Nombre de personnes non connues hommes rencontrées: 4");
-    await expect(page).toMatch("Nombre de personnes non connues femmes rencontrées: 5");
+    await expect(page).toMatch(
+      "Nombre de personnes non connues hommes rencontrées: 4"
+    );
+    await expect(page).toMatch(
+      "Nombre de personnes non connues femmes rencontrées: 5"
+    );
     await expect(page).toMatch("Présence policière: Oui");
     await expect(page).toMatch("Nombre de matériel ramassé: 6");
     await expect(page).toMatch("Ambiance: Violences");
-    await expect(page).toMatch("Nombre de médiations avec les riverains / les structures: 7");
+    await expect(page).toMatch(
+      "Nombre de médiations avec les riverains / les structures: 7"
+    );
     await expect(page).toMatch("Commentaire:");
     await expect(page).toMatch("No comment");
   });
 
   it("should have all the created data showing on reload", async () => {
     await connectWith("adminEncrypted@example.org", "secret", "plouf");
-    await expect(page).toMatch("Encrypted Orga", { timeout: 4000 });
+    await expect(page).toMatch("Encrypted Orga", { timeout: 10000 });
     await navigateWithReactRouter("/territory");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Territoires de l'organisation Encrypted orga");
@@ -83,16 +95,26 @@ describe("Organisation CRUD", () => {
 
     await page.waitForTimeout(1000);
 
-    expect(await getInputValue('input[name="name"]')).toBe("Mon premier territoire");
-    expect(await getInputValue('input[name="perimeter"]')).toBe("Entre ici et là");
+    expect(await getInputValue('input[name="name"]')).toBe(
+      "Mon premier territoire"
+    );
+    expect(await getInputValue('input[name="perimeter"]')).toBe(
+      "Entre ici et là"
+    );
     expect(page).toMatch("Lieu de conso");
 
-    await expect(page).toMatch("Nombre de personnes non connues hommes rencontrées: 4");
-    await expect(page).toMatch("Nombre de personnes non connues femmes rencontrées: 5");
+    await expect(page).toMatch(
+      "Nombre de personnes non connues hommes rencontrées: 4"
+    );
+    await expect(page).toMatch(
+      "Nombre de personnes non connues femmes rencontrées: 5"
+    );
     await expect(page).toMatch("Présence policière: Oui");
     await expect(page).toMatch("Nombre de matériel ramassé: 6");
     await expect(page).toMatch("Ambiance: Violences");
-    await expect(page).toMatch("Nombre de médiations avec les riverains / les structures: 7");
+    await expect(page).toMatch(
+      "Nombre de médiations avec les riverains / les structures: 7"
+    );
     await expect(page).toMatch("Commentaire:");
     await expect(page).toMatch("No comment");
   });

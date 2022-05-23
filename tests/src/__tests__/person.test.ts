@@ -289,7 +289,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Commentaires (2)" });
     await page.waitForTimeout(2000);
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
-    await expect(page).toMatch("Créer un commentaire", { timeout: 4000 });
+    await expect(page).toMatch("Créer un commentaire", { timeout: 10000 });
     await expect(page).toFill(
       'textarea[name="comment"]',
       "Ceci est un autre commentaire"

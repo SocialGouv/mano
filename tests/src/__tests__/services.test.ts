@@ -23,13 +23,15 @@ describe("Organisation CRUD", () => {
   beforeAll(async () => {
     await useEncryptedOrga();
     await connectWith("adminEncrypted@example.org", "secret", "plouf");
-    await expect(page).toMatch("Encrypted Orga", { timeout: 4000 });
+    await expect(page).toMatch("Encrypted Orga", { timeout: 10000 });
   });
 
   it("should be able to update services in reception", async () => {
     await navigateWithReactRouter("/reception");
     await expect(page).toMatch(
-      `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`
+      `Accueil du ${dayjs().format(
+        "dddd D MMMM YYYY"
+      )} de l'équipe Encrypted Orga Team`
     );
     await page.waitForTimeout(2000);
     await expect(page).toClick("button#Café-add");
@@ -53,8 +55,12 @@ describe("Organisation CRUD", () => {
   it("should be able go in the report", async () => {
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
-    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
-    await expect(page).toClick("button", { text: dayjs().format("D MMMM YYYY") });
+    await expect(page).toMatch(
+      "Comptes rendus de l'équipe Encrypted Orga Team"
+    );
+    await expect(page).toClick("button", {
+      text: dayjs().format("D MMMM YYYY"),
+    });
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Compte rendu de l'équipe Encrypted Orga Team`);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
@@ -66,11 +72,17 @@ describe("Organisation CRUD", () => {
   it("should be able to create previous report and update services too", async () => {
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
-    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
+    await expect(page).toMatch(
+      "Comptes rendus de l'équipe Encrypted Orga Team"
+    );
     await page.waitForTimeout(500);
-    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D MMMM YYYY") });
+    await expect(page).toClick("button", {
+      text: dayjs().add(-1, "day").format("D MMMM YYYY"),
+    });
     await page.waitForTimeout(500);
-    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
+    await expect(page).toMatch(
+      `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
+    );
     await page.waitForTimeout(500);
     await expect(page).toClick("a#report-button-Accueil");
     await page.waitForTimeout(1000);
@@ -98,7 +110,9 @@ describe("Organisation CRUD", () => {
   it("should be able to see updated services in reports", async () => {
     await navigateWithReactRouter("/reception");
     await expect(page).toMatch(
-      `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`
+      `Accueil du ${dayjs().format(
+        "dddd D MMMM YYYY"
+      )} de l'équipe Encrypted Orga Team`
     );
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("1");
@@ -106,11 +120,17 @@ describe("Organisation CRUD", () => {
 
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
-    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
+    await expect(page).toMatch(
+      "Comptes rendus de l'équipe Encrypted Orga Team"
+    );
     await page.waitForTimeout(500);
-    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D MMMM YYYY") });
+    await expect(page).toClick("button", {
+      text: dayjs().add(-1, "day").format("D MMMM YYYY"),
+    });
     await page.waitForTimeout(500);
-    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
+    await expect(page).toMatch(
+      `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
+    );
     await page.waitForTimeout(500);
     await expect(page).toClick("a#report-button-Accueil");
     await page.waitForTimeout(1000);
@@ -119,9 +139,13 @@ describe("Organisation CRUD", () => {
 
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
-    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
+    await expect(page).toMatch(
+      "Comptes rendus de l'équipe Encrypted Orga Team"
+    );
     await page.waitForTimeout(500);
-    await expect(page).toClick("button", { text: dayjs().format("D MMMM YYYY") });
+    await expect(page).toClick("button", {
+      text: dayjs().format("D MMMM YYYY"),
+    });
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);

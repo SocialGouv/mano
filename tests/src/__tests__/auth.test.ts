@@ -46,6 +46,6 @@ describe("Authentication page", () => {
     await expect(page).toFill("#password", "secret");
     await expect(page).toClick("button[type=submit]");
     await new Promise((resolve) => setTimeout(resolve, 2000));
-    await expect(page).toMatch("Support", { timeout: 4000 });
+    await expect(page).toMatch("Support", { timeout: 10000 });
   });
 });
