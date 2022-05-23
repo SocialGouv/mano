@@ -1,3 +1,10 @@
+# [1.111.0](https://github.com/SocialGouv/mano/compare/v1.110.1...v1.111.0) (2022-05-23)
+
+
+### Features
+
+* **dashboard:** add genre in stats ([b9eca48](https://github.com/SocialGouv/mano/commit/b9eca48efeb6490ede4f9c6ecbbe5383a8a4254e))
+
 ## [1.110.1](https://github.com/SocialGouv/mano/compare/v1.110.0...v1.110.1) (2022-05-23)
 
 
