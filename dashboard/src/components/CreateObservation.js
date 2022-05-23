@@ -11,7 +11,7 @@ import SelectTeam from './SelectTeam';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import CustomFieldInput from './CustomFieldInput';
-import { userState } from '../recoil/auth';
+import { teamsState, userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../services/date';
@@ -27,6 +27,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   }, [forceOpen]);
 
   const user = useRecoilValue(userState);
+  const teams = useRecoilValue(teamsState);
   const territories = useRecoilValue(territoriesState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const setTerritoryObs = useSetRecoilState(territoryObservationsState);
@@ -113,7 +114,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                       <Label htmlFor="observation-select-team">Sous l'équipe</Label>
                       <SelectTeam
                         name="team"
-                        teams={user.teams}
+                        teams={user.role === 'admin' ? teams : user.teams}
                         teamId={values.team}
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                         colored
