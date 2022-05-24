@@ -25,23 +25,22 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Encrypted Orga", { timeout: 10000 });
   });
 
-  it("should be able to update stuff in reception", async () => {
+  it.only("should be able to update stuff in reception", async () => {
     await navigateWithReactRouter("/reception");
     await expect(page).toMatch(
-      `Accueil du ${dayjs().format(
-        "dddd D MMMM YYYY"
-      )} de l'équipe Encrypted Orga Team`
+      `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`
     );
     await page.waitForTimeout(2000);
     await expect(page).toClick("button#add-anonymous-passage");
     await page.waitForTimeout(1000);
     expect(await getInnerText("span#number-of-passages")).toBe("1");
     await expect(page).toClick("button#Café-add");
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(10000);
     expect(await getInputValue("input#Café-count")).toBe("1");
     await expect(page).toClick("button#Café-add");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("2");
+    await page.waitForTimeout(1000);
     await expect(page).toClick("button#Café-remove");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("1");
@@ -81,9 +80,7 @@ describe("Organisation CRUD", () => {
   it("should be able to see the action in reception", async () => {
     await navigateWithReactRouter("/reception");
     await expect(page).toMatch(
-      `Accueil du ${dayjs().format(
-        "dddd D MMMM YYYY"
-      )} de l'équipe Encrypted Orga Team`
+      `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`
     );
     await expect(page).toMatch("Mon action");
   });
@@ -91,19 +88,13 @@ describe("Organisation CRUD", () => {
   it("should be able to add a passage", async () => {
     await navigateWithReactRouter("/reception");
     await expect(page).toMatch(
-      `Accueil du ${dayjs().format(
-        "dddd D MMMM YYYY"
-      )} de l'équipe Encrypted Orga Team`
+      `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`
     );
     await expect(page).toClick("input#person-select-and-create-reception");
-    await expect(page).toClick(
-      "div.person-select-and-create-reception__option"
+    await expect(page).toClick("div.person-select-and-create-reception__option");
+    expect(await getInnerText("div.person-select-and-create-reception__multi-value__label")).toBe(
+      "Ma première personne"
     );
-    expect(
-      await getInnerText(
-        "div.person-select-and-create-reception__multi-value__label"
-      )
-    ).toBe("Ma première personne");
     await expect(page).toClick("button", { text: "Ajouter un passage" });
     await page.waitForTimeout(1000);
     expect(await getInnerText("span#number-of-passages")).toBe("2");
@@ -115,9 +106,7 @@ describe("Organisation CRUD", () => {
   it("should be able go in the report", async () => {
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
-    await expect(page).toMatch(
-      "Comptes rendus de l'équipe Encrypted Orga Team"
-    );
+    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await expect(page).toClick("button", {
       text: dayjs().format("D MMMM YYYY"),
     });
@@ -129,25 +118,17 @@ describe("Organisation CRUD", () => {
   it("should be able to go to previous report then next report", async () => {
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(2000);
-    await expect(page).toMatch(
-      "Comptes rendus de l'équipe Encrypted Orga Team"
-    );
+    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await page.waitForTimeout(1000);
     await expect(page).toClick("button", {
       text: dayjs().add(-1, "day").format("D MMMM YYYY"),
     });
     await page.waitForTimeout(1000);
-    await expect(page).toMatch(
-      `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
-    );
+    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await expect(page).toClick("button", { text: "Suivant" });
-    await page.waitForTimeout(1000);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await expect(page).toClick("button", { text: "Précédent" });
-    await page.waitForTimeout(1000);
-    await expect(page).toMatch(
-      `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
-    );
+    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await expect(page).toClick("button", { text: "Suivant" });
     await page.waitForTimeout(1000);
   });
@@ -155,7 +136,9 @@ describe("Organisation CRUD", () => {
   it("should be able to modify services in the report", async () => {
     await expect(page).toClick("a#report-button-Accueil");
     await page.waitForTimeout(1000);
+    console.log("popopop");
     expect(await getInputValue("input#Café-count")).toBe("1");
+    console.log("pipipipi");
     await page.waitForTimeout(1000);
     await expect(page).toClick("button#Douche-add");
     await page.waitForTimeout(1000);
@@ -171,12 +154,8 @@ describe("Organisation CRUD", () => {
   it("should be able to see passages in the report", async () => {
     await expect(page).toClick("a", { text: "Passages (2)" });
     await page.waitForTimeout(1000);
-    expect(await getInnerText("span#report-passages-anonymous-count")).toBe(
-      "1"
-    );
-    expect(await getInnerText("span#report-passages-non-anonymous-count")).toBe(
-      "1"
-    );
+    expect(await getInnerText("span#report-passages-anonymous-count")).toBe("1");
+    expect(await getInnerText("span#report-passages-non-anonymous-count")).toBe("1");
     await expect(page).toMatch("Ma première personne");
     await expect(page).toMatch("Anonyme");
   });
@@ -197,12 +176,8 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("td", { text: "Mon action" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("input#update-action-select-status");
-    await expect(page).toClick(
-      "div.update-action-select-status__option:nth-of-type(2)"
-    );
-    expect(
-      await getInnerText("div.update-action-select-status__single-value")
-    ).toBe("FAITE");
+    await expect(page).toClick("div.update-action-select-status__option:nth-of-type(2)");
+    expect(await getInnerText("div.update-action-select-status__single-value")).toBe("FAITE");
     await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mise à jour !");
@@ -223,12 +198,8 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("td", { text: "Mon action" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("input#update-action-select-status");
-    await expect(page).toClick(
-      "div.update-action-select-status__option:nth-of-type(3)"
-    );
-    expect(
-      await getInnerText("div.update-action-select-status__single-value")
-    ).toBe("ANNULÉE");
+    await expect(page).toClick("div.update-action-select-status__option:nth-of-type(3)");
+    expect(await getInnerText("div.update-action-select-status__single-value")).toBe("ANNULÉE");
     await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mise à jour !");
@@ -245,12 +216,8 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Commentaires (2)" });
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Mon action");
-    await expect(page).toMatch(
-      "Encrypted Orga Admin a changé le status de l'action: FAITE"
-    );
-    await expect(page).toMatch(
-      "Encrypted Orga Admin a changé le status de l'action: ANNULÉE"
-    );
+    await expect(page).toMatch("Encrypted Orga Admin a changé le status de l'action: FAITE");
+    await expect(page).toMatch("Encrypted Orga Admin a changé le status de l'action: ANNULÉE");
   });
 
   it("should be able to add a collaboration", async () => {
@@ -260,10 +227,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Résumé" });
     await page.waitForTimeout(1000);
-    await expect(page).toFill(
-      "input#report-select-collaboration",
-      "Ma deuxième collab"
-    );
+    await expect(page).toFill("input#report-select-collaboration", "Ma deuxième collab");
     await expect(page).toClick("div.report-select-collaboration__option");
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
@@ -275,16 +239,12 @@ describe("Organisation CRUD", () => {
   it("should be able to use an added collaboration", async () => {
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
-    await expect(page).toMatch(
-      "Comptes rendus de l'équipe Encrypted Orga Team"
-    );
+    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await expect(page).toClick("button", {
       text: dayjs().add(-1, "day").format("D MMMM YYYY"),
     });
     await page.waitForTimeout(1000);
-    await expect(page).toMatch(
-      `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
-    );
+    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Résumé" });
     await page.waitForTimeout(1000);
@@ -300,25 +260,18 @@ describe("Organisation CRUD", () => {
   it("should be able to use add a description", async () => {
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
-    await expect(page).toMatch(
-      "Comptes rendus de l'équipe Encrypted Orga Team"
-    );
+    await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await expect(page).toClick("button", {
       text: dayjs().add(-1, "day").format("D MMMM YYYY"),
     });
     await page.waitForTimeout(1000);
-    await expect(page).toMatch(
-      `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
-    );
+    await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Résumé" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Ajouter une description" });
     await expect(page).toMatch("Description", { timeout: 10000 });
-    await expect(page).toFill(
-      'textarea[name="description"]',
-      "Ceci est une description"
-    );
+    await expect(page).toFill('textarea[name="description"]', "Ceci est une description");
     await expect(page).toClick("button", { text: "Enregistrer" });
     await expect(page).toClick("div.close-toastr");
     await expect(page).toMatch("Description", { timeout: 2000 });
