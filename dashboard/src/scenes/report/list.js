@@ -56,7 +56,7 @@ const HitMonth = ({ date }) => {
     if (!!existingReport) return history.push(`/report/${existingReport._id}`);
     const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date }) });
     if (!res.ok) return;
-    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => r1.date.localeCompare(r2.date)));
+    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => r2.date.localeCompare(r1.date)));
     history.push(`/report/${res.data._id}`);
   };
 
