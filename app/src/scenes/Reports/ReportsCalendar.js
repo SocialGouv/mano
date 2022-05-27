@@ -9,7 +9,6 @@ import ScrollContainer from '../../components/ScrollContainer';
 import { currentTeamState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import API from '../../services/api';
-import { isOnSameDay } from '../../services/dateDayjs';
 import colors from '../../utils/colors';
 import { refreshTriggerState } from '../../components/Loader';
 
@@ -35,14 +34,25 @@ export const mappedReportsToCalendarDaysSelector = selector({
   key: 'mappedReportsToCalendarDaysSelector',
   get: ({ get }) => {
     const reports = get(currentTeamReportsSelector);
-    const dates = {};
-    for (const report of reports) {
-      dates[report.date] = {
+    const today = dayjs().format('YYYY-MM-DD');
+    const dates = {
+      [today]: {
         selected: true,
         startingDay: true,
         endingDay: true,
         color: colors.app.color,
-      };
+        dotColor: '#000000',
+      },
+    };
+    for (const report of reports) {
+      if (report.date === today) {
+        dates[report.date].marked = true;
+      } else {
+        dates[report.date] = {
+          marked: true,
+          dotColor: '#000000',
+        };
+      }
     }
     return dates;
   },
@@ -63,8 +73,8 @@ const ReportsCalendar = ({ navigation }) => {
   const onDayPress = async ({ dateString }) => {
     if (submiting) return;
     setSubmiting(true);
-    const day = dayjs(dateString).startOf('day');
-    const report = reports.find((rep) => isOnSameDay(dayjs(rep.date).startOf('day'), day));
+    const day = dayjs(dateString).startOf('day').format('YYYY-MM-DD');
+    const report = reports.find((rep) => rep.date === day);
     if (report) {
       navigation.navigate('Report', { ...report });
       setSubmiting(false);
@@ -82,7 +92,6 @@ const ReportsCalendar = ({ navigation }) => {
       <ScreenTitle title={`Comptes-rendus de l'équipe ${currentTeam.name}`} onBack={navigation.goBack} />
       <ScrollContainer refreshControl={<RefreshControl refreshing={refreshTrigger.status} onRefresh={onRefresh} />}>
         <Calendar
-          // onVisibleMonthsChange={this.onVisibleMonthsChangeRequest}
           onDayPress={onDayPress}
           pastScrollRange={50}
           futureScrollRange={50}
@@ -95,7 +104,7 @@ const ReportsCalendar = ({ navigation }) => {
           theme={theme}
           firstDay={1}
           markedDates={JSON.parse(JSON.stringify(dates))}
-          markingType="period"
+          markingType="custom"
         />
       </ScrollContainer>
     </SceneContainer>
@@ -105,6 +114,7 @@ const ReportsCalendar = ({ navigation }) => {
 const theme = {
   selectedDayBackgroundColor: colors.app.color,
   selectedDayTextColor: '#000',
+  todayDotColor: '#000000',
 };
 
 export default ReportsCalendar;

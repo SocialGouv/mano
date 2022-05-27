@@ -57,7 +57,7 @@ const mergeItems = (oldItems, newItems) => {
 
 const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  const [lastRefresh, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-05-17');
+  const [lastRefresh, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-05-27');
 
   const [loading, setLoading] = useRecoilState(loadingState);
   const [progress, setProgress] = useRecoilState(progressState);
