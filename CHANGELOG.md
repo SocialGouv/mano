@@ -1,3 +1,10 @@
+# [1.112.0](https://github.com/SocialGouv/mano/compare/v1.111.0...v1.112.0) (2022-05-30)
+
+
+### Features
+
+* **app:**  show reports in app ([#699](https://github.com/SocialGouv/mano/issues/699)) ([9bca446](https://github.com/SocialGouv/mano/commit/9bca446de5e944191cdf700fb353b66e2adaee48))
+
 # [1.111.0](https://github.com/SocialGouv/mano/compare/v1.110.1...v1.111.0) (2022-05-23)
 
 
