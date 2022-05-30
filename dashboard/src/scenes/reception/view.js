@@ -18,7 +18,7 @@ import { actionsState, TODO } from '../../recoil/actions';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
-import { selector, selectorFamily, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { collectionsToLoadState } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
@@ -108,7 +108,7 @@ const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const [reports, setReports] = useRecoilState(reportsState);
+  const setReports = useSetRecoilState(reportsState);
   const setPassages = useSetRecoilState(passagesState);
   const passages = useRecoilValue(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
@@ -142,11 +142,13 @@ const Reception = () => {
   });
 
   const createReport = async () => {
-    const existingReport = reports.find((r) => r.date === startOfToday() && r.team === currentTeam._id);
-    if (!!existingReport) return;
-    const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: startOfToday() }) });
+    if (!!todaysReport) return;
+    const res = await API.post({
+      path: '/report',
+      body: prepareReportForEncryption({ team: currentTeam._id, date: startOfToday().format('YYYY-MM-DD') }),
+    });
     if (!res.ok) return;
-    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => r2.date.localeCompare(r1.date)));
   };
 
   useEffect(() => {

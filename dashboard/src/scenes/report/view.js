@@ -154,8 +154,6 @@ const View = () => {
     );
   };
 
-  console.log({ tabsContents });
-
   const renderScreenOnly = () => (
     <div
       className="noprint"
@@ -207,7 +205,9 @@ const View = () => {
           </div>
         }
       />
-      <div className="noprint" style={{ display: 'flex', overflow: 'hidden', flex: 1, marginTop: '1rem', borderTop: '1px solid #eee' }}>
+      <div
+        className="noprint"
+        style={{ height: '100%', display: 'flex', overflow: 'hidden', flex: 1, marginTop: '1rem', borderTop: '1px solid #eee' }}>
         <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
           <Drawer title="Navigation dans les réglages de l'organisation">
             {tabsContents.map((tabCaption, index) => {
@@ -230,54 +230,54 @@ const View = () => {
               );
             })}
           </Drawer>
-          <div ref={scrollContainer} style={{ display: 'flex', overflow: 'auto', flex: 1 }}>
-            <Box>
-              <div style={activeTab !== 0 ? { display: 'none' } : { overflow: 'auto' }}>
-                <DescriptionAndCollaborations report={report} key={report._id} />
-              </div>
-              <div style={activeTab !== 1 ? { display: 'none' } : { overflow: 'auto' }}>
-                <Reception report={report} />
-              </div>
-              <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto' }}>
-                <ActionCompletedAt
-                  date={report.date}
-                  status={DONE}
-                  onUpdateResults={(total) => updateTabContent(2, `Actions complétées (${total})`)}
-                />
-              </div>
-              <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto' }}>
-                <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, `Actions créées (${total})`)} />
-              </div>
-              <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto' }}>
-                <ActionCompletedAt
-                  date={report.date}
-                  status={CANCEL}
-                  onUpdateResults={(total) => updateTabContent(4, `Actions annulées (${total})`)}
-                />
-              </div>
-              <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto' }}>
-                <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Commentaires (${total})`)} />
-              </div>
-              <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto' }}>
-                <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, `Passages (${total})`)} />
-              </div>
-              <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto' }}>
-                <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />
-              </div>
-              <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto' }}>
-                <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(8, `Consultations faites (${total})`)} status={DONE} />
-              </div>
-              <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto' }}>
-                <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, `Consultations créées (${total})`)} />
-              </div>
-              <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto' }}>
-                <Consultations
-                  date={report.date}
-                  onUpdateResults={(total) => updateTabContent(10, `Consultations annulées (${total})`)}
-                  status={CANCEL}
-                />
-              </div>
-            </Box>
+          <div
+            ref={scrollContainer}
+            style={{
+              display: 'flex',
+              overflow: 'auto',
+              flex: 1,
+              height: '100%',
+              width: '100%',
+              padding: '15px 25px 0px',
+              backgroundColor: '#fff',
+            }}>
+            <div style={activeTab !== 0 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <DescriptionAndCollaborations report={report} key={report._id} />
+            </div>
+            <div style={activeTab !== 1 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <Reception report={report} />
+            </div>
+            <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(2, `Actions complétées (${total})`)} />
+            </div>
+            <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, `Actions créées (${total})`)} />
+            </div>
+            <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(4, `Actions annulées (${total})`)} />
+            </div>
+            <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Commentaires (${total})`)} />
+            </div>
+            <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, `Passages (${total})`)} />
+            </div>
+            <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />
+            </div>
+            <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(8, `Consultations faites (${total})`)} status={DONE} />
+            </div>
+            <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, `Consultations créées (${total})`)} />
+            </div>
+            <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <Consultations
+                date={report.date}
+                onUpdateResults={(total) => updateTabContent(10, `Consultations annulées (${total})`)}
+                status={CANCEL}
+              />
+            </div>
           </div>
         </div>
       </div>
@@ -1064,6 +1064,8 @@ const DescriptionBox = styled(StyledBox)`
   @media screen {
     padding: 10px 4rem 10px;
     border-radius: 0px;
+    height: 100%;
+    width: 100%;
   }
   @media print {
     ${(props) => props.report?.description?.length < 1 && props.report?.collaborations?.length < 1 && 'display: none !important;'}

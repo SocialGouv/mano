@@ -201,6 +201,44 @@ const Loader = () => {
       setOrganisation(response.organisation);
     }
 
+    if (!organisation.migrations?.includes('reports-from-real-date-to-date-id')) {
+      await new Promise((res) => setTimeout(res, 500));
+      setLoading('Mise à jour des données de votre organisation, veuillez patienter quelques instants...');
+      const allReports = await getData({
+        collectionName: 'report',
+        data: reports,
+        isInitialization: true,
+        setBatchData: (newReports) => {
+          newReports = newReports.filter((r) => !!r.team && !!r.date);
+          setReports((oldReports) => [...oldReports, ...newReports]);
+        },
+        API,
+      });
+
+      const reportsToMigrate = allReports
+        .filter((r) => !!r.date)
+        .map((report) => ({
+          ...report,
+          date: dayjs(report.date).format('YYYY-MM-DD'),
+          oldDateSystem: report.date, // just to track if we did bad stuff
+        }));
+      const encryptedReportsToMigrate = await Promise.all(reportsToMigrate.map(prepareReportForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const response = await API.put({
+        path: `/migration/reports-from-real-date-to-date-id`,
+        body: {
+          reportsToMigrate: encryptedReportsToMigrate,
+        },
+      });
+      if (!response.ok) {
+        if (response.error) {
+          setLoading(response.error);
+          setProgress(1);
+        }
+        return;
+      }
+      setOrganisation(response.organisation);
+    }
+
     /*
     Get number of data to download to show the appropriate loading progress bar
     */

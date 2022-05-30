@@ -19,13 +19,14 @@ describe("Organisation CRUD", () => {
 
   it("should be able to create a territory", async () => {
     await connectWith("adminEncrypted@example.org", "secret", "plouf");
-    await expect(page).toMatch("Encrypted Orga", { timeout: 4000 });
+    await expect(page).toMatch("Encrypted Orga", { timeout: 10000 });
     await navigateWithReactRouter("/territory");
     await expect(page).toMatch("Territoires de l'organisation Encrypted orga");
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     await expect(page).toClick("button", {
       text: "Créer un nouveau territoire",
     });
+    await page.waitForTimeout(2000);
     await expect(page).toFill('input[name="name"]', "Mon premier territoire");
     await expect(page).toClick("input#territory-select-types");
     await expect(page).toClick("div.territory-select-types__option");
@@ -74,7 +75,7 @@ describe("Organisation CRUD", () => {
 
   it("should have all the created data showing on reload", async () => {
     await connectWith("adminEncrypted@example.org", "secret", "plouf");
-    await expect(page).toMatch("Encrypted Orga", { timeout: 4000 });
+    await expect(page).toMatch("Encrypted Orga", { timeout: 10000 });
     await navigateWithReactRouter("/territory");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Territoires de l'organisation Encrypted orga");

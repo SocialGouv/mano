@@ -48,7 +48,7 @@ const Structures = ({ navigation }) => {
   };
   return (
     <SceneContainer>
-      <ScreenTitle title="Structures" />
+      <ScreenTitle title="Structures" onBack={navigation.goBack} />
       <FlatListStyled
         refreshing={refreshing}
         onRefresh={getStructures}

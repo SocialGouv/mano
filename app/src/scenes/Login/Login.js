@@ -34,7 +34,7 @@ const Login = ({ navigation }) => {
   const [showEncryptionKeyInput, setShowEncryptionKeyInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const setUser = useSetRecoilState(userState);
-  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-04-26');
+  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-05-27');
   const setOrganisation = useSetRecoilState(organisationState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);

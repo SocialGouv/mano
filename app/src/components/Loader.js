@@ -8,7 +8,7 @@ import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
-import { getData, storage } from '../services/dataManagement';
+import { getData } from '../services/dataManagement';
 import { useMMKVNumber } from 'react-native-mmkv';
 import { organisationState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
@@ -19,6 +19,7 @@ import { relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { territoryObservationsState } from '../recoil/territoryObservations';
 import { commentsState } from '../recoil/comments';
 import { capture } from '../services/sentry';
+import { reportsState } from '../recoil/reports';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -56,7 +57,7 @@ const mergeItems = (oldItems, newItems) => {
 
 const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  const [lastRefresh, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-04-26');
+  const [lastRefresh, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-05-27');
 
   const [loading, setLoading] = useRecoilState(loadingState);
   const [progress, setProgress] = useRecoilState(progressState);
@@ -71,6 +72,7 @@ const Loader = () => {
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
   const [comments, setComments] = useRecoilState(commentsState);
+  const [reports, setReports] = useRecoilState(reportsState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
 
   // to prevent auto-refresh to trigger on the first render
@@ -107,9 +109,10 @@ const Loader = () => {
       response.data.territoryObservations +
       response.data.places +
       response.data.comments +
+      response.data.reports +
       response.data.relsPersonPlace;
     if (initialLoad) {
-      const numberOfCollections = 8;
+      const numberOfCollections = 9;
       total = total + numberOfCollections; // for the progress bar to be beautiful
     }
     /*
@@ -228,6 +231,35 @@ const Loader = () => {
         API,
       });
       if (refreshedComments) setComments(refreshedComments);
+    }
+    /*
+    Get reports
+    */
+    /*
+    NOTA:
+    From commit ef6e2751 (2022/02/08) until commit d76fcc35 (2022/02/25), commit of full encryption
+    we had a bug where no encryption was save on report creation
+    (https://github.com/SocialGouv/mano/blob/ef6e2751ce02f6f34933cf2472492b1d5cd028d6/api/src/controllers/report.js#L67)
+    therefore, no date nor team was encryptely saved and those reports are just pollution
+    TODO: migration to delete all those reports from each organisation
+    QUICK WIN: filter those reports from recoil state
+    */
+
+    if (initialLoad || response.data.reports) {
+      setLoading('Chargement des comptes-rendus');
+      const refreshedReports = await getData({
+        collectionName: 'report',
+        data: reports,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newReports) => {
+          newReports = newReports.filter((r) => !!r.team && !!r.date);
+          setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
+        },
+        API,
+      });
+      if (refreshedReports) setReports(refreshedReports.filter((r) => !!r.team && !!r.date));
     }
 
     /*

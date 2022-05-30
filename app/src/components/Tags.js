@@ -2,10 +2,10 @@ import React, { useRef, useState } from 'react';
 import styled from 'styled-components';
 import ResetIcon from '../icons/ResetIcon';
 import PlusIcon from '../icons/PlusIcon';
-import { MyTextInput } from './MyText';
+import { MyText, MyTextInput } from './MyText';
 import Button from './Button';
 
-const Tags = ({ data = [], onAddRequest, renderTag, onChange, editable }) => {
+const Tags = ({ data = [], onAddRequest, renderTag, onChange, editable, listEmptyText = '' }) => {
   const addItem = (item) => [...data, item];
   const [text, setText] = useState('');
   const inputRef = useRef(null);
@@ -44,12 +44,13 @@ const Tags = ({ data = [], onAddRequest, renderTag, onChange, editable }) => {
         <TagItem key={`${tag}${i}`}>
           {renderTag(tag)}
           {!!editable && (
-            <ResetContainer onPress={() => onChange(data.filter((tag, index) => index !== i))}>
+            <ResetContainer onPress={() => onChange(data.filter((_, index) => index !== i))}>
               <ResetIcon />
             </ResetContainer>
           )}
         </TagItem>
       ))}
+      {!data.length && !editable && !!listEmptyText && <MyText>{listEmptyText}</MyText>}
       {renderAddTag()}
     </TagWrapper>
   );

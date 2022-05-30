@@ -11,7 +11,7 @@ import Spacer from '../../components/Spacer';
 import ScrollContainer from '../../components/ScrollContainer';
 import { refreshTriggerState } from '../../components/Loader';
 import { SectionListStyled } from '../../components/FlatListStyled';
-import ActionRow from '../Actions/ActionRow';
+import ActionRow from '../../components/ActionRow';
 import CommentRow from '../Comments/CommentRow';
 import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
@@ -136,19 +136,16 @@ const Notifications = ({ navigation }) => {
   return (
     <SceneContainer>
       <ScreenTitle title="Priorités" />
-      <ScrollContainer noPadding>
-        <Spacer height={30} />
-        <SectionListStyled
-          refreshing={refreshTrigger.status}
-          onRefresh={onRefresh}
-          sections={sections}
-          initialNumToRender={5}
-          renderItem={renderItem}
-          renderSectionHeader={SectionHeader}
-          keyExtractor={keyExtractor}
-          ListEmptyComponent={ListEmptyUrgent}
-        />
-      </ScrollContainer>
+      <SectionListStyled
+        refreshing={refreshTrigger.status}
+        onRefresh={onRefresh}
+        sections={sections}
+        initialNumToRender={5}
+        renderItem={renderItem}
+        renderSectionHeader={SectionHeader}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={ListEmptyUrgent}
+      />
     </SceneContainer>
   );
 };
