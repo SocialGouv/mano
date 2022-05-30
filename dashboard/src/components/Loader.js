@@ -5,7 +5,7 @@ import picture1 from '../assets/MANO_livraison_elements-07_green.png';
 import picture2 from '../assets/MANO_livraison_elements-08_green.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { getData, manoCacheStorage } from '../services/dataManagement';
+import { getCacheItem, getData, setCacheItem } from '../services/dataManagement';
 import { organisationState, teamsState, userState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
@@ -21,6 +21,9 @@ import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 import { treatmentsState } from '../recoil/treatments';
 import { medicalFileState } from '../recoil/medicalFiles';
+
+// Update to flush cache.
+const currentCacheKey = 'mano-last-refresh-2022-05-30';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -71,15 +74,11 @@ export const refreshTriggerState = atom({
 
 export const lastRefreshState = atom({
   key: 'lastRefreshState',
-  default: window.localStorage.getItem('mano-last-refresh-2022-04-26') || 0,
+  default: null,
   effects: [
     ({ onSet }) => {
-      onSet((newValue) => {
-        if (!!manoCacheStorage) {
-          window.localStorage.setItem('mano-last-refresh-2022-04-26', newValue);
-        } else {
-          window.localStorage.removeItem('mano-last-refresh-2022-04-26');
-        }
+      onSet(async (newValue) => {
+        await setCacheItem(currentCacheKey, newValue);
       });
     },
   ],
@@ -95,6 +94,7 @@ const Loader = () => {
   const API = useApi();
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
   const [lastRefresh, setLastRefresh] = useRecoilState(lastRefreshState);
+  const [lastRefreshReady, setLastRefreshReady] = useState(false);
   const [loading, setLoading] = useRecoilState(loadingState);
   const setCollectionsToLoad = useSetRecoilState(collectionsToLoadState);
   const [progress, setProgress] = useRecoilState(progressState);
@@ -121,6 +121,17 @@ const Loader = () => {
   // to prevent auto-refresh to trigger on the first render
   const initialLoadDone = useRef(null);
   const autoRefreshInterval = useRef(null);
+
+  useEffect(() => {
+    if (!lastRefreshReady) {
+      (async () => {
+        setLastRefresh(await getCacheItem(currentCacheKey) || 0);
+        setLastRefreshReady(true);
+      })();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastRefreshReady]);
+
 
   const refresh = async () => {
     clearInterval(autoRefreshInterval.current);
@@ -329,9 +340,9 @@ const Loader = () => {
             initialLoad
               ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
               : mergeItems(
-                  oldConsultations,
-                  newConsultations.map((c) => whitelistAllowedData(c, user))
-                )
+                oldConsultations,
+                newConsultations.map((c) => whitelistAllowedData(c, user))
+              )
           ),
         API,
       });
@@ -549,11 +560,11 @@ const Loader = () => {
   };
 
   useEffect(() => {
-    if (refreshTrigger.status === true) {
+    if (refreshTrigger.status === true && lastRefreshReady) {
       refresh();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [refreshTrigger.status]);
+  }, [refreshTrigger.status, lastRefreshReady]);
 
   // useEffect(() => {
   //   if (!autoRefreshInterval.current && initialLoadDone.current) {

@@ -18,10 +18,11 @@ export const mergeNewUpdatedData = (newData, oldData) => {
   ].filter((p) => !deletedItemsIds.includes(p._id));
 };
 
-export let manoCacheStorage = null;
+export let manoCacheStorage = undefined;
 
 // init
-(async () => {
+export async function getManoCacheStorage() {
+  if (manoCacheStorage !== undefined) return manoCacheStorage;
   const allowedDrivers = [localforage.INDEXEDDB, localforage.WEBSQL];
   for (const driver of allowedDrivers) {
     if (localforage.supports(driver)) {
@@ -38,7 +39,7 @@ export let manoCacheStorage = null;
         // if driver is not supported, localforage.ready() throw an error
         await localforage.ready();
         manoCacheStorage = localforage;
-        return;
+        return manoCacheStorage;
       } catch (e) {
         // should basically be the error thrown by localforage.ready()
         // when the browser supports the driver but the driver is not available
@@ -55,11 +56,24 @@ export let manoCacheStorage = null;
   }
   manoCacheStorage = null;
   window.localStorage?.clear();
-})();
+  return manoCacheStorage;
+};
 
-export function clearCache() {
-  manoCacheStorage?.clear();
+export async function clearCache() {
+  (await getManoCacheStorage())?.clear();
   window.localStorage?.clear();
+}
+
+export async function setCacheItem(key, value) {
+  return (await getManoCacheStorage())?.setItem(key, value);
+}
+
+export async function getCacheItem(key) {
+  return (await getManoCacheStorage())?.getItem(key);
+}
+
+export async function removeCacheItem(key) {
+  return (await getManoCacheStorage())?.removeItem(key);
 }
 
 // Get data from server (no cache yet).
@@ -68,12 +82,12 @@ export async function getData({
   collectionName,
   data = [],
   isInitialization = false,
-  setProgress = () => {},
+  setProgress = () => { },
   setBatchData = null,
   lastRefresh = 0,
 }) {
   if (isInitialization) {
-    data = (await manoCacheStorage?.getItem(collectionName)) || [];
+    data = await getCacheItem(collectionName) || [];
   }
   const response = await API.get({
     path: `/${collectionName}`,
@@ -87,6 +101,6 @@ export async function getData({
   if (!response.decryptedData?.length && !isInitialization) return null;
 
   data = mergeNewUpdatedData(response.decryptedData, data);
-  await manoCacheStorage?.setItem(collectionName, data);
+  await setCacheItem(collectionName, data);
   return data;
 }
