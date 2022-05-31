@@ -58,7 +58,7 @@ const progressState = atom({
 
 export const loaderFullScreenState = atom({
   key: 'loaderFullScreenState',
-  default: true,
+  default: false,
 });
 
 export const refreshTriggerState = atom({
@@ -329,9 +329,9 @@ const Loader = () => {
             initialLoad
               ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
               : mergeItems(
-                oldConsultations,
-                newConsultations.map((c) => whitelistAllowedData(c, user))
-              )
+                  oldConsultations,
+                  newConsultations.map((c) => whitelistAllowedData(c, user))
+                )
           ),
         API,
       });
