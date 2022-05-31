@@ -21,6 +21,11 @@ if (process.env.NODE_ENV === "development") {
 }
 
 if (process.env.NODE_ENV === "production") {
+  // FIXME: just to trigger stuff
+  console.log("to delete");
+}
+
+if (process.env.NODE_ENV === "production") {
   app.use(cors({ credentials: true, origin: /fabrique\.social\.gouv\.fr$/ }));
 } else {
   app.use(cors({ credentials: true, origin: ["http://localhost:4145", "http://localhost:8083", "http://localhost:8090"] }));
