@@ -47,7 +47,6 @@ const STYLES = {
 };
 
 const ButtonWrapper = styled.button`
-  ${(p) => STYLES[p.color] || `background: ${theme.main}; color: ${theme.white};`};
   border-radius: 8px;
   font-size: 14px;
   ${(p) => p.color === 'link' && 'font-weight: 600;'}
@@ -60,6 +59,7 @@ const ButtonWrapper = styled.button`
   border: none;
   position: relative;
   ${(props) => props.disabled && 'pointer-events: none;'}
+  ${(p) => STYLES[p.color] || `background: ${theme.main}; color: ${theme.white};`};
 
   &:disabled {
     opacity: 0.2;
@@ -78,7 +78,7 @@ const Icon = styled.div`
   display: inline-block;
   width: 20px;
   height: 20px;
-  margin-right: 10px;
+  margin-right: 7px;
 `;
 
 const Title = styled.p`

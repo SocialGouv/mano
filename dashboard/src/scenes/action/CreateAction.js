@@ -20,7 +20,7 @@ import { dateForDatePicker, formatDateWithFullMonth } from '../../services/date'
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 
-const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon, smallButton = false }) => {
+const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon, smallButton = false, icon = null }) => {
   const [open, setOpen] = useState(false);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const teams = useRecoilValue(teamsState);
@@ -63,7 +63,7 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
         </LinkButton>
       )}
       <ButtonCustom
-        icon={!noIcon && agendaIcon}
+        icon={!noIcon && (icon || agendaIcon)}
         disabled={disabled}
         onClick={() => setOpen(true)}
         color="primary"

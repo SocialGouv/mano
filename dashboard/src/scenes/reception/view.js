@@ -6,8 +6,6 @@ import { toastr } from 'react-redux-toastr';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
-import Card from '../../components/Card';
-import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
 import CreateAction from '../action/CreateAction';
 import SelectAndCreatePerson from './SelectAndCreatePerson';
@@ -27,6 +25,7 @@ import useTitle from '../../services/useTitle';
 import { capture } from '../../services/sentry';
 import { consultationsState } from '../../recoil/consultations';
 import plusIcon from '../../assets/icons/plus-icon.svg';
+import IncrementorSmall from '../../components/IncrementorSmall';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -242,9 +241,6 @@ const Reception = () => {
     }
   };
 
-  const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
-  const onGoToPrevReport = () => history.push(lastReport?._id ? `/report/${lastReport._id}` : '/report');
-
   return (
     <>
       <SmallerHeaderWithBackButton
@@ -256,7 +252,7 @@ const Reception = () => {
           </span>
         }
       />
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+      <div style={{ display: "flex", gap: "1rem", marginBottom: "5rem", marginTop: "2rem" }}>
         <div style={{ flexGrow: "1" }}>
           <SelectAndCreatePerson
             value={selectedPersons}
@@ -267,7 +263,7 @@ const Reception = () => {
           />
         </div>
         <div>
-          <CreateAction smallButton noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
+          <CreateAction smallButton icon={plusIcon} title="Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
         </div>
         <div>
           <ButtonCustom
@@ -280,16 +276,20 @@ const Reception = () => {
         </div>
       </div>
       <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
-        <Col md={8} style={{ paddingBottom: 20, marginBottom: 20, borderRight: '1px solid #ddd' }}>
-          <SectionTitle>Agenda</SectionTitle>
-          <div style={{ margin: '15px' }}>
-            <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
+        <Col md={8} style={{ paddingBottom: 20, marginBottom: 20 }}>
+          <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "2rem" }}>
+            <AgendaTitle>
+              Agenda
+            </AgendaTitle>
+            <div style={{ width: "175px" }}>
+              <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
+            </div>
           </div>
           <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
         </Col>
         <Col md={4}>
           <div>
-            <div style={{ textAlign: "center", backgroundColor: "#f8f8f8", borderRadius: "5px", padding: "1rem 0.5rem", marginBottom: "1rem" }}>
+            <div style={{ textAlign: "center", backgroundColor: "#f8f8f8", borderRadius: "5px", padding: "2rem 0.5rem", marginBottom: "1rem", display: "flex", alignItems: "center", flexDirection: "column", gap: "1rem" }}>
               <h5 style={{ color: "#555" }}>{passages.length} passage{passages.length > 1 ? 's' : ''}</h5>
               <ButtonCustom
                 onClick={onAddAnonymousPassage}
@@ -297,29 +297,22 @@ const Reception = () => {
                 icon={plusIcon}
                 title="Passage anonyme"
                 id="add-anonymous-passage"
-                disabled={addingPassage}
-              />
-            </div>
-            <Card title="Nombre de passages" count={passages.length} countId="number-of-passages" unit={`passage${passages.length > 1 ? 's' : ''}`}>
-              <ButtonCustom
-                onClick={onAddAnonymousPassage}
-                color="link"
-                title="Ajouter un passage anonyme"
-                padding="0px"
-                id="add-anonymous-passage"
-                disabled={addingPassage}
               />
               <ButtonCustom
-                onClick={() => history.push(`/report/${todaysReport._id}?tab=5`)}
+                onClick={() => history.push(`/report/${todaysReport._id}?tab=6`)}
                 color="link"
                 title="Modifier les passages"
                 padding="0px"
               />
-            </Card>
-            <SectionTitle style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Services</SectionTitle>
-            {organisation?.services?.map((service) => (
-              <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
-            ))}
+            </div>
+            <div style={{ textAlign: "center", backgroundColor: "#f8f8f8", borderRadius: "5px", padding: "2rem 1rem", marginBottom: "1rem", gap: "1rem" }}>
+              <h5 style={{ color: "#555" }}>Services</h5>
+              <div style={{ textAlign: "left", marginTop: "1rem" }}>
+                {organisation?.services?.map((service) => (
+                  <IncrementorSmall key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
+                ))}
+              </div>
+            </div>
           </div>
         </Col>
       </Row>
@@ -327,11 +320,12 @@ const Reception = () => {
   );
 };
 
-const SectionTitle = styled.h4`
+const AgendaTitle = styled.h4`
   color: ${theme.black};
   font-weight: bold;
   font-size: 20px;
   line-height: 32px;
+  flex-grow: 1;
 `;
 
 export default Reception;
