@@ -73,7 +73,7 @@ const SignIn = () => {
         setAuthViaCookie(true);
         const { organisation } = user;
         if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
-          clearCache();
+          await clearCache();
           setLastRefresh(0);
         }
         window.localStorage.setItem('mano-organisationId', organisation._id);
@@ -130,14 +130,14 @@ const SignIn = () => {
 
             const { user, token, ok } = authViaCookie
               ? await API.get({
-                  path: '/user/signin-token',
-                  skipEncryption: '/user/signin-token',
-                })
+                path: '/user/signin-token',
+                skipEncryption: '/user/signin-token',
+              })
               : await API.post({
-                  path: '/user/signin',
-                  skipEncryption: '/user/signin',
-                  body,
-                });
+                path: '/user/signin',
+                skipEncryption: '/user/signin',
+                body,
+              });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;
             if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
@@ -146,7 +146,7 @@ const SignIn = () => {
             }
             if (token) API.setToken(token);
             if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
-              clearCache();
+              await clearCache();
               setLastRefresh(0);
             }
             window.localStorage.setItem('mano-organisationId', organisation._id);

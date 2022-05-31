@@ -1,11 +1,11 @@
-import { manoCacheStorage } from '../services/dataManagement';
+import { setCacheItem } from '../services/dataManagement';
 import { atom } from 'recoil';
 
 const collectionName = 'action';
 export const actionsState = atom({
   key: collectionName,
   default: [],
-  effects: [({ onSet }) => onSet(async (newValue) => manoCacheStorage?.setItem(collectionName, newValue))],
+  effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
 const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];

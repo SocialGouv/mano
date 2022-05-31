@@ -1,4 +1,4 @@
-import { manoCacheStorage } from '../services/dataManagement';
+import { setCacheItem } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
@@ -7,7 +7,7 @@ const collectionName = 'person';
 export const personsState = atom({
   key: collectionName,
   default: [],
-  effects: [({ onSet }) => onSet(async (newValue) => manoCacheStorage?.setItem(collectionName, newValue))],
+  effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
 export const customFieldsPersonsMedicalSelector = selector({
