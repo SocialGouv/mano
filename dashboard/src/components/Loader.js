@@ -59,9 +59,9 @@ const progressState = atom({
   default: 0,
 });
 
-const loaderFullScreenState = atom({
+export const loaderFullScreenState = atom({
   key: 'loaderFullScreenState',
-  default: true,
+  default: false,
 });
 
 export const refreshTriggerState = atom({
