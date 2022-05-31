@@ -31,6 +31,7 @@ import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 import ModalConfirm from './components/ModalConfirm';
+import { loaderFullScreenState } from './components/Loader';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -87,6 +88,7 @@ const App = ({ resetRecoil }) => {
 };
 
 const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
+  const fullScreen = useRecoilValue(loaderFullScreenState);
   const user = useRecoilValue(userState);
   if (!!user && !user?.termsAccepted)
     return (
@@ -94,6 +96,9 @@ const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
         <Route {...rest} path="/auth" component={Charte} />
       </main>
     );
+
+  // Do not show content if loading state is fullscreen and user is logged in.
+  if (user && fullScreen) return <div></div>;
   return (
     <>
       {!!user && <TopBar />}
