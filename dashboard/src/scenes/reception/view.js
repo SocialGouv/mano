@@ -273,7 +273,7 @@ const Reception = () => {
         </Col>
         <Col md={4}>
           <PassagesWrapper>
-            <h5 className="passages-title">{passages.length} passage{passages.length > 1 ? 's' : ''}</h5>
+            <h5 id="passages-title">{passages.length} passage{passages.length > 1 ? 's' : ''}</h5>
             <ButtonCustom
               onClick={onAddAnonymousPassage}
               color="primary"
@@ -333,7 +333,7 @@ const PassagesWrapper = styled.div`
   align-items: center;
   flex-direction: column;
   gap: 1rem;
-  .passages-title {
+  #passages-title {
     color: #555;
   }
 `;
