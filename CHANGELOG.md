@@ -1,3 +1,15 @@
+# [1.114.0](https://github.com/SocialGouv/mano/compare/v1.113.1...v1.114.0) (2022-05-31)
+
+
+### Bug Fixes
+
+* **style:** underline link on hover ([#713](https://github.com/SocialGouv/mano/issues/713)) ([8915bdc](https://github.com/SocialGouv/mano/commit/8915bdcdf11bc1a3b68a225a037a5fcf2f69d72a))
+
+
+### Features
+
+* optimize loading, do not show restricted routes when fullscreen loader runs ([#712](https://github.com/SocialGouv/mano/issues/712)) ([716b4f8](https://github.com/SocialGouv/mano/commit/716b4f8b613d8a4f9ec23ab9b3e3dc2ba8a430b3))
+
 ## [1.113.1](https://github.com/SocialGouv/mano/compare/v1.113.0...v1.113.1) (2022-05-31)
 
 
