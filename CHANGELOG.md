@@ -1,3 +1,10 @@
+## [1.113.1](https://github.com/SocialGouv/mano/compare/v1.113.0...v1.113.1) (2022-05-31)
+
+
+### Bug Fixes
+
+* **dashboard:** cache key in index db ([#709](https://github.com/SocialGouv/mano/issues/709)) ([0e551ed](https://github.com/SocialGouv/mano/commit/0e551ed5a173b9151b02b30ecfd4eae46883b7a7))
+
 # [1.113.0](https://github.com/SocialGouv/mano/compare/v1.112.0...v1.113.0) (2022-05-30)
 
 
