@@ -36,20 +36,20 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(2000);
     await expect(page).toClick("button#Café-add");
     await page.waitForTimeout(500);
-    expect(await getInputValue("input#Café-count")).toBe("1");
+    expect(await getInnerText("div#Café-count")).toBe("1");
     await expect(page).toClick("button#Café-add");
     await page.waitForTimeout(500);
-    expect(await getInputValue("input#Café-count")).toBe("2");
+    expect(await getInnerText("div#Café-count")).toBe("2");
     await expect(page).toClick("button#Café-remove");
     await page.waitForTimeout(500);
-    expect(await getInputValue("input#Café-count")).toBe("1");
+    expect(await getInnerText("div#Café-count")).toBe("1");
     await page.waitForTimeout(1000);
     await expect(page).toClick("button#Douche-add");
     await expect(page).toClick("button#Douche-add");
     await expect(page).toClick("button#Douche-add");
     await page.waitForTimeout(500);
-    expect(await getInputValue("input#Douche-count")).toBe("3");
-    expect(await getInputValue("input#Café-count")).toBe("1");
+    expect(await getInnerText("div#Douche-count")).toBe("3");
+    expect(await getInnerText("div#Café-count")).toBe("1");
   });
 
   it("should be able go in the report", async () => {
@@ -115,8 +115,8 @@ describe("Organisation CRUD", () => {
       )} de l'équipe Encrypted Orga Team`
     );
     await page.waitForTimeout(1000);
-    expect(await getInputValue("input#Café-count")).toBe("1");
-    expect(await getInputValue("input#Bain-count")).toBe("3");
+    expect(await getInnerText("div#Café-count")).toBe("1");
+    expect(await getInnerText("div#Bain-count")).toBe("3");
 
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
