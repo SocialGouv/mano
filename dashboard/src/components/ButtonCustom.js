@@ -67,6 +67,7 @@ const ButtonWrapper = styled.button`
 
   &:hover {
     cursor: pointer;
+    ${(p) => p.color === 'link' && 'text-decoration: underline;'}
   }
 `;
 
