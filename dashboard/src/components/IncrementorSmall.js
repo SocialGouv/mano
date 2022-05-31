@@ -18,23 +18,28 @@ const IncrementorSmall = ({ service, count, onChange }) => {
     changeTimeout.current = setTimeout(() => onChange(newCount), 1000);
   };
   return (
-    <div style={{ display: "flex", gap: "5px", marginBottom: "10px" }}>
-      <ServiceName id={`${service}-title`} style={{ flexGrow: "1" }}>
+    <IncrementorSmallWrapper>
+      <div id={`${service}-title`} className="service-name">
         {service}
-      </ServiceName>
+      </div>
       <ButtonRemoveAdd aria-label="moins" disabled={localcount === 0} onClick={() => onChangeRequest(localcount - 1)} id={`${service}-remove`}>-</ButtonRemoveAdd>
       <LocalCount aria-label={`Nombre de ${service}`} id={`${service}-count`}>
         {localcount}
       </LocalCount>
       <ButtonRemoveAdd aria-label="plus" onClick={() => onChangeRequest(localcount + 1)} id={`${service}-add`}>+</ButtonRemoveAdd>
-    </div>
+    </IncrementorSmallWrapper>
   );
 };
 
-const ServiceName = styled.div`
-  color: ${theme.black75};
+const IncrementorSmallWrapper = styled.div`
+  display: flex;
+  gap: 5px;
+  margin-bottom: 10px;
+  .service-name {
+    flex-grow: 1;
+    color: ${theme.black75};
+  }
 `;
-
 const LocalCount = styled.div`
   width: 40px;
   text-align: center;

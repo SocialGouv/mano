@@ -135,31 +135,29 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
 const Person = ({ person }) => {
   const history = useHistory();
   return (
-    <div style={{ borderTop: "1px solid #ddd", marginTop: "-9px", paddingTop: "10px", paddingBottom: "5px" }}>
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "4px" }}>
-        <div style={{ flexGrow: "1" }}>
+    <PersonWrapper>
+      <PersonMainInfo>
+        <div className="person-name">
           <b>{person.name}</b>
           {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
           {!!person.alertness && <Alertness>!</Alertness>}
         </div>
-        <div>
-          <ButtonCustom
-            onClick={(e) => {
-              e.stopPropagation();
-              history.push(`/person/${person._id}`);
-            }}
-            color="link"
-            title="Accéder au dossier"
-            padding="0px"
-          />
-        </div>
-      </div>
-      <div style={{ display: "flex", gap: "1rem", fontSize: "12px" }}>
+        <ButtonCustom
+          onClick={(e) => {
+            e.stopPropagation();
+            history.push(`/person/${person._id}`);
+          }}
+          color="link"
+          title="Accéder au dossier"
+          padding="0px"
+        />
+      </PersonMainInfo>
+      <AdditionalInfoWrapper>
         <AdditionalInfo label="Dernière action" value={person.lastAction?.name} />
         <AdditionalInfo label="Dernier passage" value={person.lastPassage?.date ? formatCalendarDate(person.lastPassage?.date) : null} />
         <AdditionalInfo label="Tel" value={person.phone} />
-      </div>
-    </div>
+      </AdditionalInfoWrapper>
+    </PersonWrapper>
   );
 };
 
@@ -167,12 +165,11 @@ const AdditionalInfo = ({ label, value }) => {
   if (!value) return null;
   return (
     <div>
-      <span style={{ fontWeight: "bold", color: "#aaa", marginRight: "7px" }}>{label}</span>
+      <AdditionalInfoLabel>{label}</AdditionalInfoLabel>
       {value}
     </div>
   );
 };
-
 
 const Alertness = styled.span`
   display: inline-block;
@@ -180,6 +177,34 @@ const Alertness = styled.span`
   text-align: center;
   color: red;
   font-weight: bold;
+`;
+
+const AdditionalInfoLabel = styled.span`
+  font-weight: bold;
+  color: #aaa;
+  margin-right: 7px;
+`;
+
+const AdditionalInfoWrapper = styled.div`
+  display: flex;
+  gap: 1rem;
+  font-size: 12px;
+`;
+
+const PersonWrapper = styled.div`
+  border-top: 1px solid #ddd;
+  margin-top: -9px;
+  padding-top: 10px;
+  padding-bottom: 5px;
+`;
+
+const PersonMainInfo = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 4px;
+  .person-name {
+    flex-grow: 1;
+  }
 `;
 
 export default SelectAndCreatePerson;

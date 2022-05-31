@@ -75,15 +75,6 @@ const todaysReportSelector = selector({
   },
 });
 
-const lastReportSelector = selector({
-  key: 'lastReportSelector',
-  get: ({ get }) => {
-    const teamsReports = get(currentTeamReportsSelector);
-    const todays = get(todaysReportSelector);
-    return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
-  },
-});
-
 const todaysPassagesSelector = selector({
   key: 'todaysPassagesSelector',
   get: ({ get }) => {
@@ -121,7 +112,6 @@ const Reception = () => {
   );
 
   const todaysReport = useRecoilValue(todaysReportSelector);
-  const lastReport = useRecoilValue(lastReportSelector);
   const user = useRecoilValue(userState);
   const collectionsToLoad = useRecoilValue(collectionsToLoadState);
   const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
@@ -252,7 +242,7 @@ const Reception = () => {
           </span>
         }
       />
-      <div style={{ display: "flex", gap: "1rem", marginBottom: "5rem", marginTop: "2rem" }}>
+      <PersonsWrapper>
         <div style={{ flexGrow: "1" }}>
           <SelectAndCreatePerson
             value={selectedPersons}
@@ -262,70 +252,105 @@ const Reception = () => {
             classNamePrefix="person-select-and-create-reception"
           />
         </div>
-        <div>
-          <CreateAction smallButton icon={plusIcon} title="Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
-        </div>
-        <div>
-          <ButtonCustom
-            onClick={onAddPassageForPersons}
-            color="primary"
-            icon={plusIcon}
-            title="Passage"
-            disabled={addingPassage || !selectedPersons.length}
-          />
-        </div>
-      </div>
+        <CreateAction smallButton icon={plusIcon} title="Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
+        <ButtonCustom
+          onClick={onAddPassageForPersons}
+          color="primary"
+          icon={plusIcon}
+          title="Passage"
+          disabled={addingPassage || !selectedPersons.length}
+        />
+      </PersonsWrapper>
       <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
-        <Col md={8} style={{ paddingBottom: 20, marginBottom: 20 }}>
-          <div style={{ display: "flex", gap: "1rem", alignItems: "center", marginBottom: "2rem" }}>
-            <AgendaTitle>
-              Agenda
-            </AgendaTitle>
-            <div style={{ width: "175px" }}>
+        <Col md={8}>
+          <AgendaWrapper>
+            <div className="agenda-title">Agenda</div>
+            <div className="agenda-status">
               <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
             </div>
-          </div>
+          </AgendaWrapper>
           <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
         </Col>
         <Col md={4}>
-          <div>
-            <div style={{ textAlign: "center", backgroundColor: "#f8f8f8", borderRadius: "5px", padding: "2rem 0.5rem", marginBottom: "1rem", display: "flex", alignItems: "center", flexDirection: "column", gap: "1rem" }}>
-              <h5 style={{ color: "#555" }}>{passages.length} passage{passages.length > 1 ? 's' : ''}</h5>
-              <ButtonCustom
-                onClick={onAddAnonymousPassage}
-                color="primary"
-                icon={plusIcon}
-                title="Passage anonyme"
-                id="add-anonymous-passage"
-              />
-              <ButtonCustom
-                onClick={() => history.push(`/report/${todaysReport._id}?tab=6`)}
-                color="link"
-                title="Modifier les passages"
-                padding="0px"
-              />
+          <PassagesWrapper>
+            <h5 className="passages-title">{passages.length} passage{passages.length > 1 ? 's' : ''}</h5>
+            <ButtonCustom
+              onClick={onAddAnonymousPassage}
+              color="primary"
+              icon={plusIcon}
+              title="Passage anonyme"
+              id="add-anonymous-passage"
+            />
+            <ButtonCustom
+              onClick={() => history.push(`/report/${todaysReport._id}?tab=6`)}
+              color="link"
+              title="Modifier les passages"
+              padding="0px"
+            />
+          </PassagesWrapper>
+          <ServicesWrapper>
+            <h5 className="services-title">Services</h5>
+            <div className="services-incrementators">
+              {organisation?.services?.map((service) => (
+                <IncrementorSmall key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
+              ))}
             </div>
-            <div style={{ textAlign: "center", backgroundColor: "#f8f8f8", borderRadius: "5px", padding: "2rem 1rem", marginBottom: "1rem", gap: "1rem" }}>
-              <h5 style={{ color: "#555" }}>Services</h5>
-              <div style={{ textAlign: "left", marginTop: "1rem" }}>
-                {organisation?.services?.map((service) => (
-                  <IncrementorSmall key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
-                ))}
-              </div>
-            </div>
-          </div>
+          </ServicesWrapper>
         </Col>
       </Row>
     </>
   );
 };
 
-const AgendaTitle = styled.h4`
-  color: ${theme.black};
-  font-weight: bold;
-  font-size: 20px;
-  line-height: 32px;
-  flex-grow: 1;
+const PersonsWrapper = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 5rem;
+  margin-top: 2rem;
+`;
+const AgendaWrapper = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  .agenda-status {
+    width: 150px;
+  }
+  .agenda-title {
+    color: ${theme.black};
+    font-weight: bold;
+    font-size: 20px;
+    flex-grow: 1;
+  }
+`;
+const PassagesWrapper = styled.div`
+  text-align: center;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  padding: 2rem 0.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  .passages-title {
+    color: #555;
+  }
+`;
+const ServicesWrapper = styled.div`
+  text-align: center;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  padding: 2rem 1rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  .services-title {
+    color: #555;
+  }
+  .services-incrementators {
+    text-align: left;
+    margin-top: 1rem;
+  }
 `;
 
 export default Reception;
