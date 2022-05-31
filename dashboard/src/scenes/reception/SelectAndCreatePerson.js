@@ -87,7 +87,6 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
         (inputValue) => {
           const formattedInputValue = removeDiatricsAndAccents(inputValue);
           const options = personsToOptions(searchablePersons.filter(person => person.searchString.includes(formattedInputValue)), lastActions, lastPassages);
-          console.log(options);
           return Promise.resolve(options);
         }
       }
@@ -116,7 +115,6 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
       }}
       value={value}
       formatOptionLabel={(person, options) => {
-        console.log(options);
         if (options.context === "menu") {
           if (person.__isNew__) return <span>Créer "{person.value}"</span>;
           return <Person person={person} />;
