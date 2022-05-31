@@ -78,7 +78,7 @@ const Icon = styled.div`
   display: inline-block;
   width: 20px;
   height: 20px;
-  margin-right: 20px;
+  margin-right: 10px;
 `;
 
 const Title = styled.p`

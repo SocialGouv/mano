@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import 'react-datepicker/dist/react-datepicker.css';
-import SelectCustom from '../../components/SelectCustom';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import {
@@ -10,23 +9,94 @@ import {
   preparePersonForEncryption,
 } from '../../recoil/persons';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import AsyncSelect from 'react-select/async-creatable';
 import useApi from '../../services/api';
-import { formatBirthDate } from '../../services/date';
+import { formatBirthDate, formatCalendarDate } from '../../services/date';
+import { actionsState } from '../../recoil/actions';
+import { passagesState } from '../../recoil/passages';
+import { useHistory } from 'react-router-dom';
+import ButtonCustom from '../../components/ButtonCustom';
+
+function removeDiatricsAndAccents(str) {
+  return (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+}
+
+function personsToOptions(persons, actions, passages) {
+  return persons
+    .slice(0, 50)
+    .map((person) => ({
+      value: person._id,
+      label: person.name,
+      ...person,
+      lastAction: actions.find(action => action.person === person._id),
+      lastPassage: passages.find((passage) => passage.person === person._id)
+    }))
+}
 
 const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, classNamePrefix }) => {
   const [persons, setPersons] = useRecoilState(personsState);
+  const actions = useRecoilValue(actionsState);
+  const passages = useRecoilValue(passagesState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
 
+  const searchablePersons = useMemo(() => {
+    return persons.map((person) => {
+      return {
+        ...person,
+        searchString: [
+          removeDiatricsAndAccents(person.name),
+          formatBirthDate(person.birthdate),
+        ].join(" "),
+      };
+    });
+  }, [persons]);
+
+  const lastActions = useMemo(() => {
+    return Object.values(actions
+      .reduce((acc, action) => {
+        if (!acc[action.person] || (action.dueAt > acc[action.person].dueAt)) {
+          acc[action.person] = {
+            name: action.name,
+            dueAt: action.dueAt,
+            person: action.person,
+          };
+        }
+        return acc;
+      }, {}));
+  }, [actions]);
+
+  const lastPassages = useMemo(() => {
+    return Object.values(passages
+      .filter(passage => Boolean(passage.person))
+      .reduce((acc, passage) => {
+        if (!acc[passage.person] || (passage.date > acc[passage.person].date)) {
+          acc[passage.person] = {
+            date: passage.date,
+            person: passage.person,
+          };
+        }
+        return acc;
+      }, {}));
+  }, [passages]);
+
   return (
-    <SelectCustom
-      options={persons.map((person) => ({ value: person._id, label: person.name, ...person }))}
+    <AsyncSelect
+      loadOptions={
+        (inputValue) => {
+          const formattedInputValue = removeDiatricsAndAccents(inputValue);
+          const options = personsToOptions(searchablePersons.filter(person => person.searchString.includes(formattedInputValue)), lastActions, lastPassages);
+          console.log(options);
+          return Promise.resolve(options);
+        }
+      }
+      defaultOptions={personsToOptions(searchablePersons, lastActions, lastPassages)}
       name="persons"
       isMulti
       isSearchable
       onChange={onChange}
-      placeholder={' -- Choisir une ou plusieurs personnes -- '}
+      placeholder={'Entrez un nom, une date de naissance…'}
       onCreateOption={async (name) => {
         if (!autoCreate) {
           onChange([...value, { value: `temporary-id-${Date.now()}`, label: `${name} (en cours de création)`, name }]);
@@ -45,15 +115,16 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
         }
       }}
       value={value}
-      formatOptionLabel={(person) => {
-        if (person.__isNew__) return <span>Créer "{person.value}"</span>;
-        return (
-          <span>
-            {!!person.alertness && <Alertness>!</Alertness>}
-            {person.name}
-            {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
-          </span>
-        );
+      formatOptionLabel={(person, options) => {
+        console.log(options);
+        if (options.context === "menu") {
+          if (person.__isNew__) return <span>Créer "{person.value}"</span>;
+          return <Person person={person} />;
+        }
+        return <div>
+          {person.name}
+          {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
+        </div>;
       }}
       format
       creatable
@@ -63,9 +134,51 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
   );
 };
 
+const Person = ({ person }) => {
+  const history = useHistory();
+  return (
+    <div style={{ borderTop: "1px solid #ddd", marginTop: "-9px", paddingTop: "10px", paddingBottom: "5px" }}>
+      <div style={{ display: "flex", gap: "1rem", marginBottom: "4px" }}>
+        <div style={{ flexGrow: "1" }}>
+          <b>{person.name}</b>
+          {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
+          {!!person.alertness && <Alertness>!</Alertness>}
+        </div>
+        <div>
+          <ButtonCustom
+            onClick={(e) => {
+              e.stopPropagation();
+              history.push(`/person/${person._id}`);
+            }}
+            color="link"
+            title="Accéder au dossier"
+            padding="0px"
+          />
+        </div>
+      </div>
+      <div style={{ display: "flex", gap: "1rem", fontSize: "12px" }}>
+        <AdditionalInfo label="Dernière action" value={person.lastAction?.name} />
+        <AdditionalInfo label="Dernier passage" value={person.lastPassage?.date ? formatCalendarDate(person.lastPassage?.date) : null} />
+        <AdditionalInfo label="Tel" value={person.phone} />
+      </div>
+    </div>
+  );
+};
+
+const AdditionalInfo = ({ label, value }) => {
+  if (!value) return null;
+  return (
+    <div>
+      <span style={{ fontWeight: "bold", color: "#aaa", marginRight: "7px" }}>{label}</span>
+      {value}
+    </div>
+  );
+};
+
+
 const Alertness = styled.span`
   display: inline-block;
-  margin-right: 20px;
+  margin-left: 1rem;
   text-align: center;
   color: red;
   font-weight: bold;

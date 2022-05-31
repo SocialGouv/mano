@@ -26,6 +26,7 @@ import { passagesState, preparePassageForEncryption } from '../../recoil/passage
 import useTitle from '../../services/useTitle';
 import { capture } from '../../services/sentry';
 import { consultationsState } from '../../recoil/consultations';
+import plusIcon from '../../assets/icons/plus-icon.svg';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -51,20 +52,20 @@ export const actionsByStatusSelector = selectorFamily({
   key: 'actionsByStatusSelector',
   get:
     ({ status }) =>
-    ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
-      return actions.filter((a) => a.status === status);
-    },
+      ({ get }) => {
+        const actions = get(actionsForCurrentTeamSelector);
+        return actions.filter((a) => a.status === status);
+      },
 });
 
 export const consultationsByStatusSelector = selectorFamily({
   key: 'consultationsByStatusSelector',
   get:
     ({ status }) =>
-    ({ get }) => {
-      const consultations = get(consultationsByAuthorizationSelector);
-      return consultations.filter((a) => a.status === status);
-    },
+      ({ get }) => {
+        const consultations = get(consultationsByAuthorizationSelector);
+        return consultations.filter((a) => a.status === status);
+      },
 });
 
 const todaysReportSelector = selector({
@@ -255,63 +256,29 @@ const Reception = () => {
           </span>
         }
       />
-      <Row style={{ paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid #ddd' }}>
-        <Col
-          md={3}
-          style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'column', borderRight: '1px solid #ddd' }}>
-          <ButtonCustom
-            onClick={onGoToPrevReport}
-            color="link"
-            title="Accéder au compte-rendu précédent"
-            padding="12px 24px"
-            disabled={!lastReport?._id}
+      <div style={{ display: "flex", gap: "1rem", marginBottom: "1rem" }}>
+        <div style={{ flexGrow: "1" }}>
+          <SelectAndCreatePerson
+            value={selectedPersons}
+            onChange={onSelectPerson}
+            autoCreate
+            inputId="person-select-and-create-reception"
+            classNamePrefix="person-select-and-create-reception"
           />
-        </Col>
-        <Col
-          md={5}
-          style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'column', borderRight: '1px solid #ddd' }}>
-          <div style={{ flexShrink: 0, width: '100%' }}>
-            <SelectAndCreatePerson
-              value={selectedPersons}
-              onChange={onSelectPerson}
-              autoCreate
-              inputId="person-select-and-create-reception"
-              classNamePrefix="person-select-and-create-reception"
-            />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
-            <CreateAction noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
-            <ButtonCustom
-              onClick={onAddPassageForPersons}
-              color="primary"
-              title="Ajouter un passage"
-              padding="12px 24px"
-              disabled={addingPassage || !selectedPersons.length}
-            />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
-            <ButtonCustom disabled={selectedPersons.length !== 1} onClick={onGoToFile} color="link" title="Accéder au dossier" padding="12px 24px" />
-          </div>
-        </Col>
-        <Col md={4}>
-          <Card title="Nombre de passages" count={passages.length} countId="number-of-passages" unit={`passage${passages.length > 1 ? 's' : ''}`}>
-            <ButtonCustom
-              onClick={onAddAnonymousPassage}
-              color="link"
-              title="Ajouter un passage anonyme"
-              padding="0px"
-              id="add-anonymous-passage"
-              disabled={addingPassage}
-            />
-            <ButtonCustom
-              onClick={() => history.push(`/report/${todaysReport._id}?tab=5`)}
-              color="link"
-              title="Modifier les passages"
-              padding="0px"
-            />
-          </Card>
-        </Col>
-      </Row>
+        </div>
+        <div>
+          <CreateAction smallButton noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
+        </div>
+        <div>
+          <ButtonCustom
+            onClick={onAddPassageForPersons}
+            color="primary"
+            icon={plusIcon}
+            title="Passage"
+            disabled={addingPassage || !selectedPersons.length}
+          />
+        </div>
+      </div>
       <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
         <Col md={8} style={{ paddingBottom: 20, marginBottom: 20, borderRight: '1px solid #ddd' }}>
           <SectionTitle>Agenda</SectionTitle>
@@ -321,10 +288,39 @@ const Reception = () => {
           <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
         </Col>
         <Col md={4}>
-          <SectionTitle style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Services</SectionTitle>
-          {organisation?.services?.map((service) => (
-            <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
-          ))}
+          <div>
+            <div style={{ textAlign: "center", backgroundColor: "#f8f8f8", borderRadius: "5px", padding: "1rem 0.5rem", marginBottom: "1rem" }}>
+              <h5 style={{ color: "#555" }}>{passages.length} passage{passages.length > 1 ? 's' : ''}</h5>
+              <ButtonCustom
+                onClick={onAddAnonymousPassage}
+                color="primary"
+                icon={plusIcon}
+                title="Passage anonyme"
+                id="add-anonymous-passage"
+                disabled={addingPassage}
+              />
+            </div>
+            <Card title="Nombre de passages" count={passages.length} countId="number-of-passages" unit={`passage${passages.length > 1 ? 's' : ''}`}>
+              <ButtonCustom
+                onClick={onAddAnonymousPassage}
+                color="link"
+                title="Ajouter un passage anonyme"
+                padding="0px"
+                id="add-anonymous-passage"
+                disabled={addingPassage}
+              />
+              <ButtonCustom
+                onClick={() => history.push(`/report/${todaysReport._id}?tab=5`)}
+                color="link"
+                title="Modifier les passages"
+                padding="0px"
+              />
+            </Card>
+            <SectionTitle style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Services</SectionTitle>
+            {organisation?.services?.map((service) => (
+              <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
+            ))}
+          </div>
         </Col>
       </Row>
     </>
