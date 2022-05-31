@@ -17,10 +17,9 @@ const TagTeam = ({ teamId }) => {
 
 const teamsColors = ['#255c99', '#74776bff', '#00c6a5ff', '#ff4b64ff', '#ef798aff'];
 
-const Team = styled.span`
+const Team = styled.div`
   background-color: ${({ teamIndex }) => teamsColors[teamIndex % teamsColors?.length]};
-  margin-right: 10px;
-  margin-bottom: 5px;
+  margin: 3px 4px;
   padding: 2px 10px;
   border-radius: 5px;
   color: #fff;
