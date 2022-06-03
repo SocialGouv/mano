@@ -300,7 +300,7 @@ PODS:
   - react-native-mmkv (2.3.3):
     - MMKV (>= 1.2.13)
     - React-Core
-  - react-native-netinfo (6.2.1):
+  - react-native-netinfo (9.0.0):
     - React-Core
   - react-native-pdf (6.5.0):
     - React-Core
@@ -694,7 +694,7 @@ SPEC CHECKSUMS:
   react-native-config: 6502b1879f97ed5ac570a029961fc35ea606cd14
   react-native-image-picker: 1ccfc97709f680a7167ccb758c32466b466c96e2
   react-native-mmkv: 30297e5e2a65341b36a727c1c79b0aff0132b396
-  react-native-netinfo: 3d3769f0d65de15c83a9bf1346f8be71de5a24bf
+  react-native-netinfo: 5b664b2945a8f02102b296f0f812bddd6827ed9c
   react-native-pdf: de35db0d8f1e5d37e65e887554f7d4bd062af56b
   react-native-progress-bar-android: be43138ab7da30d51fc038bafa98e9ed594d0c40
   react-native-progress-view: 9e6b6a5305a9115c2157ae3b8852081aba0aab7c
