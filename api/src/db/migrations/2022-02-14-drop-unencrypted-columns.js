@@ -1,8 +1,9 @@
 const sequelize = require("../sequelize");
 
-(async () => {
-  await sequelize.query(
-    `ALTER TABLE "mano"."Action"
+module.exports = async () => {
+  try {
+    await sequelize.query(
+      `ALTER TABLE "mano"."Action"
       DROP COLUMN IF EXISTS "name",
       DROP COLUMN IF EXISTS "description",
       DROP COLUMN IF EXISTS "person",
@@ -12,10 +13,10 @@ const sequelize = require("../sequelize");
       DROP COLUMN IF EXISTS "structure",
       DROP COLUMN IF EXISTS "user",
       DROP COLUMN IF EXISTS "categories";`
-  );
+    );
 
-  await sequelize.query(
-    `ALTER TABLE "mano"."Comment"
+    await sequelize.query(
+      `ALTER TABLE "mano"."Comment"
       DROP COLUMN IF EXISTS "type",
       DROP COLUMN IF EXISTS "item",
       DROP COLUMN IF EXISTS "comment",
@@ -23,10 +24,10 @@ const sequelize = require("../sequelize");
       DROP COLUMN IF EXISTS "team",
       DROP COLUMN IF EXISTS "action",
       DROP COLUMN IF EXISTS "person";`
-  );
+    );
 
-  await sequelize.query(
-    `ALTER TABLE "mano"."Person"
+    await sequelize.query(
+      `ALTER TABLE "mano"."Person"
       DROP COLUMN IF EXISTS "name",
       DROP COLUMN IF EXISTS "gender",
       DROP COLUMN IF EXISTS "birthdate",
@@ -53,41 +54,41 @@ const sequelize = require("../sequelize");
       DROP COLUMN IF EXISTS "outOfActiveList",
       DROP COLUMN IF EXISTS "outOfActiveListReason",
       DROP COLUMN IF EXISTS "phone";`
-  );
+    );
 
-  await sequelize.query(
-    `ALTER TABLE "mano"."Place"
+    await sequelize.query(
+      `ALTER TABLE "mano"."Place"
       DROP COLUMN IF EXISTS "name",
       DROP COLUMN IF EXISTS "user";`
-  );
+    );
 
-  await sequelize.query(
-    `ALTER TABLE "mano"."RelPersonPlace"
+    await sequelize.query(
+      `ALTER TABLE "mano"."RelPersonPlace"
       DROP COLUMN IF EXISTS "person",
       DROP COLUMN IF EXISTS "user",
       DROP COLUMN IF EXISTS "place";`
-  );
+    );
 
-  await sequelize.query(
-    `ALTER TABLE "mano"."Report"
+    await sequelize.query(
+      `ALTER TABLE "mano"."Report"
       DROP COLUMN IF EXISTS "description",
       DROP COLUMN IF EXISTS "date",
       DROP COLUMN IF EXISTS "team",
       DROP COLUMN IF EXISTS "services",
       DROP COLUMN IF EXISTS "passages",
       DROP COLUMN IF EXISTS "collaborations";`
-  );
+    );
 
-  await sequelize.query(
-    `ALTER TABLE "mano"."Territory"
+    await sequelize.query(
+      `ALTER TABLE "mano"."Territory"
       DROP COLUMN IF EXISTS "name",
       DROP COLUMN IF EXISTS "types",
       DROP COLUMN IF EXISTS "perimeter",
       DROP COLUMN IF EXISTS "user";`
-  );
+    );
 
-  await sequelize.query(
-    `ALTER TABLE "mano"."TerritoryObservation"
+    await sequelize.query(
+      `ALTER TABLE "mano"."TerritoryObservation"
       DROP COLUMN IF EXISTS "persons",
       DROP COLUMN IF EXISTS "police",
       DROP COLUMN IF EXISTS "material",
@@ -99,7 +100,10 @@ const sequelize = require("../sequelize");
       DROP COLUMN IF EXISTS "user",
       DROP COLUMN IF EXISTS "personsMale",
       DROP COLUMN IF EXISTS "personsFemale";`
-  );
+    );
 
-  await sequelize.query(`DROP TABLE IF EXISTS "mano"."RelPersonTeam";`);
-})();
+    await sequelize.query(`DROP TABLE IF EXISTS "mano"."RelPersonTeam";`);
+  } catch (e) {
+    capture(e);
+  }
+};

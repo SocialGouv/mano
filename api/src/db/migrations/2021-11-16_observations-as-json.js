@@ -1,7 +1,7 @@
 const { QueryTypes } = require("sequelize");
 const sequelize = require("../sequelize");
 
-(async () => {
+module.exports = async () => {
   try {
     const rows = await sequelize.query(`select "customFieldsObs", _id from "mano"."Organisation" where "customFieldsObs" is not null`, {
       type: QueryTypes.SELECT,
@@ -20,4 +20,4 @@ const sequelize = require("../sequelize");
   } catch (error) {
     console.error(error);
   }
-})();
+};
