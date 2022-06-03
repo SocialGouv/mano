@@ -26,7 +26,7 @@ const Menu = ({ navigation }) => {
         <Spacer height={30} />
         <Row
           withNextButton
-          caption={`Comptes-rendus de l'équipe ${currentTeam.name}`}
+          caption={`Comptes-rendus de l'équipe ${currentTeam?.name}`}
           onPress={() => {
             if (!organisation.migrations.includes('reports-from-real-date-to-date-id')) {
               return Alert.alert(
@@ -41,11 +41,19 @@ const Menu = ({ navigation }) => {
         <Row withNextButton caption="Structures" onPress={() => navigation.navigate('Structures')} />
         <Row withNextButton caption="Soliguide" onPress={() => Linking.openURL('https://soliguide.fr')} />
         <Spacer height={30} />
-        <Row withNextButton caption={`Changer d'équipe (actuellement ${currentTeam.name})`} onPress={() => navigation.navigate('ChangeTeam')} />
+        <Row withNextButton caption={`Changer d'équipe (actuellement ${currentTeam?.name})`} onPress={() => navigation.navigate('ChangeTeam')} />
         <Row withNextButton caption="Changer le mot de passe" onPress={() => navigation.navigate('ChangePassword')} />
+        <Spacer height={30} />
+        <Row withNextButton caption="Donnez votre avis sur l'app" onPress={() => Linking.openURL(FRAMAFORM_MANO)} />
+        <Row withNextButton caption="Télécharger Mano" onPress={() => Linking.openURL(MANO_DOWNLOAD_URL)} />
+        <Spacer height={30} />
+        <Row withNextButton caption="Charte des utilisateurs" onPress={() => navigation.navigate('Charte')} />
+        <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
+        <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
+        <Spacer height={30} />
         <Row
-          withNextButton
           caption="Déconnexion"
+          color="#F00"
           loading={isLoggingOut}
           Component={TouchableWithoutFeedback}
           onPress={async () => {
@@ -57,13 +65,6 @@ const Menu = ({ navigation }) => {
             resetCurrentTeam();
           }}
         />
-        <Spacer height={30} />
-        <Row withNextButton caption="Donnez votre avis sur l'app" onPress={() => Linking.openURL(FRAMAFORM_MANO)} />
-        <Row withNextButton caption="Télécharger Mano" onPress={() => Linking.openURL(MANO_DOWNLOAD_URL)} />
-        <Spacer height={30} />
-        <Row withNextButton caption="Charte des utilisateurs" onPress={() => navigation.navigate('Charte')} />
-        <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
-        <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
         <Spacer height={30} />
       </ScrollContainer>
     </SceneContainer>
