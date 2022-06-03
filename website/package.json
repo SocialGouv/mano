@@ -1,6 +1,6 @@
 {
   "name": "boilerplate",
-  "version": "1.114.2",
+  "version": "1.114.3",
   "mobileAppVersion": "2.20.0",
   "private": true,
   "engines": {

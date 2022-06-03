@@ -1,3 +1,10 @@
+## [1.114.3](https://github.com/SocialGouv/mano/compare/v1.114.2...v1.114.3) (2022-06-03)
+
+
+### Bug Fixes
+
+* **api:** sql migrations ([#721](https://github.com/SocialGouv/mano/issues/721)) ([70e1934](https://github.com/SocialGouv/mano/commit/70e1934097c81b99aa4c7c316f0f91ff2dc1b3df))
+
 ## [1.114.2](https://github.com/SocialGouv/mano/compare/v1.114.1...v1.114.2) (2022-06-03)
 
 
