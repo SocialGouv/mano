@@ -1,3 +1,10 @@
+# [1.115.0](https://github.com/SocialGouv/mano/compare/v1.114.3...v1.115.0) (2022-06-03)
+
+
+### Features
+
+* new reception design ([#714](https://github.com/SocialGouv/mano/issues/714)) ([efe80ec](https://github.com/SocialGouv/mano/commit/efe80ec60df34cc28fdaa4e341aaecb1bd2c1f52))
+
 ## [1.114.3](https://github.com/SocialGouv/mano/compare/v1.114.2...v1.114.3) (2022-06-03)
 
 
