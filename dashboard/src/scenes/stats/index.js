@@ -490,26 +490,35 @@ const Stats = () => {
 
 const getPieData = (source, key, { options = null, isBoolean = false } = {}) => {
   const data = source.reduce(
-    (newData, person) => {
+    (newData, item) => {
       if (isBoolean) {
-        newData[Boolean(person[key]) ? 'Oui' : 'Non']++;
+        newData[Boolean(item[key]) ? 'Oui' : 'Non']++;
         return newData;
       }
-      if (!person[key] || !person[key].length) {
+      if (!item[key] || !item[key].length || item[key].includes('Choisissez') || item[key].includes('Choisir')) {
         newData['Non renseigné']++;
         return newData;
       }
       if (options && options.length) {
+        let hasMatched = false;
         for (let option of [...options, 'Uniquement']) {
-          if (typeof person[key] === 'string' ? person[key] === option : person[key].includes(option)) {
+          if (typeof item[key] === 'string' ? item[key] === option : item[key].includes(option)) {
             if (!newData[option]) newData[option] = 0;
             newData[option]++;
+            hasMatched = true;
+          }
+        }
+        if (!hasMatched) {
+          if (typeof item[key] === 'string') {
+            const unregisteredOption = item[key];
+            if (!newData[unregisteredOption]) newData[unregisteredOption] = 0;
+            newData[unregisteredOption]++;
           }
         }
         return newData;
       }
-      if (!newData[person[key]]) newData[person[key]] = 0;
-      newData[person[key]]++;
+      if (!newData[item[key]]) newData[item[key]] = 0;
+      newData[item[key]]++;
       return newData;
     },
     { 'Non renseigné': 0, Oui: 0, Non: 0 }
