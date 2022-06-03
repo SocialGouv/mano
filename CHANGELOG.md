@@ -1,3 +1,10 @@
+## [1.114.1](https://github.com/SocialGouv/mano/compare/v1.114.0...v1.114.1) (2022-06-03)
+
+
+### Bug Fixes
+
+* **dashboard:** typo ([8ec72fe](https://github.com/SocialGouv/mano/commit/8ec72fe8df10b5da950a93a319a8f26194952765))
+
 # [1.114.0](https://github.com/SocialGouv/mano/compare/v1.113.1...v1.114.0) (2022-05-31)
 
 
