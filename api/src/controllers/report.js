@@ -145,9 +145,6 @@ router.delete(
     const report = await Report.findOne(query);
     if (!report) return res.status(200).send({ ok: true });
 
-    report.set({ encrypted: null, encryptedEntityKey: null });
-    await report.save();
-
     await report.destroy();
     res.status(200).send({ ok: true });
   })

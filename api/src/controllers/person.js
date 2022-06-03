@@ -307,8 +307,6 @@ router.delete(
     let person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    person.set({ encrypted: null, encryptedEntityKey: null });
-    await person.save();
     await person.destroy();
     res.status(200).send({ ok: true });
   })

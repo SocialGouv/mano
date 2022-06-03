@@ -149,9 +149,6 @@ router.delete(
     const place = await Place.findOne(query);
     if (!place) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    place.set({ encrypted: null, encryptedEntityKey: null });
-    await place.save();
-
     await place.destroy();
     res.status(200).send({ ok: true });
   })

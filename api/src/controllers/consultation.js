@@ -286,9 +286,6 @@ router.delete(
     });
     if (!consultation) return res.status(200).send({ ok: true });
 
-    consultation.set({ encrypted: null, encryptedEntityKey: null });
-    await consultation.save();
-
     await consultation.destroy();
 
     res.status(200).send({ ok: true });

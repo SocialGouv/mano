@@ -153,9 +153,6 @@ router.delete(
     const treatment = await Treatment.findOne(query);
     if (!treatment) return res.status(200).send({ ok: true });
 
-    treatment.set({ encrypted: null, encryptedEntityKey: null });
-    await treatment.save();
-
     await treatment.destroy();
     res.status(200).send({ ok: true });
   })

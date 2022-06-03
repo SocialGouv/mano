@@ -140,9 +140,6 @@ router.delete(
     const territory = await Territory.findOne(query);
     if (!territory) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    territory.set({ encrypted: null, encryptedEntityKey: null });
-    await territory.save();
-
     await territory.destroy();
     res.status(200).send({ ok: true });
   })

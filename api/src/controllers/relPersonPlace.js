@@ -109,9 +109,6 @@ router.delete(
     const relPersonPlace = await RelPersonPlace.findOne(query);
     if (!relPersonPlace) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    relPersonPlace.set({ encrypted: null, encryptedEntityKey: null });
-    await relPersonPlace.save();
-
     await relPersonPlace.destroy();
     res.status(200).send({ ok: true });
   })
