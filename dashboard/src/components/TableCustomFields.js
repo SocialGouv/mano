@@ -255,7 +255,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                       <FormGroup>
                         <Label />
                         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                          <label htmlFor="showInStats">Voir dans les satistiques</label>
+                          <label htmlFor="showInStats">Voir dans les statistiques</label>
                           <Input type="checkbox" id="showInStats" name="showInStats" checked={field.showInStats} onChange={handleChange} />
                         </div>
                       </FormGroup>
