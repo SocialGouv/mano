@@ -15,7 +15,7 @@ import {
 dayjs.extend(utc);
 dayjs.locale("fr");
 
-jest.setTimeout(100000);
+jest.setTimeout(120000);
 setDefaultOptions({ timeout: 100000 });
 
 describe("Organisation CRUD", () => {
@@ -33,19 +33,26 @@ describe("Organisation CRUD", () => {
       )} de l'équipe Encrypted Orga Team`
     );
     await page.waitForTimeout(2000);
+
+    expect(await getInnerText("h5#passages-title")).toBe("0 passage");
     await expect(page).toClick("button#add-anonymous-passage");
     await page.waitForTimeout(1000);
-    expect(await getInnerText("span#number-of-passages")).toBe("1");
+    expect(await getInnerText("h5#passages-title")).toBe("1 passage");
+    await expect(page).toClick("button#add-anonymous-passage");
+    await page.waitForTimeout(1000);
+    expect(await getInnerText("h5#passages-title")).toBe("2 passages");
+
     await expect(page).toClick("button#Café-add");
     await page.waitForTimeout(10000);
-    expect(await getInputValue("input#Café-count")).toBe("1");
+    expect(await getInnerText("div#Café-count")).toBe("1");
+    await page.waitForTimeout(1000);
     await expect(page).toClick("button#Café-add");
     await page.waitForTimeout(1000);
-    expect(await getInputValue("input#Café-count")).toBe("2");
+    expect(await getInnerText("div#Café-count")).toBe("2");
     await page.waitForTimeout(1000);
     await expect(page).toClick("button#Café-remove");
     await page.waitForTimeout(1000);
-    expect(await getInputValue("input#Café-count")).toBe("1");
+    expect(await getInnerText("div#Café-count")).toBe("1");
   });
 
   /*
@@ -105,9 +112,9 @@ describe("Organisation CRUD", () => {
         "div.person-select-and-create-reception__multi-value__label"
       )
     ).toBe("Ma première personne");
-    await expect(page).toClick("button", { text: "Ajouter un passage" });
+    await expect(page).toClick("button", { text: "Passage" });
     await page.waitForTimeout(1000);
-    expect(await getInnerText("span#number-of-passages")).toBe("2");
+    expect(await getInnerText("h5#passages-title")).toBe("3 passages");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     await expect(page).toClick("a", { text: "Passages (1)" });
@@ -154,9 +161,7 @@ describe("Organisation CRUD", () => {
   it("should be able to modify services in the report", async () => {
     await expect(page).toClick("a#report-button-Accueil");
     await page.waitForTimeout(1000);
-    console.log("popopop");
     expect(await getInputValue("input#Café-count")).toBe("1");
-    console.log("pipipipi");
     await page.waitForTimeout(1000);
     await expect(page).toClick("button#Douche-add");
     await page.waitForTimeout(1000);
@@ -170,10 +175,10 @@ describe("Organisation CRUD", () => {
   });
 
   it("should be able to see passages in the report", async () => {
-    await expect(page).toClick("a", { text: "Passages (2)" });
+    await expect(page).toClick("a", { text: "Passages (3)" });
     await page.waitForTimeout(1000);
     expect(await getInnerText("span#report-passages-anonymous-count")).toBe(
-      "1"
+      "2"
     );
     expect(await getInnerText("span#report-passages-non-anonymous-count")).toBe(
       "1"

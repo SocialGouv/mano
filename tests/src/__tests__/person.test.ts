@@ -523,10 +523,10 @@ describe("Organisation CRUD", () => {
       await getInnerText(
         "div.person-select-and-create-reception__multi-value__label"
       )
-    ).toBe("!Ma première personne - 26/05/1981 (41 ans)");
-    await expect(page).toClick("button", { text: "Ajouter un passage" });
+    ).toBe("Ma première personne - 26/05/1981 (41 ans)");
+    await expect(page).toClick("button", { text: "Passage" });
     await page.waitForTimeout(2000);
-    expect(await getInnerText("span#number-of-passages")).toBe("1");
+    expect(await getInnerText("h5#passages-title")).toBe("1 passage");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     await expect(page).toClick("a", { text: "Passages (1)" });

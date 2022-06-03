@@ -6,8 +6,6 @@ import { toastr } from 'react-redux-toastr';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
-import Card from '../../components/Card';
-import Incrementor from '../../components/Incrementor';
 import { theme } from '../../config';
 import CreateAction from '../action/CreateAction';
 import SelectAndCreatePerson from './SelectAndCreatePerson';
@@ -26,6 +24,8 @@ import { passagesState, preparePassageForEncryption } from '../../recoil/passage
 import useTitle from '../../services/useTitle';
 import { capture } from '../../services/sentry';
 import { consultationsState } from '../../recoil/consultations';
+import plusIcon from '../../assets/icons/plus-icon.svg';
+import IncrementorSmall from '../../components/IncrementorSmall';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -51,20 +51,20 @@ export const actionsByStatusSelector = selectorFamily({
   key: 'actionsByStatusSelector',
   get:
     ({ status }) =>
-    ({ get }) => {
-      const actions = get(actionsForCurrentTeamSelector);
-      return actions.filter((a) => a.status === status);
-    },
+      ({ get }) => {
+        const actions = get(actionsForCurrentTeamSelector);
+        return actions.filter((a) => a.status === status);
+      },
 });
 
 export const consultationsByStatusSelector = selectorFamily({
   key: 'consultationsByStatusSelector',
   get:
     ({ status }) =>
-    ({ get }) => {
-      const consultations = get(consultationsByAuthorizationSelector);
-      return consultations.filter((a) => a.status === status);
-    },
+      ({ get }) => {
+        const consultations = get(consultationsByAuthorizationSelector);
+        return consultations.filter((a) => a.status === status);
+      },
 });
 
 const todaysReportSelector = selector({
@@ -72,15 +72,6 @@ const todaysReportSelector = selector({
   get: ({ get }) => {
     const teamsReports = get(currentTeamReportsSelector);
     return teamsReports.find((rep) => isToday(rep.date));
-  },
-});
-
-const lastReportSelector = selector({
-  key: 'lastReportSelector',
-  get: ({ get }) => {
-    const teamsReports = get(currentTeamReportsSelector);
-    const todays = get(todaysReportSelector);
-    return teamsReports.filter((rep) => rep._id !== todays?._id)[0];
   },
 });
 
@@ -121,7 +112,6 @@ const Reception = () => {
   );
 
   const todaysReport = useRecoilValue(todaysReportSelector);
-  const lastReport = useRecoilValue(lastReportSelector);
   const user = useRecoilValue(userState);
   const collectionsToLoad = useRecoilValue(collectionsToLoadState);
   const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
@@ -241,9 +231,6 @@ const Reception = () => {
     }
   };
 
-  const onGoToFile = () => history.push(`/person/${selectedPersons[0]?._id || ''}`);
-  const onGoToPrevReport = () => history.push(lastReport?._id ? `/report/${lastReport._id}` : '/report');
-
   return (
     <>
       <SmallerHeaderWithBackButton
@@ -255,87 +242,115 @@ const Reception = () => {
           </span>
         }
       />
-      <Row style={{ paddingBottom: 20, marginBottom: 20, borderBottom: '1px solid #ddd' }}>
-        <Col
-          md={3}
-          style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'column', borderRight: '1px solid #ddd' }}>
-          <ButtonCustom
-            onClick={onGoToPrevReport}
-            color="link"
-            title="Accéder au compte-rendu précédent"
-            padding="12px 24px"
-            disabled={!lastReport?._id}
+      <PersonsWrapper>
+        <div style={{ flexGrow: "1" }}>
+          <SelectAndCreatePerson
+            value={selectedPersons}
+            onChange={onSelectPerson}
+            autoCreate
+            inputId="person-select-and-create-reception"
+            classNamePrefix="person-select-and-create-reception"
           />
-        </Col>
-        <Col
-          md={5}
-          style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexDirection: 'column', borderRight: '1px solid #ddd' }}>
-          <div style={{ flexShrink: 0, width: '100%' }}>
-            <SelectAndCreatePerson
-              value={selectedPersons}
-              onChange={onSelectPerson}
-              autoCreate
-              inputId="person-select-and-create-reception"
-              classNamePrefix="person-select-and-create-reception"
-            />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
-            <CreateAction noIcon title="Nouvelle Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
-            <ButtonCustom
-              onClick={onAddPassageForPersons}
-              color="primary"
-              title="Ajouter un passage"
-              padding="12px 24px"
-              disabled={addingPassage || !selectedPersons.length}
-            />
-          </div>
-          <div style={{ display: 'flex', justifyContent: 'space-evenly', alignItems: 'center', flexShrink: 0, width: '100%' }}>
-            <ButtonCustom disabled={selectedPersons.length !== 1} onClick={onGoToFile} color="link" title="Accéder au dossier" padding="12px 24px" />
-          </div>
+        </div>
+        <CreateAction smallButton icon={plusIcon} title="Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
+        <ButtonCustom
+          onClick={onAddPassageForPersons}
+          color="primary"
+          icon={plusIcon}
+          title="Passage"
+          disabled={addingPassage || !selectedPersons.length}
+        />
+      </PersonsWrapper>
+      <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
+        <Col md={8}>
+          <AgendaWrapper>
+            <div className="agenda-title">Agenda</div>
+            <div className="agenda-status">
+              <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
+            </div>
+          </AgendaWrapper>
+          <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
         </Col>
         <Col md={4}>
-          <Card title="Nombre de passages" count={passages.length} countId="number-of-passages" unit={`passage${passages.length > 1 ? 's' : ''}`}>
+          <PassagesWrapper>
+            <h5 id="passages-title">{passages.length} passage{passages.length > 1 ? 's' : ''}</h5>
             <ButtonCustom
               onClick={onAddAnonymousPassage}
-              color="link"
-              title="Ajouter un passage anonyme"
-              padding="0px"
+              color="primary"
+              icon={plusIcon}
+              title="Passage anonyme"
               id="add-anonymous-passage"
-              disabled={addingPassage}
             />
             <ButtonCustom
-              onClick={() => history.push(`/report/${todaysReport._id}?tab=5`)}
+              onClick={() => history.push(`/report/${todaysReport._id}?tab=6`)}
               color="link"
               title="Modifier les passages"
               padding="0px"
             />
-          </Card>
-        </Col>
-      </Row>
-      <Row style={{ paddingBottom: 20, marginBottom: 20 }}>
-        <Col md={8} style={{ paddingBottom: 20, marginBottom: 20, borderRight: '1px solid #ddd' }}>
-          <SectionTitle>Agenda</SectionTitle>
-          <div style={{ margin: '15px' }}>
-            <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
-          </div>
-          <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />
-        </Col>
-        <Col md={4}>
-          <SectionTitle style={{ marginRight: 20, width: 250, flexShrink: 0 }}>Services</SectionTitle>
-          {organisation?.services?.map((service) => (
-            <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
-          ))}
+          </PassagesWrapper>
+          <ServicesWrapper>
+            <h5 className="services-title">Services</h5>
+            <div className="services-incrementators">
+              {organisation?.services?.map((service) => (
+                <IncrementorSmall key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
+              ))}
+            </div>
+          </ServicesWrapper>
         </Col>
       </Row>
     </>
   );
 };
 
-const SectionTitle = styled.h4`
-  color: ${theme.black};
-  font-weight: bold;
-  font-size: 20px;
-  line-height: 32px;
+const PersonsWrapper = styled.div`
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 5rem;
+  margin-top: 2rem;
+`;
+const AgendaWrapper = styled.div`
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  .agenda-status {
+    width: 150px;
+  }
+  .agenda-title {
+    color: ${theme.black};
+    font-weight: bold;
+    font-size: 20px;
+    flex-grow: 1;
+  }
+`;
+const PassagesWrapper = styled.div`
+  text-align: center;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  padding: 2rem 0.5rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  #passages-title {
+    color: #555;
+  }
+`;
+const ServicesWrapper = styled.div`
+  text-align: center;
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  padding: 2rem 1rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  .services-title {
+    color: #555;
+  }
+  .services-incrementators {
+    text-align: left;
+    margin-top: 1rem;
+  }
 `;
 
 export default Reception;
