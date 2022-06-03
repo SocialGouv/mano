@@ -1,3 +1,10 @@
+## [1.114.2](https://github.com/SocialGouv/mano/compare/v1.114.1...v1.114.2) (2022-06-03)
+
+
+### Bug Fixes
+
+* **dashboard:** show create new field instead of update when field is new ([dcc69c6](https://github.com/SocialGouv/mano/commit/dcc69c67f500c6afc9d873b22239330052bf2f8d))
+
 ## [1.114.1](https://github.com/SocialGouv/mano/compare/v1.114.0...v1.114.1) (2022-06-03)
 
 
