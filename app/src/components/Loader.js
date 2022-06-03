@@ -91,7 +91,7 @@ const Loader = () => {
     */
     const response = await API.get({
       path: '/organisation/stats',
-      query: { organisation: organisationId, lastRefresh },
+      query: { organisation: organisationId, after: lastRefresh, withDeleted: true },
     });
     if (!response.ok) {
       capture('error getting stats', { extra: response });
