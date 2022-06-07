@@ -1,11 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import styled from 'styled-components';
 import OutsideClickHandler from 'react-outside-click-handler';
-import { DateRangePicker } from 'react-dates';
-import { dayjsInstance } from '../services/date';
-import moment from 'moment';
-
-moment.locale('fr');
+import DatePicker from 'react-datepicker';
+import { dayjsInstance, dateForDatePicker } from '../services/date';
+import { theme } from '../config';
 
 const getOffsetFromToday = (value, unit, end) => {
   const a = dayjsInstance();
@@ -31,7 +29,7 @@ const periods = [
     period: { startDate: dayjsInstance().startOf('week'), endDate: dayjsInstance().endOf('week') },
   },
   {
-    label: 'Le semaine dernière',
+    label: 'La semaine dernière',
     period: { startDate: dayjsInstance().startOf('week').subtract(1, 'week'), endDate: dayjsInstance().endOf('week').subtract(1, 'week') },
   },
   {
@@ -78,6 +76,8 @@ const periods = [
   },
 ];
 
+// https://reactdatepicker.com/#example-date-range
+
 const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   const [showDatePicker, setShowDatepicker] = useState(true);
   const [preset, setPreset] = useState(null);
@@ -106,11 +106,11 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
     if (!!showDatePicker) return event.preventDefault();
     setShowDatepicker(true);
   };
-
-  const setPeriodRequest = (period) => {
+  const onChange = (dates) => {
+    const [startDate, endDate] = dates;
     setPeriod({
-      startDate: period.startDate ? dayjsInstance(period.startDate.toDate()) : null,
-      endDate: period.endDate ? dayjsInstance(period.endDate.toDate()) : null,
+      startDate: dateForDatePicker(startDate),
+      endDate: dateForDatePicker(endDate),
     });
     setPreset(null);
   };
@@ -124,14 +124,21 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
 
   const setPresetRequest = (preset) => {
     setPreset(preset.label);
-    setPeriod(preset.period);
+    setPeriod({
+      startDate: dateForDatePicker(preset.period.startDate),
+      endDate: dateForDatePicker(preset.period.endDate),
+    });
     closeDatePicker();
   };
 
   const renderLabel = () => {
     if (!!preset) return preset;
-    if (!!period.startDate && !!period.endDate)
-      return `${dayjsInstance(period.startDate).format('DD/MM/YYYY')} -> ${period.endDate.format('DD/MM/YYYY')}`;
+    if (!!period.startDate && !!period.endDate) {
+      const startFormatted = dayjsInstance(period.startDate).format('D MMM YYYY');
+      const endFormatted = dayjsInstance(period.endDate).format('D MMM YYYY');
+      if (startFormatted === endFormatted) return startFormatted;
+      return `${startFormatted} -> ${endFormatted}`;
+    }
     return `Entre... et le...`;
   };
 
@@ -148,25 +155,16 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
                 </PresetButton>
               ))}
             </Presets>
-            <DateRangePicker
-              startDateId="startDate"
-              endDateId="endDate"
-              startDatePlaceholderText="Entre..."
-              endDatePlaceholderText="et le..."
-              phrases={{ closeDatePicker: 'Fermer', clearDates: 'Effacer' }}
-              startDate={period.startDate ? moment(period.startDate.toDate()) : null}
-              endDate={period.endDate ? moment(period.endDate.toDate()) : null}
-              onDatesChange={setPeriodRequest}
-              focusedInput={datePickerFocused}
-              onFocusChange={setDatePickerFocused}
-              disabled={false}
-              monthFormat="MMMM YYYY"
-              minimumNights={0}
-              showClearDates
-              displayFormat="DD-MM-yyyy"
-              isOutsideRange={() => null}
-              hideKeyboardShortcutsPanel
-              numberOfMonths={numberOfMonths}
+            <DatePicker
+              monthsShown={numberOfMonths}
+              selectsRange
+              inline
+              locale="fr"
+              name="date"
+              selected={period.startDate}
+              onChange={onChange}
+              startDate={period.startDate}
+              endDate={period.endDate}
             />
           </PickerContainer>
         </OutsideClickHandler>
@@ -190,30 +188,31 @@ const OpenPickerButton = styled.button`
 `;
 
 const Presets = styled.div`
+  position: absolute;
   display: flex;
   flex-direction: column;
-  justify-content: space-evenly;
-  align-items: center;
+  justify-content: flex-start;
+  align-items: flex-start;
   overflow-y: scroll;
   box-sizing: border-box;
-  height: 100%;
-  flex-shrink: 0;
-  button:first-child {
-    margin-top: 150px;
-  }
-  button:last-child {
-    margin-bottom: 50px;
-  }
+  flex: 1;
+  max-height: 100%;
+  width: 14rem;
+  top: 0px;
+  left: 0px;
+  bottom: 0px;
+  margin-left: 0.4rem;
 `;
 
 const PresetButton = styled.button`
-  margin: 5px 15px;
+  padding: 5px;
   border: none;
   background-color: white;
-  width: 12em;
   border-radius: 8px;
+  text-align: center;
+  width: 100%;
   :hover {
-    background-color: #f2f6ff;
+    background-color: ${theme.main25};
   }
 `;
 
@@ -221,40 +220,34 @@ const PickerContainer = styled.div`
   position: absolute;
   z-index: 1000;
   top: 50px;
-  left: -4rem;
-  min-width: 40rem;
-  max-width: calc(100vw - 230px);
-  height: 25em;
-  padding: 25px;
+  @media (min-width: 1100px) {
+    min-width: 45rem;
+  }
+  padding-left: 14rem;
   background-color: #fff;
-  border-radius: 8px;
+  border-radius: 0.5rem;
+  border: 1px solid #aeaeae;
   overflow-x: auto;
-  box-shadow: 0 2px 6px 0 #d5d0d7;
   display: flex;
-
-  .DateRangePicker {
-    display: block;
-  }
-
-  .DateRangePickerInput {
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-end;
+  .react-datepicker {
     border: none;
-    padding-right: 0px;
+    border-left: 1px solid #aeaeae;
+    border-radius: 0px;
   }
-  .DateRangePickerInput > * {
-    display: none;
+  .react-datepicker__day--outside-month {
+    opacity: 0.3;
   }
-
-  .DateRangePicker_picker {
-    display: block;
-    border: none;
-    position: relative;
-    top: unset !important;
-    left: 0 !important;
+  .react-datepicker__day--in-range,
+  .react-datepicker__day--selected,
+  .react-datepicker__day--keyboard-selected,
+  .react-datepicker__day--in-selecting-range {
+    background-color: ${theme.main};
   }
-
-  .DayPicker__withBorder {
-    box-shadow: none;
-    border: none;
+  .react-datepicker__navigation-icon {
+    font-size: 10px;
   }
 `;
 

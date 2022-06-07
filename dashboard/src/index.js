@@ -1,12 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import 'react-redux-toastr/lib/css/react-redux-toastr.min.css';
-import 'react-dates/initialize';
-import 'react-dates/lib/css/_datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './datepicker.css';
 import './index.scss';
-import 'moment/min/locales.min';
 import App from './app';
 import './services/sentry';
 import './services/api';
