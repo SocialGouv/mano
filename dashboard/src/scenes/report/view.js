@@ -40,7 +40,7 @@ import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
-import Incrementor from '../../components/Incrementor';
+import IncrementorSmall from '../../components/IncrementorSmall';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
@@ -115,9 +115,8 @@ const View = () => {
 
   useEffect(() => {
     // for print use only
-    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${report && dayjs(report.date).format('DD-MM-YYYY')} - imprimé par ${
-      user.name
-    }`;
+    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${report && dayjs(report.date).format('DD-MM-YYYY')} - imprimé par ${user.name
+      }`;
     return () => {
       document.title = 'Mano - Admin';
     };
@@ -327,7 +326,7 @@ const Reception = ({ report }) => {
     return (
       <>
         {organisation?.services?.map((service) => (
-          <Incrementor key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
+          <IncrementorSmall key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
         ))}
       </>
     );
@@ -336,12 +335,28 @@ const Reception = ({ report }) => {
   return (
     <StyledBox>
       <TabTitle>Services effectués ce jour</TabTitle>
-      <div style={{ display: 'flex', flexWrap: 'wrap', margin: '20px 0', flexShrink: 0, gap: 5, justifyContent: 'space-evenly' }}>
+      <ServicesWrapper>
         {renderServices()}
-      </div>
+      </ServicesWrapper>
     </StyledBox>
   );
 };
+
+const ServicesWrapper = styled.div`
+  background-color: #f8f8f8;
+  border-radius: 5px;
+  max-width: 500px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  gap: 1rem;
+  .services-title {
+    color: #555;
+  }
+  .services-incrementators {
+    text-align: left;
+    margin-top: 1rem;
+  }
+`;
 
 const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const history = useHistory();
@@ -513,9 +528,8 @@ const Consultations = ({ date, onUpdateResults = () => null, status }) => {
       <StyledBox>
         <Table
           className="Table"
-          title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
-            moreThanOne ? 's' : ''
-          } le ${formatDateWithFullMonth(date)}`}
+          title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${moreThanOne ? 's' : ''
+            } le ${formatDateWithFullMonth(date)}`}
           noData={`Pas de consultation ${status === DONE ? 'faite' : 'annulée'} ce jour`}
           data={data}
           onRowClick={(actionOrConsultation) =>
@@ -734,14 +748,14 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
                   <p>
                     {comment.comment
                       ? comment.comment.split('\n').map((c, i, a) => {
-                          if (i === a.length - 1) return c;
-                          return (
-                            <React.Fragment key={i}>
-                              {c}
-                              <br />
-                            </React.Fragment>
-                          );
-                        })
+                        if (i === a.length - 1) return c;
+                        return (
+                          <React.Fragment key={i}>
+                            {c}
+                            <br />
+                          </React.Fragment>
+                        );
+                      })
                       : ''}
                   </p>
                 );
@@ -895,9 +909,8 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
       <StyledBox>
         <Table
           className="Table"
-          title={`Observation${moreThanOne ? 's' : ''} de territoire${moreThanOne ? 's' : ''} faite${
-            moreThanOne ? 's' : ''
-          } le ${formatDateWithFullMonth(date)}`}
+          title={`Observation${moreThanOne ? 's' : ''} de territoire${moreThanOne ? 's' : ''} faite${moreThanOne ? 's' : ''
+            } le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'observation faite ce jour"
           data={data}
           onRowClick={(obs) => {
@@ -1009,11 +1022,11 @@ const DescriptionAndCollaborations = ({ report }) => {
             {!report?.description
               ? 'Pas de description'
               : report?.description?.split('\n').map((sentence, index) => (
-                  <React.Fragment key={index}>
-                    {sentence}
-                    <br />
-                  </React.Fragment>
-                ))}
+                <React.Fragment key={index}>
+                  {sentence}
+                  <br />
+                </React.Fragment>
+              ))}
           </p>
         </DescriptionBox>
       )}
