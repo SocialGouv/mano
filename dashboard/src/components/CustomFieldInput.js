@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { Col, FormGroup, Input, Label } from 'reactstrap';
-import 'react-datepicker/dist/react-datepicker.css';
 import styled from 'styled-components';
 import SelectAsInput from './SelectAsInput';
 import SelectCustom from './SelectCustom';

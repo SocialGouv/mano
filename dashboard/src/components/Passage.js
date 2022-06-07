@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 import { Formik } from 'formik';
 
 import ButtonCustom from './ButtonCustom';

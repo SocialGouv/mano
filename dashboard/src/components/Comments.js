@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
-import 'react-datepicker/dist/react-datepicker.css';
 
 import Box from './Box';
 import ButtonCustom from '../components/ButtonCustom';

@@ -4,7 +4,6 @@ import DatePicker from 'react-datepicker';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
-import 'react-datepicker/dist/react-datepicker.css';
 
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
 import SelectTeam from './SelectTeam';

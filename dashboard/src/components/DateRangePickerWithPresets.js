@@ -13,72 +13,72 @@ const getOffsetFromToday = (value, unit, end) => {
   return end ? b.endOf('day') : b.startOf('day');
 };
 
-const DateRangePickerWithPresets = ({ period, setPeriod }) => {
-  const periods = [
-    {
-      label: 'Toutes les données',
-      period: { startDate: null, endDate: null },
+const periods = [
+  {
+    label: 'Toutes les données',
+    period: { startDate: null, endDate: null },
+  },
+  {
+    label: "Aujourd'hui",
+    period: { startDate: dayjsInstance().startOf('day'), endDate: dayjsInstance().endOf('day') },
+  },
+  {
+    label: 'Hier',
+    period: { startDate: getOffsetFromToday(1, 'day'), endDate: getOffsetFromToday(1, 'day', true) },
+  },
+  {
+    label: 'Cette semaine',
+    period: { startDate: dayjsInstance().startOf('week'), endDate: dayjsInstance().endOf('week') },
+  },
+  {
+    label: 'Le semaine dernière',
+    period: { startDate: dayjsInstance().startOf('week').subtract(1, 'week'), endDate: dayjsInstance().endOf('week').subtract(1, 'week') },
+  },
+  {
+    label: 'Ce mois-ci',
+    period: { startDate: dayjsInstance().startOf('month'), endDate: dayjsInstance().endOf('month') },
+  },
+  {
+    label: 'Le mois dernier',
+    period: { startDate: dayjsInstance().subtract(1, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
+  },
+  {
+    label: 'Les trois derniers mois',
+    period: { startDate: dayjsInstance().subtract(3, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
+  },
+  {
+    label: 'Les six derniers mois',
+    period: { startDate: dayjsInstance().subtract(6, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
+  },
+  {
+    label: 'Ce semestre',
+    period: {
+      startDate: dayjsInstance().get('month') < 6 ? dayjsInstance().startOf('year') : dayjsInstance().startOf('year').add(6, 'month'),
+      endDate: dayjsInstance().get('month') < 6 ? dayjsInstance().startOf('year').add(5, 'month').endOf('month') : dayjsInstance().endOf('year'),
     },
-    {
-      label: "Aujourd'hui",
-      period: { startDate: dayjsInstance().startOf('day'), endDate: dayjsInstance().endOf('day') },
+  },
+  {
+    label: 'Le dernier semestre',
+    period: {
+      startDate:
+        dayjsInstance().get('month') < 6 ? dayjsInstance().subtract(1, 'year').startOf('year').add(6, 'month') : dayjsInstance().startOf('year'),
+      endDate:
+        dayjsInstance().get('month') < 6
+          ? dayjsInstance().subtract(1, 'year').endOf('year')
+          : dayjsInstance().startOf('year').add(5, 'month').endOf('month'),
     },
-    {
-      label: 'Hier',
-      period: { startDate: getOffsetFromToday(1, 'day'), endDate: getOffsetFromToday(1, 'day', true) },
-    },
-    {
-      label: 'Cette semaine',
-      period: { startDate: dayjsInstance().startOf('week'), endDate: dayjsInstance().endOf('week') },
-    },
-    {
-      label: 'Le semaine dernière',
-      period: { startDate: dayjsInstance().startOf('week').subtract(1, 'week'), endDate: dayjsInstance().endOf('week').subtract(1, 'week') },
-    },
-    {
-      label: 'Ce mois-ci',
-      period: { startDate: dayjsInstance().startOf('month'), endDate: dayjsInstance().endOf('month') },
-    },
-    {
-      label: 'Le mois dernier',
-      period: { startDate: dayjsInstance().subtract(1, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
-    },
-    {
-      label: 'Les trois derniers mois',
-      period: { startDate: dayjsInstance().subtract(3, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
-    },
-    {
-      label: 'Les six derniers mois',
-      period: { startDate: dayjsInstance().subtract(6, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
-    },
-    {
-      label: 'Ce semestre',
-      period: {
-        startDate: dayjsInstance().get('month') < 6 ? dayjsInstance().startOf('year') : dayjsInstance().startOf('year').add(6, 'month'),
-        endDate: dayjsInstance().get('month') < 6 ? dayjsInstance().startOf('year').add(5, 'month').endOf('month') : dayjsInstance().endOf('year'),
-      },
-    },
-    {
-      label: 'Le dernier semestre',
-      period: {
-        startDate:
-          dayjsInstance().get('month') < 6 ? dayjsInstance().subtract(1, 'year').startOf('year').add(6, 'month') : dayjsInstance().startOf('year'),
-        endDate:
-          dayjsInstance().get('month') < 6
-            ? dayjsInstance().subtract(1, 'year').endOf('year')
-            : dayjsInstance().startOf('year').add(5, 'month').endOf('month'),
-      },
-    },
-    {
-      label: 'Cette année',
-      period: { startDate: dayjsInstance().startOf('year'), endDate: dayjsInstance().endOf('year') },
-    },
-    {
-      label: "L'année dernière",
-      period: { startDate: dayjsInstance().subtract(1, 'year').startOf('year'), endDate: dayjsInstance().subtract(1, 'year').endOf('year') },
-    },
-  ];
+  },
+  {
+    label: 'Cette année',
+    period: { startDate: dayjsInstance().startOf('year'), endDate: dayjsInstance().endOf('year') },
+  },
+  {
+    label: "L'année dernière",
+    period: { startDate: dayjsInstance().subtract(1, 'year').startOf('year'), endDate: dayjsInstance().subtract(1, 'year').endOf('year') },
+  },
+];
 
+const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   const [showDatePicker, setShowDatepicker] = useState(true);
   const [preset, setPreset] = useState(null);
   const [datePickerFocused, setDatePickerFocused] = useState(null);

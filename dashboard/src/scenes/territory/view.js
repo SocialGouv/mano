@@ -4,8 +4,6 @@ import { useParams, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import { Formik } from 'formik';
 
-import 'react-datepicker/dist/react-datepicker.css';
-
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import Box from '../../components/Box';

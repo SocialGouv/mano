@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
-import 'react-datepicker/dist/react-datepicker.css';
 import QuestionMarkButton from './QuestionMarkButton';
 
 const NightSessionModale = () => {

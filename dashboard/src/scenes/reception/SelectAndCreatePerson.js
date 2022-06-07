@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import 'react-datepicker/dist/react-datepicker.css';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import {
@@ -18,19 +17,20 @@ import { useHistory } from 'react-router-dom';
 import ButtonCustom from '../../components/ButtonCustom';
 
 function removeDiatricsAndAccents(str) {
-  return (str || "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  return (str || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '');
 }
 
 function personsToOptions(persons, actions, passages) {
-  return persons
-    .slice(0, 50)
-    .map((person) => ({
-      value: person._id,
-      label: person.name,
-      ...person,
-      lastAction: actions.find(action => action.person === person._id),
-      lastPassage: passages.find((passage) => passage.person === person._id)
-    }))
+  return persons.slice(0, 50).map((person) => ({
+    value: person._id,
+    label: person.name,
+    ...person,
+    lastAction: actions.find((action) => action.person === person._id),
+    lastPassage: passages.find((passage) => passage.person === person._id),
+  }));
 }
 
 const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, classNamePrefix }) => {
@@ -45,18 +45,15 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
     return persons.map((person) => {
       return {
         ...person,
-        searchString: [
-          removeDiatricsAndAccents(person.name),
-          formatBirthDate(person.birthdate),
-        ].join(" "),
+        searchString: [removeDiatricsAndAccents(person.name), formatBirthDate(person.birthdate)].join(' '),
       };
     });
   }, [persons]);
 
   const lastActions = useMemo(() => {
-    return Object.values(actions
-      .reduce((acc, action) => {
-        if (!acc[action.person] || (action.dueAt > acc[action.person].dueAt)) {
+    return Object.values(
+      actions.reduce((acc, action) => {
+        if (!acc[action.person] || action.dueAt > acc[action.person].dueAt) {
           acc[action.person] = {
             name: action.name,
             dueAt: action.dueAt,
@@ -64,32 +61,37 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
           };
         }
         return acc;
-      }, {}));
+      }, {})
+    );
   }, [actions]);
 
   const lastPassages = useMemo(() => {
-    return Object.values(passages
-      .filter(passage => Boolean(passage.person))
-      .reduce((acc, passage) => {
-        if (!acc[passage.person] || (passage.date > acc[passage.person].date)) {
-          acc[passage.person] = {
-            date: passage.date,
-            person: passage.person,
-          };
-        }
-        return acc;
-      }, {}));
+    return Object.values(
+      passages
+        .filter((passage) => Boolean(passage.person))
+        .reduce((acc, passage) => {
+          if (!acc[passage.person] || passage.date > acc[passage.person].date) {
+            acc[passage.person] = {
+              date: passage.date,
+              person: passage.person,
+            };
+          }
+          return acc;
+        }, {})
+    );
   }, [passages]);
 
   return (
     <AsyncSelect
-      loadOptions={
-        (inputValue) => {
-          const formattedInputValue = removeDiatricsAndAccents(inputValue);
-          const options = personsToOptions(searchablePersons.filter(person => person.searchString.includes(formattedInputValue)), lastActions, lastPassages);
-          return Promise.resolve(options);
-        }
-      }
+      loadOptions={(inputValue) => {
+        const formattedInputValue = removeDiatricsAndAccents(inputValue);
+        const options = personsToOptions(
+          searchablePersons.filter((person) => person.searchString.includes(formattedInputValue)),
+          lastActions,
+          lastPassages
+        );
+        return Promise.resolve(options);
+      }}
       defaultOptions={personsToOptions(searchablePersons, lastActions, lastPassages)}
       name="persons"
       isMulti
@@ -115,7 +117,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
       }}
       value={value}
       formatOptionLabel={(person, options) => {
-        if (options.context === "menu") {
+        if (options.context === 'menu') {
           if (person.__isNew__) return <span>Créer "{person.value}"</span>;
           return <Person person={person} />;
         }
@@ -131,23 +133,25 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
 
 const PersonSelected = ({ person }) => {
   const history = useHistory();
-  return <div>
-    <div style={{ display: "flex", alignItems: "center" }}>
-      {person.name}
-      {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
-      <ButtonCustom
-        onClick={(e) => {
-          e.stopPropagation();
-          history.push(`/person/${person._id}`);
-        }}
-        color="link"
-        title="Accéder au dossier"
-        padding="0"
-        style={{ marginLeft: "0.5rem" }}
-      />
+  return (
+    <div>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
+        {person.name}
+        {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
+        <ButtonCustom
+          onClick={(e) => {
+            e.stopPropagation();
+            history.push(`/person/${person._id}`);
+          }}
+          color="link"
+          title="Accéder au dossier"
+          padding="0"
+          style={{ marginLeft: '0.5rem' }}
+        />
+      </div>
     </div>
-  </div>;
-}
+  );
+};
 
 const Person = ({ person }) => {
   const history = useHistory();
