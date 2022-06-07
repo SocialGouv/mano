@@ -1,7 +1,6 @@
 import React from 'react';
 import styled from 'styled-components';
 import { ActivityIndicator, TouchableWithoutFeedback } from 'react-native';
-import EditIcon from '../icons/EditIcon';
 
 const hitSlop = {
   top: 20,

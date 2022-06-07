@@ -1,12 +1,10 @@
 import { useRecoilState, useRecoilValue } from 'recoil';
-import * as Sentry from '@sentry/react-native';
 import React, { useCallback } from 'react';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import { refreshTriggerState } from '../../components/Loader';
 import FlatListStyled from '../../components/FlatListStyled';
-import CommentRow from '../Comments/CommentRow';
-import { ListNoMoreComments, ListNoMoreObservations } from '../../components/ListEmptyContainer';
+import { ListNoMoreObservations } from '../../components/ListEmptyContainer';
 import { observationsForReport } from './selectors';
 import { getPeriodTitle } from './utils';
 import { currentTeamState } from '../../recoil/auth';

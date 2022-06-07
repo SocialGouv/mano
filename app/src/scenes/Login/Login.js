@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
-import { Alert, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View, Text } from 'react-native';
+import { Alert, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import AsyncStorage from '@react-native-community/async-storage';
 import { version } from '../../../package.json';
@@ -34,6 +34,7 @@ const Login = ({ navigation }) => {
   const [showEncryptionKeyInput, setShowEncryptionKeyInput] = useState(false);
   const [loading, setLoading] = useState(false);
   const setUser = useSetRecoilState(userState);
+  // eslint-disable-next-line no-unused-vars
   const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-05-27');
   const setOrganisation = useSetRecoilState(organisationState);
   const setTeams = useSetRecoilState(teamsState);

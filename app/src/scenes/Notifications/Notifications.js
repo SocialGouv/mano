@@ -7,8 +7,6 @@ import { commentsState } from '../../recoil/comments';
 import { personsState } from '../../recoil/persons';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
-import Spacer from '../../components/Spacer';
-import ScrollContainer from '../../components/ScrollContainer';
 import { refreshTriggerState } from '../../components/Loader';
 import { SectionListStyled } from '../../components/FlatListStyled';
 import ActionRow from '../../components/ActionRow';

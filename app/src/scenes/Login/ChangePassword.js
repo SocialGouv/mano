@@ -19,6 +19,7 @@ const checks = {
   NO_LETTER: (password) => !/[a-zA-Z]/g.test(password),
   NO_UPPERCASE: (password) => !/[A-Z]/g.test(password),
   NO_LOWERCASE: (password) => !/[a-z]/g.test(password),
+  // eslint-disable-next-line no-useless-escape
   NO_SPECIAL: (password) => !/[ `!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/.test(password),
 };
 

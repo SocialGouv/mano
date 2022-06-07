@@ -24,7 +24,6 @@ const castToReport = (report = {}) => ({
   description: report.description?.trim() || '',
   collaborations: report.collaborations || [],
   date: report.date,
-  date: report.date,
 });
 
 const Report = ({ navigation, route }) => {
