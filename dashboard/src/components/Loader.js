@@ -125,13 +125,12 @@ const Loader = () => {
   useEffect(() => {
     if (!lastRefreshReady) {
       (async () => {
-        setLastRefresh(await getCacheItem(currentCacheKey) || 0);
+        setLastRefresh((await getCacheItem(currentCacheKey)) || 0);
         setLastRefreshReady(true);
       })();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastRefreshReady]);
-
 
   const refresh = async () => {
     clearInterval(autoRefreshInterval.current);
@@ -255,7 +254,7 @@ const Loader = () => {
     */
     const response = await API.get({
       path: '/organisation/stats',
-      query: { organisation: organisationId, lastRefresh },
+      query: { organisation: organisationId, after: lastRefresh, withDeleted: true },
     });
     if (!response.ok) {
       setRefreshTrigger({
@@ -279,10 +278,9 @@ const Loader = () => {
     if (lastRefresh > 0 && user.healthcareProfessional) {
       // medical data is never saved in cache
       // so we always have to download all at every page reload
-      // therefore for the loader to be efficient, we need to
       const medicalDataResponse = await API.get({
         path: '/organisation/stats',
-        query: { organisation: organisationId, lastRefresh: 0 },
+        query: { organisation: organisationId, after: initialLoad ? 0 : lastRefresh, withDeleted: true },
       });
       if (!medicalDataResponse.ok) {
         setRefreshTrigger({
@@ -340,9 +338,9 @@ const Loader = () => {
             initialLoad
               ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
               : mergeItems(
-                oldConsultations,
-                newConsultations.map((c) => whitelistAllowedData(c, user))
-              )
+                  oldConsultations,
+                  newConsultations.map((c) => whitelistAllowedData(c, user))
+                )
           ),
         API,
       });
