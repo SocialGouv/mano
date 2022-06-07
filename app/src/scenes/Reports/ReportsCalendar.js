@@ -89,7 +89,7 @@ const ReportsCalendar = ({ navigation }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title={`Comptes-rendus de l'équipe ${currentTeam.name}`} onBack={navigation.goBack} />
+      <ScreenTitle title={`Comptes-rendus de l'équipe ${currentTeam?.name}`} onBack={navigation.goBack} />
       <ScrollContainer refreshControl={<RefreshControl refreshing={refreshTrigger.status} onRefresh={onRefresh} />}>
         <Calendar
           onDayPress={onDayPress}
