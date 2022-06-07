@@ -154,9 +154,6 @@ router.delete(
     const passage = await Passage.findOne(query);
     if (!passage) return res.status(200).send({ ok: true });
 
-    passage.set({ encrypted: null, encryptedEntityKey: null });
-    await passage.save();
-
     await passage.destroy();
     res.status(200).send({ ok: true });
   })

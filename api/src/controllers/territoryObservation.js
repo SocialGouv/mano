@@ -150,9 +150,6 @@ router.delete(
     let observation = await TerritoryObservation.findOne(query);
     if (!observation) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    observation.set({ encrypted: null, encryptedEntityKey: null });
-    await observation.save();
-
     await observation.destroy();
     res.status(200).send({ ok: true });
   })

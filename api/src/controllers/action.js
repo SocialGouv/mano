@@ -210,9 +210,6 @@ router.delete(
     });
     if (!action) return res.status(200).send({ ok: true });
 
-    action.set({ encrypted: null, encryptedEntityKey: null });
-    await action.save();
-
     await action.destroy();
 
     res.status(200).send({ ok: true });

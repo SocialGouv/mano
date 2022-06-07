@@ -153,9 +153,6 @@ router.delete(
     const comment = await Comment.findOne(query);
     if (!comment) return res.status(200).send({ ok: true });
 
-    comment.set({ encrypted: null, encryptedEntityKey: null });
-    await comment.save();
-
     await comment.destroy();
     res.status(200).send({ ok: true });
   })

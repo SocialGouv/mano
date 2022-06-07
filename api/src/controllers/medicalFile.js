@@ -153,9 +153,6 @@ router.delete(
     const medicalFile = await MedicalFile.findOne(query);
     if (!medicalFile) return res.status(200).send({ ok: true });
 
-    medicalFile.set({ encrypted: null, encryptedEntityKey: null });
-    await medicalFile.save();
-
     await medicalFile.destroy();
     res.status(200).send({ ok: true });
   })
