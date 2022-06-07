@@ -1,3 +1,11 @@
+## [1.115.1](https://github.com/SocialGouv/mano/compare/v1.115.0...v1.115.1) (2022-06-07)
+
+
+### Bug Fixes
+
+* **api:** keep encrypted fields even if soft delete ([#725](https://github.com/SocialGouv/mano/issues/725)) ([d69e363](https://github.com/SocialGouv/mano/commit/d69e3632fc32f3668071f670f7b5175f30c4eec7))
+* **app:** crash on logout + logout button position and color ([#723](https://github.com/SocialGouv/mano/issues/723)) ([3276aba](https://github.com/SocialGouv/mano/commit/3276aba79e96f7f6315dc349be802b2dfc79f3de))
+
 # [1.115.0](https://github.com/SocialGouv/mano/compare/v1.114.3...v1.115.0) (2022-06-03)
 
 
