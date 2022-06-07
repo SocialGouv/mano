@@ -1,3 +1,10 @@
+## [1.115.2](https://github.com/SocialGouv/mano/compare/v1.115.1...v1.115.2) (2022-06-07)
+
+
+### Bug Fixes
+
+* **dashboard,api:** remove lastRefresh on organisation stats request ([#724](https://github.com/SocialGouv/mano/issues/724)) ([92d5866](https://github.com/SocialGouv/mano/commit/92d586696541aacaf3451f82cc9364bbcd46d905))
+
 ## [1.115.1](https://github.com/SocialGouv/mano/compare/v1.115.0...v1.115.1) (2022-06-07)
 
 
