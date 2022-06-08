@@ -561,12 +561,12 @@ router.put(
     const user = await User.findOne({ where: { _id } });
     if (!user) return res.status(404).send({ ok: false, error: "Utilisateur non trouvé" });
 
-    if (name) user.name = sanitizeAll(name);
-    if (email) user.email = sanitizeAll(email.trim().toLowerCase());
-    if (termsAccepted) user.termsAccepted = termsAccepted;
+    if (name) user.set({ name: sanitizeAll(name) });
+    if (email) user.set({ email: sanitizeAll(email.trim().toLowerCase()) });
+    if (termsAccepted) user.set({ termsAccepted: termsAccepted });
     if (password) {
       if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
-      user.password = password;
+      user.set({ password: password });
     }
 
     const tx = await User.sequelize.transaction();
@@ -628,8 +628,8 @@ router.put(
 
     if (name) user.name = sanitizeAll(name);
     if (email) user.email = sanitizeAll(email.trim().toLowerCase());
-    if (healthcareProfessional !== undefined) user.healthcareProfessional = healthcareProfessional;
-    if (role) user.role = role;
+    if (healthcareProfessional !== undefined) user.set({ healthcareProfessional });
+    if (role) user.set({ role });
 
     const tx = await User.sequelize.transaction();
     if (team && Array.isArray(team)) {
