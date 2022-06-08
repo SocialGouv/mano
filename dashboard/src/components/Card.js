@@ -52,7 +52,7 @@ const CardWrapper = styled.div`
   flex-direction: column;
   font-weight: bold;
   margin-bottom: 10px;
-  border: 1px solid ${theme.mainlight};
+  border: 1px solid ${theme.main25};
   width: 100%;
 `;
 

@@ -1,8 +1,13 @@
+// app colors based on
+// https://www.gouvernement.fr/charte/charte-graphique-les-fondamentaux/les-couleurs
+// Menthe
+// Tuile
+
 export default {
   app: {
-    color: '#49c3a6',
-    secondary: '#f05a68',
-    colorDark: '#3ab39a',
+    color: '#008e7f',
+    secondary: '#ae1d20',
+    colorDark: '#0d5b54',
     colorGrey: '#8C9294',
     colorWhite: '#fff',
     colorBackgroundDarkGrey: '#74776b',
