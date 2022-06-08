@@ -22,7 +22,7 @@ if (process.env.NODE_ENV === "development") {
 
 if (process.env.NODE_ENV === "production") {
   // FIXME: just to trigger stuff
-  console.log("to delete");
+  console.log("to delete again");
 }
 
 if (process.env.NODE_ENV === "production") {
