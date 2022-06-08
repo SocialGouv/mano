@@ -1,3 +1,10 @@
+## [1.115.3](https://github.com/SocialGouv/mano/compare/v1.115.2...v1.115.3) (2022-06-08)
+
+
+### Bug Fixes
+
+* **dashboard:** show ascionts in stats with wrong category ([#722](https://github.com/SocialGouv/mano/issues/722)) ([5b770e1](https://github.com/SocialGouv/mano/commit/5b770e125c5f02b13c28b8a7c39aa926e8ece969))
+
 ## [1.115.2](https://github.com/SocialGouv/mano/compare/v1.115.1...v1.115.2) (2022-06-07)
 
 
