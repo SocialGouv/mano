@@ -1,8 +1,8 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Alert, Linking, Text } from 'react-native';
+import { Linking, Text } from 'react-native';
 import styled from 'styled-components';
-import { connectActionSheet } from '@expo/react-native-action-sheet';
 import * as Sentry from '@sentry/react-native';
+import { useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
 import InputLabelled from '../../components/InputLabelled';
@@ -20,8 +20,6 @@ import CheckboxLabelled from '../../components/CheckboxLabelled';
 import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
 import colors from '../../utils/colors';
 import PhoneIcon from '../../icons/PhoneIcon';
-import API from '../../services/api';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
@@ -32,7 +30,6 @@ const PersonSummary = ({
   navigation,
   person,
   personDB,
-  showActionSheetWithOptions,
   onUpdatePerson,
   onChange,
   updating,
@@ -45,34 +42,6 @@ const PersonSummary = ({
   writeComment,
 }) => {
   const onAddPlaceRequest = () => navigation.push('NewPersonPlaceForm', { person: personDB, fromRoute: 'Person' });
-
-  const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
-  const onPlaceMore = async (relPersPlace) => {
-    const options = ['Modifier', 'Retirer', 'Annuler'];
-    showActionSheetWithOptions(
-      {
-        options,
-        cancelButtonIndex: options.length - 1,
-        destructiveButtonIndex: 1,
-      },
-      async (buttonIndex) => {
-        if (options[buttonIndex] === 'Modifier') {
-          navigation.navigate('PersonPlace', {
-            _id: relPersPlace.place,
-            personName: personDB?.name,
-            fromRoute: 'Person',
-          });
-        }
-        if (options[buttonIndex] === 'Retirer') {
-          const response = await API.delete({ path: `/relPersonPlace/${relPersPlace?._id}` });
-          if (response.ok) {
-            setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersPlace?._id));
-          }
-          if (!response.ok) return Alert.alert(response.error);
-        }
-      }
-    );
-  };
 
   const onCommentUpdate = (comment) => {
     navigation.navigate('PersonComment', {
@@ -324,4 +293,4 @@ const AlterOutOfActiveList = styled.View`
   padding: 10px;
 `;
 
-export default connectActionSheet(PersonSummary);
+export default PersonSummary;

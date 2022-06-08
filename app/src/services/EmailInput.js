@@ -27,6 +27,7 @@ const EmailInput = ({ innerRef, onChange, onFocus, onSubmitEditing, testID = 'em
       const storedEmail = await AsyncStorage.getItem('persistent_email');
       if (storedEmail) onInputChange(storedEmail);
     })();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

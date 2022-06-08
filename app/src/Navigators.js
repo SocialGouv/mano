@@ -3,7 +3,7 @@ import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { AgendaIcon, PersonIcon, StructuresIcon, MenuIcon, TerritoryIcon } from './icons';
+import { AgendaIcon, PersonIcon, TerritoryIcon } from './icons';
 import { AppState } from 'react-native';
 import { RecoilRoot } from 'recoil';
 import logEvents from './services/logEvents';

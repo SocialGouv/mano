@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 import React from 'react';
 import styled from 'styled-components';
 import Svg, { G, Path } from 'react-native-svg';
