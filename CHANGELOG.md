@@ -1,3 +1,10 @@
+## [1.115.4](https://github.com/SocialGouv/mano/compare/v1.115.3...v1.115.4) (2022-06-08)
+
+
+### Bug Fixes
+
+* **app,api:** sonarcloud bugs ([#732](https://github.com/SocialGouv/mano/issues/732)) ([765426f](https://github.com/SocialGouv/mano/commit/765426fcca28275f250c485f05c85617ba63c040))
+
 ## [1.115.3](https://github.com/SocialGouv/mano/compare/v1.115.2...v1.115.3) (2022-06-08)
 
 
