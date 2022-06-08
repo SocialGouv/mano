@@ -86,7 +86,7 @@ export const personsSearchSelector = selectorFamily({
 export const personsFullSearchSelector = selectorFamily({
   key: 'personsFullSearchSelector',
   get:
-    ({ search = '', filterTeams = [], filters = [], filterAlertness = false, filterOutOfActiveList = false }) =>
+    ({ search = '', filterTeams = [], filters = [], filterAlertness = false, filterOutOfActiveList = '' }) =>
     ({ get }) => {
       const persons = get(personsWithPlacesSelector);
       let personsFiltered = persons;
