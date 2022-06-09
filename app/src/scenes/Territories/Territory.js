@@ -28,10 +28,11 @@ const Territory = ({ route, navigation }) => {
 
   const [territory, setTerritory] = useState(castToTerritory(route?.params));
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
-  const territoryObservations = useMemo(
-    () => allTerritoryOservations.filter((obs) => obs.territory === territoryDB?._id),
-    [territoryDB, allTerritoryOservations]
-  );
+  const territoryObservations = useMemo(() => {
+    return allTerritoryOservations
+      .filter((obs) => obs.territory === territoryDB?._id)
+      .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
+  }, [territoryDB, allTerritoryOservations]);
 
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
