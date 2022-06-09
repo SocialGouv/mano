@@ -1,3 +1,10 @@
+## [1.115.6](https://github.com/SocialGouv/mano/compare/v1.115.5...v1.115.6) (2022-06-09)
+
+
+### Bug Fixes
+
+* **app:** sort observations ([3f078bc](https://github.com/SocialGouv/mano/commit/3f078bceb494c34f414a12ad26cbc114c9777627))
+
 ## [1.115.5](https://github.com/SocialGouv/mano/compare/v1.115.4...v1.115.5) (2022-06-09)
 
 
