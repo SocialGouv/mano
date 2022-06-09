@@ -105,6 +105,11 @@ export default function Footer({ skipFirstParagraph }) {
           <a className="w-20 mb-10 md:mb-0" href="/">
             <img className="object-contain w-full h-full" src="/logo-white.png" alt="" />
           </a>
+          <p className="text-xs text-white">
+            <Link href="/legal">
+              <a>Accessibilité : non conforme</a>
+            </Link>
+          </p>
           <p className="text-xs text-white opacity-40">
             <Link href="/legal">
               <a>Mentions légales</a>
