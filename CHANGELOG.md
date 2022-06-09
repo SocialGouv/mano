@@ -1,3 +1,15 @@
+# [1.116.0](https://github.com/SocialGouv/mano/compare/v1.115.6...v1.116.0) (2022-06-09)
+
+
+### Bug Fixes
+
+* **website:** api localhost ([ef89ac3](https://github.com/SocialGouv/mano/commit/ef89ac3978550062110b220e29ae7d34fe640915))
+
+
+### Features
+
+* accessibility in footer ([9395e12](https://github.com/SocialGouv/mano/commit/9395e12cd9d5b718350bf663b918bb09d08a7e9f))
+
 ## [1.115.6](https://github.com/SocialGouv/mano/compare/v1.115.5...v1.115.6) (2022-06-09)
 
 
