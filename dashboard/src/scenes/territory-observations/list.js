@@ -17,7 +17,8 @@ const List = ({ territory = {} }) => {
   const [openObservationModale, setOpenObservationModale] = useState(null);
   const API = useApi();
 
-  const observations = territoryObservations.filter((obs) => obs.territory === territory._id);
+  const observations = territoryObservations.filter((obs) => obs.territory === territory._id)
+    .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
 
   if (!observations) return null;
 
