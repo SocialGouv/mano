@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import { toastr } from 'react-redux-toastr';
 import {
@@ -40,6 +40,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
+  const optionsExist = useRef(null);
 
   const searchablePersons = useMemo(() => {
     return persons.map((person) => {
@@ -90,6 +91,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
           lastActions,
           lastPassages
         );
+        optionsExist.current = options.length;
         return Promise.resolve(options);
       }}
       defaultOptions={personsToOptions(searchablePersons, lastActions, lastPassages)}
@@ -125,6 +127,10 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
       }}
       format
       creatable
+      onKeyDown={(e, b) => {
+        // prevent create Person on Enter press
+        if (e.key === 'Enter' && !optionsExist.current) e.preventDefault();
+      }}
       inputId={inputId}
       classNamePrefix={classNamePrefix}
     />
