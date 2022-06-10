@@ -1,3 +1,10 @@
+## [1.116.2](https://github.com/SocialGouv/mano/compare/v1.116.1...v1.116.2) (2022-06-10)
+
+
+### Bug Fixes
+
+* **metabase:** skip auth for public routes ([#738](https://github.com/SocialGouv/mano/issues/738)) ([60e9fd4](https://github.com/SocialGouv/mano/commit/60e9fd4ee48fd2ad37706a1e3f1fec72a74ba045))
+
 ## [1.116.1](https://github.com/SocialGouv/mano/compare/v1.116.0...v1.116.1) (2022-06-10)
 
 
