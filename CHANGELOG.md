@@ -1,3 +1,10 @@
+## [1.116.1](https://github.com/SocialGouv/mano/compare/v1.116.0...v1.116.1) (2022-06-10)
+
+
+### Bug Fixes
+
+* mobile app version ([587b749](https://github.com/SocialGouv/mano/commit/587b749dca4d1e265e12089a887a4be3a6f78b5b))
+
 # [1.116.0](https://github.com/SocialGouv/mano/compare/v1.115.6...v1.116.0) (2022-06-09)
 
 
