@@ -3,7 +3,6 @@ import { Col, Button, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } fro
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
-import 'react-datepicker/dist/react-datepicker.css';
 import { useRecoilValue } from 'recoil';
 
 import ButtonCustom from './ButtonCustom';

@@ -1,5 +1,4 @@
 import React from 'react';
-import 'react-datepicker/dist/react-datepicker.css';
 import { formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../services/date';
 
 const showBoolean = (value) => {
