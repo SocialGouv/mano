@@ -83,6 +83,8 @@ const Stats = () => {
     { filters: filterPersons, field: 'followedSince' }
   );
 
+  const personsActive = persons.filter((p) => !p.outOfActiveList);
+
   const actions = getDataForPeriod(
     allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
     period,
@@ -222,7 +224,7 @@ const Stats = () => {
           <Title>Statistiques générales</Title>
           <Row style={{ marginBottom: '20px' }}>
             <Col md={2} />
-            <Block data={persons} title="Nombre de personnes suivies" />
+            <Block data={personsActive} title="Nombre de personnes suivies" />
             <Block data={actions} title="Nombre d'actions" />
             <Col md={2} />
           </Row>
@@ -286,55 +288,55 @@ const Stats = () => {
           <Title>Statistiques des personnes suivies</Title>
           <Filters base={filterPersonsWithAllFields} filters={filterPersons} onChange={setFilterPersons} />
           <Row>
-            <Block data={persons} title="Nombre de personnes suivies" />
-            <BlockCreatedAt persons={persons} />
-            <BlockWanderingAt persons={persons} />
+            <Block data={personsActive} title="Nombre de personnes suivies" />
+            <BlockCreatedAt persons={personsActive} />
+            <BlockWanderingAt persons={personsActive} />
           </Row>
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Nationalité"
             field="nationalitySituation"
-            data={getPieData(persons, 'nationalitySituation', { options: nationalitySituationOptions })}
+            data={getPieData(personsActive, 'nationalitySituation', { options: nationalitySituationOptions })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Genre"
             field="gender"
-            data={getPieData(persons, 'gender', { options: genderOptions })}
+            data={getPieData(personsActive, 'gender', { options: genderOptions })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Situation personnelle"
             field="personalSituation"
-            data={getPieData(persons, 'personalSituation', { options: personalSituationOptions })}
+            data={getPieData(personsActive, 'personalSituation', { options: personalSituationOptions })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Motif de la situation de rue"
             field="reasons"
-            data={getPieData(persons, 'reasons', { options: reasonsOptions })}
+            data={getPieData(personsActive, 'reasons', { options: reasonsOptions })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Ressources des personnes suivies"
             field="resources"
-            data={getPieData(persons, 'resources', { options: ressourcesOptions })}
+            data={getPieData(personsActive, 'resources', { options: ressourcesOptions })}
           />
-          <AgeRangeBar persons={persons} />
-          <StatsCreatedAtRangeBar persons={persons} />
-          <CustomResponsivePie onAddFilter={addFilter} title="Type d'hébergement" data={getAdressPieData(persons)} />
+          <AgeRangeBar persons={personsActive} />
+          <StatsCreatedAtRangeBar persons={personsActive} />
+          <CustomResponsivePie onAddFilter={addFilter} title="Type d'hébergement" data={getAdressPieData(personsActive)} />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Couverture médicale des personnes"
             field="healthInsurance"
-            data={getPieData(persons, 'healthInsurance', { options: healthInsuranceOptions })}
+            data={getPieData(personsActive, 'healthInsurance', { options: healthInsuranceOptions })}
           />
-          <CustomResponsivePie onAddFilter={addFilter} title="Avec animaux" data={getPieData(persons, 'hasAnimal')} />
+          <CustomResponsivePie onAddFilter={addFilter} title="Avec animaux" data={getPieData(personsActive, 'hasAnimal')} />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Personnes très vulnérables"
             field="alertness"
-            data={getPieData(persons, 'alertness', { isBoolean: true })}
+            data={getPieData(personsActive, 'alertness', { isBoolean: true })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
