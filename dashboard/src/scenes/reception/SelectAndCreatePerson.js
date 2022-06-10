@@ -119,10 +119,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
           if (person.__isNew__) return <span>Créer "{person.value}"</span>;
           return <Person person={person} />;
         }
-        return <div>
-          {person.name}
-          {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
-        </div>;
+        return <PersonSelected person={person} />;
       }}
       format
       creatable
@@ -131,6 +128,26 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
     />
   );
 };
+
+const PersonSelected = ({ person }) => {
+  const history = useHistory();
+  return <div>
+    <div style={{ display: "flex", alignItems: "center" }}>
+      {person.name}
+      {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
+      <ButtonCustom
+        onClick={(e) => {
+          e.stopPropagation();
+          history.push(`/person/${person._id}`);
+        }}
+        color="link"
+        title="Accéder au dossier"
+        padding="0"
+        style={{ marginLeft: "0.5rem" }}
+      />
+    </div>
+  </div>;
+}
 
 const Person = ({ person }) => {
   const history = useHistory();
