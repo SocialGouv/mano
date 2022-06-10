@@ -41,3 +41,6 @@ oauth2-proxy:
         name: oauth2-proxy-configmap
     - secretRef:
         name: oauth2-proxy-sealed-secret
+  additionalArgs:
+    - --skip-auth-route
+    - ^/public/.*,^/app/dist/.*,^/api/public/.*,^/api/session/.*,^/app/assets/.*
