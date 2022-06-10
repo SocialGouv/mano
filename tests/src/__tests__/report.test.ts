@@ -41,16 +41,16 @@ describe("Organisation CRUD", () => {
     expect(await getInnerText("h5#passages-title")).toBe("2 passages");
 
     await expect(page).toClick("button#Café-add");
-    await page.waitForTimeout(10000);
-    expect(await getInnerText("div#Café-count")).toBe("1");
+    await page.waitForTimeout(1500);
+    expect(await getInputValue("input#Café-count")).toBe("1");
     await page.waitForTimeout(1000);
     await expect(page).toClick("button#Café-add");
     await page.waitForTimeout(1000);
-    expect(await getInnerText("div#Café-count")).toBe("2");
+    expect(await getInputValue("input#Café-count")).toBe("2");
     await page.waitForTimeout(1000);
     await expect(page).toClick("button#Café-remove");
     await page.waitForTimeout(1000);
-    expect(await getInnerText("div#Café-count")).toBe("1");
+    expect(await getInputValue("input#Café-count")).toBe("1");
   });
 
   /*
