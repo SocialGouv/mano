@@ -1,3 +1,11 @@
+## [1.116.3](https://github.com/SocialGouv/mano/compare/v1.116.2...v1.116.3) (2022-06-10)
+
+
+### Bug Fixes
+
+* remove old incrementator ([#729](https://github.com/SocialGouv/mano/issues/729)) ([b4bcbe5](https://github.com/SocialGouv/mano/commit/b4bcbe572f1a8ffb88803e199a611dad0bc01697))
+* **dashboard:** remove react-dates ([#728](https://github.com/SocialGouv/mano/issues/728)) ([9eae1c7](https://github.com/SocialGouv/mano/commit/9eae1c756c4e628b8fdfa4e9d244a808ca34c8a5))
+
 ## [1.116.2](https://github.com/SocialGouv/mano/compare/v1.116.1...v1.116.2) (2022-06-10)
 
 
