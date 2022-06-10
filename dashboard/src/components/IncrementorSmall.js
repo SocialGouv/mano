@@ -22,11 +22,19 @@ const IncrementorSmall = ({ service, count, onChange }) => {
       <div id={`${service}-title`} className="service-name">
         {service}
       </div>
-      <ButtonRemoveAdd aria-label="moins" disabled={localcount === 0} onClick={() => onChangeRequest(localcount - 1)} id={`${service}-remove`}>-</ButtonRemoveAdd>
-      <LocalCount aria-label={`Nombre de ${service}`} id={`${service}-count`}>
-        {localcount}
-      </LocalCount>
-      <ButtonRemoveAdd aria-label="plus" onClick={() => onChangeRequest(localcount + 1)} id={`${service}-add`}>+</ButtonRemoveAdd>
+      <ButtonRemoveAdd aria-label="moins" disabled={localcount === 0} onClick={() => onChangeRequest(localcount - 1)} id={`${service}-remove`}>
+        -
+      </ButtonRemoveAdd>
+      <LocalCount
+        aria-label={`Nombre de ${service}`}
+        id={`${service}-count`}
+        type="number"
+        value={localcount}
+        onChange={(e) => onChangeRequest(Number(e.currentTarget.value))}
+      />
+      <ButtonRemoveAdd aria-label="plus" onClick={() => onChangeRequest(localcount + 1)} id={`${service}-add`}>
+        +
+      </ButtonRemoveAdd>
     </IncrementorSmallWrapper>
   );
 };
@@ -40,10 +48,12 @@ const IncrementorSmallWrapper = styled.div`
     color: ${theme.black75};
   }
 `;
-const LocalCount = styled.div`
+const LocalCount = styled.input`
   width: 40px;
   text-align: center;
   color: ${theme.black75};
+  background: none;
+  border: none;
 `;
 
 const ButtonRemoveAdd = styled.button`
