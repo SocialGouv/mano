@@ -272,7 +272,7 @@ const EncryptionKey = ({ isMain }) => {
         onClick={() => setOpen(true)}
       />
       <StyledModal
-        backdrop={!onboardingForEncryption ? true : 'static'}
+        backdrop="static"
         isOpen={open}
         toggle={() => setOpen(false)}
         onClosed={() => {

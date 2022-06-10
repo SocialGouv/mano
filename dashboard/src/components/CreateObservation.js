@@ -56,7 +56,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
 
   return (
     <CreateStyle>
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>{observation._id ? "Modifier l'observation" : 'Créer une nouvelle observation'}</ModalHeader>
         <ModalBody>
           <Formik

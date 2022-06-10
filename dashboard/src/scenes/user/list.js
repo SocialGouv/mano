@@ -94,7 +94,7 @@ const Create = ({ onChange }) => {
   return (
     <CreateWrapper>
       <ButtonCustom onClick={() => setOpen(true)} color="primary" title="Créer un nouvel utilisateur" padding="12px 24px" />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouvel utilisateur</ModalHeader>
         <ModalBody>
           <Formik

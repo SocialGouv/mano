@@ -55,7 +55,7 @@ const OutOfActiveList = ({ person }) => {
         width={person.outOfActiveList ? 250 : 200}
         color={'warning'}
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Sortie de file active de {person.name}</ModalHeader>
         <ModalBody>
           <Formik

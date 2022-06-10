@@ -9,7 +9,7 @@ const NightSessionModale = () => {
   return (
     <>
       <QuestionMarkButton onClick={() => setOpen(true)} />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Maraude de nuit</ModalHeader>
         <ModalBody>
           <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>

@@ -20,7 +20,7 @@ const ReportDescriptionModale = ({ report }) => {
         title={!report?.description?.length ? 'Ajouter une description' : '&#9998;'}
         color={!report?.description?.length ? 'info' : 'link'}
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Description</ModalHeader>
         <ModalBody>
           <Formik

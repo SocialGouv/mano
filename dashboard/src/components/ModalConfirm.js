@@ -45,7 +45,7 @@ const ModalConfirm = () => {
   const close = () => setModalConfirmState((prevState) => ({ ...prevState, open: false }));
 
   return (
-    <Modal isOpen={open} toggle={close} size="sm" centered onClosed={() => setModalConfirmState(closedState)}>
+    <Modal isOpen={open} toggle={close} size="sm" centered onClosed={() => setModalConfirmState(closedState)} backdrop="static">
       <ModalBody>
         <Row>
           <Col md={12}>{title}</Col>

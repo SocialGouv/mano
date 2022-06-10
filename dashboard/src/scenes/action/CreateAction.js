@@ -20,7 +20,19 @@ import { dateForDatePicker, formatDateWithFullMonth } from '../../services/date'
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 
-const CreateAction = ({ disabled, title, person = null, persons = null, isMulti = false, completedAt, refreshable, buttonOnly = false, noIcon, smallButton = false, icon = null }) => {
+const CreateAction = ({
+  disabled,
+  title,
+  person = null,
+  persons = null,
+  isMulti = false,
+  completedAt,
+  refreshable,
+  buttonOnly = false,
+  noIcon,
+  smallButton = false,
+  icon = null,
+}) => {
   const [open, setOpen] = useState(false);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const teams = useRecoilValue(teamsState);
@@ -68,9 +80,9 @@ const CreateAction = ({ disabled, title, person = null, persons = null, isMulti 
         onClick={() => setOpen(true)}
         color="primary"
         title={title}
-        padding={smallButton ? "8px 14px" : "12px 24px"}
+        padding={smallButton ? '8px 14px' : '12px 24px'}
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>{title}</ModalHeader>
         <ModalBody>
           <Formik

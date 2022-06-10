@@ -140,7 +140,7 @@ const Create = ({ onChange }) => {
   return (
     <CreateWrapper style={{ marginTop: '1rem' }}>
       <ButtonCustom onClick={() => setOpen(true)} color="primary" title="Créer une nouvelle organisation" />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
         <ModalBody>
           <Formik
