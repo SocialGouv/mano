@@ -1,3 +1,10 @@
+# [1.117.0](https://github.com/SocialGouv/mano/compare/v1.116.8...v1.117.0) (2022-06-13)
+
+
+### Features
+
+* **api:** app v2.20.2 ([a575098](https://github.com/SocialGouv/mano/commit/a5750981e6577df1f4f416251d4b139bcc690a34))
+
 ## [1.116.8](https://github.com/SocialGouv/mano/compare/v1.116.7...v1.116.8) (2022-06-13)
 
 
