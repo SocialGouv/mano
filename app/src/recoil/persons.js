@@ -1,4 +1,4 @@
-import { setCacheItem } from '../services/dataManagement';
+import { storage } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
