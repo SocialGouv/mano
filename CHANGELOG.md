@@ -1,3 +1,10 @@
+## [1.116.8](https://github.com/SocialGouv/mano/compare/v1.116.7...v1.116.8) (2022-06-13)
+
+
+### Bug Fixes
+
+* **app:** navigate to nested Person/Action in Report ([#745](https://github.com/SocialGouv/mano/issues/745)) ([866c3b5](https://github.com/SocialGouv/mano/commit/866c3b53824ac77c957bca84cb733a3d95645820))
+
 ## [1.116.7](https://github.com/SocialGouv/mano/compare/v1.116.6...v1.116.7) (2022-06-13)
 
 
