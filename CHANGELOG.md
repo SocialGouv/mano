@@ -1,3 +1,11 @@
+## [1.116.6](https://github.com/SocialGouv/mano/compare/v1.116.5...v1.116.6) (2022-06-13)
+
+
+### Bug Fixes
+
+* **dashboard:** exclude out of active list in stats when pertinent ([#743](https://github.com/SocialGouv/mano/issues/743)) ([540b74e](https://github.com/SocialGouv/mano/commit/540b74ec62b576b7cef9fc3eeb310757947f3e19))
+* **dashboard:** prevent create person on creatable on Enter press ([#742](https://github.com/SocialGouv/mano/issues/742)) ([40d1a27](https://github.com/SocialGouv/mano/commit/40d1a27df2a84ed5f7e39074b8c2ed1f4267d0bd))
+
 ## [1.116.5](https://github.com/SocialGouv/mano/compare/v1.116.4...v1.116.5) (2022-06-13)
 
 
