@@ -11,7 +11,7 @@ const OnboardingEndModal = ({ open, setOpen }) => {
   const organisation = useRecoilValue(organisationState);
 
   return (
-    <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+    <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
       <ModalHeader close={<></>} style={{ justifyContent: 'center' }} toggle={() => setOpen(false)}>
         C'est fini !
       </ModalHeader>

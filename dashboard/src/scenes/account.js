@@ -82,7 +82,7 @@ const LinkToChangePassword = () => {
         onClick={() => setOpen(true)}
       />
 
-      <Modal isOpen={open} toggle={() => setOpen(false)} className="change-password">
+      <Modal isOpen={open} toggle={() => setOpen(false)} className="change-password" backdrop="static">
         <ModalHeader>Modifier son mot de passe</ModalHeader>
         <ModalBody>
           <ChangePassword

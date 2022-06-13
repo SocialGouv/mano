@@ -83,7 +83,7 @@ const Create = ({ onChange }) => {
         title="Créer une nouvelle structure"
         padding="12px 24px"
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Créer une structure</ModalHeader>
         <ModalBody>
           <Formik

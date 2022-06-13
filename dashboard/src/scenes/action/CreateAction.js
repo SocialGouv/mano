@@ -81,7 +81,7 @@ const CreateAction = ({
         title={title}
         padding={smallButton ? '8px 14px' : '12px 24px'}
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>{title}</ModalHeader>
         <ModalBody>
           <Formik

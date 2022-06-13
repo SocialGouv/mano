@@ -54,7 +54,7 @@ const CreatePerson = ({ refreshable }) => {
         title="Créer une nouvelle personne"
         padding="12px 24px"
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle personne</ModalHeader>
         <ModalBody>
           <Formik

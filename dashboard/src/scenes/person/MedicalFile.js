@@ -645,7 +645,7 @@ export function MedicalFile({ person }) {
         }}
       />
       <div style={{ height: '50vh' }} className="noprint" />
-      <Modal isOpen={showAddConsultation} toggle={resetCurrentConsultation} size="lg">
+      <Modal isOpen={showAddConsultation} toggle={resetCurrentConsultation} size="lg" backdrop="static">
         <Formik
           enableReinitialize
           initialValues={currentConsultation}
@@ -843,7 +843,7 @@ export function MedicalFile({ person }) {
           )}
         </Formik>
       </Modal>
-      <Modal isOpen={showAddTreatment} toggle={resetCurrentTreatment} size="lg">
+      <Modal isOpen={showAddTreatment} toggle={resetCurrentTreatment} size="lg" backdrop="static">
         <Formik
           enableReinitialize
           initialValues={currentTreatment}

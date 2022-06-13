@@ -74,7 +74,7 @@ const AddPlace = ({ personId }) => {
   return (
     <div style={{ marginTop: 15, marginBottom: 30 }}>
       <ButtonCustom disabled={!currentTeam} onClick={() => setOpen(true)} color="primary" title="Ajouter un lieu" padding="12px 24px" />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Ajouter un lieu</ModalHeader>
         <ModalBody>
           <Formik

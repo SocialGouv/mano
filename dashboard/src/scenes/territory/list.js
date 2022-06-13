@@ -121,7 +121,7 @@ const CreateTerritory = () => {
         title="Créer un nouveau territoire"
         padding="12px 24px"
       />
-      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+      <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Créer un nouveau territoire</ModalHeader>
         <ModalBody>
           <Formik

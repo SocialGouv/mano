@@ -52,7 +52,7 @@ const SortableGrid = ({ list, onUpdateList, onRemoveItem, onEditItem, editItemTi
 
 const EditContent = ({ open, setOpen, onSubmit, content, title }) => {
   return (
-    <Modal isOpen={open} toggle={() => setOpen(false)} size="lg">
+    <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
       <ModalHeader toggle={() => setOpen(false)}>{title}</ModalHeader>
       <ModalBody>
         <Formik

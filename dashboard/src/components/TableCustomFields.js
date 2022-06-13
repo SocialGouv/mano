@@ -200,7 +200,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
 
   return (
     <CreateStyle>
-      <Modal key={isNewField || editingField?.name} isOpen={open} toggle={() => onClose(null)} size="lg">
+      <Modal key={isNewField || editingField?.name} isOpen={open} toggle={() => onClose(null)} size="lg" backdrop="static">
         <ModalHeader toggle={() => onClose(null)}>{!isNewField ? 'Modifier le champ' : 'Créer un nouveau champ'}</ModalHeader>
         <ModalBody>
           <Formik key={open} initialValues={editingField || newField()} onSubmit={onSaveField}>

@@ -152,7 +152,7 @@ const ImportData = () => {
         style={{ display: 'none' }}
         onChange={onParseData}
       />
-      <Modal isOpen={showImportSummary} toggle={() => setShowImpotSummary(false)} size="lg">
+      <Modal isOpen={showImportSummary} toggle={() => setShowImpotSummary(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setShowImpotSummary(false)}>Résumé</ModalHeader>
         <ModalBody>
           <ul style={{ overflow: 'auto', maxHeight: '62vh' }}>
