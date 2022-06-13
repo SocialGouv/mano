@@ -66,6 +66,9 @@ const ButtonRemoveAdd = styled.button`
   cursor: pointer;
   color: ${theme.main};
   border-radius: 20%;
+  flex-shrink: 0;
+  margin-top: auto;
+  margin-bottom: auto;
   &:hover {
     background: ${theme.main};
     color: ${theme.white};
