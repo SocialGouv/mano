@@ -1,3 +1,10 @@
+## [1.116.7](https://github.com/SocialGouv/mano/compare/v1.116.6...v1.116.7) (2022-06-13)
+
+
+### Bug Fixes
+
+* **dashboard:** prevent outside click of modal ([#739](https://github.com/SocialGouv/mano/issues/739)) ([d86b162](https://github.com/SocialGouv/mano/commit/d86b162309d2123232462f345d82c340a2750c13))
+
 ## [1.116.6](https://github.com/SocialGouv/mano/compare/v1.116.5...v1.116.6) (2022-06-13)
 
 
