@@ -32,8 +32,8 @@ const getSettingTitle = (tabId) => {
   if (tabId === 'encryption') return 'Chiffrement';
   if (tabId === 'reception') return 'Accueil';
   if (tabId === 'persons') return 'Personnes';
-  if (tabId === 'consultations') return 'Consultations';
-  if (tabId === 'medicalFile') return 'Dossier Médical';
+  if (tabId === 'consultations') return 'Consultations 🧑‍⚕️ ';
+  if (tabId === 'medicalFile') return 'Dossier Médical 🧑‍⚕️';
   if (tabId === 'actions') return 'Actions';
   if (tabId === 'territories') return 'Territoires';
   if (tabId === 'export') return 'Export';
@@ -75,10 +75,10 @@ const View = () => {
             Personnes suivies
           </DrawerButton>
           <DrawerButton className={tab === 'medicalFile' ? 'active' : ''} onClick={() => setTab('medicalFile')}>
-            Dossier Médical
+            Dossier Médical 🧑‍⚕️
           </DrawerButton>
           <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
-            Consultations
+            Consultations 🧑‍⚕️
           </DrawerButton>
 
           <DrawerButton className={tab === 'actions' ? 'active' : ''} onClick={() => setTab('actions')}>
@@ -120,7 +120,7 @@ const View = () => {
                   case 'infos':
                     return (
                       <>
-                        <SubTitle>Infos</SubTitle>
+                        <SubTitle>Informations générales</SubTitle>
                         <Row>
                           <Col md={6}>
                             <FormGroup>
@@ -151,13 +151,15 @@ const View = () => {
                   case 'medicalFile':
                     return (
                       <>
+                        <SubTitle>Dossier Médical</SubTitle>
                         {organisation.encryptionEnabled ? (
                           <>
-                            <SubTitle>Réglage des champs personnalisés du Dossier Médical de personnes suivies</SubTitle>
                             <p>
-                              Disponible pour les professionnels de santé seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
+                              Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
                             </p>
+                            <hr />
                             <Row>
+                              <Label>Champs personnalisés</Label>
                               <TableCustomFields
                                 customFields="customFieldsMedicalFile"
                                 key="customFieldsMedicalFile"
@@ -170,7 +172,6 @@ const View = () => {
                           </>
                         ) : (
                           <>
-                            <SubTitle>Réglage des champs personnalisés du dossier médical</SubTitle>
                             <Row>
                               <Col md={10}>
                                 <p>
@@ -189,7 +190,7 @@ const View = () => {
                   case 'actions':
                     return (
                       <>
-                        <SubTitle>Réglage des Actions</SubTitle>
+                        <SubTitle>Actions</SubTitle>
                         <Row>
                           <Col md={12}>
                             <FormGroup>
@@ -280,7 +281,7 @@ const View = () => {
                   case 'reception':
                     return (
                       <>
-                        <SubTitle>Réglage de l'Accueil de jour</SubTitle>
+                        <SubTitle>Accueil de jour</SubTitle>
                         <Row>
                           <Col md={12}>
                             <FormGroup>
@@ -406,10 +407,11 @@ const View = () => {
                   case 'territories':
                     return (
                       <>
+                        <SubTitle>Territoires</SubTitle>
                         {organisation.encryptionEnabled ? (
                           <>
-                            <SubTitle>Réglage des champs personnalisés des territoires</SubTitle>
                             <Row>
+                              <Label>Champs personnalisés</Label>
                               <TableCustomFields
                                 customFields="customFieldsObs"
                                 key="customFieldsObs"
@@ -422,7 +424,6 @@ const View = () => {
                           </>
                         ) : (
                           <>
-                            <SubTitle>Réglage des champs personnalisés</SubTitle>
                             <Row>
                               <Col md={10}>
                                 <p>
@@ -441,10 +442,11 @@ const View = () => {
                   case 'persons':
                     return (
                       <>
+                        <SubTitle>Personnes suivies</SubTitle>
                         {organisation.encryptionEnabled ? (
                           <>
-                            <SubTitle>Réglage des champs personnalisés des personnes suivies (informations sociales)</SubTitle>
                             <Row>
+                              <Label>Champs personnalisés - informations sociales</Label>
                               <TableCustomFields
                                 customFields="customFieldsPersonsSocial"
                                 key="customFieldsPersonsSocial"
@@ -454,8 +456,8 @@ const View = () => {
                                 })()}
                               />
                             </Row>
-                            <SubTitle>Réglage des champs personnalisés des personnes suivies (informations médicales)</SubTitle>
                             <Row>
+                              <Label>Champs personnalisés - informations médicales</Label>
                               <TableCustomFields
                                 customFields="customFieldsPersonsMedical"
                                 key="customFieldsPersonsMedical"
@@ -468,7 +470,6 @@ const View = () => {
                           </>
                         ) : (
                           <>
-                            <SubTitle>Réglage des champs personnalisés des personnes</SubTitle>
                             <Row>
                               <Col md={10}>
                                 <p>
@@ -573,8 +574,11 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   return (
     <>
       <SubTitle>Consultations</SubTitle>
-      <p>Les consultations sont visible dans le dossier médical pour les utilisateurs de type « professionnel de santé »</p>
+      <p>
+        Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
+      </p>
       <hr />
+
       <SubTitleLevel2>Configuration du type de consultation</SubTitleLevel2>
 
       <FormGroup>
