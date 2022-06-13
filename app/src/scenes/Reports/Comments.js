@@ -25,7 +25,7 @@ const Comments = ({ navigation, route }) => {
   const onPseudoPress = useCallback(
     (person) => {
       Sentry.setContext('person', { _id: person._id });
-      navigation.navigate('Persons', { screen: 'Person', params: { ...person, fromRoute: 'Comments' } });
+      navigation.navigate('Person', { ...person, fromRoute: 'Comments' });
     },
     [navigation]
   );
@@ -33,12 +33,9 @@ const Comments = ({ navigation, route }) => {
   const onActionPress = useCallback(
     (action) => {
       Sentry.setContext('action', { _id: action._id });
-      navigation.navigate('Agenda', {
-        screen: 'Action',
-        params: {
-          ...action,
-          fromRoute: 'Comments',
-        },
+      navigation.navigate('Action', {
+        ...action,
+        fromRoute: 'Comments',
       });
     },
     [navigation]
