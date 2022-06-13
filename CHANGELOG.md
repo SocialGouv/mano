@@ -1,3 +1,10 @@
+## [1.116.4](https://github.com/SocialGouv/mano/compare/v1.116.3...v1.116.4) (2022-06-13)
+
+
+### Bug Fixes
+
+* **dashboard:** incrementor flex ([c07f4fc](https://github.com/SocialGouv/mano/commit/c07f4fcc4263ef92a6413bb0f4e7edfb59a8c9fa))
+
 ## [1.116.3](https://github.com/SocialGouv/mano/compare/v1.116.2...v1.116.3) (2022-06-10)
 
 
