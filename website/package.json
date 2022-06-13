@@ -1,7 +1,7 @@
 {
   "name": "boilerplate",
   "version": "1.116.8",
-  "mobileAppVersion": "2.20.1",
+  "mobileAppVersion": "2.20.2",
   "private": true,
   "engines": {
     "npm": "please-use-yarn",
