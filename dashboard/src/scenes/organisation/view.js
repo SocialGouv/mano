@@ -11,7 +11,11 @@ import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { defaultMedicalCustomFields, personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  personFieldsIncludingCustomFieldsSelector,
+} from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState } from '../../recoil/auth';
@@ -25,7 +29,6 @@ import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { refreshTriggerState } from '../../components/Loader';
 import useTitle from '../../services/useTitle';
 import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
-import { defaultMedicalFileCustomFields } from '../../recoil/medicalFiles';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -47,6 +50,8 @@ const View = () => {
   const reports = useRecoilValue(reportsState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
@@ -55,6 +60,8 @@ const View = () => {
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });
   }, [tab]);
+
+  console.log(personFieldsIncludingCustomFields);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', margin: '0 -4rem -3rem', height: 'calc(100% + 3rem)' }}>
@@ -163,10 +170,7 @@ const View = () => {
                               <TableCustomFields
                                 customFields="customFieldsMedicalFile"
                                 key="customFieldsMedicalFile"
-                                data={(() => {
-                                  if (Array.isArray(organisation.customFieldsMedicalFile)) return organisation.customFieldsMedicalFile;
-                                  return defaultMedicalFileCustomFields;
-                                })()}
+                                data={customFieldsPersonsMedical}
                               />
                             </Row>
                           </>
@@ -450,10 +454,7 @@ const View = () => {
                               <TableCustomFields
                                 customFields="customFieldsPersonsSocial"
                                 key="customFieldsPersonsSocial"
-                                data={(() => {
-                                  if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
-                                  return [];
-                                })()}
+                                data={customFieldsPersonsSocial}
                               />
                             </Row>
                             <Row>
@@ -461,10 +462,7 @@ const View = () => {
                               <TableCustomFields
                                 customFields="customFieldsPersonsMedical"
                                 key="customFieldsPersonsMedical"
-                                data={(() => {
-                                  if (Array.isArray(organisation.customFieldsPersonsMedical)) return organisation.customFieldsPersonsMedical;
-                                  return defaultMedicalCustomFields;
-                                })()}
+                                data={customFieldsPersonsMedical}
                               />
                             </Row>
                           </>

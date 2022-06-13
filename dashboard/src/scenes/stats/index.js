@@ -350,7 +350,8 @@ const Stats = () => {
             field="outOfActiveListReason"
             data={getPieData(
               persons.filter((p) => !!p.outOfActiveList),
-              'outOfActiveListReason'
+              'outOfActiveListReason',
+              { options: customFieldsPersonsSocial.find((f) => f.name === 'outOfActiveListReason').options }
             )}
           />
           {

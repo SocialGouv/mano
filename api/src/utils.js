@@ -40,6 +40,7 @@ const customFieldSchema = z
     type: z.string().min(1),
     label: z.optional(z.string().min(1)),
     enabled: z.optional(z.boolean()),
+    deletable: z.optional(z.boolean()),
     required: z.optional(z.boolean()),
     showInStats: z.optional(z.boolean()),
     onlyHealthcareProfessional: z.optional(z.boolean()),

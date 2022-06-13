@@ -167,7 +167,10 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
             title: '',
             dataKey: 'name',
             small: true,
-            render: (f) => <ButtonCustom title="Supprimer" loading={isSubmitting} onClick={() => onDelete(f)} width={75} color="danger" />,
+            render: (f) =>
+              f.deletable === false ? null : (
+                <ButtonCustom title="Supprimer" loading={isSubmitting} onClick={() => onDelete(f)} width={75} color="danger" />
+              ),
           },
           // Remove null fields
         ].filter((e) => e)}

@@ -1,5 +1,5 @@
+import { setCacheItem } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
-import { storage } from '../services/dataManagement';
 import { capture } from '../services/sentry';
 import { organisationState } from './auth';
 
@@ -26,9 +26,126 @@ export const customFieldsPersonsMedicalSelector = selector({
 export const customFieldsPersonsSocialSelector = selector({
   key: 'customFieldsPersonsSocialSelector',
   get: ({ get }) => {
+    const outOfActiveListCustomReasons = {
+      name: 'outOfActiveListReason',
+      type: 'enum',
+      label: 'Motif de sortie de file active',
+      options: outOfActiveListReasonOptions,
+      showInStats: true,
+      enabled: true,
+      deletable: false,
+    };
+
     const organisation = get(organisationState);
-    if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
-    return [];
+    if (Array.isArray(organisation.customFieldsPersonsSocial)) {
+      if (!organisation.customFieldsPersonsSocial.find((field) => field.name === 'outOfActiveListReason')) {
+        return [outOfActiveListCustomReasons, ...organisation.customFieldsPersonsSocial];
+      }
+      return organisation.customFieldsPersonsSocial;
+    }
+    return [outOfActiveListCustomReasons];
+  },
+});
+
+export const defaultMedicalCustomFields = [
+  {
+    name: 'consumptions',
+    label: 'Consommations',
+    type: 'multi-choice',
+    options: [
+      'Alcool',
+      'Amphétamine/MDMA/Ecstasy',
+      'Benzodiazépines',
+      'Buprénorphine/Subutex',
+      'Cocaïne',
+      'Crack',
+      'Cannabis',
+      'Héroïne',
+      'Lyrica',
+      'Méthadone',
+      'Moscantin/Skénan',
+      'Tabac',
+      'Tramadol',
+    ],
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'vulnerabilities',
+    label: 'Vulnérabilités',
+    type: 'multi-choice',
+    options: ['Pathologie chronique', 'Psychologique', 'Injecteur', 'Handicap'],
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'caseHistoryTypes',
+    label: "Catégorie d'antécédents",
+    type: 'multi-choice',
+    options: [
+      'Psychiatrie',
+      'Neurologie',
+      'Dermatologie',
+      'Pulmonaire',
+      'Gastro-enterologie',
+      'Rhumatologie',
+      'Cardio-vasculaire',
+      'Ophtalmologie',
+      'ORL',
+      'Dentaire',
+      'Traumatologie',
+      'Endocrinologie',
+      'Uro-gynéco',
+      'Cancer',
+      'Addiction alcool',
+      'Addiction autres',
+      'Hospitalisation',
+    ],
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'caseHistoryDescription',
+    label: 'Informations complémentaires (antécédents)',
+    type: 'textarea',
+    options: null,
+    enabled: true,
+    required: false,
+    showInStats: true,
+  },
+  {
+    name: 'numeroSecuriteSociale',
+    label: 'Numéro de sécurité sociale',
+    type: 'text',
+    options: null,
+    enabled: true,
+    required: false,
+    showInStats: false,
+  },
+];
+
+export const personFieldsIncludingCustomFieldsSelector = selector({
+  key: 'personFieldsIncludingCustomFieldsSelector',
+  get: ({ get }) => {
+    const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
+    const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
+    return [
+      ...personFields,
+      ...[...customFieldsPersonsMedical, ...customFieldsPersonsSocial].map((f) => {
+        return {
+          name: f.name,
+          type: f.type,
+          label: f.label,
+          encrypted: true,
+          importable: true,
+          options: f.options || null,
+          deletable: f.deletable || true,
+        };
+      }),
+    ];
   },
 });
 
@@ -51,8 +168,6 @@ export const reasonsOptions = [
   'Autre',
 ];
 
-export const vulnerabilitiesOptions = ['Pathologie chronique', 'Psychologique', 'Injecteur', 'Handicap'];
-
 export const ressourcesOptions = [
   'SANS',
   'ARE',
@@ -66,22 +181,6 @@ export const ressourcesOptions = [
   'Mendicité',
   'Autre',
 ];
-
-export const consumptionsOptions = [
-  'Héroïne',
-  'Buprénorphine/Subutex',
-  'Méthadone',
-  'Moscantin/Skénan',
-  'Cocaïne',
-  'Crack',
-  'Amphétamine/MDMA/Ecstasy',
-  'Benzodiazépines',
-  'Cannabis',
-  'Alcool',
-  'Tabac',
-  'Tramadol',
-  'Lyrica',
-].sort((c1, c2) => c1.localeCompare(c2));
 
 export const addressDetailsFixedFields = [
   'Logement',
@@ -108,26 +207,6 @@ export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française'];
 
 export const yesNoOptions = ['Oui', 'Non'];
 
-export const caseHistoryTypesOptions = [
-  'Psychiatrie',
-  'Neurologie',
-  'Dermatologie',
-  'Pulmonaire',
-  'Gastro-enterologie',
-  'Rhumatologie',
-  'Cardio-vasculaire',
-  'Ophtalmologie',
-  'ORL',
-  'Dentaire',
-  'Traumatologie',
-  'Endocrinologie',
-  'Uro-gynéco',
-  'Cancer',
-  'Addiction alcool',
-  'Addiction autres',
-  'Hospitalisation',
-];
-
 export const outOfActiveListReasonOptions = [
   'Relai vers autre structure',
   'Hébergée',
@@ -138,59 +217,6 @@ export const outOfActiveListReasonOptions = [
   'Hospitalisation',
   'Reconduite à la frontière',
   'Autre',
-];
-
-export const defaultMedicalCustomFields = [
-  {
-    name: 'consumptions',
-    label: 'Consommations',
-    type: 'multi-choice',
-    options: consumptionsOptions,
-    enabled: true,
-    required: false,
-    showInStats: true,
-    onlyHealthcareProfessional: false,
-  },
-  {
-    name: 'vulnerabilities',
-    label: 'Vulnérabilités',
-    type: 'multi-choice',
-    options: vulnerabilitiesOptions,
-    enabled: true,
-    required: false,
-    showInStats: true,
-    onlyHealthcareProfessional: false,
-  },
-  {
-    name: 'caseHistoryTypes',
-    label: "Catégorie d'antécédents",
-    type: 'multi-choice',
-    options: caseHistoryTypesOptions,
-    enabled: true,
-    required: false,
-    showInStats: true,
-    onlyHealthcareProfessional: false,
-  },
-  {
-    name: 'caseHistoryDescription',
-    label: 'Informations complémentaires (antécédents)',
-    type: 'textarea',
-    options: null,
-    enabled: true,
-    required: false,
-    showInStats: true,
-    onlyHealthcareProfessional: false,
-  },
-  {
-    name: 'numeroSecuriteSociale',
-    label: 'Numéro de sécurité sociale',
-    type: 'text',
-    options: null,
-    enabled: true,
-    required: false,
-    showInStats: false,
-    onlyHealthcareProfessional: true,
-  },
 ];
 
 /*
@@ -259,29 +285,12 @@ export const personFields = [
     options: healthInsuranceOptions,
     filterable: true,
   },
-  {
-    name: 'vulnerabilities',
-    type: 'multi-choice',
-    label: 'Vulnérabilités',
-    encrypted: true,
-    importable: true,
-    options: vulnerabilitiesOptions,
-    filterable: true,
-  },
-  {
-    name: 'consumptions',
-    type: 'multi-choice',
-    label: 'Consommations',
-    encrypted: true,
-    importable: true,
-    options: consumptionsOptions,
-    filterable: true,
-  },
+
   { name: 'phone', type: 'text', label: 'Téléphone', encrypted: true, importable: true, filterable: true },
-  { name: 'assignedTeams', label: '', encrypted: true, importable: false, filterable: false },
+  { name: 'assignedTeams', type: 'multi-choice', label: 'Équipes en charge', encrypted: true, importable: true, filterable: false },
   { name: '_id', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'organisation', label: '', encrypted: false, importable: false, filterable: false },
-  { name: 'followedSince', type: 'date', label: 'Suivi(e) depuis le / Créé le', encrypted: true, importable: true, filterable: true },
+  { name: 'followedSince', type: 'date', label: 'Suivi(e) depuis le / Créé(e) le', encrypted: true, importable: true, filterable: true },
   { name: 'createdAt', type: 'date', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'updatedAt', type: 'date', label: '', encrypted: false, importable: false, filterable: false },
   {
@@ -389,5 +398,4 @@ export const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
   }
   return null;
 };
-
-export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ label, name, options }) => ({ label, field: name, options }));
+export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ name, ...rest }) => ({ field: name, ...rest }));

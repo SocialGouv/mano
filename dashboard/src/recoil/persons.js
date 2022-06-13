@@ -22,9 +22,24 @@ export const customFieldsPersonsMedicalSelector = selector({
 export const customFieldsPersonsSocialSelector = selector({
   key: 'customFieldsPersonsSocialSelector',
   get: ({ get }) => {
+    const outOfActiveListCustomReasons = {
+      name: 'outOfActiveListReason',
+      type: 'enum',
+      label: 'Motif de sortie de file active',
+      options: outOfActiveListReasonOptions,
+      showInStats: true,
+      enabled: true,
+      deletable: false,
+    };
+
     const organisation = get(organisationState);
-    if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
-    return [];
+    if (Array.isArray(organisation.customFieldsPersonsSocial)) {
+      if (!organisation.customFieldsPersonsSocial.find((field) => field.name === 'outOfActiveListReason')) {
+        return [outOfActiveListCustomReasons, ...organisation.customFieldsPersonsSocial];
+      }
+      return organisation.customFieldsPersonsSocial;
+    }
+    return [outOfActiveListCustomReasons];
   },
 });
 
@@ -123,6 +138,7 @@ export const personFieldsIncludingCustomFieldsSelector = selector({
           encrypted: true,
           importable: true,
           options: f.options || null,
+          deletable: f.deletable || true,
         };
       }),
     ];

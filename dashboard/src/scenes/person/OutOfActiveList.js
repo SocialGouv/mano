@@ -8,7 +8,6 @@ import ButtonCustom from '../../components/ButtonCustom';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
-  outOfActiveListReasonOptions,
   personsState,
   preparePersonForEncryption,
 } from '../../recoil/persons';
@@ -74,7 +73,7 @@ const OutOfActiveList = ({ person }) => {
                         <SelectAsInput
                           styles={{ width: '800px' }}
                           style={{ width: '800px' }}
-                          options={outOfActiveListReasonOptions}
+                          options={customFieldsPersonsSocial.find((f) => f.name === 'outOfActiveListReason').options}
                           name="outOfActiveListReason"
                           value={values.outOfActiveListReason || ''}
                           onChange={handleChange}
