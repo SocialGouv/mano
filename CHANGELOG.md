@@ -1,3 +1,10 @@
+## [1.116.5](https://github.com/SocialGouv/mano/compare/v1.116.4...v1.116.5) (2022-06-13)
+
+
+### Bug Fixes
+
+* **app,dashboard:** colors for accessibility ([#733](https://github.com/SocialGouv/mano/issues/733)) ([8813800](https://github.com/SocialGouv/mano/commit/8813800494b03bd4834b2ada311a411bc118d53a))
+
 ## [1.116.4](https://github.com/SocialGouv/mano/compare/v1.116.3...v1.116.4) (2022-06-13)
 
 
