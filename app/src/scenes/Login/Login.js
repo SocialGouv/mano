@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Alert, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import AsyncStorage from '@react-native-community/async-storage';
-import { version } from '../../../package.json';
 import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -15,7 +14,7 @@ import { MyText } from '../../components/MyText';
 import InputLabelled from '../../components/InputLabelled';
 import EyeIcon from '../../icons/EyeIcon';
 import Title, { SubTitle } from '../../components/Title';
-import { MANO_DOWNLOAD_URL } from '../../config';
+import { MANO_DOWNLOAD_URL, VERSION } from '../../config';
 import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import { clearCache } from '../../services/dataManagement';
@@ -47,11 +46,11 @@ const Login = ({ navigation }) => {
     setTimeout(async () => {
       // check version
       const response = await API.get({ path: '/version' });
-      if (response.ok && version !== response.data) {
+      if (response.ok && VERSION !== response.data) {
         RNBootSplash.hide({ fade: true });
         Alert.alert(
           `La nouvelle version ${response.data} de Mano est disponible !`,
-          `Vous avez la version ${version} actuellement sur votre téléphone`,
+          `Vous avez la version ${VERSION} actuellement sur votre téléphone`,
           [
             { text: 'Télécharger', onPress: () => Linking.openURL(MANO_DOWNLOAD_URL) },
             { text: 'Plus tard', style: 'cancel' },
@@ -289,7 +288,7 @@ const Login = ({ navigation }) => {
             <ButtonsContainer>
               <Button caption="Connecter" onPress={onConnect} loading={loading} disabled={loading} testID="button-connect" />
             </ButtonsContainer>
-            <Version>Mano v{version}</Version>
+            <Version>Mano v{VERSION}</Version>
           </View>
         </ScrollContainer>
       </SceneContainer>
