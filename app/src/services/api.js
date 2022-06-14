@@ -1,6 +1,5 @@
 import URI from 'urijs';
-import { version } from '../../package.json';
-import { HOST, SCHEME } from '../config';
+import { HOST, SCHEME, VERSION } from '../config';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
 import { capture } from './sentry';
 import ReactNativeBlobUtil from 'react-native-blob-util';
@@ -58,7 +57,7 @@ class ApiService {
       if (this.token) headers.Authorization = `JWT ${this.token}`;
       const options = {
         method,
-        headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: this.platform, version },
+        headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: this.platform, version: VERSION },
       };
       if (body) {
         if (!skipEncryption) {
@@ -98,7 +97,10 @@ class ApiService {
         const res = await response.json();
         if (!response.ok && this.handleApiError) this.handleApiError(res);
         if (res?.message && res.message === 'Veuillez mettre à jour votre application!') {
-          if (this.handleNewVersion) return this.handleNewVersion(res.message);
+          if (this.handleNewVersion) {
+            this.handleNewVersion(res.message);
+            return res;
+          }
         }
         if (!!res.data && Array.isArray(res.data)) {
           const decryptedData = [];
