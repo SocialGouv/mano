@@ -1,3 +1,10 @@
+## [1.117.1](https://github.com/SocialGouv/mano/compare/v1.117.0...v1.117.1) (2022-06-14)
+
+
+### Bug Fixes
+
+* **app:** handle properly the force update ([#746](https://github.com/SocialGouv/mano/issues/746)) ([97fdcd8](https://github.com/SocialGouv/mano/commit/97fdcd8f5cbc1418e6f5b17454eddd67d41dd6e9))
+
 # [1.117.0](https://github.com/SocialGouv/mano/compare/v1.116.8...v1.117.0) (2022-06-13)
 
 
