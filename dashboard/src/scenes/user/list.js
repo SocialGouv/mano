@@ -11,7 +11,6 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import Table from '../../components/table';
 import CreateWrapper from '../../components/createWrapper';
-import SelectCustom from '../../components/SelectCustom';
 import TagTeam from '../../components/TagTeam';
 import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
