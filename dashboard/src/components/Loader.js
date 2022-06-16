@@ -132,6 +132,26 @@ const Loader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastRefreshReady]);
 
+  const migrationIsDone = (updatedOrganisation) => {
+    setOrganisation(updatedOrganisation);
+    /* FIXME ?:
+    the `setOrganisation(response.organisation)` doesn't provide an updated version of `organisation`
+     for the rest of this `refresh` function
+     neither for the `useApi` hook
+     therefore, a new organisation with no `migrationLastUpdateAt` won't be able to do the multiple migrations
+     because server side, `!!organisation.migrationLastUpdateAt === true` but `req.query.migrationLastUpdateAt === null`
+     so we need to end the refresh after each migration, and restart it with the fresh organisation
+    */
+    setRefreshTrigger((oldRefreshState) => ({
+      ...oldRefreshState,
+      status: false,
+    }));
+    setRefreshTrigger((oldRefreshState) => ({
+      ...oldRefreshState,
+      status: true,
+    }));
+  };
+
   const refresh = async () => {
     clearInterval(autoRefreshInterval.current);
     autoRefreshInterval.current = null;
@@ -208,7 +228,7 @@ const Loader = () => {
         }
         return;
       }
-      setOrganisation(response.organisation);
+      return migrationIsDone(response.organisation);
     }
 
     if (!organisation.migrations?.includes('reports-from-real-date-to-date-id')) {
@@ -246,7 +266,7 @@ const Loader = () => {
         }
         return;
       }
-      setOrganisation(response.organisation);
+      return migrationIsDone(response.organisation);
     }
 
     /*
