@@ -244,7 +244,7 @@ const List = () => {
   );
 };
 
-const Teams = ({ person: { _id, assignedTeams }, teams }) => (
+const Teams = ({ person: { _id, assignedTeams } }) => (
   <React.Fragment key={_id}>
     {assignedTeams?.map((teamId) => (
       <TagTeam key={teamId} teamId={teamId} />
