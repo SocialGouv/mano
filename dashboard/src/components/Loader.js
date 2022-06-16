@@ -275,7 +275,7 @@ const Loader = () => {
       response.data.reports +
       response.data.relsPersonPlace;
 
-    if (lastRefresh > 0 && user.healthcareProfessional) {
+    if (lastRefresh > 0 && ['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
       // medical data is never saved in cache
       // so we always have to download all at every page reload
       const medicalDataResponse = await API.get({
@@ -325,66 +325,68 @@ const Loader = () => {
     /*
     Get consultations
     */
-    if (response.data.consultations || initialLoad) {
-      setLoading('Chargement des consultations');
-      const refreshedConsultations = await getData({
-        collectionName: 'consultation',
-        data: consultations,
-        isInitialization: initialLoad,
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newConsultations) =>
-          setConsultations((oldConsultations) =>
-            initialLoad
-              ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
-              : mergeItems(
+    if (['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
+      if (response.data.consultations || initialLoad) {
+        setLoading('Chargement des consultations');
+        const refreshedConsultations = await getData({
+          collectionName: 'consultation',
+          data: consultations,
+          isInitialization: initialLoad,
+          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+          setBatchData: (newConsultations) =>
+            setConsultations((oldConsultations) =>
+              initialLoad
+                ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
+                : mergeItems(
                   oldConsultations,
                   newConsultations.map((c) => whitelistAllowedData(c, user))
                 )
-          ),
-        API,
-      });
-      if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
-    /*
+            ),
+          API,
+        });
+        if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
+      }
+      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
+      /*
     Get treatments
     */
-    if (user.healthcareProfessional && (response.data.treatments || initialLoad)) {
-      setLoading('Chargement des traitements');
-      const refreshedTreatments = await getData({
-        collectionName: 'treatment',
-        data: treatments,
-        isInitialization: initialLoad,
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newTreatments) =>
-          setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
-        API,
-      });
-      if (refreshedTreatments) setTreatments(refreshedTreatments);
+      if (response.data.treatments || initialLoad) {
+        setLoading('Chargement des traitements');
+        const refreshedTreatments = await getData({
+          collectionName: 'treatment',
+          data: treatments,
+          isInitialization: initialLoad,
+          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+          setBatchData: (newTreatments) =>
+            setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
+          API,
+        });
+        if (refreshedTreatments) setTreatments(refreshedTreatments);
+      }
+      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'treatment'));
+      /*
+      Get medicalFiles
+      */
+      if (response.data.medicalFiles || initialLoad) {
+        setLoading('Chargement des informations médicales');
+        const refreshedMedicalFiles = await getData({
+          collectionName: 'medical-file',
+          data: medicalFiles,
+          isInitialization: initialLoad,
+          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+          setBatchData: (newMedicalFiles) =>
+            setMedicalFiles((oldMedicalFiles) =>
+              initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
+            ),
+          API,
+        });
+        if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
+      }
+      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'medical-file'));
     }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'treatment'));
-    /*
-    Get medicalFiles
-    */
-    if (user.healthcareProfessional && (response.data.medicalFiles || initialLoad)) {
-      setLoading('Chargement des informations médicales');
-      const refreshedMedicalFiles = await getData({
-        collectionName: 'medical-file',
-        data: medicalFiles,
-        isInitialization: initialLoad,
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newMedicalFiles) =>
-          setMedicalFiles((oldMedicalFiles) =>
-            initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
-          ),
-        API,
-      });
-      if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'medical-file'));
     /*
     Get reports
     */

@@ -55,6 +55,7 @@ import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
+const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages'];
 
 const View = () => {
   const { id } = useParams();
@@ -121,6 +122,13 @@ const View = () => {
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
           if (!user.healthcareProfessional && tabCaption.includes('Dossier Médical')) return null;
+          if (['restricted-access'].includes(user.role)) {
+            let showTab = false;
+            for (const authorizedTab of tabsForRestrictedRole) {
+              if (tabCaption.includes(authorizedTab)) showTab = true;
+            }
+            if (!showTab) return null;
+          }
           return (
             <NavItem key={index} style={{ cursor: 'pointer' }}>
               <NavLink
@@ -142,7 +150,7 @@ const View = () => {
         <TabPane tabId={0}>
           <Summary person={person} />
         </TabPane>
-        {!!user.healthcareProfessional && (
+        {!['restricted-access'].includes(user.role) && !!user.healthcareProfessional && (
           <TabPane tabId={1}>
             <MedicalFile person={person} />
           </TabPane>
@@ -150,32 +158,38 @@ const View = () => {
         <TabPane tabId={2}>
           <Actions person={person} onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
         </TabPane>
-        <TabPane tabId={3}>
-          <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Commentaires (${total})`)} />
-        </TabPane>
+        {!['restricted-access'].includes(user.role) && (
+          <TabPane tabId={3}>
+            <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Commentaires (${total})`)} />
+          </TabPane>
+        )}
         <TabPane tabId={4}>
           <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
-        <TabPane tabId={5}>
-          <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
-        </TabPane>
-        <TabPane tabId={6}>
-          {
-            <PersonDocuments
-              person={person}
-              onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)}
-              onGoToMedicalFiles={async () => {
-                const searchParams = new URLSearchParams(location.search);
-                searchParams.set('tab', 'dossier médical');
-                history.replace({ pathname: location.pathname, search: searchParams.toString() });
-                setActiveTab(1);
-                await new Promise((res) => setTimeout(res, 250));
-                const element = document.getElementById('all-medical-documents');
-                element.scrollIntoView({ behavior: 'smooth' });
-              }}
-            />
-          }
-        </TabPane>
+        {!['restricted-access'].includes(user.role) && (
+          <>
+            <TabPane tabId={5}>
+              <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
+            </TabPane>
+            <TabPane tabId={6}>
+              {
+                <PersonDocuments
+                  person={person}
+                  onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)}
+                  onGoToMedicalFiles={async () => {
+                    const searchParams = new URLSearchParams(location.search);
+                    searchParams.set('tab', 'dossier médical');
+                    history.replace({ pathname: location.pathname, search: searchParams.toString() });
+                    setActiveTab(1);
+                    await new Promise((res) => setTimeout(res, 250));
+                    const element = document.getElementById('all-medical-documents');
+                    element.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                />
+              }
+            </TabPane>
+          </>
+        )}
       </TabContent>
     </StyledContainer>
   );
@@ -302,7 +316,7 @@ const Summary = ({ person }) => {
                     </div>
                   </FormGroup>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <FormGroup>
                     <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
                     <div>
@@ -316,7 +330,7 @@ const Summary = ({ person }) => {
                     </div>
                   </FormGroup>
                 </Col>
-                <Col md={6}>
+                <Col md={4}>
                   <FormGroup>
                     <Label />
                     <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
@@ -331,141 +345,150 @@ const Summary = ({ person }) => {
                     </div>
                   </FormGroup>
                 </Col>
-                <Col md={12}>
+                <Col md={4}>
                   <FormGroup>
                     <Label htmlFor="phone">Téléphone</Label>
                     <Input name="phone" id="phone" value={values.phone || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
-                <Col md={12}>
-                  <FormGroup>
-                    <Label htmlFor="description">Description</Label>
-                    <Input type="textarea" rows={5} name="description" id="description" value={values.description || ''} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
+                {!['restricted-access'].includes(user.role) && (
+                  <Col md={12}>
+                    <FormGroup>
+                      <Label htmlFor="description">Description</Label>
+                      <Input type="textarea" rows={5} name="description" id="description" value={values.description || ''} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+                )}
               </Row>
-              <hr />
-              <Title>Informations sociales</Title>
-              <Row>
-                <Col md={4}>
-                  <Label htmlFor="person-select-personalSituation">Situation personnelle</Label>
-                  <SelectAsInput
-                    options={personalSituationOptions}
-                    name="personalSituation"
-                    value={values.personalSituation || ''}
-                    onChange={handleChange}
-                    inputId="person-select-personalSituation"
-                    classNamePrefix="person-select-personalSituation"
-                  />
-                </Col>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="structureSocial">Structure de suivi social</Label>
-                    <Input name="structureSocial" id="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="person-select-animals">Avec animaux</Label>
-                    <SelectAsInput
-                      options={yesNoOptions}
-                      name="hasAnimal"
-                      value={values.hasAnimal || ''}
-                      onChange={handleChange}
-                      inputId="person-select-animals"
-                      classNamePrefix="person-select-animals"
-                    />
-                  </FormGroup>
-                </Col>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="person-select-address">Hébergement</Label>
-                    <SelectAsInput
-                      options={yesNoOptions}
-                      name="address"
-                      value={values.address || ''}
-                      onChange={handleChange}
-                      inputId="person-select-address"
-                      classNamePrefix="person-select-address"
-                    />
-                  </FormGroup>
-                </Col>
+              {!['restricted-access'].includes(user.role) && (
+                <>
+                  <hr />
+                  <Title>Informations sociales</Title>
+                  <Row>
+                    <Col md={4}>
+                      <Label htmlFor="person-select-personalSituation">Situation personnelle</Label>
+                      <SelectAsInput
+                        options={personalSituationOptions}
+                        name="personalSituation"
+                        value={values.personalSituation || ''}
+                        onChange={handleChange}
+                        inputId="person-select-personalSituation"
+                        classNamePrefix="person-select-personalSituation"
+                      />
+                    </Col>
+                    <Col md={4}>
+                      <FormGroup>
+                        <Label htmlFor="structureSocial">Structure de suivi social</Label>
+                        <Input name="structureSocial" id="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />
+                      </FormGroup>
+                    </Col>
+                    <Col md={4}>
+                      <FormGroup>
+                        <Label htmlFor="person-select-animals">Avec animaux</Label>
+                        <SelectAsInput
+                          options={yesNoOptions}
+                          name="hasAnimal"
+                          value={values.hasAnimal || ''}
+                          onChange={handleChange}
+                          inputId="person-select-animals"
+                          classNamePrefix="person-select-animals"
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col md={4}>
+                      <FormGroup>
+                        <Label htmlFor="person-select-address">Hébergement</Label>
+                        <SelectAsInput
+                          options={yesNoOptions}
+                          name="address"
+                          value={values.address || ''}
+                          onChange={handleChange}
+                          inputId="person-select-address"
+                          classNamePrefix="person-select-address"
+                        />
+                      </FormGroup>
+                    </Col>
 
-                <AddressDetails values={values} onChange={handleChange} />
+                    <AddressDetails values={values} onChange={handleChange} />
 
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="person-select-nationalitySituation">Nationalité</Label>
-                    <SelectAsInput
-                      options={nationalitySituationOptions}
-                      name="nationalitySituation"
-                      value={values.nationalitySituation || ''}
-                      onChange={handleChange}
-                      inputId="person-select-nationalitySituation"
-                      classNamePrefix="person-select-nationalitySituation"
-                    />
-                  </FormGroup>
-                </Col>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="person-select-employment">Emploi</Label>
-                    <SelectAsInput
-                      options={employmentOptions}
-                      name="employment"
-                      value={values.employment || ''}
-                      onChange={handleChange}
-                      inputId="person-select-employment"
-                      classNamePrefix="person-select-employment"
-                    />
-                  </FormGroup>
-                </Col>
+                    <Col md={4}>
+                      <FormGroup>
+                        <Label htmlFor="person-select-nationalitySituation">Nationalité</Label>
+                        <SelectAsInput
+                          options={nationalitySituationOptions}
+                          name="nationalitySituation"
+                          value={values.nationalitySituation || ''}
+                          onChange={handleChange}
+                          inputId="person-select-nationalitySituation"
+                          classNamePrefix="person-select-nationalitySituation"
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col md={4}>
+                      <FormGroup>
+                        <Label htmlFor="person-select-employment">Emploi</Label>
+                        <SelectAsInput
+                          options={employmentOptions}
+                          name="employment"
+                          value={values.employment || ''}
+                          onChange={handleChange}
+                          inputId="person-select-employment"
+                          classNamePrefix="person-select-employment"
+                        />
+                      </FormGroup>
+                    </Col>
 
-                <Col md={4}>
-                  <Ressources value={values.resources} onChange={handleChange} />
-                </Col>
+                    <Col md={4}>
+                      <Ressources value={values.resources} onChange={handleChange} />
+                    </Col>
 
-                <Col md={4}>
-                  <Reasons value={values.reasons} onChange={handleChange} />
-                </Col>
-                {customFieldsPersonsSocial
-                  .filter((f) => f.enabled)
-                  .map((field) => (
-                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                  ))}
-              </Row>
+                    <Col md={4}>
+                      <Reasons value={values.reasons} onChange={handleChange} />
+                    </Col>
+                    {customFieldsPersonsSocial
+                      .filter((f) => f.enabled)
+                      .map((field) => (
+                        <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                      ))}
+                  </Row>
 
-              <hr />
-              <Title>Informations médicales</Title>
-              <Row>
-                <Col md={4}>
-                  <Label htmlFor="person-select-healthInsurance">Couverture médicale</Label>
-                  <SelectAsInput
-                    options={healthInsuranceOptions}
-                    name="healthInsurance"
-                    value={values.healthInsurance || ''}
-                    onChange={handleChange}
-                    inputId="person-select-healthInsurance"
-                    classNamePrefix="person-select-healthInsurance"
-                  />
-                </Col>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="structureMedical">Structure de suivi médical</Label>
-                    <Input name="structureMedical" id="structureMedical" value={values.structureMedical} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                {customFieldsPersonsMedical
-                  .filter((f) => f.enabled)
-                  .map((field) => (
-                    <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                  ))}
-              </Row>
+                  <hr />
+                  <Title>Informations médicales</Title>
+                  <Row>
+                    <Col md={4}>
+                      <Label htmlFor="person-select-healthInsurance">Couverture médicale</Label>
+                      <SelectAsInput
+                        options={healthInsuranceOptions}
+                        name="healthInsurance"
+                        value={values.healthInsurance || ''}
+                        onChange={handleChange}
+                        inputId="person-select-healthInsurance"
+                        classNamePrefix="person-select-healthInsurance"
+                      />
+                    </Col>
+                    <Col md={4}>
+                      <FormGroup>
+                        <Label htmlFor="structureMedical">Structure de suivi médical</Label>
+                        <Input name="structureMedical" id="structureMedical" value={values.structureMedical} onChange={handleChange} />
+                      </FormGroup>
+                    </Col>
+                    {customFieldsPersonsMedical
+                      .filter((f) => f.enabled)
+                      .map((field) => (
+                        <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                      ))}
+                  </Row>
 
-              <hr />
-
+                  <hr />
+                </>
+              )}
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                <OutOfActiveList person={person} />
-                <DeletePerson person={person} />
+                {!['restricted-access'].includes(user.role) && (
+                  <>
+                    <OutOfActiveList person={person} />
+                    <DeletePerson person={person} />
+                  </>
+                )}
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
               </div>
             </React.Fragment>
@@ -480,6 +503,8 @@ const Actions = ({ person, onUpdateResults }) => {
   const actions = useRecoilValue(actionsState);
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
+
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
 
@@ -553,6 +578,7 @@ const Actions = ({ person, onUpdateResults }) => {
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         noData={data.length && !filteredData.length ? 'Aucune action trouvée' : 'Aucune action'}
+        rowDisabled={() => ['restricted-access'].includes(user.role)}
         columns={[
           {
             title: '',
@@ -571,14 +597,14 @@ const Actions = ({ person, onUpdateResults }) => {
               return formatTime(action.dueAt);
             },
           },
-          { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
+          { title: 'Nom', noShow: ['restricted-access'].includes(user.role), dataKey: 'name', render: (action) => <ActionName action={action} /> },
           { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           {
             title: 'Équipe',
             dataKey: 'team',
             render: (action) => <TagTeam key={action.team} teamId={action.team} />,
           },
-        ]}
+        ].filter((c) => !c.noShow)}
       />
     </React.Fragment>
   );

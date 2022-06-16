@@ -11,7 +11,7 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import SelectCustom from '../../components/SelectCustom';
+import SelectRole from '../../components/SelectRole';
 import { organisationState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
@@ -111,12 +111,7 @@ const View = () => {
                 <Col md={6}>
                   <FormGroup>
                     <Label htmlFor="role">Role</Label>
-                    <SelectCustom
-                      options={['normal', 'admin'].map((role) => ({ value: role, label: role }))}
-                      onChange={({ value }) => handleChange({ target: { value, name: 'role' } })}
-                      value={{ value: values.role, label: values.role }}
-                      inputId="role"
-                    />
+                    <SelectRole handleChange={handleChange} value={values.role} />
                   </FormGroup>
                 </Col>
                 <Col md={12}>

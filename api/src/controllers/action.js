@@ -17,7 +17,7 @@ const STATUS = [TODO, DONE, CANCEL];
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "restricted-access"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
@@ -64,7 +64,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);

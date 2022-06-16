@@ -57,6 +57,8 @@ const CreateAction = ({
 
   const catsSelect = [...(organisation.categories || [])];
 
+  if (['restricted-access'].includes(user.role)) return null;
+
   return (
     <Wrapper {...wrapperProps}>
       {!!refreshable && (

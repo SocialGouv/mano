@@ -65,7 +65,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           history.push(`/action/${actionOrConsultation._id}`);
         }
       }}
-      rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
+      rowDisabled={(actionOrConsultation) => ['restricted-access'].includes(user.role) || disableConsultationRow(actionOrConsultation, user)}
       rowKey="_id"
       columns={[
         {
@@ -88,7 +88,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           },
         },
         {
-          title: 'Nom',
+          title: ['restricted-access'].includes(user.role) ? null : 'Nom',
           dataKey: 'name',
           render: (action) => <ActionName action={action} />,
         },

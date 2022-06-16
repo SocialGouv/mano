@@ -27,16 +27,20 @@ const Drawer = () => {
                 </NavLink>
               </li>
             )}
-            <li>
-              <NavLink to="/search" activeClassName="active">
-                Recherche
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/stats" activeClassName="active">
-                Statistiques
-              </NavLink>
-            </li>
+            {!['restricted-access'].includes(user.role) && (
+              <li>
+                <NavLink to="/search" activeClassName="active">
+                  Recherche
+                </NavLink>
+              </li>
+            )}
+            {!['restricted-access'].includes(user.role) && (
+              <li>
+                <NavLink to="/stats" activeClassName="active">
+                  Statistiques
+                </NavLink>
+              </li>
+            )}
           </>
         )}
         <hr />
@@ -71,27 +75,31 @@ const Drawer = () => {
                 Personnes suivies
               </NavLink>
             </li>
-            <li>
-              <NavLink to="/action" activeClassName="active">
-                Agenda
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/territory" activeClassName="active">
-                Territoires
-              </NavLink>
-            </li>
-            <hr />
-            <li>
-              <NavLink to="/place" activeClassName="active">
-                Lieux fréquentés
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/structure" activeClassName="active">
-                Structures
-              </NavLink>
-            </li>
+            {!['restricted-access'].includes(user.role) && (
+              <>
+                <li>
+                  <NavLink to="/action" activeClassName="active">
+                    Agenda
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/territory" activeClassName="active">
+                    Territoires
+                  </NavLink>
+                </li>
+                <hr />
+                <li>
+                  <NavLink to="/place" activeClassName="active">
+                    Lieux fréquentés
+                  </NavLink>
+                </li>
+                <li>
+                  <NavLink to="/structure" activeClassName="active">
+                    Structures
+                  </NavLink>
+                </li>
+              </>
+            )}
             <hr />
             <li>
               <NavLink to="/report" activeClassName="active">
