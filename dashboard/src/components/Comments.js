@@ -171,13 +171,14 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
         <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={value}
+            initialValues={{ ...value, comment: value.comment || window.sessionStorage.getItem('currentComment') }}
             onSubmit={async (body, actions) => {
               if (!body.user && !newComment) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.date && !newComment) return toastr.error('Erreur!', 'La date est obligatoire');
               if (!body.comment) return toastr.error('Erreur!', 'Le commentaire est obligatoire');
               await onSubmit({ ...value, ...body });
               actions.setSubmitting(false);
+              window.sessionStorage.removeItem('currentComment');
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
@@ -218,7 +219,16 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                   <Col md={12}>
                     <FormGroup>
                       <Label htmlFor="comment">Commentaire</Label>
-                      <Input id="comment" name="comment" type="textarea" value={values.comment} onChange={handleChange} />
+                      <Input
+                        id="comment"
+                        name="comment"
+                        type="textarea"
+                        value={values.comment}
+                        onChange={(e) => {
+                          window.sessionStorage.setItem('currentComment', e.target.value);
+                          handleChange(e);
+                        }}
+                      />
                     </FormGroup>
                   </Col>
                   <Col md={12}>

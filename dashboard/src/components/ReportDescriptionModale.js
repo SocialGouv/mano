@@ -25,7 +25,7 @@ const ReportDescriptionModale = ({ report }) => {
         <ModalBody>
           <Formik
             className="noprint"
-            initialValues={report}
+            initialValues={{ ...report, description: report.description || window.sessionStorage.getItem('currentReportDescription') }}
             onSubmit={async (body) => {
               const reportUpdate = {
                 ...report,
@@ -41,6 +41,7 @@ const ReportDescriptionModale = ({ report }) => {
                 );
                 toastr.success('Mis à jour !');
                 setOpen(false);
+                window.sessionStorage.removeItem('currentReportDescription');
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -48,7 +49,16 @@ const ReportDescriptionModale = ({ report }) => {
                 <Col md={12}>
                   <FormGroup>
                     <Label htmlFor="description">Description</Label>
-                    <Input id="description" name="description" type="textarea" value={values.description} onChange={handleChange} />
+                    <Input
+                      id="description"
+                      name="description"
+                      type="textarea"
+                      value={values.description}
+                      onChange={(e) => {
+                        window.sessionStorage.setItem('currentReportDescription', e.target.value);
+                        handleChange(e);
+                      }}
+                    />
                   </FormGroup>
                 </Col>
                 <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
