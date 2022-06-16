@@ -17,6 +17,12 @@ import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
 import useTitle from '../../services/useTitle';
 
+const roles = [
+  { value: 'normal', label: 'Normal' },
+  { value: 'admin', label: 'Admin' },
+  { value: 'restricted-access', label: 'Accès restreint' },
+];
+
 const View = () => {
   const [localUser, setLocalUser] = useState(null);
   const { id } = useParams();
@@ -112,9 +118,9 @@ const View = () => {
                   <FormGroup>
                     <Label htmlFor="role">Role</Label>
                     <SelectCustom
-                      options={['normal', 'admin', 'restricted-access'].map((role) => ({ value: role, label: role }))}
+                      options={roles}
                       onChange={({ value }) => handleChange({ target: { value, name: 'role' } })}
-                      value={{ value: values.role, label: values.role }}
+                      value={roles.find((r) => r.value === values.role)}
                       inputId="role"
                     />
                   </FormGroup>
