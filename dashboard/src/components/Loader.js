@@ -278,7 +278,6 @@ const Loader = () => {
     if (lastRefresh > 0 && ['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
       // medical data is never saved in cache
       // so we always have to download all at every page reload
-      console.log('OH OUI');
       const medicalDataResponse = await API.get({
         path: '/organisation/stats',
         query: { organisation: organisationId, after: initialLoad ? 0 : lastRefresh, withDeleted: true },
@@ -340,9 +339,9 @@ const Loader = () => {
               initialLoad
                 ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
                 : mergeItems(
-                    oldConsultations,
-                    newConsultations.map((c) => whitelistAllowedData(c, user))
-                  )
+                  oldConsultations,
+                  newConsultations.map((c) => whitelistAllowedData(c, user))
+                )
             ),
           API,
         });
