@@ -17,6 +17,7 @@ import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
+import SelectRole from '../../components/SelectRole';
 
 const List = () => {
   const [users, setUsers] = useState(null);
@@ -141,12 +142,7 @@ const Create = ({ onChange }) => {
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="role">Role</Label>
-                      <SelectCustom
-                        options={['normal', 'admin', 'restricted-access'].map((role) => ({ value: role, label: role }))}
-                        onChange={({ value }) => handleChange({ target: { value, name: 'role' } })}
-                        value={{ value: values.role, label: values.role }}
-                        inputId="role"
-                      />
+                      <SelectRole handleChange={handleChange} value={values.role} />
                       {touched.role && errors.role && <Error>{errors.role}</Error>}
                     </FormGroup>
                   </Col>
