@@ -122,7 +122,7 @@ const View = () => {
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
           if (!user.healthcareProfessional && tabCaption.includes('Dossier Médical')) return null;
-          if (['non-professional'].includes(user.role)) {
+          if (['restricted-access'].includes(user.role)) {
             let showTab = false;
             for (const authorizedTab of tabsForRestrictedRole) {
               if (tabCaption.includes(authorizedTab)) showTab = true;
@@ -150,7 +150,7 @@ const View = () => {
         <TabPane tabId={0}>
           <Summary person={person} />
         </TabPane>
-        {!['non-professional'].includes(user.role) && !!user.healthcareProfessional && (
+        {!['restricted-access'].includes(user.role) && !!user.healthcareProfessional && (
           <TabPane tabId={1}>
             <MedicalFile person={person} />
           </TabPane>
@@ -158,7 +158,7 @@ const View = () => {
         <TabPane tabId={2}>
           <Actions person={person} onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
         </TabPane>
-        {!['non-professional'].includes(user.role) && (
+        {!['restricted-access'].includes(user.role) && (
           <TabPane tabId={3}>
             <Comments personId={person?._id} onUpdateResults={(total) => updateTabContent(3, `Commentaires (${total})`)} />
           </TabPane>
@@ -166,7 +166,7 @@ const View = () => {
         <TabPane tabId={4}>
           <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
-        {!['non-professional'].includes(user.role) && (
+        {!['restricted-access'].includes(user.role) && (
           <>
             <TabPane tabId={5}>
               <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
@@ -351,7 +351,7 @@ const Summary = ({ person }) => {
                     <Input name="phone" id="phone" value={values.phone || ''} onChange={handleChange} />
                   </FormGroup>
                 </Col>
-                {!['non-professional'].includes(user.role) && (
+                {!['restricted-access'].includes(user.role) && (
                   <Col md={12}>
                     <FormGroup>
                       <Label htmlFor="description">Description</Label>
@@ -360,7 +360,7 @@ const Summary = ({ person }) => {
                   </Col>
                 )}
               </Row>
-              {!['non-professional'].includes(user.role) && (
+              {!['restricted-access'].includes(user.role) && (
                 <>
                   <hr />
                   <Title>Informations sociales</Title>
@@ -483,7 +483,7 @@ const Summary = ({ person }) => {
                 </>
               )}
               <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                {!['non-professional'].includes(user.role) && (
+                {!['restricted-access'].includes(user.role) && (
                   <>
                     <OutOfActiveList person={person} />
                     <DeletePerson person={person} />
@@ -578,7 +578,7 @@ const Actions = ({ person, onUpdateResults }) => {
         rowKey={'_id'}
         onRowClick={(action) => history.push(`/action/${action._id}`)}
         noData={data.length && !filteredData.length ? 'Aucune action trouvée' : 'Aucune action'}
-        rowDisabled={() => ['non-professional'].includes(user.role)}
+        rowDisabled={() => ['restricted-access'].includes(user.role)}
         columns={[
           {
             title: '',
@@ -597,7 +597,7 @@ const Actions = ({ person, onUpdateResults }) => {
               return formatTime(action.dueAt);
             },
           },
-          { title: 'Nom', noShow: ['non-professional'].includes(user.role), dataKey: 'name', render: (action) => <ActionName action={action} /> },
+          { title: 'Nom', noShow: ['restricted-access'].includes(user.role), dataKey: 'name', render: (action) => <ActionName action={action} /> },
           { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           {
             title: 'Équipe',

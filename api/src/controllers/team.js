@@ -31,7 +31,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["superadmin", "admin", "normal", "non-professional"]),
+  validateUser(["superadmin", "admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     const data = await Team.findAll({ where: { organisation: req.user.organisation }, include: ["Organisation"] });
     return res.status(200).send({ ok: true, data });

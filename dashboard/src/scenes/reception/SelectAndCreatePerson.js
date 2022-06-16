@@ -187,7 +187,7 @@ const Person = ({ person }) => {
           value={
             !person.lastAction
               ? null
-              : ['non-professional'].includes(user.role)
+              : ['restricted-access'].includes(user.role)
               ? formatCalendarDate(person.lastAction.dueAt)
               : `${person.lastAction?.name} - ${formatCalendarDate(person.lastAction.dueAt)}`
           }

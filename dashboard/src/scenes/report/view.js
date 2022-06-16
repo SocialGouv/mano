@@ -74,7 +74,7 @@ const View = () => {
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || ['non-professional'].includes(user.role) ? 1 : 0));
+  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || ['restricted-access'].includes(user.role) ? 1 : 0));
   const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? [...tabs, ...healthcareTabs] : tabs);
   const API = useApi();
 
@@ -140,9 +140,9 @@ const View = () => {
           <br />
           {getPeriodTitle(report.date, currentTeam?.nightSession)}
         </div>
-        {!['non-professional'].includes(user.role) && <DescriptionAndCollaborations report={report} key={report._id} />}
+        {!['restricted-access'].includes(user.role) && <DescriptionAndCollaborations report={report} key={report._id} />}
         <Reception report={report} />
-        {!['non-professional'].includes(user.role) && (
+        {!['restricted-access'].includes(user.role) && (
           <>
             <ActionCompletedAt date={report.date} status={DONE} />
             <ActionCreatedAt date={report.date} />
@@ -151,7 +151,7 @@ const View = () => {
           </>
         )}
         <PassagesCreatedAt date={report.date} report={report} />
-        {!['non-professional'].includes(user.role) && (
+        {!['restricted-access'].includes(user.role) && (
           <>
             <TerritoryObservationsCreatedAt date={report.date} />
             {!!user.healthcareProfessional && <Consultations date={report.date} />}
@@ -182,7 +182,7 @@ const View = () => {
               <div style={{ display: 'flex' }}>
                 <BackButton />
                 <BackButtonWrapper caption="Imprimer" onClick={window.print} />
-                {!['non-professional'].includes(user.role) && <BackButtonWrapper caption="Supprimer" onClick={deleteData} />}
+                {!['restricted-access'].includes(user.role) && <BackButtonWrapper caption="Supprimer" onClick={deleteData} />}
               </div>
               <div style={{ display: 'flex' }}>
                 <ButtonCustom
@@ -221,7 +221,7 @@ const View = () => {
           <Drawer title="Navigation dans les réglages de l'organisation">
             {tabsContents.map((tabCaption, index) => {
               if (!organisation.receptionEnabled && index === 1) return null;
-              if (['non-professional'].includes(user.role)) {
+              if (['restricted-access'].includes(user.role)) {
                 let showTab = false;
                 for (const authorizedTab of tabsForRestrictedRole) {
                   if (tabCaption.includes(authorizedTab)) showTab = true;
@@ -257,7 +257,7 @@ const View = () => {
               padding: '15px 25px 0px',
               backgroundColor: '#fff',
             }}>
-            {!['non-professional'].includes(user.role) && (
+            {!['restricted-access'].includes(user.role) && (
               <div style={activeTab !== 0 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                 <DescriptionAndCollaborations report={report} key={report._id} />
               </div>
@@ -265,7 +265,7 @@ const View = () => {
             <div style={activeTab !== 1 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
               <Reception report={report} />
             </div>
-            {!['non-professional'].includes(user.role) && (
+            {!['restricted-access'].includes(user.role) && (
               <>
                 <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                   <ActionCompletedAt
@@ -292,7 +292,7 @@ const View = () => {
             <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
               <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, `Passages (${total})`)} />
             </div>
-            {!['non-professional'].includes(user.role) && (
+            {!['restricted-access'].includes(user.role) && (
               <>
                 <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                   <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />

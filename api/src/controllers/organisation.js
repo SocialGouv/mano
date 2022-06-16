@@ -29,7 +29,7 @@ const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 router.get(
   "/stats",
   passport.authenticate("user", { session: false }),
-  validateUser(["superadmin", "admin", "normal", "non-professional"]),
+  validateUser(["superadmin", "admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.query.organisation);

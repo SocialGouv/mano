@@ -27,14 +27,14 @@ const Drawer = () => {
                 </NavLink>
               </li>
             )}
-            {!['non-professional'].includes(user.role) && (
+            {!['restricted-access'].includes(user.role) && (
               <li>
                 <NavLink to="/search" activeClassName="active">
                   Recherche
                 </NavLink>
               </li>
             )}
-            {!['non-professional'].includes(user.role) && (
+            {!['restricted-access'].includes(user.role) && (
               <li>
                 <NavLink to="/stats" activeClassName="active">
                   Statistiques
@@ -75,7 +75,7 @@ const Drawer = () => {
                 Personnes suivies
               </NavLink>
             </li>
-            {!['non-professional'].includes(user.role) && (
+            {!['restricted-access'].includes(user.role) && (
               <>
                 <li>
                   <NavLink to="/action" activeClassName="active">
