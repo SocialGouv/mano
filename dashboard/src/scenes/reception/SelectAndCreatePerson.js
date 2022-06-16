@@ -15,6 +15,7 @@ import { actionsState } from '../../recoil/actions';
 import { passagesState } from '../../recoil/passages';
 import { useHistory } from 'react-router-dom';
 import ButtonCustom from '../../components/ButtonCustom';
+import { userState } from '../../recoil/auth';
 
 function removeDiatricsAndAccents(str) {
   return (str || '')
@@ -161,6 +162,7 @@ const PersonSelected = ({ person }) => {
 
 const Person = ({ person }) => {
   const history = useHistory();
+  const user = useRecoilValue(userState);
   return (
     <PersonWrapper>
       <PersonMainInfo>
@@ -180,7 +182,16 @@ const Person = ({ person }) => {
         />
       </PersonMainInfo>
       <AdditionalInfoWrapper>
-        <AdditionalInfo label="Dernière action" value={person.lastAction?.name} />
+        <AdditionalInfo
+          label="Dernière action"
+          value={
+            !person.lastAction
+              ? null
+              : ['non-professional'].includes(user.role)
+              ? formatCalendarDate(person.lastAction.dueAt)
+              : `${person.lastAction?.name} - ${formatCalendarDate(person.lastAction.dueAt)}`
+          }
+        />
         <AdditionalInfo label="Dernier passage" value={person.lastPassage?.date ? formatCalendarDate(person.lastPassage?.date) : null} />
         <AdditionalInfo label="Tel" value={person.phone} />
       </AdditionalInfoWrapper>

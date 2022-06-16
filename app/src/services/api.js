@@ -270,7 +270,13 @@ class ApiService {
     const response = await ReactNativeBlobUtil.fetch(
       'POST',
       url,
-      { 'Content-Type': 'multipart/form-data', Authorization: `JWT ${this.token}`, Accept: 'application/json', platform: this.platform, version },
+      {
+        'Content-Type': 'multipart/form-data',
+        Authorization: `JWT ${this.token}`,
+        Accept: 'application/json',
+        platform: this.platform,
+        version: VERSION,
+      },
       [
         // element with property `filename` will be transformed into `file` in form data
         { name: 'file', filename: file.fileName, mime: file.type, type: file.type, data: encryptedFile },

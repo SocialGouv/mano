@@ -12,7 +12,7 @@ const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "non-professional"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
@@ -51,7 +51,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "non-professional"]),
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
@@ -95,7 +95,7 @@ router.get(
 router.put(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "non-professional"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
@@ -140,7 +140,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "non-professional"]),
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);

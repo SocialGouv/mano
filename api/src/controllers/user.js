@@ -156,7 +156,7 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
 router.get(
   "/me",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin"]),
+  validateUser(["admin", "normal", "superadmin", "non-professional"]),
   catchErrors(async (req, res) => {
     const user = await User.findOne({ where: { _id: req.user._id } });
     const teams = await user.getTeams();
@@ -171,7 +171,7 @@ router.get(
 router.post(
   "/logout",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin"]),
+  validateUser(["admin", "normal", "superadmin", "non-professional"]),
   catchErrors(async (_req, res) => {
     res.clearCookie("jwt", logoutCookieOptions());
     return res.status(200).send({ ok: true });
@@ -208,6 +208,10 @@ router.post(
     updateUserDebugInfos(req, user);
 
     await user.save();
+    // non-professional users cannot acces the app
+    if (req.headers.platform === "android" && user.role === "non-professional") {
+      return res.status(403).send({ ok: false, error: "Accès interdit au personnel non habilité" });
+    }
 
     const organisation = await user.getOrganisation();
     const orgTeams = await Team.findAll({ where: { organisation: organisation._id } });
@@ -224,7 +228,7 @@ router.post(
 router.get(
   "/signin-token",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin"]),
+  validateUser(["admin", "normal", "superadmin", "non-professional"]),
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().regex(jwtRegex)).parse(req.cookies.jwt);
@@ -327,7 +331,7 @@ router.post(
       z.string().email().parse(req.body.email);
       z.boolean().parse(req.body.healthcareProfessional);
       z.array(z.string().regex(looseUuidRegex)).parse(req.body.team);
-      z.enum(["admin", "normal"]).parse(req.body.role);
+      z.enum(["admin", "normal", "non-professional"]).parse(req.body.role);
     } catch (e) {
       const error = new Error(`Invalid request in user creation: ${e}`);
       error.status = 400;
@@ -400,7 +404,7 @@ Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 1
 router.post(
   "/reset_password",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin"]),
+  validateUser(["admin", "normal", "superadmin", "non-professional"]),
   catchErrors(async (req, res, next) => {
     try {
       z.string().min(1).parse(req.body.password);
@@ -487,7 +491,7 @@ router.get(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin"]),
+  validateUser(["admin", "normal", "superadmin", "non-professional"]),
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.literal("true")).parse(req.query.minimal);
@@ -537,7 +541,7 @@ router.get(
 router.put(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin"]),
+  validateUser(["admin", "normal", "superadmin", "non-professional"]),
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().min(1)).parse(req.body.name);
@@ -613,7 +617,7 @@ router.put(
         .parse((req.body.email || "").trim().toLowerCase());
       z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
       z.optional(z.boolean()).parse(req.body.healthcareProfessional);
-      z.optional(z.enum(["admin", "normal"])).parse(req.body.role);
+      z.optional(z.enum(["admin", "normal", "non-professional"])).parse(req.body.role);
     } catch (e) {
       const error = new Error(`Invalid request in put user by id: ${e}`);
       error.status = 400;

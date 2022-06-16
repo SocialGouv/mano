@@ -53,6 +53,7 @@ import { consultationsState, disableConsultationRow } from '../../recoil/consult
 
 const tabs = ['Résumé', 'Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
 const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
+const tabsForRestrictedRole = ['Accueil', 'Passages'];
 const spaceAfterTab = [0, 1, 4, 5, 6, 7];
 
 const getPeriodTitle = (date, nightSession) => {
@@ -73,7 +74,7 @@ const View = () => {
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || 0));
+  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || ['non-professional'].includes(user.role) ? 1 : 0));
   const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? [...tabs, ...healthcareTabs] : tabs);
   const API = useApi();
 
@@ -115,8 +116,9 @@ const View = () => {
 
   useEffect(() => {
     // for print use only
-    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${report && dayjs(report.date).format('DD-MM-YYYY')} - imprimé par ${user.name
-      }`;
+    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${report && dayjs(report.date).format('DD-MM-YYYY')} - imprimé par ${
+      user.name
+    }`;
     return () => {
       document.title = 'Mano - Admin';
     };
@@ -138,17 +140,25 @@ const View = () => {
           <br />
           {getPeriodTitle(report.date, currentTeam?.nightSession)}
         </div>
-        <DescriptionAndCollaborations report={report} key={report._id} />
+        {!['non-professional'].includes(user.role) && <DescriptionAndCollaborations report={report} key={report._id} />}
         <Reception report={report} />
-        <ActionCompletedAt date={report.date} status={DONE} />
-        <ActionCreatedAt date={report.date} />
-        <ActionCompletedAt date={report.date} status={CANCEL} />
-        <CommentCreatedAt date={report.date} />
+        {!['non-professional'].includes(user.role) && (
+          <>
+            <ActionCompletedAt date={report.date} status={DONE} />
+            <ActionCreatedAt date={report.date} />
+            <ActionCompletedAt date={report.date} status={CANCEL} />
+            <CommentCreatedAt date={report.date} />
+          </>
+        )}
         <PassagesCreatedAt date={report.date} report={report} />
-        <TerritoryObservationsCreatedAt date={report.date} />
-        {!!user.healthcareProfessional && <Consultations date={report.date} />}
-        {!!user.healthcareProfessional && <ConsultationsCreatedAt date={report.date} />}
-        {!!user.healthcareProfessional && <Consultations date={report.date} status={CANCEL} />}
+        {!['non-professional'].includes(user.role) && (
+          <>
+            <TerritoryObservationsCreatedAt date={report.date} />
+            {!!user.healthcareProfessional && <Consultations date={report.date} />}
+            {!!user.healthcareProfessional && <ConsultationsCreatedAt date={report.date} />}
+            {!!user.healthcareProfessional && <Consultations date={report.date} status={CANCEL} />}
+          </>
+        )}
       </div>
     );
   };
@@ -172,7 +182,7 @@ const View = () => {
               <div style={{ display: 'flex' }}>
                 <BackButton />
                 <BackButtonWrapper caption="Imprimer" onClick={window.print} />
-                <BackButtonWrapper caption="Supprimer" onClick={deleteData} />
+                {!['non-professional'].includes(user.role) && <BackButtonWrapper caption="Supprimer" onClick={deleteData} />}
               </div>
               <div style={{ display: 'flex' }}>
                 <ButtonCustom
@@ -211,6 +221,13 @@ const View = () => {
           <Drawer title="Navigation dans les réglages de l'organisation">
             {tabsContents.map((tabCaption, index) => {
               if (!organisation.receptionEnabled && index === 1) return null;
+              if (['non-professional'].includes(user.role)) {
+                let showTab = false;
+                for (const authorizedTab of tabsForRestrictedRole) {
+                  if (tabCaption.includes(authorizedTab)) showTab = true;
+                }
+                if (!showTab) return null;
+              }
               return (
                 <React.Fragment key={index + tabCaption}>
                   <DrawerLink
@@ -240,43 +257,72 @@ const View = () => {
               padding: '15px 25px 0px',
               backgroundColor: '#fff',
             }}>
-            <div style={activeTab !== 0 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <DescriptionAndCollaborations report={report} key={report._id} />
-            </div>
+            {!['non-professional'].includes(user.role) && (
+              <div style={activeTab !== 0 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <DescriptionAndCollaborations report={report} key={report._id} />
+              </div>
+            )}
             <div style={activeTab !== 1 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
               <Reception report={report} />
             </div>
-            <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(2, `Actions complétées (${total})`)} />
-            </div>
-            <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, `Actions créées (${total})`)} />
-            </div>
-            <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(4, `Actions annulées (${total})`)} />
-            </div>
-            <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Commentaires (${total})`)} />
-            </div>
+            {!['non-professional'].includes(user.role) && (
+              <>
+                <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                  <ActionCompletedAt
+                    date={report.date}
+                    status={DONE}
+                    onUpdateResults={(total) => updateTabContent(2, `Actions complétées (${total})`)}
+                  />
+                </div>
+                <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                  <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, `Actions créées (${total})`)} />
+                </div>
+                <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                  <ActionCompletedAt
+                    date={report.date}
+                    status={CANCEL}
+                    onUpdateResults={(total) => updateTabContent(4, `Actions annulées (${total})`)}
+                  />
+                </div>
+                <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                  <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Commentaires (${total})`)} />
+                </div>
+              </>
+            )}
             <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
               <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, `Passages (${total})`)} />
             </div>
-            <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />
-            </div>
-            <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(8, `Consultations faites (${total})`)} status={DONE} />
-            </div>
-            <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, `Consultations créées (${total})`)} />
-            </div>
-            <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <Consultations
-                date={report.date}
-                onUpdateResults={(total) => updateTabContent(10, `Consultations annulées (${total})`)}
-                status={CANCEL}
-              />
-            </div>
+            {!['non-professional'].includes(user.role) && (
+              <>
+                <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />
+                </div>
+                {!!user.healthcareProfessional && (
+                  <>
+                    <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                      <Consultations
+                        date={report.date}
+                        onUpdateResults={(total) => updateTabContent(8, `Consultations faites (${total})`)}
+                        status={DONE}
+                      />
+                    </div>
+                    <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                      <ConsultationsCreatedAt
+                        date={report.date}
+                        onUpdateResults={(total) => updateTabContent(9, `Consultations créées (${total})`)}
+                      />
+                    </div>
+                    <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                      <Consultations
+                        date={report.date}
+                        onUpdateResults={(total) => updateTabContent(10, `Consultations annulées (${total})`)}
+                        status={CANCEL}
+                      />
+                    </div>
+                  </>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -326,7 +372,12 @@ const Reception = ({ report }) => {
     return (
       <>
         {organisation?.services?.map((service) => (
-          <IncrementorSmall key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
+          <IncrementorSmall
+            key={service}
+            service={service}
+            count={services[service] || 0}
+            onChange={(newCount) => onServiceUpdate(service, newCount)}
+          />
         ))}
       </>
     );
@@ -335,9 +386,7 @@ const Reception = ({ report }) => {
   return (
     <StyledBox>
       <TabTitle>Services effectués ce jour</TabTitle>
-      <ServicesWrapper>
-        {renderServices()}
-      </ServicesWrapper>
+      <ServicesWrapper>{renderServices()}</ServicesWrapper>
     </StyledBox>
   );
 };
@@ -528,8 +577,9 @@ const Consultations = ({ date, onUpdateResults = () => null, status }) => {
       <StyledBox>
         <Table
           className="Table"
-          title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${moreThanOne ? 's' : ''
-            } le ${formatDateWithFullMonth(date)}`}
+          title={`Consultation${moreThanOne ? 's' : ''} ${status === DONE ? 'faite' : 'annulée'}${
+            moreThanOne ? 's' : ''
+          } le ${formatDateWithFullMonth(date)}`}
           noData={`Pas de consultation ${status === DONE ? 'faite' : 'annulée'} ce jour`}
           data={data}
           onRowClick={(actionOrConsultation) =>
@@ -748,14 +798,14 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
                   <p>
                     {comment.comment
                       ? comment.comment.split('\n').map((c, i, a) => {
-                        if (i === a.length - 1) return c;
-                        return (
-                          <React.Fragment key={i}>
-                            {c}
-                            <br />
-                          </React.Fragment>
-                        );
-                      })
+                          if (i === a.length - 1) return c;
+                          return (
+                            <React.Fragment key={i}>
+                              {c}
+                              <br />
+                            </React.Fragment>
+                          );
+                        })
                       : ''}
                   </p>
                 );
@@ -909,8 +959,9 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
       <StyledBox>
         <Table
           className="Table"
-          title={`Observation${moreThanOne ? 's' : ''} de territoire${moreThanOne ? 's' : ''} faite${moreThanOne ? 's' : ''
-            } le ${formatDateWithFullMonth(date)}`}
+          title={`Observation${moreThanOne ? 's' : ''} de territoire${moreThanOne ? 's' : ''} faite${
+            moreThanOne ? 's' : ''
+          } le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'observation faite ce jour"
           data={data}
           onRowClick={(obs) => {
@@ -1022,11 +1073,11 @@ const DescriptionAndCollaborations = ({ report }) => {
             {!report?.description
               ? 'Pas de description'
               : report?.description?.split('\n').map((sentence, index) => (
-                <React.Fragment key={index}>
-                  {sentence}
-                  <br />
-                </React.Fragment>
-              ))}
+                  <React.Fragment key={index}>
+                    {sentence}
+                    <br />
+                  </React.Fragment>
+                ))}
           </p>
         </DescriptionBox>
       )}

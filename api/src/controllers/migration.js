@@ -17,7 +17,7 @@ router.put(
   "/:migrationName",
   passport.authenticate("user", { session: false }),
   validateEncryptionAndMigrations,
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "non-professional"]),
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.user.organisation);

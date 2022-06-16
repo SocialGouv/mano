@@ -112,7 +112,7 @@ const View = () => {
                   <FormGroup>
                     <Label htmlFor="role">Role</Label>
                     <SelectCustom
-                      options={['normal', 'admin'].map((role) => ({ value: role, label: role }))}
+                      options={['normal', 'admin', 'non-professional'].map((role) => ({ value: role, label: role }))}
                       onChange={({ value }) => handleChange({ target: { value, name: 'role' } })}
                       value={{ value: values.role, label: values.role }}
                       inputId="role"

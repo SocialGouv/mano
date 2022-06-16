@@ -31,7 +31,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser(["admin", "normal", "non-professional"]),
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string()).parse(req.body.search);
