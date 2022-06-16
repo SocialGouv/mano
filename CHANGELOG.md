@@ -1,3 +1,15 @@
+# [1.118.0](https://github.com/SocialGouv/mano/compare/v1.117.1...v1.118.0) (2022-06-16)
+
+
+### Bug Fixes
+
+* **dashboard:** auto team when only one team ([#741](https://github.com/SocialGouv/mano/issues/741)) ([58b0214](https://github.com/SocialGouv/mano/commit/58b0214114c3a2d59a0e86794c61ef4a90408376))
+
+
+### Features
+
+* **dashboard:** save current comment and report description in session storage ([#740](https://github.com/SocialGouv/mano/issues/740)) ([ecd9409](https://github.com/SocialGouv/mano/commit/ecd9409da95b85e61e30a3dd62569bfa8829bdf1))
+
 ## [1.117.1](https://github.com/SocialGouv/mano/compare/v1.117.0...v1.117.1) (2022-06-14)
 
 
