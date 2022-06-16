@@ -1,3 +1,10 @@
+# [1.119.0](https://github.com/SocialGouv/mano/compare/v1.118.0...v1.119.0) (2022-06-16)
+
+
+### Features
+
+* new role non-professional ([#748](https://github.com/SocialGouv/mano/issues/748)) ([3f36e6e](https://github.com/SocialGouv/mano/commit/3f36e6edcb583b70ffc677978f453ffef610c4b1))
+
 # [1.118.0](https://github.com/SocialGouv/mano/compare/v1.117.1...v1.118.0) (2022-06-16)
 
 
