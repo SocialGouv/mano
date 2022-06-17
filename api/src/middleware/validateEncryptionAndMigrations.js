@@ -28,7 +28,6 @@ async function validateEncryptionAndMigrations(req, res, next) {
     });
   }
 
-  /*
   if (organisation.migrationLastUpdateAt) {
     if (!migrationLastUpdateAt) {
       return res
@@ -43,7 +42,7 @@ async function validateEncryptionAndMigrations(req, res, next) {
       });
     }
   }
- */
+
   if (organisation.migrating) {
     return res
       .status(403)

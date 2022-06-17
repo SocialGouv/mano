@@ -207,7 +207,7 @@ const useApi = () => {
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
-    return await response.json();
+    return response.json();
   };
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false } = {}) => {
