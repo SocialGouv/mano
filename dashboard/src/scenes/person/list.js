@@ -9,7 +9,12 @@ import Search from '../../components/search';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
 import CreatePerson from './CreatePerson';
-import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, filterPersonsBase } from '../../recoil/persons';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  fieldsPersonsCustomizableOptionsSelector,
+  filterPersonsBase,
+} from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
 import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
@@ -95,6 +100,7 @@ const List = () => {
   ]);
 
   const teams = useRecoilValue(teamsState);
+  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const organisation = useRecoilValue(organisationState);
@@ -110,6 +116,7 @@ const List = () => {
   // Add places and enabled custom fields in filters.
   const filterPersonsWithAllFields = [
     ...filterPersonsBase,
+    ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
     {

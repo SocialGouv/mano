@@ -31,7 +31,15 @@ const sanitizeFields = (field) => {
   return sanitizedField;
 };
 
-const TableCustomFields = ({ data, customFields, mergeData = null, extractData = null, keyPrefix = null, hideStats = false }) => {
+const TableCustomFields = ({
+  data,
+  customFields,
+  mergeData = null,
+  extractData = null,
+  keyPrefix = null,
+  hideStats = false,
+  onlyOptionsEditable,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
@@ -125,6 +133,7 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
             dataKey: '_id',
             render: (field) => <EditButton onClick={() => setEditingField(field)}>&#9998;</EditButton>,
             small: true,
+            show: true,
           },
           {
             title: 'Nom',
@@ -134,6 +143,7 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
                 <span>{f.label}</span>
               </CellWrapper>
             ),
+            show: true,
           },
           {
             title: 'Type',
@@ -143,40 +153,39 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
                 <span>{getValueFromType(f.type).label}</span>
               </CellWrapper>
             ),
+            show: true,
           },
           {
             title: 'Options',
             dataKey: 'options',
             render: (f) => <CellWrapper>{!['enum', 'multi-choice'].includes(f.type) ? null : (f?.options || []).join(', ')}</CellWrapper>,
+            show: true,
           },
           { title: 'Activé', dataKey: 'enabled', render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} /> },
-          hideStats
-            ? null
-            : {
-                title: (
-                  <>
-                    Voir dans les
-                    <br />
-                    statistiques
-                  </>
-                ),
-                dataKey: 'showInStats',
-                render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
-              },
+          {
+            title: (
+              <>
+                Voir dans les
+                <br />
+                statistiques
+              </>
+            ),
+            dataKey: 'showInStats',
+            render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
+            show: !onlyOptionsEditable && !hideStats,
+          },
           {
             title: '',
             dataKey: 'name',
             small: true,
-            render: (f) =>
-              f.deletable === false ? null : (
-                <ButtonCustom title="Supprimer" loading={isSubmitting} onClick={() => onDelete(f)} width={75} color="danger" />
-              ),
+            show: !onlyOptionsEditable,
+            render: (f) => <ButtonCustom title="Supprimer" loading={isSubmitting} onClick={() => onDelete(f)} width={75} color="danger" />,
           },
           // Remove null fields
-        ].filter((e) => e)}
+        ].filter((col) => !!col.show)}
       />
       <ButtonsWrapper>
-        <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={() => setIsNewField(true)} width={200} />
+        {!onlyOptionsEditable && <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={() => setIsNewField(true)} width={200} />}
         <ButtonCustom
           title="Mettre à jour"
           loading={isSubmitting}
@@ -187,6 +196,7 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
       </ButtonsWrapper>
       <EditCustomField
         editingField={editingField}
+        onlyOptionsEditable={onlyOptionsEditable}
         onClose={() => {
           setEditingField(null);
           setIsNewField(false);
@@ -198,7 +208,7 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
   );
 };
 
-const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => {
+const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyOptionsEditable }) => {
   const open = Boolean(editingField) || isNewField;
 
   return (
@@ -214,7 +224,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                     <Col md={12}>
                       <FormGroup>
                         <Label htmlFor="label">Nom</Label>
-                        <Input type="textarea" id="label" name="label" value={field.label} onChange={handleChange} />
+                        <Input type="textarea" id="label" name="label" value={field.label} onChange={handleChange} disabled={onlyOptionsEditable} />
                       </FormGroup>
                     </Col>
                     <Col md={6}>
@@ -222,6 +232,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                         <Label htmlFor="type">Type</Label>
                         <SelectCustom
                           inputId="type"
+                          isDisabled={onlyOptionsEditable}
                           options={typeOptions}
                           value={getValueFromType(field.type)}
                           onChange={({ value }) => handleChange({ currentTarget: { value, name: 'type' } })}
@@ -250,7 +261,14 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                         <Label />
                         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                           <label htmlFor="enabled">Activé</label>
-                          <Input id="enabled" type="checkbox" name="enabled" checked={field.enabled} onChange={handleChange} />
+                          <Input
+                            id="enabled"
+                            type="checkbox"
+                            disabled={onlyOptionsEditable}
+                            name="enabled"
+                            checked={field.enabled}
+                            onChange={handleChange}
+                          />
                         </div>
                       </FormGroup>
                     </Col>
@@ -259,7 +277,14 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                         <Label />
                         <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
                           <label htmlFor="showInStats">Voir dans les statistiques</label>
-                          <Input type="checkbox" id="showInStats" name="showInStats" checked={field.showInStats} onChange={handleChange} />
+                          <Input
+                            type="checkbox"
+                            id="showInStats"
+                            disabled={onlyOptionsEditable}
+                            name="showInStats"
+                            checked={field.showInStats}
+                            onChange={handleChange}
+                          />
                         </div>
                       </FormGroup>
                     </Col>

@@ -207,6 +207,7 @@ router.put(
         z.optional(z.array(z.string().min(1))).parse(req.body.categories);
         z.optional(z.array(z.string().min(1))).parse(req.body.collaborations);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsObs);
+        z.optional(z.array(customFieldSchema)).parse(req.body.fieldsPersonsCustomizableOptions);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsSocial);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsMedical);
         z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsMedicalFile);
@@ -249,6 +250,11 @@ router.put(
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
     if (req.body.hasOwnProperty("customFieldsObs"))
       updateOrg.customFieldsObs = typeof req.body.customFieldsObs === "string" ? JSON.parse(req.body.customFieldsObs) : req.body.customFieldsObs;
+    if (req.body.hasOwnProperty("fieldsPersonsCustomizableOptions"))
+      updateOrg.fieldsPersonsCustomizableOptions =
+        typeof req.body.fieldsPersonsCustomizableOptions === "string"
+          ? JSON.parse(req.body.fieldsPersonsCustomizableOptions)
+          : req.body.fieldsPersonsCustomizableOptions;
     if (req.body.hasOwnProperty("customFieldsPersonsSocial"))
       updateOrg.customFieldsPersonsSocial =
         typeof req.body.customFieldsPersonsSocial === "string" ? JSON.parse(req.body.customFieldsPersonsSocial) : req.body.customFieldsPersonsSocial;

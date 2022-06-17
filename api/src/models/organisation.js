@@ -17,6 +17,7 @@ Organisation.init(
     receptionEnabled: { type: DataTypes.BOOLEAN },
     services: DataTypes.ARRAY(DataTypes.TEXT),
     customFieldsObs: DataTypes.JSONB,
+    fieldsPersonsCustomizableOptions: DataTypes.JSONB,
     customFieldsPersonsSocial: DataTypes.JSONB,
     customFieldsPersonsMedical: DataTypes.JSONB,
     customFieldsMedicalFile: DataTypes.JSONB,

@@ -14,6 +14,7 @@ import { actionsCategories, actionsState, prepareActionForEncryption } from '../
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
+  fieldsPersonsCustomizableOptionsSelector,
   personFieldsIncludingCustomFieldsSelector,
 } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
@@ -50,6 +51,7 @@ const View = () => {
   const reports = useRecoilValue(reportsState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
@@ -60,8 +62,6 @@ const View = () => {
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });
   }, [tab]);
-
-  console.log(personFieldsIncludingCustomFields);
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', margin: '0 -4rem -3rem', height: 'calc(100% + 3rem)' }}>
@@ -449,6 +449,15 @@ const View = () => {
                         <SubTitle>Personnes suivies</SubTitle>
                         {organisation.encryptionEnabled ? (
                           <>
+                            <Row>
+                              <Label>Champs permanents - options modulables</Label>
+                              <TableCustomFields
+                                customFields="fieldsPersonsCustomizableOptions"
+                                key="fieldsPersonsCustomizableOptions"
+                                data={fieldsPersonsCustomizableOptions}
+                                onlyOptionsEditable
+                              />
+                            </Row>
                             <Row>
                               <Label>Champs personnalisés - informations sociales</Label>
                               <TableCustomFields

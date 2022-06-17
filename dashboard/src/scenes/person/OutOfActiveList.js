@@ -8,6 +8,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
+  fieldsPersonsCustomizableOptionsSelector,
   personsState,
   preparePersonForEncryption,
 } from '../../recoil/persons';
@@ -18,6 +19,7 @@ const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
   const API = useApi();
 
+  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
 
@@ -73,7 +75,7 @@ const OutOfActiveList = ({ person }) => {
                         <SelectAsInput
                           styles={{ width: '800px' }}
                           style={{ width: '800px' }}
-                          options={customFieldsPersonsSocial.find((f) => f.name === 'outOfActiveListReason').options}
+                          options={fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReason').options}
                           name="outOfActiveListReason"
                           value={values.outOfActiveListReason || ''}
                           onChange={handleChange}

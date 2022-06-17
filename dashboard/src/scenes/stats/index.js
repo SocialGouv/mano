@@ -15,6 +15,7 @@ import {
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
   genderOptions,
+  fieldsPersonsCustomizableOptionsSelector,
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
@@ -57,6 +58,7 @@ const Stats = () => {
   const allObservations = useRecoilValue(territoryObservationsState);
   const allPassages = useRecoilValue(passagesState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const territories = useRecoilValue(territoriesState);
@@ -351,7 +353,7 @@ const Stats = () => {
             data={getPieData(
               persons.filter((p) => !!p.outOfActiveList),
               'outOfActiveListReason',
-              { options: customFieldsPersonsSocial.find((f) => f.name === 'outOfActiveListReason').options }
+              { options: fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReason').options }
             )}
           />
           {
