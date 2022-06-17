@@ -289,7 +289,7 @@ const Reception = () => {
                 title="Modifier les passages"
                 padding="0px"
               />
-              <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir ceux d'aujourd'hui" padding="0px" />
+              <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
             </div>
           </PassagesWrapper>
           <ServicesWrapper>
