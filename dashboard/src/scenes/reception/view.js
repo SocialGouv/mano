@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Col, Row } from 'reactstrap';
+import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
@@ -26,6 +26,10 @@ import { capture } from '../../services/sentry';
 import { consultationsState } from '../../recoil/consultations';
 import plusIcon from '../../assets/icons/plus-icon.svg';
 import IncrementorSmall from '../../components/IncrementorSmall';
+import PersonName from '../../components/PersonName';
+import Table from '../../components/table';
+import Passage from '../../components/Passage';
+import UserName from '../../components/UserName';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -51,20 +55,20 @@ export const actionsByStatusSelector = selectorFamily({
   key: 'actionsByStatusSelector',
   get:
     ({ status }) =>
-      ({ get }) => {
-        const actions = get(actionsForCurrentTeamSelector);
-        return actions.filter((a) => a.status === status);
-      },
+    ({ get }) => {
+      const actions = get(actionsForCurrentTeamSelector);
+      return actions.filter((a) => a.status === status);
+    },
 });
 
 export const consultationsByStatusSelector = selectorFamily({
   key: 'consultationsByStatusSelector',
   get:
     ({ status }) =>
-      ({ get }) => {
-        const consultations = get(consultationsByAuthorizationSelector);
-        return consultations.filter((a) => a.status === status);
-      },
+    ({ get }) => {
+      const consultations = get(consultationsByAuthorizationSelector);
+      return consultations.filter((a) => a.status === status);
+    },
 });
 
 const todaysReportSelector = selector({
@@ -105,6 +109,7 @@ const Reception = () => {
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const consultationsByStatus = useRecoilValue(consultationsByStatusSelector({ status }));
+  const [todaysPassagesOpen, setTodaysPassagesOpen] = useState(false);
 
   const dataConsolidated = useMemo(
     () => [...actionsByStatus, ...consultationsByStatus].sort((a, b) => new Date(b.dueAt || b.date) - new Date(a.dueAt || a.date)),
@@ -243,7 +248,7 @@ const Reception = () => {
         }
       />
       <PersonsWrapper>
-        <div style={{ flexGrow: "1" }}>
+        <div style={{ flexGrow: '1' }}>
           <SelectAndCreatePerson
             value={selectedPersons}
             onChange={onSelectPerson}
@@ -273,32 +278,88 @@ const Reception = () => {
         </Col>
         <Col md={4}>
           <PassagesWrapper>
-            <h5 id="passages-title">{passages.length} passage{passages.length > 1 ? 's' : ''}</h5>
-            <ButtonCustom
-              onClick={onAddAnonymousPassage}
-              color="primary"
-              icon={plusIcon}
-              title="Passage anonyme"
-              id="add-anonymous-passage"
-            />
-            <ButtonCustom
-              onClick={() => history.push(`/report/${todaysReport._id}?tab=6`)}
-              color="link"
-              title="Modifier les passages"
-              padding="0px"
-            />
+            <h5 id="passages-title">
+              {passages.length} passage{passages.length > 1 ? 's' : ''}
+            </h5>
+            <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
+            <div style={{ display: 'flex', flexDirection: "column", gap: '0.5rem' }}>
+              <ButtonCustom
+                onClick={() => history.push(`/report/${todaysReport._id}?tab=6`)}
+                color="link"
+                title="Modifier les passages"
+                padding="0px"
+              />
+              <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
+            </div>
           </PassagesWrapper>
           <ServicesWrapper>
             <h5 className="services-title">Services</h5>
             <div className="services-incrementators">
               {organisation?.services?.map((service) => (
-                <IncrementorSmall key={service} service={service} count={services[service] || 0} onChange={(newCount) => onServiceUpdate(service, newCount)} />
+                <IncrementorSmall
+                  key={service}
+                  service={service}
+                  count={services[service] || 0}
+                  onChange={(newCount) => onServiceUpdate(service, newCount)}
+                />
               ))}
             </div>
           </ServicesWrapper>
         </Col>
       </Row>
+      <PassagesToday isOpen={todaysPassagesOpen} setOpen={setTodaysPassagesOpen} passages={passages} />
     </>
+  );
+};
+
+const PassagesToday = ({ passages, isOpen, setOpen }) => {
+  const [passageToEdit, setPassageToEdit] = useState(null);
+
+  return (
+    <Modal isOpen={isOpen} toggle={() => setOpen(false)} size="lg" backdrop="static">
+      <ModalHeader toggle={() => setOpen(false)}>Passages du {formatDateWithNameOfDay(now())}</ModalHeader>
+      <ModalBody>
+        <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+        {!!passages.length && (
+          <Table
+            className="Table"
+            onRowClick={setPassageToEdit}
+            data={passages}
+            rowKey={'_id'}
+            columns={[
+              {
+                title: 'Heure',
+                dataKey: 'date',
+                render: (passage) => {
+                  const time = dayjs(passage.date).format('HH:mm');
+                  // anonymous comment migrated from `report.passages`
+                  // have no time
+                  // have no user assigned either
+                  if (time === '00:00' && !passage.user) return null;
+                  return <span>{time}</span>;
+                },
+              },
+              {
+                title: 'Personne suivie',
+                dataKey: 'person',
+                render: (passage) =>
+                  passage.person ? (
+                    <PersonName item={passage} redirectToTab="passages" />
+                  ) : (
+                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
+                  ),
+              },
+              {
+                title: 'Enregistré par',
+                dataKey: 'user',
+                render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+              },
+              { title: 'Commentaire', dataKey: 'comment' },
+            ]}
+          />
+        )}
+      </ModalBody>
+    </Modal>
   );
 };
 

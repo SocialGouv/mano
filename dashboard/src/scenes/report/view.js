@@ -74,7 +74,7 @@ const View = () => {
   const location = useLocation();
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || ['restricted-access'].includes(user.role) ? 1 : 0));
+  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (['restricted-access'].includes(user.role) ? 1 : 0)));
   const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? [...tabs, ...healthcareTabs] : tabs);
   const API = useApi();
 

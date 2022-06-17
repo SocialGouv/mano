@@ -45,6 +45,7 @@ const Passage = ({ passage, onFinished }) => {
 
   const isNew = !passage?._id;
   const isForPerson = !!passage?.person;
+  const showMultiSelect = isNew && !isForPerson;
 
   return (
     <>
@@ -59,7 +60,8 @@ const Passage = ({ passage, onFinished }) => {
               if (!body.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
               if (body.anonymous && !body.anonymousNumberOfPassages)
                 return toastr.error('Erreur!', 'Veuillez spécifier le nombre de passages anonymes');
-              if (!body.anonymous && !body.persons?.length) return toastr.error('Erreur!', 'Veuillez spécifier une personne');
+              if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length))
+                return toastr.error('Erreur!', 'Veuillez spécifier une personne');
 
               if (isNew) {
                 const newPassage = {
@@ -79,7 +81,7 @@ const Passage = ({ passage, onFinished }) => {
                       setPassages((passages) => [response.decryptedData, ...passages]);
                     }
                   }
-                } else {
+                } else if (showMultiSelect) {
                   for (const person of body.persons) {
                     const response = await API.post({
                       path: '/passage',
@@ -88,6 +90,14 @@ const Passage = ({ passage, onFinished }) => {
                     if (response.ok) {
                       setPassages((passages) => [response.decryptedData, ...passages]);
                     }
+                  }
+                } else {
+                  const response = await API.post({
+                    path: '/passage',
+                    body: preparePassageForEncryption({ ...newPassage, person: body.person }),
+                  });
+                  if (response.ok) {
+                    setPassages((passages) => [response.decryptedData, ...passages]);
                   }
                 }
 
@@ -167,7 +177,7 @@ const Passage = ({ passage, onFinished }) => {
                               id="number-of-anonymous-passages"
                             />
                           </>
-                        ) : isNew && !isForPerson ? (
+                        ) : showMultiSelect ? (
                           <SelectPerson value={values.persons} onChange={handleChange} isClearable isMulti name="persons" />
                         ) : (
                           <SelectPerson value={values.person} onChange={handleChange} />
