@@ -14,6 +14,7 @@ import { currentTeamState, teamsState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { useRecoilState } from 'recoil';
 import useTitle from '../../services/useTitle';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
 const View = () => {
   const [team, setTeam] = useState(null);
@@ -35,17 +36,6 @@ const View = () => {
     getTeam();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  const deleteData = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const res = await API.delete({ path: `/team/${id}` });
-      if (!res.ok) return;
-      setTeams(teams.filter((t) => t._id !== id));
-      toastr.success('Suppression réussie');
-      history.goBack();
-    }
-  };
 
   if (!team) return <Loading />;
 
@@ -95,7 +85,21 @@ const View = () => {
                 </Col>
               </Row>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                <ButtonCustom title={'Supprimer'} type="button" color="danger" onClick={deleteData} />
+                <DeleteButtonAndConfirmModal
+                  title={`Voulez-vous vraiment supprimer l'équipe ${team.name}`}
+                  textToConfirm={team.name}
+                  onConfirm={async () => {
+                    const res = await API.delete({ path: `/team/${id}` });
+                    if (!res.ok) return;
+                    setTeams(teams.filter((t) => t._id !== id));
+                    toastr.success('Suppression réussie');
+                    history.goBack();
+                  }}>
+                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                    Cette opération est irréversible
+                    <br />
+                  </span>
+                </DeleteButtonAndConfirmModal>
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
               </div>
             </React.Fragment>

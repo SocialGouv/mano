@@ -171,8 +171,8 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
             render: (f) => (
               <DeleteButtonAndConfirmModal
                 buttonWidth={75}
-                title={`Voulez-vous vraiment supprimer le champ ${f.name}`}
-                textToConfirm={f.name}
+                title={`Voulez-vous vraiment supprimer le champ ${f.label}`}
+                textToConfirm={f.label}
                 onConfirm={async () => onDelete(f)}>
                 <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
                   Cette opération est irréversible
@@ -274,12 +274,14 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField }) => 
                     </Col>
                   </Row>
                   <br />
-                  <ButtonCustom
-                    disabled={isSubmitting || !field.label}
-                    loading={isSubmitting}
-                    onClick={() => !isSubmitting && handleSubmit()}
-                    title="Enregistrer"
-                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                    <ButtonCustom
+                      disabled={isSubmitting || !field.label}
+                      loading={isSubmitting}
+                      onClick={() => !isSubmitting && handleSubmit()}
+                      title="Enregistrer"
+                    />
+                  </div>
                 </React.Fragment>
               );
             }}

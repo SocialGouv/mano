@@ -29,15 +29,6 @@ const View = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
-  const deleteData = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const response = await API.delete({ path: `/structure/${id}` });
-      if (response.ok) toastr.success('Suppression réussie');
-      history.goBack();
-    }
-  };
-
   useTitle(`${structure?.name} - Structure`);
 
   if (!structure) return <Loading />;

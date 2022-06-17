@@ -14,7 +14,7 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectRole from '../../components/SelectRole';
 import { organisationState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
-import { AppSentry, capture } from '../../services/sentry';
+import { AppSentry } from '../../services/sentry';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
@@ -36,16 +36,6 @@ const View = () => {
   useEffect(() => {
     getData();
   }, [getData, id]);
-
-  const deleteData = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const res = await API.delete({ path: `/user/${id}` });
-      if (!res.ok) return;
-      toastr.success('Suppression réussie');
-      history.goBack();
-    }
-  };
 
   if (!localUser) return <Loading />;
 

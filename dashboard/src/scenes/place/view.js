@@ -16,6 +16,7 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
 const View = () => {
   const { id } = useParams();
@@ -29,24 +30,6 @@ const View = () => {
 
   const place = places.find((p) => p._id === id);
   useTitle(`${place?.name} - Lieu fréquenté`);
-
-  const deleteData = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const placeRes = await API.delete({ path: `/place/${id}` });
-      if (placeRes.ok) {
-        setPlaces((places) => places.filter((p) => p._id !== id));
-        for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === id)) {
-          const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-          if (res.ok) {
-            setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
-          }
-        }
-        toastr.success('Suppression réussie');
-        history.goBack();
-      }
-    }
-  };
 
   if (!place) return <Loading />;
 
@@ -109,7 +92,29 @@ const View = () => {
                 </Col>
               </Row>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                <ButtonCustom title={'Supprimer'} type="button" color="danger" onClick={deleteData} />
+                <DeleteButtonAndConfirmModal
+                  title={`Voulez-vous vraiment supprimer le lieu ${place.name}`}
+                  textToConfirm={place.name}
+                  onConfirm={async () => {
+                    const placeRes = await API.delete({ path: `/place/${id}` });
+                    if (placeRes.ok) {
+                      setPlaces((places) => places.filter((p) => p._id !== id));
+                      for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === id)) {
+                        const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+                        if (res.ok) {
+                          setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+                        }
+                      }
+                      toastr.success('Suppression réussie');
+                      history.goBack();
+                    }
+                  }}>
+                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                    Cette opération est irréversible
+                    <br />
+                    et entrainera la suppression définitive de ce lieu et de toutes les notifications de personnes passées dans ce lieu.
+                  </span>
+                </DeleteButtonAndConfirmModal>
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
               </div>
             </React.Fragment>
