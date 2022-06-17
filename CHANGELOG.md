@@ -1,3 +1,10 @@
+## [1.121.1](https://github.com/SocialGouv/mano/compare/v1.121.0...v1.121.1) (2022-06-17)
+
+
+### Bug Fixes
+
+* **app:** improve colors ([#752](https://github.com/SocialGouv/mano/issues/752)) ([7574655](https://github.com/SocialGouv/mano/commit/75746556a07a90ff9c4400aa0ca839980941d9a0))
+
 # [1.121.0](https://github.com/SocialGouv/mano/compare/v1.120.0...v1.121.0) (2022-06-17)
 
 
