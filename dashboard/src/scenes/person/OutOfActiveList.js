@@ -51,9 +51,7 @@ const OutOfActiveList = ({ person }) => {
       <ButtonCustom
         title={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
         type="button"
-        style={{ marginRight: 10 }}
         onClick={() => (person.outOfActiveList ? handleSetOutOfActiveList() : setOpen(true))}
-        width={person.outOfActiveList ? 250 : 200}
         color={'warning'}
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">

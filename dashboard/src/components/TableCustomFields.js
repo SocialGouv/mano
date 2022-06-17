@@ -10,6 +10,7 @@ import useApi from '../services/api';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import Table from './table';
+import DeleteButtonAndConfirmModal from './DeleteButtonAndConfirmModal';
 
 const newField = () => ({
   // Todo: I guess could use crypto here.
@@ -179,19 +180,30 @@ const TableCustomFields = ({
             dataKey: 'name',
             small: true,
             show: !onlyOptionsEditable,
-            render: (f) => <ButtonCustom title="Supprimer" loading={isSubmitting} onClick={() => onDelete(f)} width={75} color="danger" />,
+            render: (f) => (
+              <DeleteButtonAndConfirmModal
+                buttonWidth={75}
+                title={`Voulez-vous vraiment supprimer le champ ${f.label}`}
+                textToConfirm={f.label}
+                onConfirm={async () => onDelete(f)}>
+                <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                  Cette opération est irréversible
+                  <br />
+                  et entrainera la suppression définitive de toutes les données enregistrées sous ce champ.
+                </span>
+              </DeleteButtonAndConfirmModal>
+            ),
           },
           // Remove null fields
         ].filter((col) => !!col.show)}
       />
       <ButtonsWrapper>
-        {!onlyOptionsEditable && <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={() => setIsNewField(true)} width={200} />}
+        {!onlyOptionsEditable && <ButtonCustom title="Ajouter un champ" loading={isSubmitting} onClick={() => setIsNewField(true)} />}
         <ButtonCustom
           title="Mettre à jour"
           loading={isSubmitting}
           onClick={() => handleSubmit()}
           disabled={JSON.stringify(mutableData) === JSON.stringify(data)}
-          width={200}
         />
       </ButtonsWrapper>
       <EditCustomField
@@ -290,12 +302,14 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
                     </Col>
                   </Row>
                   <br />
-                  <ButtonCustom
-                    disabled={isSubmitting || !field.label}
-                    loading={isSubmitting}
-                    onClick={() => !isSubmitting && handleSubmit()}
-                    title="Enregistrer"
-                  />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                    <ButtonCustom
+                      disabled={isSubmitting || !field.label}
+                      loading={isSubmitting}
+                      onClick={() => !isSubmitting && handleSubmit()}
+                      title="Enregistrer"
+                    />
+                  </div>
                 </React.Fragment>
               );
             }}
@@ -326,6 +340,7 @@ const CellWrapper = styled.div`
 const ButtonsWrapper = styled.div`
   display: flex;
   justify-content: flex-end;
+  gap: 1rem;
   margin-top: 40px;
   margin-bottom: 40px;
   width: 100%;

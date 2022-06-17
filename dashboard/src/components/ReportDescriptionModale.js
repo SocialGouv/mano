@@ -61,8 +61,8 @@ const ReportDescriptionModale = ({ report }) => {
                     />
                   </FormGroup>
                 </Col>
-                <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <ButtonCustom title={'Enregistrer'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                  <ButtonCustom title={'Enregistrer'} loading={isSubmitting} onClick={handleSubmit} />
                 </Col>
               </Row>
             )}

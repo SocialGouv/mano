@@ -257,9 +257,9 @@ const View = () => {
                     </FormGroup>
                   </Col>
                 </Row>
-                <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                  <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
-                  <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                  <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} />
+                  <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
                 </div>
               </React.Fragment>
             );

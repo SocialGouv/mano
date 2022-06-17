@@ -1,3 +1,10 @@
+# [1.122.0](https://github.com/SocialGouv/mano/compare/v1.121.1...v1.122.0) (2022-06-17)
+
+
+### Features
+
+* **dashboard:**  confirm suppression for critical things ([#753](https://github.com/SocialGouv/mano/issues/753)) ([5cb2024](https://github.com/SocialGouv/mano/commit/5cb202456c16ff94b9732324286e0a3cd30baf38))
+
 ## [1.121.1](https://github.com/SocialGouv/mano/compare/v1.121.0...v1.121.1) (2022-06-17)
 
 

@@ -293,7 +293,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"]),
+  validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.params._id);
