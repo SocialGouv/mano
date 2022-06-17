@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     services text[],
     collaborations text[],
     "customFieldsObs" jsonb,
+    "fieldsPersonsCustomizableOptions" jsonb,
     "customFieldsPersonsSocial" jsonb,
     "customFieldsPersonsMedical" jsonb,
     "encryptedVerificationKey" text,

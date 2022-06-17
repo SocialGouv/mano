@@ -10,7 +10,12 @@ import Box from '../../components/Box';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
-import { defaultMedicalCustomFields, personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
+import {
+  customFieldsPersonsMedicalSelector,
+  customFieldsPersonsSocialSelector,
+  fieldsPersonsCustomizableOptionsSelector,
+  personFieldsIncludingCustomFieldsSelector,
+} from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState, userState } from '../../recoil/auth';
@@ -24,7 +29,6 @@ import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { refreshTriggerState } from '../../components/Loader';
 import useTitle from '../../services/useTitle';
 import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
-import { defaultMedicalFileCustomFields } from '../../recoil/medicalFiles';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { capture } from '../../services/sentry';
 
@@ -49,6 +53,9 @@ const View = () => {
   const reports = useRecoilValue(reportsState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
@@ -187,10 +194,7 @@ const View = () => {
                               <TableCustomFields
                                 customFields="customFieldsMedicalFile"
                                 key="customFieldsMedicalFile"
-                                data={(() => {
-                                  if (Array.isArray(organisation.customFieldsMedicalFile)) return organisation.customFieldsMedicalFile;
-                                  return defaultMedicalFileCustomFields;
-                                })()}
+                                data={customFieldsPersonsMedical}
                               />
                             </Row>
                           </>
@@ -468,14 +472,20 @@ const View = () => {
                         {organisation.encryptionEnabled ? (
                           <>
                             <Row>
+                              <Label>Champs permanents - options modulables</Label>
+                              <TableCustomFields
+                                customFields="fieldsPersonsCustomizableOptions"
+                                key="fieldsPersonsCustomizableOptions"
+                                data={fieldsPersonsCustomizableOptions}
+                                onlyOptionsEditable
+                              />
+                            </Row>
+                            <Row>
                               <Label>Champs personnalisés - informations sociales</Label>
                               <TableCustomFields
                                 customFields="customFieldsPersonsSocial"
                                 key="customFieldsPersonsSocial"
-                                data={(() => {
-                                  if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
-                                  return [];
-                                })()}
+                                data={customFieldsPersonsSocial}
                               />
                             </Row>
                             <Row>
@@ -483,10 +493,7 @@ const View = () => {
                               <TableCustomFields
                                 customFields="customFieldsPersonsMedical"
                                 key="customFieldsPersonsMedical"
-                                data={(() => {
-                                  if (Array.isArray(organisation.customFieldsPersonsMedical)) return organisation.customFieldsPersonsMedical;
-                                  return defaultMedicalCustomFields;
-                                })()}
+                                data={customFieldsPersonsMedical}
                               />
                             </Row>
                           </>

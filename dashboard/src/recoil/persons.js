@@ -10,6 +10,15 @@ export const personsState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
+export const fieldsPersonsCustomizableOptionsSelector = selector({
+  key: 'fieldsPersonsCustomizableOptionsSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (Array.isArray(organisation.fieldsPersonsCustomizableOptions)) return organisation.fieldsPersonsCustomizableOptions;
+    return fieldsPersonsCustomizableOptions;
+  },
+});
+
 export const customFieldsPersonsMedicalSelector = selector({
   key: 'customFieldsPersonsMedicalSelector',
   get: ({ get }) => {
@@ -24,7 +33,7 @@ export const customFieldsPersonsSocialSelector = selector({
   get: ({ get }) => {
     const organisation = get(organisationState);
     if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
-    return [];
+    return defaultMedicalCustomFields;
   },
 });
 
@@ -111,11 +120,12 @@ export const defaultMedicalCustomFields = [
 export const personFieldsIncludingCustomFieldsSelector = selector({
   key: 'personFieldsIncludingCustomFieldsSelector',
   get: ({ get }) => {
+    const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
     const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
     const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
     return [
       ...personFields,
-      ...[...customFieldsPersonsMedical, ...customFieldsPersonsSocial].map((f) => {
+      ...[...fieldsPersonsCustomizableOptions, ...customFieldsPersonsMedical, ...customFieldsPersonsSocial].map((f) => {
         return {
           name: f.name,
           type: f.type,
@@ -197,6 +207,17 @@ export const outOfActiveListReasonOptions = [
   'Hospitalisation',
   'Reconduite à la frontière',
   'Autre',
+];
+
+const fieldsPersonsCustomizableOptions = [
+  {
+    name: 'outOfActiveListReason',
+    type: 'enum',
+    label: 'Motif de sortie de file active',
+    options: outOfActiveListReasonOptions,
+    showInStats: true,
+    enabled: true,
+  },
 ];
 
 /*
@@ -282,20 +303,17 @@ export const personFields = [
     options: yesNoOptions,
     filterable: true,
   },
-  {
-    name: 'outOfActiveListReason',
-    type: 'enum',
-    label: 'Motif de sortie de file active',
-    encrypted: true,
-    importable: false,
-    options: outOfActiveListReasonOptions,
-  },
   { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
 export const preparePersonForEncryption = (customFieldsMedical, customFieldsSocial) => (person) => {
-  const encryptedFieldsIncludingCustom = [...customFieldsSocial.map((f) => f.name), ...customFieldsMedical.map((f) => f.name), ...encryptedFields];
+  const encryptedFieldsIncludingCustom = [
+    ...customFieldsSocial.map((f) => f.name),
+    ...customFieldsMedical.map((f) => f.name),
+    ...fieldsPersonsCustomizableOptions.map((f) => f.name),
+    ...encryptedFields,
+  ];
   const decrypted = {};
   for (let field of encryptedFieldsIncludingCustom) {
     decrypted[field] = person[field];
