@@ -1,3 +1,10 @@
+## [1.119.1](https://github.com/SocialGouv/mano/compare/v1.119.0...v1.119.1) (2022-06-17)
+
+
+### Bug Fixes
+
+* **dashboard:** accessibilité partielle ([b27ae67](https://github.com/SocialGouv/mano/commit/b27ae678d8ca5e0f1291627f8d62762cc8193c83))
+
 # [1.119.0](https://github.com/SocialGouv/mano/compare/v1.118.0...v1.119.0) (2022-06-16)
 
 
