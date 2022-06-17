@@ -1,3 +1,10 @@
+## [1.123.1](https://github.com/SocialGouv/mano/compare/v1.123.0...v1.123.1) (2022-06-17)
+
+
+### Bug Fixes
+
+* **api:** bump version ([6338665](https://github.com/SocialGouv/mano/commit/63386651aa413ea4752afaed81f56e3d667fd182))
+
 # [1.123.0](https://github.com/SocialGouv/mano/compare/v1.122.0...v1.123.0) (2022-06-17)
 
 
