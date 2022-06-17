@@ -109,7 +109,10 @@ const Drawer = () => {
           </>
         )}
       </Nav>
-      <Version>Version: {version}</Version>
+      <Footer>
+        <span>Version: {version}</span>
+        <span>Accessibilité: partielle</span>
+      </Footer>
     </Sidebar>
   );
 };
@@ -161,10 +164,12 @@ const Nav = styled.div`
     list-style-type: none;
   }
 `;
-const Version = styled.span`
+const Footer = styled.p`
   margin-top: auto;
   font-size: 0.65rem;
-  display: block;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   color: ${theme.main};
 `;
 export default Drawer;
