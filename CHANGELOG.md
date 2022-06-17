@@ -1,3 +1,10 @@
+# [1.121.0](https://github.com/SocialGouv/mano/compare/v1.120.0...v1.121.0) (2022-06-17)
+
+
+### Features
+
+* **dashboard:** reorder menu ([#751](https://github.com/SocialGouv/mano/issues/751)) ([1ea377f](https://github.com/SocialGouv/mano/commit/1ea377f91ee1c94971ef2cac92cddb00207d6db1))
+
 # [1.120.0](https://github.com/SocialGouv/mano/compare/v1.119.1...v1.120.0) (2022-06-17)
 
 
