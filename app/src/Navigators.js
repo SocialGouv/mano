@@ -177,7 +177,7 @@ const TabNavigator = () => (
     initialRouteName="Agenda"
     tabBarOptions={{
       activeTintColor: colors.app.color,
-      inactiveTintColor: '#ddd',
+      inactiveTintColor: '#aaa',
     }}
     screenOptions={{
       gestureEnabled: false,

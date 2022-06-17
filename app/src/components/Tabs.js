@@ -82,13 +82,7 @@ const styles = StyleSheet.create({
     transform: [
       {
         translateY:
-          parentScroll?.interpolate && !forceTop
-            ? parentScroll.interpolate({
-                inputRange: [0, 100],
-                outputRange: [90, 0],
-                extrapolate: 'clamp',
-              })
-            : 0,
+          parentScroll?.interpolate && !forceTop ? parentScroll.interpolate({ inputRange: [0, 100], outputRange: [90, 0], extrapolate: 'clamp' }) : 0,
       },
     ],
   }),
@@ -123,7 +117,7 @@ const styles = StyleSheet.create({
     textTransform: 'none',
     fontFamily: 'NexaRegular',
     fontSize: 15,
-    color: '#000',
+    color: '#fff',
   },
   activeLabelStyle: {
     color: colors.app.secondary,
