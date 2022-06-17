@@ -14,96 +14,99 @@ const Drawer = () => {
 
   const onboardingForEncryption = !organisation.encryptionEnabled;
   const onboardingForTeams = !teams.length;
+  const role = user.role;
 
   return (
     <Sidebar className="noprint" isOnboarding={onboardingForEncryption || onboardingForTeams} title="Navigation principale">
       <Nav>
-        {!['superadmin'].includes(user.role) && (
+        {['admin', 'normal'].includes(role) && (
           <>
-            {!!organisation.receptionEnabled && (
-              <li>
-                <NavLink to="/reception" activeClassName="active">
-                  Accueil
-                </NavLink>
-              </li>
-            )}
-            {!['restricted-access'].includes(user.role) && (
-              <li>
-                <NavLink to="/search" activeClassName="active">
-                  Recherche
-                </NavLink>
-              </li>
-            )}
-            {!['restricted-access'].includes(user.role) && (
-              <li>
-                <NavLink to="/stats" activeClassName="active">
-                  Statistiques
-                </NavLink>
-              </li>
-            )}
+            <li>
+              <NavLink to="/search" activeClassName="active">
+                &#128269; Recherche
+              </NavLink>
+            </li>
+            <hr />
           </>
         )}
-        <hr />
-        {['admin'].includes(user.role) && (
-          <li id="show-on-onboarding">
-            <NavLink to={`/organisation/${organisation._id}`} activeClassName="active">
-              Organisation
+        {['admin', 'normal', 'restricted-access'].includes(role) && !!organisation.receptionEnabled && (
+          <li>
+            <NavLink to="/reception" activeClassName="active">
+              Accueil
             </NavLink>
           </li>
         )}
-        {['admin'].includes(user.role) && (
-          <li id="show-on-onboarding">
-            <NavLink to="/team" activeClassName="active">
-              Équipes
+        {['admin', 'normal'].includes(role) && (
+          <li>
+            <NavLink to="/action" activeClassName="active">
+              Agenda
             </NavLink>
           </li>
         )}
-        {['admin'].includes(user.role) && (
-          <React.Fragment>
-            <li>
-              <NavLink to="/user" activeClassName="active">
-                Utilisateurs
-              </NavLink>
-            </li>
-            <hr />
-          </React.Fragment>
+        {['admin', 'normal', 'restricted-access'].includes(role) && (
+          <li>
+            <NavLink to="/person" activeClassName="active">
+              Personnes suivies
+            </NavLink>
+          </li>
         )}
-        {!['superadmin'].includes(user.role) && (
+        {['admin', 'normal'].includes(role) && (
+          <li>
+            <NavLink to="/territory" activeClassName="active">
+              Territoires
+            </NavLink>
+          </li>
+        )}
+        {['admin', 'normal', 'restricted-access'].includes(role) && (
           <>
-            <li>
-              <NavLink to="/person" activeClassName="active">
-                Personnes suivies
-              </NavLink>
-            </li>
-            {!['restricted-access'].includes(user.role) && (
-              <>
-                <li>
-                  <NavLink to="/action" activeClassName="active">
-                    Agenda
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to="/territory" activeClassName="active">
-                    Territoires
-                  </NavLink>
-                </li>
-                <hr />
-                <li>
-                  <NavLink to="/place" activeClassName="active">
-                    Lieux fréquentés
-                  </NavLink>
-                </li>
-                <li>
-                  <NavLink to="/structure" activeClassName="active">
-                    Structures
-                  </NavLink>
-                </li>
-              </>
-            )}
-            <hr />
             <li>
               <NavLink to="/report" activeClassName="active">
                 Comptes rendus
+              </NavLink>
+            </li>
+          </>
+        )}
+        {['admin', 'normal'].includes(role) && (
+          <>
+            <hr />
+            <li>
+              <NavLink to="/place" activeClassName="active">
+                Lieux fréquentés
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/structure" activeClassName="active">
+                Structures
+              </NavLink>
+            </li>
+            <hr />
+          </>
+        )}
+        {['admin', 'normal'].includes(role) && (
+          <>
+            <li>
+              <NavLink to="/stats" activeClassName="active">
+                Statistiques
+              </NavLink>
+            </li>
+          </>
+        )}
+        {['admin'].includes(role) && (
+          <>
+            <hr />
+            <li id="show-on-onboarding">
+              <NavLink to={`/organisation/${organisation._id}`} activeClassName="active">
+                Organisation
+              </NavLink>
+            </li>
+            <li id="show-on-onboarding">
+              <NavLink to="/team" activeClassName="active">
+                Équipes
+              </NavLink>
+            </li>
+            <li>
+              <NavLink to="/user" activeClassName="active">
+                Utilisateurs
               </NavLink>
             </li>
           </>
