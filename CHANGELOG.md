@@ -1,3 +1,15 @@
+# [1.120.0](https://github.com/SocialGouv/mano/compare/v1.119.1...v1.120.0) (2022-06-17)
+
+
+### Bug Fixes
+
+* **api:** validate migrations since app is ready for it ([#747](https://github.com/SocialGouv/mano/issues/747)) ([5a246ed](https://github.com/SocialGouv/mano/commit/5a246ed5c3e7747cd022383ef61b1dc834b6448f))
+
+
+### Features
+
+* **dashboard:** show all passages from today in reception ([#749](https://github.com/SocialGouv/mano/issues/749)) ([4f1b295](https://github.com/SocialGouv/mano/commit/4f1b295bd19d8b54ff6136cf1d0f4ea7d0bfebec))
+
 ## [1.119.1](https://github.com/SocialGouv/mano/compare/v1.119.0...v1.119.1) (2022-06-17)
 
 
