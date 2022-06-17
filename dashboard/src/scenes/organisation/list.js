@@ -9,12 +9,16 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Loading from '../../components/loading';
 import CreateWrapper from '../../components/createWrapper';
 import useApi from '../../services/api';
-import DeleteOrganisation from '../../components/DeleteOrganisation';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { capture } from '../../services/sentry';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../recoil/auth';
 
 const List = () => {
   const [organisations, setOrganisations] = useState(null);
+  const user = useRecoilValue(userState);
   const [updateKey, setUpdateKey] = useState(null);
   const [sortBy, setSortBy] = useState('countersTotal');
   const [sortOrder, setSortOrder] = useState('DESC');
@@ -105,16 +109,31 @@ const List = () => {
           {
             title: 'Action',
             dataKey: 'delete',
-            render: (o) => {
+            render: (organisation) => {
               return (
-                <DeleteOrganisation
-                  buttonTitle="Supprimer"
-                  onSuccess={() => {
-                    setRefresh(true);
-                  }}
-                  buttonStyle={{ margin: 'auto' }}
-                  organisation={o}
-                />
+                <DeleteButtonAndConfirmModal
+                  title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
+                  textToConfirm={organisation.name}
+                  onConfirm={async () => {
+                    try {
+                      const res = await API.delete({ path: `/organisation/${organisation._id}` });
+                      if (res.ok) {
+                        toastr.success('Organisation supprimée');
+                        setRefresh(true);
+                      }
+                    } catch (organisationDeleteError) {
+                      capture(organisationDeleteError, { extra: { organisation }, user });
+                      toastr.error('Erreur!', organisationDeleteError.message);
+                    }
+                  }}>
+                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                    Cette opération est irréversible
+                    <br />
+                    et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
+                    <br />
+                    équipes, utilisateurs, personnes suivies, actions, territoires, commentaires et observations, comptes-rendus...
+                  </span>
+                </DeleteButtonAndConfirmModal>
               );
             },
           },

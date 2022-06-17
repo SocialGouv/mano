@@ -11,6 +11,7 @@ import Loading from '../../components/loading';
 import Box from '../../components/Box';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
 const View = () => {
   const [structure, setStructure] = useState(null);
@@ -68,9 +69,24 @@ const View = () => {
                   </FormGroup>
                 </Col>
               </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                <DeleteButtonAndConfirmModal
+                  title={`Voulez-vous vraiment supprimer la structure ${structure.name}`}
+                  textToConfirm={structure.name}
+                  onConfirm={async () => {
+                    const response = await API.delete({ path: `/structure/${id}` });
+                    if (response.ok) toastr.success('Suppression réussie');
+                    history.goBack();
+                  }}>
+                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                    Cette opération est irréversible
+                    <br />
+                    et entrainera la suppression définitive de cette structure
+                    <br />
+                    pour toutes les organisations qui utilisent Mano
+                  </span>
+                </DeleteButtonAndConfirmModal>
                 <ButtonCustom loading={isSubmitting} onClick={handleSubmit} title="Mettre à jour" />
-                <ButtonCustom style={{ marginLeft: 10 }} color="danger" onClick={deleteData} title="Supprimer" />
               </div>
             </React.Fragment>
           )}
