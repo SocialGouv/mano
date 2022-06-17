@@ -18,8 +18,8 @@ const Comment = require("../models/comment");
 const Passage = require("../models/passage");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
-const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../utils");
-const { capture } = require("../sentry");
+const { looseUuidRegex, customFieldSchema, positiveIntegerRegex, jwtRegex, headerJwtRegex } = require("../utils");
+const { checkEncryptedVerificationKey } = require("../utils/encryption");
 const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const TerritoryObservation = require("../models/territoryObservation");
@@ -132,6 +132,32 @@ Nathan Fradin, chargé de déploiement: nathan.fradin.mano@gmail.com - +33 6 29 
 Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96
 `;
     await mailservice.sendEmail(adminUser.email, subject, body);
+
+    return res.status(200).send({ ok: true });
+  })
+);
+
+router.post(
+  "/check-encryption-key",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "restricted-access"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.user.organisation);
+      z.string().regex(jwtRegex).parse(req.cookies.jwt);
+      z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.auth);
+      z.enum(["android", "dashboard"]).parse(req.headers.platform);
+      z.string().parse(req.body.orgEncryptionKey);
+    } catch (e) {
+      const error = new Error(`Invalid request in check encryption key: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+    const encryptionKeyIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, req.body.orgEncryptionKey);
+    if (!encryptionKeyIsValid) {
+      return res.status(400).send({ ok: false, error: "La clé de chiffrement ne semble pas être correcte, veuillez réessayer." });
+    }
 
     return res.status(200).send({ ok: true });
   })

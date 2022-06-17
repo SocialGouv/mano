@@ -1,0 +1,54 @@
+const libsodium = require("libsodium-wrappers");
+
+/*
+
+Decrypt
+
+*/
+
+const derivedMasterKey = async (password) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+
+  const password_base64 = Buffer.from(password, "binary").toString("base64");
+
+  let salt = Buffer.from("808182838485868788898a8b8c8d8e8f", "hex");
+  const crypted = sodium.crypto_pwhash(32, password_base64, salt, 2, 65536 << 10, 2);
+
+  // Uint8Array
+  return crypted;
+};
+
+const _decrypt_after_extracting_nonce = async (nonce_and_ciphertext_b64, key_uint8array) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+
+  const nonce_and_cypher_uint8array = sodium.from_base64(nonce_and_ciphertext_b64, sodium.base64_variants.ORIGINAL);
+
+  if (nonce_and_cypher_uint8array.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
+    throw new Error("Short message");
+  }
+
+  const nonce_uint8array = nonce_and_cypher_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
+  const ciphertext_uint8array = nonce_and_cypher_uint8array.slice(sodium.crypto_secretbox_NONCEBYTES);
+  return sodium.crypto_secretbox_open_easy(ciphertext_uint8array, nonce_uint8array, key_uint8array);
+};
+
+const verificationPassphrase = "Surprise !";
+
+const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey) => {
+  const hashedMasterKey = await derivedMasterKey(masterKey);
+  try {
+    const decryptedVerificationKey_uint8array = await _decrypt_after_extracting_nonce(encryptedVerificationKey, hashedMasterKey);
+    const decryptedVerificationKey = Buffer.from(new TextDecoder().decode(decryptedVerificationKey_uint8array), "base64").toString("binary");
+    console.log({ decryptedVerificationKey, verificationPassphrase });
+    return decryptedVerificationKey === verificationPassphrase;
+  } catch (e) {
+    console.log("error checkEncryptedVerificationKey", e);
+  }
+  return false;
+};
+
+module.exports = {
+  checkEncryptedVerificationKey,
+};

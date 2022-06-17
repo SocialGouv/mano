@@ -6,7 +6,7 @@ import fetchRetry from 'fetch-retry';
 import { version } from '../../package.json';
 import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, encryptFile, decryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
 import { apiVersionState } from '../recoil/apiVersion';
 const fetch = fetchRetry(window.fetch);
@@ -26,15 +26,8 @@ let wrongKeyWarned = false; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryp
 export let tokenCached = null;
 
 /* methods */
-export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificationKey = null, name, _id } = {}) => {
-  const newHashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
-  if (!!encryptedVerificationKey) {
-    const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
-    if (!encryptionKeyIsValid) {
-      toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
-      return false;
-    }
-  }
+export const setEncryptedVerificationKey = async (decryptedVerificationKey) => {
+  const newHashedOrgEncryptionKey = await derivedMasterKey(decryptedVerificationKey);
   hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
   enableEncrypt = true;
   sendCaptureError = 0;
@@ -62,7 +55,7 @@ export const encryptItem =
     return item;
   };
 
-const decryptDBItem = async (item, { logout, debug = false, encryptedVerificationKey = null } = {}) => {
+const decryptDBItem = async (item, { logout, debug = false, encryptionEnabled = false } = {}) => {
   if (wrongKeyWarned) return item;
   if (!enableEncrypt) return item;
   if (!item.encrypted) return item;
@@ -96,7 +89,7 @@ const decryptDBItem = async (item, { logout, debug = false, encryptedVerificatio
       });
       sendCaptureError++;
     }
-    if (!!encryptedVerificationKey) {
+    if (!!encryptionEnabled) {
       toastr.error(
         "Désolé, un élément n'a pas pu être déchiffré",
         "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
@@ -133,7 +126,7 @@ const useApi = () => {
   const setApiVersion = useSetRecoilState(apiVersionState);
   const history = useHistory();
 
-  const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
+  const { encryptionLastUpdateAt, encryptionEnabled, migrationLastUpdateAt } = organisation;
 
   const reset = () => {
     hashedOrgEncryptionKey = null;
@@ -256,7 +249,7 @@ const useApi = () => {
         if (!!res.data && Array.isArray(res.data)) {
           const decryptedData = [];
           for (const item of res.data) {
-            const decryptedItem = await decryptDBItem(item, { debug, logout, encryptedVerificationKey });
+            const decryptedItem = await decryptDBItem(item, { debug, logout, encryptionEnabled });
             if (wrongKeyWarned) {
               return { ok: false, data: [] };
             }
@@ -265,7 +258,7 @@ const useApi = () => {
           res.decryptedData = decryptedData;
           return res;
         } else if (res.data) {
-          res.decryptedData = await decryptDBItem(res.data, { debug, logout, encryptedVerificationKey });
+          res.decryptedData = await decryptDBItem(res.data, { debug, logout, encryptionEnabled });
           return res;
         } else {
           return res;

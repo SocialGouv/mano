@@ -7,7 +7,6 @@ import {
   connectWith,
   navigateWithReactRouter,
   useEncryptedOrga,
-  scrollDown,
   scrollTop,
   getInputValue,
   getInnerText,

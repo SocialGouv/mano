@@ -19,7 +19,7 @@ import { placesState, preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
-import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
+import useApi, { setEncryptedVerificationKey, encryptItem } from '../services/api';
 import { loadingState } from './Loader';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import { consultationsState, prepareConsultationForEncryption } from '../recoil/consultations';
@@ -36,7 +36,7 @@ const EncryptionKey = ({ isMain }) => {
   const history = useHistory();
 
   const [open, setOpen] = useState(onboardingForEncryption);
-  const [encryptionKey, setEncryptionKey] = useState('');
+  const [encryptionKey, setDecryptedOrganisationKey] = useState('');
   const [encryptingStatus, setEncryptingStatus] = useState('');
   const [encryptingProgress, setEncryptingProgress] = useState(0);
 
@@ -84,8 +84,8 @@ const EncryptionKey = ({ isMain }) => {
       if (!values.encryptionKey) return toastr.error('Erreur!', 'La clé est obligatoire');
       if (!values.encryptionKeyConfirm) return toastr.error('Erreur!', 'La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
-      setEncryptionKey(values.encryptionKey.trim());
-      const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
+      setDecryptedOrganisationKey(values.encryptionKey.trim());
+      const hashedOrgEncryptionKey = await setEncryptedVerificationKey(values.encryptionKey.trim());
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
       const encryptedPersons = await Promise.all(
@@ -159,7 +159,7 @@ const EncryptionKey = ({ isMain }) => {
       toastr.error('Erreur!', orgEncryptionError.message, { timeOut: 0 });
       API.logout();
       setEncryptingProgress(0);
-      setEncryptionKey('');
+      setDecryptedOrganisationKey('');
       setEncryptingStatus("Erreur lors du chiffrement, veuillez contacter l'administrateur");
     }
   };
@@ -275,7 +275,7 @@ const EncryptionKey = ({ isMain }) => {
         isOpen={open}
         toggle={() => setOpen(false)}
         onClosed={() => {
-          setEncryptionKey('');
+          setDecryptedOrganisationKey('');
           setEncryptingProgress(0);
           setEncryptingStatus('');
         }}

@@ -12,7 +12,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { DEFAULT_ORGANISATION_KEY, theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import useApi, { setOrgEncryptionKey } from '../../services/api';
+import useApi, { setEncryptedVerificationKey } from '../../services/api';
 import { AppSentry } from '../../services/sentry';
 import { refreshTriggerState, loadingState, lastRefreshState } from '../../components/Loader';
 import { clearCache } from '../../services/dataManagement';
@@ -140,10 +140,6 @@ const SignIn = () => {
                 });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;
-            if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
-              setShowEncryption(true);
-              return actions.setSubmitting(false);
-            }
             if (token) API.setToken(token);
             if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
               await clearCache();
@@ -151,9 +147,17 @@ const SignIn = () => {
             }
             window.localStorage.setItem('mano-organisationId', organisation._id);
             setOrganisation(organisation);
+            if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
+              setShowEncryption(true);
+              return actions.setSubmitting(false);
+            }
             if (!['superadmin'].includes(user.role) && !!values.orgEncryptionKey) {
-              const encryptionIsValid = await setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
-              if (!encryptionIsValid) return;
+              const encryptionIsValidResponse = await API.post({
+                path: '/organisation/check-encryption-key',
+                body: { orgEncryptionKey: values.orgEncryptionKey },
+              });
+              if (!encryptionIsValidResponse.ok) return;
+              await setEncryptedVerificationKey(values.orgEncryptionKey.trim());
             }
             setUser(user);
             AppSentry.setUser(user);
