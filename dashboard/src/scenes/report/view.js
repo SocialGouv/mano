@@ -1025,13 +1025,12 @@ const DescriptionAndCollaborations = ({ report }) => {
                   <SelectAndCreateCollaboration values={values.collaborations} onChange={handleChange} />
                 </FormGroup>
               </Col>
-              <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 <ButtonCustom
                   title={'Mettre à jour'}
                   loading={isSubmitting}
                   disabled={JSON.stringify(report.collaborations) === JSON.stringify(values.collaborations)}
                   onClick={handleSubmit}
-                  width={200}
                 />
               </Col>
               <Col md={12}>

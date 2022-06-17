@@ -209,60 +209,65 @@ export function MedicalFile({ person }) {
                   />
                 </Col>
               </Row>
-              <ButtonCustom
-                title={'Mettre à jour'}
-                disabled={JSON.stringify(person) === JSON.stringify(values)}
-                loading={isSubmitting}
-                onClick={handleSubmit}
-                width={200}
-              />
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                <ButtonCustom
+                  title={'Mettre à jour'}
+                  disabled={JSON.stringify(person) === JSON.stringify(values)}
+                  loading={isSubmitting}
+                  onClick={handleSubmit}
+                />
+              </div>
             </React.Fragment>
           );
         }}
       </Formik>
-      <TitleWithButtonsContainer>
-        <Title>Dossier médical</Title>
-      </TitleWithButtonsContainer>
-      {!!medicalFile && (
-        <Formik
-          enableReinitialize
-          initialValues={medicalFile}
-          onSubmit={async (body) => {
-            const response = await API.put({
-              path: `/medical-file/${medicalFile._id}`,
-              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...body }),
-            });
-            if (!response.ok) return;
-            setAllMedicalFiles((medicalFiles) =>
-              medicalFiles.map((m) => {
-                if (m._id === medicalFile._id) return response.decryptedData;
-                return m;
-              })
-            );
-            toastr.success('Mise à jour effectuée !');
-          }}>
-          {({ values, handleChange, handleSubmit, isSubmitting }) => {
-            return (
-              <React.Fragment>
-                <Row>
-                  {customFieldsMedicalFile
-                    .filter((f) => f.enabled)
-                    .map((field) => (
-                      <CustomFieldInput colWidth={4} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                    ))}
-                </Row>
-                <ButtonCustom
-                  title={'Mettre à jour'}
-                  disabled={JSON.stringify(medicalFile) === JSON.stringify(values)}
-                  loading={isSubmitting}
-                  onClick={handleSubmit}
-                  width={200}
-                />
-              </React.Fragment>
-            );
-          }}
-        </Formik>
+      {!!medicalFile && !!customFieldsMedicalFile.filter((f) => f.enabled).length && (
+        <>
+          <TitleWithButtonsContainer>
+            <Title>Dossier médical</Title>
+          </TitleWithButtonsContainer>
+          <Formik
+            enableReinitialize
+            initialValues={medicalFile}
+            onSubmit={async (body) => {
+              const response = await API.put({
+                path: `/medical-file/${medicalFile._id}`,
+                body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...body }),
+              });
+              if (!response.ok) return;
+              setAllMedicalFiles((medicalFiles) =>
+                medicalFiles.map((m) => {
+                  if (m._id === medicalFile._id) return response.decryptedData;
+                  return m;
+                })
+              );
+              toastr.success('Mise à jour effectuée !');
+            }}>
+            {({ values, handleChange, handleSubmit, isSubmitting }) => {
+              return (
+                <React.Fragment>
+                  <Row>
+                    {customFieldsMedicalFile
+                      .filter((f) => f.enabled)
+                      .map((field) => (
+                        <CustomFieldInput colWidth={4} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                      ))}
+                  </Row>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                    <ButtonCustom
+                      title={'Mettre à jour'}
+                      disabled={JSON.stringify(medicalFile) === JSON.stringify(values)}
+                      loading={isSubmitting}
+                      onClick={handleSubmit}
+                    />
+                  </div>
+                </React.Fragment>
+              );
+            }}
+          </Formik>
+        </>
       )}
+      <hr />
       <TitleWithButtonsContainer>
         <Title style={{ marginTop: '2rem' }}>Traitement en cours</Title>
         <ButtonsFloatingRight>

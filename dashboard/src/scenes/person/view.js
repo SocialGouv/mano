@@ -46,13 +46,14 @@ import { dateForDatePicker, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
-import DeletePerson from './DeletePerson';
 import { MedicalFile } from './MedicalFile';
 import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
 import Passage from '../../components/Passage';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages'];
@@ -196,14 +197,17 @@ const View = () => {
 };
 
 const Summary = ({ person }) => {
-  const setPersons = useSetRecoilState(personsState);
-  const setComments = useSetRecoilState(commentsState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
+  const setPersons = useSetRecoilState(personsState);
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [comments, setComments] = useRecoilState(commentsState);
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const API = useApi();
+  const history = useHistory();
 
   return (
     <>
@@ -482,14 +486,54 @@ const Summary = ({ person }) => {
                   <hr />
                 </>
               )}
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 {!['restricted-access'].includes(user.role) && (
                   <>
                     <OutOfActiveList person={person} />
-                    <DeletePerson person={person} />
+                    <DeleteButtonAndConfirmModal
+                      title={`Voulez-vous vraiment supprimer la personne ${person.name}`}
+                      textToConfirm={person.name}
+                      onConfirm={async () => {
+                        const personRes = await API.delete({ path: `/person/${person._id}` });
+                        if (personRes.ok) {
+                          setPersons((persons) => persons.filter((p) => p._id !== person._id));
+                          for (const action of actions.filter((a) => a.person === person._id)) {
+                            const actionRes = await API.delete({ path: `/action/${action._id}` });
+                            if (actionRes.ok) {
+                              setActions((actions) => actions.filter((a) => a._id !== action._id));
+                              for (let comment of comments.filter((c) => c.action === action._id)) {
+                                const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+                                if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
+                              }
+                            }
+                          }
+                          for (let comment of comments.filter((c) => c.person === person._id)) {
+                            const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+                            if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
+                          }
+                          for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === person._id)) {
+                            const relRes = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+                            if (relRes.ok) {
+                              setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+                            }
+                          }
+                        }
+                        if (personRes?.ok) {
+                          toastr.success('Suppression réussie');
+                          history.goBack();
+                        }
+                      }}>
+                      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                        Cette opération est irréversible
+                        <br />
+                        et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;:
+                        <br />
+                        actions, commentaires, lieux visités, passages, documents...
+                      </span>
+                    </DeleteButtonAndConfirmModal>
                   </>
                 )}
-                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
               </div>
             </React.Fragment>
           );

@@ -16,6 +16,7 @@ import { organisationState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { AppSentry } from '../../services/sentry';
 import useTitle from '../../services/useTitle';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
 const View = () => {
   const [localUser, setLocalUser] = useState(null);
@@ -35,16 +36,6 @@ const View = () => {
   useEffect(() => {
     getData();
   }, [getData, id]);
-
-  const deleteData = async () => {
-    const confirm = window.confirm('Êtes-vous sûr ?');
-    if (confirm) {
-      const res = await API.delete({ path: `/user/${id}` });
-      if (!res.ok) return;
-      toastr.success('Suppression réussie');
-      history.goBack();
-    }
-  };
 
   if (!localUser) return <Loading />;
 
@@ -133,11 +124,21 @@ const View = () => {
                   </div>
                 </Col>
               </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 {id !== user._id && (
-                  <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} width={200} />
+                  <DeleteButtonAndConfirmModal
+                    title={`Voulez-vous vraiment supprimer l'utilisateur ${organisation.name}`}
+                    textToConfirm={organisation.name}
+                    onConfirm={async () => {
+                      const res = await API.delete({ path: `/user/${id}` });
+                      if (!res.ok) return;
+                      toastr.success('Suppression réussie');
+                      history.goBack();
+                    }}>
+                    <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>Cette opération est irréversible</span>
+                  </DeleteButtonAndConfirmModal>
                 )}
-                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} width={200} />
+                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
               </div>
             </React.Fragment>
           )}

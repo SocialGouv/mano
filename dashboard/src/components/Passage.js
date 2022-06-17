@@ -213,18 +213,9 @@ const Passage = ({ passage, onFinished }) => {
                     </Col>
                   </Row>
                   <br />
-                  <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
-                    {!isNew && (
-                      <ButtonCustom
-                        title="Supprimer"
-                        type="button"
-                        style={{ marginRight: 10 }}
-                        color="danger"
-                        onClick={onDeletePassage}
-                        width={200}
-                      />
-                    )}
-                    <ButtonCustom title="Enregistrer" loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} width={200} />
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                    {!isNew && <ButtonCustom title="Supprimer" type="button" color="danger" onClick={onDeletePassage} />}
+                    <ButtonCustom title="Enregistrer" loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} />
                   </div>
                 </React.Fragment>
               );

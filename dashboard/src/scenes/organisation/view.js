@@ -7,14 +7,13 @@ import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import Box from '../../components/Box';
-import DeleteOrganisation from '../../components/DeleteOrganisation';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import { defaultMedicalCustomFields, personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
-import { organisationState } from '../../recoil/auth';
+import { organisationState, userState } from '../../recoil/auth';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
@@ -26,6 +25,8 @@ import { refreshTriggerState } from '../../components/Loader';
 import useTitle from '../../services/useTitle';
 import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
 import { defaultMedicalFileCustomFields } from '../../recoil/medicalFiles';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { capture } from '../../services/sentry';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -43,6 +44,7 @@ const getSettingTitle = (tabId) => {
 
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const user = useRecoilValue(userState);
   const actions = useRecoilValue(actionsState);
   const reports = useRecoilValue(reportsState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
@@ -129,9 +131,31 @@ const View = () => {
                             </FormGroup>
                           </Col>
                         </Row>
-                        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
-                          <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} width={200} />
-                          <DeleteOrganisation organisation={organisation} onSuccess={() => API.logout()} />
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                          <DeleteButtonAndConfirmModal
+                            title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
+                            textToConfirm={organisation.name}
+                            onConfirm={async () => {
+                              try {
+                                const res = await API.delete({ path: `/organisation/${organisation._id}` });
+                                if (res.ok) {
+                                  toastr.success('Organisation supprimée');
+                                  API.logout();
+                                }
+                              } catch (organisationDeleteError) {
+                                capture(organisationDeleteError, { extra: { organisation }, user });
+                                toastr.error('Erreur!', organisationDeleteError.message);
+                              }
+                            }}>
+                            <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                              Cette opération est irréversible
+                              <br />
+                              et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
+                              <br />
+                              équipes, utilisateurs, personnes suivies, actions, territoires, commentaires et observations, comptes-rendus...
+                            </span>
+                          </DeleteButtonAndConfirmModal>
+                          <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} />
                         </div>
                       </>
                     );
@@ -267,13 +291,12 @@ const View = () => {
                             </FormGroup>
                           </Col>
                         </Row>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
                           <ButtonCustom
                             title={'Mettre à jour'}
                             disabled={JSON.stringify(organisation.categories) === JSON.stringify(values.categories || [])}
                             loading={isSubmitting}
                             onClick={handleSubmit}
-                            width={200}
                           />
                         </div>
                       </>
@@ -390,7 +413,7 @@ const View = () => {
                             </FormGroup>
                           </Col>
                         </Row>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: 40 }}>
                           <ButtonCustom
                             title={'Mettre à jour'}
                             disabled={
@@ -399,7 +422,6 @@ const View = () => {
                             }
                             loading={isSubmitting}
                             onClick={handleSubmit}
-                            width={200}
                           />
                         </div>
                       </>
@@ -657,7 +679,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
           isClearable
         />
       </FormGroup>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '2rem', marginTop: '1rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '2rem', marginTop: '1rem', gap: '1rem' }}>
         <ButtonCustom
           title="Mettre à jour"
           loading={isSubmitting}
@@ -666,7 +688,6 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
             handleChange({ target: { value: orgConsultations, name: 'consultations' } });
             handleSubmit();
           }}
-          width={200}
         />
       </div>
       <hr />
