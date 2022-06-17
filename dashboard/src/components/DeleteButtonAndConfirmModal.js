@@ -6,12 +6,23 @@ import { toastr } from 'react-redux-toastr';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../recoil/auth';
 
 const DeleteButtonAndConfirmModal = ({ title, children, textToConfirm, onConfirm, buttonWidth = null }) => {
+  const user = useRecoilValue(userState);
   const [open, setOpen] = useState(false);
   return (
     <>
-      <ButtonCustom title="Supprimer" color="danger" onClick={() => setOpen(true)} width={buttonWidth} />
+      <ButtonCustom
+        title="Supprimer"
+        color="danger"
+        onClick={() => {
+          if (!['admin'].includes(user.role)) return toastr.error("Désolé, seul un admin peut supprimer ce type d'élément");
+          setOpen(true);
+        }}
+        width={buttonWidth}
+      />
       <StyledModal isOpen={open} toggle={() => setOpen(false)} size="lg" centered>
         <ModalHeader toggle={() => setOpen(false)} color="danger">
           <span style={{ color: theme.redDark, textAlign: 'center', display: 'block' }}>{title}</span>
