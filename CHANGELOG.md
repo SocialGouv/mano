@@ -1,3 +1,10 @@
+# [1.123.0](https://github.com/SocialGouv/mano/compare/v1.122.0...v1.123.0) (2022-06-17)
+
+
+### Features
+
+* out of active list custom field ([#750](https://github.com/SocialGouv/mano/issues/750)) ([30ec4b9](https://github.com/SocialGouv/mano/commit/30ec4b9ddd10f3d38a8e60b96f71df965fe5462e))
+
 # [1.122.0](https://github.com/SocialGouv/mano/compare/v1.121.1...v1.122.0) (2022-06-17)
 
 
