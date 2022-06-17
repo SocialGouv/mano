@@ -55,7 +55,6 @@ const Passage = ({ passage, onFinished }) => {
           <Formik
             initialValues={{ ...passage, anonymousNumberOfPassages: 1, persons: passage?.person ? [passage.person] : [] }}
             onSubmit={async (body, actions) => {
-              console.log({ body });
               if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
               if (!body.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
