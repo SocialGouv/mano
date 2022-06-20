@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Alert, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
 import AsyncStorage from '@react-native-community/async-storage';
+import { useMMKVNumber, useMMKVString } from 'react-native-mmkv';
 import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -19,7 +20,6 @@ import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import { clearCache } from '../../services/dataManagement';
 import { refreshTriggerState } from '../../components/Loader';
-import { useMMKVNumber, useMMKVString } from 'react-native-mmkv';
 
 const Login = ({ navigation }) => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
@@ -137,7 +137,7 @@ const Login = ({ navigation }) => {
       setPassword('');
       return;
     }
-    if (response.user.role === 'superadmin') {
+    if (response?.user?.role === 'superadmin') {
       Alert.alert("Vous n'avez pas d'organisation dans Mano");
       setLoading(false);
       return;
@@ -149,6 +149,7 @@ const Login = ({ navigation }) => {
       API.showTokenExpiredError = true;
       API.organisation = response.user.organisation;
       setUser(response.user);
+
       setOrganisation(response.user.organisation);
       if (!!response.user.organisation?.encryptionEnabled && !showEncryptionKeyInput) {
         setLoading(false);
