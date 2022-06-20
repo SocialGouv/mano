@@ -216,7 +216,7 @@ router.put(
       if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
-      z.array(z.string().regex(looseUuidRegex)).parse(req.body.onlyVisibleBy);
+      z.optional(z.array(z.string().regex(looseUuidRegex)).parse(req.body.onlyVisibleBy));
     } catch (e) {
       const error = new Error(`Invalid request in consultation put: ${e}`);
       error.status = 400;
