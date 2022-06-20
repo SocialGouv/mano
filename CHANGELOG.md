@@ -1,3 +1,10 @@
+## [1.123.2](https://github.com/SocialGouv/mano/compare/v1.123.1...v1.123.2) (2022-06-20)
+
+
+### Bug Fixes
+
+* **api:** optional onlyVisibleBy in consultation ([b6c05ad](https://github.com/SocialGouv/mano/commit/b6c05ad89e97ba24218507ccc723513e64895901))
+
 ## [1.123.1](https://github.com/SocialGouv/mano/compare/v1.123.0...v1.123.1) (2022-06-17)
 
 
