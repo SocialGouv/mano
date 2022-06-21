@@ -19,6 +19,7 @@ import PhoneIcon from '../../icons/PhoneIcon';
 import { MyText } from '../../components/MyText';
 import { useRecoilState } from 'recoil';
 import { structuresState } from '../../recoil/structures';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
 const isEven = (value) => {
   if (value % 2 === 0) return true;
@@ -123,34 +124,18 @@ const Structure = ({ navigation, route }) => {
     }
   };
 
-  const onDeleteRequest = () => {
-    Alert.alert('Voulez-vous vraiment supprimer cette structure ?', 'Cette opération est irréversible.', [
-      {
-        text: 'Supprimer',
-        style: 'destructive',
-        onPress: onDelete,
-      },
-      {
-        text: 'Annuler',
-        style: 'cancel',
-      },
-    ]);
-  };
-
   const onDelete = async () => {
     setUpdating(true);
     const response = await API.delete({ path: `/structure/${structureDB._id}` });
     if (response.error) {
       setUpdating(false);
       Alert.alert(response.error);
-      return;
     }
-    if (response.ok) {
-      Alert.alert('Structure supprimée !');
-      setStructures((structures) => structures.filter((s) => s._id !== structure._id));
-      onBack();
-      setUpdating(false);
-    }
+    if (!response.ok) return false;
+    Alert.alert('Structure supprimée !');
+    setStructures((structures) => structures.filter((s) => s._id !== structure._id));
+    setUpdating(false);
+    return true;
   };
 
   const isUpdateDisabled = useMemo(() => {
@@ -287,7 +272,14 @@ const Structure = ({ navigation, route }) => {
           renderTag={(name) => <MyText>{name}</MyText>}
         />
         <ButtonsContainer>
-          <ButtonDelete onPress={onDeleteRequest} />
+          <DeleteButtonAndConfirmModal
+            title={`Voulez-vous vraiment supprimer ${structureDB?.name} ?`}
+            onBack={onBack}
+            textToConfirm={structureDB?.name}
+            onDelete={onDelete}>
+            Cette opération est irréversible{'\n'}et entrainera la suppression définitive de cette structure{'\n'}pour toutes les organisations qui
+            utilisent Mano
+          </DeleteButtonAndConfirmModal>
           <Button
             caption={editable ? 'Mettre à jour' : 'Modifier'}
             onPress={editable ? onUpdateStructure : onEdit}

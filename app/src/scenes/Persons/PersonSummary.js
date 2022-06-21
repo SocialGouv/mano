@@ -25,21 +25,22 @@ import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
 const PersonSummary = ({
   navigation,
   person,
   personDB,
   onUpdatePerson,
-  onChange,
   updating,
-  deleting,
   editable,
   onEdit,
   isUpdateDisabled,
-  onDeleteRequest,
   backgroundColor,
   writeComment,
+  onChange,
+  onDelete,
+  onBack,
 }) => {
   const onAddPlaceRequest = () => navigation.push('NewPersonPlaceForm', { person: personDB, fromRoute: 'Person' });
 
@@ -227,11 +228,18 @@ const PersonSummary = ({
       />
       {!editable && <Spacer />}
       <ButtonsContainer>
-        <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />
+        <DeleteButtonAndConfirmModal
+          title={`Voulez-vous vraiment supprimer ${personDB?.name} ?`}
+          onBack={onBack}
+          textToConfirm={personDB?.name}
+          onDelete={onDelete}>
+          Cette opération est irréversible{'\n'}et entrainera la suppression définitive{'\n'}de toutes les données liées à la personne&nbsp;:{'\n\n'}
+          actions, commentaires, lieux visités, passages, documents...
+        </DeleteButtonAndConfirmModal>
         <Button
           caption={editable ? 'Mettre à jour' : 'Modifier'}
           onPress={editable ? onUpdatePerson : onEdit}
-          disabled={editable ? isUpdateDisabled : deleting}
+          disabled={editable ? isUpdateDisabled : false}
           loading={updating}
         />
       </ButtonsContainer>
@@ -240,7 +248,7 @@ const PersonSummary = ({
           caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
           onPress={() => (person.outOfActiveList ? onGetBackToActiveList() : onRemoveFromActiveList())}
           color={colors.warning.color}
-          disabled={editable ? isUpdateDisabled : deleting}
+          disabled={editable ? isUpdateDisabled : false}
         />
       </ButtonsContainer>
 

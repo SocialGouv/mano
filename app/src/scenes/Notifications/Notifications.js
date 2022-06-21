@@ -13,7 +13,7 @@ import ActionRow from '../../components/ActionRow';
 import CommentRow from '../Comments/CommentRow';
 import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
-import { ListEmptyUrgent } from '../../components/ListEmptyContainer';
+import { ListEmptyUrgent, ListEmptyUrgentAction, ListEmptyUrgentComment } from '../../components/ListEmptyContainer';
 
 export const urgentItemsSelector = selector({
   key: 'urgentItemsSelector',
@@ -131,6 +131,14 @@ const Notifications = ({ navigation }) => {
     return null;
   };
 
+  const renderEmptySection = ({ section }) => {
+    if (!section.data.length) {
+      if (section.title === 'Actions urgentes') return <ListEmptyUrgentAction />;
+      return <ListEmptyUrgentComment />;
+    }
+    return null;
+  };
+
   return (
     <SceneContainer>
       <ScreenTitle title="Priorités" />
@@ -143,6 +151,7 @@ const Notifications = ({ navigation }) => {
         renderSectionHeader={SectionHeader}
         keyExtractor={keyExtractor}
         ListEmptyComponent={ListEmptyUrgent}
+        renderSectionFooter={renderEmptySection}
       />
     </SceneContainer>
   );
