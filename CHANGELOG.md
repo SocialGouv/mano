@@ -1,3 +1,10 @@
+## [1.124.1](https://github.com/SocialGouv/mano/compare/v1.124.0...v1.124.1) (2022-06-21)
+
+
+### Bug Fixes
+
+* **dashboard:** limit export size ([#758](https://github.com/SocialGouv/mano/issues/758)) ([3984e90](https://github.com/SocialGouv/mano/commit/3984e904e9ea02cb6d8aa4260e143ae16205b9f3))
+
 # [1.124.0](https://github.com/SocialGouv/mano/compare/v1.123.2...v1.124.0) (2022-06-21)
 
 
