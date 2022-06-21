@@ -45,11 +45,12 @@ const createSheet = (data) => {
           continue;
         }
         if (typeof value === 'string') {
-          row.push(value);
+          // https://stackoverflow.com/questions/26837514/a-new-idea-on-how-to-beat-the-32-767-text-limit-in-excel
+          row.push(value.substring(0, 32766));
           continue;
         }
         if (typeof value[0] === 'string') {
-          row.push(value.join(', '));
+          row.push(value.join(', ').substring(0, 32766));
           continue;
         }
         row.push(JSON.stringify(value));
