@@ -18,8 +18,8 @@ export const customFieldsMedicalFileSelector = selector({
 
 const encryptedFields = ['person', 'documents'];
 
-export const prepareMedicalFileForEncryption = (customFieldsMedicalFileSelector) => (medicalFile) => {
-  const encryptedFieldsIncludingCustom = [...customFieldsMedicalFileSelector.map((f) => f.name), ...encryptedFields];
+export const prepareMedicalFileForEncryption = (customFieldsMedicalFile) => (medicalFile) => {
+  const encryptedFieldsIncludingCustom = [...customFieldsMedicalFile.map((f) => f.name), ...encryptedFields];
   const decrypted = {};
   for (let field of encryptedFieldsIncludingCustom) {
     decrypted[field] = medicalFile[field];

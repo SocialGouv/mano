@@ -57,6 +57,7 @@ import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { medicalFileState } from '../../recoil/medicalFiles';
 import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
+import MergeTwoPersons from './MergeTwoPersons';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages'];
@@ -496,6 +497,7 @@ const Summary = ({ person }) => {
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 {!['restricted-access'].includes(user.role) && (
                   <>
+                    <MergeTwoPersons person={person} />
                     <OutOfActiveList person={person} />
                     <DeleteButtonAndConfirmModal
                       title={`Voulez-vous vraiment supprimer la personne ${person.name}`}

@@ -6,7 +6,7 @@ import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../services/date';
 
-const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) => {
+const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
     if (['text', 'number'].includes(field.type)) return `${model}-custom-input-${field.name}`;
     if (['textarea'].includes(field.type)) return `${model}-custom-textarea-${field.name}`;
@@ -20,12 +20,29 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) 
   return (
     <Col md={colWidth} key={field.name}>
       <FormGroup>
-        <Label htmlFor={id}>{field.type !== 'boolean' ? field.label : ''}</Label>
+        {!hideLabel && <Label htmlFor={id}>{field.type !== 'boolean' ? field.label : ''}</Label>}
         {!!['text', 'number'].includes(field.type) && (
-          <Input name={field.name} type={field.type} required={field.required} value={values[field.name] || ''} onChange={handleChange} id={id} />
+          <Input
+            disabled={disabled}
+            name={field.name}
+            type={field.type}
+            required={field.required}
+            value={values[field.name] || ''}
+            onChange={handleChange}
+            id={id}
+          />
         )}
         {!!['textarea'].includes(field.type) && (
-          <Input name={field.name} type="textarea" rows={5} required={field.required} value={values[field.name]} onChange={handleChange} id={id} />
+          <Input
+            disabled={disabled}
+            name={field.name}
+            type="textarea"
+            rows={5}
+            required={field.required}
+            value={values[field.name]}
+            onChange={handleChange}
+            id={id}
+          />
         )}
         {!!['date-with-time', 'date'].includes(field.type) && (
           <div>
@@ -38,6 +55,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) 
               timeInputLabel="Heure :"
               dateFormat={`dd/MM/yyyy${field.type === 'date-with-time' ? ' HH:mm' : ''}`}
               showTimeInput={field.type === 'date-with-time'}
+              disabled={disabled}
             />
           </div>
         )}
@@ -51,6 +69,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) 
               name={field.name}
               checked={values[field.name]}
               onChange={() => handleChange({ target: { value: !values[field.name], name: field.name } })}
+              disabled={disabled}
             />
           </CheckboxContainer>
         )}
@@ -62,6 +81,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) 
             onChange={handleChange}
             inputId={id}
             classNamePrefix={id}
+            isDisabled={disabled}
           />
         )}
         {!!['enum'].includes(field.type) && (
@@ -72,6 +92,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) 
             onChange={handleChange}
             inputId={id}
             classNamePrefix={id}
+            isDisabled={disabled}
           />
         )}
         {!!['multi-choice'].includes(field.type) && (
@@ -87,6 +108,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6 }) 
             placeholder={' -- Choisir -- '}
             getOptionValue={(i) => i}
             getOptionLabel={(i) => i}
+            isDisabled={disabled}
           />
         )}
       </FormGroup>
