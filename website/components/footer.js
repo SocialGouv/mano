@@ -116,6 +116,11 @@ export default function Footer({ skipFirstParagraph }) {
             </Link>
           </p>
           <p className="text-xs text-white opacity-40">
+            <Link href="/privacy.pdf">
+              <a>Politique de confidentialité</a>
+            </Link>
+          </p>
+          <p className="text-xs text-white opacity-40">
             &copy; 2021-{year} Mano - Tous droits réservés
           </p>
         </div>
