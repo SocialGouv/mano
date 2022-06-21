@@ -1,3 +1,10 @@
+# [1.124.0](https://github.com/SocialGouv/mano/compare/v1.123.2...v1.124.0) (2022-06-21)
+
+
+### Features
+
+* **website:** add privacy policy ([#757](https://github.com/SocialGouv/mano/issues/757)) ([6792a4f](https://github.com/SocialGouv/mano/commit/6792a4f2aa17a9c2c38d83632a599d54c87e37e2))
+
 ## [1.123.2](https://github.com/SocialGouv/mano/compare/v1.123.1...v1.123.2) (2022-06-20)
 
 
