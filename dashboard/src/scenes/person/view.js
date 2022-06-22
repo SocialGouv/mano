@@ -54,6 +54,9 @@ import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import { medicalFileState } from '../../recoil/medicalFiles';
+import { consultationsState } from '../../recoil/consultations';
+import { treatmentsState } from '../../recoil/treatments';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages'];
@@ -205,6 +208,10 @@ const Summary = ({ person }) => {
   const setPersons = useSetRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
   const [comments, setComments] = useRecoilState(commentsState);
+  const [passages, setPassages] = useRecoilState(passagesState);
+  const [consultations, setConsultations] = useRecoilState(consultationsState);
+  const [treatments, setTreatments] = useRecoilState(treatmentsState);
+  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const API = useApi();
   const history = useHistory();
@@ -516,6 +523,22 @@ const Summary = ({ person }) => {
                             if (relRes.ok) {
                               setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
                             }
+                          }
+                          for (let passage of passages.filter((c) => c.person === person._id)) {
+                            const passageRes = await API.delete({ path: `/passage/${passage._id}` });
+                            if (passageRes.ok) setPassages((passages) => passages.filter((c) => c._id !== passage._id));
+                          }
+                          for (let medicalFile of medicalFiles.filter((c) => c.person === person._id)) {
+                            const medicalFileRes = await API.delete({ path: `/medical-file/${medicalFile._id}` });
+                            if (medicalFileRes.ok) setMedicalFiles((medicalFiles) => medicalFiles.filter((c) => c._id !== medicalFile._id));
+                          }
+                          for (let treatment of treatments.filter((c) => c.person === person._id)) {
+                            const treatmentRes = await API.delete({ path: `/treatment/${treatment._id}` });
+                            if (treatmentRes.ok) setTreatments((treatments) => treatments.filter((c) => c._id !== treatment._id));
+                          }
+                          for (let consultation of consultations.filter((c) => c.person === person._id)) {
+                            const consultationRes = await API.delete({ path: `/consultation/${consultation._id}` });
+                            if (consultationRes.ok) setConsultations((consultations) => consultations.filter((c) => c._id !== consultation._id));
                           }
                         }
                         if (personRes?.ok) {
