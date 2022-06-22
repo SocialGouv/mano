@@ -1,3 +1,11 @@
+## [1.124.3](https://github.com/SocialGouv/mano/compare/v1.124.2...v1.124.3) (2022-06-22)
+
+
+### Bug Fixes
+
+* **dashboard:** delete medical stuff and passages when delete person ([#763](https://github.com/SocialGouv/mano/issues/763)) ([de57836](https://github.com/SocialGouv/mano/commit/de5783604227bde64eeebfc8e70d574a7f2ce9c7))
+* **dashboard:** dont save medical files in cache ([#764](https://github.com/SocialGouv/mano/issues/764)) ([e0ab16f](https://github.com/SocialGouv/mano/commit/e0ab16ffe4b7d9970c2207655cf89f94da8e9bcd))
+
 ## [1.124.2](https://github.com/SocialGouv/mano/compare/v1.124.1...v1.124.2) (2022-06-22)
 
 
