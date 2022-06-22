@@ -23,7 +23,7 @@ const DeleteButtonAndConfirmModal = ({ title, children, textToConfirm, onConfirm
         }}
         width={buttonWidth}
       />
-      <StyledModal isOpen={open} toggle={() => setOpen(false)} size="lg" centered>
+      <StyledModal isOpen={open} toggle={() => setOpen(false)} size="lg">
         <ModalHeader toggle={() => setOpen(false)} color="danger">
           <span style={{ color: theme.redDark, textAlign: 'center', display: 'block' }}>{title}</span>
         </ModalHeader>

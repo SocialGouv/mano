@@ -10,7 +10,7 @@ import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
 import { getData } from '../services/dataManagement';
 import { useMMKVNumber } from 'react-native-mmkv';
-import { organisationState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
 import { territoriesState } from '../recoil/territory';
@@ -20,6 +20,9 @@ import { territoryObservationsState } from '../recoil/territoryObservations';
 import { commentsState } from '../recoil/comments';
 import { capture } from '../services/sentry';
 import { reportsState } from '../recoil/reports';
+import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
+import { medicalFileState } from '../recoil/medicalFiles';
+import { treatmentsState } from '../recoil/treatments';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -64,9 +67,13 @@ const Loader = () => {
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
   const organisation = useRecoilValue(organisationState);
   const organisationId = organisation?._id;
+  const user = useRecoilValue(userState);
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
+  const [consultations, setConsultations] = useRecoilState(consultationsState);
+  const [treatments, setTreatments] = useRecoilState(treatmentsState);
+  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [places, setPlaces] = useRecoilState(placesState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
@@ -78,6 +85,68 @@ const Loader = () => {
   // to prevent auto-refresh to trigger on the first render
   const initialLoadDone = useRef(null);
   const autoRefreshInterval = useRef(null);
+
+  const cleanupData = async () => {
+    setLoading('Nettoyage de vos données, veuillez patienter quelques instants...');
+
+    let needToRefreshAfterCleanup = false;
+    const personIds = persons.map((p) => p._id);
+
+    const actionsToDelete = actions.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
+    for (const action of actionsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/action/${action._id}` });
+    }
+    // const passagesToDelete = passages.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
+    // for (const passage of passagesToDelete) {
+    //   needToRefreshAfterCleanup = true;
+    //   await API.delete({ path: `/passage/${passage._id}` });
+    // }
+    const commentsToDelete = comments.filter((item) => !!item.person && !personIds.includes(item.person)).map((item) => item._id);
+    for (const comment of commentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/comment/${comment._id}` });
+    }
+    const relsPersonPlaceToDelete = relsPersonPlace.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
+    for (const relPersonPlace of relsPersonPlaceToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+    }
+
+    const consultationsToDelete = consultations.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
+    for (const consultation of consultationsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/consultation/${consultation._id}` });
+    }
+    const treatmentsToDelete = treatments.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
+    for (const treatment of treatmentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/treatment/${treatment._id}` });
+    }
+    const medicalFilesToDelete = medicalFiles.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
+    for (const medicalFile of medicalFilesToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/medicalFile/${medicalFile._id}` });
+    }
+
+    const actionIds = persons.map((p) => p._id);
+
+    const actionsCommentsToDelete = comments.filter((item) => !!item.action && !actionIds.includes(item.action)).map((item) => item._id);
+    for (const comment of actionsCommentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/comment/${comment._id}` });
+    }
+    if (needToRefreshAfterCleanup) {
+      setRefreshTrigger((oldRefreshState) => ({
+        ...oldRefreshState,
+        status: false,
+      }));
+      setRefreshTrigger((oldRefreshState) => ({
+        ...oldRefreshState,
+        status: true,
+      }));
+    }
+  };
 
   const refresh = async () => {
     clearInterval(autoRefreshInterval.current);
@@ -111,6 +180,24 @@ const Loader = () => {
       response.data.comments +
       response.data.reports +
       response.data.relsPersonPlace;
+
+    if (lastRefresh > 0 && ['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
+      // medical data is never saved in cache
+      // so we always have to download all at every page reload
+      const medicalDataResponse = await API.get({
+        path: '/organisation/stats',
+        query: { organisation: organisationId, after: initialLoad ? 0 : lastRefresh, withDeleted: true },
+      });
+      if (!medicalDataResponse.ok) {
+        setRefreshTrigger({
+          status: false,
+          options: { showFullScreen: false, initialLoad: false },
+        });
+        return;
+      }
+      total = total + medicalDataResponse.data.consultations + medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles;
+    }
+
     if (initialLoad) {
       const numberOfCollections = 9;
       total = total + numberOfCollections; // for the progress bar to be beautiful
@@ -130,6 +217,68 @@ const Loader = () => {
         API,
       });
       if (refreshedPersons) setPersons(refreshedPersons.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    }
+    /*
+    Get consultations
+    */
+    if (['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
+      if (response.data.consultations || initialLoad) {
+        setLoading('Chargement des consultations');
+        const refreshedConsultations = await getData({
+          collectionName: 'consultation',
+          data: consultations,
+          isInitialization: initialLoad,
+          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+          setBatchData: (newConsultations) =>
+            setConsultations((oldConsultations) =>
+              initialLoad
+                ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
+                : mergeItems(
+                    oldConsultations,
+                    newConsultations.map((c) => whitelistAllowedData(c, user))
+                  )
+            ),
+          API,
+        });
+        if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
+      }
+      /*
+    Get treatments
+    */
+      if (response.data.treatments || initialLoad) {
+        setLoading('Chargement des traitements');
+        const refreshedTreatments = await getData({
+          collectionName: 'treatment',
+          data: treatments,
+          isInitialization: initialLoad,
+          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+          setBatchData: (newTreatments) =>
+            setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
+          API,
+        });
+        if (refreshedTreatments) setTreatments(refreshedTreatments);
+      }
+      /*
+      Get medicalFiles
+      */
+      if (response.data.medicalFiles || initialLoad) {
+        setLoading('Chargement des informations médicales');
+        const refreshedMedicalFiles = await getData({
+          collectionName: 'medical-file',
+          data: medicalFiles,
+          isInitialization: initialLoad,
+          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+          setBatchData: (newMedicalFiles) =>
+            setMedicalFiles((oldMedicalFiles) =>
+              initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
+            ),
+          API,
+        });
+        if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
+      }
     }
     /*
     Get actions
@@ -261,6 +410,8 @@ const Loader = () => {
       });
       if (refreshedReports) setReports(refreshedReports.filter((r) => !!r.team && !!r.date));
     }
+
+    await cleanupData();
 
     /*
     Reset refresh trigger
