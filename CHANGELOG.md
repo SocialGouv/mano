@@ -1,3 +1,10 @@
+## [1.124.2](https://github.com/SocialGouv/mano/compare/v1.124.1...v1.124.2) (2022-06-22)
+
+
+### Bug Fixes
+
+* **dashboard:** keep persons list page on back from person view ([#760](https://github.com/SocialGouv/mano/issues/760)) ([0a0a3dc](https://github.com/SocialGouv/mano/commit/0a0a3dca17f58f472f364e2729e32940fcc902a9))
+
 ## [1.124.1](https://github.com/SocialGouv/mano/compare/v1.124.0...v1.124.1) (2022-06-21)
 
 
