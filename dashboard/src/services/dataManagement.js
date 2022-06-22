@@ -57,7 +57,7 @@ export async function getManoCacheStorage() {
   manoCacheStorage = null;
   window.localStorage?.clear();
   return manoCacheStorage;
-};
+}
 
 export async function clearCache() {
   (await getManoCacheStorage())?.clear();
@@ -82,18 +82,20 @@ export async function getData({
   collectionName,
   data = [],
   isInitialization = false,
-  setProgress = () => { },
+  setProgress = () => {},
   setBatchData = null,
   lastRefresh = 0,
+  withDeleted = false,
+  saveInCache = true,
 }) {
   if (isInitialization) {
-    data = await getCacheItem(collectionName) || [];
+    data = (await getCacheItem(collectionName)) || [];
   }
   const response = await API.get({
     path: `/${collectionName}`,
     batch: 1000,
     setProgress,
-    query: { after: lastRefresh, withDeleted: Boolean(lastRefresh) },
+    query: { after: lastRefresh, withDeleted },
     setBatchData,
   });
 
@@ -101,6 +103,10 @@ export async function getData({
   if (!response.decryptedData?.length && !isInitialization) return null;
 
   data = mergeNewUpdatedData(response.decryptedData, data);
-  await setCacheItem(collectionName, data);
+  if (saveInCache) {
+    await setCacheItem(collectionName, data);
+  } else {
+    await removeCacheItem(collectionName);
+  }
   return data;
 }

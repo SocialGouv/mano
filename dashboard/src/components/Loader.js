@@ -171,6 +171,7 @@ const Loader = () => {
         collectionName: 'report',
         data: reports,
         isInitialization: initialLoad,
+        withDeleted: false,
         setBatchData: (newReports) => {
           newReports = newReports.filter((r) => !!r.team && !!r.date);
           setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
@@ -181,6 +182,7 @@ const Loader = () => {
         collectionName: 'comment',
         data: comments,
         isInitialization: initialLoad,
+        withDeleted: false,
         setBatchData: (newComments) =>
           setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
         API,
@@ -238,6 +240,7 @@ const Loader = () => {
         collectionName: 'report',
         data: reports,
         isInitialization: true,
+        withDeleted: false,
         setBatchData: (newReports) => {
           newReports = newReports.filter((r) => !!r.team && !!r.date);
           setReports((oldReports) => [...oldReports, ...newReports]);
@@ -331,6 +334,7 @@ const Loader = () => {
         collectionName: 'person',
         data: persons,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
@@ -352,6 +356,8 @@ const Loader = () => {
           collectionName: 'consultation',
           data: consultations,
           isInitialization: initialLoad,
+          withDeleted: true,
+          saveInCache: false,
           setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
           lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
           setBatchData: (newConsultations) =>
@@ -359,9 +365,9 @@ const Loader = () => {
               initialLoad
                 ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
                 : mergeItems(
-                  oldConsultations,
-                  newConsultations.map((c) => whitelistAllowedData(c, user))
-                )
+                    oldConsultations,
+                    newConsultations.map((c) => whitelistAllowedData(c, user))
+                  )
             ),
           API,
         });
@@ -377,6 +383,8 @@ const Loader = () => {
           collectionName: 'treatment',
           data: treatments,
           isInitialization: initialLoad,
+          withDeleted: true,
+          saveInCache: false,
           setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
           lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
           setBatchData: (newTreatments) =>
@@ -395,6 +403,8 @@ const Loader = () => {
           collectionName: 'medical-file',
           data: medicalFiles,
           isInitialization: initialLoad,
+          withDeleted: true,
+          saveInCache: false,
           setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
           lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
           setBatchData: (newMedicalFiles) =>
@@ -426,6 +436,7 @@ const Loader = () => {
         collectionName: 'report',
         data: reports,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newReports) => {
@@ -448,6 +459,7 @@ const Loader = () => {
         collectionName: 'passage',
         data: passages,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newPassages) =>
@@ -471,6 +483,7 @@ const Loader = () => {
         collectionName: 'action',
         data: actions,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newActions) => setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions))),
@@ -488,6 +501,7 @@ const Loader = () => {
         collectionName: 'territory',
         data: territories,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newTerritories) =>
@@ -507,6 +521,7 @@ const Loader = () => {
         collectionName: 'place',
         data: places,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
@@ -519,6 +534,7 @@ const Loader = () => {
         collectionName: 'relPersonPlace',
         data: relsPersonPlace,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newRelPerPlace) =>
@@ -537,6 +553,7 @@ const Loader = () => {
         collectionName: 'territory-observation',
         data: territoryObservations,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
@@ -554,6 +571,7 @@ const Loader = () => {
         collectionName: 'comment',
         data: comments,
         isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
         setBatchData: (newComments) =>
