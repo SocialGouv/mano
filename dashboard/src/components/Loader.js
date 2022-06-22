@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
+import dayjs from 'dayjs';
 import { theme } from '../config';
 import picture1 from '../assets/MANO_livraison_elements-07_green.png';
 import picture2 from '../assets/MANO_livraison_elements-08_green.png';
@@ -16,7 +17,6 @@ import { territoryObservationsState } from '../recoil/territoryObservations';
 import { commentsState } from '../recoil/comments';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
-import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 import { treatmentsState } from '../recoil/treatments';
@@ -132,38 +132,12 @@ const Loader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastRefreshReady]);
 
-  const migrationIsDone = (updatedOrganisation) => {
-    setOrganisation(updatedOrganisation);
-    /* FIXME ?:
-    the `setOrganisation(response.organisation)` doesn't provide an updated version of `organisation`
-     for the rest of this `refresh` function
-     neither for the `useApi` hook
-     therefore, a new organisation with no `migrationLastUpdateAt` won't be able to do the multiple migrations
-     because server side, `!!organisation.migrationLastUpdateAt === true` but `req.query.migrationLastUpdateAt === null`
-     so we need to end the refresh after each migration, and restart it with the fresh organisation
-    */
-    setRefreshTrigger((oldRefreshState) => ({
-      ...oldRefreshState,
-      status: false,
-    }));
-    setRefreshTrigger((oldRefreshState) => ({
-      ...oldRefreshState,
-      status: true,
-    }));
-  };
-
-  const refresh = async () => {
-    clearInterval(autoRefreshInterval.current);
-    autoRefreshInterval.current = null;
-
-    const { showFullScreen, initialLoad } = refreshTrigger.options;
-    setFullScreen(showFullScreen);
-    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
+  const migrate = async () => {
+    const { initialLoad } = refreshTrigger.options;
 
     /*
     Play organisation internal migrations (things that requires the database to be fully loaded locally).
     */
-
     if (!organisation.migrations?.includes('passages-from-comments-to-table')) {
       await new Promise((res) => setTimeout(res, 500));
       setLoading('Mise à jour des données de votre organisation, veuillez patienter quelques instants...');
@@ -230,7 +204,12 @@ const Loader = () => {
         }
         return;
       }
-      return migrationIsDone(response.organisation);
+      setOrganisation(response.organisation);
+      setRefreshTrigger((oldRefreshState) => ({
+        ...oldRefreshState,
+        status: 'migrated-passages-from-comments-to-table',
+      }));
+      return;
     }
 
     if (!organisation.migrations?.includes('reports-from-real-date-to-date-id')) {
@@ -269,8 +248,26 @@ const Loader = () => {
         }
         return;
       }
-      return migrationIsDone(response.organisation);
+      setOrganisation(response.organisation);
+      setRefreshTrigger((oldRefreshState) => ({
+        ...oldRefreshState,
+        status: 'migrated-reports-from-real-date-to-date-id-done',
+      }));
+      return;
     }
+    setRefreshTrigger((oldRefreshState) => ({
+      ...oldRefreshState,
+      status: 'refresh',
+    }));
+  };
+
+  const refresh = async () => {
+    clearInterval(autoRefreshInterval.current);
+    autoRefreshInterval.current = null;
+
+    const { showFullScreen, initialLoad } = refreshTrigger.options;
+    setFullScreen(showFullScreen);
+    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
 
     /*
     Get number of data to download to show the appropriate loading progress bar
@@ -334,9 +331,9 @@ const Loader = () => {
         collectionName: 'person',
         data: persons,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
         API,
       });
@@ -436,9 +433,9 @@ const Loader = () => {
         collectionName: 'report',
         data: reports,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newReports) => {
           newReports = newReports.filter((r) => !!r.team && !!r.date);
           setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
@@ -459,9 +456,9 @@ const Loader = () => {
         collectionName: 'passage',
         data: passages,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newPassages) =>
           setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
         API,
@@ -483,9 +480,9 @@ const Loader = () => {
         collectionName: 'action',
         data: actions,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newActions) => setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions))),
         API,
       });
@@ -501,9 +498,9 @@ const Loader = () => {
         collectionName: 'territory',
         data: territories,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newTerritories) =>
           setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
         API,
@@ -521,9 +518,9 @@ const Loader = () => {
         collectionName: 'place',
         data: places,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
         API,
       });
@@ -534,9 +531,9 @@ const Loader = () => {
         collectionName: 'relPersonPlace',
         data: relsPersonPlace,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newRelPerPlace) =>
           setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
         API,
@@ -553,9 +550,9 @@ const Loader = () => {
         collectionName: 'territory-observation',
         data: territoryObservations,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
         API,
       });
@@ -571,9 +568,9 @@ const Loader = () => {
         collectionName: 'comment',
         data: comments,
         isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
+        withDeleted: Boolean(lastRefresh),
         setBatchData: (newComments) =>
           setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
         API,
@@ -581,7 +578,84 @@ const Loader = () => {
       if (refreshedComments) setComments(refreshedComments);
     }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'comment'));
+    setRefreshTrigger({
+      status: 'clean',
+      options: { showFullScreen: false, initialLoad: false },
+    });
+  };
 
+  const cleanupData = async () => {
+    setLoading('Nettoyage de vos données, veuillez patienter quelques instants...');
+
+    let needToRefreshAfterCleanup = false;
+    const personIds = persons.map((p) => p._id);
+
+    const actionsToDelete = actions.filter((item) => !personIds.includes(item.person));
+    for (const action of actionsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/action/${action._id}` });
+      setActions((actions) => actions.filter((c) => c._id !== action._id));
+    }
+    const passagesToDelete = passages.filter((item) => !!item.person && !personIds.includes(item.person));
+
+    for (const passage of passagesToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/passage/${passage._id}` });
+      setPassages((passages) => passages.filter((c) => c._id !== passage._id));
+    }
+    const commentsToDelete = comments.filter((item) => !!item.person && !personIds.includes(item.person));
+
+    for (const comment of commentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/comment/${comment._id}` });
+      setComments((comments) => comments.filter((c) => c._id !== comment._id));
+    }
+    const relsPersonPlaceToDelete = relsPersonPlace.filter((item) => !personIds.includes(item.person));
+
+    for (const relPersonPlace of relsPersonPlaceToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+      setRelsPersonPlace((rels) => rels.filter((r) => r._id !== relsPersonPlace._id));
+    }
+    const consultationsToDelete = consultations.filter((item) => !personIds.includes(item.person));
+
+    for (const consultation of consultationsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/consultation/${consultation._id}` });
+      setConsultations((consultations) => consultations.filter((c) => c._id !== consultation._id));
+    }
+    const treatmentsToDelete = treatments.filter((item) => !personIds.includes(item.person));
+
+    for (const treatment of treatmentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/treatment/${treatment._id}` });
+      setTreatments((treatments) => treatments.filter((c) => c._id !== treatment._id));
+    }
+    const medicalFilesToDelete = medicalFiles.filter((item) => !personIds.includes(item.person));
+
+    for (const medicalFile of medicalFilesToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/medical-file/${medicalFile._id}` });
+      setMedicalFiles((medicalFiles) => medicalFiles.filter((c) => c._id !== medicalFile._id));
+    }
+
+    const actionIds = actions.map((p) => p._id);
+
+    const actionsCommentsToDelete = comments.filter((item) => !!item.action && !actionIds.includes(item.action));
+
+    for (const comment of actionsCommentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/comment/${comment._id}` });
+      setComments((comments) => comments.filter((c) => c._id !== comment._id));
+    }
+    setRefreshTrigger((oldRefreshState) => ({
+      ...oldRefreshState,
+      status: needToRefreshAfterCleanup,
+    }));
+    resetRefreshTrigger();
+  };
+
+  const resetRefreshTrigger = async () => {
     /*
     Reset refresh trigger
     */
@@ -597,9 +671,23 @@ const Loader = () => {
     });
   };
 
+  const triggerRefresh = async () => {
+    clearInterval(autoRefreshInterval.current);
+    autoRefreshInterval.current = null;
+
+    const { showFullScreen, initialLoad } = refreshTrigger.options;
+    setFullScreen(showFullScreen);
+    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
+
+    migrate();
+  };
+
   useEffect(() => {
-    if (refreshTrigger.status === true && lastRefreshReady) {
-      refresh();
+    if (lastRefreshReady) {
+      if (refreshTrigger.status === true) triggerRefresh();
+      if (refreshTrigger.status.includes('migrated')) migrate();
+      if (refreshTrigger.status === 'refresh') refresh();
+      if (refreshTrigger.status === 'clean') cleanupData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status, lastRefreshReady]);

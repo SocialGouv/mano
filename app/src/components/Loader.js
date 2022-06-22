@@ -349,6 +349,84 @@ const Loader = () => {
       if (refreshedReports) setReports(refreshedReports.filter((r) => !!r.team && !!r.date));
     }
 
+    setRefreshTrigger({
+      status: 'clean',
+      options: { showFullScreen: false, initialLoad: false },
+    });
+  };
+
+  const cleanupData = async () => {
+    setLoading('Nettoyage de vos données, veuillez patienter quelques instants...');
+
+    let needToRefreshAfterCleanup = false;
+    const personIds = persons.map((p) => p._id);
+
+    const actionsToDelete = actions.filter((item) => !personIds.includes(item.person));
+    for (const action of actionsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/action/${action._id}` });
+      setActions((actions) => actions.filter((c) => c._id !== action._id));
+    }
+    const passagesToDelete = passages.filter((item) => !!item.person && !personIds.includes(item.person));
+
+    for (const passage of passagesToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/passage/${passage._id}` });
+      setPassages((passages) => passages.filter((c) => c._id !== passage._id));
+    }
+    const commentsToDelete = comments.filter((item) => !!item.person && !personIds.includes(item.person));
+
+    for (const comment of commentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/comment/${comment._id}` });
+      setComments((comments) => comments.filter((c) => c._id !== comment._id));
+    }
+    const relsPersonPlaceToDelete = relsPersonPlace.filter((item) => !personIds.includes(item.person));
+
+    for (const relPersonPlace of relsPersonPlaceToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+      setRelsPersonPlace((rels) => rels.filter((r) => r._id !== relsPersonPlace._id));
+    }
+    const consultationsToDelete = consultations.filter((item) => !personIds.includes(item.person));
+
+    for (const consultation of consultationsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/consultation/${consultation._id}` });
+      setConsultations((consultations) => consultations.filter((c) => c._id !== consultation._id));
+    }
+    const treatmentsToDelete = treatments.filter((item) => !personIds.includes(item.person));
+
+    for (const treatment of treatmentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/treatment/${treatment._id}` });
+      setTreatments((treatments) => treatments.filter((c) => c._id !== treatment._id));
+    }
+    const medicalFilesToDelete = medicalFiles.filter((item) => !personIds.includes(item.person));
+
+    for (const medicalFile of medicalFilesToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/medical-file/${medicalFile._id}` });
+      setMedicalFiles((medicalFiles) => medicalFiles.filter((c) => c._id !== medicalFile._id));
+    }
+
+    const actionIds = actions.map((p) => p._id);
+
+    const actionsCommentsToDelete = comments.filter((item) => !!item.action && !actionIds.includes(item.action));
+
+    for (const comment of actionsCommentsToDelete) {
+      needToRefreshAfterCleanup = true;
+      await API.delete({ path: `/comment/${comment._id}` });
+      setComments((comments) => comments.filter((c) => c._id !== comment._id));
+    }
+    setRefreshTrigger((oldRefreshState) => ({
+      ...oldRefreshState,
+      status: needToRefreshAfterCleanup,
+    }));
+    resetRefreshTrigger();
+  };
+
+  const resetRefreshTrigger = async () => {
     /*
     Reset refresh trigger
     */
@@ -365,12 +443,10 @@ const Loader = () => {
   };
 
   useEffect(() => {
-    if (refreshTrigger.status === true) {
-      refresh();
-    }
+    if (refreshTrigger.status === true) refresh();
+    if (refreshTrigger.status === 'clean') cleanupData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status]);
-
   // useEffect(() => {
   //   if (!autoRefreshInterval.current && initialLoadDone.current) {
   //     autoRefreshInterval.current = setInterval(async () => {
