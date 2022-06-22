@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
 import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -106,10 +106,16 @@ const List = () => {
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
 
+  const isMounted = useRef(null);
   useEffect(() => {
-    // its not possible to update two different URLSearchParams very quickly, the second one cancels the first one
-    setPage(0); // internal state
-    setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id], { sideEffect: ['page', 0] });
+    // effect on currentTeam/viewAllOrganisationData change
+    // not to be triggered on first render, because it would erase the `page` query param
+    if (isMounted.current) {
+      // its not possible to update two different URLSearchParams very quickly, the second one cancels the first one
+      setPage(0); // internal state
+      setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id], { sideEffect: ['page', 0] });
+    }
+    isMounted.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewAllOrganisationData, currentTeam, teams]);
 
