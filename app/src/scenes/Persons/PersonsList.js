@@ -16,7 +16,7 @@ import { loadingState, refreshTriggerState } from '../../components/Loader';
 const PersonsList = ({ navigation, route }) => {
   const [search, setSearch] = useState('');
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
-  const loading = useRecoilState(loadingState);
+  const loading = useRecoilValue(loadingState);
   const params = route?.params?.filters || {};
 
   const filterTeams = params?.filterTeams || [];
