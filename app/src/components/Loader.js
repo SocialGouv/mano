@@ -86,68 +86,6 @@ const Loader = () => {
   const initialLoadDone = useRef(null);
   const autoRefreshInterval = useRef(null);
 
-  const cleanupData = async () => {
-    setLoading('Nettoyage de vos données, veuillez patienter quelques instants...');
-
-    let needToRefreshAfterCleanup = false;
-    const personIds = persons.map((p) => p._id);
-
-    const actionsToDelete = actions.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
-    for (const action of actionsToDelete) {
-      needToRefreshAfterCleanup = true;
-      await API.delete({ path: `/action/${action._id}` });
-    }
-    // const passagesToDelete = passages.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
-    // for (const passage of passagesToDelete) {
-    //   needToRefreshAfterCleanup = true;
-    //   await API.delete({ path: `/passage/${passage._id}` });
-    // }
-    const commentsToDelete = comments.filter((item) => !!item.person && !personIds.includes(item.person)).map((item) => item._id);
-    for (const comment of commentsToDelete) {
-      needToRefreshAfterCleanup = true;
-      await API.delete({ path: `/comment/${comment._id}` });
-    }
-    const relsPersonPlaceToDelete = relsPersonPlace.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
-    for (const relPersonPlace of relsPersonPlaceToDelete) {
-      needToRefreshAfterCleanup = true;
-      await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-    }
-
-    const consultationsToDelete = consultations.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
-    for (const consultation of consultationsToDelete) {
-      needToRefreshAfterCleanup = true;
-      await API.delete({ path: `/consultation/${consultation._id}` });
-    }
-    const treatmentsToDelete = treatments.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
-    for (const treatment of treatmentsToDelete) {
-      needToRefreshAfterCleanup = true;
-      await API.delete({ path: `/treatment/${treatment._id}` });
-    }
-    const medicalFilesToDelete = medicalFiles.filter((item) => !personIds.includes(item.person)).map((item) => item._id);
-    for (const medicalFile of medicalFilesToDelete) {
-      needToRefreshAfterCleanup = true;
-      await API.delete({ path: `/medicalFile/${medicalFile._id}` });
-    }
-
-    const actionIds = persons.map((p) => p._id);
-
-    const actionsCommentsToDelete = comments.filter((item) => !!item.action && !actionIds.includes(item.action)).map((item) => item._id);
-    for (const comment of actionsCommentsToDelete) {
-      needToRefreshAfterCleanup = true;
-      await API.delete({ path: `/comment/${comment._id}` });
-    }
-    if (needToRefreshAfterCleanup) {
-      setRefreshTrigger((oldRefreshState) => ({
-        ...oldRefreshState,
-        status: false,
-      }));
-      setRefreshTrigger((oldRefreshState) => ({
-        ...oldRefreshState,
-        status: true,
-      }));
-    }
-  };
-
   const refresh = async () => {
     clearInterval(autoRefreshInterval.current);
     autoRefreshInterval.current = null;
@@ -410,8 +348,6 @@ const Loader = () => {
       });
       if (refreshedReports) setReports(refreshedReports.filter((r) => !!r.team && !!r.date));
     }
-
-    await cleanupData();
 
     /*
     Reset refresh trigger
