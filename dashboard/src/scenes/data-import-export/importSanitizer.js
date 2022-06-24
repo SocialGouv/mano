@@ -58,7 +58,7 @@ const sanitizeBoolean = (value) => {
   return Boolean(value);
 };
 
-export function sanitizeFieldValue(field, { v: rawValue, w: formattedText }) {
+export const sanitizeFieldValueFromExcel = (field, { v: rawValue, w: formattedText }) => {
   if (field.type === 'text') return sanitizeString(rawValue);
   if (field.type === 'textarea') return sanitizeString(rawValue);
   if (field.type === 'number') return sanitizeNumber(rawValue);
@@ -69,4 +69,4 @@ export function sanitizeFieldValue(field, { v: rawValue, w: formattedText }) {
   if (field.type === 'multi-choice') return sanitizeMultiChoice(rawValue, field.options);
   if (field.type === 'boolean') return sanitizeBoolean(rawValue);
   return rawValue;
-}
+};

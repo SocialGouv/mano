@@ -24,7 +24,7 @@ export const prepareConsultationForEncryption = (customFieldsConsultations) => (
     completedAt: consultation.completedAt,
     dueAt: consultation.dueAt,
     status: consultation.status,
-    onlyVisibleBy: consultation.onlyVisibleBy,
+    onlyVisibleBy: consultation.onlyVisibleBy || [],
 
     decrypted,
     entityKey: consultation.entityKey,

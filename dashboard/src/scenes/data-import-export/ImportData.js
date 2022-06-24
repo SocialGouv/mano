@@ -15,7 +15,7 @@ import { teamsState, userState } from '../../recoil/auth';
 import { isNullOrUndefined } from '../../utils';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import { formatDateWithFullMonth, now } from '../../services/date';
-import { sanitizeFieldValue } from './importSanitizer';
+import { sanitizeFieldValueFromExcel } from './importSanitizer';
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
@@ -94,7 +94,7 @@ const ImportData = () => {
         const person = {};
         for (const [column, field] of headerColumnsAndField) {
           if (!personsSheet[`${column}${i}`]) continue;
-          const value = sanitizeFieldValue(field, personsSheet[`${column}${i}`]);
+          const value = sanitizeFieldValueFromExcel(field, personsSheet[`${column}${i}`]);
           if (!isNullOrUndefined(value)) {
             person[field.name] = value;
             if (field.name === 'assignedTeams' && value.length > 0) {

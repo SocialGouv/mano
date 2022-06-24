@@ -73,9 +73,9 @@ const CreatePerson = ({ refreshable }) => {
                 setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
                 toastr.success('Création réussie !');
                 setOpen(false);
+                actions.setSubmitting(false);
                 history.push(`/person/${response.decryptedData._id}`);
               }
-              actions.setSubmitting(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
