@@ -417,7 +417,7 @@ const MergeTwoPersons = ({ person }) => {
                       Annuler
                     </Button>
                     <Button disabled={isSubmitting} onClick={() => !isSubmitting && handleSubmit()}>
-                      Fusionner
+                      {isSubmitting ? 'Fusion en cours' : 'Fusionner'}
                     </Button>
                   </Row>
                 </>
