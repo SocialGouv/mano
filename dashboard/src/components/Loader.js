@@ -298,7 +298,7 @@ const Loader = () => {
       response.data.reports +
       response.data.relsPersonPlace;
 
-    if (lastRefresh > 0 && ['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
+    if (lastRefresh > 0) {
       // medical data is never saved in cache
       // so we always have to download all at every page reload
       const medicalDataResponse = await API.get({
@@ -312,7 +312,11 @@ const Loader = () => {
         });
         return;
       }
-      total = total + medicalDataResponse.data.consultations + medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles;
+
+      total =
+        total +
+        medicalDataResponse.data.consultations +
+        (!user.healthcareProfessional ? 0 : medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles);
     }
 
     if (initialLoad) {
@@ -349,30 +353,30 @@ const Loader = () => {
     /*
     Get consultations
     */
+    if (response.data.consultations || initialLoad) {
+      setLoading('Chargement des consultations');
+      const refreshedConsultations = await getData({
+        collectionName: 'consultation',
+        data: consultations,
+        isInitialization: initialLoad,
+        withDeleted: true,
+        saveInCache: false,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+        setBatchData: (newConsultations) =>
+          setConsultations((oldConsultations) =>
+            initialLoad
+              ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
+              : mergeItems(
+                  oldConsultations,
+                  newConsultations.map((c) => whitelistAllowedData(c, user))
+                )
+          ),
+        API,
+      });
+      if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
+    }
     if (['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
-      if (response.data.consultations || initialLoad) {
-        setLoading('Chargement des consultations');
-        const refreshedConsultations = await getData({
-          collectionName: 'consultation',
-          data: consultations,
-          isInitialization: initialLoad,
-          withDeleted: true,
-          saveInCache: false,
-          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-          setBatchData: (newConsultations) =>
-            setConsultations((oldConsultations) =>
-              initialLoad
-                ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
-                : mergeItems(
-                    oldConsultations,
-                    newConsultations.map((c) => whitelistAllowedData(c, user))
-                  )
-            ),
-          API,
-        });
-        if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
-      }
       setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
       /*
     Get treatments
