@@ -341,7 +341,6 @@ const MergeTwoPersons = ({ person }) => {
                       {
                         dataKey: 'field',
                         render: (field) => {
-                          console.log(field);
                           return <Field>{field.name === 'user' ? 'Créé(e) par' : field.label}</Field>;
                         },
                       },
