@@ -91,7 +91,8 @@ const MergeTwoPersons = ({ person }) => {
     if (!originPerson || !personToMergeWith) return [];
     return [...new Set([...Object.keys(originPerson), ...Object.keys(personToMergeWith)])]
       .filter((fieldName) => !['_id', 'encryptedEntityKey', 'entityKey', 'createdAt', 'updatedAt', 'organisation', 'documents'].includes(fieldName))
-      .map((fieldName) => allFields.find((f) => f.name === fieldName) || fieldName);
+      .map((fieldName) => allFields.find((f) => f.name === fieldName))
+      .filter(Boolean);
   }, [originPerson, personToMergeWith, allFields]);
 
   const medicalFields = useMemo(() => {
@@ -101,7 +102,8 @@ const MergeTwoPersons = ({ person }) => {
         (fieldName) =>
           !['_id', 'encryptedEntityKey', 'entityKey', 'createdAt', 'updatedAt', 'organisation', 'documents', 'person'].includes(fieldName)
       )
-      .map((fieldName) => customFieldsMedicalFile.find((f) => f.name === fieldName) || fieldName);
+      .map((fieldName) => customFieldsMedicalFile.find((f) => f.name === fieldName))
+      .filter(Boolean);
   }, [originPerson, personToMergeWith, originPersonMedicalFile, personToMergeMedicalFile, customFieldsMedicalFile]);
 
   const initMergedPerson = useMemo(() => {
@@ -338,7 +340,10 @@ const MergeTwoPersons = ({ person }) => {
                     columns={[
                       {
                         dataKey: 'field',
-                        render: (field) => <Field>{field.name === 'user' ? 'Créé(e) par' : field.label}</Field>,
+                        render: (field) => {
+                          console.log(field);
+                          return <Field>{field.name === 'user' ? 'Créé(e) par' : field.label}</Field>;
+                        },
                       },
                       {
                         title: originPerson?.name,
@@ -351,9 +356,9 @@ const MergeTwoPersons = ({ person }) => {
                               </Col>
                             );
                           if (field.name === 'assignedTeams') {
-                            return <Col md={12}>{originPerson.assignedTeams.map((id) => teams.find((t) => t._id === id)?.name).join(', ')}</Col>;
+                            return <Col md={12}>{originPerson?.assignedTeams?.map((id) => teams.find((t) => t._id === id)?.name).join(', ')}</Col>;
                           }
-                          return getRawValue(field, originPerson[field.name] || originPersonMedicalFile[field.name]);
+                          return getRawValue(field, originPerson[field.name] || originPersonMedicalFile?.[field.name]);
                         },
                       },
                       {
@@ -368,7 +373,7 @@ const MergeTwoPersons = ({ person }) => {
                             );
                           if (field.name === 'assignedTeams') {
                             return (
-                              <Col md={12}>{personToMergeWith?.assignedTeams.map((id) => teams.find((t) => t._id === id)?.name).join(', ')}</Col>
+                              <Col md={12}>{personToMergeWith?.assignedTeams?.map((id) => teams.find((t) => t._id === id)?.name).join(', ')}</Col>
                             );
                           }
                           return getRawValue(field, personToMergeWith?.[field.name] || personToMergeMedicalFile?.[field.name]);
