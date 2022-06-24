@@ -1,3 +1,10 @@
+## [1.125.1](https://github.com/SocialGouv/mano/compare/v1.125.0...v1.125.1) (2022-06-24)
+
+
+### Bug Fixes
+
+* **app,dashboard:** can logout with cache clear if needed ([#767](https://github.com/SocialGouv/mano/issues/767)) ([6d75ce2](https://github.com/SocialGouv/mano/commit/6d75ce2e35713b5273aebd229e757403561fc0a6))
+
 # [1.125.0](https://github.com/SocialGouv/mano/compare/v1.124.3...v1.125.0) (2022-06-24)
 
 
