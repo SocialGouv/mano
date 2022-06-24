@@ -122,6 +122,7 @@ const TopBarLogo = styled.div`
 const TopBarAccount = styled.div`
   display: flex;
   justify-content: flex-end;
+  z-index: 10000;
 `;
 
 const TopBarOrganistionTeamBox = styled.div`
@@ -132,7 +133,6 @@ const TopBarOrganistionTeamBox = styled.div`
 
 const TopBarStyled = styled.aside`
   background-color: ${theme.white};
-  z-index: 10000;
   width: 100%;
   padding: 12px 18px;
   flex-shrink: 0;
