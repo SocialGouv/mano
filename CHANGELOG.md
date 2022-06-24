@@ -1,3 +1,15 @@
+# [1.125.0](https://github.com/SocialGouv/mano/compare/v1.124.3...v1.125.0) (2022-06-24)
+
+
+### Bug Fixes
+
+* **dashboard:** import medical data properly ([#771](https://github.com/SocialGouv/mano/issues/771)) ([a6bde24](https://github.com/SocialGouv/mano/commit/a6bde240e6383c27a81150251bba3652b6c40a81))
+
+
+### Features
+
+* **app:** confirm delete on app for territory + for admins ([#755](https://github.com/SocialGouv/mano/issues/755)) ([94f36bf](https://github.com/SocialGouv/mano/commit/94f36bf7f76a814615d8253fcceef693f24e2816))
+
 ## [1.124.3](https://github.com/SocialGouv/mano/compare/v1.124.2...v1.124.3) (2022-06-22)
 
 
