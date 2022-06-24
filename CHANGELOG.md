@@ -1,3 +1,10 @@
+# [1.126.0](https://github.com/SocialGouv/mano/compare/v1.125.1...v1.126.0) (2022-06-24)
+
+
+### Features
+
+* **dashboard:** merge two persons ([#756](https://github.com/SocialGouv/mano/issues/756)) ([5edfa71](https://github.com/SocialGouv/mano/commit/5edfa71314bca0f48a758f1b63e17f286fe67b10))
+
 ## [1.125.1](https://github.com/SocialGouv/mano/compare/v1.125.0...v1.125.1) (2022-06-24)
 
 
