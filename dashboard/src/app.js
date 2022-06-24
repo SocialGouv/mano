@@ -3,6 +3,7 @@ import { RecoilRoot, useRecoilValue } from 'recoil';
 import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import lifecycle from 'page-lifecycle';
 import { Provider } from 'react-redux';
 import { combineReducers, createStore } from 'redux';
@@ -21,8 +22,7 @@ import User from './scenes/user';
 import Report from './scenes/report';
 import Person from './scenes/person';
 import Drawer from './components/drawer';
-import Loader from './components/Loader';
-import 'react-datepicker/dist/react-datepicker.css';
+import Loader, { loaderFullScreenState } from './components/Loader';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { userState } from './recoil/auth';
@@ -31,7 +31,6 @@ import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 import ModalConfirm from './components/ModalConfirm';
-import { loaderFullScreenState } from './components/Loader';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -87,7 +86,7 @@ const App = ({ resetRecoil }) => {
   );
 };
 
-const RestrictedRoute = ({ component: Component, isLoggedIn, ...rest }) => {
+const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
   const fullScreen = useRecoilValue(loaderFullScreenState);
   const user = useRecoilValue(userState);
   if (!!user && !user?.termsAccepted)

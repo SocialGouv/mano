@@ -9,6 +9,8 @@ import ScrollContainer from '../../components/ScrollContainer';
 import { FRAMAFORM_MANO, MANO_DOWNLOAD_URL } from '../../config';
 import { useRecoilValue, useResetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { useMMKVNumber } from 'react-native-mmkv';
+import { clearCache } from '../../services/dataManagement';
 
 const Menu = ({ navigation }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -16,8 +18,23 @@ const Menu = ({ navigation }) => {
   const resetUser = useResetRecoilState(userState);
   const resetTeams = useResetRecoilState(teamsState);
   const resetCurrentTeam = useResetRecoilState(currentTeamState);
+  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-05-27');
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
+
+  const onLogoutRequest = (clearAll = false) => {
+    setIsLoggingOut(true);
+    API.logout();
+    resetOrganisation();
+    resetUser();
+    resetTeams();
+    resetCurrentTeam();
+    if (clearAll) {
+      clearCache();
+      setLastRefresh(0);
+      Alert.alert('Vous êtes déconnecté(e)', 'Vous pouvez aussi supprimer Mano pour plus de sécurité');
+    }
+  };
 
   return (
     <SceneContainer>
@@ -51,19 +68,13 @@ const Menu = ({ navigation }) => {
         <Row withNextButton caption="Mentions Légales" onPress={() => navigation.navigate('Legal')} />
         <Row withNextButton caption="Politique de Confidentialité" onPress={() => navigation.navigate('Privacy')} />
         <Spacer height={30} />
+        <Row caption="Se déconnecter" color="#F00" loading={isLoggingOut} Component={TouchableWithoutFeedback} onPress={() => onLogoutRequest()} />
         <Row
-          caption="Déconnexion"
+          caption="Se déconnecter et supprimer toute trace de mon passage"
           color="#F00"
           loading={isLoggingOut}
           Component={TouchableWithoutFeedback}
-          onPress={async () => {
-            setIsLoggingOut(true);
-            API.logout();
-            resetOrganisation();
-            resetUser();
-            resetTeams();
-            resetCurrentTeam();
-          }}
+          onPress={() => onLogoutRequest(true)}
         />
         <Spacer height={30} />
       </ScrollContainer>

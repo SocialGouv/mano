@@ -1,5 +1,6 @@
 import API from '../services/api';
 import { MMKV } from 'react-native-mmkv';
+import AsyncStorage from '@react-native-community/async-storage';
 
 export const mergeNewUpdatedData = (newData, oldData) => {
   const oldDataIds = oldData.map((p) => p._id);
@@ -20,6 +21,7 @@ export const storage = new MMKV();
 
 export function clearCache() {
   storage.clearAll();
+  AsyncStorage.clear();
 }
 
 // Get data from cache or fetch from server.
