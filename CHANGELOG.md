@@ -1,3 +1,10 @@
+## [1.126.1](https://github.com/SocialGouv/mano/compare/v1.126.0...v1.126.1) (2022-06-24)
+
+
+### Bug Fixes
+
+* **app,dashboard:** mo medical file yet in app + fix medical data in dashboard ([#772](https://github.com/SocialGouv/mano/issues/772)) ([493d2a6](https://github.com/SocialGouv/mano/commit/493d2a6ef0fb08b82898b127f10cb760fc9a58db))
+
 # [1.126.0](https://github.com/SocialGouv/mano/compare/v1.125.1...v1.126.0) (2022-06-24)
 
 
