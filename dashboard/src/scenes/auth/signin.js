@@ -130,14 +130,14 @@ const SignIn = () => {
 
             const { user, token, ok } = authViaCookie
               ? await API.get({
-                path: '/user/signin-token',
-                skipEncryption: '/user/signin-token',
-              })
+                  path: '/user/signin-token',
+                  skipEncryption: '/user/signin-token',
+                })
               : await API.post({
-                path: '/user/signin',
-                skipEncryption: '/user/signin',
-                body,
-              });
+                  path: '/user/signin',
+                  skipEncryption: '/user/signin',
+                  body,
+                });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;
             if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
@@ -151,7 +151,7 @@ const SignIn = () => {
             }
             window.localStorage.setItem('mano-organisationId', organisation._id);
             setOrganisation(organisation);
-            if (!!values.orgEncryptionKey) {
+            if (!['superadmin'].includes(user.role) && !!values.orgEncryptionKey) {
               const encryptionIsValid = await setOrgEncryptionKey(values.orgEncryptionKey.trim(), organisation);
               if (!encryptionIsValid) return;
             }

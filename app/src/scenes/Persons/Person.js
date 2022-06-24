@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Alert, Platform, Modal } from 'react-native';
+import { Alert, Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -22,11 +22,6 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
-import ScrollContainer from '../../components/ScrollContainer';
-import InputLabelled from '../../components/InputLabelled';
-import ButtonsContainer from '../../components/ButtonsContainer';
-import ButtonDelete from '../../components/ButtonDelete';
-import { SubTitle } from '../../components/Title';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -46,9 +41,6 @@ const Person = ({ route, navigation }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
-
-  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
-  const [nameConfirm, setNameConfirm] = useState('');
 
   const personDB = useMemo(() => persons.find((p) => p._id === route.params?._id), [persons, route.params?._id]);
 
@@ -166,18 +158,6 @@ const Person = ({ route, navigation }) => {
     return true;
   };
 
-  const onDeleteRequest = () => setShowConfirmDelete(true);
-  const onDeleteConfirm = () => {
-    if (!nameConfirm) return Alert.alert('Le nom est obligatoire');
-    if (nameConfirm.trim().toLocaleLowerCase() !== personDB?.name.trim().toLocaleLowerCase()) {
-      return Alert.alert('Le nom de la personne est incorrect');
-    }
-    if (nameConfirm.trim() !== personDB?.name.trim()) {
-      return Alert.alert('Veuillez respecter les minuscules/majuscules');
-    }
-    onDelete();
-  };
-
   const onDelete = async () => {
     setDeleting(true);
     const res = await API.delete({ path: `/person/${personDB._id}` });
@@ -186,7 +166,7 @@ const Person = ({ route, navigation }) => {
         setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
       } else {
         Alert.alert(res.error);
-        return;
+        return false;
       }
     }
     for (const action of actions.filter((a) => a.person === personDB._id)) {
@@ -214,10 +194,9 @@ const Person = ({ route, navigation }) => {
       }
     }
     setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
-    setShowConfirmDelete(false);
     setDeleting(false);
     Alert.alert('Personne supprimée !');
-    onBack();
+    return true;
   };
 
   const isUpdateDisabled = useMemo(() => {
@@ -311,10 +290,10 @@ const Person = ({ route, navigation }) => {
                 onUpdatePerson={onUpdatePerson}
                 writeComment={setWritingComment}
                 onEdit={onEdit}
+                onDelete={onDelete}
+                onBack={onBack}
                 isUpdateDisabled={isUpdateDisabled}
-                onDeleteRequest={onDeleteRequest}
                 updating={updating}
-                deleting={deleting}
                 editable={editable}
               />
             )}
@@ -331,38 +310,13 @@ const Person = ({ route, navigation }) => {
                 onUpdatePerson={onUpdatePerson}
                 onEdit={onEdit}
                 isUpdateDisabled={isUpdateDisabled}
-                onDeleteRequest={onDeleteRequest}
                 editable={editable}
                 updating={updating}
-                deleting={deleting}
               />
             )}
           </TabNavigator.Screen>
         </TabNavigator.Navigator>
       </SceneContainer>
-      <Modal animationType="fade" visible={!!showConfirmDelete}>
-        <SceneContainer>
-          <ScreenTitle title={`Voulez-vous vraiment supprimer ${personDB?.name} ?`} onBack={() => setShowConfirmDelete(false)} />
-          <ScrollContainer>
-            <SubTitle>
-              Cette opération est irréversible et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;: {'\n'}actions,
-              commentaires, lieux visités, passages, documents...
-            </SubTitle>
-            <SubTitle>Veuillez taper le nom de la personne pour confirmer en respectant les majuscules, minuscules ou accents</SubTitle>
-            <InputLabelled
-              label="Nom"
-              value={nameConfirm}
-              onChangeText={setNameConfirm}
-              placeholder={personDB?.name}
-              editable
-              onSubmitEditing={onDeleteConfirm}
-            />
-            <ButtonsContainer>
-              <ButtonDelete onPress={onDeleteConfirm} deleting={deleting} />
-            </ButtonsContainer>
-          </ScrollContainer>
-        </SceneContainer>
-      </Modal>
     </>
   );
 };

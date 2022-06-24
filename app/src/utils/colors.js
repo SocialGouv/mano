@@ -20,7 +20,7 @@ export default {
     color: '#D97706',
   },
   menu: {
-    backgroundColor: '#49c3a6',
+    backgroundColor: '#008e7f',
     color: '#fff',
   },
 };

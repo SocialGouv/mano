@@ -14,6 +14,7 @@ import TerritoryObservationRow from './TerritoryObservationRow';
 import { useRecoilState } from 'recoil';
 import { prepareTerritoryForEncryption, territoriesState } from '../../recoil/territory';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
+import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
 const castToTerritory = (territory = {}) => ({
   name: territory.name?.trim() || '',
@@ -84,32 +85,20 @@ const Territory = ({ route, navigation }) => {
     }
   };
 
-  const onDeleteRequest = () => {
-    Alert.alert('Voulez-vous vraiment supprimer ce territoire ?', 'Cette opération est irréversible.', [
-      {
-        text: 'Supprimer',
-        style: 'destructive',
-        onPress: onDelete,
-      },
-      {
-        text: 'Annuler',
-        style: 'cancel',
-      },
-    ]);
-  };
-
   const onDelete = async () => {
     const response = await API.delete({ path: `/territory/${territoryDB._id}` });
-    if (response.error) return Alert.alert(response.error);
-    if (response.ok) {
-      for (let obs of territoryObservations.filter((o) => o.territory === territoryDB._id)) {
-        await API.delete({ path: `/territory-observation/${obs._id}` });
-        setTerritoryObservations((obs) => obs.filter((o) => o.territory !== territoryDB._id));
-      }
-      setTerritories((territories) => territories.filter((t) => t._id !== territoryDB._id));
-      Alert.alert('Territoire supprimé !');
-      onBack();
+    if (response.error) {
+      Alert.alert(response.error);
+      return false;
     }
+    if (!response.ok) return false;
+    for (let obs of territoryObservations.filter((o) => o.territory === territoryDB._id)) {
+      await API.delete({ path: `/territory-observation/${obs._id}` });
+      setTerritoryObservations((obs) => obs.filter((o) => o.territory !== territoryDB._id));
+    }
+    setTerritories((territories) => territories.filter((t) => t._id !== territoryDB._id));
+    Alert.alert('Territoire supprimé !');
+    return true;
   };
 
   const isUpdateDisabled = useMemo(() => {
@@ -179,7 +168,13 @@ const Territory = ({ route, navigation }) => {
             editable={editable}
           />
           <ButtonsContainer>
-            <ButtonDelete onPress={onDeleteRequest} />
+            <DeleteButtonAndConfirmModal
+              title={`Voulez-vous vraiment supprimer ${territoryDB?.name} ?`}
+              onBack={onBack}
+              textToConfirm={territoryDB?.name}
+              onDelete={onDelete}>
+              Cette opération est irréversible{'\n'}et entrainera la suppression définitive{'\n'}de toutes les observations liées au territoire
+            </DeleteButtonAndConfirmModal>
             <Button
               caption={editable ? 'Mettre à jour' : 'Modifier'}
               onPress={editable ? onUpdateTerritory : onEdit}
