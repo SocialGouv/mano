@@ -298,26 +298,24 @@ const Loader = () => {
       response.data.reports +
       response.data.relsPersonPlace;
 
-    if (lastRefresh > 0) {
-      // medical data is never saved in cache
-      // so we always have to download all at every page reload
-      const medicalDataResponse = await API.get({
-        path: '/organisation/stats',
-        query: { organisation: organisationId, after: initialLoad ? 0 : lastRefresh, withDeleted: true },
+    // medical data is never saved in cache
+    // so we always have to download all at every page reload
+    const medicalDataResponse = await API.get({
+      path: '/organisation/stats',
+      query: { organisation: organisationId, after: initialLoad ? 0 : lastRefresh, withDeleted: true },
+    });
+    if (!medicalDataResponse.ok) {
+      setRefreshTrigger({
+        status: false,
+        options: { showFullScreen: false, initialLoad: false },
       });
-      if (!medicalDataResponse.ok) {
-        setRefreshTrigger({
-          status: false,
-          options: { showFullScreen: false, initialLoad: false },
-        });
-        return;
-      }
-
-      total =
-        total +
-        medicalDataResponse.data.consultations +
-        (!user.healthcareProfessional ? 0 : medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles);
+      return;
     }
+
+    total =
+      total +
+      medicalDataResponse.data.consultations +
+      (!user.healthcareProfessional ? 0 : medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles);
 
     if (initialLoad) {
       total = total + collections.length; // for the progress bar to be beautiful
@@ -353,7 +351,7 @@ const Loader = () => {
     /*
     Get consultations
     */
-    if (response.data.consultations || initialLoad) {
+    if (medicalDataResponse.data.consultations || initialLoad) {
       setLoading('Chargement des consultations');
       const refreshedConsultations = await getData({
         collectionName: 'consultation',
@@ -375,13 +373,13 @@ const Loader = () => {
         API,
       });
       if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
+      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
     }
     if (['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
-      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
       /*
     Get treatments
     */
-      if (response.data.treatments || initialLoad) {
+      if (medicalDataResponse.data.treatments || initialLoad) {
         setLoading('Chargement des traitements');
         const refreshedTreatments = await getData({
           collectionName: 'treatment',
@@ -401,7 +399,7 @@ const Loader = () => {
       /*
       Get medicalFiles
       */
-      if (response.data.medicalFiles || initialLoad) {
+      if (medicalDataResponse.data.medicalFiles || initialLoad) {
         setLoading('Chargement des informations médicales');
         const refreshedMedicalFiles = await getData({
           collectionName: 'medical-file',
