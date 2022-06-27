@@ -233,7 +233,7 @@ router.get(
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().regex(jwtRegex)).parse(req.cookies.jwt);
-      z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.auth);
+      z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.authorization);
       z.enum(["android", "dashboard"]).parse(req.headers.platform);
     } catch (e) {
       const error = new Error(`Invalid request in signin token: ${e}`);

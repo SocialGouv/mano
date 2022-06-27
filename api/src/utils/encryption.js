@@ -1,4 +1,5 @@
 const libsodium = require("libsodium-wrappers");
+const { capture } = require("../sentry");
 
 /*
 
@@ -41,10 +42,11 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   try {
     const decryptedVerificationKey_uint8array = await _decrypt_after_extracting_nonce(encryptedVerificationKey, hashedMasterKey);
     const decryptedVerificationKey = Buffer.from(new TextDecoder().decode(decryptedVerificationKey_uint8array), "base64").toString("binary");
-    console.log({ decryptedVerificationKey, verificationPassphrase });
     return decryptedVerificationKey === verificationPassphrase;
   } catch (e) {
-    console.log("error checkEncryptedVerificationKey", e);
+    console.log(e.message);
+    if (e.message === "wrong secret key for the given ciphertext") return false;
+    capture(e);
   }
   return false;
 };

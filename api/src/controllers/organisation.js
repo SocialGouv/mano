@@ -23,6 +23,7 @@ const { checkEncryptedVerificationKey } = require("../utils/encryption");
 const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const TerritoryObservation = require("../models/territoryObservation");
+const { ExtractJwt } = require("passport-jwt");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -144,8 +145,8 @@ router.post(
   catchErrors(async (req, res, next) => {
     try {
       z.string().regex(looseUuidRegex).parse(req.user.organisation);
-      z.string().regex(jwtRegex).parse(req.cookies.jwt);
-      z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.auth);
+      z.optional(z.string().regex(jwtRegex)).parse(req.cookies.jwt);
+      z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.authorization);
       z.enum(["android", "dashboard"]).parse(req.headers.platform);
       z.string().parse(req.body.orgEncryptionKey);
     } catch (e) {
@@ -153,10 +154,18 @@ router.post(
       error.status = 400;
       return next(error);
     }
+
+    const { platform } = req.headers;
+
+    const token = platform === "dashboard" ? req.cookies.jwt : platform === "android" ? ExtractJwt.fromAuthHeaderWithScheme("JWT")(req) : null;
+    if (!token) return res.status(400).send({ ok: false });
+
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     const encryptionKeyIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, req.body.orgEncryptionKey);
     if (!encryptionKeyIsValid) {
-      return res.status(400).send({ ok: false, error: "La clé de chiffrement ne semble pas être correcte, veuillez réessayer." });
+      return res
+        .status(400)
+        .send({ ok: false, error: "La clé de chiffrement ne semble pas être correcte, veuillez réessayer.", code: "WRONG_ENCRYPTION_KEY" });
     }
 
     return res.status(200).send({ ok: true });

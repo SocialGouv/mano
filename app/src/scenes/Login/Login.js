@@ -156,13 +156,31 @@ const Login = ({ navigation }) => {
         setShowEncryptionKeyInput(true);
         return;
       }
-      if (showEncryptionKeyInput) {
-        const keyIsValid = await API.setOrgEncryptionKey(encryptionKey);
-        if (!keyIsValid) {
-          setLoading(false);
-          return;
+      const encryptionIsValidResponse = await API.post({
+        path: '/organisation/check-encryption-key',
+        body: { orgEncryptionKey: encryptionKey },
+      });
+      if (!encryptionIsValidResponse.ok) {
+        if (encryptionIsValidResponse?.code === 'WRONG_ENCRYPTION_KEY') {
+          Alert.alert(
+            'La clé de chiffrement ne semble pas correcte',
+            'Veuillez réssayer',
+            [{ text: 'OK', onPress: () => encryptionKeyRef.current.focus() }],
+            {
+              cancelable: true,
+              onDismiss: () => encryptionKeyRef.current.focus(),
+            }
+          );
+        } else {
+          Alert.alert(encryptionIsValidResponse.error, null, [{ text: 'OK', onPress: () => encryptionKeyRef.current.focus() }], {
+            cancelable: true,
+            onDismiss: () => encryptionKeyRef.current.focus(),
+          });
         }
+        setLoading(false);
+        return;
       }
+      await API.setEncryptedVerificationKey(encryptionKey);
       await AsyncStorage.setItem('persistent_email', email);
       const { data: teams } = await API.get({ path: '/team' });
       const { data: users } = await API.get({ path: '/user', query: { minimal: true } });

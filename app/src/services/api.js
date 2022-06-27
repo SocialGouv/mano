@@ -1,6 +1,6 @@
 import URI from 'urijs';
 import { HOST, SCHEME, VERSION } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, encryptFile } from './encryption';
 import { capture } from './sentry';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {
@@ -170,18 +170,8 @@ class ApiService {
   put = (args) => this.execute({ method: 'PUT', ...args });
   delete = (args) => this.execute({ method: 'DELETE', ...args });
 
-  setOrgEncryptionKey = async (orgEncryptionKey) => {
+  setEncryptedVerificationKey = async (orgEncryptionKey) => {
     this.hashedOrgEncryptionKey = await derivedMasterKey(orgEncryptionKey);
-    const { encryptedVerificationKey } = this.organisation;
-    if (!encryptedVerificationKey) {
-      capture('encryptedVerificationKey not setup yet', { extra: { organisation: this.organisation } });
-    } else {
-      const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, this.hashedOrgEncryptionKey);
-      if (!encryptionKeyIsValid) {
-        this.handleWrongKey();
-        return false;
-      }
-    }
     this.enableEncrypt = true;
     this.orgEncryptionKey = orgEncryptionKey;
     this.sendCaptureError = 0;
@@ -239,7 +229,7 @@ class ApiService {
         });
         this.sendCaptureError++;
       }
-      if (this.organisation.encryptedVerificationKey) {
+      if (this.organisation.encryptionEnabled) {
         if (this.handleError) {
           this.handleError(
             "Désolé, un élément n'a pas pu être déchiffré",
