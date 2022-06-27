@@ -126,7 +126,6 @@ router.put(
         consultations: organisation.consultations,
         collaborations: organisation.collaborations,
         customFieldsObs: organisation.customFieldsObs,
-        encryptedVerificationKey: organisation.encryptedVerificationKey,
         fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions,
         customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
         customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
