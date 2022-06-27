@@ -191,7 +191,7 @@ export const employmentOptions = ['DPH', 'CDD', 'CDDI', 'CDI', 'Interim', 'Bén�
 
 export const personalSituationOptions = ['Aucune', 'Homme isolé', 'Femme isolée', 'En couple', 'Famille', 'Autre'];
 
-export const genderOptions = ['Aucun', 'Homme', 'Femme', 'Autre'];
+export const genderOptions = ['Aucun', 'Homme', 'Femme', 'Homme transgenre', 'Femme transgenre', 'Non binaire', 'Autre'];
 
 export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française'];
 
