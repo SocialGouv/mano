@@ -2,6 +2,7 @@ const { version, mobileAppVersion } = require("../package.json");
 
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.SECRET || "not_so_secret_4";
+const ENCRYPTION_TOKEN_SECRET = process.env.ENCRYPTION_TOKEN_SECRET || "not_so_secret_6";
 const ENVIRONMENT = process.env.NODE_ENV || "development";
 
 const PGHOST = process.env.PGHOST;
@@ -21,6 +22,7 @@ module.exports = {
   PORT,
   ENVIRONMENT,
   SECRET,
+  ENCRYPTION_TOKEN_SECRET,
   PGHOST,
   PGPORT,
   PGUSER,

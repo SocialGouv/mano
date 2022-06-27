@@ -25,6 +25,8 @@ import {
   isTablet,
 } from 'react-native-device-info';
 
+const computeAuthHeader = (tokens) => tokens.map(([key, value]) => `${key} ${value}`).join(',');
+
 class ApiService {
   getUrl = (path, query = {}) => {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
@@ -54,7 +56,7 @@ class ApiService {
 
   execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
     try {
-      if (this.token) headers.Authorization = `JWT ${this.token}`;
+      if (this.tokens.length) headers.Authorization = computeAuthHeader(this.tokens);
       const options = {
         method,
         headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: this.platform, version: VERSION },
@@ -262,7 +264,7 @@ class ApiService {
       url,
       {
         'Content-Type': 'multipart/form-data',
-        Authorization: `JWT ${this.token}`,
+        Authorization: computeAuthHeader(this.tokens),
         Accept: 'application/json',
         platform: this.platform,
         version: VERSION,
@@ -289,6 +291,9 @@ class ApiService {
     const json = await response.json();
     return { ...json, encryptedEntityKey };
   };
+
+  tokens = [];
+  addToken = ([key, value]) => [...(this.tokens || []), [key, value]];
 }
 
 const API = new ApiService();

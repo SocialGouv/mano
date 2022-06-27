@@ -251,7 +251,7 @@ const App = () => {
       logEvents.logAppVisit();
       appStateListener.current = AppState.addEventListener('change', (nextAppState) => {
         if (appState.current.match(/inactive|background/) && nextAppState === 'active') {
-          if (API.token) API.get({ path: '/check-auth' }); // will force logout if session is expired
+          if (API.tokens?.length) API.get({ path: '/check-auth' }); // will force logout if session is expired
           logEvents.logAppVisit();
         } else {
           logEvents.logAppClose();

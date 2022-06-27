@@ -62,7 +62,7 @@ const Login = ({ navigation }) => {
       // check token
       const storedToken = await AsyncStorage.getItem('persistent_token');
       if (!storedToken) return RNBootSplash.hide({ duration: 250 });
-      API.token = storedToken;
+      API.addToken('JWT', storedToken);
       const { token, ok, user } = await API.get({
         path: '/user/signin-token',
         skipEncryption: '/user/signin-token',
@@ -103,7 +103,7 @@ const Login = ({ navigation }) => {
     setAuthViaCookie(false);
     setUserName('');
     setShowEncryptionKeyInput(false);
-    API.token = null;
+    API.tokens = [];
   };
 
   const onForgetPassword = () => navigation.navigate('ForgetPassword');
@@ -144,7 +144,7 @@ const Login = ({ navigation }) => {
     }
     if (response.ok) {
       Keyboard.dismiss();
-      API.token = response.token;
+      API.addToken('JWT', response.token);
       await AsyncStorage.setItem('persistent_token', response.token);
       API.showTokenExpiredError = true;
       API.organisation = response.user.organisation;
@@ -157,8 +157,8 @@ const Login = ({ navigation }) => {
         return;
       }
       const encryptionIsValidResponse = await API.post({
-        path: '/organisation/check-encryption-key',
-        body: { orgEncryptionKey: encryptionKey },
+        path: '/user/check-encryption-key',
+        body: { password: encryptionKey },
       });
       if (!encryptionIsValidResponse.ok) {
         if (encryptionIsValidResponse?.code === 'WRONG_ENCRYPTION_KEY') {
@@ -180,6 +180,7 @@ const Login = ({ navigation }) => {
         setLoading(false);
         return;
       }
+      API.addToken('JWT-ENCRYPTED-DATA', encryptionIsValidResponse.token);
       await API.setEncryptedVerificationKey(encryptionKey);
       await AsyncStorage.setItem('persistent_email', email);
       const { data: teams } = await API.get({ path: '/team' });

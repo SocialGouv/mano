@@ -10,7 +10,7 @@ const Structure = require("../models/structure");
 
 router.post(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -30,7 +30,7 @@ router.post(
 
 router.get(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -63,7 +63,7 @@ router.get(
 
 router.get(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -82,7 +82,7 @@ router.get(
 
 router.put(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -116,7 +116,7 @@ router.put(
 
 router.delete(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {

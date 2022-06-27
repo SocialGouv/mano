@@ -11,7 +11,7 @@ const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 router.post(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"], { healthcareProfessional: true }),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
@@ -50,7 +50,7 @@ router.post(
 
 router.get(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"], { healthcareProfessional: true }),
   catchErrors(async (req, res, next) => {
     try {
@@ -90,7 +90,7 @@ router.get(
 
 router.put(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"], { healthcareProfessional: true }),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
@@ -134,7 +134,7 @@ router.put(
 
 router.delete(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"], { healthcareProfessional: true }),
   catchErrors(async (req, res, next) => {
     try {

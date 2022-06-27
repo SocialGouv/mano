@@ -13,7 +13,7 @@ const { looseUuidRegex } = require("../utils");
 
 router.put(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser("admin"),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {

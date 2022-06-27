@@ -24,7 +24,7 @@ API.logout = async (from) => {
       ],
     });
   }
-  API.token = null;
+  API.tokens = [];
   AsyncStorage.removeItem('persistent_token');
   API.enableEncrypt = null;
   API.wrongKeyWarned = null;
@@ -54,7 +54,7 @@ API.handleWrongKey = () => {
     });
     API.showTokenExpiredError = false;
     API.navigation = null;
-    API.token = null;
+    API.tokens = [];
     AsyncStorage.removeItem('persistent_token');
   }
 };

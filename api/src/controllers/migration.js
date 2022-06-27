@@ -15,7 +15,7 @@ const validateUser = require("../middleware/validateUser");
 
 router.put(
   "/:migrationName",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateEncryptionAndMigrations,
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {

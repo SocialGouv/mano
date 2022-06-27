@@ -140,7 +140,7 @@ const SignIn = () => {
                 });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;
-            if (token) API.setToken(token);
+            if (token) API.addToken('JWT', token);
             if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
               await clearCache();
               setLastRefresh(0);
@@ -153,11 +153,12 @@ const SignIn = () => {
             }
             if (!['superadmin'].includes(user.role) && !!values.orgEncryptionKey) {
               const encryptionIsValidResponse = await API.post({
-                path: '/organisation/check-encryption-key',
-                body: { orgEncryptionKey: values.orgEncryptionKey },
+                path: '/user/check-encryption-key',
+                body: { password: values.orgEncryptionKey },
               });
               if (!encryptionIsValidResponse.ok) return;
               await setEncryptedVerificationKey(values.orgEncryptionKey.trim());
+              if (encryptionIsValidResponse.token) API.addToken('JWT-ENCRYPTED-DATA', encryptionIsValidResponse.token);
             }
             setUser(user);
             AppSentry.setUser(user);
@@ -169,8 +170,11 @@ const SignIn = () => {
               return;
             }
             const teamResponse = await API.get({ path: '/team' });
+            console.log({ teamResponse });
             const teams = teamResponse.data;
+            console.log({ teams });
             const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
+            console.log({ usersResponse });
             const users = usersResponse.data;
             setTeams(teams);
             setUsers(users);

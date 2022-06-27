@@ -1,5 +1,23 @@
 const libsodium = require("libsodium-wrappers");
+const { ENCRYPTION_TOKEN_SECRET } = require("../config");
 const { capture } = require("../sentry");
+
+/*
+
+Encrypt
+
+*/
+const _encrypt_and_prepend_nonce = async (message_string_or_uint8array, key_uint8array) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+
+  let nonce_uint8array = sodium.randombytes_buf(sodium.crypto_secretbox_NONCEBYTES);
+  const crypto_secretbox_easy_uint8array = sodium.crypto_secretbox_easy(message_string_or_uint8array, nonce_uint8array, key_uint8array);
+  const arrayBites = _appendBuffer(nonce_uint8array, crypto_secretbox_easy_uint8array);
+  return sodium.to_base64(arrayBites, sodium.base64_variants.ORIGINAL);
+};
+
+const encryptDataAuthToken = (userId) => _encrypt_and_prepend_nonce(userId, ENCRYPTION_TOKEN_SECRET);
 
 /*
 
@@ -53,4 +71,5 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
 
 module.exports = {
   checkEncryptedVerificationKey,
+  encryptDataAuthToken,
 };

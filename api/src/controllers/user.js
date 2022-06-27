@@ -13,9 +13,11 @@ const { comparePassword } = require("../utils");
 const User = require("../models/user");
 const RelUserTeam = require("../models/relUserTeam");
 const Team = require("../models/team");
+const Organisation = require("../models/organisation");
 const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
-const { ExtractJwt } = require("passport-jwt");
+const { checkEncryptedVerificationKey, encryptDataAuthToken } = require("../utils/encryption");
+const { extractTokenFromAuth } = require("../passport");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
@@ -36,9 +38,9 @@ function cookieOptions() {
 
 function logoutCookieOptions() {
   if (config.ENVIRONMENT === "development" || config.ENVIRONMENT === "test") {
-    return { httpOnly: true, secure: true, sameSite: "None" };
+    return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, sameSite: "None" };
   } else {
-    return { httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
+    return { maxAge: COOKIE_MAX_AGE, httpOnly: true, secure: true, domain: ".fabrique.social.gouv.fr", sameSite: "Lax" };
   }
 }
 
@@ -174,6 +176,7 @@ router.post(
   validateUser(["admin", "normal", "superadmin", "restricted-access"]),
   catchErrors(async (_req, res) => {
     res.clearCookie("jwt", logoutCookieOptions());
+    res.clearCookie("jwtForEncryptedData", logoutCookieOptions());
     return res.status(200).send({ ok: true });
   })
 );
@@ -225,6 +228,44 @@ router.post(
   })
 );
 
+router.post(
+  "/check-encryption-key",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "restricted-access"]),
+  catchErrors(async (req, res, next) => {
+    try {
+      z.string().regex(looseUuidRegex).parse(req.user.organisation);
+      z.optional(z.string().regex(jwtRegex)).parse(req.cookies.jwt);
+      // z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.authorization);
+      z.enum(["android", "dashboard"]).parse(req.headers.platform);
+      z.string().parse(req.body.password);
+    } catch (e) {
+      const error = new Error(`Invalid request in check encryption key: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+
+    const { platform } = req.headers;
+
+    const unencryptedToken =
+      platform === "dashboard" ? req.cookies.jwt : platform === "android" ? extractTokenFromAuth("JWT", req.headers.authorization) : null;
+    if (!unencryptedToken) return res.status(400).send({ ok: false });
+
+    const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
+    const encryptionKeyIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, req.body.password);
+    if (!encryptionKeyIsValid) {
+      return res
+        .status(400)
+        .send({ ok: false, error: "La clé de chiffrement ne semble pas être correcte, veuillez réessayer.", code: "WRONG_ENCRYPTION_KEY" });
+    }
+
+    const token = jwt.sign({ _id: req.user._id }, config.ENCRYPTION_TOKEN_SECRET, { expiresIn: JWT_MAX_AGE });
+    res.cookie("jwtEncryptedData", token, cookieOptions());
+
+    return res.status(200).send({ ok: true, token });
+  })
+);
+
 router.get(
   "/signin-token",
   passport.authenticate("user", { session: false }),
@@ -232,7 +273,7 @@ router.get(
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.string().regex(jwtRegex)).parse(req.cookies.jwt);
-      z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.authorization);
+      // z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.authorization);
       z.enum(["android", "dashboard"]).parse(req.headers.platform);
     } catch (e) {
       const error = new Error(`Invalid request in signin token: ${e}`);
@@ -242,7 +283,7 @@ router.get(
 
     const { platform } = req.headers;
 
-    const token = platform === "dashboard" ? req.cookies.jwt : platform === "android" ? ExtractJwt.fromAuthHeaderWithScheme("JWT")(req) : null;
+    const token = platform === "dashboard" ? req.cookies.jwt : platform === "android" ? extractTokenFromAuth("JWT", req.headers.authorization) : null;
     if (!token) return res.status(400).send({ ok: false });
     const user = await User.findOne({ where: { _id: req.user._id } });
 
@@ -491,7 +532,7 @@ router.get(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal", "superadmin", "restricted-access"]),
+  validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
       z.optional(z.literal("true")).parse(req.query.minimal);

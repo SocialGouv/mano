@@ -23,7 +23,8 @@ let sendCaptureError = 0; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encrypti
 let wrongKeyWarned = false; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryptionVerificationKey`
 
 /* auth */
-export let tokenCached = null;
+export let tokensCached = [];
+const computeAuthHeader = (tokens) => tokens.map(([key, value]) => `${key} ${value}`).join(',');
 
 /* methods */
 export const setEncryptedVerificationKey = async (decryptedVerificationKey) => {
@@ -131,7 +132,7 @@ const useApi = () => {
   const reset = () => {
     hashedOrgEncryptionKey = null;
     enableEncrypt = false;
-    tokenCached = null;
+    tokensCached = [];
     sendCaptureError = 0;
     wrongKeyWarned = false;
     blockEncrypt = false;
@@ -168,7 +169,7 @@ const useApi = () => {
       mode: 'cors',
       credentials: 'include',
       body: formData,
-      headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: computeAuthHeader(tokensCached), Accept: 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -182,7 +183,7 @@ const useApi = () => {
       method: 'GET',
       mode: 'cors',
       credentials: 'include',
-      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: computeAuthHeader(tokensCached), 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -196,7 +197,7 @@ const useApi = () => {
       method: 'DELETE',
       mode: 'cors',
       credentials: 'include',
-      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: computeAuthHeader(tokensCached), 'Content-Type': 'application/json', platform: 'dashboard', version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -205,7 +206,7 @@ const useApi = () => {
 
   const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false } = {}) => {
     try {
-      if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
+      if (tokensCached) headers.Authorization = computeAuthHeader(tokensCached);
       const options = {
         method,
         mode: 'cors',
@@ -319,7 +320,7 @@ const useApi = () => {
   const put = (args) => execute({ method: 'PUT', ...args });
 
   return {
-    setToken: (newToken) => (tokenCached = newToken),
+    addToken: ([key, value]) => [...(tokensCached || []), [key, value]],
     // token,
     get,
     reset,

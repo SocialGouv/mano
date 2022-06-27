@@ -26,7 +26,7 @@ import Loader, { loaderFullScreenState } from './components/Loader';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { userState } from './recoil/auth';
-import useApi, { recoilResetKeyState, tokenCached } from './services/api';
+import useApi, { recoilResetKeyState, tokensCached } from './services/api';
 import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
@@ -46,7 +46,7 @@ const App = ({ resetRecoil }) => {
   }, [recoilResetKey]);
 
   const onWindowFocus = useCallback((e) => {
-    if (tokenCached && e.newState === 'active') API.get({ path: '/check-auth' }); // will force logout if session is expired
+    if (Object.keys(tokensCached).length && e.newState === 'active') API.get({ path: '/check-auth' }); // will force logout if session is expired
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

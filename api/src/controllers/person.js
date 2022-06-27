@@ -24,7 +24,7 @@ function personDocumentBasedir(userOrganisation, personId) {
 // Upload a document for a person.
 router.post(
   "/:id/document",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"]),
   // Use multer to handle the file upload.
   multer({
@@ -67,7 +67,7 @@ router.post(
 // Download a file for a person by its filename.
 router.get(
   "/:id/document/:filename",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -92,7 +92,7 @@ router.get(
 // Delete a file for a person by its filename.
 router.delete(
   "/:id/document/:filename",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -117,7 +117,7 @@ router.delete(
 
 router.post(
   "/import",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser("admin"),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
@@ -161,7 +161,7 @@ router.post(
 
 router.post(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal", "restricted-access"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
@@ -199,7 +199,7 @@ router.post(
 
 router.get(
   "/",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
@@ -244,7 +244,7 @@ router.get(
 
 router.put(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"]),
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
@@ -288,7 +288,7 @@ router.put(
 
 router.delete(
   "/:_id",
-  passport.authenticate("user", { session: false }),
+  passport.authenticate("user-allowed-for-encrypted-data", { session: false }),
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
