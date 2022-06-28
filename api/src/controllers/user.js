@@ -16,7 +16,7 @@ const Team = require("../models/team");
 const Organisation = require("../models/organisation");
 const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
-const { checkEncryptedVerificationKey, encryptDataAuthToken } = require("../utils/encryption");
+const { checkEncryptedVerificationKey, decryptBase64 } = require("../utils/encryption");
 const { extractTokenFromAuth } = require("../passport");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
@@ -228,6 +228,13 @@ router.post(
   })
 );
 
+router.get(
+  "/get-public-key-for-encryption-process",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal", "restricted-access"]),
+  catchErrors(async (req, res, next) => res.status(200).send({ ok: true, data: config.CHECK_ENCRYPTION_KEY_PUBLIC_KEY }))
+);
+
 router.post(
   "/check-encryption-key",
   passport.authenticate("user", { session: false }),
@@ -251,8 +258,10 @@ router.post(
       platform === "dashboard" ? req.cookies.jwt : platform === "android" ? extractTokenFromAuth("JWT", req.headers.authorization) : null;
     if (!unencryptedToken) return res.status(400).send({ ok: false });
 
+    const passwordFromB64 = await decryptBase64(req.body.password);
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
-    const encryptionKeyIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, req.body.password);
+    const decryptedPassword = crypto.privateDecrypt(config.CHECK_ENCRYPTION_KEY_PRIVATE_KEY, Buffer.from(passwordFromB64));
+    const encryptionKeyIsValid = await checkEncryptedVerificationKey(organisation.encryptedVerificationKey, decryptedPassword.toString());
     if (!encryptionKeyIsValid) {
       return res
         .status(400)

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
 import validator from 'validator';
+import crypto from 'crypto-browserify';
 import { Link, useHistory } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
@@ -16,6 +17,7 @@ import useApi, { setEncryptedVerificationKey } from '../../services/api';
 import { AppSentry } from '../../services/sentry';
 import { refreshTriggerState, loadingState, lastRefreshState } from '../../components/Loader';
 import { clearCache } from '../../services/dataManagement';
+import { encryptBase64 } from '../../services/encryption';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -152,11 +154,24 @@ const SignIn = () => {
               return actions.setSubmitting(false);
             }
             if (!['superadmin'].includes(user.role) && !!values.orgEncryptionKey) {
+              const publicKeyResponse = await API.get({ path: '/user/get-public-key-for-encryption-process' });
+              if (!publicKeyResponse.ok) return actions.setSubmitting(false);
+              const publicKey = publicKeyResponse.data;
+              console.log('public key');
+              console.log({ publicKey: publicKey.replace(/\\n/g, '\n') });
+              const buffer = Buffer.from(values.orgEncryptionKey);
+              console.log({ buffer });
+
+              console.log(crypto.constants.RSA_PKCS1_OAEP_PADDING);
+              const encryptedData = crypto.publicEncrypt(publicKey, buffer);
+              const encryptedDataB64 = await encryptBase64(encryptedData);
+              // The encrypted data is in the form of bytes, so we print it in base64 format
+              // so that it's displayed in a more readable form
               const encryptionIsValidResponse = await API.post({
                 path: '/user/check-encryption-key',
-                body: { password: values.orgEncryptionKey },
+                body: { password: encryptedDataB64 },
               });
-              if (!encryptionIsValidResponse.ok) return;
+              if (!encryptionIsValidResponse.ok) return actions.setSubmitting(false);
               await setEncryptedVerificationKey(values.orgEncryptionKey.trim());
               if (encryptionIsValidResponse.token) API.addToken('JWT-ENCRYPTED-DATA', encryptionIsValidResponse.token);
             }

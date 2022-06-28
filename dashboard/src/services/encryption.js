@@ -162,4 +162,16 @@ const decryptFile = async (file, encryptedEntityKey, masterKey) => {
 const verificationPassphrase = 'Surprise !';
 const encryptVerificationKey = (masterKey) => _encrypt_and_prepend_nonce(encodeContent(verificationPassphrase), masterKey);
 
-export { encryptFile, decryptFile, derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey };
+const encryptBase64 = async (content) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+  return sodium.to_base64(content, sodium.base64_variants.ORIGINAL);
+};
+
+const decryptBase64 = async (content_b64) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+  return sodium.from_base64(content_b64, sodium.base64_variants.ORIGINAL);
+};
+
+export { encryptFile, decryptFile, derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, encryptBase64, decryptBase64 };

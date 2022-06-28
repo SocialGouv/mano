@@ -1,4 +1,16 @@
 const { version, mobileAppVersion } = require("../package.json");
+const crypto = require("crypto");
+
+const { publicKey: CHECK_ENCRYPTION_KEY_PUBLIC_KEY, privateKey: CHECK_ENCRYPTION_KEY_PRIVATE_KEY } = crypto.generateKeyPairSync("rsa", {
+  // The standard secure default length for RSA keys is 2048 bits
+  modulusLength: 2048,
+  publicKeyEncoding: {
+    type: "pkcs1",
+    format: "pem",
+  },
+});
+
+console.log({ CHECK_ENCRYPTION_KEY_PUBLIC_KEY, CHECK_ENCRYPTION_KEY_PRIVATE_KEY });
 
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.SECRET || "not_so_secret_4";
@@ -23,6 +35,8 @@ module.exports = {
   ENVIRONMENT,
   SECRET,
   ENCRYPTION_TOKEN_SECRET,
+  CHECK_ENCRYPTION_KEY_PRIVATE_KEY,
+  CHECK_ENCRYPTION_KEY_PUBLIC_KEY,
   PGHOST,
   PGPORT,
   PGUSER,

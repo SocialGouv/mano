@@ -69,7 +69,21 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   return false;
 };
 
+const encryptBase64 = async (content) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+  return sodium.to_base64(content, sodium.base64_variants.ORIGINAL);
+};
+
+const decryptBase64 = async (content_b64) => {
+  await libsodium.ready;
+  const sodium = libsodium;
+  return sodium.from_base64(content_b64, sodium.base64_variants.ORIGINAL);
+};
+
 module.exports = {
   checkEncryptedVerificationKey,
   encryptDataAuthToken,
+  encryptBase64,
+  decryptBase64,
 };
