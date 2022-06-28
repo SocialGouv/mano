@@ -32,6 +32,7 @@ import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { passagesState } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
+import { consultationsState } from '../../recoil/consultations';
 
 const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -45,7 +46,7 @@ const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrga
   );
 };
 
-const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Observations', 'Comptes-rendus'];
+const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Observations', 'Comptes-rendus', "Consultations"];
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -53,6 +54,7 @@ const Stats = () => {
   const teams = useRecoilValue(teamsState);
 
   const allPersons = useRecoilValue(personsState);
+  const allConsultations = useRecoilValue(consultationsState);
   const allActions = useRecoilValue(actionsState);
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
@@ -92,6 +94,12 @@ const Stats = () => {
     period,
     currentTeam,
     viewAllOrganisationData
+  );
+  const consultations = getDataForPeriod(
+    allConsultations,
+    period,
+    currentTeam,
+    true
   );
   const observations = getDataForPeriod(
     allObservations
@@ -210,7 +218,7 @@ const Stats = () => {
         )}
       </Row>
       <Nav tabs style={{ marginBottom: 20 }}>
-        {tabs.map((tabCaption, index) => {
+        {tabs.filter(e => user.healthcareProfessional || e !== 'Consultations').map((tabCaption, index) => {
           if (!organisation.receptionEnabled && index === 1) return null;
           return (
             <NavItem key={index} style={{ cursor: 'pointer' }}>
@@ -488,6 +496,22 @@ const Stats = () => {
             data={getPieData(reports, 'collaborations', { options: organisation.collaborations || [] })}
           />
         </TabPane>
+        {user.healthcareProfessional && <TabPane tabId={7}>
+          <Title>Statistiques des consultations</Title>
+          <Row style={{ marginBottom: '20px' }}>
+            <Col md={4} />
+            <Block data={consultations} title="Nombre de consultations" />
+            <Col md={4} />
+          </Row>
+          <CustomResponsivePie
+            title="Consultations par type"
+            data={getPieData(consultations, 'type')}
+          />
+          <CustomResponsivePie
+            title="Consultations par statut"
+            data={getPieData(consultations, 'status')}
+          />
+        </TabPane>}
       </TabContent>
     </>
   );
