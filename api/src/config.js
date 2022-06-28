@@ -10,8 +10,6 @@ const { publicKey: CHECK_ENCRYPTION_KEY_PUBLIC_KEY, privateKey: CHECK_ENCRYPTION
   },
 });
 
-console.log({ CHECK_ENCRYPTION_KEY_PUBLIC_KEY, CHECK_ENCRYPTION_KEY_PRIVATE_KEY });
-
 const PORT = process.env.PORT || 3000;
 const SECRET = process.env.SECRET || "not_so_secret_4";
 const ENCRYPTION_TOKEN_SECRET = process.env.ENCRYPTION_TOKEN_SECRET || "not_so_secret_6";

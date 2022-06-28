@@ -157,12 +157,8 @@ const SignIn = () => {
               const publicKeyResponse = await API.get({ path: '/user/get-public-key-for-encryption-process' });
               if (!publicKeyResponse.ok) return actions.setSubmitting(false);
               const publicKey = publicKeyResponse.data;
-              console.log('public key');
-              console.log({ publicKey: publicKey.replace(/\\n/g, '\n') });
               const buffer = Buffer.from(values.orgEncryptionKey);
-              console.log({ buffer });
 
-              console.log(crypto.constants.RSA_PKCS1_OAEP_PADDING);
               const encryptedData = crypto.publicEncrypt(publicKey, buffer);
               const encryptedDataB64 = await encryptBase64(encryptedData);
               // The encrypted data is in the form of bytes, so we print it in base64 format
@@ -185,11 +181,8 @@ const SignIn = () => {
               return;
             }
             const teamResponse = await API.get({ path: '/team' });
-            console.log({ teamResponse });
             const teams = teamResponse.data;
-            console.log({ teams });
             const usersResponse = await API.get({ path: '/user', query: { minimal: true } });
-            console.log({ usersResponse });
             const users = usersResponse.data;
             setTeams(teams);
             setUsers(users);
