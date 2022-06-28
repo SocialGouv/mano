@@ -122,7 +122,9 @@ const TopBarLogo = styled.div`
 const TopBarAccount = styled.div`
   display: flex;
   justify-content: flex-end;
-  z-index: 10000;
+  .dropdown-menu.show {
+    z-index: 10000;
+  }
 `;
 
 const TopBarOrganistionTeamBox = styled.div`
