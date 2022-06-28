@@ -1,3 +1,15 @@
+# [1.127.0](https://github.com/SocialGouv/mano/compare/v1.126.1...v1.127.0) (2022-06-28)
+
+
+### Bug Fixes
+
+* **dashboard:** z-index of dropdown-menu ([#777](https://github.com/SocialGouv/mano/issues/777)) ([a39ae07](https://github.com/SocialGouv/mano/commit/a39ae07fc009408dec82867c464514d6e4bf3e2e))
+
+
+### Features
+
+* **app,dashboard:** more choices in gender options ([#776](https://github.com/SocialGouv/mano/issues/776)) ([1870bdc](https://github.com/SocialGouv/mano/commit/1870bdcc043ec38d5ce61a2e91c616cdc3819d29))
+
 ## [1.126.1](https://github.com/SocialGouv/mano/compare/v1.126.0...v1.126.1) (2022-06-24)
 
 
