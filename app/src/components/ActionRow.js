@@ -8,6 +8,7 @@ import colors from '../utils/colors';
 import TeamsTags from './TeamsTags';
 import { personsState } from '../recoil/persons';
 import { DONE } from '../recoil/actions';
+import DateAndTimeCalendarDisplay from './DateAndTimeCalendarDisplay';
 
 const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName, testID = 'action' }) => {
   const persons = useRecoilValue(personsState);
@@ -30,17 +31,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
 
   return (
     <RowContainer onPress={onRowPress} testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
-      <DateContainer>
-        {Boolean(dueAt) && (
-          <>
-            <Day>{dueAt.getLocaleWeekDay('fr')}</Day>
-            <DateNumber heavy>{dueAt.getLocaleDay('fr')}</DateNumber>
-            <Month>{dueAt.getLocaleMonth('fr')}</Month>
-            {new Date().getFullYear() !== dueAt.getFullYear() && <Month>{dueAt.getFullYear()}</Month>}
-            {Boolean(withTime) && <Time>{dueAt.getLocalePureTime('fr')}</Time>}
-          </>
-        )}
-      </DateContainer>
+      <DateAndTimeCalendarDisplay date={dueAt} withTime={withTime} />
       <CaptionsContainer>
         <Name bold>{name}</Name>
         {!!withTeamName && <TeamsTags teams={[action.team]} />}
@@ -100,37 +91,6 @@ const Pseudo = styled(MyText)`
   flex-grow: 0;
   align-self: flex-start;
   color: ${colors.app.color};
-`;
-
-const DateContainer = styled.View`
-  flex-shrink: 0;
-  flex-basis: 70px;
-`;
-
-const DateText = styled(MyText)`
-  font-size: 12px;
-  font-style: italic;
-  text-align: center;
-  text-transform: uppercase;
-`;
-
-const Day = styled(DateText)`
-  color: ${colors.app.color};
-`;
-
-const Time = styled(DateText)`
-  margin-top: 10px;
-`;
-
-const Month = styled(DateText)`
-  color: ${colors.app.secondary};
-`;
-
-const DateNumber = styled(MyText)`
-  font-size: 20px;
-  font-style: italic;
-  text-align: center;
-  margin-vertical: 5px;
 `;
 
 export default ActionRow;

@@ -11,7 +11,6 @@ import ActionRow from '../../components/ActionRow';
 import CommentRow from '../Comments/CommentRow';
 import PlaceRow from '../Places/PlaceRow';
 import SubList from '../../components/SubList';
-import ButtonDelete from '../../components/ButtonDelete';
 import DateAndTimeInput, { displayBirthDate } from '../../components/DateAndTimeInput';
 import GenderSelect from '../../components/Selects/GenderSelect';
 import Spacer from '../../components/Spacer';

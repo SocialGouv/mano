@@ -20,13 +20,14 @@ import { sortByName } from '../../utils/sortByName';
 
 const NewPersonForm = ({ navigation, route }) => {
   const [persons, setPersons] = useRecoilState(personsState);
+  console.log({ persons });
   const currentTeam = useRecoilValue(currentTeamState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const teams = useRecoilValue(teamsState);
 
   const [name, setName] = useState('');
-  const [assignedTeams, setAssignedTeams] = useState([currentTeam._id]);
+  const [assignedTeams, setAssignedTeams] = useState([currentTeam?._id]);
   const [posting, setPosting] = useState(false);
 
   const backRequestHandledRef = useRef(null);

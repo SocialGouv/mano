@@ -18,7 +18,7 @@ import colors from '../../utils/colors';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { customFieldsPersonsSocialSelector } from '../../recoil/persons';
 
-const FileSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, onEdit, isUpdateDisabled, backgroundColor, person }) => {
+const InformationsSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, onEdit, isUpdateDisabled, backgroundColor, person }) => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
 
   const scrollViewRef = useRef(null);
@@ -108,4 +108,4 @@ const FileSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, 
   );
 };
 
-export default FileSocial;
+export default InformationsSocial;

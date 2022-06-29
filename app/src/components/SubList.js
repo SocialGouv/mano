@@ -82,9 +82,11 @@ const List = styled.View`
   flex-shrink: 0;
   margin-horizontal: -30px;
   margin-bottom: ${(props) => (props.expanded ? 30 : 0)}px;
+  padding-top: ${(props) => (props.expanded ? 5 : 0)}px;
 `;
 
 const ChildrenContainer = styled.View`
+  flex-shrink: 0;
   margin-vertical: 10px;
 `;
 
