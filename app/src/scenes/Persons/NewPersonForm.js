@@ -20,7 +20,6 @@ import { sortByName } from '../../utils/sortByName';
 
 const NewPersonForm = ({ navigation, route }) => {
   const [persons, setPersons] = useRecoilState(personsState);
-  console.log({ persons });
   const currentTeam = useRecoilValue(currentTeamState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);

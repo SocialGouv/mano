@@ -140,7 +140,7 @@ const MedicalFile = ({
   };
 
   const onAddConsultationRequest = () => null;
-  const onAddTreatmentRequest = () => null;
+  const onGoToTreatment = (treatmentDB) => navigation.navigate('NewTreatmentForm', { personDB, treatmentDB });
   const onAddMedicalDocumentRequest = () => null;
 
   return (
@@ -201,9 +201,9 @@ const MedicalFile = ({
       </ButtonsContainer>
       <SubList
         label="Traitements"
-        onAdd={onAddTreatmentRequest}
+        onAdd={onGoToTreatment}
         data={treatments}
-        renderItem={(treatment) => <TreatmentRow treatment={treatment} key={treatment._id} />}
+        renderItem={(treatment) => <TreatmentRow treatment={treatment} key={treatment._id} onTreatmentPress={onGoToTreatment} />}
         ifEmpty="Pas encore de traitement"
       />
       <SubList

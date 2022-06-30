@@ -30,7 +30,7 @@ const ConsultationRow = ({ onConsultationPress, consultation, testID = 'consulta
         </StatusContainer>
         <UserContainer>{!!user && <UserName caption="Créée par" id={user?._id || user} />}</UserContainer>
       </CaptionsContainer>
-      <ButtonRight onPress={onConsultationPress} caption=">" />
+      <ButtonRight onPress={onRowPress} caption=">" />
     </RowContainer>
   );
 };

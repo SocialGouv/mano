@@ -63,6 +63,10 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument }) => {
 
   return (
     <>
+      {documents.map((doc) => (
+        <Document key={doc.name} document={doc} />
+      ))}
+      <Hint>Il n'est pour l'instant pas possible de lire, télécharger ou supprimer un document depuis l'app - seulement depuis le dashboard.</Hint>
       <Button
         caption="Ajouter une photo"
         disabled={!!loading}
@@ -96,10 +100,6 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument }) => {
           handleSavePicture(result);
         }}
       />
-      <Hint>Il n'est pour l'instant pas possible de lire, télécharger ou supprimer un document depuis l'app - seulement depuis le dashboard.</Hint>
-      {documents.map((doc) => (
-        <Document key={doc.name} document={doc} />
-      ))}
       <Modal animationType="fade" visible={!!asset}>
         <SceneContainer>
           <ScreenTitle title="Donner un nom à cette photo" onBack={reset} />

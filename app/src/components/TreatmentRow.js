@@ -4,24 +4,16 @@ import styled from 'styled-components';
 import ButtonRight from './ButtonRight';
 import RowContainer from './RowContainer';
 import { MyText } from './MyText';
-import { formatDateWithFullMonth } from '../services/dateDayjs';
 import DateAndTimeCalendarDisplay from './DateAndTimeCalendarDisplay';
 
-const showDate = (treatment) => {
-  if (treatment.endDate) {
-    return `Du ${formatDateWithFullMonth(treatment.startDate)}\nau ${formatDateWithFullMonth(treatment.endDate)}`;
-  }
-  return `À partir du\n${formatDateWithFullMonth(treatment.startDate)}`;
-};
-
-const TreatmentRow = ({ onConsultationPress, treatment, testID = 'treatment' }) => {
+const TreatmentRow = ({ onTreatmentPress, treatment, testID = 'treatment' }) => {
   const name = treatment?.name;
   const dosage = treatment?.dosage;
   const frequency = treatment?.frequency;
 
   const onRowPress = useCallback(() => {
-    onConsultationPress(treatment);
-  }, [treatment, onConsultationPress]);
+    onTreatmentPress(treatment);
+  }, [treatment, onTreatmentPress]);
 
   return (
     <RowContainer onPress={onRowPress} testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
@@ -34,7 +26,7 @@ const TreatmentRow = ({ onConsultationPress, treatment, testID = 'treatment' }) 
           <MyText>{frequency}</MyText>
         </DosageContainer>
       </CaptionsContainer>
-      <ButtonRight onPress={onConsultationPress} caption=">" />
+      <ButtonRight onPress={onRowPress} caption=">" />
     </RowContainer>
   );
 };

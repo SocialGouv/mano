@@ -46,7 +46,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
         ) : null}
         {urgent ? <Urgent bold>❗ Action prioritaire</Urgent> : null}
       </CaptionsContainer>
-      <ButtonRight onPress={onActionPress} caption=">" />
+      <ButtonRight onPress={onRowPress} caption=">" />
     </RowContainer>
   );
 };
