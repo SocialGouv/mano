@@ -10,8 +10,8 @@ const hitSlop = {
   bottom: 20,
 };
 
-const ButtonRight = ({ onPress, caption, color = '#888', left = false }) => (
-  <ButtonContainer leftCss={left}>
+const ButtonRight = ({ onPress, caption, color = '#888', left = false, disabled = false }) => (
+  <ButtonContainer leftCss={left} disabled={disabled}>
     <TouchableOpacity onPress={onPress} hitSlop={hitSlop}>
       <Icon>
         <Next color={color}>{caption}</Next>

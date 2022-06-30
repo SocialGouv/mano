@@ -179,6 +179,12 @@ const formatData = (data) => {
   return dataInSections;
 };
 
+/*
+
+Actions
+
+*/
+
 export const actionsDoneSelector = selector({
   key: 'actionsDoneSelector',
   get: ({ get }) => {
@@ -245,16 +251,11 @@ export const totalActionsByStatusSelector = selectorFamily({
     },
 });
 
-export const actionsSearchSelector = selectorFamily({
-  key: 'actionsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const actions = get(actionsState);
-      if (!search?.length) return [];
-      return filterBySearch(search, actions);
-    },
-});
+/*
+
+Observations
+
+*/
 
 export const onlyFilledObservationsTerritories = selector({
   key: 'onlyFilledObservationsTerritories',

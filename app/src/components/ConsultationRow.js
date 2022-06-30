@@ -9,19 +9,32 @@ import colors from '../utils/colors';
 import { DONE } from '../recoil/actions';
 import UserName from './UserName';
 import DateAndTimeCalendarDisplay from './DateAndTimeCalendarDisplay';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../recoil/auth';
+
+const isVisibleByMe = (consultation, me) => {
+  if (!me.healthcareProfessional) return false;
+  if (!consultation?.onlyVisibleBy?.length) return true;
+  return consultation.onlyVisibleBy.includes(me._id);
+};
 
 const ConsultationRow = ({ onConsultationPress, consultation, testID = 'consultation' }) => {
+  const me = useRecoilValue(userState);
+
   const name = consultation?.name;
   const status = consultation?.status;
   const user = consultation?.user;
+  const visibleByMe = isVisibleByMe(consultation, me);
+
   const dueAt = consultation?.dueAt ? new Date(consultation?.dueAt) : null;
 
   const onRowPress = useCallback(() => {
+    if (!visibleByMe) return;
     onConsultationPress(consultation);
-  }, [consultation, onConsultationPress]);
+  }, [consultation, onConsultationPress, visibleByMe]);
 
   return (
-    <RowContainer onPress={onRowPress} testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
+    <RowContainer disabled={!visibleByMe} onPress={onRowPress} testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
       <DateAndTimeCalendarDisplay date={dueAt} withTime />
       <CaptionsContainer>
         <Name bold>{name}</Name>
@@ -30,7 +43,7 @@ const ConsultationRow = ({ onConsultationPress, consultation, testID = 'consulta
         </StatusContainer>
         <UserContainer>{!!user && <UserName caption="Créée par" id={user?._id || user} />}</UserContainer>
       </CaptionsContainer>
-      <ButtonRight onPress={onRowPress} caption=">" />
+      <ButtonRight onPress={onRowPress} caption=">" disabled={!visibleByMe} />
     </RowContainer>
   );
 };
