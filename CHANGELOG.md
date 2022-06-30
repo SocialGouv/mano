@@ -1,3 +1,10 @@
+## [1.128.2](https://github.com/SocialGouv/mano/compare/v1.128.1...v1.128.2) (2022-06-30)
+
+
+### Bug Fixes
+
+* onlyVisibleBy ([#784](https://github.com/SocialGouv/mano/issues/784)) ([77f66dd](https://github.com/SocialGouv/mano/commit/77f66dd918e7ebf6a90cca657deebd76bf46a9d9))
+
 ## [1.128.1](https://github.com/SocialGouv/mano/compare/v1.128.0...v1.128.1) (2022-06-30)
 
 
