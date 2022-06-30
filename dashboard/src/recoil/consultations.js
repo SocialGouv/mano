@@ -48,7 +48,7 @@ const allowedFieldsForNonProfessional = [
 export const defaultConsultationFields = { isConsultation: true, withTime: true };
 
 export const whitelistAllowedData = (consultation, user) => {
-  if (!user.healthcareProfessional || (consultation.onlyVisibleBy?.length && consultation.onlyVisibleBy.includes(user._id))) {
+  if (!user.healthcareProfessional || (consultation.onlyVisibleBy?.length && !consultation.onlyVisibleBy.includes(user._id))) {
     const allowedConsultation = { ...defaultConsultationFields };
     for (const allowedField of allowedFieldsForNonProfessional) {
       allowedConsultation[allowedField] = consultation[allowedField];

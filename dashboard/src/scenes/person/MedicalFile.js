@@ -727,8 +727,8 @@ export function MedicalFile({ person }) {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label htmlFor="create-action-name">Nom</Label>
-                      <Input id="create-action-name" name="name" value={values.name} onChange={handleChange} />
+                      <Label htmlFor="create-consultation-name">Nom</Label>
+                      <Input id="create-consultation-name" name="name" value={values.name} onChange={handleChange} />
                       {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>
                   </Col>
@@ -756,24 +756,24 @@ export function MedicalFile({ person }) {
                     })}
 
                   <Col md={6}>
-                    <Label htmlFor="new-action-select-status">Statut</Label>
+                    <Label htmlFor="new-consultation-select-status">Statut</Label>
                     <SelectStatus
                       name="status"
                       value={values.status || ''}
                       onChange={handleChange}
-                      inputId="new-action-select-status"
-                      classNamePrefix="new-action-select-status"
+                      inputId="new-consultation-select-status"
+                      classNamePrefix="new-consultation-select-status"
                     />
                     {touched.status && errors.status && <Error>{errors.status}</Error>}
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label htmlFor="create-action-dueat">Date</Label>
+                      <Label htmlFor="create-consultation-dueat">Date</Label>
                       <div>
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          id="create-action-dueat"
+                          id="create-consultation-dueat"
                           selected={dateForDatePicker(values.dueAt)}
                           onChange={(dueAt) => handleChange({ target: { value: dueAt, name: 'dueAt' } })}
                           timeInputLabel="Heure :"
@@ -786,10 +786,10 @@ export function MedicalFile({ person }) {
                   </Col>
                   <Col md={12}>
                     <FormGroup>
-                      <Label htmlFor="create-action-onlyme">
+                      <Label htmlFor="create-consultation-onlyme">
                         <input
                           type="checkbox"
-                          id="create-action-onlyme"
+                          id="create-consultation-onlyme"
                           style={{ marginRight: '0.5rem' }}
                           name="onlyVisibleByCreator"
                           checked={values.onlyVisibleBy?.includes(user._id)}

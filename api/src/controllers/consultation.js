@@ -125,6 +125,7 @@ router.get(
         "status",
         "dueAt",
         "completedAt",
+        "onlyVisibleBy",
         // All other fields are encrypted and should not be returned.
       ],
     });
