@@ -1,3 +1,10 @@
+## [1.128.1](https://github.com/SocialGouv/mano/compare/v1.128.0...v1.128.1) (2022-06-30)
+
+
+### Bug Fixes
+
+* **app:**  person search case insensitive ([#783](https://github.com/SocialGouv/mano/issues/783)) ([0d627db](https://github.com/SocialGouv/mano/commit/0d627db1f5772f25b3ac28726538cc5d58abfd55))
+
 # [1.128.0](https://github.com/SocialGouv/mano/compare/v1.127.0...v1.128.0) (2022-06-28)
 
 
