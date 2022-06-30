@@ -65,7 +65,9 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         .flat() || [];
     const otherDocs = medicalFile?.documents || [];
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-  }, [consultations, medicalFile?.documents, treatments]);
+  }, [consultations, medicalFile, treatments]);
+
+  console.log(JSON.stringify({ medicalFile }, null, 2));
 
   const scrollViewRef = useRef(null);
   const refs = useRef({});
@@ -100,11 +102,30 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         return m;
       })
     );
+    setMedicalFile(response.decryptedData);
     await onUpdatePerson();
   };
 
   const onGoToConsultation = (consultationDB) => navigation.navigate('Consultation', { personDB, consultationDB });
   const onGoToTreatment = (treatmentDB) => navigation.navigate('Treatment', { personDB, treatmentDB });
+
+  const onAddDocument = async (doc) => {
+    const body = prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+      ...medicalFile,
+      documents: [...(medicalFile.documents || []), doc],
+    });
+    const medicalFileResponse = await API.put({ path: `/medical-file/${medicalFile._id}`, body });
+
+    if (medicalFileResponse.ok) {
+      setAllMedicalFiles((medicalFiles) =>
+        medicalFiles.map((m) => {
+          if (m._id === medicalFileDB._id) return medicalFileResponse.decryptedData;
+          return m;
+        })
+      );
+      setMedicalFile(medicalFileResponse.decryptedData);
+    }
+  };
 
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
@@ -186,7 +207,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
           </DocumentRow>
         )}
         ifEmpty="Pas encore de document médical">
-        <DocumentsManager personDB={personDB} onAddDocument={console.log} />
+        <DocumentsManager personDB={personDB} onAddDocument={onAddDocument} />
       </SubList>
     </ScrollContainer>
   );
