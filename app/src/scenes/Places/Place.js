@@ -11,6 +11,7 @@ import ButtonDelete from '../../components/ButtonDelete';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import API from '../../services/api';
+import { sortByName } from '../../utils/sortByName';
 
 const Place = ({ navigation, route }) => {
   const [name, setName] = useState(false);
@@ -58,7 +59,7 @@ const Place = ({ navigation, route }) => {
             if (p._id === placeDB._id) return response.decryptedData;
             return p;
           })
-          .sort((p1, p2) => p1.name.localeCompare(p2.name))
+          .sort(sortByName)
       );
       setUpdating(false);
       Alert.alert('Lieu mis-à-jour !', null, [{ text: 'OK', onPress: onBack }]);

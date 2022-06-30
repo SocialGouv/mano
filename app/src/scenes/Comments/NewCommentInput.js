@@ -10,7 +10,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 
-const NewCommentInput = ({ person, action, forwardRef, onFocus, writeComment: writeCommentProp }) => {
+const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }) => {
   const [comment, setComment] = useState('');
   const [posting, setPosting] = useState(false);
   const setComments = useSetRecoilState(commentsState);
@@ -40,7 +40,7 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, writeComment: wr
       Keyboard.dismiss();
       setPosting(false);
       setComment('');
-      writeCommentProp?.('');
+      onCommentWrite?.('');
     }
   };
 
@@ -60,14 +60,14 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, writeComment: wr
     ]);
   };
 
-  const writeComment = (newComment) => {
+  const onChangeText = (newComment) => {
     setComment(newComment);
-    writeCommentProp?.(newComment);
+    onCommentWrite?.(newComment);
   };
 
   return (
     <>
-      <InputMultilineAutoAdjust onChangeText={writeComment} value={comment} placeholder="Ajouter un commentaire" ref={forwardRef} onFocus={onFocus} />
+      <InputMultilineAutoAdjust onChangeText={onChangeText} value={comment} placeholder="Ajouter un commentaire" ref={forwardRef} onFocus={onFocus} />
       {!!comment.length && (
         <>
           <Spacer />

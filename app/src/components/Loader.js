@@ -20,6 +20,7 @@ import { territoryObservationsState } from '../recoil/territoryObservations';
 import { commentsState } from '../recoil/comments';
 import { capture } from '../services/sentry';
 import { reportsState } from '../recoil/reports';
+import { sortByName } from '../utils/sortByName';
 // import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 // import { medicalFileState } from '../recoil/medicalFiles';
 // import { treatmentsState } from '../recoil/treatments';
@@ -156,7 +157,7 @@ const Loader = () => {
         setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
         API,
       });
-      if (refreshedPersons) setPersons(refreshedPersons.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      if (refreshedPersons) setPersons(refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt })).sort(sortByName));
     }
     /*
     Get consultations
