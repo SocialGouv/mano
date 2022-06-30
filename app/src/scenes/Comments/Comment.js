@@ -12,7 +12,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import API from '../../services/api';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 
-const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
+const Comment = ({ navigation, route, onCommentWrite }) => {
   const [comments, setComments] = useRecoilState(commentsState);
   const commentDB = useMemo(() => comments.find((c) => c._id === route.params?._id), [comments, route?.params]);
 
@@ -120,9 +120,9 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const writeComment = (newComment) => {
+  const onChangeText = (newComment) => {
     setComment(newComment);
-    writeCommentProp?.(newComment);
+    onCommentWrite?.(newComment);
   };
 
   return (
@@ -130,7 +130,7 @@ const Comment = ({ navigation, route, writeComment: writeCommentProp }) => {
       <ScreenTitle title={`${route?.params?.name} - Commentaire`} onBack={onGoBackRequested} testID="comment" />
       <ScrollContainer>
         <View>
-          <InputLabelled label="Commentaire" onChangeText={writeComment} value={comment} placeholder="Description" multiline />
+          <InputLabelled label="Commentaire" onChangeText={onChangeText} value={comment} placeholder="Description" multiline />
           <CheckboxLabelled
             label="Commentaire prioritaire (ce commentaire sera mis en avant par rapport aux autres)"
             alone

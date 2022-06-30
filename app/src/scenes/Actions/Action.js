@@ -517,7 +517,7 @@ const Action = ({ navigation, route }) => {
               forwardRef={newCommentRef}
               onFocus={() => _scrollToInput(newCommentRef)}
               action={actionDB?._id}
-              writeComment={setWritingComment}
+              onCommentWrite={setWritingComment}
             />
           )}
         </SubList>

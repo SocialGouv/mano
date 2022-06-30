@@ -37,7 +37,7 @@ const PersonSummary = ({
   onEdit,
   isUpdateDisabled,
   backgroundColor,
-  writeComment,
+  onCommentWrite,
   onChange,
   onDelete,
   onBack,
@@ -271,7 +271,7 @@ const PersonSummary = ({
           forwardRef={newCommentRef}
           onFocus={() => _scrollToInput(newCommentRef)}
           person={personDB?._id}
-          writeComment={writeComment}
+          onCommentWrite={onCommentWrite}
         />
       </SubList>
       <SubList

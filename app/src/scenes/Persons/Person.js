@@ -288,7 +288,7 @@ const Person = ({ route, navigation }) => {
                 backgroundColor={!person?.outOfActiveList ? colors.app.color : colors.app.colorBackgroundDarkGrey}
                 onChange={onChange}
                 onUpdatePerson={onUpdatePerson}
-                writeComment={setWritingComment}
+                onCommentWrite={setWritingComment}
                 onEdit={onEdit}
                 onDelete={onDelete}
                 onBack={onBack}
