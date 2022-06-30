@@ -49,7 +49,8 @@ import Actions from './scenes/Reports/Actions';
 import Comments from './scenes/Reports/Comments';
 import Observations from './scenes/Reports/Observations';
 import Collaborations from './scenes/Reports/Collaborations';
-import NewTreatmentForm from './scenes/Persons/NewTreatmentForm';
+import Treatment from './scenes/Persons/Treatment';
+import Consultation from './scenes/Persons/Consultation';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -84,7 +85,8 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
 
-      <PersonsStack.Screen name="NewTreatmentForm" component={NewTreatmentForm} />
+      <PersonsStack.Screen name="Treatment" component={Treatment} />
+      <PersonsStack.Screen name="Consultation" component={Consultation} />
 
       <PersonsStack.Screen name="Action" component={Action} />
       <PersonsStack.Screen name="NewActionForm" component={NewActionForm} />

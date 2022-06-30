@@ -43,7 +43,7 @@ const Treatment = ({ navigation, route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onCreateTreatmentRequest = async () => {
+  const onSaveTreatment = async () => {
     if (!name) return Alert.alert('Veuillez indiquer un nom');
     if (!dosage) return Alert.alert('Veuillez indiquer un dosage');
     if (!frequency) return Alert.alert('Veuillez indiquer une fréquence');
@@ -102,7 +102,7 @@ const Treatment = ({ navigation, route }) => {
       {
         text: 'Enregistrer',
         onPress: async () => {
-          const response = await onCreateTreatmentRequest();
+          const response = await onSaveTreatment();
           if (response.ok) onBack();
         },
       },
@@ -146,7 +146,7 @@ const Treatment = ({ navigation, route }) => {
           <Button
             caption={isNew ? 'Créer' : 'Modifier'}
             disabled={!!isDisabled}
-            onPress={onCreateTreatmentRequest}
+            onPress={onSaveTreatment}
             loading={posting}
             testID="new-treatment-create"
           />

@@ -6,7 +6,7 @@ export const consultationsState = atom({
   default: [],
 });
 
-const encryptedFields = ['name', 'type', 'person', 'user', 'documents'];
+export const encryptedFields = ['name', 'type', 'person', 'user', 'documents'];
 
 export const prepareConsultationForEncryption = (customFieldsConsultations) => (consultation) => {
   const consultationTypeCustomFields = customFieldsConsultations.find((consult) => consult.name === consultation.type).fields;

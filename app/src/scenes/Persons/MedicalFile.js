@@ -1,31 +1,15 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Linking, Text } from 'react-native';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
-import * as Sentry from '@sentry/react-native';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import Button from '../../components/Button';
 import InputLabelled from '../../components/InputLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
-import ActionRow from '../../components/ActionRow';
-import CommentRow from '../Comments/CommentRow';
-import PlaceRow from '../Places/PlaceRow';
 import SubList from '../../components/SubList';
 import DateAndTimeInput, { displayBirthDate } from '../../components/DateAndTimeInput';
 import GenderSelect from '../../components/Selects/GenderSelect';
-import Spacer from '../../components/Spacer';
-import NewCommentInput from '../Comments/NewCommentInput';
-import CheckboxLabelled from '../../components/CheckboxLabelled';
-import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
 import colors from '../../utils/colors';
-import PhoneIcon from '../../icons/PhoneIcon';
-import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
-import { actionsState } from '../../recoil/actions';
-import { placesState } from '../../recoil/places';
-import { commentsState } from '../../recoil/comments';
-import { organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState } from '../../recoil/persons';
+import { organisationState } from '../../recoil/auth';
 import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
@@ -37,33 +21,13 @@ import TreatmentRow from '../../components/TreatmentRow';
 import Document from '../../components/Document';
 import DocumentsManager from '../../components/DocumentsManager';
 
-const MedicalFile = ({
-  navigation,
-  person,
-  personDB,
-  onUpdatePerson,
-  updating,
-  editable,
-  onEdit,
-  isUpdateDisabled,
-  backgroundColor,
-  writeComment,
-  onChange,
-  onDelete,
-  onBack,
-}) => {
-  const setPersons = useSetRecoilState(personsState);
-  const user = useRecoilValue(userState);
-  const users = useRecoilValue(usersState);
+const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, editable, onEdit, isUpdateDisabled, backgroundColor, onChange }) => {
   const organisation = useRecoilValue(organisationState);
-  const teams = useRecoilValue(teamsState);
 
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
-  const [allConsultations, setAllConsultations] = useRecoilState(consultationsState);
-  const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
+  const allConsultations = useRecoilValue(consultationsState);
+  const allTreatments = useRecoilValue(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
 
   const consultations = useMemo(() => (allConsultations || []).filter((c) => c.person === personDB._id), [allConsultations, personDB._id]);
@@ -139,9 +103,8 @@ const MedicalFile = ({
     await onUpdatePerson();
   };
 
-  const onAddConsultationRequest = () => null;
-  const onGoToTreatment = (treatmentDB) => navigation.navigate('NewTreatmentForm', { personDB, treatmentDB });
-  const onAddMedicalDocumentRequest = () => null;
+  const onGoToConsultation = (consultationDB) => navigation.navigate('Consultation', { personDB, consultationDB });
+  const onGoToTreatment = (treatmentDB) => navigation.navigate('Treatment', { personDB, treatmentDB });
 
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
@@ -201,17 +164,17 @@ const MedicalFile = ({
       </ButtonsContainer>
       <SubList
         label="Traitements"
-        onAdd={onGoToTreatment}
+        onAdd={() => onGoToTreatment()}
         data={treatments}
         renderItem={(treatment) => <TreatmentRow treatment={treatment} key={treatment._id} onTreatmentPress={onGoToTreatment} />}
         ifEmpty="Pas encore de traitement"
       />
       <SubList
         label="Consultations"
-        onAdd={onAddConsultationRequest}
+        onAdd={() => onGoToConsultation()}
         testID="person-consultations-list"
         data={consultations}
-        renderItem={(consultation) => <ConsultationRow consultation={consultation} key={consultation._id} />}
+        renderItem={(consultation) => <ConsultationRow consultation={consultation} key={consultation._id} onConsultationPress={onGoToConsultation} />}
         ifEmpty="Pas encore de consultation"
       />
       <SubList
