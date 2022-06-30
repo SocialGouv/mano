@@ -16,6 +16,7 @@ import {
 import API from '../../services/api';
 import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
 import { currentTeamState, teamsState } from '../../recoil/auth';
+import { sortByName } from '../../utils/sortByName';
 
 const NewPersonForm = ({ navigation, route }) => {
   const [persons, setPersons] = useRecoilState(personsState);
@@ -72,7 +73,9 @@ const NewPersonForm = ({ navigation, route }) => {
       body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name, followedSince: new Date(), assignedTeams }),
     });
     if (response.ok) {
-      setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      setPersons((persons) =>
+        [response.decryptedData, ...persons].map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt })).sort(sortByName)
+      );
     }
     if (!response.ok) {
       setPosting(false);

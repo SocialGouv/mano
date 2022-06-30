@@ -14,6 +14,7 @@ import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { userState } from '../../recoil/auth';
 import { refreshTriggerState } from '../../components/Loader';
+import { sortByName } from '../../utils/sortByName';
 
 const NewPlaceForm = ({ route, navigation }) => {
   const [name, setName] = useState('');
@@ -55,7 +56,7 @@ const NewPlaceForm = ({ route, navigation }) => {
       return;
     }
     if (response.ok) {
-      setPlaces((places) => [response.decryptedData, ...places].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      setPlaces((places) => [response.decryptedData, ...places].sort(sortByName));
 
       onSubmit(response.decryptedData);
     }

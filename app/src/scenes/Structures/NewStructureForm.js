@@ -8,6 +8,7 @@ import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import API from '../../services/api';
 import { structuresState } from '../../recoil/structures';
+import { sortByName } from '../../utils/sortByName';
 
 const NewStructureForm = ({ navigation, route }) => {
   const [name, setName] = useState('');
@@ -48,7 +49,7 @@ const NewStructureForm = ({ navigation, route }) => {
     }
     if (response.ok) {
       backRequestHandledRef.current = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
-      setStructures((structures) => [...structures, response.data].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      setStructures((structures) => [...structures, response.data].sort(sortByName));
       navigation.navigate('Structure', {
         fromRoute: route.params.fromRoute,
         ...response.data,
