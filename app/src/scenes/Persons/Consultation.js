@@ -92,12 +92,10 @@ const Consultation = ({ navigation, route }) => {
       consultation.completedAt = null;
     }
     const body = prepareConsultationForEncryption(organisation.consultations)({ ...consultation, _id: consultationDB?._id });
-    console.log(JSON.stringify({ body }, null, 2));
     const consultationResponse = isNew
       ? await API.post({ path: '/consultation', body })
       : await API.put({ path: `/consultation/${consultationDB._id}`, body });
     if (!consultationResponse.ok) return;
-    console.log(JSON.stringify({ 'consultationResponse.decryptedData': consultationResponse.decryptedData }, null, 2));
     if (isNew) {
       setAllConsultations((all) => [...all, consultationResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
     } else {
@@ -145,8 +143,6 @@ const Consultation = ({ navigation, route }) => {
       },
     ]);
   };
-
-  console.log(JSON.stringify({ consultationDB }, null, 2));
 
   return (
     <SceneContainer testID="consultation-form">
