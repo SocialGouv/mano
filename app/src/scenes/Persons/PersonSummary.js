@@ -25,8 +25,6 @@ import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { consultationsState } from '../../recoil/consultations';
-import ConsultationRow from '../../components/ConsultationRow';
 
 const PersonSummary = ({
   navigation,
@@ -55,10 +53,6 @@ const PersonSummary = ({
 
   const onAddActionRequest = () => {
     navigation.push('NewActionForm', { fromRoute: 'Person', person: personDB?._id });
-  };
-
-  const onAddConsultationRequest = () => {
-    navigation.push('Consultation', { fromRoute: 'Person', personDB, fromRoute: 'Person' });
   };
 
   const scrollViewRef = useRef(null);
@@ -90,12 +84,6 @@ const PersonSummary = ({
     [allActions, personDB?._id]
   );
 
-  const allConsultations = useRecoilValue(consultationsState);
-  const consultations = useMemo(
-    () => allConsultations.filter((a) => a.person === personDB?._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)),
-    [allConsultations, personDB?._id]
-  );
-
   const allRelsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const relsPersonPlace = useMemo(() => allRelsPersonPlace.filter((rel) => rel.person === personDB?._id), [allRelsPersonPlace, personDB?._id]);
 
@@ -117,13 +105,6 @@ const PersonSummary = ({
       navigation.push('Action', { _id: action._id, fromRoute: 'Person' });
     },
     [navigation]
-  );
-
-  const onConsultationPress = useCallback(
-    (consultation) => {
-      navigation.push('Consultation', { consultationDB: consultation, personDB, fromRoute: 'Person' });
-    },
-    [navigation, personDB]
   );
 
   return (
@@ -279,22 +260,6 @@ const PersonSummary = ({
           <ActionRow key={index} action={action} showStatus withTeamName testID="person-action" onActionPress={onActionPress} />
         )}
         ifEmpty="Pas encore d'action"
-      />
-      <SubList
-        label="Consultations"
-        onAdd={onAddConsultationRequest}
-        testID="person-consultations-list"
-        data={consultations}
-        renderItem={(consultation, index) => (
-          <ConsultationRow
-            key={index}
-            consultation={consultation}
-            showStatus
-            testID="person-consultation"
-            onConsultationPress={onConsultationPress}
-          />
-        )}
-        ifEmpty="Pas encore de consultation"
       />
       <SubList
         label="Commentaires"
