@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
 
 import ButtonRight from './ButtonRight';
@@ -11,6 +11,8 @@ import UserName from './UserName';
 import DateAndTimeCalendarDisplay from './DateAndTimeCalendarDisplay';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth';
+import { StyleSheet } from 'react-native';
+import { personsState } from '../recoil/persons';
 
 const isVisibleByMe = (consultation, me) => {
   if (!me.healthcareProfessional) return false;
@@ -18,35 +20,68 @@ const isVisibleByMe = (consultation, me) => {
   return consultation.onlyVisibleBy.includes(me._id);
 };
 
-const ConsultationRow = ({ onConsultationPress, consultation, testID = 'consultation' }) => {
+const ConsultationRow = ({ onConsultationPress, consultation, testID = 'consultation', withBadge = false, showStatus, onPseudoPress }) => {
+  const persons = useRecoilValue(personsState);
   const me = useRecoilValue(userState);
 
   const name = consultation?.name;
   const status = consultation?.status;
   const user = consultation?.user;
+  const person = useMemo(() => (consultation?.person ? persons?.find((p) => p._id === consultation.person) : null), [persons, consultation.person]);
+  const pseudo = useMemo(() => consultation?.personName || person?.name, [consultation, person?.name]);
   const visibleByMe = isVisibleByMe(consultation, me);
 
   const dueAt = consultation?.dueAt ? new Date(consultation?.dueAt) : null;
 
   const onRowPress = useCallback(() => {
     if (!visibleByMe) return;
-    onConsultationPress(consultation);
-  }, [consultation, onConsultationPress, visibleByMe]);
+    onConsultationPress(consultation, person);
+  }, [consultation, onConsultationPress, visibleByMe, person]);
+
+  const onPseudoContainerPress = useCallback(() => {
+    onPseudoPress(person);
+  }, [person, onPseudoPress]);
 
   return (
-    <RowContainer disabled={!visibleByMe} onPress={onRowPress} testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
+    <RowContainer
+      styles={styles}
+      disabled={!visibleByMe}
+      onPress={onRowPress}
+      testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
+      {!!withBadge && (
+        <ConsultationBadge>
+          <MyText>🩺</MyText>
+        </ConsultationBadge>
+      )}
       <DateAndTimeCalendarDisplay date={dueAt} withTime />
       <CaptionsContainer>
         <Name bold>{name}</Name>
-        <StatusContainer>
-          <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>
-        </StatusContainer>
+        {showStatus ? (
+          <>
+            <StatusContainer>
+              <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>
+            </StatusContainer>
+          </>
+        ) : pseudo ? (
+          <PseudoContainer onPress={onPseudoContainerPress} testID={`${testID}-row-person-${pseudo?.split(' ').join('-').toLowerCase()}-button`}>
+            <Pseudo>Pour {pseudo}</Pseudo>
+          </PseudoContainer>
+        ) : null}
         <UserContainer>{!!user && <UserName caption="Créée par" id={user?._id || user} />}</UserContainer>
       </CaptionsContainer>
       <ButtonRight onPress={onRowPress} caption=">" disabled={!visibleByMe} />
     </RowContainer>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    // borderWidth: 2,
+    // borderColor: '#0a69da',
+    backgroundColor: '#ddf4ff',
+  },
+  subContainer: {},
+});
 
 const CaptionsContainer = styled.View`
   margin-horizontal: 15px;
@@ -77,4 +112,32 @@ const Status = styled(MyText)`
   color: ${(props) => props.color};
 `;
 
+const ConsultationBadge = styled.View`
+  position: absolute;
+  top: 3px;
+  left: 3px;
+
+  background-color: #fef2f2;
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  font-size: 15px;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid #0a69da;
+`;
+
+const PseudoContainer = styled.TouchableOpacity`
+  margin-top: 15px;
+  align-self: flex-start;
+`;
+
+const Pseudo = styled(MyText)`
+  /* text-decoration: underline; */
+  flex-grow: 0;
+  align-self: flex-start;
+  color: ${colors.app.color};
+`;
 export default ConsultationRow;

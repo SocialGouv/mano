@@ -36,7 +36,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
         <Name bold>{name}</Name>
         {!!withTeamName && <TeamsTags teams={[action.team]} />}
         {showStatus ? (
-          <StatusContainer onPress={onPseudoPress}>
+          <StatusContainer>
             <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>
           </StatusContainer>
         ) : pseudo ? (

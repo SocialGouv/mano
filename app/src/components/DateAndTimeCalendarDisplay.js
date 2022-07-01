@@ -26,6 +26,7 @@ const DateAndTimeCalendarDisplay = ({ date, withTime, topCaption }) => {
 const DateContainer = styled.View`
   flex-shrink: 0;
   flex-basis: 70px;
+  /* border: 2px solid black; */
 `;
 
 const DateText = styled(MyText)`
