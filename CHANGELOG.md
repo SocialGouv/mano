@@ -1,3 +1,10 @@
+## [1.128.3](https://github.com/SocialGouv/mano/compare/v1.128.2...v1.128.3) (2022-07-01)
+
+
+### Bug Fixes
+
+* **dashboard:** medical file settings ([#786](https://github.com/SocialGouv/mano/issues/786)) ([a91e1c9](https://github.com/SocialGouv/mano/commit/a91e1c92b8965ee99d98b05a96518228b30fcde4))
+
 ## [1.128.2](https://github.com/SocialGouv/mano/compare/v1.128.1...v1.128.2) (2022-06-30)
 
 
