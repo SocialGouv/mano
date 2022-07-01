@@ -119,7 +119,7 @@ const PersonSummary = ({
     (consultation) => {
       navigation.push('Consultation', { consultationDB: consultation, personDB, fromRoute: 'Person' });
     },
-    [navigation]
+    [navigation, personDB]
   );
 
   return (
