@@ -1,3 +1,10 @@
+# [1.129.0](https://github.com/SocialGouv/mano/compare/v1.128.4...v1.129.0) (2022-07-01)
+
+
+### Features
+
+* **app:** medical folder ([#781](https://github.com/SocialGouv/mano/issues/781)) ([2167b39](https://github.com/SocialGouv/mano/commit/2167b39ef82a1b394b5f7d2a7372ebc5e065f233))
+
 ## [1.128.4](https://github.com/SocialGouv/mano/compare/v1.128.3...v1.128.4) (2022-07-01)
 
 
