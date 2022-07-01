@@ -18,7 +18,7 @@ const DeleteButtonAndConfirmModal = ({ title, children, textToConfirm, onConfirm
         title="Supprimer"
         color="danger"
         onClick={() => {
-          if (!['admin'].includes(user.role)) return toastr.error("Désolé, seul un admin peut supprimer ce type d'élément");
+          if (!['admin', 'superadmin'].includes(user.role)) return toastr.error("Désolé, seul un admin peut supprimer ce type d'élément");
           setOpen(true);
         }}
         width={buttonWidth}

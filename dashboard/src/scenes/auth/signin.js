@@ -140,6 +140,7 @@ const SignIn = () => {
                 });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;
+            console.log(user.role);
             if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {
               setShowEncryption(true);
               return actions.setSubmitting(false);
