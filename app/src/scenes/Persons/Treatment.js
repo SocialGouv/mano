@@ -12,6 +12,8 @@ import DateAndTimeInput from '../../components/DateAndTimeInput';
 import DocumentsManager from '../../components/DocumentsManager';
 import Spacer from '../../components/Spacer';
 import Label from '../../components/Label';
+import ButtonDelete from '../../components/ButtonDelete';
+import ButtonsContainer from '../../components/ButtonsContainer';
 
 const Treatment = ({ navigation, route }) => {
   const setAllTreatments = useSetRecoilState(treatmentsState);
@@ -27,6 +29,7 @@ const Treatment = ({ navigation, route }) => {
   const [endDate, setEndDate] = useState(treatmentDB?.endDate || null);
   const [documents, setDocuments] = useState(treatmentDB?.documents || []);
   const [posting, setPosting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const backRequestHandledRef = useRef(null);
   const handleBeforeRemove = (e) => {
@@ -118,6 +121,32 @@ const Treatment = ({ navigation, route }) => {
     ]);
   };
 
+  const onDeleteRequest = () => {
+    Alert.alert('Voulez-vous vraiment supprimer ce traitement ?', 'Cette opération est irréversible.', [
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: onDelete,
+      },
+      {
+        text: 'Annuler',
+        style: 'cancel',
+      },
+    ]);
+  };
+
+  const onDelete = async () => {
+    setDeleting(true);
+    const response = await API.delete({ path: `/treatment/${treatmentDB._id}` });
+    if (!response.ok) {
+      Alert.alert(response.error);
+      return;
+    }
+    setAllTreatments((all) => all.filter((t) => t._id !== treatmentDB._id));
+    Alert.alert('Traitement supprimé !');
+    onBack();
+  };
+
   return (
     <SceneContainer testID="new-treatment-form">
       <ScreenTitle
@@ -142,14 +171,16 @@ const Treatment = ({ navigation, route }) => {
           <Spacer />
           <DateAndTimeInput label="Date de début" date={startDate} setDate={setStartDate} editable showYear />
           <DateAndTimeInput label="Date de fin" date={endDate} setDate={setEndDate} editable showYear />
-          <Spacer />
-          <Button
-            caption={isNew ? 'Créer' : 'Modifier'}
-            disabled={!!isDisabled}
-            onPress={onSaveTreatment}
-            loading={posting}
-            testID="new-treatment-create"
-          />
+          <ButtonsContainer>
+            <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />
+            <Button
+              caption={isNew ? 'Créer' : 'Modifier'}
+              disabled={!!isDisabled}
+              onPress={onSaveTreatment}
+              loading={posting}
+              testID="new-treatment-create"
+            />
+          </ButtonsContainer>
         </View>
       </ScrollContainer>
     </SceneContainer>

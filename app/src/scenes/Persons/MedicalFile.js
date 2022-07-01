@@ -67,8 +67,6 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [consultations, medicalFile, treatments]);
 
-  console.log(JSON.stringify({ medicalFile }, null, 2));
-
   const scrollViewRef = useRef(null);
   const refs = useRef({});
   const _scrollToInput = (ref) => {

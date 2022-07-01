@@ -18,6 +18,8 @@ import CustomFieldInput from '../../components/CustomFieldInput';
 import { organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, TODO } from '../../recoil/actions';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
+import ButtonsContainer from '../../components/ButtonsContainer';
+import ButtonDelete from '../../components/ButtonDelete';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -59,6 +61,7 @@ const Consultation = ({ navigation, route }) => {
   );
 
   const [posting, setPosting] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   const [consultation, setConsultation] = useState(() => castToConsultation(consultationDB));
 
@@ -111,6 +114,32 @@ const Consultation = ({ navigation, route }) => {
     onBack();
   };
 
+  const onDeleteRequest = () => {
+    Alert.alert('Voulez-vous vraiment supprimer cette consultation ?', 'Cette opération est irréversible.', [
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: onDelete,
+      },
+      {
+        text: 'Annuler',
+        style: 'cancel',
+      },
+    ]);
+  };
+
+  const onDelete = async () => {
+    setDeleting(true);
+    const response = await API.delete({ path: `/consultation/${consultationDB._id}` });
+    if (!response.ok) {
+      Alert.alert(response.error);
+      return;
+    }
+    setAllConsultations((all) => all.filter((t) => t._id !== consultationDB._id));
+    Alert.alert('Consultation supprimée !');
+    onBack();
+  };
+
   const isDisabled = useMemo(() => {
     if (JSON.stringify(castToConsultation(consultationDB)) === JSON.stringify(castToConsultation(consultation))) return true;
     return false;
@@ -120,6 +149,7 @@ const Consultation = ({ navigation, route }) => {
     backRequestHandledRef.current = true;
     navigation.goBack();
     setTimeout(() => setPosting(false), 250);
+    setTimeout(() => setDeleting(false), 250);
   };
 
   const onGoBackRequested = () => {
@@ -195,14 +225,16 @@ const Consultation = ({ navigation, route }) => {
             onPress={() => onChange({ onlyVisibleBy: consultation.onlyVisibleBy?.includes(user._id) ? [] : [user._id] })}
             value={consultation.onlyVisibleBy?.includes(user._id)}
           />
-          <Spacer />
-          <Button
-            caption={isNew ? 'Créer' : 'Modifier'}
-            disabled={!!isDisabled}
-            onPress={onSaveConsultationRequest}
-            loading={posting}
-            testID="consultation-create"
-          />
+          <ButtonsContainer>
+            <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />
+            <Button
+              caption={isNew ? 'Créer' : 'Modifier'}
+              disabled={!!isDisabled}
+              onPress={onSaveConsultationRequest}
+              loading={posting}
+              testID="consultation-create"
+            />
+          </ButtonsContainer>
         </View>
       </ScrollContainer>
     </SceneContainer>
