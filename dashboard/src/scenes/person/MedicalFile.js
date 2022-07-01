@@ -58,6 +58,7 @@ export function MedicalFile({ person }) {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+
   const user = useRecoilValue(userState);
   const users = useRecoilValue(usersState);
   const API = useApi();

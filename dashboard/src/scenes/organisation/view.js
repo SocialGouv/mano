@@ -31,6 +31,7 @@ import useTitle from '../../services/useTitle';
 import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { capture } from '../../services/sentry';
+import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -56,6 +57,8 @@ const View = () => {
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
@@ -194,7 +197,7 @@ const View = () => {
                               <TableCustomFields
                                 customFields="customFieldsMedicalFile"
                                 key="customFieldsMedicalFile"
-                                data={customFieldsPersonsMedical}
+                                data={customFieldsMedicalFile}
                               />
                             </Row>
                           </>
