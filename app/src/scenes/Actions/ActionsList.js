@@ -15,6 +15,7 @@ import { actionsByStatusSelector, totalActionsByStatusSelector } from '../../rec
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 import Button from '../../components/Button';
+import ConsultationRow from '../../components/ConsultationRow';
 
 const emptyArray = [];
 const keyExtractor = (action) => action._id;
@@ -70,7 +71,17 @@ const ActionsList = () => {
     [navigation]
   );
 
+  const onConsultationPress = useCallback(
+    (consultationDB, personDB) => {
+      navigation.navigate('Consultation', { personDB, consultationDB, fromRoute: 'ActionsList' });
+    },
+    [navigation]
+  );
+
   const renderItem = (item) => {
+    if (item.item.isConsultation) {
+      return <ConsultationRow consultation={item.item} onConsultationPress={onConsultationPress} onPseudoPress={onPseudoPress} withBadge />;
+    }
     return <ActionRow action={item.item} onPseudoPress={onPseudoPress} onActionPress={onActionPress} />;
   };
 

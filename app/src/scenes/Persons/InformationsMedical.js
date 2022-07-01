@@ -13,7 +13,7 @@ import CustomFieldInput from '../../components/CustomFieldInput';
 import { customFieldsPersonsMedicalSelector } from '../../recoil/persons';
 import { userState } from '../../recoil/auth';
 
-const FileMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, isUpdateDisabled, updating, backgroundColor, person }) => {
+const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, isUpdateDisabled, updating, backgroundColor, person }) => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
   const scrollViewRef = useRef(null);
@@ -38,7 +38,6 @@ const FileMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, i
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
         <View>
           <HealthInsuranceSelect value={person.healthInsurance} onSelect={(healthInsurance) => onChange({ healthInsurance })} editable={editable} />
-
           <InputLabelled
             label="Structure de suivi médical"
             onChangeText={(structureMedical) => onChange({ structureMedical })}
@@ -80,4 +79,4 @@ const FileMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, i
   );
 };
 
-export default FileMedical;
+export default InformationsMedical;

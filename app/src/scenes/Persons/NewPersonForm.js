@@ -26,7 +26,7 @@ const NewPersonForm = ({ navigation, route }) => {
   const teams = useRecoilValue(teamsState);
 
   const [name, setName] = useState('');
-  const [assignedTeams, setAssignedTeams] = useState([currentTeam._id]);
+  const [assignedTeams, setAssignedTeams] = useState([currentTeam?._id]);
   const [posting, setPosting] = useState(false);
 
   const backRequestHandledRef = useRef(null);

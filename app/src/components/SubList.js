@@ -41,7 +41,7 @@ const SubList = ({ label, onAdd, data = [], renderItem, ifEmpty, children, testI
         <LabelStyled>{`${label}${data !== null ? ` (${data.length})` : ''}`}</LabelStyled>
         {Boolean(onAdd) && <Button caption="Ajouter" onPress={onAdd} noBorder testID={`${testID}-add`} />}
       </ListLabel>
-      {!!children && <ChildrenContainer>{children}</ChildrenContainer>}
+      {!!children && expanded && <ChildrenContainer>{children}</ChildrenContainer>}
       <List expanded={expanded}>{renderList()}</List>
     </>
   );
@@ -82,9 +82,11 @@ const List = styled.View`
   flex-shrink: 0;
   margin-horizontal: -30px;
   margin-bottom: ${(props) => (props.expanded ? 30 : 0)}px;
+  padding-top: ${(props) => (props.expanded ? 5 : 0)}px;
 `;
 
 const ChildrenContainer = styled.View`
+  flex-shrink: 0;
   margin-vertical: 10px;
 `;
 

@@ -9,6 +9,7 @@ import { territoriesState } from './territory';
 import { isComingInDays, isPassed, isToday, isTomorrow } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { filterBySearch, filterData } from '../utils/search';
+import { consultationsState } from './consultations';
 
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
@@ -179,11 +180,38 @@ const formatData = (data) => {
   return dataInSections;
 };
 
+/*
+
+Actions and consultations
+
+*/
+
+const sortDoneOrCancel = (a, b) => {
+  if (!a.dueAt) return -1;
+  if (!b.dueAt) return 1;
+  if (a.dueAt > b.dueAt) return -1;
+  return 1;
+};
+/*
+
+Actions and Consultations
+
+*/
+
+const actionsAndConsultationsSelector = selector({
+  key: 'actionsAndConsultationsSelector',
+  get: ({ get }) => {
+    const actions = get(actionsForCurrentTeamSelector);
+    const consultations = get(consultationsState);
+    return [...actions, ...consultations.map((c) => ({ ...c, isConsultation: true }))];
+  },
+});
+
 export const actionsDoneSelector = selector({
   key: 'actionsDoneSelector',
   get: ({ get }) => {
-    const actions = get(actionsForCurrentTeamSelector);
-    return actions.filter((a) => a.status === DONE);
+    const actions = get(actionsAndConsultationsSelector);
+    return actions.filter((a) => a.status === DONE).sort(sortDoneOrCancel);
   },
 });
 
@@ -200,7 +228,7 @@ export const actionsDoneSelectorSliced = selectorFamily({
 export const actionsTodoSelector = selector({
   key: 'actionsTodoSelector',
   get: ({ get }) => {
-    const actions = get(actionsForCurrentTeamSelector);
+    const actions = get(actionsAndConsultationsSelector);
     return formatData(actions.filter((a) => a.status === TODO));
   },
 });
@@ -208,8 +236,8 @@ export const actionsTodoSelector = selector({
 export const actionsCanceledSelector = selector({
   key: 'actionsCanceledSelector',
   get: ({ get }) => {
-    const actions = get(actionsForCurrentTeamSelector);
-    return actions.filter((a) => a.status === CANCEL);
+    const actions = get(actionsAndConsultationsSelector);
+    return actions.filter((a) => a.status === CANCEL).sort(sortDoneOrCancel);
   },
 });
 
@@ -245,16 +273,11 @@ export const totalActionsByStatusSelector = selectorFamily({
     },
 });
 
-export const actionsSearchSelector = selectorFamily({
-  key: 'actionsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const actions = get(actionsState);
-      if (!search?.length) return [];
-      return filterBySearch(search, actions);
-    },
-});
+/*
+
+Observations
+
+*/
 
 export const onlyFilledObservationsTerritories = selector({
   key: 'onlyFilledObservationsTerritories',
