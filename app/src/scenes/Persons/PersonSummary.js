@@ -57,6 +57,10 @@ const PersonSummary = ({
     navigation.push('NewActionForm', { fromRoute: 'Person', person: personDB?._id });
   };
 
+  const onAddConsultationRequest = () => {
+    navigation.push('Consultation', { fromRoute: 'Person', personDB, fromRoute: 'Person' });
+  };
+
   const scrollViewRef = useRef(null);
   const descriptionRef = useRef(null);
   const newCommentRef = useRef(null);
@@ -278,7 +282,7 @@ const PersonSummary = ({
       />
       <SubList
         label="Consultations"
-        onAdd={onAddActionRequest}
+        onAdd={onAddConsultationRequest}
         testID="person-consultations-list"
         data={consultations}
         renderItem={(consultation, index) => (
