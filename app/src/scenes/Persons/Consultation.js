@@ -205,8 +205,8 @@ const Consultation = ({ navigation, route }) => {
                   value={consultation[name]}
                   handleChange={(newValue) => onChange({ [name]: newValue })}
                   editable
-                  // ref={(r) => (refs.current[`${name}-ref`] = r)}
-                  // onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
+                // ref={(r) => (refs.current[`${name}-ref`] = r)}
+                // onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
                 />
               );
             })}
@@ -226,7 +226,7 @@ const Consultation = ({ navigation, route }) => {
             value={consultation.onlyVisibleBy?.includes(user._id)}
           />
           <ButtonsContainer>
-            <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />
+            {!isNew && <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />}
             <Button
               caption={isNew ? 'Créer' : 'Modifier'}
               disabled={!!isDisabled}

@@ -83,13 +83,13 @@ const Treatment = ({ navigation, route }) => {
 
   const isDisabled = useMemo(() => {
     if (!name || !name.length || !name.trim().length) return true;
-    if (JSON.stringify(treatmentDB.documents) !== JSON.stringify(documents)) return false;
-    if (JSON.stringify(treatmentDB.name) !== JSON.stringify(name)) return false;
-    if (JSON.stringify(treatmentDB.dosage) !== JSON.stringify(dosage)) return false;
-    if (JSON.stringify(treatmentDB.frequency) !== JSON.stringify(frequency)) return false;
-    if (JSON.stringify(treatmentDB.indication) !== JSON.stringify(indication)) return false;
-    if (JSON.stringify(treatmentDB.startDate) !== JSON.stringify(startDate)) return false;
-    if (JSON.stringify(treatmentDB.endDate) !== JSON.stringify(endDate)) return false;
+    if (JSON.stringify((treatmentDB || {}).documents) !== JSON.stringify(documents)) return false;
+    if (JSON.stringify((treatmentDB || {}).name) !== JSON.stringify(name)) return false;
+    if (JSON.stringify((treatmentDB || {}).dosage) !== JSON.stringify(dosage)) return false;
+    if (JSON.stringify((treatmentDB || {}).frequency) !== JSON.stringify(frequency)) return false;
+    if (JSON.stringify((treatmentDB || {}).indication) !== JSON.stringify(indication)) return false;
+    if (JSON.stringify((treatmentDB || {}).startDate) !== JSON.stringify(startDate)) return false;
+    if (JSON.stringify((treatmentDB || {}).endDate) !== JSON.stringify(endDate)) return false;
     return true;
   }, [documents, dosage, endDate, frequency, indication, name, startDate, treatmentDB]);
 
@@ -172,7 +172,7 @@ const Treatment = ({ navigation, route }) => {
           <DateAndTimeInput label="Date de début" date={startDate} setDate={setStartDate} editable showYear />
           <DateAndTimeInput label="Date de fin" date={endDate} setDate={setEndDate} editable showYear />
           <ButtonsContainer>
-            <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />
+            {!isNew && <ButtonDelete onPress={onDeleteRequest} deleting={deleting} />}
             <Button
               caption={isNew ? 'Créer' : 'Modifier'}
               disabled={!!isDisabled}
