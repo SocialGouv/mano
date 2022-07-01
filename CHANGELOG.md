@@ -1,3 +1,10 @@
+## [1.128.4](https://github.com/SocialGouv/mano/compare/v1.128.3...v1.128.4) (2022-07-01)
+
+
+### Bug Fixes
+
+* **dashboard:** superadmin can delete organisation ([#787](https://github.com/SocialGouv/mano/issues/787)) ([6264221](https://github.com/SocialGouv/mano/commit/62642215ee142f8eeb1cebb11a1da86df2a9803d))
+
 ## [1.128.3](https://github.com/SocialGouv/mano/compare/v1.128.2...v1.128.3) (2022-07-01)
 
 
