@@ -61,7 +61,7 @@ router.post(
     }
     try {
       z.string().regex(looseUuidRegex).parse(req.body.personToDeleteId);
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.medicalFileToDeleteId));
+      z.optional(z.string().regex(looseUuidRegex)).parse(req.body.medicalFileToDeleteId);
     } catch (e) {
       const error = new Error(`Invalid request in merge two persons personToDeleteId: ${e}`);
       error.status = 400;

@@ -233,7 +233,7 @@ const MergeTwoPersons = ({ person }) => {
                         _id: originPersonMedicalFile._id,
                         organisation: organisation._id,
                         person: originPerson._id,
-                        documents: [...(originPersonMedicalFile.documents || []), ...(personToMergeMedicalFile.documents || [])],
+                        documents: [...(originPersonMedicalFile.documents || []), ...((personToMergeMedicalFile || {}).documents || [])],
                       }),
                       medicalFileToDeleteId: personToMergeMedicalFile?._id,
                     };
