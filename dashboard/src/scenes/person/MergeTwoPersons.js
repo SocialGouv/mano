@@ -2,12 +2,11 @@ import React, { useMemo, useState } from 'react';
 import { Col, Button, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { toastr } from 'react-redux-toastr';
 import dayjs from 'dayjs';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
-  commentForUpdatePerson,
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
   personFieldsIncludingCustomFieldsSelector,
@@ -19,16 +18,17 @@ import CustomFieldInput from '../../components/CustomFieldInput';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import UserName from '../../components/UserName';
 import Table from '../../components/table';
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import { organisationState, teamsState, userState } from '../../recoil/auth';
+import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { consultationsState, prepareConsultationForEncryption } from '../../recoil/consultations';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
-import { medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
 import { theme } from '../../config';
+import { refreshTriggerState } from '../../components/Loader';
 
 const getRawValue = (field, value) => {
   try {
@@ -48,12 +48,12 @@ const getRawValue = (field, value) => {
   return '';
 };
 
-const initMergeValue = (field, originPerson = {}, personToMergeWith = {}) => {
+const initMergeValue = (field, originPerson = {}, personToMergeAndDelete = {}) => {
   if (Array.isArray(originPerson[field.name])) {
-    if (!originPerson[field.name]?.length) return personToMergeWith[field.name];
+    if (!originPerson[field.name]?.length) return personToMergeAndDelete[field.name];
     return originPerson[field.name];
   }
-  return originPerson[field.name] || personToMergeWith[field.name];
+  return originPerson[field.name] || personToMergeAndDelete[field.name];
 };
 
 const MergeTwoPersons = ({ person }) => {
@@ -61,42 +61,46 @@ const MergeTwoPersons = ({ person }) => {
   const [open, setOpen] = useState(false);
 
   const [originPerson, setOriginPerson] = useState(person);
-  const [personToMergeWith, setPersonToMergeWith] = useState(null);
+  const [personToMergeAndDelete, setPersonToMergeAndDelete] = useState(null);
 
   const [persons, setPersons] = useRecoilState(personsState);
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
-  const currentTeam = useRecoilValue(currentTeamState);
-  const [comments, setComments] = useRecoilState(commentsState);
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [passages, setPassages] = useRecoilState(passagesState);
-  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
-  const [consultations, setConsultations] = useRecoilState(consultationsState);
-  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
-  const [treatments, setTreatments] = useRecoilState(treatmentsState);
+  const comments = useRecoilValue(commentsState);
+  const actions = useRecoilValue(actionsState);
+  const passages = useRecoilValue(passagesState);
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
+  const consultations = useRecoilValue(consultationsState);
+  const medicalFiles = useRecoilValue(medicalFileState);
+  const treatments = useRecoilValue(treatmentsState);
+
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsMedicalFile = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
   const allFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
 
   const personsToMergeWith = useMemo(() => persons.filter((p) => p._id !== originPerson?._id), [persons, originPerson]);
 
   const originPersonMedicalFile = useMemo(() => medicalFiles.find((p) => p.person === originPerson._id), [medicalFiles, originPerson]);
-  const personToMergeMedicalFile = useMemo(() => medicalFiles.find((p) => p.person === personToMergeWith?._id), [medicalFiles, personToMergeWith]);
+  const personToMergeMedicalFile = useMemo(
+    () => medicalFiles.find((p) => p.person === personToMergeAndDelete?._id),
+    [medicalFiles, personToMergeAndDelete]
+  );
 
   const fields = useMemo(() => {
-    if (!originPerson || !personToMergeWith) return [];
-    return [...new Set([...Object.keys(originPerson), ...Object.keys(personToMergeWith)])]
+    if (!originPerson || !personToMergeAndDelete) return [];
+    return [...new Set([...Object.keys(originPerson), ...Object.keys(personToMergeAndDelete)])]
       .filter((fieldName) => !['_id', 'encryptedEntityKey', 'entityKey', 'createdAt', 'updatedAt', 'organisation', 'documents'].includes(fieldName))
       .map((fieldName) => allFields.find((f) => f.name === fieldName))
       .filter(Boolean);
-  }, [originPerson, personToMergeWith, allFields]);
+  }, [originPerson, personToMergeAndDelete, allFields]);
 
   const medicalFields = useMemo(() => {
-    if (!originPerson || !personToMergeWith) return [];
+    if (!originPerson || !personToMergeAndDelete) return [];
     return [...new Set([...Object.keys(originPersonMedicalFile || {}), ...Object.keys(personToMergeMedicalFile || {})])]
       .filter(
         (fieldName) =>
@@ -104,13 +108,13 @@ const MergeTwoPersons = ({ person }) => {
       )
       .map((fieldName) => customFieldsMedicalFile.find((f) => f.name === fieldName))
       .filter(Boolean);
-  }, [originPerson, personToMergeWith, originPersonMedicalFile, personToMergeMedicalFile, customFieldsMedicalFile]);
+  }, [originPerson, personToMergeAndDelete, originPersonMedicalFile, personToMergeMedicalFile, customFieldsMedicalFile]);
 
   const initMergedPerson = useMemo(() => {
-    if (!originPerson || !personToMergeWith) return null;
+    if (!originPerson || !personToMergeAndDelete) return null;
     const mergedPerson = {};
     for (let field of fields) {
-      mergedPerson[field.name] = initMergeValue(field, originPerson, personToMergeWith);
+      mergedPerson[field.name] = initMergeValue(field, originPerson, personToMergeAndDelete);
     }
     for (let medicalField of medicalFields) {
       mergedPerson[medicalField.name] = initMergeValue(medicalField, originPersonMedicalFile, personToMergeMedicalFile);
@@ -121,10 +125,10 @@ const MergeTwoPersons = ({ person }) => {
       createdAt: originPerson.createdAt,
       updatedAt: originPerson.updatedAt,
       entityKey: originPerson.entityKey,
-      documents: [...(originPerson.documents || []), ...(personToMergeWith.documents || [])],
+      documents: [...(originPerson.documents || []), ...(personToMergeAndDelete.documents || [])],
       ...mergedPerson,
     };
-  }, [originPerson, personToMergeWith, fields, medicalFields, originPersonMedicalFile, personToMergeMedicalFile]);
+  }, [originPerson, personToMergeAndDelete, fields, medicalFields, originPersonMedicalFile, personToMergeMedicalFile]);
 
   return (
     <>
@@ -159,8 +163,8 @@ const MergeTwoPersons = ({ person }) => {
                 inputId="person-to-merge-with-select"
                 isClearable
                 isSearchable
-                onChange={setPersonToMergeWith}
-                value={personToMergeWith}
+                onChange={setPersonToMergeAndDelete}
+                value={personToMergeAndDelete}
                 getOptionValue={(i) => i._id}
                 getOptionLabel={(i) => i?.name || ''}
               />
@@ -182,152 +186,98 @@ const MergeTwoPersons = ({ person }) => {
               initialValues={initMergedPerson}
               enableReinitialize
               onSubmit={async (body, { setSubmitting }) => {
-                if (window.confirm('Cette opération est irréversible, êtes-vous sûr ?')) {
-                  if (!body.followedSince) body.followedSince = originPerson.createdAt;
-                  body.entityKey = originPerson.entityKey;
-                  const response = await API.put({
-                    path: `/person/${originPerson._id}`,
-                    body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
-                  });
-                  if (response.ok) {
-                    const newPerson = response.decryptedData;
-                    setPersons((persons) =>
-                      persons.map((p) => {
-                        if (p._id === originPerson._id) return newPerson;
-                        return p;
-                      })
-                    );
-                    const comment = commentForUpdatePerson({ newPerson, oldPerson: originPerson });
-                    if (comment) {
-                      comment.user = user._id;
-                      comment.team = currentTeam._id;
-                      comment.organisation = organisation._id;
-                      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-                      if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
-                    }
-                  }
-                  for (const action of actions.filter((a) => a.person === personToMergeWith._id)) {
-                    const actionResponse = await API.put({
-                      path: `/action/${action._id}`,
-                      body: prepareActionForEncryption({ ...action, person: originPerson._id }),
-                    });
-                    if (actionResponse.ok) {
-                      const newAction = actionResponse.decryptedData;
-                      setActions((actions) =>
-                        actions.map((a) => {
-                          if (a._id === newAction._id) return newAction;
-                          return a;
-                        })
-                      );
-                    }
-                  }
-                  for (let comment of comments.filter((c) => c.person === personToMergeWith._id)) {
-                    const commentRes = await API.put({
-                      path: `/comment/${comment._id}`,
-                      body: prepareCommentForEncryption({ ...comment, person: originPerson._id }),
-                    });
-                    if (commentRes.ok) {
-                      setComments((comments) =>
-                        comments.map((c) => {
-                          if (c._id === comment._id) return commentRes.decryptedData;
-                          return c;
-                        })
-                      );
-                    }
-                  }
-                  for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === personToMergeWith._id)) {
-                    const relRes = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-                    if (relRes.ok) setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
-                    const res = await API.post({
-                      path: '/relPersonPlace',
-                      body: prepareRelPersonPlaceForEncryption({ place: relPersonPlace.place, person: originPerson._id, user: relPersonPlace.user }),
-                    });
-                    if (res.ok) setRelsPersonPlace((relsPersonPlace) => [res.decryptedData, ...relsPersonPlace]);
-                  }
-                  for (let passage of passages.filter((p) => p.person === personToMergeWith._id)) {
-                    const passageRes = await API.put({
-                      path: `/passage/${passage._id}`,
-                      body: preparePassageForEncryption({ ...passage, person: originPerson._id }),
-                    });
-                    if (passageRes.ok) {
-                      setPassages((passages) =>
-                        passages.map((p) => {
-                          if (p._id === passage._id) return passageRes.decryptedData;
-                          return p;
-                        })
-                      );
-                    }
-                  }
-                  for (let consultation of consultations.filter((p) => p.person === personToMergeWith._id)) {
-                    const consultationRes = await API.put({
-                      path: `/consultation/${consultation._id}`,
-                      body: prepareConsultationForEncryption(organisation.consultations)({ ...consultation, person: originPerson._id }),
-                    });
-                    if (consultationRes.ok) {
-                      setConsultations((consultations) =>
-                        consultations.map((c) => {
-                          if (c._id === consultation._id) return consultationRes.decryptedData;
-                          return c;
-                        })
-                      );
-                    }
+                if (!window.confirm('Cette opération est irréversible, êtes-vous sûr ?')) return;
+                if (!body.followedSince) body.followedSince = originPerson.createdAt;
+                body.entityKey = originPerson.entityKey;
+
+                const mergedPerson = preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body);
+                const mergedActions = actions
+                  .filter((a) => a.person === personToMergeAndDelete._id)
+                  .map((comment) => prepareActionForEncryption({ ...comment, person: originPerson._id }))
+                  .map(encryptItem(hashedOrgEncryptionKey));
+
+                const mergedComments = comments
+                  .filter((c) => c.person === personToMergeAndDelete._id)
+                  .map((comment) => prepareCommentForEncryption({ ...comment, person: originPerson._id }))
+                  .map(encryptItem(hashedOrgEncryptionKey));
+
+                const mergedRelsPersonPlace = relsPersonPlace
+                  .filter((rel) => rel.person === personToMergeAndDelete._id)
+                  .map((relPersonPlace) =>
+                    prepareRelPersonPlaceForEncryption({
+                      ...relPersonPlace,
+                      place: relPersonPlace.place,
+                      person: originPerson._id,
+                      user: relPersonPlace.user,
+                    })
+                  );
+
+                const mergedPassages = passages
+                  .filter((p) => p.person === personToMergeAndDelete._id)
+                  .map((passage) => preparePassageForEncryption({ ...passage, person: originPerson._id }))
+                  .map(encryptItem(hashedOrgEncryptionKey));
+
+                const mergedConsultations = consultations
+                  .filter((consultation) => consultation.person === personToMergeAndDelete._id)
+                  .map((consultation) => prepareConsultationForEncryption(organisation.consultations)({ ...consultation, person: originPerson._id }));
+
+                const mergedTreatments = treatments
+                  .filter((t) => t.person === personToMergeAndDelete._id)
+                  .map((treatment) => prepareTreatmentForEncryption({ ...treatment, person: originPerson._id }));
+
+                const { mergedMedicalFile, medicalFileToDeleteId } = (() => {
+                  if (!!originPersonMedicalFile) {
+                    return {
+                      mergedMedicalFile: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                        ...body,
+                        _id: originPersonMedicalFile._id,
+                        organisation: organisation._id,
+                        person: originPerson._id,
+                        documents: [...(originPersonMedicalFile.documents || []), ...((personToMergeMedicalFile || {}).documents || [])],
+                      }),
+                      medicalFileToDeleteId: personToMergeMedicalFile?._id,
+                    };
                   }
                   if (!originPersonMedicalFile && !!personToMergeMedicalFile) {
-                    const medicalFileRes = await API.put({
-                      path: `/medical-file/${personToMergeMedicalFile._id}`,
-                      body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                    return {
+                      mergedMedicalFile: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
                         ...body,
+                        _id: personToMergeMedicalFile._id,
+                        organisation: organisation._id,
+                        person: originPerson._id,
                         documents: personToMergeMedicalFile.documents || [],
-                        person: originPerson._id,
                       }),
-                    });
-                    if (medicalFileRes.ok) {
-                      setMedicalFiles((medicalFiles) =>
-                        medicalFiles.map((m) => {
-                          if (m._id === personToMergeMedicalFile._id) return medicalFileRes.decryptedData;
-                          return m;
-                        })
-                      );
-                    }
-                  } else if (!!originPersonMedicalFile && !!personToMergeMedicalFile && !!personToMergeMedicalFile?.documents?.length) {
-                    const medicalFileRes = await API.put({
-                      path: `/medical-file/${originPersonMedicalFile._id}`,
-                      body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
-                        ...body,
-                        person: originPerson._id,
-                        documents: [...(originPersonMedicalFile.documents || []), ...(personToMergeMedicalFile.documents || [])],
-                      }),
-                    });
-                    if (medicalFileRes.ok) {
-                      await API.delete({ path: `/medical-file/${personToMergeMedicalFile._id}` });
-                      setMedicalFiles((medicalFiles) =>
-                        medicalFiles
-                          .map((m) => {
-                            if (m._id === originPersonMedicalFile._id) return medicalFileRes.decryptedData;
-                            return m;
-                          })
-                          .filter((m) => m._id !== personToMergeMedicalFile._id)
-                      );
-                    }
+                    };
                   }
-                  for (let treatment of treatments.filter((p) => p.person === personToMergeWith._id)) {
-                    const treatmentRes = await API.put({
-                      path: `/treatment/${treatment._id}`,
-                      body: prepareTreatmentForEncryption({ ...treatment, person: originPerson._id }),
-                    });
-                    if (treatmentRes.ok) {
-                      setTreatments((treatments) =>
-                        treatments.map((t) => {
-                          if (t._id === treatment._id) return treatmentRes.decryptedData;
-                          return t;
-                        })
-                      );
-                    }
-                  }
-                  const personToMergeWithRes = await API.delete({ path: `/person/${personToMergeWith._id}` });
-                  if (personToMergeWithRes.ok) setPersons((persons) => persons.filter((p) => p._id !== personToMergeWith._id));
-                }
+                  return null;
+                })();
+
+                const response = await API.post({
+                  path: '/merge/persons',
+                  body: {
+                    mergedPerson: await encryptItem(hashedOrgEncryptionKey)(mergedPerson),
+                    mergedActions: await Promise.all(mergedActions.map(encryptItem(hashedOrgEncryptionKey))),
+                    mergedComments: await Promise.all(mergedComments.map(encryptItem(hashedOrgEncryptionKey))),
+                    mergedRelsPersonPlace: await Promise.all(mergedRelsPersonPlace.map(encryptItem(hashedOrgEncryptionKey))),
+                    mergedPassages: await Promise.all(mergedPassages.map(encryptItem(hashedOrgEncryptionKey))),
+                    mergedConsultations: await Promise.all(mergedConsultations.map(encryptItem(hashedOrgEncryptionKey))),
+                    mergedTreatments: await Promise.all(mergedTreatments.map(encryptItem(hashedOrgEncryptionKey))),
+                    mergedMedicalFile: await encryptItem(hashedOrgEncryptionKey)(mergedMedicalFile),
+                    personToDeleteId: personToMergeAndDelete._id,
+                    medicalFileToDeleteId,
+                  },
+                });
+
+                if (!response.ok) return;
                 toastr.success('Fusion réussie !');
+
+                setPersons((persons) => persons.filter((p) => p._id !== personToMergeAndDelete._id));
+
+                setRefreshTrigger({
+                  status: true,
+                  options: { initialLoad: false, showFullScreen: false },
+                });
+
                 setOpen(false);
                 setSubmitting(false);
               }}>
@@ -361,21 +311,23 @@ const MergeTwoPersons = ({ person }) => {
                         },
                       },
                       {
-                        title: personToMergeWith?.name,
-                        dataKey: 'personToMergeWith',
+                        title: personToMergeAndDelete?.name,
+                        dataKey: 'personToMergeAndDelete',
                         render: (field) => {
                           if (field.name === 'user')
                             return (
                               <Col md={12}>
-                                <UserName id={personToMergeWith?.user} />
+                                <UserName id={personToMergeAndDelete?.user} />
                               </Col>
                             );
                           if (field.name === 'assignedTeams') {
                             return (
-                              <Col md={12}>{personToMergeWith?.assignedTeams?.map((id) => teams.find((t) => t._id === id)?.name).join(', ')}</Col>
+                              <Col md={12}>
+                                {personToMergeAndDelete?.assignedTeams?.map((id) => teams.find((t) => t._id === id)?.name).join(', ')}
+                              </Col>
                             );
                           }
-                          return getRawValue(field, personToMergeWith?.[field.name] || personToMergeMedicalFile?.[field.name]);
+                          return getRawValue(field, personToMergeAndDelete?.[field.name] || personToMergeMedicalFile?.[field.name]);
                         },
                       },
                       {

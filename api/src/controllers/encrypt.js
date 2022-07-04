@@ -46,6 +46,7 @@ router.post(
         "territories",
         "observations",
         "places",
+        "passages",
         "reports",
         "relsPersonPlace",
       ];
