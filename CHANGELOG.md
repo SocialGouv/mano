@@ -1,3 +1,10 @@
+## [1.130.1](https://github.com/SocialGouv/mano/compare/v1.130.0...v1.130.1) (2022-07-04)
+
+
+### Bug Fixes
+
+* **api:** cant create orga with duplicated email ([#790](https://github.com/SocialGouv/mano/issues/790)) ([d683a81](https://github.com/SocialGouv/mano/commit/d683a81688efe86e65e48fce576b4810f38d0aee))
+
 # [1.130.0](https://github.com/SocialGouv/mano/compare/v1.129.0...v1.130.0) (2022-07-01)
 
 
