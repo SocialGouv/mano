@@ -83,35 +83,35 @@ router.post(
       } = req.body;
 
       for (let { encrypted, encryptedEntityKey, _id } of [mergedPerson]) {
-        await Person.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        await Person.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedActions) {
-        await Action.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        await Action.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedConsultations) {
-        await Consultation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        await Consultation.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedTreatments) {
-        await Treatment.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        await Treatment.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of [mergedMedicalFile]) {
-        await MedicalFile.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        await MedicalFile.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedComments) {
-        await Comment.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        await Comment.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedPassages) {
-        await Passage.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        await Passage.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedRelsPersonPlace) {
-        await RelPersonPlace.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        await RelPersonPlace.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       let person = await Person.findOne({ where: { _id: personToDeleteId, organisation: req.user.organisation } });
