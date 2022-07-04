@@ -1,3 +1,10 @@
+## [1.130.2](https://github.com/SocialGouv/mano/compare/v1.130.1...v1.130.2) (2022-07-04)
+
+
+### Bug Fixes
+
+* **dashboard,api:** merge two persons in sql transaction ([#789](https://github.com/SocialGouv/mano/issues/789)) ([10b2388](https://github.com/SocialGouv/mano/commit/10b23882cfa5d1abbe91d04aa1c1d3ceffc592e4))
+
 ## [1.130.1](https://github.com/SocialGouv/mano/compare/v1.130.0...v1.130.1) (2022-07-04)
 
 
