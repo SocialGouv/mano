@@ -97,6 +97,9 @@ router.post(
       return next(error);
     }
     const { orgName, name, email } = req.body;
+    const user = await User.findOne({ where: { email } });
+    if (!!user) return res.status(400).send({ ok: false, error: "Cet email existe déjà dans une autre organisation" });
+
     const organisation = await Organisation.create({ name: orgName }, { returning: true });
     const token = crypto.randomBytes(20).toString("hex");
     const adminUser = await User.create(
