@@ -125,185 +125,82 @@ router.put(
         if (req.params.migrationName === "add-relations-to-db-models") {
           try {
             for (const objectKey of ["encryptedPassages"]) {
-              try {
-                z.array(
-                  z.object({
-                    _id: z.string().regex(looseUuidRegex),
-                    encrypted: z.string(),
-                    encryptedEntityKey: z.string(),
-                    // person: z.optional(z.string().regex(looseUuidRegex)),
-                    // user: z.optional(z.string().regex(looseUuidRegex)),
-                    team: z.string().regex(looseUuidRegex),
-                  })
-                ).parse(req.body[objectKey]);
-              } catch (e) {
-                console.log({ objectKey });
-                console.log(e);
-                organisation.set({
-                  migrating: false,
-                });
-                await organisation.save();
-                return res.status(500).send({ ok: false });
-              }
-            }
-
-            for (const objectKey of ["encryptedConsultations", "encryptedTreatments"]) {
-              try {
-                z.array(
-                  z.object({
-                    _id: z.string().regex(looseUuidRegex),
-                    encrypted: z.string(),
-                    encryptedEntityKey: z.string(),
-                    person: z.string().regex(looseUuidRegex),
-                    // user: z.string().regex(looseUuidRegex),
-                  })
-                ).parse(req.body[objectKey]);
-              } catch (e) {
-                console.log({ objectKey });
-                console.log(e);
-                organisation.set({
-                  migrating: false,
-                });
-                await organisation.save();
-                return res.status(500).send({ ok: false });
-              }
+              z.array(
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  // person: z.optional(z.string().regex(looseUuidRegex)),
+                  // user: z.optional(z.string().regex(looseUuidRegex)),
+                  team: z.string().regex(looseUuidRegex),
+                })
+              ).parse(req.body[objectKey]);
             }
 
             for (const objectKey of ["encryptedPersons", "encryptedPlaces", "encryptedTerritories"]) {
-              try {
-                z.array(
-                  z.object({
-                    _id: z.string().regex(looseUuidRegex),
-                    encrypted: z.string(),
-                    encryptedEntityKey: z.string(),
-                    // user: z.string().regex(looseUuidRegex),
-                  })
-                ).parse(req.body[objectKey]);
-              } catch (e) {
-                console.log({ objectKey });
-                console.log(e);
-                organisation.set({
-                  migrating: false,
-                });
-                await organisation.save();
-                return res.status(500).send({ ok: false });
-              }
+              z.array(
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  // user: z.string().regex(looseUuidRegex),
+                })
+              ).parse(req.body[objectKey]);
             }
 
             for (const objectKey of ["encryptedReports"]) {
-              try {
-                z.array(
-                  z.object({
-                    _id: z.string().regex(looseUuidRegex),
-                    encrypted: z.string(),
-                    encryptedEntityKey: z.string(),
-                    team: z.string().regex(looseUuidRegex),
-                  })
-                ).parse(req.body[objectKey]);
-              } catch (e) {
-                console.log({ objectKey });
-                console.log(e);
-                organisation.set({
-                  migrating: false,
-                });
-                await organisation.save();
-                return res.status(500).send({ ok: false });
-              }
-            }
-
-            for (const objectKey of ["encryptedMedicalFiles"]) {
-              try {
-                z.array(
-                  z.object({
-                    _id: z.string().regex(looseUuidRegex),
-                    encrypted: z.string(),
-                    encryptedEntityKey: z.string(),
-                    person: z.string().regex(looseUuidRegex),
-                  })
-                ).parse(req.body[objectKey]);
-              } catch (e) {
-                console.log({ objectKey });
-                console.log(e);
-                organisation.set({
-                  migrating: false,
-                });
-                await organisation.save();
-                return res.status(500).send({ ok: false });
-              }
-            }
-
-            try {
               z.array(
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  territory: z.string().regex(looseUuidRegex),
-                  user: z.string().regex(looseUuidRegex),
                   team: z.string().regex(looseUuidRegex),
                 })
-              ).parse(req.body.encryptedTerritoryObservations);
-            } catch (e) {
-              console.log("encryptedTerritoryObservations");
-              console.log(e);
-              organisation.set({
-                migrating: false,
-              });
-              await organisation.save();
-              return res.status(500).send({ ok: false });
+              ).parse(req.body[objectKey]);
             }
 
-            try {
-              z.array(
-                z.object({
-                  _id: z.string().regex(looseUuidRegex),
-                  encrypted: z.string(),
-                  encryptedEntityKey: z.string(),
-                  person: z.string().regex(looseUuidRegex),
-                  place: z.string().regex(looseUuidRegex),
-                  user: z.string().regex(looseUuidRegex),
-                })
-              ).parse(req.body.encryptedRelsPersonPlace);
-            } catch (e) {
-              console.log("encryptedRelsPersonPlace");
-              console.log(e);
-              organisation.set({
-                migrating: false,
-              });
-              await organisation.save();
-              return res.status(500).send({ ok: false });
-            }
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+                territory: z.string().regex(looseUuidRegex),
+                user: z.string().regex(looseUuidRegex),
+                team: z.string().regex(looseUuidRegex),
+              })
+            ).parse(req.body.encryptedTerritoryObservations);
 
-            try {
-              z.array(
-                z.object({
-                  _id: z.string().regex(looseUuidRegex),
-                  encrypted: z.string(),
-                  encryptedEntityKey: z.string(),
-                  person: z.string().regex(looseUuidRegex),
-                  // user: z.string().regex(looseUuidRegex),
-                  team: z.string().regex(looseUuidRegex),
-                })
-              ).parse(req.body.encryptedComments.filter((c) => Boolean(c.person)));
-              z.array(
-                z.object({
-                  _id: z.string().regex(looseUuidRegex),
-                  encrypted: z.string(),
-                  encryptedEntityKey: z.string(),
-                  action: z.string().regex(looseUuidRegex),
-                  // user: z.string().regex(looseUuidRegex),
-                  team: z.string().regex(looseUuidRegex),
-                })
-              ).parse(req.body.encryptedComments.filter((c) => Boolean(c.action)));
-            } catch (e) {
-              console.log("encryptedComments");
-              console.log(e);
-              organisation.set({
-                migrating: false,
-              });
-              await organisation.save();
-              return res.status(500).send({ ok: false });
-            }
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+                person: z.string().regex(looseUuidRegex),
+                place: z.string().regex(looseUuidRegex),
+                user: z.string().regex(looseUuidRegex),
+              })
+            ).parse(req.body.encryptedRelsPersonPlace);
+
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+                person: z.string().regex(looseUuidRegex),
+                // user: z.string().regex(looseUuidRegex),
+                team: z.string().regex(looseUuidRegex),
+              })
+            ).parse(req.body.encryptedComments.filter((c) => Boolean(c.person)));
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+                action: z.string().regex(looseUuidRegex),
+                // user: z.string().regex(looseUuidRegex),
+                team: z.string().regex(looseUuidRegex),
+              })
+            ).parse(req.body.encryptedComments.filter((c) => Boolean(c.action)));
           } catch (e) {
             const error = new Error(`Invalid request in add-relations-to-db-models migration: ${e}`);
             error.status = 400;
@@ -313,8 +210,6 @@ router.put(
           const {
             encryptedActions,
             encryptedComments,
-            encryptedConsultations,
-            encryptedMedicalFiles,
             encryptedPassages,
             encryptedPersons,
             encryptedPlaces,
@@ -322,7 +217,6 @@ router.put(
             encryptedReports,
             encryptedTerritories,
             encryptedTerritoryObservations,
-            encryptedTreatments,
           } = req.body;
 
           const teams = (await Team.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
@@ -356,29 +250,6 @@ router.put(
                 action: !!action && actions.includes(action) ? action : null,
                 user: users.includes(user) ? user : null,
                 team: teams.includes(team) ? team : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, person, user, _id } of encryptedConsultations) {
-            await Consultation.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                person: persons.includes(person) ? person : null,
-                user: users.includes(user) ? user : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, person, _id } of encryptedMedicalFiles) {
-            await MedicalFile.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                person: persons.includes(person) ? person : null,
               },
               { where: { _id, organisation: req.user.organisation }, transaction: tx }
             );
@@ -461,6 +332,65 @@ router.put(
                 territory: territories.includes(territory) ? territory : null,
                 user: users.includes(user) ? user : null,
                 team: teams.includes(team) ? team : null,
+              },
+              { where: { _id, organisation: req.user.organisation }, transaction: tx }
+            );
+          }
+        }
+
+        if (req.params.migrationName === "add-relations-of-medical-data-to-db-models") {
+          try {
+            for (const objectKey of ["encryptedConsultations", "encryptedTreatments"]) {
+              z.array(
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  person: z.string().regex(looseUuidRegex),
+                  // user: z.string().regex(looseUuidRegex),
+                })
+              ).parse(req.body[objectKey]);
+            }
+
+            for (const objectKey of ["encryptedMedicalFiles"]) {
+              z.array(
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  person: z.string().regex(looseUuidRegex),
+                })
+              ).parse(req.body[objectKey]);
+            }
+          } catch (e) {
+            const error = new Error(`Invalid request in add-relations-to-db-models migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+
+          const { encryptedConsultations, encryptedMedicalFiles, encryptedTreatments } = req.body;
+
+          const users = (await User.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+          const persons = (await Person.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+
+          for (const { encrypted, encryptedEntityKey, person, user, _id } of encryptedConsultations) {
+            await Consultation.update(
+              {
+                encrypted,
+                encryptedEntityKey,
+                person: persons.includes(person) ? person : null,
+                user: users.includes(user) ? user : null,
+              },
+              { where: { _id, organisation: req.user.organisation }, transaction: tx }
+            );
+          }
+
+          for (const { encrypted, encryptedEntityKey, person, _id } of encryptedMedicalFiles) {
+            await MedicalFile.update(
+              {
+                encrypted,
+                encryptedEntityKey,
+                person: persons.includes(person) ? person : null,
               },
               { where: { _id, organisation: req.user.organisation }, transaction: tx }
             );

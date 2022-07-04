@@ -88,6 +88,8 @@ const Loader = () => {
   const autoRefreshInterval = useRef(null);
 
   const refresh = async () => {
+    // check migrations
+
     if (!organisation.migrations?.includes('add-relations-to-db-models')) {
       Alert.alert(
         "Veuillez vous connecter sur un navigateur d'abord",
@@ -99,6 +101,19 @@ const Loader = () => {
       });
       return;
     }
+    if (user.healthcareProfessional && !organisation.migrations?.includes('add-relations-of-medical-data-to-db-models')) {
+      Alert.alert(
+        "Veuillez vous connecter sur un navigateur d'abord",
+        'Une mise-à-jour importante doit être effectuée et ne peut avoir lieu que sur votre navigateur. Désolé...'
+      );
+      setRefreshTrigger({
+        status: false,
+        options: { showFullScreen: true, initialLoad: false },
+      });
+      return;
+    }
+
+    // refresh
     clearInterval(autoRefreshInterval.current);
     autoRefreshInterval.current = null;
 

@@ -339,40 +339,6 @@ const Loader = () => {
         API,
       });
       const encryptedComments = await Promise.all(allComments.map(prepareCommentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
-      console.log(
-        'no comment',
-        encryptedComments.filter((r) => !Boolean(r.person) && !Boolean(r.action))
-      );
-
-      const allConsultations = await getData({
-        collectionName: 'consultation',
-        isInitialization: true,
-        withDeleted: true,
-        lastRefresh: 0,
-        saveInCache: false,
-        API,
-      });
-      const encryptedConsultations = await Promise.all(
-        allConsultations
-          .filter((c) => Boolean(c.person))
-          .map(prepareConsultationForEncryption(organisation.consultations))
-          .map(encryptItem(hashedOrgEncryptionKey))
-      );
-
-      const allMedicalFiles = await getData({
-        collectionName: 'medical-file',
-        isInitialization: true,
-        withDeleted: true,
-        lastRefresh: 0,
-        saveInCache: false,
-        API,
-      });
-      const encryptedMedicalFiles = await Promise.all(
-        allMedicalFiles
-          .filter((c) => Boolean(c.person))
-          .map(prepareMedicalFileForEncryption(customFieldsMedicalFile))
-          .map(encryptItem(hashedOrgEncryptionKey))
-      );
 
       const allPersons = await getData({
         collectionName: 'person',
@@ -456,6 +422,36 @@ const Loader = () => {
         allObservations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem(hashedOrgEncryptionKey))
       );
 
+      const response = await API.put({
+        path: `/migration/add-relations-to-db-models`,
+        body: {
+          encryptedActions,
+          encryptedComments,
+          encryptedPersons,
+          encryptedPassages,
+          encryptedPlaces,
+          encryptedRelsPersonPlace,
+          encryptedReports,
+          encryptedTerritories,
+          encryptedTerritoryObservations,
+        },
+      });
+      if (!response.ok) {
+        if (response.error) {
+          setLoading(response.error);
+          setProgress(1);
+        }
+        return;
+      }
+      setLastRefresh(0);
+      setProgress(0);
+      return migrationIsDone(response.organisation);
+    }
+
+    if (user.healthcareProfessional && !organisation.migrations?.includes('add-relations-of-medical-data-to-db-models')) {
+      await new Promise((res) => setTimeout(res, 500));
+      setLoading('Mise à jour globale des données de votre organisation, veuillez patienter quelques minutes...');
+
       const allTreatments = await getData({
         collectionName: 'treatment',
         isInitialization: true,
@@ -471,20 +467,41 @@ const Loader = () => {
           .map(encryptItem(hashedOrgEncryptionKey))
       );
 
+      const allConsultations = await getData({
+        collectionName: 'consultation',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedConsultations = await Promise.all(
+        allConsultations
+          .filter((c) => Boolean(c.person))
+          .map(prepareConsultationForEncryption(organisation.consultations))
+          .map(encryptItem(hashedOrgEncryptionKey))
+      );
+
+      const allMedicalFiles = await getData({
+        collectionName: 'medical-file',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedMedicalFiles = await Promise.all(
+        allMedicalFiles
+          .filter((c) => Boolean(c.person))
+          .map(prepareMedicalFileForEncryption(customFieldsMedicalFile))
+          .map(encryptItem(hashedOrgEncryptionKey))
+      );
+
       const response = await API.put({
-        path: `/migration/add-relations-to-db-models`,
+        path: `/migration/add-relations-of-medical-data-to-db-models`,
         body: {
-          encryptedActions,
-          encryptedComments,
           encryptedConsultations,
           encryptedMedicalFiles,
-          encryptedPersons,
-          encryptedPassages,
-          encryptedPlaces,
-          encryptedRelsPersonPlace,
-          encryptedReports,
-          encryptedTerritories,
-          encryptedTerritoryObservations,
           encryptedTreatments,
         },
       });
@@ -495,6 +512,7 @@ const Loader = () => {
         }
         return;
       }
+
       setLastRefresh(0);
       setProgress(0);
       return migrationIsDone(response.organisation);
