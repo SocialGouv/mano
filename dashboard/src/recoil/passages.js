@@ -8,7 +8,7 @@ export const passagesState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];
+const encryptedFields = ['date', 'comment'];
 
 export const preparePassageForEncryption = (passage) => {
   const decrypted = {};
@@ -20,6 +20,9 @@ export const preparePassageForEncryption = (passage) => {
     createdAt: passage.createdAt,
     updatedAt: passage.updatedAt,
     organisation: passage.organisation,
+    person: passage.person,
+    team: passage.team,
+    user: passage.user,
 
     decrypted,
     entityKey: passage.entityKey,

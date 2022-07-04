@@ -18,6 +18,8 @@ router.post(
     try {
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
+      z.string().regex(looseUuidRegex).parse(req.body.place);
     } catch (e) {
       const error = new Error(`Invalid request in relPersonPlace creation: ${e}`);
       error.status = 400;
@@ -27,8 +29,11 @@ router.post(
     const data = await RelPersonPlace.create(
       {
         organisation: req.user.organisation,
+        user: req.user._id,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
+        person: req.body.person,
+        place: req.body.place,
       },
       { returning: true }
     );
@@ -40,6 +45,9 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        user: data.user,
+        person: data.person,
+        place: data.place,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -82,7 +90,7 @@ router.get(
 
     const data = await RelPersonPlace.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "user", "person", "place", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })

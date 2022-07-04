@@ -7,7 +7,7 @@ export const actionsState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('action', JSON.stringify(newValue)))],
 });
 
-const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];
+const encryptedFields = ['category', 'categories', 'structure', 'name', 'description', 'withTime', 'urgent'];
 
 export const prepareActionForEncryption = (action) => {
   const decrypted = {};
@@ -21,6 +21,9 @@ export const prepareActionForEncryption = (action) => {
     updatedAt: action.updatedAt,
 
     completedAt: action.completedAt,
+    person: action.person,
+    team: action.team,
+    user: action.user,
     dueAt: action.dueAt,
     status: action.status,
 

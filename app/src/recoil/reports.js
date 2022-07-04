@@ -7,7 +7,7 @@ export const reportsState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('report', JSON.stringify(newValue)))],
 });
 
-const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations', 'oldDateSystem'];
+const encryptedFields = ['description', 'services', 'date', 'collaborations', 'oldDateSystem'];
 
 export const prepareReportForEncryption = (report) => {
   const decrypted = {};
@@ -19,6 +19,7 @@ export const prepareReportForEncryption = (report) => {
     createdAt: report.createdAt,
     updatedAt: report.updatedAt,
     organisation: report.organisation,
+    team: report.team,
 
     decrypted,
     entityKey: report.entityKey,

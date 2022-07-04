@@ -6,10 +6,10 @@ export const consultationsState = atom({
   default: [],
 });
 
-export const encryptedFields = ['name', 'type', 'person', 'user', 'documents'];
+const encryptedFields = ['name', 'type', 'documents'];
 
 export const prepareConsultationForEncryption = (customFieldsConsultations) => (consultation) => {
-  const consultationTypeCustomFields = customFieldsConsultations.find((consult) => consult.name === consultation.type).fields || [];
+  const consultationTypeCustomFields = customFieldsConsultations.find((consult) => consult.name === consultation.type).fields;
   const encryptedFieldsIncludingCustom = [...consultationTypeCustomFields.map((f) => f.name), ...encryptedFields];
   const decrypted = {};
   for (let field of encryptedFieldsIncludingCustom) {
@@ -21,10 +21,13 @@ export const prepareConsultationForEncryption = (customFieldsConsultations) => (
     createdAt: consultation.createdAt,
     updatedAt: consultation.updatedAt,
 
+    person: consultation.person,
+    user: consultation.user,
+
     completedAt: consultation.completedAt,
     dueAt: consultation.dueAt,
     status: consultation.status,
-    onlyVisibleBy: consultation.onlyVisibleBy,
+    onlyVisibleBy: consultation.onlyVisibleBy || [],
 
     decrypted,
     entityKey: consultation.entityKey,

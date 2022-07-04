@@ -18,6 +18,7 @@ router.post(
     try {
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
     } catch (e) {
       const error = new Error(`Invalid request in treatment creation: ${e}`);
       error.status = 400;
@@ -27,8 +28,10 @@ router.post(
     const data = await Treatment.create(
       {
         organisation: req.user.organisation,
+        user: req.user._id,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
+        person: req.body.person,
       },
       { returning: true }
     );
@@ -40,6 +43,8 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        user: data.user,
+        person: data.person,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -82,7 +87,7 @@ router.get(
 
     const data = await Treatment.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "user", "person", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -98,6 +103,8 @@ router.put(
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
+      z.string().regex(looseUuidRegex).parse(req.body.user);
     } catch (e) {
       const error = new Error(`Invalid request in treatment put: ${e}`);
       error.status = 400;
@@ -107,11 +114,13 @@ router.put(
     const treatment = await Treatment.findOne(query);
     if (!treatment) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey, person, user } = req.body;
 
     const updateTreatment = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
+      person: person,
+      user: user,
     };
 
     await Treatment.update(updateTreatment, query, { silent: false });
@@ -124,6 +133,8 @@ router.put(
         encrypted: newTreatment.encrypted,
         encryptedEntityKey: newTreatment.encryptedEntityKey,
         organisation: newTreatment.organisation,
+        user: newTreatment.user,
+        person: newTreatment.person,
         createdAt: newTreatment.createdAt,
         updatedAt: newTreatment.updatedAt,
         deletedAt: newTreatment.deletedAt,

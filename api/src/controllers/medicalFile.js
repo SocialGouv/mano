@@ -18,6 +18,7 @@ router.post(
     try {
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
     } catch (e) {
       const error = new Error(`Invalid request in medicalFile creation: ${e}`);
       error.status = 400;
@@ -29,6 +30,7 @@ router.post(
         organisation: req.user.organisation,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
+        person: req.body.person,
       },
       { returning: true }
     );
@@ -40,6 +42,7 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        person: data.person,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -82,7 +85,7 @@ router.get(
 
     const data = await MedicalFile.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "person", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -98,6 +101,7 @@ router.put(
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
     } catch (e) {
       const error = new Error(`Invalid request in medicalFile put: ${e}`);
       error.status = 400;
@@ -107,11 +111,12 @@ router.put(
     const medicalFile = await MedicalFile.findOne(query);
     if (!medicalFile) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey, person } = req.body;
 
     const updateMedicalFile = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
+      person: person,
     };
 
     await MedicalFile.update(updateMedicalFile, query, { silent: false });
@@ -124,6 +129,7 @@ router.put(
         encrypted: newMedicalFile.encrypted,
         encryptedEntityKey: newMedicalFile.encryptedEntityKey,
         organisation: newMedicalFile.organisation,
+        person: newMedicalFile.person,
         createdAt: newMedicalFile.createdAt,
         updatedAt: newMedicalFile.updatedAt,
         deletedAt: newMedicalFile.deletedAt,

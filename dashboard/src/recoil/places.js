@@ -8,7 +8,7 @@ export const placesState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['user', 'name'];
+const encryptedFields = ['name'];
 
 export const preparePlaceForEncryption = (place) => {
   const decrypted = {};
@@ -20,6 +20,7 @@ export const preparePlaceForEncryption = (place) => {
     createdAt: place.createdAt,
     updatedAt: place.updatedAt,
     organisation: place.organisation,
+    user: place.user,
 
     decrypted,
     entityKey: place.entityKey,

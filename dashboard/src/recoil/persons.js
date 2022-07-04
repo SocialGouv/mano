@@ -221,7 +221,7 @@ Utils
 */
 
 export const personFields = [
-  { name: 'user', type: 'text', label: '', encrypted: true, importable: false, filterable: false },
+  { name: 'user', type: 'text', label: '', encrypted: false, importable: false, filterable: false },
   { name: 'name', type: 'text', label: 'Nom prénom ou Pseudonyme', encrypted: true, importable: true, filterable: true },
   { name: 'otherNames', type: 'text', label: 'Autres pseudos', encrypted: true, importable: true, filterable: true },
   { name: 'gender', type: 'enum', label: 'Genre', encrypted: true, importable: true, options: genderOptions, filterable: true },
@@ -315,6 +315,7 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
   return {
     _id: person._id,
     organisation: person.organisation,
+    user: person.user,
     createdAt: person.createdAt,
     updatedAt: person.updatedAt,
     outOfActiveList: person.outOfActiveList,

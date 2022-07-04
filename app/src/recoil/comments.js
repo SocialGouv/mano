@@ -7,7 +7,7 @@ export const commentsState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('comment', JSON.stringify(newValue)))],
 });
 
-const encryptedFields = ['comment', 'person', 'action', 'team', 'user', 'date', 'urgent'];
+const encryptedFields = ['comment', 'date', 'urgent'];
 
 export const prepareCommentForEncryption = (comment) => {
   const decrypted = {};
@@ -19,6 +19,10 @@ export const prepareCommentForEncryption = (comment) => {
     createdAt: comment.createdAt,
     updatedAt: comment.updatedAt,
     organisation: comment.organisation,
+    person: comment.person,
+    team: comment.team,
+    user: comment.user,
+    action: comment.action,
 
     decrypted,
     entityKey: comment.entityKey,

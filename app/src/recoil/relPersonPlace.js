@@ -7,18 +7,21 @@ export const relsPersonPlaceState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('relPersonPlace', JSON.stringify(newValue)))],
 });
 
-const encryptedFields = ['place', 'person', 'user'];
+// const encryptedFields = [];
 
 export const prepareRelPersonPlaceForEncryption = (relPersonPlace) => {
   const decrypted = {};
-  for (let field of encryptedFields) {
-    decrypted[field] = relPersonPlace[field];
-  }
+  // for (let field of encryptedFields) {
+  //   decrypted[field] = relPersonPlace[field];
+  // }
   return {
     _id: relPersonPlace._id,
     createdAt: relPersonPlace.createdAt,
     updatedAt: relPersonPlace.updatedAt,
     organisation: relPersonPlace.organisation,
+    user: relPersonPlace.user,
+    person: relPersonPlace.person,
+    place: relPersonPlace.place,
 
     decrypted,
     entityKey: relPersonPlace.entityKey,

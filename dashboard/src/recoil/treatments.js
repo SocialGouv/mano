@@ -6,7 +6,7 @@ export const treatmentsState = atom({
   default: [],
 });
 
-const encryptedFields = ['person', 'user', 'startDate', 'endDate', 'name', 'dosage', 'frequency', 'indication', 'documents'];
+const encryptedFields = ['startDate', 'endDate', 'name', 'dosage', 'frequency', 'indication', 'documents'];
 
 export const prepareTreatmentForEncryption = (treatment) => {
   const decrypted = {};
@@ -18,6 +18,8 @@ export const prepareTreatmentForEncryption = (treatment) => {
     createdAt: treatment.createdAt,
     updatedAt: treatment.updatedAt,
     organisation: treatment.organisation,
+    person: treatment.person,
+    user: treatment.user,
 
     decrypted,
     entityKey: treatment.entityKey,

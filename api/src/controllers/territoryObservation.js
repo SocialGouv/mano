@@ -18,6 +18,8 @@ router.post(
     try {
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.territory);
+      z.string().regex(looseUuidRegex).parse(req.body.team);
     } catch (e) {
       const error = new Error(`Invalid request in observation creation: ${e}`);
       error.status = 400;
@@ -25,6 +27,9 @@ router.post(
     }
     const newObs = {
       organisation: req.user.organisation,
+      user: req.user._id,
+      team: req.body.team,
+      territory: req.body.territory,
       encrypted: req.body.encrypted,
       encryptedEntityKey: req.body.encryptedEntityKey,
     };
@@ -34,9 +39,12 @@ router.post(
       ok: true,
       data: {
         _id: data._id,
+        organisation: data.organisation,
+        user: data.user,
+        team: data.team,
+        territory: data.territory,
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
-        organisation: data.organisation,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -79,7 +87,7 @@ router.get(
 
     const data = await TerritoryObservation.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "user", "team", "territory", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -95,6 +103,9 @@ router.put(
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.user);
+      z.string().regex(looseUuidRegex).parse(req.body.team);
+      z.string().regex(looseUuidRegex).parse(req.body.territory);
     } catch (e) {
       const error = new Error(`Invalid request in observation put: ${e}`);
       error.status = 400;
@@ -105,10 +116,13 @@ router.put(
     const territoryObservation = await TerritoryObservation.findOne(query);
     if (!territoryObservation) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey, territory, user, team } = req.body;
     const updatedTerritoryObservation = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
+      user: user,
+      team: team,
+      territory: territory,
     };
 
     await TerritoryObservation.update(updatedTerritoryObservation, query, { silent: false });
@@ -121,6 +135,9 @@ router.put(
         encrypted: newTerritoryObservation.encrypted,
         encryptedEntityKey: newTerritoryObservation.encryptedEntityKey,
         organisation: newTerritoryObservation.organisation,
+        user: newTerritoryObservation.user,
+        team: newTerritoryObservation.team,
+        territory: newTerritoryObservation.territory,
         createdAt: newTerritoryObservation.createdAt,
         updatedAt: newTerritoryObservation.updatedAt,
         deletedAt: newTerritoryObservation.deletedAt,

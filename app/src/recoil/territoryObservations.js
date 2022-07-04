@@ -77,7 +77,7 @@ export const defaultCustomFields = [
   },
 ];
 
-const compulsoryEncryptedFields = ['territory', 'user', 'team', 'observedAt'];
+const compulsoryEncryptedFields = ['observedAt'];
 
 export const prepareObsForEncryption = (customFields) => (obs) => {
   const encryptedFields = [...customFields.map((f) => f.name), ...compulsoryEncryptedFields];
@@ -90,10 +90,12 @@ export const prepareObsForEncryption = (customFields) => (obs) => {
     createdAt: obs.createdAt,
     updatedAt: obs.updatedAt,
     organisation: obs.organisation,
+    user: obs.user,
+    team: obs.team,
+    territory: obs.territory,
 
     decrypted,
     entityKey: obs.entityKey,
   };
 };
-
 export const observationsKeyLabels = defaultCustomFields.map((f) => f.name);

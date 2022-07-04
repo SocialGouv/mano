@@ -151,6 +151,7 @@ router.post(
         encrypted: p.encrypted,
         encryptedEntityKey: p.encryptedEntityKey,
         organisation: p.organisation,
+        user: p.user,
         createdAt: p.createdAt,
         updatedAt: p.updatedAt,
         deletedAt: p.deletedAt,
@@ -179,6 +180,7 @@ router.post(
         organisation: req.user.organisation,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
+        user: req.user._id,
       },
       { returning: true }
     );
@@ -189,6 +191,7 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        user: data.user,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -230,7 +233,7 @@ router.get(
 
     const data = await Person.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "user", "createdAt", "updatedAt", "deletedAt"],
     });
 
     return res.status(200).send({
@@ -252,6 +255,7 @@ router.put(
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.user);
     } catch (e) {
       const error = new Error(`Invalid request in person put: ${e}`);
       error.status = 400;
@@ -262,10 +266,11 @@ router.put(
     const person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey, user } = req.body;
     const updatePerson = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
+      user: user,
     };
 
     await Person.update(updatePerson, query, { silent: false });
@@ -278,6 +283,7 @@ router.put(
         encrypted: newPerson.encrypted,
         encryptedEntityKey: newPerson.encryptedEntityKey,
         organisation: newPerson.organisation,
+        user: newPerson.user,
         createdAt: newPerson.createdAt,
         updatedAt: newPerson.updatedAt,
         deletedAt: newPerson.deletedAt,

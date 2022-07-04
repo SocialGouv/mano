@@ -7,20 +7,20 @@ import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.pn
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { getCacheItem, getData, setCacheItem } from '../services/dataManagement';
 import { organisationState, teamsState, userState } from '../recoil/auth';
-import { actionsState } from '../recoil/actions';
-import { personsState } from '../recoil/persons';
-import { territoriesState } from '../recoil/territory';
-import { placesState } from '../recoil/places';
-import { relsPersonPlaceState } from '../recoil/relPersonPlace';
-import { territoryObservationsState } from '../recoil/territoryObservations';
-import { commentsState } from '../recoil/comments';
+import { actionsState, prepareActionForEncryption } from '../recoil/actions';
+import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState, preparePersonForEncryption } from '../recoil/persons';
+import { prepareTerritoryForEncryption, territoriesState } from '../recoil/territory';
+import { placesState, preparePlaceForEncryption } from '../recoil/places';
+import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
+import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
+import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
-import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
-import { treatmentsState } from '../recoil/treatments';
-import { medicalFileState } from '../recoil/medicalFiles';
+import { consultationsState, prepareConsultationForEncryption, whitelistAllowedData } from '../recoil/consultations';
+import { prepareTreatmentForEncryption, treatmentsState } from '../recoil/treatments';
+import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
 
 // Update to flush cache.
 const currentCacheKey = 'mano-last-refresh-2022-05-30';
@@ -132,6 +132,11 @@ const Loader = () => {
   const [comments, setComments] = useRecoilState(commentsState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
 
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const customFieldsObs = useRecoilValue(customFieldsObsSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+
   // to prevent auto-refresh to trigger on the first render
   const initialLoadDone = useRef(null);
   const autoRefreshInterval = useRef(null);
@@ -148,14 +153,6 @@ const Loader = () => {
 
   const migrationIsDone = (updatedOrganisation) => {
     setOrganisation(updatedOrganisation);
-    /* FIXME ?:
-    the `setOrganisation(response.organisation)` doesn't provide an updated version of `organisation`
-     for the rest of this `refresh` function
-     neither for the `useApi` hook
-     therefore, a new organisation with no `migrationLastUpdateAt` won't be able to do the multiple migrations
-     because server side, `!!organisation.migrationLastUpdateAt === true` but `req.query.migrationLastUpdateAt === null`
-     so we need to end the refresh after each migration, and restart it with the fresh organisation
-    */
     setRefreshTrigger((oldRefreshState) => ({
       ...oldRefreshState,
       status: false,
@@ -314,6 +311,192 @@ const Loader = () => {
         }
         return;
       }
+      setLastRefresh(0);
+      setProgress(0);
+      return migrationIsDone(response.organisation);
+    }
+
+    if (!organisation.migrations?.includes('add-relations-to-db-models')) {
+      await new Promise((res) => setTimeout(res, 500));
+      setLoading('Mise à jour globale des données de votre organisation, veuillez patienter quelques minutes...');
+
+      const allActions = await getData({
+        collectionName: 'action',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedActions = await Promise.all(allActions.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+
+      const allComments = await getData({
+        collectionName: 'comment',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedComments = await Promise.all(allComments.map(prepareCommentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      console.log(
+        'no comment',
+        encryptedComments.filter((r) => !Boolean(r.person) && !Boolean(r.action))
+      );
+
+      const allConsultations = await getData({
+        collectionName: 'consultation',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedConsultations = await Promise.all(
+        allConsultations
+          .filter((c) => Boolean(c.person))
+          .map(prepareConsultationForEncryption(organisation.consultations))
+          .map(encryptItem(hashedOrgEncryptionKey))
+      );
+
+      const allMedicalFiles = await getData({
+        collectionName: 'medical-file',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedMedicalFiles = await Promise.all(
+        allMedicalFiles
+          .filter((c) => Boolean(c.person))
+          .map(prepareMedicalFileForEncryption(customFieldsMedicalFile))
+          .map(encryptItem(hashedOrgEncryptionKey))
+      );
+
+      const allPersons = await getData({
+        collectionName: 'person',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedPersons = await Promise.all(
+        allPersons.map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)).map(encryptItem(hashedOrgEncryptionKey))
+      );
+
+      const allPassages = await getData({
+        collectionName: 'passage',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedPassages = await Promise.all(allPassages.map(preparePassageForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+
+      const allPlaces = await getData({
+        collectionName: 'place',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedPlaces = await Promise.all(allPlaces.map(preparePlaceForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+
+      const allRelsPersonPlace = await getData({
+        collectionName: 'relPersonPlace',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedRelsPersonPlace = await Promise.all(
+        allRelsPersonPlace.map(prepareRelPersonPlaceForEncryption).map(encryptItem(hashedOrgEncryptionKey))
+      );
+
+      const allReports = await getData({
+        collectionName: 'report',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+
+      const encryptedReports = await Promise.all(
+        allReports
+          .filter((r) => Boolean(r.team))
+          .map(prepareReportForEncryption)
+          .map(encryptItem(hashedOrgEncryptionKey))
+      );
+
+      const allTerritories = await getData({
+        collectionName: 'territory',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedTerritories = await Promise.all(allTerritories.map(prepareTerritoryForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+
+      const allObservations = await getData({
+        collectionName: 'territory-observation',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedTerritoryObservations = await Promise.all(
+        allObservations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem(hashedOrgEncryptionKey))
+      );
+
+      const allTreatments = await getData({
+        collectionName: 'treatment',
+        isInitialization: true,
+        withDeleted: true,
+        lastRefresh: 0,
+        saveInCache: false,
+        API,
+      });
+      const encryptedTreatments = await Promise.all(
+        allTreatments
+          .filter((c) => Boolean(c.person))
+          .map(prepareTreatmentForEncryption)
+          .map(encryptItem(hashedOrgEncryptionKey))
+      );
+
+      const response = await API.put({
+        path: `/migration/add-relations-to-db-models`,
+        body: {
+          encryptedActions,
+          encryptedComments,
+          encryptedConsultations,
+          encryptedMedicalFiles,
+          encryptedPersons,
+          encryptedPassages,
+          encryptedPlaces,
+          encryptedRelsPersonPlace,
+          encryptedReports,
+          encryptedTerritories,
+          encryptedTerritoryObservations,
+          encryptedTreatments,
+        },
+      });
+      if (!response.ok) {
+        if (response.error) {
+          setLoading(response.error);
+          setProgress(1);
+        }
+        return;
+      }
+      setLastRefresh(0);
+      setProgress(0);
       return migrationIsDone(response.organisation);
     }
 

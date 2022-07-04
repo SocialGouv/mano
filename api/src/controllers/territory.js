@@ -26,8 +26,10 @@ router.post(
     const data = await Territory.create(
       {
         organisation: req.user.organisation,
+        user: req.user._id,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
+        territory: req.body.territory,
       },
       { returning: true }
     );
@@ -38,6 +40,8 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        user: data.user,
+        territory: data.territory,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -80,7 +84,7 @@ router.get(
 
     const data = await Territory.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "user", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -96,6 +100,7 @@ router.put(
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.territory);
     } catch (e) {
       const error = new Error(`Invalid request in territory put: ${e}`);
       error.status = 400;
@@ -105,11 +110,12 @@ router.put(
     const territory = await Territory.findOne(query);
     if (!territory) return res.status(404).send({ ok: false, error: "Not found" });
 
-    const { encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey, user } = req.body;
 
     const updateTerritory = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
+      user: user,
     };
 
     territory.set(updateTerritory);

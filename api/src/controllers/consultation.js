@@ -30,15 +30,18 @@ router.post(
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
       z.array(z.string().regex(looseUuidRegex)).parse(req.body.onlyVisibleBy);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
     } catch (e) {
       const error = new Error(`Invalid request in consultation creation: ${e}`);
       error.status = 400;
       return next(error);
     }
 
-    const { status, dueAt, completedAt, encrypted, encryptedEntityKey, onlyVisibleBy } = req.body;
+    const { status, dueAt, completedAt, encrypted, encryptedEntityKey, onlyVisibleBy, person } = req.body;
     const consultation = {
       organisation: req.user.organisation,
+      user: req.user._id,
+      person,
       status,
       dueAt,
       completedAt: completedAt || null,
@@ -56,6 +59,7 @@ router.post(
         encryptedEntityKey: data.encryptedEntityKey,
         onlyVisibleBy: data.onlyVisibleBy,
         organisation: data.organisation,
+        person: data.person,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -118,6 +122,8 @@ router.get(
         "encrypted",
         "encryptedEntityKey",
         "organisation",
+        "person",
+        "user",
         "createdAt",
         "updatedAt",
         "deletedAt",
@@ -141,6 +147,8 @@ router.get(
         encryptedEntityKey: consultation.encryptedEntityKey,
         onlyVisibleBy: consultation.onlyVisibleBy,
         organisation: consultation.organisation,
+        user: consultation.user,
+        person: consultation.person,
         createdAt: consultation.createdAt,
         updatedAt: consultation.updatedAt,
         deletedAt: consultation.deletedAt,
@@ -217,6 +225,8 @@ router.put(
       if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
+      z.string().regex(looseUuidRegex).parse(req.body.user);
       z.optional(z.array(z.string().regex(looseUuidRegex)).parse(req.body.onlyVisibleBy));
     } catch (e) {
       const error = new Error(`Invalid request in consultation put: ${e}`);
@@ -232,7 +242,7 @@ router.put(
     });
     if (!consultation) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { status, dueAt, completedAt, encrypted, encryptedEntityKey, onlyVisibleBy } = req.body;
+    const { status, dueAt, completedAt, encrypted, encryptedEntityKey, onlyVisibleBy, person, user } = req.body;
     consultation.set({
       status,
       dueAt,
@@ -240,6 +250,8 @@ router.put(
       completedAt: completedAt || null,
       encrypted,
       encryptedEntityKey,
+      person,
+      user,
     });
     await consultation.save();
 
@@ -250,6 +262,8 @@ router.put(
         encrypted: consultation.encrypted,
         encryptedEntityKey: consultation.encryptedEntityKey,
         organisation: consultation.organisation,
+        person: consultation.person,
+        user: consultation.user,
         createdAt: consultation.createdAt,
         updatedAt: consultation.updatedAt,
         deletedAt: consultation.deletedAt,
@@ -288,7 +302,5 @@ router.delete(
     res.status(200).send({ ok: true });
   })
 );
-
-module.exports = router;
 
 module.exports = router;

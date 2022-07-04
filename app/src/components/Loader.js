@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { Dimensions } from 'react-native';
+import { Alert, Dimensions } from 'react-native';
 import API from '../services/api';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
@@ -88,6 +88,17 @@ const Loader = () => {
   const autoRefreshInterval = useRef(null);
 
   const refresh = async () => {
+    if (!organisation.migrations?.includes('add-relations-to-db-models')) {
+      Alert.alert(
+        "Veuillez vous connecter sur un navigateur d'abord",
+        'Une mise-à-jour importante doit être effectuée et ne peut avoir lieu que sur votre navigateur. Désolé...'
+      );
+      setRefreshTrigger({
+        status: false,
+        options: { showFullScreen: true, initialLoad: false },
+      });
+      return;
+    }
     clearInterval(autoRefreshInterval.current);
     autoRefreshInterval.current = null;
 

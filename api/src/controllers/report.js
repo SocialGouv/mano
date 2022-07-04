@@ -40,7 +40,7 @@ router.get(
 
     const data = await Report.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "team", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -55,6 +55,7 @@ router.post(
     try {
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.team);
     } catch (e) {
       const error = new Error(`Invalid request in report creation: ${e}`);
       error.status = 400;
@@ -66,6 +67,7 @@ router.post(
         organisation: req.user.organisation,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
+        team: req.body.team,
       },
       { returning: true }
     );
@@ -76,6 +78,7 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        team: data.team,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -94,6 +97,7 @@ router.put(
       z.string().regex(looseUuidRegex).parse(req.params._id);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().parse(req.body.team);
     } catch (e) {
       const error = new Error(`Invalid request in report put: ${e}`);
       error.status = 400;
@@ -103,10 +107,11 @@ router.put(
     const report = await Report.findOne(query);
     if (!report) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey, team } = req.body;
     report.set({
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
+      team: team,
     });
     await report.save();
     return res.status(200).send({
@@ -116,6 +121,7 @@ router.put(
         encrypted: report.encrypted,
         encryptedEntityKey: report.encryptedEntityKey,
         organisation: report.organisation,
+        team: report.team,
         createdAt: report.createdAt,
         updatedAt: report.updatedAt,
         deletedAt: report.deletedAt,

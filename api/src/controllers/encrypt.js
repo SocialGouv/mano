@@ -98,51 +98,54 @@ router.post(
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of persons) {
-          await Person.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Person.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of actions) {
-          await Action.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Action.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of consultations) {
-          await Consultation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Consultation.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of treatments) {
-          await Treatment.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Treatment.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of medicalFiles) {
-          await MedicalFile.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await MedicalFile.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of comments) {
-          await Comment.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Comment.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of passages) {
-          await Passage.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Passage.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of territories) {
-          await Territory.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Territory.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of observations) {
-          await TerritoryObservation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await TerritoryObservation.update(
+            { encrypted, encryptedEntityKey },
+            { where: { _id, organisation: req.user.organisation }, transaction: tx }
+          );
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of places) {
-          await Place.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Place.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of relsPersonPlace) {
-          await RelPersonPlace.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await RelPersonPlace.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of reports) {
-          await Report.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+          await Report.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
         }
         organisation.set({
           encryptionEnabled: "true",

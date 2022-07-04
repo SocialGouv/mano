@@ -18,6 +18,8 @@ router.post(
     try {
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
+      z.string().regex(looseUuidRegex).parse(req.body.team);
     } catch (e) {
       const error = new Error(`Invalid request in passage creation: ${e}`);
       error.status = 400;
@@ -29,6 +31,9 @@ router.post(
         organisation: req.user.organisation,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
+        person: req.body.person,
+        team: req.body.team,
+        user: req.user._id,
       },
       { returning: true }
     );
@@ -40,6 +45,9 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        person: data.person,
+        team: data.team,
+        user: data.user,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -82,7 +90,7 @@ router.get(
 
     const data = await Passage.findAll({
       ...query,
-      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
+      attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "person", "team", "user", "createdAt", "updatedAt", "deletedAt"],
     });
     return res.status(200).send({ ok: true, data, hasMore: data.length === Number(limit), total });
   })
@@ -99,6 +107,9 @@ router.put(
       if (req.body.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.createdAt);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
+      z.string().regex(looseUuidRegex).parse(req.body.team);
+      z.string().regex(looseUuidRegex).parse(req.body.user);
     } catch (e) {
       const error = new Error(`Invalid request in passage put: ${e}`);
       error.status = 400;
@@ -108,11 +119,14 @@ router.put(
     const passage = await Passage.findOne(query);
     if (!passage) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { encrypted, encryptedEntityKey } = req.body;
+    const { encrypted, encryptedEntityKey, person, team, user } = req.body;
 
     const updatePassage = {
       encrypted: encrypted,
       encryptedEntityKey: encryptedEntityKey,
+      person: person,
+      team: team,
+      user: user,
     };
 
     await Passage.update(updatePassage, query, { silent: false });
@@ -125,6 +139,9 @@ router.put(
         encrypted: newPassage.encrypted,
         encryptedEntityKey: newPassage.encryptedEntityKey,
         organisation: newPassage.organisation,
+        person: newPassage.person,
+        team: newPassage.team,
+        user: newPassage.user,
         createdAt: newPassage.createdAt,
         updatedAt: newPassage.updatedAt,
         deletedAt: newPassage.deletedAt,

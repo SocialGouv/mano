@@ -24,6 +24,8 @@ router.post(
       z.enum(STATUS).parse(req.body.status);
       z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
       if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
+      z.string().regex(looseUuidRegex).parse(req.body.team);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
     } catch (e) {
@@ -32,9 +34,12 @@ router.post(
       return next(error);
     }
 
-    const { status, dueAt, completedAt, encrypted, encryptedEntityKey } = req.body;
+    const { status, dueAt, completedAt, encrypted, encryptedEntityKey, person, team, user } = req.body;
     const action = {
       organisation: req.user.organisation,
+      user: req.user._id,
+      person,
+      team,
       status,
       dueAt,
       completedAt: completedAt || null,
@@ -50,6 +55,9 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        person: data.person,
+        team: data.team,
+        user: data.user,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -112,6 +120,9 @@ router.get(
         "encrypted",
         "encryptedEntityKey",
         "organisation",
+        "person",
+        "team",
+        "user",
         "createdAt",
         "updatedAt",
         "deletedAt",
@@ -143,6 +154,9 @@ router.put(
       if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
       z.string().parse(req.body.encrypted);
       z.string().parse(req.body.encryptedEntityKey);
+      z.string().regex(looseUuidRegex).parse(req.body.person);
+      z.string().regex(looseUuidRegex).parse(req.body.team);
+      z.string().regex(looseUuidRegex).parse(req.body.user);
     } catch (e) {
       const error = new Error(`Invalid request in action put: ${e}`);
       error.status = 400;
@@ -157,13 +171,16 @@ router.put(
     });
     if (!action) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    const { status, dueAt, completedAt, encrypted, encryptedEntityKey } = req.body;
+    const { status, dueAt, completedAt, encrypted, encryptedEntityKey, person, team, user } = req.body;
     action.set({
       status,
       dueAt,
       completedAt: completedAt || null,
       encrypted,
       encryptedEntityKey,
+      person,
+      team,
+      user,
     });
     await action.save();
 
@@ -174,6 +191,9 @@ router.put(
         encrypted: action.encrypted,
         encryptedEntityKey: action.encryptedEntityKey,
         organisation: action.organisation,
+        person: action.person,
+        team: action.team,
+        user: action.user,
         createdAt: action.createdAt,
         updatedAt: action.updatedAt,
         deletedAt: action.deletedAt,
