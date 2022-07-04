@@ -66,8 +66,8 @@ User.hasMany(Place, userForeignKey);
 
 RelPersonPlace.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(RelPersonPlace, organisationForeignKey);
-RelPersonPlace.hasOne(Place, placeForeignKey);
-RelPersonPlace.hasOne(Person, personForeignKey);
+Place.belongsToMany(Person, { ...placeForeignKey, through: RelPersonPlace });
+Person.belongsToMany(Place, { ...personForeignKey, through: RelPersonPlace });
 
 // Structure
 Structure.belongsTo(Organisation, organisationForeignKey);
