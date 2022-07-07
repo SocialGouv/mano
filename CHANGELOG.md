@@ -1,3 +1,10 @@
+## [1.130.3](https://github.com/SocialGouv/mano/compare/v1.130.2...v1.130.3) (2022-07-07)
+
+
+### Bug Fixes
+
+* fix MANO-CR issue ([4d87c38](https://github.com/SocialGouv/mano/commit/4d87c38336535b13af0a568baeec3535db0343b8))
+
 ## [1.130.2](https://github.com/SocialGouv/mano/compare/v1.130.1...v1.130.2) (2022-07-04)
 
 
