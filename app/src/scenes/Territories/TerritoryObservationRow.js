@@ -43,7 +43,7 @@ const computeCustomFieldDisplay = (field, value) => {
   if (['boolean'].includes(field.type)) return showBoolean(value);
   if (['yes-no'].includes(field.type)) return value;
   if (['enum'].includes(field.type)) return value;
-  if (['multi-choice'].includes(field.type)) return value?.join(', ');
+  if (['multi-choice'].includes(field.type)) return Array.isArray(value) ? value.join(', ') : String(value || '');
   return JSON.stringify(value);
 };
 

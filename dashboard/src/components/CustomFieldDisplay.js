@@ -27,7 +27,7 @@ const CustomFieldDisplay = ({ field, value }) => {
       {!!['boolean'].includes(field.type) && showBoolean(value)}
       {!!['yes-no'].includes(field.type) && value}
       {!!['enum'].includes(field.type) && value}
-      {!!['multi-choice'].includes(field.type) && value?.join(', ')}
+      {!!['multi-choice'].includes(field.type) && (Array.isArray(value) ? value.join(', ') : String(value || ''))}
     </>
   );
 };
