@@ -1,8 +1,9 @@
 import URI from 'urijs';
+import FileViewer from "react-native-file-viewer";
 import { HOST, SCHEME, VERSION } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { capture } from './sentry';
-import ReactNativeBlobUtil from 'react-native-blob-util';
+import ReactNativeBlobUtil, { PolyfillFileReader } from 'react-native-blob-util';
 import {
   getApiLevel,
   getBrand,
@@ -24,7 +25,8 @@ import {
   getUserAgent,
   isTablet,
 } from 'react-native-device-info';
-
+import base64 from 'react-native-base64';
+const RNFS = require('react-native-fs');
 class ApiService {
   getUrl = (path, query = {}) => {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
@@ -257,6 +259,42 @@ class ApiService {
       this.blockEncrypt = this.enableEncrypt && errorDecrypt.message.includes('FAILURE');
     }
     return item;
+  };
+
+  // Download a file from a path.
+  download = async ({ path, encryptedEntityKey }) => {
+    const url = this.getUrl(path);
+    const options = {
+      method: 'GET',
+      mode: 'cors',
+      credentials: 'include',
+      headers: { Authorization: `JWT ${this.token}`, 'Content-Type': 'application/json', platform: this.platform, version: VERSION },
+    };
+    const response = await ReactNativeBlobUtil.config({
+      fileCache: true,
+    }).fetch('GET', url, options.headers);
+    const aaa = response.path();
+    console.log(aaa);
+
+    /*
+    const papath = FileViewer.open(aaa) // absolute-path-to-my-local-file.
+      .then((f) => {
+        console.log('FileViewer opened', f);
+      })
+      .catch((error) => {
+        console.log('FileViewer opened', error);
+      });
+*/
+    const res = await RNFS.readFile(aaa, 'base64');
+    console.log(res);
+    const decrypted = await decryptFile(res, encryptedEntityKey, this.hashedOrgEncryptionKey);
+    // console.log(typeof r, typeof response);
+    // console.log(r.substring(0, 100));$
+    const newPath = RNFS.TemporaryDirectoryPath + "test.png";
+    await RNFS.writeFile(newPath, decrypted, 'base64');
+    return { path: newPath, decrypted };
+    // const decrypted = await decryptFile(r, encryptedEntityKey, this.hashedOrgEncryptionKey);
+    return decrypted;
   };
 
   // Upload a file to a path.

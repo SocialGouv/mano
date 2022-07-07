@@ -62,6 +62,7 @@ const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8
 
   const nonce_uint8array = nonce_and_cypher_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
   const ciphertext_uint8array = nonce_and_cypher_uint8array.slice(sodium.crypto_secretbox_NONCEBYTES);
+  console.log("3", typeof ciphertext_uint8array, ciphertext_uint8array.length, typeof nonce_uint8array, typeof key_uint8array);
   return sodium.crypto_secretbox_open_easy(ciphertext_uint8array, nonce_uint8array, key_uint8array);
 };
 
@@ -152,6 +153,7 @@ const encryptFile = async (file, masterKey) => {
 // Decrypt a file with the master key + entity key, and return the decrypted file
 // (file: File, masterKey: Uint8Array, entityKey: Uint8Array) => Promise<File>
 const decryptFile = async (file, encryptedEntityKey, masterKey) => {
+  console.log(encryptedEntityKey, masterKey)
   const fileContent = new Uint8Array(await file.arrayBuffer());
   const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
   const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(fileContent, entityKey_bytes_array);

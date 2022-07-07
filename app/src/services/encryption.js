@@ -1,5 +1,6 @@
 /* eslint-disable no-bitwise */
 import 'fast-text-encoding'; // for TextEncoder
+import { getArrayBufferForBlob } from "react-native-blob-jsi-helper";
 const Buffer = require('buffer').Buffer;
 import sodium from 'react-native-sodium';
 import rnBase64 from 'react-native-base64';
@@ -148,4 +149,68 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   return false;
 };
 
-export { derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey, encryptFile };
+// Decrypt a file with the master key + entity key, and return the decrypted file
+// (file: File, masterKey: Uint8Array, entityKey: Uint8Array) => Promise<File>
+const decryptFile = async (fileAsBase64, encryptedEntityKey, masterKey) => {
+  console.log(encryptedEntityKey, masterKey)
+  console.log("zouzou");
+  // const fileContent = new Uint8Array(await file.arrayBuffer());
+  console.log("bubune", encryptedEntityKey, masterKey)
+  const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
+  // const content_uint8array = await _decrypt_after_extracting_nonce(fileAsBase64, entityKey_bytes_array);``
+  // const bzbz = base64js.toByteArray(fileAsBase64);
+  console.log("pieh ?");
+  console.log(rnBase64.decode(fileAsBase64))
+  console.log(new Uint8Array(Buffer.from(rnBase64.decode(fileAsBase64), 'binary')))
+
+  // const fileContent = base64js.toByteArray(fileAsBase64);
+
+
+  // const fileContent = new Uint8Array(await getArrayBufferForBlob(fileAsBase64));
+  // const fileContent = new Uint8Array(await fileAsBase64.arrayBuffer());
+  console.log("youpi ?");
+  // const content_uint8array = null;
+  try {
+    const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(
+      // new Uint8Array(fileAsBase64),
+      new Uint8Array(Buffer.from(rnBase64.decode(fileAsBase64), 'binary')),
+      entityKey_bytes_array
+    );
+    console.log("youpi.");
+    return content_uint8array;
+  } catch (e) {
+    console.log("fcatch", e);
+  }
+  /*
+  const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(
+    // new Uint8Array(fileAsBase64),
+    new Uint8Array(base64js.toByteArray(fileAsBase64)),
+    entityKey_bytes_array
+  );
+  */
+  console.log("youpi.");
+  // return content_uint8array;
+  // console.log("lol", content_uint8array.substring(0, 100));
+  // return rnBase64.decode(content_uint8array);
+  // return base64js.fromByteArray(rnBase64.decode(content_uint8array));
+  // const decryptedFile = new File([content_uint8array], file.name, { type: file.type });
+  // return decryptedFile;
+};
+
+const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8array, key_b64) => {
+  if (nonce_and_cypher_uint8array.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
+    throw new Error('Short message');
+  }
+  const nonce_uint8array = nonce_and_cypher_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
+  const ciphertext_uint8array = nonce_and_cypher_uint8array.slice(sodium.crypto_secretbox_NONCEBYTES);
+  console.log("3", typeof ciphertext_uint8array, ciphertext_uint8array.length, typeof nonce_uint8array, typeof key_b64);
+
+  const nonce_b64 = base64js.fromByteArray(nonce_uint8array);
+  const ciphertext_b64 = base64js.fromByteArray(ciphertext_uint8array);
+  // ciphertext: b64 string
+  // nonce: b64 string
+  // key: b64 string
+  return sodium.crypto_secretbox_open_easy(ciphertext_b64, nonce_b64, key_b64);
+};
+
+export { decryptFile, derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey, encryptFile };

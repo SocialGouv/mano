@@ -64,7 +64,7 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument }) => {
   return (
     <>
       {documents.map((doc) => (
-        <Document key={doc.name} document={doc} />
+        <Document key={doc.name} document={doc} personId={personDB._id} />
       ))}
       <Hint>Il n'est pour l'instant pas possible de lire, télécharger ou supprimer un document depuis l'app - seulement depuis le dashboard.</Hint>
       <Button
