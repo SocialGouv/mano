@@ -1,30 +1,20 @@
-import React, { useEffect } from 'react';
-import { Dimensions } from 'react-native';
+import React from 'react';
 import styled from 'styled-components';
 import API from '../services/api';
-import FileViewer from "react-native-file-viewer";
+import FileViewer from 'react-native-file-viewer';
 
 const Document = ({ personId, document }) => {
   console.log(document);
-  /*
-  useEffect(() => {
-    API.download({
-      path: `/person/${personId}/document/${document.file.filename}`,
-      encryptedEntityKey: document.encryptedEntityKey,
-    }).then((e) => {
-      console.log('download done', e.substring(0, 10));
-    });
-  }, [personId, document]);
-  */
   return (
     <DocumentContainer
       onPress={() => {
         API.download({
           path: `/person/${personId}/document/${document.file.filename}`,
           encryptedEntityKey: document.encryptedEntityKey,
-        }).then(({ decrypted, path }) => {
+          document,
+        }).then(({ path }) => {
           console.log('download done', path);
-          FileViewer.open(path) // absolute-path-to-my-local-file.
+          FileViewer.open(path)
             .then((f) => {
               console.log('FileViewer opened', f);
             })
@@ -35,7 +25,6 @@ const Document = ({ personId, document }) => {
       }}
       key={document.name}>
       <DocumentTitle>{document.name}</DocumentTitle>
-      <ImageStyled source={require('../assets/MANO_livraison_elements-04.png')} />
     </DocumentContainer>
   );
 };
@@ -56,10 +45,4 @@ const DocumentContainer = styled.TouchableOpacity`
 const DocumentTitle = styled.Text`
   text-align: left;
 `;
-
-const ImageStyled = styled.Image`
-  width: ${Dimensions.get('window').width * 0.7}px;
-  height: ${Dimensions.get('window').width * 0.7}px;
-`;
-
 export default Document;

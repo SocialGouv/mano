@@ -153,7 +153,6 @@ const encryptFile = async (file, masterKey) => {
 // Decrypt a file with the master key + entity key, and return the decrypted file
 // (file: File, masterKey: Uint8Array, entityKey: Uint8Array) => Promise<File>
 const decryptFile = async (file, encryptedEntityKey, masterKey) => {
-  console.log(encryptedEntityKey, masterKey)
   const fileContent = new Uint8Array(await file.arrayBuffer());
   const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
   const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(fileContent, entityKey_bytes_array);

@@ -289,9 +289,6 @@ PODS:
   - React-jsinspector (0.68.1)
   - React-logger (0.68.1):
     - glog
-  - react-native-blob-jsi-helper (0.2.1):
-    - React
-    - React-Core
   - react-native-blob-util (0.14.1):
     - React-Core
   - react-native-config (1.4.5):
@@ -489,7 +486,6 @@ DEPENDENCIES:
   - React-jsiexecutor (from `../node_modules/react-native/ReactCommon/jsiexecutor`)
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - React-logger (from `../node_modules/react-native/ReactCommon/logger`)
-  - react-native-blob-jsi-helper (from `../node_modules/react-native-blob-jsi-helper`)
   - react-native-blob-util (from `../node_modules/react-native-blob-util`)
   - react-native-config (from `../node_modules/react-native-config`)
   - react-native-image-picker (from `../node_modules/react-native-image-picker`)
@@ -591,8 +587,6 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native/ReactCommon/jsinspector"
   React-logger:
     :path: "../node_modules/react-native/ReactCommon/logger"
-  react-native-blob-jsi-helper:
-    :path: "../node_modules/react-native-blob-jsi-helper"
   react-native-blob-util:
     :path: "../node_modules/react-native-blob-util"
   react-native-config:
@@ -706,7 +700,6 @@ SPEC CHECKSUMS:
   React-jsiexecutor: 4a4bae5671b064a2248a690cf75957669489d08c
   React-jsinspector: 218a2503198ff28a085f8e16622a8d8f507c8019
   React-logger: f79dd3cc0f9b44f5611c6c7862badd891a862cf8
-  react-native-blob-jsi-helper: be675949b05dcd0f7ae55439aa11ad7d222afaa3
   react-native-blob-util: 7ac01cd4a4ba81016864727a756ce2c1af995e35
   react-native-config: 6502b1879f97ed5ac570a029961fc35ea606cd14
   react-native-image-picker: 1ccfc97709f680a7167ccb758c32466b466c96e2

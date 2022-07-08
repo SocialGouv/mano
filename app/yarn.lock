@@ -7022,11 +7022,6 @@ react-native-base64@^0.2.1:
   resolved "https://registry.yarnpkg.com/react-native-base64/-/react-native-base64-0.2.1.tgz#3d0e73a649c4c0129f7b7695d3912456aebae847"
   integrity sha512-eHgt/MA8y5ZF0aHfZ1aTPcIkDWxza9AaEk4GcpIX+ZYfZ04RcaNahO+527KR7J44/mD3efYfM23O2C1N44ByWA==
 
-react-native-blob-jsi-helper@^0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/react-native-blob-jsi-helper/-/react-native-blob-jsi-helper-0.2.1.tgz#ee2e85af1119edaa32b52c2960dd0b916513d9bd"
-  integrity sha512-HZS6IlGZXSXxs5y8GRaNNw0j8JHVHHCwtL4jBqjbE56XelIjdWmcBCm2PgsbmdoRdVfn3dbVkcfsX0rBAasZgg==
-
 react-native-blob-util@^0.14.0:
   version "0.14.1"
   resolved "https://registry.yarnpkg.com/react-native-blob-util/-/react-native-blob-util-0.14.1.tgz#2c75816888439d8062b46dd6d703f5f41e38d35a"
