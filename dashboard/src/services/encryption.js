@@ -62,7 +62,6 @@ const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8
 
   const nonce_uint8array = nonce_and_cypher_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
   const ciphertext_uint8array = nonce_and_cypher_uint8array.slice(sodium.crypto_secretbox_NONCEBYTES);
-  console.log("3", typeof ciphertext_uint8array, ciphertext_uint8array.length, typeof nonce_uint8array, typeof key_uint8array);
   return sodium.crypto_secretbox_open_easy(ciphertext_uint8array, nonce_uint8array, key_uint8array);
 };
 
