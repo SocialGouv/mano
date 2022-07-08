@@ -58,7 +58,7 @@
     "react-native-calendars": "^1.1283.0",
     "react-native-config": "^1.4.5",
     "react-native-country-picker-modal": "^2.0.0",
-    "react-native-device-info": "^9.0.0",
+    "react-native-device-info": "^10.0.0",
     "react-native-gesture-handler": "^1.10.3",
     "react-native-image-picker": "^4.7.3",
     "react-native-keychain": "^6.2.0",
