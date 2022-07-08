@@ -1,30 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Text } from 'react-native';
 import API from '../services/api';
 import FileViewer from 'react-native-file-viewer';
 
 const Document = ({ personId, document }) => {
-  console.log(document);
+  const [isLoading, setIsLoading] = useState(false);
   return (
     <DocumentContainer
       onPress={() => {
+        if (isLoading) return;
+        setIsLoading(true);
         API.download({
           path: `/person/${personId}/document/${document.file.filename}`,
           encryptedEntityKey: document.encryptedEntityKey,
           document,
         }).then(({ path }) => {
-          console.log('download done', path);
           FileViewer.open(path)
             .then((f) => {
-              console.log('FileViewer opened', f);
+              setIsLoading(false);
             })
             .catch((error) => {
-              console.log('FileViewer opened', error);
+              setIsLoading(false);
             });
         });
       }}
       key={document.name}>
-      <DocumentTitle>{document.name}</DocumentTitle>
+      {isLoading ? <Text>Chargement du document chiffré, veuillez patienter</Text> : <DocumentTitle>{document.name}</DocumentTitle>}
     </DocumentContainer>
   );
 };

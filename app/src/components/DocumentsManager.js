@@ -63,10 +63,11 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument }) => {
 
   return (
     <>
+      {documents.length > 0 && <Hint>Cliquez sur un document pour le consulter</Hint>}
       {documents.map((doc) => (
         <Document key={doc.name} document={doc} personId={personDB._id} />
       ))}
-      <Hint>Il n'est pour l'instant pas possible de lire, télécharger ou supprimer un document depuis l'app - seulement depuis le dashboard.</Hint>
+      <Hint>👉 Vous ne pouvez pas supprimer un document depuis l'application mobile (seulement depuis le dashboard)</Hint>
       <Button
         caption="Ajouter une photo"
         disabled={!!loading}
