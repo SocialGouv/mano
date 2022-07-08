@@ -268,7 +268,7 @@ class ApiService {
     }).fetch('GET', url, { Authorization: `JWT ${this.token}`, 'Content-Type': 'application/json', platform: this.platform, version: VERSION });
     const res = await RNFS.readFile(response.path(), 'base64');
     const decrypted = await decryptFile(res, encryptedEntityKey, this.hashedOrgEncryptionKey);
-    const newPath = RNFS.TemporaryDirectoryPath + document.file.originalname;
+    const newPath = RNFS.TemporaryDirectoryPath + '/' + document.file.originalname;
     await RNFS.writeFile(newPath, decrypted, 'base64');
     return { path: newPath, decrypted };
   };
