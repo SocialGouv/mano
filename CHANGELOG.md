@@ -1,3 +1,10 @@
+# [1.131.0](https://github.com/SocialGouv/mano/compare/v1.130.3...v1.131.0) (2022-07-11)
+
+
+### Features
+
+* **app:** download file ([#795](https://github.com/SocialGouv/mano/issues/795)) ([83395c5](https://github.com/SocialGouv/mano/commit/83395c5f1641dbd4c1f93e5d42b009bcb6726eca))
+
 ## [1.130.3](https://github.com/SocialGouv/mano/compare/v1.130.2...v1.130.3) (2022-07-07)
 
 
