@@ -1,11 +1,35 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
+import { Text } from 'react-native';
+import API from '../services/api';
+import FileViewer from 'react-native-file-viewer';
 
-const Document = ({ document }) => (
-  <DocumentContainer key={document.name}>
-    <DocumentTitle>{document.name}</DocumentTitle>
-  </DocumentContainer>
-);
+const Document = ({ personId, document }) => {
+  const [isLoading, setIsLoading] = useState(false);
+  return (
+    <DocumentContainer
+      onPress={() => {
+        if (isLoading) return;
+        setIsLoading(true);
+        API.download({
+          path: `/person/${personId}/document/${document.file.filename}`,
+          encryptedEntityKey: document.encryptedEntityKey,
+          document,
+        }).then(({ path }) => {
+          FileViewer.open(path)
+            .then((f) => {
+              setIsLoading(false);
+            })
+            .catch((error) => {
+              setIsLoading(false);
+            });
+        });
+      }}
+      key={document.name}>
+      {isLoading ? <Text>Chargement du document chiffré, veuillez patienter</Text> : <DocumentTitle>{document.name}</DocumentTitle>}
+    </DocumentContainer>
+  );
+};
 
 const DocumentContainer = styled.TouchableOpacity`
   border: 1px solid rgba(30, 36, 55, 0.1);
@@ -15,7 +39,7 @@ const DocumentContainer = styled.TouchableOpacity`
   align-self: center;
   justify-content: flex-start;
   align-items: center;
-  flex-direction: row;
+  flex-direction: column;
   align-self: stretch;
   margin-bottom: 15px;
 `;
@@ -23,5 +47,4 @@ const DocumentContainer = styled.TouchableOpacity`
 const DocumentTitle = styled.Text`
   text-align: left;
 `;
-
 export default Document;

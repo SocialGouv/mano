@@ -1,6 +1,6 @@
 import URI from 'urijs';
 import { HOST, SCHEME, VERSION } from '../config';
-import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile } from './encryption';
+import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { capture } from './sentry';
 import ReactNativeBlobUtil from 'react-native-blob-util';
 import {
@@ -24,7 +24,8 @@ import {
   getUserAgent,
   isTablet,
 } from 'react-native-device-info';
-
+import base64 from 'react-native-base64';
+const RNFS = require('react-native-fs');
 class ApiService {
   getUrl = (path, query = {}) => {
     return new URI().scheme(SCHEME).host(HOST).path(path).setSearch(query).toString();
@@ -257,6 +258,19 @@ class ApiService {
       this.blockEncrypt = this.enableEncrypt && errorDecrypt.message.includes('FAILURE');
     }
     return item;
+  };
+
+  // Download a file from a path.
+  download = async ({ path, encryptedEntityKey, document }) => {
+    const url = this.getUrl(path);
+    const response = await ReactNativeBlobUtil.config({
+      fileCache: true,
+    }).fetch('GET', url, { Authorization: `JWT ${this.token}`, 'Content-Type': 'application/json', platform: this.platform, version: VERSION });
+    const res = await RNFS.readFile(response.path(), 'base64');
+    const decrypted = await decryptFile(res, encryptedEntityKey, this.hashedOrgEncryptionKey);
+    const newPath = RNFS.TemporaryDirectoryPath + '/' + document.file.originalname;
+    await RNFS.writeFile(newPath, decrypted, 'base64');
+    return { path: newPath, decrypted };
   };
 
   // Upload a file to a path.

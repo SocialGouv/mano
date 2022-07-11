@@ -148,4 +148,32 @@ const checkEncryptedVerificationKey = async (encryptedVerificationKey, masterKey
   return false;
 };
 
-export { derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey, encryptFile };
+// Decrypt a file with the master key + entity key, and return the decrypted file
+// (file: File, masterKey: Uint8Array, entityKey: Uint8Array) => Promise<File>
+const decryptFile = async (fileAsBase64, encryptedEntityKey, masterKey) => {
+  const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
+  try {
+    const content_uint8array = await _decrypt_after_extracting_nonce_uint8array(
+      new Uint8Array(Buffer.from(rnBase64.decode(fileAsBase64), 'binary')),
+      entityKey_bytes_array
+    );
+    return content_uint8array;
+  } catch (e) { }
+};
+
+const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8array, key_b64) => {
+  if (nonce_and_cypher_uint8array.length < sodium.crypto_secretbox_NONCEBYTES + sodium.crypto_secretbox_MACBYTES) {
+    throw new Error('Short message');
+  }
+  const nonce_uint8array = nonce_and_cypher_uint8array.slice(0, sodium.crypto_secretbox_NONCEBYTES);
+  const ciphertext_uint8array = nonce_and_cypher_uint8array.slice(sodium.crypto_secretbox_NONCEBYTES);
+
+  const nonce_b64 = base64js.fromByteArray(nonce_uint8array);
+  const ciphertext_b64 = base64js.fromByteArray(ciphertext_uint8array);
+  // ciphertext: b64 string
+  // nonce: b64 string
+  // key: b64 string
+  return sodium.crypto_secretbox_open_easy(ciphertext_b64, nonce_b64, key_b64);
+};
+
+export { decryptFile, derivedMasterKey, generateEntityKey, encrypt, decrypt, encryptVerificationKey, checkEncryptedVerificationKey, encryptFile };

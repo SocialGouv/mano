@@ -201,7 +201,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
         data={allMedicalDocuments}
         renderItem={(medicalDocument) => (
           <DocumentRow key={medicalDocument.name}>
-            <Document document={medicalDocument} />
+            <Document document={medicalDocument} personId={personDB._id} />
           </DocumentRow>
         )}
         ifEmpty="Pas encore de document médical">
