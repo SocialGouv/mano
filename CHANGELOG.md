@@ -1,3 +1,10 @@
+# [1.133.0](https://github.com/SocialGouv/mano/compare/v1.132.1...v1.133.0) (2022-07-12)
+
+
+### Features
+
+* **dashboard:** stats by consultation type ([351043f](https://github.com/SocialGouv/mano/commit/351043fc48d57d358ee0e2e3dc566ebfe0278f4d))
+
 ## [1.132.1](https://github.com/SocialGouv/mano/compare/v1.132.0...v1.132.1) (2022-07-12)
 
 
