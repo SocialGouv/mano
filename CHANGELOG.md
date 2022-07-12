@@ -1,3 +1,10 @@
+# [1.132.0](https://github.com/SocialGouv/mano/compare/v1.131.0...v1.132.0) (2022-07-12)
+
+
+### Features
+
+* **website:** add stats ([e8c31e4](https://github.com/SocialGouv/mano/commit/e8c31e40ab91befe38895eec65f7a31d56425e20))
+
 # [1.131.0](https://github.com/SocialGouv/mano/compare/v1.130.3...v1.131.0) (2022-07-11)
 
 
