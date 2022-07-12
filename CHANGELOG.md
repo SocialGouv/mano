@@ -1,3 +1,10 @@
+## [1.133.1](https://github.com/SocialGouv/mano/compare/v1.133.0...v1.133.1) (2022-07-12)
+
+
+### Bug Fixes
+
+* **dashboard:** page navigation on persons ([16525d8](https://github.com/SocialGouv/mano/commit/16525d8dbbc3f4987752b11b3ac6f2e89895c4a5))
+
 # [1.133.0](https://github.com/SocialGouv/mano/compare/v1.132.1...v1.133.0) (2022-07-12)
 
 
