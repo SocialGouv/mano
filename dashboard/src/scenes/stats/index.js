@@ -369,40 +369,7 @@ const Stats = () => {
             //
             [customFieldsPersonsMedical, customFieldsPersonsSocial].map((customFields, key) => {
               return (
-                <React.Fragment key={key}>
-                  {customFields
-                    .filter((f) => f)
-                    .filter((f) => f.enabled)
-                    .filter((f) => f.showInStats)
-                    .filter((field) => ['number'].includes(field.type))
-                    .map((field) => (
-                      <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-                        <BlockTotal title={field.label} data={persons} field={field.name} />
-                      </Col>
-                    ))}
-                  {customFields
-                    .filter((f) => f)
-                    .filter((f) => f.enabled)
-                    .filter((f) => f.showInStats)
-                    .filter((field) => ['date', 'date-with-time'].includes(field.type))
-                    .map((field) => (
-                      <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-                        <BlockDateWithTime data={persons} field={field} />
-                      </Col>
-                    ))}
-                  {customFields
-                    .filter((f) => f)
-                    .filter((f) => f.enabled)
-                    .filter((f) => f.showInStats)
-                    .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
-                    .map((field) => (
-                      <CustomResponsivePie
-                        title={field.label}
-                        key={field.name}
-                        data={getPieData(persons, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
-                      />
-                    ))}
-                </React.Fragment>
+                <CustomFieldsStats key={key} data={persons} customFields={customFields} />
               );
             })
           }
@@ -455,38 +422,7 @@ const Stats = () => {
             />
           </div>
           <Row>
-            {customFieldsObs
-              .filter((f) => f)
-              .filter((f) => f.enabled)
-              .filter((f) => f.showInStats)
-              .filter((field) => ['number'].includes(field.type))
-              .map((field) => (
-                <Col md={4} style={{ marginBottom: '20px' }} key={field.name}>
-                  <BlockTotal title={field.label} data={observations} field={field.name} />
-                </Col>
-              ))}
-            {customFieldsObs
-              .filter((f) => f)
-              .filter((f) => f.enabled)
-              .filter((f) => f.showInStats)
-              .filter((field) => ['date', 'date-with-time'].includes(field.type))
-              .map((field) => (
-                <Col md={4} style={{ marginBottom: '20px' }} key={field.name}>
-                  <BlockDateWithTime data={observations} field={field} />
-                </Col>
-              ))}
-            {customFieldsObs
-              .filter((f) => f)
-              .filter((f) => f.enabled)
-              .filter((f) => f.showInStats)
-              .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
-              .map((field) => (
-                <CustomResponsivePie
-                  title={field.label}
-                  key={field.name}
-                  data={getPieData(observations, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
-                />
-              ))}
+            <CustomFieldsStats data={observations} customFields={customFieldsObs} />
           </Row>
         </TabPane>
         <TabPane tabId={6}>
@@ -511,6 +447,16 @@ const Stats = () => {
             title="Consultations par statut"
             data={getPieData(consultations, 'status')}
           />
+          {organisation.consultations.map(c => {
+            return (
+              <div>
+                <h4 style={{ color: "#444", fontSize: "16px" }}>Statistiques des consultations de type « {c.name} »</h4>
+                <CustomFieldsStats data={consultations.filter(
+                  (d) => d.type === c.name
+                )} customFields={c.fields} />
+              </div>
+            );
+          })}
         </TabPane>}
       </TabContent>
     </>
@@ -753,6 +699,45 @@ const BlockTotal = ({ title, unit, data, field }) => {
   }
   return null;
 };
+
+function CustomFieldsStats({ customFields, data }) {
+  return (
+    <>
+      {customFields
+        .filter((f) => f)
+        .filter((f) => f.enabled)
+        .filter((f) => f.showInStats)
+        .filter((field) => ['number'].includes(field.type))
+        .map((field) => (
+          <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+            <BlockTotal title={field.label} data={data} field={field.name} />
+          </Col>
+        ))}
+      {customFields
+        .filter((f) => f)
+        .filter((f) => f.enabled)
+        .filter((f) => f.showInStats)
+        .filter((field) => ['date', 'date-with-time'].includes(field.type))
+        .map((field) => (
+          <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
+            <BlockDateWithTime data={data} field={field} />
+          </Col>
+        ))}
+      {customFields
+        .filter((f) => f)
+        .filter((f) => f.enabled)
+        .filter((f) => f.showInStats)
+        .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
+        .map((field) => (
+          <CustomResponsivePie
+            title={field.label}
+            key={field.name}
+            data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+          />
+        ))}
+    </>
+  );
+}
 
 const Title = styled.h3`
   margin-top: 20px;
