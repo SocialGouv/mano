@@ -1,3 +1,10 @@
+## [1.132.1](https://github.com/SocialGouv/mano/compare/v1.132.0...v1.132.1) (2022-07-12)
+
+
+### Bug Fixes
+
+* **dashboard:** fix BlockCreatedAt when no user ([f41f7f6](https://github.com/SocialGouv/mano/commit/f41f7f6db4010e691f5d473824ad14397d87229e))
+
 # [1.132.0](https://github.com/SocialGouv/mano/compare/v1.131.0...v1.132.0) (2022-07-12)
 
 
