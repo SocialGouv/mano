@@ -10,6 +10,7 @@ import ActionStatus from '../../components/ActionStatus';
 import DateBloc from '../../components/DateBloc';
 import Search from '../../components/search';
 import ActionsCalendar from '../../components/ActionsCalendar';
+import ActionsWeekly from '../../components/ActionsWeekly';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
 import PersonName from '../../components/PersonName';
@@ -28,7 +29,7 @@ import { loadingState, refreshTriggerState } from '../../components/Loader';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
-const showAsOptions = ['Calendrier', 'Liste'];
+const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
 const List = () => {
   const history = useHistory();
@@ -213,6 +214,12 @@ const List = () => {
           </div>
         </Col>
       </Row>
+
+      {showAs === showAsOptions[2] && (
+        <div style={{ minHeight: '100vh' }}>
+          <ActionsWeekly actions={dataConsolidated} />
+        </div>
+      )}
 
       {showAs === showAsOptions[0] && (
         <div style={{ minHeight: '100vh' }}>
