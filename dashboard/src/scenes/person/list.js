@@ -172,7 +172,14 @@ const List = () => {
           <Search
             placeholder="Par mot clé, présent dans le nom, la description, un commentaire, une action, ..."
             value={search}
-            onChange={setSearch}
+            onChange={(value) => {
+              if (page) {
+                setPage(0);
+                setSearch(value, { sideEffect: ['page', 0] })
+              } else {
+                setSearch(value);
+              }
+            }}
           />
         </Col>
         <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
