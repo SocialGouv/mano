@@ -705,6 +705,13 @@ const BlockDateWithTime = ({ data, field }) => {
 };
 
 const BlockCreatedAt = ({ persons }) => {
+  if (persons.length === 0) {
+    return (
+      <Col md={4} style={{ marginBottom: 20 }}>
+        <Card title="Temps de suivi moyen" count={"-"} />
+      </Col>
+    );
+  }
   const averageFollowedSince =
     persons.reduce((total, person) => total + Date.parse(person.followedSince || person.createdAt), 0) / (persons.length || 1);
   const durationFromNowToAverage = Date.now() - averageFollowedSince;
@@ -720,7 +727,7 @@ const BlockCreatedAt = ({ persons }) => {
 const BlockWanderingAt = ({ persons }) => {
   persons = persons.filter((p) => Boolean(p.wanderingAt));
   if (!persons.length) {
-    return <Card title="Temps d'errance des personnes<br/>en moyenne" unit={'N/A'} count={0} />;
+    return <Col md={4} style={{ marginBottom: 20 }}><Card title="Temps d'errance des personnes<br/>en moyenne" unit={'N/A'} count={0} /></Col>;
   }
   const averageWanderingAt = persons.reduce((total, person) => total + Date.parse(person.wanderingAt), 0) / (persons.length || 1);
   const durationFromNowToAverage = Date.now() - averageWanderingAt;
