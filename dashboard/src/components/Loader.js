@@ -344,7 +344,9 @@ const Loader = () => {
       });
       if (refreshedPersons)
         setPersons(
-          refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt })).sort((p1, p2) => p1.name.localeCompare(p2.name))
+          refreshedPersons
+            .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
+            .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
         );
     }
     setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'person'));
