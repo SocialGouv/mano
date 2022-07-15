@@ -1,3 +1,10 @@
+## [1.133.6](https://github.com/SocialGouv/mano/compare/v1.133.5...v1.133.6) (2022-07-15)
+
+
+### Bug Fixes
+
+* fix MANO-CP ([47a4158](https://github.com/SocialGouv/mano/commit/47a4158a2eba56f487e7cb53a5cff7342aa19bdf))
+
 ## [1.133.5](https://github.com/SocialGouv/mano/compare/v1.133.4...v1.133.5) (2022-07-15)
 
 
