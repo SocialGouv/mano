@@ -24,7 +24,6 @@ import {
   getUserAgent,
   isTablet,
 } from 'react-native-device-info';
-import base64 from 'react-native-base64';
 const RNFS = require('react-native-fs');
 class ApiService {
   getUrl = (path, query = {}) => {
