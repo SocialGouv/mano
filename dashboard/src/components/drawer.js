@@ -123,8 +123,8 @@ const Drawer = () => {
 const Sidebar = styled.nav`
   background-color: ${theme.white};
   flex-shrink: 0;
-  max-width: 230px;
-  flex-basis: 230px;
+  max-width: 210px;
+  flex-basis: 210px;
   padding: 18px;
   display: flex;
   flex-direction: column;
