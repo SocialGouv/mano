@@ -1,3 +1,10 @@
+## [1.133.4](https://github.com/SocialGouv/mano/compare/v1.133.3...v1.133.4) (2022-07-15)
+
+
+### Bug Fixes
+
+* **security:** remove password from extra info in sentry ([2c89508](https://github.com/SocialGouv/mano/commit/2c8950847d33b7846c60bd82cab2fff727ed4c66))
+
 ## [1.133.3](https://github.com/SocialGouv/mano/compare/v1.133.2...v1.133.3) (2022-07-15)
 
 
