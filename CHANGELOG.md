@@ -1,3 +1,10 @@
+# [1.134.0](https://github.com/SocialGouv/mano/compare/v1.133.6...v1.134.0) (2022-07-15)
+
+
+### Features
+
+* **app:** release app 2.23.0 ([6032fba](https://github.com/SocialGouv/mano/commit/6032fba11fb47f34ee0ba1c25f27863736d05e1a))
+
 ## [1.133.6](https://github.com/SocialGouv/mano/compare/v1.133.5...v1.133.6) (2022-07-15)
 
 
