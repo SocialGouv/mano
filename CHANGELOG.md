@@ -1,3 +1,10 @@
+## [1.133.3](https://github.com/SocialGouv/mano/compare/v1.133.2...v1.133.3) (2022-07-15)
+
+
+### Bug Fixes
+
+* fit content ([e83b6cf](https://github.com/SocialGouv/mano/commit/e83b6cf31a920a8f9586c3f1ee781b5ea0339b71))
+
 ## [1.133.2](https://github.com/SocialGouv/mano/compare/v1.133.1...v1.133.2) (2022-07-13)
 
 
