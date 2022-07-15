@@ -85,7 +85,7 @@ const Consultation = ({ navigation, route }) => {
   const onSaveConsultationRequest = async () => {
     if (!consultation.name) return Alert.alert('Veuillez indiquer un nom');
     if (!consultation.status) return Alert.alert('Veuillez indiquer un status');
-    if (!consultation.dueAt) return Alert.alert('Veuillez indiquer un dueAt');
+    if (!consultation.dueAt) return Alert.alert('Veuillez indiquer une date');
     if (!consultation.type) return Alert.alert('Veuillez indiquer un type');
     Keyboard.dismiss();
     setPosting(true);
@@ -158,8 +158,7 @@ const Consultation = ({ navigation, route }) => {
       {
         text: 'Enregistrer',
         onPress: async () => {
-          const response = await onSaveConsultationRequest();
-          if (response.ok) onBack();
+          await onSaveConsultationRequest();
         },
       },
       {
