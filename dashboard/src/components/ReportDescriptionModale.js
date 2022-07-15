@@ -25,7 +25,7 @@ const ReportDescriptionModale = ({ report }) => {
         <ModalBody>
           <Formik
             className="noprint"
-            initialValues={{ ...report, description: report.description || window.sessionStorage.getItem('currentReportDescription') }}
+            initialValues={{ ...report, description: report.description || window.sessionStorage.getItem('currentReportDescription') || '' }}
             onSubmit={async (body) => {
               const reportUpdate = {
                 ...report,
