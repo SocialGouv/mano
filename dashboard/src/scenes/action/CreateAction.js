@@ -82,6 +82,7 @@ const CreateAction = ({
         color="primary"
         title={title}
         padding={smallButton ? '8px 14px' : '12px 24px'}
+        {...(smallButton ? { style: { height: 'fit-content' } } : {})}
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>{title}</ModalHeader>
