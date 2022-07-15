@@ -205,8 +205,8 @@ const Consultation = ({ navigation, route }) => {
                   value={consultation[name]}
                   handleChange={(newValue) => onChange({ [name]: newValue })}
                   editable
-                // ref={(r) => (refs.current[`${name}-ref`] = r)}
-                // onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
+                  // ref={(r) => (refs.current[`${name}-ref`] = r)}
+                  // onFocus={() => _scrollToInput(refs.current[`${name}-ref`])}
                 />
               );
             })}
