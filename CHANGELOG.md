@@ -1,3 +1,10 @@
+## [1.133.5](https://github.com/SocialGouv/mano/compare/v1.133.4...v1.133.5) (2022-07-15)
+
+
+### Bug Fixes
+
+* **dahsboard:** empty collaboration MANO-CQ ([3888ce2](https://github.com/SocialGouv/mano/commit/3888ce215e1087161340a6404cecc893b42a2757))
+
 ## [1.133.4](https://github.com/SocialGouv/mano/compare/v1.133.3...v1.133.4) (2022-07-15)
 
 
