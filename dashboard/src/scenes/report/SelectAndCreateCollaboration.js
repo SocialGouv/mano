@@ -24,7 +24,9 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
     onChangeRequest([...(values || []), collab]);
     const response = await API.put({
       path: `/organisation/${organisation._id}`,
-      body: { collaborations: [...(organisation.collaborations || []), collab].sort((c1, c2) => c1.localeCompare(c2)) },
+      body: {
+        collaborations: [...(organisation.collaborations || []), collab].filter((e) => Boolean(e.trim())).sort((c1, c2) => c1.localeCompare(c2)),
+      },
     });
     if (response.ok) {
       toastr.clean();
