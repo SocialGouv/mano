@@ -1,3 +1,10 @@
+# [1.137.0](https://github.com/SocialGouv/mano/compare/v1.136.0...v1.137.0) (2022-07-18)
+
+
+### Features
+
+* **dashboard:** calendar weekly ([#798](https://github.com/SocialGouv/mano/issues/798)) ([e1f3285](https://github.com/SocialGouv/mano/commit/e1f3285cc82867524a0e40f4eeabd3ac47019abc))
+
 # [1.136.0](https://github.com/SocialGouv/mano/compare/v1.135.0...v1.136.0) (2022-07-18)
 
 
