@@ -1,3 +1,10 @@
+# [1.138.0](https://github.com/SocialGouv/mano/compare/v1.137.0...v1.138.0) (2022-07-18)
+
+
+### Features
+
+* **dashboard:** services stats chart in reception ([e12f25c](https://github.com/SocialGouv/mano/commit/e12f25c91308e99540386ed945b61afe184fcfb2))
+
 # [1.137.0](https://github.com/SocialGouv/mano/compare/v1.136.0...v1.137.0) (2022-07-18)
 
 
