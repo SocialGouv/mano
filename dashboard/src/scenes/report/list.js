@@ -23,7 +23,13 @@ const List = () => {
   return (
     <>
       <SmallerHeaderWithBackButton
-        title={`Comptes rendus de l'équipe ${currentTeam?.nightSession ? 'de nuit ' : ''}${currentTeam?.name || ''}`}
+        titleStyle={{ fontWeight: '400' }}
+        title={
+          <span>
+            Comptes rendus de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
+            <b>{currentTeam?.name || ''}</b>
+          </span>
+        }
         onRefresh={() => {
           setRefreshTrigger({
             status: true,
