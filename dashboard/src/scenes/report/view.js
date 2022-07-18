@@ -19,7 +19,7 @@ import BackButton, { BackButtonWrapper } from '../../components/backButton';
 import Box from '../../components/Box';
 import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
-import CreateAction from '../action/CreateAction';
+import CreateActionModal from '../../components/CreateActionModal';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
 import { actionsState, CANCEL, DONE } from '../../recoil/actions';
@@ -50,6 +50,7 @@ import useTitle from '../../services/useTitle';
 import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
+import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
 const tabs = [
   'Résumé',
@@ -425,6 +426,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const allActions = useRecoilValue(actionsState);
 
+  const [modalOpen, setModalOpen] = useState(false);
   const data = useMemo(
     () =>
       allActions
@@ -450,7 +452,16 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
       <StyledBox>
         {status === DONE && (
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <CreateAction completedAt={completedAt} isMulti />
+            <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} completedAt={completedAt} isMulti />
+            <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+              <ButtonCustom
+                icon={agendaIcon}
+                onClick={() => setModalOpen(true)}
+                color="primary"
+                title={`Créer une nouvelle action faite le ${formatDateWithFullMonth(completedAt)}`}
+                padding={'12px 24px'}
+              />
+            </div>
           </div>
         )}
         <Table

@@ -7,7 +7,7 @@ import { SmallerHeaderWithBackButton } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-import CreateAction from '../action/CreateAction';
+import CreateActionModal from '../../components/CreateActionModal';
 import SelectAndCreatePerson from './SelectAndCreatePerson';
 import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
@@ -110,6 +110,7 @@ const Reception = () => {
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const consultationsByStatus = useRecoilValue(consultationsByStatusSelector({ status }));
   const [todaysPassagesOpen, setTodaysPassagesOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const dataConsolidated = useMemo(
     () => [...actionsByStatus, ...consultationsByStatus].sort((a, b) => new Date(b.dueAt || b.date) - new Date(a.dueAt || a.date)),
@@ -257,7 +258,25 @@ const Reception = () => {
             classNamePrefix="person-select-and-create-reception"
           />
         </div>
-        <CreateAction smallButton icon={plusIcon} title="Action" buttonOnly isMulti persons={selectedPersons.map((p) => p?._id).filter(Boolean)} />
+        <ButtonCustom
+          icon={plusIcon}
+          onClick={() => setModalOpen(true)}
+          color="primary"
+          title="Action"
+          padding={'8px 14px'}
+          style={{ height: 'fit-content' }}
+        />
+        <CreateActionModal
+          open={modalOpen}
+          setOpen={(value) => setModalOpen(value)}
+          smallButton
+          icon={plusIcon}
+          title="Action"
+          buttonOnly
+          isMulti
+          persons={selectedPersons.map((p) => p?._id).filter(Boolean)}
+        />
+
         <ButtonCustom
           onClick={onAddPassageForPersons}
           color="primary"

@@ -11,7 +11,7 @@ import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
-import CreateAction from '../action/CreateAction';
+import CreateActionModal from '../../components/CreateActionModal';
 import Comments from '../../components/Comments';
 import ActionStatus from '../../components/ActionStatus';
 import Table from '../../components/table';
@@ -58,6 +58,7 @@ import { medicalFileState } from '../../recoil/medicalFiles';
 import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
 import MergeTwoPersons from './MergeTwoPersons';
+import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages'];
@@ -574,6 +575,7 @@ const Actions = ({ person, onUpdateResults }) => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
 
+  const [modalOpen, setModalOpen] = useState(false);
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
 
@@ -606,7 +608,16 @@ const Actions = ({ person, onUpdateResults }) => {
     <React.Fragment>
       <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
         <Title>Actions</Title>
-        <CreateAction person={person._id} />
+        <CreateActionModal person={person._id} open={modalOpen} setOpen={(value) => setModalOpen(value)} />
+        <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+          <ButtonCustom
+            icon={agendaIcon}
+            onClick={() => setModalOpen(true)}
+            color="primary"
+            title="Créer une nouvelle action"
+            padding={'12px 24px'}
+          />
+        </div>
       </div>
       {data.length ? (
         <Row>
