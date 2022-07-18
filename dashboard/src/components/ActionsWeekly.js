@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Badge, Button } from 'reactstrap';
 import styled from 'styled-components';
@@ -9,11 +9,18 @@ import PersonName from './PersonName';
 
 // TODO: remove inline style when UI is stabilized.
 
-export default function ActionsWeekly({ actions }) {
-  const [startOfWeek, setStartOfWeek] = useState(dayjsInstance().startOf('week'));
+export default function ActionsWeekly({ actions, onCreateAction }) {
+  const [startOfWeek, setStartOfWeek] = useState(dayjsInstance(window.localStorage.getItem('startOfWeek')).startOf('week'));
+
   const actionsInWeek = useMemo(() => {
     return actions.filter((action) => dayjsInstance(action.dueAt).isBetween(startOfWeek, startOfWeek.add(7, 'day').endOf('day')));
   }, [actions, startOfWeek]);
+
+  useEffect(() => {
+    window.localStorage.setItem('startOfWeek', startOfWeek.toISOString());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [startOfWeek]);
+
   return (
     <div>
       <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem', marginBottom: '1rem', alignItems: 'center' }}>
@@ -57,7 +64,9 @@ export default function ActionsWeekly({ actions }) {
                   {day.format('D')}
                 </div>
               </div>
-              <ActionsOfDay actions={actionsInWeek.filter((action) => isOnSameDay(action.dueAt, day))} />
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+                <ActionsOfDay actions={actionsInWeek.filter((action) => isOnSameDay(action.dueAt, day))} />
+              </div>
             </div>
           );
         })}
@@ -82,7 +91,7 @@ function ActionsOfDay({ actions }) {
   ];
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+    <>
       {sortedActions.map((action) => (
         <div
           onClick={() => {
@@ -135,7 +144,7 @@ function ActionsOfDay({ actions }) {
           <ActionStatus status={action.status} />
         </div>
       ))}
-    </div>
+    </>
   );
 }
 
