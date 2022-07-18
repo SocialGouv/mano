@@ -46,7 +46,7 @@ const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrga
   );
 };
 
-const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Observations', 'Comptes-rendus', "Consultations"];
+const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Observations', 'Comptes-rendus', 'Consultations'];
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -95,12 +95,7 @@ const Stats = () => {
     currentTeam,
     viewAllOrganisationData
   );
-  const consultations = getDataForPeriod(
-    allConsultations,
-    period,
-    currentTeam,
-    true
-  );
+  const consultations = getDataForPeriod(allConsultations, period, currentTeam, true);
   const observations = getDataForPeriod(
     allObservations
       .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
@@ -218,16 +213,18 @@ const Stats = () => {
         )}
       </Row>
       <Nav tabs style={{ marginBottom: 20 }}>
-        {tabs.filter(e => user.healthcareProfessional || e !== 'Consultations').map((tabCaption, index) => {
-          if (!organisation.receptionEnabled && index === 1) return null;
-          return (
-            <NavItem key={index} style={{ cursor: 'pointer' }}>
-              <NavLink key={index} className={`${activeTab === index && 'active'}`} onClick={() => setActiveTab(index)}>
-                {tabCaption}
-              </NavLink>
-            </NavItem>
-          );
-        })}
+        {tabs
+          .filter((e) => user.healthcareProfessional || e !== 'Consultations')
+          .map((tabCaption, index) => {
+            if (!organisation.receptionEnabled && index === 1) return null;
+            return (
+              <NavItem key={index} style={{ cursor: 'pointer' }}>
+                <NavLink key={index} className={`${activeTab === index && 'active'}`} onClick={() => setActiveTab(index)}>
+                  {tabCaption}
+                </NavLink>
+              </NavItem>
+            );
+          })}
       </Nav>
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0}>
@@ -244,13 +241,19 @@ const Stats = () => {
             <Title>Statistiques de l'accueil</Title>
             <Row>
               <Block data={passages.length} title="Nombre de passages" />
-              {organisation.services?.map((service) => (
-                <Block
-                  key={service}
-                  data={reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0)}
-                  title={service}
-                />
-              ))}
+            </Row>
+            <Row>
+              <CustomResponsivePie
+                title="Services"
+                data={organisation.services?.map((service) => {
+                  console.log(organisation.services);
+                  return {
+                    id: service,
+                    label: service,
+                    value: reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0),
+                  };
+                })}
+              />
             </Row>
           </TabPane>
         )}
@@ -368,9 +371,7 @@ const Stats = () => {
             // In this particular case, we can use index as a key since order is always the same.
             //
             [customFieldsPersonsMedical, customFieldsPersonsSocial].map((customFields, key) => {
-              return (
-                <CustomFieldsStats key={key} data={persons} customFields={customFields} />
-              );
+              return <CustomFieldsStats key={key} data={persons} customFields={customFields} />;
             })
           }
         </TabPane>
@@ -432,32 +433,26 @@ const Stats = () => {
             data={getPieData(reports, 'collaborations', { options: organisation.collaborations || [] })}
           />
         </TabPane>
-        {user.healthcareProfessional && <TabPane tabId={7}>
-          <Title>Statistiques des consultations</Title>
-          <Row style={{ marginBottom: '20px' }}>
-            <Col md={4} />
-            <Block data={consultations} title="Nombre de consultations" />
-            <Col md={4} />
-          </Row>
-          <CustomResponsivePie
-            title="Consultations par type"
-            data={getPieData(consultations, 'type')}
-          />
-          <CustomResponsivePie
-            title="Consultations par statut"
-            data={getPieData(consultations, 'status')}
-          />
-          {organisation.consultations.map(c => {
-            return (
-              <div>
-                <h4 style={{ color: "#444", fontSize: "16px" }}>Statistiques des consultations de type « {c.name} »</h4>
-                <CustomFieldsStats data={consultations.filter(
-                  (d) => d.type === c.name
-                )} customFields={c.fields} />
-              </div>
-            );
-          })}
-        </TabPane>}
+        {user.healthcareProfessional && (
+          <TabPane tabId={7}>
+            <Title>Statistiques des consultations</Title>
+            <Row style={{ marginBottom: '20px' }}>
+              <Col md={4} />
+              <Block data={consultations} title="Nombre de consultations" />
+              <Col md={4} />
+            </Row>
+            <CustomResponsivePie title="Consultations par type" data={getPieData(consultations, 'type')} />
+            <CustomResponsivePie title="Consultations par statut" data={getPieData(consultations, 'status')} />
+            {organisation.consultations.map((c) => {
+              return (
+                <div>
+                  <h4 style={{ color: '#444', fontSize: '16px' }}>Statistiques des consultations de type « {c.name} »</h4>
+                  <CustomFieldsStats data={consultations.filter((d) => d.type === c.name)} customFields={c.fields} />
+                </div>
+              );
+            })}
+          </TabPane>
+        )}
       </TabContent>
     </>
   );
@@ -654,7 +649,7 @@ const BlockCreatedAt = ({ persons }) => {
   if (persons.length === 0) {
     return (
       <Col md={4} style={{ marginBottom: 20 }}>
-        <Card title="Temps de suivi moyen" count={"-"} />
+        <Card title="Temps de suivi moyen" count={'-'} />
       </Col>
     );
   }
@@ -673,7 +668,11 @@ const BlockCreatedAt = ({ persons }) => {
 const BlockWanderingAt = ({ persons }) => {
   persons = persons.filter((p) => Boolean(p.wanderingAt));
   if (!persons.length) {
-    return <Col md={4} style={{ marginBottom: 20 }}><Card title="Temps d'errance des personnes<br/>en moyenne" unit={'N/A'} count={0} /></Col>;
+    return (
+      <Col md={4} style={{ marginBottom: 20 }}>
+        <Card title="Temps d'errance des personnes<br/>en moyenne" unit={'N/A'} count={0} />
+      </Col>
+    );
   }
   const averageWanderingAt = persons.reduce((total, person) => total + Date.parse(person.wanderingAt), 0) / (persons.length || 1);
   const durationFromNowToAverage = Date.now() - averageWanderingAt;
