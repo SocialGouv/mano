@@ -1,3 +1,10 @@
+# [1.136.0](https://github.com/SocialGouv/mano/compare/v1.135.0...v1.136.0) (2022-07-18)
+
+
+### Features
+
+* **dashboard:** person created today in report ([5e4d3d4](https://github.com/SocialGouv/mano/commit/5e4d3d451a4d6c00efa156eb96b4dcb9d249ebd2))
+
 # [1.135.0](https://github.com/SocialGouv/mano/compare/v1.134.0...v1.135.0) (2022-07-18)
 
 
