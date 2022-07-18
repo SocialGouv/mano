@@ -1,3 +1,10 @@
+# [1.135.0](https://github.com/SocialGouv/mano/compare/v1.134.0...v1.135.0) (2022-07-18)
+
+
+### Features
+
+* **dashboard,app:** add new resources select options ([c36373c](https://github.com/SocialGouv/mano/commit/c36373c0d36239dcc5ce2b565210f2ff2ecbef4c))
+
 # [1.134.0](https://github.com/SocialGouv/mano/compare/v1.133.6...v1.134.0) (2022-07-15)
 
 
