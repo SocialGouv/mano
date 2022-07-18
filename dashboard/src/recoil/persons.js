@@ -169,6 +169,8 @@ export const ressourcesOptions = [
   'Allocation Chômage',
   'Indemnités journalières',
   'Mendicité',
+  'Aide financière CCAS',
+  'Revenus de Formations',
   'Autre',
 ];
 
