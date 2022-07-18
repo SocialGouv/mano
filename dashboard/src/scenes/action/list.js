@@ -1,8 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Col, Label, Row } from 'reactstrap';
+import { Col, Label, Row, Button } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
-import CreateAction from './CreateAction';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import CreateActionModal from '../../components/CreateActionModal';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import Page from '../../components/pagination';
 import Table from '../../components/table';
@@ -24,12 +24,16 @@ import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
+import { loadingState, refreshTriggerState } from '../../components/Loader';
+import ButtonCustom from '../../components/ButtonCustom';
+import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
 const showAsOptions = ['Calendrier', 'Liste'];
 
 const List = () => {
   const history = useHistory();
   useTitle('Agenda');
+  const [modalOpen, setModalOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);
   const consultations = useRecoilValue(consultationsState);
@@ -37,6 +41,8 @@ const List = () => {
   const persons = useRecoilValue(personsWithPlacesSelector);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
+  const loading = useRecoilValue(loadingState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
   const [search, setSearch] = useSearchParamState('search', '');
@@ -119,7 +125,31 @@ const List = () => {
       />
       <Row style={{ marginBottom: 20, justifyContent: 'center' }}>
         <Col md={12}>
-          <CreateAction disabled={!currentTeam} isMulti refreshable />
+          <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
+            <Button
+              onClick={() => {
+                setRefreshTrigger({
+                  status: true,
+                  options: { showFullScreen: false, initialLoad: false },
+                });
+              }}
+              disabled={!!loading}
+              color="link"
+              style={{ marginRight: 10 }}>
+              Rafraichir
+            </Button>
+            <ButtonCustom
+              icon={agendaIcon}
+              disabled={!currentTeam}
+              onClick={() => setModalOpen(true)}
+              color="primary"
+              title="Créer une nouvelle action"
+              padding={'12px 24px'}
+            />
+          </div>
+        </Col>
+        <Col md={12}>
+          <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
         </Col>
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
