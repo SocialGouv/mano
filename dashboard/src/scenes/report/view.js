@@ -51,10 +51,20 @@ import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 
-const tabs = ['Résumé', 'Accueil', 'Actions complétées', 'Actions créées', 'Actions annulées', 'Commentaires', 'Passages', 'Observations'];
+const tabs = [
+  'Résumé',
+  'Accueil',
+  'Actions complétées',
+  'Actions créées',
+  'Actions annulées',
+  'Commentaires',
+  'Passages',
+  'Observations',
+  'Personnes créées',
+];
 const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
 const tabsForRestrictedRole = ['Accueil', 'Passages'];
-const spaceAfterTab = [0, 1, 4, 5, 6, 7];
+const spaceAfterTab = [0, 1, 4, 5, 6, 7, 8];
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -297,25 +307,28 @@ const View = () => {
                 <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                   <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />
                 </div>
+                <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Personnes créées (${total})`)} />
+                </div>
                 {!!user.healthcareProfessional && (
                   <>
-                    <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                    <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <Consultations
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(8, `Consultations faites (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(9, `Consultations faites (${total})`)}
                         status={DONE}
                       />
                     </div>
-                    <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                    <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <ConsultationsCreatedAt
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(9, `Consultations créées (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(10, `Consultations créées (${total})`)}
                       />
                     </div>
-                    <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                    <div style={activeTab !== 11 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <Consultations
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(10, `Consultations annulées (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(11, `Consultations annulées (${total})`)}
                         status={CANCEL}
                       />
                     </div>
@@ -987,6 +1000,58 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
       </StyledBox>
       <CreateObservation observation={observation} forceOpen={openObservationModale} />
       <hr />
+    </>
+  );
+};
+
+const PersonCreatedAt = ({ date, onUpdateResults = () => null }) => {
+  const history = useHistory();
+  const currentTeam = useRecoilValue(currentTeamState);
+  const persons = useRecoilValue(personsState);
+
+  const data = useMemo(
+    () =>
+      persons
+        .filter((o) => (o.assignedTeams || []).includes(currentTeam._id))
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0)),
+    [currentTeam._id, currentTeam?.nightSession, date, persons]
+  );
+
+  useEffect(() => {
+    onUpdateResults(data.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.length]);
+
+  if (!data) return <div />;
+  const moreThanOne = data.length > 1;
+
+  return (
+    <>
+      <StyledBox>
+        <Table
+          className="Table"
+          title={`Personne${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
+          noData="Pas de personnes créées ce jour"
+          data={data}
+          onRowClick={(person) => {
+            if (person) history.push(`/person/${person._id}`);
+          }}
+          rowKey="_id"
+          columns={[
+            {
+              title: 'Heure',
+              dataKey: 'createdAt',
+              render: (obs) => <span>{dayjs(obs.createdAt).format('HH:mm')}</span>,
+            },
+            { title: 'Personne (nom)', dataKey: 'name' },
+            {
+              title: 'Utilisateur (créateur)',
+              dataKey: 'user',
+              render: (obs) => <UserName id={obs.user} />,
+            },
+          ]}
+        />
+      </StyledBox>
     </>
   );
 };
