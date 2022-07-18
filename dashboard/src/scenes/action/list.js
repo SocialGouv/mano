@@ -10,6 +10,7 @@ import ActionStatus from '../../components/ActionStatus';
 import DateBloc from '../../components/DateBloc';
 import Search from '../../components/search';
 import ActionsCalendar from '../../components/ActionsCalendar';
+import ActionsWeekly from '../../components/ActionsWeekly';
 import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
 import PersonName from '../../components/PersonName';
@@ -28,7 +29,7 @@ import { loadingState, refreshTriggerState } from '../../components/Loader';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
-const showAsOptions = ['Calendrier', 'Liste'];
+const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
 const List = () => {
   const history = useHistory();
@@ -50,6 +51,7 @@ const List = () => {
   const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
   const [categories, setCategories] = useSearchParamState('categories', []);
 
+  const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useState(window.localStorage.getItem('showAs') || showAsOptions[0]); // calendar, list
 
   // List of actions filtered by current team and selected statuses.
@@ -141,16 +143,17 @@ const List = () => {
             <ButtonCustom
               icon={agendaIcon}
               disabled={!currentTeam}
-              onClick={() => setModalOpen(true)}
+              onClick={() => {
+                setActionDate(new Date());
+                setModalOpen(true);
+              }}
               color="primary"
               title="Créer une nouvelle action"
               padding={'12px 24px'}
             />
           </div>
         </Col>
-        <Col md={12}>
-          <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
-        </Col>
+        <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
@@ -213,6 +216,18 @@ const List = () => {
           </div>
         </Col>
       </Row>
+
+      {showAs === showAsOptions[2] && (
+        <div style={{ minHeight: '100vh' }}>
+          <ActionsWeekly
+            actions={dataConsolidated}
+            onCreateAction={(date) => {
+              setActionDate(date);
+              setModalOpen(true);
+            }}
+          />
+        </div>
+      )}
 
       {showAs === showAsOptions[0] && (
         <div style={{ minHeight: '100vh' }}>

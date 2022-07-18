@@ -17,7 +17,7 @@ import ButtonCustom from './ButtonCustom';
 import SelectStatus from './SelectStatus';
 import SelectCustom from './SelectCustom';
 
-const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, open = false, setOpen = () => {} }) => {
+const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
@@ -45,7 +45,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
             name: '',
             person: isMulti ? persons : person,
             team: null,
-            dueAt: !!completedAt ? new Date(completedAt) : new Date(),
+            dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
             withTime: false,
             status: !!completedAt ? DONE : TODO,
             categories: [],
