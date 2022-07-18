@@ -76,7 +76,7 @@ function ActionsOfDay({ actions }) {
     ...actions
       .filter((action) => !action.urgent)
       .filter((action) => Boolean(action.withTime))
-      .sort((a, b) => a.dueAt - b.dueAt),
+      .sort((a, b) => dayjsInstance(a.dueAt).diff(dayjsInstance(b.dueAt))),
     // Then actions without time.
     ...actions.filter((action) => !action.urgent).filter((action) => !action.withTime),
   ];
@@ -101,6 +101,7 @@ function ActionsOfDay({ actions }) {
             gap: '0.5rem',
             display: 'flex',
             flexDirection: 'column',
+            cursor: 'pointer',
           }}>
           {(Boolean(action.isConsultation) || Boolean(action.urgent)) && (
             <div>
