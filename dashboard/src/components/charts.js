@@ -73,7 +73,7 @@ export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisT
       <Col md={12}>
         <CardTitle>{title}</CardTitle>
       </Col>
-      <DataWrapper md={6}>
+      <DataWrapper md={4}>
         <Data>
           <tbody>
             {[...data].map((item) => (
@@ -91,6 +91,7 @@ export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisT
           </tbody>
         </Data>
       </DataWrapper>
+      <Col md={2}> </Col>
       <Col md={6}>
         <BarContainer>
           <ResponsiveBar
@@ -165,10 +166,8 @@ const DataWrapper = styled(Col)`
 `;
 
 const Data = styled.table`
-  flex-basis: 25%;
-  flex-shrink: 0;
-  flex-grow: 0;
   border: 1px solid #aaa;
+  width: 100%;
   /* font-size: 0.7em; */
   td {
     border: 1px solid #aaa;
