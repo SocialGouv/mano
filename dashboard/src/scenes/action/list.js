@@ -51,6 +51,7 @@ const List = () => {
   const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
   const [categories, setCategories] = useSearchParamState('categories', []);
 
+  const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useState(window.localStorage.getItem('showAs') || showAsOptions[0]); // calendar, list
 
   // List of actions filtered by current team and selected statuses.
@@ -142,16 +143,17 @@ const List = () => {
             <ButtonCustom
               icon={agendaIcon}
               disabled={!currentTeam}
-              onClick={() => setModalOpen(true)}
+              onClick={() => {
+                setActionDate(new Date());
+                setModalOpen(true);
+              }}
               color="primary"
               title="Créer une nouvelle action"
               padding={'12px 24px'}
             />
           </div>
         </Col>
-        <Col md={12}>
-          <CreateActionModal open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
-        </Col>
+        <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
       </Row>
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
@@ -217,7 +219,13 @@ const List = () => {
 
       {showAs === showAsOptions[2] && (
         <div style={{ minHeight: '100vh' }}>
-          <ActionsWeekly actions={dataConsolidated} />
+          <ActionsWeekly
+            actions={dataConsolidated}
+            onCreateAction={(date) => {
+              setActionDate(date);
+              setModalOpen(true);
+            }}
+          />
         </div>
       )}
 

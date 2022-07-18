@@ -66,6 +66,7 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
                 <ActionsOfDay actions={actionsInWeek.filter((action) => isOnSameDay(action.dueAt, day))} />
+                <ButtonAddAction onClick={() => onCreateAction(day.toDate())}>+ ajouter une action</ButtonAddAction>
               </div>
             </div>
           );
@@ -147,6 +148,18 @@ function ActionsOfDay({ actions }) {
     </>
   );
 }
+
+const ButtonAddAction = styled.button`
+  all: unset;
+  margin: 0 auto;
+  cursor: pointer;
+  color: #aaa;
+  font-size: 11px;
+  &:hover {
+    color: #888;
+    text-decoration: underline;
+  }
+`;
 
 const WeekContainer = styled.div`
   display: grid;
