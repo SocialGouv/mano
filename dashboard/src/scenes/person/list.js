@@ -53,7 +53,12 @@ const List = () => {
         return false;
       });
     }
-    return pFiltered;
+    return pFiltered.map((person) => {
+      return {
+        ...person,
+        formattedBirthDate: formatBirthDate(person.birthdate),
+      };
+    });
   }, [persons, filterTeams, filters, alertness]);
 
   // The next memos are used to filter by search (empty array when search is empty).
@@ -175,7 +180,7 @@ const List = () => {
             onChange={(value) => {
               if (page) {
                 setPage(0);
-                setSearch(value, { sideEffect: ['page', 0] })
+                setSearch(value, { sideEffect: ['page', 0] });
               } else {
                 setSearch(value);
               }
@@ -234,10 +239,10 @@ const List = () => {
             dataKey: '_id',
             render: (p) => {
               if (!p.birthdate) return '';
-              else if (p.outOfActiveList) return <i style={{ color: theme.black50 }}>{formatBirthDate(p.birthdate)}</i>;
+              else if (p.outOfActiveList) return <i style={{ color: theme.black50 }}>{p.formattedBirthDate}</i>;
               return (
                 <span>
-                  <i>{formatBirthDate(p.birthdate)}</i>
+                  <i>{p.formattedBirthDate}</i>
                 </span>
               );
             },

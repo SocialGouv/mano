@@ -21,7 +21,7 @@ import { territoriesState } from '../../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import PersonName from '../../components/PersonName';
-import { formatDateWithFullMonth, formatTime } from '../../services/date';
+import { formatBirthDate, formatDateWithFullMonth, formatTime } from '../../services/date';
 import { refreshTriggerState } from '../../components/Loader';
 import { placesState } from '../../recoil/places';
 import { filterBySearch } from './utils';
@@ -170,7 +170,15 @@ const Persons = ({ search, onUpdateResults }) => {
 
   const data = useMemo(() => {
     if (!search?.length) return [];
-    return filterBySearch(search, persons);
+    return filterBySearch(
+      search,
+      persons.map((person) => {
+        return {
+          ...person,
+          formattedBirthDate: formatBirthDate(person.birthdate),
+        };
+      })
+    );
   }, [search, persons]);
 
   useEffect(() => {
