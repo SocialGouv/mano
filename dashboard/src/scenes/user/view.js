@@ -9,7 +9,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
-import Box from '../../components/Box';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectRole from '../../components/SelectRole';
 import { organisationState, userState } from '../../recoil/auth';
@@ -42,108 +41,106 @@ const View = () => {
   return (
     <>
       <SmallerHeaderWithBackButton />
-      <Box>
-        <Formik
-          initialValues={{
-            name: localUser.name,
-            email: localUser.email,
-            team: localUser.team,
-            role: localUser.role,
-            healthcareProfessional: localUser.healthcareProfessional,
-          }}
-          onSubmit={async (body, actions) => {
-            try {
-              if (!body.team?.length) return toastr.error('Erreur !', 'Au moins une équipe est obligatoire');
-              body.organisation = organisation._id;
-              const res = await API.put({ path: `/user/${id}`, body });
-              if (!res.ok) return actions.setSubmitting(false);
-              if (user._id === id) {
-                const { data } = await API.get({ path: `/user/${id}` });
-                setUser(data);
-                AppSentry.setUser(data);
-              }
-              actions.setSubmitting(false);
-              toastr.success('Mis à jour !');
-            } catch (errorUpdatingUser) {
-              console.log('error in updating user', errorUpdatingUser);
-              toastr.error('Erreur!', errorUpdatingUser.message);
+      <Formik
+        initialValues={{
+          name: localUser.name,
+          email: localUser.email,
+          team: localUser.team,
+          role: localUser.role,
+          healthcareProfessional: localUser.healthcareProfessional,
+        }}
+        onSubmit={async (body, actions) => {
+          try {
+            if (!body.team?.length) return toastr.error('Erreur !', 'Au moins une équipe est obligatoire');
+            body.organisation = organisation._id;
+            const res = await API.put({ path: `/user/${id}`, body });
+            if (!res.ok) return actions.setSubmitting(false);
+            if (user._id === id) {
+              const { data } = await API.get({ path: `/user/${id}` });
+              setUser(data);
+              AppSentry.setUser(data);
             }
-          }}>
-          {({ values, handleChange, handleSubmit, isSubmitting }) => (
-            <React.Fragment>
-              <Row>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="name">Nom</Label>
-                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="email">Email</Label>
-                    <Input name="email" id="email" value={values.email} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="team">Équipes</Label>
-                    <div>
-                      <SelectTeamMultiple
-                        onChange={(team) => handleChange({ target: { value: team || [], name: 'team' } })}
-                        organisation={organisation._id}
-                        value={values.team || []}
-                        colored
-                        required
-                        inputId="team"
-                      />
-                    </div>
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="role">Role</Label>
-                    <SelectRole handleChange={handleChange} value={values.role} />
-                  </FormGroup>
-                </Col>
-                <Col md={12}>
-                  <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
-                    <input
-                      type="checkbox"
-                      id="healthcareProfessional"
-                      style={{ marginRight: '0.5rem' }}
-                      name="healthcareProfessional"
-                      checked={values.healthcareProfessional}
-                      onChange={() => {
-                        handleChange({ target: { value: !values.healthcareProfessional, name: 'healthcareProfessional' } });
-                      }}
-                    />
-                    Professionnel de santé
-                  </Label>
+            actions.setSubmitting(false);
+            toastr.success('Mis à jour !');
+          } catch (errorUpdatingUser) {
+            console.log('error in updating user', errorUpdatingUser);
+            toastr.error('Erreur!', errorUpdatingUser.message);
+          }
+        }}>
+        {({ values, handleChange, handleSubmit, isSubmitting }) => (
+          <React.Fragment>
+            <Row>
+              <Col md={6}>
+                <FormGroup>
+                  <Label htmlFor="name">Nom</Label>
+                  <Input name="name" id="name" value={values.name} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label htmlFor="email">Email</Label>
+                  <Input name="email" id="email" value={values.email} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label htmlFor="team">Équipes</Label>
                   <div>
-                    <small className="text-muted">Un professionnel de santé à accès au dossier médical complet des personnes.</small>
+                    <SelectTeamMultiple
+                      onChange={(team) => handleChange({ target: { value: team || [], name: 'team' } })}
+                      organisation={organisation._id}
+                      value={values.team || []}
+                      colored
+                      required
+                      inputId="team"
+                    />
                   </div>
-                </Col>
-              </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                {id !== user._id && (
-                  <DeleteButtonAndConfirmModal
-                    title={`Voulez-vous vraiment supprimer l'utilisateur ${organisation.name}`}
-                    textToConfirm={organisation.name}
-                    onConfirm={async () => {
-                      const res = await API.delete({ path: `/user/${id}` });
-                      if (!res.ok) return;
-                      toastr.success('Suppression réussie');
-                      history.goBack();
-                    }}>
-                    <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>Cette opération est irréversible</span>
-                  </DeleteButtonAndConfirmModal>
-                )}
-                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
-              </div>
-            </React.Fragment>
-          )}
-        </Formik>
-      </Box>
+                </FormGroup>
+              </Col>
+              <Col md={6}>
+                <FormGroup>
+                  <Label htmlFor="role">Role</Label>
+                  <SelectRole handleChange={handleChange} value={values.role} />
+                </FormGroup>
+              </Col>
+              <Col md={12}>
+                <Label htmlFor="healthcareProfessional" style={{ marginBottom: 0 }}>
+                  <input
+                    type="checkbox"
+                    id="healthcareProfessional"
+                    style={{ marginRight: '0.5rem' }}
+                    name="healthcareProfessional"
+                    checked={values.healthcareProfessional}
+                    onChange={() => {
+                      handleChange({ target: { value: !values.healthcareProfessional, name: 'healthcareProfessional' } });
+                    }}
+                  />
+                  Professionnel de santé
+                </Label>
+                <div>
+                  <small className="text-muted">Un professionnel de santé à accès au dossier médical complet des personnes.</small>
+                </div>
+              </Col>
+            </Row>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              {id !== user._id && (
+                <DeleteButtonAndConfirmModal
+                  title={`Voulez-vous vraiment supprimer l'utilisateur ${organisation.name}`}
+                  textToConfirm={organisation.name}
+                  onConfirm={async () => {
+                    const res = await API.delete({ path: `/user/${id}` });
+                    if (!res.ok) return;
+                    toastr.success('Suppression réussie');
+                    history.goBack();
+                  }}>
+                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>Cette opération est irréversible</span>
+                </DeleteButtonAndConfirmModal>
+              )}
+              <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+            </div>
+          </React.Fragment>
+        )}
+      </Formik>
     </>
   );
 };

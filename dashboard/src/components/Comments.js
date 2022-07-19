@@ -4,7 +4,6 @@ import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, 
 import { toastr } from 'react-redux-toastr';
 import DatePicker from 'react-datepicker';
 
-import Box from './Box';
 import ButtonCustom from '../components/ButtonCustom';
 import UserName from './UserName';
 import SelectUser from './SelectUser';
@@ -99,48 +98,46 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
           <Title>Commentaires</Title>
         </Col>
       </Row>
-      <Box>
-        {!comments.length && !!loading ? (
-          <Loading />
-        ) : (
-          <>
-            <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment />
-            {comments.map((comment) => {
-              return (
-                <StyledComment key={comment._id} urgent={comment.urgent} onClick={() => setEditing(comment._id)}>
-                  <CloseButton
-                    close
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      deleteData(comment._id);
-                    }}
-                  />
-                  <UserName id={comment.user} wrapper={(name) => <div className="author">{name}</div>} />
-                  <div className="user"></div>
-                  <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
-                  <div className="content">
-                    {!!comment.urgent && <ExclamationMarkButton />}
-                    <p>
-                      {comment.comment
-                        ? comment.comment.split('\n').map((c, i, a) => {
-                            if (i === a.length - 1) return <React.Fragment key={i}>{c}</React.Fragment>;
-                            return (
-                              <React.Fragment key={i}>
-                                {c}
-                                <br />
-                              </React.Fragment>
-                            );
-                          })
-                        : ''}
-                    </p>
-                  </div>
-                </StyledComment>
-              );
-            })}
-            {!!loading && <Loading />}
-          </>
-        )}
-      </Box>
+      {!comments.length && !!loading ? (
+        <Loading />
+      ) : (
+        <>
+          <EditingComment key={clearNewCommentKey} onSubmit={addData} newComment />
+          {comments.map((comment) => {
+            return (
+              <StyledComment key={comment._id} urgent={comment.urgent} onClick={() => setEditing(comment._id)}>
+                <CloseButton
+                  close
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    deleteData(comment._id);
+                  }}
+                />
+                <UserName id={comment.user} wrapper={(name) => <div className="author">{name}</div>} />
+                <div className="user"></div>
+                <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
+                <div className="content">
+                  {!!comment.urgent && <ExclamationMarkButton />}
+                  <p>
+                    {comment.comment
+                      ? comment.comment.split('\n').map((c, i, a) => {
+                          if (i === a.length - 1) return <React.Fragment key={i}>{c}</React.Fragment>;
+                          return (
+                            <React.Fragment key={i}>
+                              {c}
+                              <br />
+                            </React.Fragment>
+                          );
+                        })
+                      : ''}
+                  </p>
+                </div>
+              </StyledComment>
+            );
+          })}
+          {!!loading && <Loading />}
+        </>
+      )}
       <EditingComment
         commentId={editingId}
         value={comments.find((c) => c._id === editingId)}
@@ -166,7 +163,11 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
 
   return (
     <>
-      {!!newComment && <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />}
+      {!!newComment && (
+        <div>
+          <ButtonCustom title="Ajouter un commentaire" onClick={() => setOpen(true)} style={{ marginBottom: 20 }} />
+        </div>
+      )}
       <Modal isOpen={!!open} toggle={onCancelRequest} size="lg" backdrop="static">
         <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
         <ModalBody>
