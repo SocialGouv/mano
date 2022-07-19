@@ -669,7 +669,7 @@ const BlockWanderingAt = ({ persons }) => {
   if (!persons.length) {
     return (
       <Col md={4} style={{ marginBottom: 20 }}>
-        <Card title="Temps d'errance des personnes<br/>en moyenne" unit={'N/A'} count={0} />
+        <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={'N/A'} count={0} />
       </Col>
     );
   }
@@ -679,7 +679,7 @@ const BlockWanderingAt = ({ persons }) => {
 
   return (
     <Col md={4} style={{ marginBottom: 20 }}>
-      <Card title="Temps d'errance des personnes<br/>en moyenne" unit={unit} count={count} />
+      <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={unit} count={count} />
     </Col>
   );
 };

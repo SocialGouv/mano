@@ -21,7 +21,7 @@ const Card = ({ title, count, unit, children, onChange, countId }) => {
 
   return (
     <CardWrapper>
-      {!!title && <CardTitle dangerouslySetInnerHTML={{ __html: title }} />}
+      {!!title && <CardTitle>{title}</CardTitle>}
       <CardCount withChildren={!!children}>
         {!!onChange ? (
           <InputStyled
@@ -43,7 +43,7 @@ const Card = ({ title, count, unit, children, onChange, countId }) => {
 
 const CardWrapper = styled.div`
   background: ${theme.white};
-  padding: 24px 0 40px;
+  padding: 24px 12px 40px;
   border-radius: 20px;
   display: flex;
   height: 100%;
