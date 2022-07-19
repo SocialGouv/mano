@@ -1,3 +1,10 @@
+# [1.140.0](https://github.com/SocialGouv/mano/compare/v1.139.1...v1.140.0) (2022-07-19)
+
+
+### Features
+
+* **dashboard:** interface simplification ([#802](https://github.com/SocialGouv/mano/issues/802)) ([11c9568](https://github.com/SocialGouv/mano/commit/11c9568c9f5de137d2ea2e4d274b27b8f94d11d7))
+
 ## [1.139.1](https://github.com/SocialGouv/mano/compare/v1.139.0...v1.139.1) (2022-07-19)
 
 
