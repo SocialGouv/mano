@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
@@ -41,7 +41,7 @@ const List = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton titleStyle={{ fontWeight: 400 }} title="Structures" />
+      <SmallHeader title="Structures" />
       <Row style={{ marginBottom: 20 }}>
         <Col>
           <Create onChange={() => setRefresh(true)} />

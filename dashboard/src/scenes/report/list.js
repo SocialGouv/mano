@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Collapse } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeader } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import { theme } from '../../config';
 import styled from 'styled-components';
@@ -22,8 +22,7 @@ const List = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton
-        titleStyle={{ fontWeight: '400' }}
+      <SmallHeader
         title={
           <span>
             Comptes rendus de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}

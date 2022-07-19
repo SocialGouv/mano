@@ -88,7 +88,6 @@ const View = () => {
   return (
     <>
       <Header
-        titleStyle={{ fontWeight: '400' }}
         title="Rechercher"
         onRefresh={() => {
           setRefreshTrigger({

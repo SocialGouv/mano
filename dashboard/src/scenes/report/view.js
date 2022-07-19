@@ -13,7 +13,7 @@ import {
   startOfToday,
 } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeader } from '../../components/header';
 import Loading from '../../components/loading';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
 import Box from '../../components/Box';
@@ -184,7 +184,7 @@ const View = () => {
         height: 'calc(100% + 4rem)',
         overflow: 'hidden',
       }}>
-      <SmallerHeaderWithBackButton
+      <SmallHeader
         style={{ width: '100%', padding: 0 }}
         titleStyle={{ width: '100%' }}
         title={
@@ -217,10 +217,9 @@ const View = () => {
                 <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onFirstLaterReport} />
               </div>
             </div>
-            <div style={{ padding: '0 4rem' }}>
-              {`Compte rendu de l'équipe ${currentTeam?.name || ''}`}
-              <br />
-              {getPeriodTitle(report.date, currentTeam?.nightSession)}
+            <div style={{ padding: '0 2rem', fontWeight: '400' }}>
+              {`Compte rendu de l'équipe `}
+              <b>{currentTeam?.name || ''}</b> - {getPeriodTitle(report.date, currentTeam?.nightSession)}
             </div>
           </div>
         }

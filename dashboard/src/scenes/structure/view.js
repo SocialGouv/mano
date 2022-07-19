@@ -6,7 +6,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
@@ -34,7 +34,7 @@ const View = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton />
+      <SmallHeaderWithBackButton />
       <Formik
         initialValues={structure}
         onSubmit={async (body) => {

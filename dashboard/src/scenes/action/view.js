@@ -8,7 +8,7 @@ import DatePicker from 'react-datepicker';
 
 import SelectPerson from '../../components/SelectPerson';
 
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 
 import ButtonCustom from '../../components/ButtonCustom';
@@ -68,7 +68,7 @@ const View = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton
+      <SmallHeaderWithBackButton
         onRefresh={() =>
           setRefreshTrigger({
             status: true,

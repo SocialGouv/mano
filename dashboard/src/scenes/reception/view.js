@@ -3,7 +3,7 @@ import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { toastr } from 'react-redux-toastr';
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeader } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
@@ -239,8 +239,7 @@ const Reception = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton
-        titleStyle={{ fontWeight: '400' }}
+      <SmallHeader
         title={
           <span>
             Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}

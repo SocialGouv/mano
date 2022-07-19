@@ -5,7 +5,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeader } from '../../components/header';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -39,7 +39,7 @@ const List = () => {
   if (!users) return <Loading />;
   return (
     <>
-      <SmallerHeaderWithBackButton titleStyle={{ fontWeight: 400 }} title="Utilisateurs" />
+      <SmallHeader title="Utilisateurs" />
       {['superadmin', 'admin'].includes(user.role) && <Create onChange={() => setRefresh(true)} />}
       <Table
         data={users}
