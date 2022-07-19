@@ -6,7 +6,6 @@ import { toastr } from 'react-redux-toastr';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
-import Box from './Box';
 import ButtonCustom from './ButtonCustom';
 import { placesState } from '../recoil/places';
 import Table from './table';
