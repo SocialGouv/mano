@@ -40,18 +40,16 @@ const Places = ({ personId = '', onUpdateResults }) => {
         <Col md={4} />
         <Col md={4}></Col>
       </Row>
-      <Box>
-        <Table
-          data={data}
-          rowKey={'_id'}
-          onRowClick={(relation) => history.push(`/place/${relation?.place?._id}`)}
-          columns={[
-            { title: 'Nom', render: (relation) => relation?.place?.name },
-            { title: 'Ajouté le', dataKey: 'createdAt', render: (relation) => formatDateWithFullMonth(relation.createdAt) },
-          ]}
-        />
-        <AddPlace personId={personId} />
-      </Box>
+      <AddPlace personId={personId} />
+      <Table
+        data={data}
+        rowKey={'_id'}
+        onRowClick={(relation) => history.push(`/place/${relation?.place?._id}`)}
+        columns={[
+          { title: 'Nom', render: (relation) => relation?.place?.name },
+          { title: 'Ajouté le', dataKey: 'createdAt', render: (relation) => formatDateWithFullMonth(relation.createdAt) },
+        ]}
+      />
     </React.Fragment>
   );
 };
@@ -72,8 +70,8 @@ const AddPlace = ({ personId }) => {
   const API = useApi();
 
   return (
-    <div style={{ marginTop: 15, marginBottom: 30 }}>
-      <ButtonCustom disabled={!currentTeam} onClick={() => setOpen(true)} color="primary" title="Ajouter un lieu" padding="12px 24px" />
+    <div>
+      <ButtonCustom disabled={!currentTeam} onClick={() => setOpen(true)} color="primary" title="Ajouter un lieu" />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Ajouter un lieu</ModalHeader>
         <ModalBody>

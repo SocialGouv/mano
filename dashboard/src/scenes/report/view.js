@@ -180,8 +180,8 @@ const View = () => {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        margin: '0 -4rem -3rem',
-        height: 'calc(100% + 3rem)',
+        margin: '-1rem -3rem -3rem',
+        height: 'calc(100% + 4rem)',
         overflow: 'hidden',
       }}>
       <SmallerHeaderWithBackButton

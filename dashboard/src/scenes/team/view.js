@@ -8,7 +8,6 @@ import { toastr } from 'react-redux-toastr';
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
-import Box from '../../components/Box';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, teamsState } from '../../recoil/auth';
 import useApi from '../../services/api';
@@ -42,70 +41,68 @@ const View = () => {
   return (
     <>
       <SmallerHeaderWithBackButton />
-      <Box>
-        <Formik
-          initialValues={team}
-          onSubmit={async (body) => {
-            try {
-              const response = await API.put({ path: `/team/${team._id}`, body });
-              if (response.ok) {
-                toastr.success('Mise à jour !');
-                setTeams(
-                  teams.map((t) => {
-                    if (t._id !== id) return t;
-                    return response.data;
-                  })
-                );
-                if (currentTeam._id === id) setCurrentTeam(response.data);
-              }
-            } catch (errorUpdatingTeam) {
-              console.log('error in updating team', errorUpdatingTeam);
-              toastr.error('Erreur!', errorUpdatingTeam.message);
+      <Formik
+        initialValues={team}
+        onSubmit={async (body) => {
+          try {
+            const response = await API.put({ path: `/team/${team._id}`, body });
+            if (response.ok) {
+              toastr.success('Mise à jour !');
+              setTeams(
+                teams.map((t) => {
+                  if (t._id !== id) return t;
+                  return response.data;
+                })
+              );
+              if (currentTeam._id === id) setCurrentTeam(response.data);
             }
-          }}>
-          {({ values, handleChange, handleSubmit, isSubmitting }) => (
-            <React.Fragment>
-              <Row>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="name">Nom</Label>
-                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={6} />
-                <Col md={12}>
-                  <FormGroup>
-                    <Label />
-                    <div style={{ display: 'flex', marginLeft: 20, width: '80%' }}>
-                      <label htmlFor="nightSession">Maraude de nuit</label>
-                      <Input type="checkbox" name="nightSession" id="nightSession" checked={values.nightSession} onChange={handleChange} />
-                      <NightSessionModale />
-                    </div>
-                  </FormGroup>
-                </Col>
-              </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                <DeleteButtonAndConfirmModal
-                  title={`Voulez-vous vraiment supprimer l'équipe ${team.name}`}
-                  textToConfirm={team.name}
-                  onConfirm={async () => {
-                    const res = await API.delete({ path: `/team/${id}` });
-                    if (!res.ok) return;
-                    setTeams(teams.filter((t) => t._id !== id));
-                    toastr.success('Suppression réussie');
-                    history.goBack();
-                  }}>
-                  <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-                    Cette opération est irréversible
-                    <br />
-                  </span>
-                </DeleteButtonAndConfirmModal>
-                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
-              </div>
-            </React.Fragment>
-          )}
-        </Formik>
-      </Box>
+          } catch (errorUpdatingTeam) {
+            console.log('error in updating team', errorUpdatingTeam);
+            toastr.error('Erreur!', errorUpdatingTeam.message);
+          }
+        }}>
+        {({ values, handleChange, handleSubmit, isSubmitting }) => (
+          <React.Fragment>
+            <Row>
+              <Col md={6}>
+                <FormGroup>
+                  <Label htmlFor="name">Nom</Label>
+                  <Input name="name" id="name" value={values.name} onChange={handleChange} />
+                </FormGroup>
+              </Col>
+              <Col md={6} />
+              <Col md={12}>
+                <FormGroup>
+                  <Label />
+                  <div style={{ display: 'flex', marginLeft: 20, width: '80%' }}>
+                    <label htmlFor="nightSession">Maraude de nuit</label>
+                    <Input type="checkbox" name="nightSession" id="nightSession" checked={values.nightSession} onChange={handleChange} />
+                    <NightSessionModale />
+                  </div>
+                </FormGroup>
+              </Col>
+            </Row>
+            <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+              <DeleteButtonAndConfirmModal
+                title={`Voulez-vous vraiment supprimer l'équipe ${team.name}`}
+                textToConfirm={team.name}
+                onConfirm={async () => {
+                  const res = await API.delete({ path: `/team/${id}` });
+                  if (!res.ok) return;
+                  setTeams(teams.filter((t) => t._id !== id));
+                  toastr.success('Suppression réussie');
+                  history.goBack();
+                }}>
+                <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                  Cette opération est irréversible
+                  <br />
+                </span>
+              </DeleteButtonAndConfirmModal>
+              <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+            </div>
+          </React.Fragment>
+        )}
+      </Formik>
     </>
   );
 };

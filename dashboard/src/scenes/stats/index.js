@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import Header from '../../components/header';
+import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import {
   healthInsuranceOptions,
@@ -165,9 +165,10 @@ const Stats = () => {
 
   return (
     <>
-      <Header
+      <SmallerHeaderWithBackButton
+        titleStyle={{ fontWeight: '400' }}
         title={
-          <>
+          <span>
             Statistiques{' '}
             {viewAllOrganisationData ? (
               <>
@@ -179,15 +180,15 @@ const Stats = () => {
                 <b>{currentTeam?.name || ''}</b>
               </>
             )}
-          </>
+          </span>
         }
-        titleStyle={{ fontWeight: 400 }}
-        onRefresh={() =>
+        onRefresh={() => {
           setRefreshTrigger({
             status: true,
             options: { initialLoad: false, showFullScreen: false },
-          })
-        }
+          });
+        }}
+        loading={!!loading}
       />
       <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
         <Col md={4} style={{ flexShrink: 0, minWidth: '15rem', padding: 0 }}>

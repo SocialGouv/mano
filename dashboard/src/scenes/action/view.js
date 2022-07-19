@@ -10,7 +10,6 @@ import SelectPerson from '../../components/SelectPerson';
 
 import { SmallerHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
-import Box from '../../components/Box';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import Comments from '../../components/Comments';
@@ -81,191 +80,187 @@ const View = () => {
         {`${action?.name}`}
         <UserName id={action.user} wrapper={(name) => ` (créée par ${name})`} />
       </Title>
-      <Box>
-        <Formik
-          initialValues={action}
-          onSubmit={async (body) => {
-            const statusChanged = body.status && action.status !== body.status;
+      <Formik
+        initialValues={action}
+        onSubmit={async (body) => {
+          const statusChanged = body.status && action.status !== body.status;
+          if (statusChanged) {
+            if ([DONE, CANCEL].includes(body.status)) {
+              // When status changed to finished (done, cancel) completedAt we set it to now if not set.
+              body.completedAt = body.completedAt || now();
+            } else {
+              // When status just changed to "todo" we set completedAt to null (since it's not done yet).
+              body.completedAt = null;
+            }
+          }
+          const actionResponse = await API.put({
+            path: `/action/${body._id}`,
+            body: prepareActionForEncryption(body),
+          });
+          if (actionResponse.ok) {
+            const newAction = actionResponse.decryptedData;
+            setActions((actions) =>
+              actions.map((a) => {
+                if (a._id === newAction._id) return newAction;
+                return a;
+              })
+            );
             if (statusChanged) {
-              if ([DONE, CANCEL].includes(body.status)) {
-                // When status changed to finished (done, cancel) completedAt we set it to now if not set.
-                body.completedAt = body.completedAt || now();
-              } else {
-                // When status just changed to "todo" we set completedAt to null (since it's not done yet).
-                body.completedAt = null;
-              }
+              const comment = {
+                comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
+                action: action._id,
+                team: currentTeam._id,
+                user: user._id,
+                organisation: organisation._id,
+              };
+              const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
+              if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
             }
-            const actionResponse = await API.put({
-              path: `/action/${body._id}`,
-              body: prepareActionForEncryption(body),
+            toastr.success('Mise à jour !');
+            setRefreshTrigger({
+              status: true,
+              options: { showFullScreen: false, initialLoad: false },
             });
-            if (actionResponse.ok) {
-              const newAction = actionResponse.decryptedData;
-              setActions((actions) =>
-                actions.map((a) => {
-                  if (a._id === newAction._id) return newAction;
-                  return a;
-                })
-              );
-              if (statusChanged) {
-                const comment = {
-                  comment: `${user.name} a changé le status de l'action: ${
-                    mappedIdsToLabels.find((status) => status._id === newAction.status)?.name
-                  }`,
-                  action: action._id,
-                  team: currentTeam._id,
-                  user: user._id,
-                  organisation: organisation._id,
-                };
-                const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-                if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
-              }
-              toastr.success('Mise à jour !');
-              setRefreshTrigger({
-                status: true,
-                options: { showFullScreen: false, initialLoad: false },
-              });
-            }
-          }}>
-          {({ values, handleChange, handleSubmit, isSubmitting }) => {
-            return (
-              <React.Fragment>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="name">Nom</Label>
-                      <Input name="name" id="name" type="textarea" value={values.name} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={3}>
-                    <Label htmlFor="update-action-select-status">Statut</Label>
-                    <SelectStatus
-                      name="status"
-                      value={values.status || ''}
-                      onChange={handleChange}
-                      inputId="update-action-select-status"
-                      classNamePrefix="update-action-select-status"
+          }
+        }}>
+        {({ values, handleChange, handleSubmit, isSubmitting }) => {
+          return (
+            <React.Fragment>
+              <Row>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label htmlFor="name">Nom</Label>
+                    <Input name="name" id="name" type="textarea" value={values.name} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={3}>
+                  <Label htmlFor="update-action-select-status">Statut</Label>
+                  <SelectStatus
+                    name="status"
+                    value={values.status || ''}
+                    onChange={handleChange}
+                    inputId="update-action-select-status"
+                    classNamePrefix="update-action-select-status"
+                  />
+                </Col>
+                <Col md={3}>
+                  <FormGroup>
+                    <Label htmlFor="team">Sous l'équipe</Label>
+                    <SelectTeam
+                      teams={user.role === 'admin' ? teams : user.teams}
+                      teamId={values.team}
+                      inputId="team"
+                      onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                     />
-                  </Col>
-                  <Col md={3}>
-                    <FormGroup>
-                      <Label htmlFor="team">Sous l'équipe</Label>
-                      <SelectTeam
-                        teams={user.role === 'admin' ? teams : user.teams}
-                        teamId={values.team}
-                        inputId="team"
-                        onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label htmlFor="dueAt">À faire le</Label>
+                    <div>
+                      <DatePicker
+                        id="dueAt"
+                        locale="fr"
+                        className="form-control"
+                        selected={dateForDatePicker(values.dueAt ?? new Date())}
+                        onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
+                        dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
+                        showTimeInput={values.withTime}
                       />
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
+                    </div>
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  <FormGroup>
+                    <Label />
+                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                      <label htmlFor="withTime">Afficher l'heure</label>
+                      <Input
+                        type="checkbox"
+                        id="withTime"
+                        name="withTime"
+                        checked={values.withTime || false}
+                        onChange={() => {
+                          handleChange({ target: { name: 'withTime', checked: Boolean(!values.withTime), value: Boolean(!values.withTime) } });
+                        }}
+                      />
+                    </div>
+                  </FormGroup>
+                </Col>
+                <Col md={4}>
+                  {[DONE, CANCEL].includes(values.status) && (
                     <FormGroup>
-                      <Label htmlFor="dueAt">À faire le</Label>
+                      {values.status === DONE && <Label htmlFor="completedAt">Faite le</Label>}
+                      {values.status === CANCEL && <Label htmlFor="completedAt">Annulée le</Label>}
                       <div>
                         <DatePicker
-                          id="dueAt"
+                          id="completedAt"
                           locale="fr"
                           className="form-control"
-                          selected={dateForDatePicker(values.dueAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
-                          dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
-                          showTimeInput={values.withTime}
+                          selected={dateForDatePicker(values.completedAt ?? new Date())}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
+                          timeInputLabel="Heure :"
+                          dateFormat="dd/MM/yyyy HH:mm"
+                          showTimeInput
                         />
                       </div>
                     </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label />
-                      <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                        <label htmlFor="withTime">Afficher l'heure</label>
-                        <Input
-                          type="checkbox"
-                          id="withTime"
-                          name="withTime"
-                          checked={values.withTime || false}
-                          onChange={() => {
-                            handleChange({ target: { name: 'withTime', checked: Boolean(!values.withTime), value: Boolean(!values.withTime) } });
-                          }}
-                        />
-                      </div>
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    {[DONE, CANCEL].includes(values.status) && (
-                      <FormGroup>
-                        {values.status === DONE && <Label htmlFor="completedAt">Faite le</Label>}
-                        {values.status === CANCEL && <Label htmlFor="completedAt">Annulée le</Label>}
-                        <div>
-                          <DatePicker
-                            id="completedAt"
-                            locale="fr"
-                            className="form-control"
-                            selected={dateForDatePicker(values.completedAt ?? new Date())}
-                            onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
-                            timeInputLabel="Heure :"
-                            dateFormat="dd/MM/yyyy HH:mm"
-                            showTimeInput
-                          />
-                        </div>
-                      </FormGroup>
-                    )}
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <SelectPerson value={values.person} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="categories">Catégories</Label>
-                      <SelectCustom
-                        options={catsSelect}
-                        inputId="categories"
-                        name="categories"
-                        onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
-                        isClearable={false}
-                        isMulti
-                        value={values.categories || []}
-                        getOptionValue={(i) => i}
-                        getOptionLabel={(i) => i}
+                  )}
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <SelectPerson value={values.person} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={6}>
+                  <FormGroup>
+                    <Label htmlFor="categories">Catégories</Label>
+                    <SelectCustom
+                      options={catsSelect}
+                      inputId="categories"
+                      name="categories"
+                      onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                      isClearable={false}
+                      isMulti
+                      value={values.categories || []}
+                      getOptionValue={(i) => i}
+                      getOptionLabel={(i) => i}
+                    />
+                  </FormGroup>
+                </Col>
+                <Col md={12}>
+                  <FormGroup>
+                    <Label htmlFor="description">Description</Label>
+                    <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
+                  </FormGroup>
+                </Col>
+                <Col md={12}>
+                  <FormGroup>
+                    <Label htmlFor="create-action-urgent">
+                      <input
+                        type="checkbox"
+                        id="create-action-urgent"
+                        style={{ marginRight: '0.5rem' }}
+                        name="urgent"
+                        checked={values.urgent}
+                        onChange={() => {
+                          handleChange({ target: { name: 'urgent', checked: Boolean(!values.urgent), value: Boolean(!values.urgent) } });
+                        }}
                       />
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label htmlFor="description">Description</Label>
-                      <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label htmlFor="create-action-urgent">
-                        <input
-                          type="checkbox"
-                          id="create-action-urgent"
-                          style={{ marginRight: '0.5rem' }}
-                          name="urgent"
-                          checked={values.urgent}
-                          onChange={() => {
-                            handleChange({ target: { name: 'urgent', checked: Boolean(!values.urgent), value: Boolean(!values.urgent) } });
-                          }}
-                        />
-                        Action prioritaire <br />
-                        <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
-                      </Label>
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                  <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} />
-                  <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
-                </div>
-              </React.Fragment>
-            );
-          }}
-        </Formik>
-      </Box>
+                      Action prioritaire <br />
+                      <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
+                    </Label>
+                  </FormGroup>
+                </Col>
+              </Row>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} />
+                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+              </div>
+            </React.Fragment>
+          );
+        }}
+      </Formik>
       <Comments actionId={action._id} />
     </>
   );

@@ -6,7 +6,6 @@ import styled from 'styled-components';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import Box from '../../components/Box';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
 import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
@@ -69,10 +68,10 @@ const View = () => {
   }, [tab]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', margin: '0 -4rem -3rem', height: 'calc(100% + 3rem)' }}>
-      <Title>Réglages de l'organisation {organisation.name}</Title>
+    <div style={{ display: 'flex', flexDirection: 'column', margin: '-1rem -3rem -3rem', height: 'calc(100% + 4rem)' }}>
+      <Title>Configuration de l'organisation {organisation.name}</Title>
       <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
-        <Drawer title="Navigation dans les réglages de l'organisation">
+        <Drawer title="Navigation dans la configuration de l'organisation">
           <DrawerButton className={tab === 'infos' ? 'active' : ''} onClick={() => setTab('infos')}>
             Infos
           </DrawerButton>
@@ -110,481 +109,465 @@ const View = () => {
             Import
           </DrawerButton>
         </Drawer>
-        <div ref={scrollContainer} style={{ overflow: 'auto', flexBasis: '100%' }}>
-          <Box>
-            <Formik
-              initialValues={{ ...organisation, receptionEnabled: organisation.receptionEnabled || false }}
-              onSubmit={async (body) => {
-                try {
-                  const response = await API.put({ path: `/organisation/${organisation._id}`, body });
-                  if (response.ok) {
-                    toastr.success('Mise à jour !');
-                    setOrganisation(response.data);
-                  }
-                } catch (orgUpdateError) {
-                  console.log('error in updating organisation', orgUpdateError);
-                  toastr.error('Erreur!', orgUpdateError.message);
+        <div ref={scrollContainer} style={{ overflow: 'auto', flexBasis: '100%', padding: '15px 25px 20px' }}>
+          <Formik
+            initialValues={{ ...organisation, receptionEnabled: organisation.receptionEnabled || false }}
+            onSubmit={async (body) => {
+              try {
+                const response = await API.put({ path: `/organisation/${organisation._id}`, body });
+                if (response.ok) {
+                  toastr.success('Mise à jour !');
+                  setOrganisation(response.data);
                 }
-              }}>
-              {({ values, handleChange, handleSubmit, isSubmitting }) => {
-                switch (tab) {
-                  default:
-                  case 'infos':
-                    return (
-                      <>
-                        <SubTitle>Informations générales</SubTitle>
-                        <Row>
-                          <Col md={6}>
-                            <FormGroup>
-                              <Label htmlFor="name">Nom</Label>
-                              <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
-                          <DeleteButtonAndConfirmModal
-                            title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
-                            textToConfirm={organisation.name}
-                            onConfirm={async () => {
-                              try {
-                                const res = await API.delete({ path: `/organisation/${organisation._id}` });
-                                if (res.ok) {
-                                  toastr.success('Organisation supprimée');
-                                  API.logout();
-                                }
-                              } catch (organisationDeleteError) {
-                                capture(organisationDeleteError, { extra: { organisation }, user });
-                                toastr.error('Erreur!', organisationDeleteError.message);
+              } catch (orgUpdateError) {
+                console.log('error in updating organisation', orgUpdateError);
+                toastr.error('Erreur!', orgUpdateError.message);
+              }
+            }}>
+            {({ values, handleChange, handleSubmit, isSubmitting }) => {
+              switch (tab) {
+                default:
+                case 'infos':
+                  return (
+                    <>
+                      <SubTitle>Informations générales</SubTitle>
+                      <Row>
+                        <Col md={6}>
+                          <FormGroup>
+                            <Label htmlFor="name">Nom</Label>
+                            <Input name="name" id="name" value={values.name} onChange={handleChange} />
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                        <DeleteButtonAndConfirmModal
+                          title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
+                          textToConfirm={organisation.name}
+                          onConfirm={async () => {
+                            try {
+                              const res = await API.delete({ path: `/organisation/${organisation._id}` });
+                              if (res.ok) {
+                                toastr.success('Organisation supprimée');
+                                API.logout();
                               }
-                            }}>
-                            <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-                              Cette opération est irréversible
-                              <br />
-                              et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
-                              <br />
-                              équipes, utilisateurs, personnes suivies, actions, territoires, commentaires et observations, comptes-rendus...
-                            </span>
-                          </DeleteButtonAndConfirmModal>
-                          <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} />
-                        </div>
-                      </>
-                    );
-                  case 'encryption':
-                    return (
-                      <>
-                        <SubTitle>Chiffrement</SubTitle>
-                        <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
-                          <EncryptionKey isMain />
-                        </div>
-                      </>
-                    );
-                  case 'consultations':
-                    return (
-                      <Consultations organisation={values} handleChange={handleChange} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />
-                    );
-                  case 'medicalFile':
-                    return (
-                      <>
-                        <SubTitle>Dossier Médical</SubTitle>
-                        {organisation.encryptionEnabled ? (
-                          <>
-                            <p>
-                              Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
-                            </p>
-                            <hr />
-                            <Row>
-                              <Label>Champs personnalisés</Label>
-                              <TableCustomFields
-                                customFields="customFieldsMedicalFile"
-                                key="customFieldsMedicalFile"
-                                data={customFieldsMedicalFile}
-                              />
-                            </Row>
-                          </>
-                        ) : (
-                          <>
-                            <Row>
-                              <Col md={10}>
-                                <p>
-                                  Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour le dossier médical des
-                                  personnes suivies n'existe que pour les organisations chiffrées.
-                                </p>
-                              </Col>
-                            </Row>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                              <EncryptionKey />
-                            </div>
-                          </>
-                        )}
-                      </>
-                    );
-                  case 'actions':
-                    return (
-                      <>
-                        <SubTitle>Actions</SubTitle>
-                        <Row>
-                          <Col md={12}>
-                            <FormGroup>
-                              <Label htmlFor="categories">Categories des actions</Label>
-                              <SortableGrid
-                                list={values.categories || []}
-                                editItemTitle="Changer le nom de la catégorie d'action"
-                                onUpdateList={(cats) => handleChange({ target: { value: cats, name: 'categories' } })}
-                                onRemoveItem={(content) =>
-                                  handleChange({ target: { value: (values.categories || []).filter((cat) => cat !== content), name: 'categories' } })
-                                }
-                                onEditItem={async ({ content, newContent }) => {
-                                  if (!newContent) {
-                                    toastr.error('Erreur', 'Vous devez saisir un nom pour la catégorie');
-                                    return;
-                                  }
-                                  const encryptedActions = await Promise.all(
-                                    actions
-                                      .filter((a) => a.categories.includes(content))
-                                      .map((action) => ({
-                                        ...action,
-                                        categories: [...new Set(action.categories.map((cat) => (cat === content ? newContent : cat)))],
-                                      }))
-                                      .map(prepareActionForEncryption)
-                                      .map(encryptItem(hashedOrgEncryptionKey))
-                                  );
-                                  const newCategories = [...new Set((values.categories || []).map((cat) => (cat === content ? newContent : cat)))];
-                                  const response = await API.put({
-                                    path: `/category`,
-                                    body: {
-                                      categories: newCategories,
-                                      actions: encryptedActions,
-                                    },
-                                  });
-                                  if (response.ok) {
-                                    setRefreshTrigger({
-                                      status: true,
-                                      options: { showFullScreen: false, initialLoad: false },
-                                    });
-                                    handleChange({ target: { value: newCategories, name: 'categories' } });
-                                    setOrganisation({ ...organisation, categories: newCategories });
-                                    toastr.success(
-                                      'Catégorie mise à jour',
-                                      "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-                                    );
-                                  } else {
-                                    toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
-                                  }
-                                }}
-                              />
-                            </FormGroup>
-                            <FormGroup>
-                              <Label htmlFor="organisation-select-categories">Ajouter une catégorie</Label>
-                              <SelectCustom
-                                key={JSON.stringify(values.categories || [])}
-                                creatable
-                                options={[...(actionsCategories || [])]
-                                  .filter((cat) => !(values.categories || []).includes(cat))
-                                  .sort((c1, c2) => c1.localeCompare(c2))
-                                  .map((cat) => ({ value: cat, label: cat }))}
-                                value={null}
-                                onChange={(cat) => {
-                                  if (cat && cat.value) {
-                                    handleChange({ target: { value: [...(values.categories || []), cat.value], name: 'categories' } });
-                                  }
-                                }}
-                                onCreateOption={async (name) => {
-                                  handleChange({ target: { value: [...(values.categories || []), name], name: 'categories' } });
-                                }}
-                                isClearable
-                                inputId="organisation-select-categories"
-                                classNamePrefix="organisation-select-categories"
-                              />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
-                          <ButtonCustom
-                            title={'Mettre à jour'}
-                            disabled={JSON.stringify(organisation.categories) === JSON.stringify(values.categories || [])}
-                            loading={isSubmitting}
-                            onClick={handleSubmit}
-                          />
-                        </div>
-                      </>
-                    );
-                  case 'reception':
-                    return (
-                      <>
-                        <SubTitle>Accueil de jour</SubTitle>
-                        <Row>
-                          <Col md={12}>
-                            <FormGroup>
-                              <Label />
-                              <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                                <label htmlFor="receptionEnabled">Accueil de jour activé</label>
-                                <Input
-                                  type="checkbox"
-                                  name="receptionEnabled"
-                                  id="receptionEnabled"
-                                  checked={values.receptionEnabled || false}
-                                  onChange={handleChange}
-                                />
-                              </div>
-                            </FormGroup>
-                          </Col>
-                          <Col md={12}>
-                            <FormGroup>
-                              <Label htmlFor="services">Services disponibles</Label>
-                              <SortableGrid
-                                list={values.services || []}
-                                editItemTitle="Changer le nom du service"
-                                onUpdateList={(newServices) => handleChange({ target: { value: newServices, name: 'services' } })}
-                                onRemoveItem={(content) =>
-                                  handleChange({ target: { value: values.services.filter((service) => service !== content), name: 'services' } })
-                                }
-                                onEditItem={async ({ content, newContent }) => {
-                                  if (!newContent) {
-                                    toastr.error('Erreur', 'Vous devez saisir un nom pour le service');
-                                    return;
-                                  }
-                                  // two cases:
-                                  // 1. just change 'one_service' to 'another_new_service'
-                                  // 2. merge 'one_service' to 'an_existing_service'
-                                  const reportsWithService = reports.filter((r) => Object.keys(JSON.parse(r.services || '{}')).includes(content));
-                                  const encryptedReports = await Promise.all(
-                                    reportsWithService
-                                      .map((report) => {
-                                        const newServices = {};
-                                        const oldServices = JSON.parse(report.services || '{}');
-                                        for (const service of Object.keys(oldServices)) {
-                                          if (service === content) {
-                                            if (Object.keys(oldServices).includes(newContent)) {
-                                              // merge
-                                              if (!newServices[newContent]) newServices[newContent] = 0;
-                                              newServices[newContent] = newServices[newContent] + oldServices[newContent];
-                                            } else {
-                                              newServices[newContent] = oldServices[content];
-                                            }
-                                          } else {
-                                            if (!newServices[service]) newServices[service] = 0;
-                                            newServices[service] = newServices[service] + oldServices[service];
-                                          }
-                                        }
-                                        return {
-                                          ...report,
-                                          services: JSON.stringify(newServices),
-                                        };
-                                      })
-                                      .map(prepareReportForEncryption)
-                                      .map(encryptItem(hashedOrgEncryptionKey))
-                                  );
-
-                                  const newServices = [...new Set(values.services.map((service) => (service === content ? newContent : service)))];
-                                  const response = await API.put({
-                                    path: `/service`,
-                                    body: {
-                                      services: newServices,
-                                      reports: encryptedReports,
-                                    },
-                                  });
-                                  if (response.ok) {
-                                    setRefreshTrigger({
-                                      status: true,
-                                      options: { showFullScreen: false, initialLoad: false },
-                                    });
-                                    handleChange({ target: { value: newServices, name: 'services' } });
-                                    setOrganisation({ ...organisation, services: newServices });
-                                    toastr.success(
-                                      'Service mis à jour',
-                                      "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-                                    );
-                                  } else {
-                                    toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
-                                  }
-                                }}
-                              />
-                            </FormGroup>
-                            <FormGroup>
-                              <Label htmlFor="organisation-select-services">Ajouter un service</Label>
-                              <SelectCustom
-                                key={JSON.stringify(values.services)}
-                                creatable
-                                isOptionDisabled={({ value }) => (values.services || []).includes(value)}
-                                options={[...(organisation.services || [])]
-                                  .sort((c1, c2) => c1.localeCompare(c2))
-                                  .map((cat) => ({ value: cat, label: cat }))}
-                                value={null}
-                                onCreateOption={async (name) => {
-                                  handleChange({ target: { value: [...(values.services || []), name], name: 'services' } });
-                                }}
-                                isClearable
-                                inputId="organisation-select-services"
-                                classNamePrefix="organisation-select-services"
-                              />
-                            </FormGroup>
-                          </Col>
-                        </Row>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: 40 }}>
-                          <ButtonCustom
-                            title={'Mettre à jour'}
-                            disabled={
-                              values.receptionEnabled === organisation.receptionEnabled &&
-                              JSON.stringify(organisation.services) === JSON.stringify(values.services || [])
+                            } catch (organisationDeleteError) {
+                              capture(organisationDeleteError, { extra: { organisation }, user });
+                              toastr.error('Erreur!', organisationDeleteError.message);
                             }
-                            loading={isSubmitting}
-                            onClick={handleSubmit}
+                          }}>
+                          <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                            Cette opération est irréversible
+                            <br />
+                            et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
+                            <br />
+                            équipes, utilisateurs, personnes suivies, actions, territoires, commentaires et observations, comptes-rendus...
+                          </span>
+                        </DeleteButtonAndConfirmModal>
+                        <ButtonCustom title="Mettre à jour" loading={isSubmitting} onClick={handleSubmit} />
+                      </div>
+                    </>
+                  );
+                case 'encryption':
+                  return (
+                    <>
+                      <SubTitle>Chiffrement</SubTitle>
+                      <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
+                        <EncryptionKey isMain />
+                      </div>
+                    </>
+                  );
+                case 'consultations':
+                  return <Consultations organisation={values} handleChange={handleChange} handleSubmit={handleSubmit} isSubmitting={isSubmitting} />;
+                case 'medicalFile':
+                  return (
+                    <>
+                      <SubTitle>Dossier Médical</SubTitle>
+                      {organisation.encryptionEnabled ? (
+                        <>
+                          <p>
+                            Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
+                          </p>
+                          <hr />
+                          <Row>
+                            <Label>Champs personnalisés</Label>
+                            <TableCustomFields customFields="customFieldsMedicalFile" key="customFieldsMedicalFile" data={customFieldsMedicalFile} />
+                          </Row>
+                        </>
+                      ) : (
+                        <>
+                          <Row>
+                            <Col md={10}>
+                              <p>
+                                Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour le dossier médical des personnes
+                                suivies n'existe que pour les organisations chiffrées.
+                              </p>
+                            </Col>
+                          </Row>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                            <EncryptionKey />
+                          </div>
+                        </>
+                      )}
+                    </>
+                  );
+                case 'actions':
+                  return (
+                    <>
+                      <SubTitle>Actions</SubTitle>
+                      <Row>
+                        <Col md={12}>
+                          <FormGroup>
+                            <Label htmlFor="categories">Categories des actions</Label>
+                            <SortableGrid
+                              list={values.categories || []}
+                              editItemTitle="Changer le nom de la catégorie d'action"
+                              onUpdateList={(cats) => handleChange({ target: { value: cats, name: 'categories' } })}
+                              onRemoveItem={(content) =>
+                                handleChange({ target: { value: (values.categories || []).filter((cat) => cat !== content), name: 'categories' } })
+                              }
+                              onEditItem={async ({ content, newContent }) => {
+                                if (!newContent) {
+                                  toastr.error('Erreur', 'Vous devez saisir un nom pour la catégorie');
+                                  return;
+                                }
+                                const encryptedActions = await Promise.all(
+                                  actions
+                                    .filter((a) => a.categories.includes(content))
+                                    .map((action) => ({
+                                      ...action,
+                                      categories: [...new Set(action.categories.map((cat) => (cat === content ? newContent : cat)))],
+                                    }))
+                                    .map(prepareActionForEncryption)
+                                    .map(encryptItem(hashedOrgEncryptionKey))
+                                );
+                                const newCategories = [...new Set((values.categories || []).map((cat) => (cat === content ? newContent : cat)))];
+                                const response = await API.put({
+                                  path: `/category`,
+                                  body: {
+                                    categories: newCategories,
+                                    actions: encryptedActions,
+                                  },
+                                });
+                                if (response.ok) {
+                                  setRefreshTrigger({
+                                    status: true,
+                                    options: { showFullScreen: false, initialLoad: false },
+                                  });
+                                  handleChange({ target: { value: newCategories, name: 'categories' } });
+                                  setOrganisation({ ...organisation, categories: newCategories });
+                                  toastr.success(
+                                    'Catégorie mise à jour',
+                                    "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
+                                  );
+                                } else {
+                                  toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+                                }
+                              }}
+                            />
+                          </FormGroup>
+                          <FormGroup>
+                            <Label htmlFor="organisation-select-categories">Ajouter une catégorie</Label>
+                            <SelectCustom
+                              key={JSON.stringify(values.categories || [])}
+                              creatable
+                              options={[...(actionsCategories || [])]
+                                .filter((cat) => !(values.categories || []).includes(cat))
+                                .sort((c1, c2) => c1.localeCompare(c2))
+                                .map((cat) => ({ value: cat, label: cat }))}
+                              value={null}
+                              onChange={(cat) => {
+                                if (cat && cat.value) {
+                                  handleChange({ target: { value: [...(values.categories || []), cat.value], name: 'categories' } });
+                                }
+                              }}
+                              onCreateOption={async (name) => {
+                                handleChange({ target: { value: [...(values.categories || []), name], name: 'categories' } });
+                              }}
+                              isClearable
+                              inputId="organisation-select-categories"
+                              classNamePrefix="organisation-select-categories"
+                            />
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                        <ButtonCustom
+                          title={'Mettre à jour'}
+                          disabled={JSON.stringify(organisation.categories) === JSON.stringify(values.categories || [])}
+                          loading={isSubmitting}
+                          onClick={handleSubmit}
+                        />
+                      </div>
+                    </>
+                  );
+                case 'reception':
+                  return (
+                    <>
+                      <SubTitle>Accueil de jour</SubTitle>
+                      <Row>
+                        <Col md={12}>
+                          <FormGroup>
+                            <Label />
+                            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                              <label htmlFor="receptionEnabled">Accueil de jour activé</label>
+                              <Input
+                                type="checkbox"
+                                name="receptionEnabled"
+                                id="receptionEnabled"
+                                checked={values.receptionEnabled || false}
+                                onChange={handleChange}
+                              />
+                            </div>
+                          </FormGroup>
+                        </Col>
+                        <Col md={12}>
+                          <FormGroup>
+                            <Label htmlFor="services">Services disponibles</Label>
+                            <SortableGrid
+                              list={values.services || []}
+                              editItemTitle="Changer le nom du service"
+                              onUpdateList={(newServices) => handleChange({ target: { value: newServices, name: 'services' } })}
+                              onRemoveItem={(content) =>
+                                handleChange({ target: { value: values.services.filter((service) => service !== content), name: 'services' } })
+                              }
+                              onEditItem={async ({ content, newContent }) => {
+                                if (!newContent) {
+                                  toastr.error('Erreur', 'Vous devez saisir un nom pour le service');
+                                  return;
+                                }
+                                // two cases:
+                                // 1. just change 'one_service' to 'another_new_service'
+                                // 2. merge 'one_service' to 'an_existing_service'
+                                const reportsWithService = reports.filter((r) => Object.keys(JSON.parse(r.services || '{}')).includes(content));
+                                const encryptedReports = await Promise.all(
+                                  reportsWithService
+                                    .map((report) => {
+                                      const newServices = {};
+                                      const oldServices = JSON.parse(report.services || '{}');
+                                      for (const service of Object.keys(oldServices)) {
+                                        if (service === content) {
+                                          if (Object.keys(oldServices).includes(newContent)) {
+                                            // merge
+                                            if (!newServices[newContent]) newServices[newContent] = 0;
+                                            newServices[newContent] = newServices[newContent] + oldServices[newContent];
+                                          } else {
+                                            newServices[newContent] = oldServices[content];
+                                          }
+                                        } else {
+                                          if (!newServices[service]) newServices[service] = 0;
+                                          newServices[service] = newServices[service] + oldServices[service];
+                                        }
+                                      }
+                                      return {
+                                        ...report,
+                                        services: JSON.stringify(newServices),
+                                      };
+                                    })
+                                    .map(prepareReportForEncryption)
+                                    .map(encryptItem(hashedOrgEncryptionKey))
+                                );
+
+                                const newServices = [...new Set(values.services.map((service) => (service === content ? newContent : service)))];
+                                const response = await API.put({
+                                  path: `/service`,
+                                  body: {
+                                    services: newServices,
+                                    reports: encryptedReports,
+                                  },
+                                });
+                                if (response.ok) {
+                                  setRefreshTrigger({
+                                    status: true,
+                                    options: { showFullScreen: false, initialLoad: false },
+                                  });
+                                  handleChange({ target: { value: newServices, name: 'services' } });
+                                  setOrganisation({ ...organisation, services: newServices });
+                                  toastr.success(
+                                    'Service mis à jour',
+                                    "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
+                                  );
+                                } else {
+                                  toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+                                }
+                              }}
+                            />
+                          </FormGroup>
+                          <FormGroup>
+                            <Label htmlFor="organisation-select-services">Ajouter un service</Label>
+                            <SelectCustom
+                              key={JSON.stringify(values.services)}
+                              creatable
+                              isOptionDisabled={({ value }) => (values.services || []).includes(value)}
+                              options={[...(organisation.services || [])]
+                                .sort((c1, c2) => c1.localeCompare(c2))
+                                .map((cat) => ({ value: cat, label: cat }))}
+                              value={null}
+                              onCreateOption={async (name) => {
+                                handleChange({ target: { value: [...(values.services || []), name], name: 'services' } });
+                              }}
+                              isClearable
+                              inputId="organisation-select-services"
+                              classNamePrefix="organisation-select-services"
+                            />
+                          </FormGroup>
+                        </Col>
+                      </Row>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: 40 }}>
+                        <ButtonCustom
+                          title={'Mettre à jour'}
+                          disabled={
+                            values.receptionEnabled === organisation.receptionEnabled &&
+                            JSON.stringify(organisation.services) === JSON.stringify(values.services || [])
+                          }
+                          loading={isSubmitting}
+                          onClick={handleSubmit}
+                        />
+                      </div>
+                    </>
+                  );
+                case 'territories':
+                  return (
+                    <>
+                      <SubTitle>Territoires</SubTitle>
+                      {organisation.encryptionEnabled ? (
+                        <>
+                          <Label>Champs personnalisés</Label>
+                          <TableCustomFields
+                            customFields="customFieldsObs"
+                            key="customFieldsObs"
+                            data={(() => {
+                              if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
+                              return defaultCustomFields;
+                            })()}
                           />
-                        </div>
-                      </>
-                    );
-                  case 'territories':
-                    return (
-                      <>
-                        <SubTitle>Territoires</SubTitle>
-                        {organisation.encryptionEnabled ? (
-                          <>
-                            <Row>
-                              <Label>Champs personnalisés</Label>
-                              <TableCustomFields
-                                customFields="customFieldsObs"
-                                key="customFieldsObs"
-                                data={(() => {
-                                  if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
-                                  return defaultCustomFields;
-                                })()}
-                              />
-                            </Row>
-                          </>
-                        ) : (
-                          <>
-                            <Row>
-                              <Col md={10}>
-                                <p>
-                                  Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les observations de
-                                  territoires n'existe que pour les organisations chiffrées.
-                                </p>
-                              </Col>
-                            </Row>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                              <EncryptionKey />
-                            </div>
-                          </>
-                        )}
-                      </>
-                    );
-                  case 'persons':
-                    return (
-                      <>
-                        <SubTitle>Personnes suivies</SubTitle>
-                        {organisation.encryptionEnabled ? (
-                          <>
-                            <Row>
-                              <Label>Champs permanents - options modulables</Label>
-                              <TableCustomFields
-                                customFields="fieldsPersonsCustomizableOptions"
-                                key="fieldsPersonsCustomizableOptions"
-                                data={fieldsPersonsCustomizableOptions}
-                                onlyOptionsEditable
-                              />
-                            </Row>
-                            <Row>
-                              <Label>Champs personnalisés - informations sociales</Label>
-                              <TableCustomFields
-                                customFields="customFieldsPersonsSocial"
-                                key="customFieldsPersonsSocial"
-                                data={customFieldsPersonsSocial}
-                              />
-                            </Row>
-                            <Row>
-                              <Label>Champs personnalisés - informations médicales</Label>
-                              <TableCustomFields
-                                customFields="customFieldsPersonsMedical"
-                                key="customFieldsPersonsMedical"
-                                data={customFieldsPersonsMedical}
-                              />
-                            </Row>
-                          </>
-                        ) : (
-                          <>
-                            <Row>
-                              <Col md={10}>
-                                <p>
-                                  Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les personnes suivies n'existe
-                                  que pour les organisations chiffrées.
-                                </p>
-                              </Col>
-                            </Row>
-                            <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                              <EncryptionKey />
-                            </div>
-                          </>
-                        )}
-                      </>
-                    );
-                  case 'export':
-                    return (
-                      <>
-                        <SubTitle>Exporter des données</SubTitle>
-                        <Row>
-                          <Col md={10}>
-                            <p>Vous pouvez exporter l'ensemble de vos données dans un fichier Excel.</p>
-                          </Col>
-                        </Row>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                          <ExportData />
-                        </div>
-                      </>
-                    );
-                  case 'import':
-                    return (
-                      <>
-                        <SubTitle>Importer des personnes suivies</SubTitle>
-                        <Row>
-                          <Col md={10}>
-                            <p>
-                              Vous pouvez importer une liste de personnes suivies depuis un fichier Excel. Ce fichier doit avoir quelques
-                              caractéristiques:
-                            </p>
-                            <ul>
-                              <li>
-                                avoir un onglet dont le nom contient <code>personne</code>
-                              </li>
-                              <li>avoir en première ligne de cet onglet des têtes de colonnes</li>
-                              <li>
-                                les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne
-                                sera pas prise en compte - certaines colonnes ont des valeurs imposées :
-                                <table className="table table-sm" style={{ fontSize: '14px', marginTop: '2rem' }}>
-                                  <thead>
-                                    <tr>
-                                      <th>Colonne</th>
-                                      <th>Valeur</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {personFieldsIncludingCustomFields
-                                      .filter((f) => f.importable)
-                                      .map((f) => {
-                                        return (
-                                          <tr key={f.label}>
-                                            <td>{f.label}</td>
-                                            <td>
-                                              <ImportFieldDetails field={f} />
-                                            </td>
-                                          </tr>
-                                        );
-                                      })}
-                                  </tbody>
-                                </table>
-                              </li>
-                            </ul>
-                          </Col>
-                        </Row>
-                        <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
-                          <DownloadExample />
-                          <ImportData />
-                        </div>
-                      </>
-                    );
-                }
-              }}
-            </Formik>
-          </Box>
+                        </>
+                      ) : (
+                        <>
+                          <Row>
+                            <Col md={10}>
+                              <p>
+                                Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les observations de territoires
+                                n'existe que pour les organisations chiffrées.
+                              </p>
+                            </Col>
+                          </Row>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                            <EncryptionKey />
+                          </div>
+                        </>
+                      )}
+                    </>
+                  );
+                case 'persons':
+                  return (
+                    <>
+                      <SubTitle>Personnes suivies</SubTitle>
+                      {organisation.encryptionEnabled ? (
+                        <>
+                          <Label>Champs permanents - options modulables</Label>
+                          <TableCustomFields
+                            customFields="fieldsPersonsCustomizableOptions"
+                            key="fieldsPersonsCustomizableOptions"
+                            data={fieldsPersonsCustomizableOptions}
+                            onlyOptionsEditable
+                          />
+                          <Label>Champs personnalisés - informations sociales</Label>
+                          <TableCustomFields
+                            customFields="customFieldsPersonsSocial"
+                            key="customFieldsPersonsSocial"
+                            data={customFieldsPersonsSocial}
+                          />
+                          <Label>Champs personnalisés - informations médicales</Label>
+                          <TableCustomFields
+                            customFields="customFieldsPersonsMedical"
+                            key="customFieldsPersonsMedical"
+                            data={customFieldsPersonsMedical}
+                          />
+                        </>
+                      ) : (
+                        <>
+                          <Row>
+                            <Col md={10}>
+                              <p>
+                                Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les personnes suivies n'existe
+                                que pour les organisations chiffrées.
+                              </p>
+                            </Col>
+                          </Row>
+                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                            <EncryptionKey />
+                          </div>
+                        </>
+                      )}
+                    </>
+                  );
+                case 'export':
+                  return (
+                    <>
+                      <SubTitle>Exporter des données</SubTitle>
+                      <Row>
+                        <Col md={10}>
+                          <p>Vous pouvez exporter l'ensemble de vos données dans un fichier Excel.</p>
+                        </Col>
+                      </Row>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                        <ExportData />
+                      </div>
+                    </>
+                  );
+                case 'import':
+                  return (
+                    <>
+                      <SubTitle>Importer des personnes suivies</SubTitle>
+                      <Row>
+                        <Col md={10}>
+                          <p>
+                            Vous pouvez importer une liste de personnes suivies depuis un fichier Excel. Ce fichier doit avoir quelques
+                            caractéristiques:
+                          </p>
+                          <ul>
+                            <li>
+                              avoir un onglet dont le nom contient <code>personne</code>
+                            </li>
+                            <li>avoir en première ligne de cet onglet des têtes de colonnes</li>
+                            <li>
+                              les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne
+                              sera pas prise en compte - certaines colonnes ont des valeurs imposées :
+                              <table className="table table-sm" style={{ fontSize: '14px', marginTop: '2rem' }}>
+                                <thead>
+                                  <tr>
+                                    <th>Colonne</th>
+                                    <th>Valeur</th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {personFieldsIncludingCustomFields
+                                    .filter((f) => f.importable)
+                                    .map((f) => {
+                                      return (
+                                        <tr key={f.label}>
+                                          <td>{f.label}</td>
+                                          <td>
+                                            <ImportFieldDetails field={f} />
+                                          </td>
+                                        </tr>
+                                      );
+                                    })}
+                                </tbody>
+                              </table>
+                            </li>
+                          </ul>
+                        </Col>
+                      </Row>
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                        <DownloadExample />
+                        <ImportData />
+                      </div>
+                    </>
+                  );
+              }
+            }}
+          </Formik>
         </div>
       </div>
     </div>
@@ -710,22 +693,20 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
             <small>
               Vous pouvez personnaliser les champs disponibles pour les consultations de type <strong>{consultation.name}</strong>.
             </small>
-            <Row>
-              <TableCustomFields
-                customFields="consultations"
-                hideStats
-                keyPrefix={consultation.name}
-                mergeData={(newData) => {
-                  return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));
-                }}
-                extractData={(data) => {
-                  return data.find((e) => e.name === consultation.name).fields || [];
-                }}
-                data={(() => {
-                  return Array.isArray(consultation.fields) ? consultation.fields : [];
-                })()}
-              />
-            </Row>
+            <TableCustomFields
+              customFields="consultations"
+              hideStats
+              keyPrefix={consultation.name}
+              mergeData={(newData) => {
+                return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));
+              }}
+              extractData={(data) => {
+                return data.find((e) => e.name === consultation.name).fields || [];
+              }}
+              data={(() => {
+                return Array.isArray(consultation.fields) ? consultation.fields : [];
+              })()}
+            />
           </div>
         );
       })}
@@ -759,7 +740,6 @@ const ImportFieldDetails = ({ field }) => {
 
 const Title = styled.h2`
   color: ${theme.black};
-  font-weight: bold;
   font-size: 1.5rem;
   line-height: 2rem;
   /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */

@@ -3,7 +3,6 @@ import styled from 'styled-components';
 import { Col, Row } from 'reactstrap';
 import { toastr } from 'react-redux-toastr';
 
-import Box from '../../components/Box';
 import ButtonCustom from '../../components/ButtonCustom';
 import Observation from './view';
 import CreateObservation from '../../components/CreateObservation';
@@ -17,7 +16,8 @@ const List = ({ territory = {} }) => {
   const [openObservationModale, setOpenObservationModale] = useState(null);
   const API = useApi();
 
-  const observations = territoryObservations.filter((obs) => obs.territory === territory._id)
+  const observations = territoryObservations
+    .filter((obs) => obs.territory === territory._id)
     .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
 
   if (!observations) return null;
@@ -41,32 +41,30 @@ const List = ({ territory = {} }) => {
           <Title>Observations</Title>
         </Col>
       </Row>
-      <Box>
-        <Row style={{ marginBottom: '30px', justifyContent: 'flex-end' }}>
-          <Col md={3}>
-            <ButtonCustom
-              onClick={() => {
-                setObservation({});
-                setOpenObservationModale((k) => k + 1);
-              }}
-              color="primary"
-              title="Nouvelle observation"
-              padding="12px 24px"
-            />
-          </Col>
-        </Row>
-        {observations.map((obs) => (
-          <Observation
-            key={obs._id}
-            obs={obs}
-            onDelete={deleteData}
+      <Row style={{ marginBottom: '30px', justifyContent: 'flex-end' }}>
+        <Col md={3}>
+          <ButtonCustom
             onClick={() => {
-              setObservation(obs);
+              setObservation({});
               setOpenObservationModale((k) => k + 1);
             }}
+            color="primary"
+            title="Nouvelle observation"
+            padding="12px 24px"
           />
-        ))}
-      </Box>
+        </Col>
+      </Row>
+      {observations.map((obs) => (
+        <Observation
+          key={obs._id}
+          obs={obs}
+          onDelete={deleteData}
+          onClick={() => {
+            setObservation(obs);
+            setOpenObservationModale((k) => k + 1);
+          }}
+        />
+      ))}
       <CreateObservation observation={{ ...observation, territory: observation.territory || territory?._id }} forceOpen={openObservationModale} />
     </>
   );
