@@ -1,3 +1,10 @@
+# [1.139.0](https://github.com/SocialGouv/mano/compare/v1.138.0...v1.139.0) (2022-07-19)
+
+
+### Features
+
+* search by birthdate everywhere ([4c663bb](https://github.com/SocialGouv/mano/commit/4c663bb16b270d026f8c16b1d758b9bcef64f050))
+
 # [1.138.0](https://github.com/SocialGouv/mano/compare/v1.137.0...v1.138.0) (2022-07-18)
 
 
