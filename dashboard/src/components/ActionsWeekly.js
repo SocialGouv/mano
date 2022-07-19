@@ -10,7 +10,7 @@ import PersonName from './PersonName';
 // TODO: remove inline style when UI is stabilized.
 
 export default function ActionsWeekly({ actions, onCreateAction }) {
-  const [startOfWeek, setStartOfWeek] = useState(dayjsInstance(window.localStorage.getItem('startOfWeek')).startOf('week'));
+  const [startOfWeek, setStartOfWeek] = useState(dayjsInstance(window.localStorage.getItem('startOfWeek') || new Date()).startOf('week'));
 
   const actionsInWeek = useMemo(() => {
     return actions.filter((action) => dayjsInstance(action.dueAt).isBetween(startOfWeek, startOfWeek.add(7, 'day').endOf('day')));
