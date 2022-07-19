@@ -95,6 +95,7 @@ function ActionsOfDay({ actions }) {
     <>
       {sortedActions.map((action) => (
         <div
+          key={action._id}
           onClick={() => {
             if (action.isConsultation) {
               history.push(`/person/${action.person}?tab=dossier+médical&consultationId=${action._id}`);
