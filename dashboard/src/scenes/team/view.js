@@ -5,7 +5,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import NightSessionModale from '../../components/NightSessionModale';
@@ -40,7 +40,7 @@ const View = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton />
+      <SmallHeaderWithBackButton />
       <Formik
         initialValues={team}
         onSubmit={async (body) => {

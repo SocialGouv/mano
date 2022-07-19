@@ -3,7 +3,7 @@ import { Col, Label, Row, Button } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
 import Table from '../../components/table';
 import ActionStatus from '../../components/ActionStatus';
@@ -117,8 +117,7 @@ const List = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton
-        titleStyle={{ fontWeight: '400' }}
+      <SmallHeader
         title={
           <span>
             Agenda de l'équipe <b>{currentTeam?.name || ''}</b>

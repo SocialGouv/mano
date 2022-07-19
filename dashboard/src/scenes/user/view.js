@@ -6,7 +6,7 @@ import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
@@ -40,7 +40,7 @@ const View = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton />
+      <SmallHeaderWithBackButton />
       <Formik
         initialValues={{
           name: localUser.name,

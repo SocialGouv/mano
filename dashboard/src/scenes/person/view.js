@@ -9,7 +9,7 @@ import DatePicker from 'react-datepicker';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeaderWithBackButton } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import CreateActionModal from '../../components/CreateActionModal';
 import Comments from '../../components/Comments';
@@ -87,7 +87,7 @@ const View = () => {
 
   return (
     <StyledContainer>
-      <SmallerHeaderWithBackButton
+      <SmallHeaderWithBackButton
         className="noprint"
         onRefresh={() =>
           setRefreshTrigger({

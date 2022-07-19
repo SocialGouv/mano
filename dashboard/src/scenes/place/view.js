@@ -5,7 +5,7 @@ import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 
-import { SmallerHeaderWithBackButton } from '../../components/header';
+import { SmallHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import { personsState } from '../../recoil/persons';
@@ -34,7 +34,7 @@ const View = () => {
 
   return (
     <>
-      <SmallerHeaderWithBackButton
+      <SmallHeaderWithBackButton
         onRefresh={() =>
           setRefreshTrigger({
             status: true,

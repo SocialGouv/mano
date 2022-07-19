@@ -17,8 +17,12 @@ const Header = ({ title, onRefresh, loading, style = {}, titleStyle = {}, classN
   );
 };
 
-export const SmallerHeaderWithBackButton = (props) => {
+export const SmallHeaderWithBackButton = (props) => {
   return <Header style={{ padding: '16px 0', ...props.style }} title={<BackButton />} {...props} />;
+};
+
+export const SmallHeader = (props) => {
+  return <Header style={{ padding: '16px 0', ...props.style }} titleStyle={{ fontWeight: '400' }} {...props} />;
 };
 
 const HeaderStyled = styled.div`
