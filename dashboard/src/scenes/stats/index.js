@@ -246,7 +246,6 @@ const Stats = () => {
               <CustomResponsivePie
                 title="Services"
                 data={organisation.services?.map((service) => {
-                  console.log(organisation.services);
                   return {
                     id: service,
                     label: service,
