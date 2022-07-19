@@ -1,3 +1,10 @@
+## [1.139.1](https://github.com/SocialGouv/mano/compare/v1.139.0...v1.139.1) (2022-07-19)
+
+
+### Bug Fixes
+
+* **dashboard:** crash firefox on new agenda ([67d995a](https://github.com/SocialGouv/mano/commit/67d995a5e70a01b00a319542ea3c951ac18b8a93))
+
 # [1.139.0](https://github.com/SocialGouv/mano/compare/v1.138.0...v1.139.0) (2022-07-19)
 
 
