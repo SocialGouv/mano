@@ -249,7 +249,7 @@ const MergeTwoPersons = ({ person }) => {
                       }),
                     };
                   }
-                  return null;
+                  return {};
                 })();
 
                 const response = await API.post({
@@ -268,7 +268,11 @@ const MergeTwoPersons = ({ person }) => {
                   },
                 });
 
-                if (!response.ok) return;
+                if (!response.ok) {
+                  toastr.error('Échec de la fusion');
+                  setSubmitting(false);
+                  return;
+                }
                 toastr.success('Fusion réussie !');
 
                 setPersons((persons) => persons.filter((p) => p._id !== personToMergeAndDelete._id));
