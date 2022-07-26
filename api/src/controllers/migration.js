@@ -124,8 +124,8 @@ router.put(
 
         if (req.params.migrationName === "add-relations-to-db-models") {
           try {
-            for (const objectKey of ["encryptedPassages"]) {
-              z.array(
+            for (const encryptedPassage of req.body.encryptedPassages) {
+              try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
@@ -133,74 +133,165 @@ router.put(
                   // person: z.optional(z.string().regex(looseUuidRegex)),
                   // user: z.optional(z.string().regex(looseUuidRegex)),
                   team: z.string().regex(looseUuidRegex),
-                })
-              ).parse(req.body[objectKey]);
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedPassages: ${e}`);
+                error.status = 400;
+                throw error;
+              }
             }
 
-            for (const objectKey of ["encryptedPersons", "encryptedPlaces", "encryptedTerritories"]) {
-              z.array(
+            for (const encryptedPerson of req.body.encryptedPersons) {
+              try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  // user: z.string().regex(looseUuidRegex),
-                })
-              ).parse(req.body[objectKey]);
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedPersons: ${e}`);
+                error.status = 400;
+                throw error;
+              }
             }
 
-            for (const objectKey of ["encryptedReports"]) {
-              z.array(
+            for (const encryptedPlace of req.body.encryptedPlaces) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedPlaces: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
+
+            for (const encryptedTerritory of req.body.encryptedTerritories) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedTerritories: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
+
+            for (const encryptedReport of req.body.encryptedReports) {
+              try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
                   team: z.string().regex(looseUuidRegex),
-                })
-              ).parse(req.body[objectKey]);
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedReports: ${e}`);
+                error.status = 400;
+                throw error;
+              }
             }
 
-            z.array(
-              z.object({
-                _id: z.string().regex(looseUuidRegex),
-                encrypted: z.string(),
-                encryptedEntityKey: z.string(),
-                territory: z.string().regex(looseUuidRegex),
-                user: z.string().regex(looseUuidRegex),
-                team: z.string().regex(looseUuidRegex),
-              })
-            ).parse(req.body.encryptedTerritoryObservations);
+            for (const encryptedTerritoryObservation of req.body.encryptedTerritoryObservations) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  territory: z.string().regex(looseUuidRegex),
+                  user: z.string().regex(looseUuidRegex),
+                  team: z.string().regex(looseUuidRegex),
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedTerritoryObservations: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
 
-            z.array(
-              z.object({
-                _id: z.string().regex(looseUuidRegex),
-                encrypted: z.string(),
-                encryptedEntityKey: z.string(),
-                person: z.string().regex(looseUuidRegex),
-                place: z.string().regex(looseUuidRegex),
-                user: z.string().regex(looseUuidRegex),
-              })
-            ).parse(req.body.encryptedRelsPersonPlace);
+            for (const encryptedRelPersonPlace of req.body.encryptedRelsPersonPlace) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  person: z.string().regex(looseUuidRegex),
+                  place: z.string().regex(looseUuidRegex),
+                  user: z.string().regex(looseUuidRegex),
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedRelsPersonPlace: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
 
-            z.array(
-              z.object({
-                _id: z.string().regex(looseUuidRegex),
-                encrypted: z.string(),
-                encryptedEntityKey: z.string(),
-                person: z.string().regex(looseUuidRegex),
-                // user: z.string().regex(looseUuidRegex),
-                team: z.string().regex(looseUuidRegex),
-              })
-            ).parse(req.body.encryptedComments.filter((c) => Boolean(c.person)));
-            z.array(
-              z.object({
-                _id: z.string().regex(looseUuidRegex),
-                encrypted: z.string(),
-                encryptedEntityKey: z.string(),
-                action: z.string().regex(looseUuidRegex),
-                // user: z.string().regex(looseUuidRegex),
-                team: z.string().regex(looseUuidRegex),
-              })
-            ).parse(req.body.encryptedComments.filter((c) => Boolean(c.action)));
+            for (const encryptedRelPersonPlace of req.body.encryptedRelsPersonPlace) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  person: z.string().regex(looseUuidRegex),
+                  place: z.string().regex(looseUuidRegex),
+                  user: z.string().regex(looseUuidRegex),
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedRelsPersonPlace: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
+
+            for (const encryptedComment of req.body.encryptedComments.filter((c) => Boolean(c.person))) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  person: z.string().regex(looseUuidRegex),
+                  // user: z.string().regex(looseUuidRegex),
+                  team: z.string().regex(looseUuidRegex),
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models person encryptedComments: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
+
+            for (const encryptedComment of req.body.encryptedComments.filter((c) => Boolean(c.action))) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  action: z.string().regex(looseUuidRegex),
+                  // user: z.string().regex(looseUuidRegex),
+                  team: z.string().regex(looseUuidRegex),
+                  organisation: z.string().regex(looseUuidRegex),
+                });
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models action encryptedComments: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
           } catch (e) {
             const error = new Error(`Invalid request in add-relations-to-db-models migration: ${e}`);
             error.status = 400;

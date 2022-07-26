@@ -16,11 +16,15 @@ router.post(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.person));
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.action));
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.team));
+      z.object({
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+        team: z.string().regex(looseUuidRegex),
+        person: z.optional(z.string().regex(looseUuidRegex)),
+        action: z.optional(z.string().regex(looseUuidRegex)),
+      })
+        .refine((comment) => !!comment.person || !!comment.action)
+        .parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in comment creation: ${e}`);
       error.status = 400;
