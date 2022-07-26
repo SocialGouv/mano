@@ -124,17 +124,33 @@ router.put(
 
         if (req.params.migrationName === "add-relations-to-db-models") {
           try {
+            for (const encryptedAction of req.body.encryptedActions) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  person: z.string().regex(looseUuidRegex),
+                  user: z.string().regex(looseUuidRegex).optional(),
+                  team: z.string().regex(looseUuidRegex),
+                }).parse(encryptedAction);
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedActions: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
+
             for (const encryptedPassage of req.body.encryptedPassages) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  // person: z.optional(z.string().regex(looseUuidRegex)),
-                  // user: z.optional(z.string().regex(looseUuidRegex)),
+                  person: z.string().regex(looseUuidRegex).optional(),
+                  user: z.string().regex(looseUuidRegex).optional(),
                   team: z.string().regex(looseUuidRegex),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                }).parse(encryptedPassage);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models encryptedPassages: ${e}`);
                 error.status = 400;
@@ -148,8 +164,8 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                  user: z.string().regex(looseUuidRegex).optional(),
+                }).parse(encryptedPerson);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models encryptedPersons: ${e}`);
                 error.status = 400;
@@ -163,8 +179,8 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                  user: z.string().regex(looseUuidRegex).optional(),
+                }).parse(encryptedPlace);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models encryptedPlaces: ${e}`);
                 error.status = 400;
@@ -178,8 +194,8 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                  user: z.string().regex(looseUuidRegex).optional(),
+                }).parse(encryptedTerritory);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models encryptedTerritories: ${e}`);
                 error.status = 400;
@@ -194,8 +210,7 @@ router.put(
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
                   team: z.string().regex(looseUuidRegex),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                }).parse(encryptedReport);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models encryptedReports: ${e}`);
                 error.status = 400;
@@ -212,8 +227,7 @@ router.put(
                   territory: z.string().regex(looseUuidRegex),
                   user: z.string().regex(looseUuidRegex),
                   team: z.string().regex(looseUuidRegex),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                }).parse(encryptedTerritoryObservation);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models encryptedTerritoryObservations: ${e}`);
                 error.status = 400;
@@ -230,8 +244,7 @@ router.put(
                   person: z.string().regex(looseUuidRegex),
                   place: z.string().regex(looseUuidRegex),
                   user: z.string().regex(looseUuidRegex),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                }).parse(encryptedRelPersonPlace);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models encryptedRelsPersonPlace: ${e}`);
                 error.status = 400;
@@ -248,8 +261,7 @@ router.put(
                   person: z.string().regex(looseUuidRegex),
                   place: z.string().regex(looseUuidRegex),
                   user: z.string().regex(looseUuidRegex),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                }).parse(encryptedRelPersonPlace);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models encryptedRelsPersonPlace: ${e}`);
                 error.status = 400;
@@ -264,10 +276,9 @@ router.put(
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
                   person: z.string().regex(looseUuidRegex),
-                  // user: z.string().regex(looseUuidRegex),
+                  user: z.string().regex(looseUuidRegex).optional(),
                   team: z.string().regex(looseUuidRegex),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                }).parse(encryptedComment);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models person encryptedComments: ${e}`);
                 error.status = 400;
@@ -282,10 +293,9 @@ router.put(
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
                   action: z.string().regex(looseUuidRegex),
-                  // user: z.string().regex(looseUuidRegex),
+                  user: z.string().regex(looseUuidRegex).optional(),
                   team: z.string().regex(looseUuidRegex),
-                  organisation: z.string().regex(looseUuidRegex),
-                });
+                }).parse(encryptedComment);
               } catch (e) {
                 const error = new Error(`Invalid request in add-relations-to-db-models action encryptedComments: ${e}`);
                 error.status = 400;
@@ -431,27 +441,51 @@ router.put(
 
         if (req.params.migrationName === "add-relations-of-medical-data-to-db-models") {
           try {
-            for (const objectKey of ["encryptedConsultations", "encryptedTreatments"]) {
-              z.array(
+            for (const encryptedConsultation of req.body.encryptedConsultations) {
+              try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
                   person: z.string().regex(looseUuidRegex),
-                  // user: z.string().regex(looseUuidRegex),
-                })
-              ).parse(req.body[objectKey]);
+                  user: z.string().regex(looseUuidRegex).optional(),
+                }).parse(encryptedConsultation);
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedConsultations: ${e}`);
+                error.status = 400;
+                throw error;
+              }
             }
 
-            for (const objectKey of ["encryptedMedicalFiles"]) {
-              z.array(
+            for (const encryptedTreatment of req.body.encryptedTreatments) {
+              try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
                   person: z.string().regex(looseUuidRegex),
-                })
-              ).parse(req.body[objectKey]);
+                  user: z.string().regex(looseUuidRegex).optional(),
+                }).parse(encryptedTreatment);
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedTreatments: ${e}`);
+                error.status = 400;
+                throw error;
+              }
+            }
+
+            for (const encryptedMedicalFile of req.body.encryptedMedicalFiles) {
+              try {
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                  person: z.string().regex(looseUuidRegex),
+                }).parse(encryptedMedicalFile);
+              } catch (e) {
+                const error = new Error(`Invalid request in add-relations-to-db-models encryptedMedicalFiles: ${e}`);
+                error.status = 400;
+                throw error;
+              }
             }
           } catch (e) {
             const error = new Error(`Invalid request in add-relations-to-db-models migration: ${e}`);
