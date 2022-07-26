@@ -1,3 +1,10 @@
+## [1.140.2](https://github.com/SocialGouv/mano/compare/v1.140.1...v1.140.2) (2022-07-26)
+
+
+### Bug Fixes
+
+* **dashboard:** show places only with existing persons ([05c6578](https://github.com/SocialGouv/mano/commit/05c657896d168c4237eba81d3b2ac86605702bff))
+
 ## [1.140.1](https://github.com/SocialGouv/mano/compare/v1.140.0...v1.140.1) (2022-07-22)
 
 
