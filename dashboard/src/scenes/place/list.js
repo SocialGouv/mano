@@ -84,6 +84,7 @@ const List = () => {
                 {relsPersonPlace
                   .filter((rel) => rel.place === place._id)
                   .map((rel) => persons.find((p) => p._id === rel.person))
+                  .filter(Boolean)
                   .map(({ _id, name }, index, arr) => (
                     <Fragment key={_id}>
                       {name}
