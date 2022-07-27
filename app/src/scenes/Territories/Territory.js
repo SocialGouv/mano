@@ -11,10 +11,11 @@ import ButtonDelete from '../../components/ButtonDelete';
 import TerritoryMultiCheckBoxes from '../../components/MultiCheckBoxes/TerritoryMultiCheckBoxes';
 import SubList from '../../components/SubList';
 import TerritoryObservationRow from './TerritoryObservationRow';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { prepareTerritoryForEncryption, territoriesState } from '../../recoil/territory';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { refreshTriggerState } from '../../components/Loader';
 
 const castToTerritory = (territory = {}) => ({
   name: territory.name?.trim() || '',
@@ -37,6 +38,7 @@ const Territory = ({ route, navigation }) => {
 
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const onBack = () => {
     backRequestHandledRef.current = true;
@@ -92,11 +94,11 @@ const Territory = ({ route, navigation }) => {
       return false;
     }
     if (!response.ok) return false;
-    for (let obs of territoryObservations.filter((o) => o.territory === territoryDB._id)) {
-      await API.delete({ path: `/territory-observation/${obs._id}` });
-      setTerritoryObservations((obs) => obs.filter((o) => o.territory !== territoryDB._id));
-    }
     setTerritories((territories) => territories.filter((t) => t._id !== territoryDB._id));
+    setRefreshTrigger({
+      status: true,
+      options: { showFullScreen: false, initialLoad: false },
+    }); // to get all deleted in cascade
     Alert.alert('Territoire supprimé !');
     return true;
   };

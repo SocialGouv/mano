@@ -36,7 +36,7 @@ const View = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [actions, setActions] = useRecoilState(actionsState);
-  const [comments, setComments] = useRecoilState(commentsState);
+  const setComments = useSetRecoilState(commentsState);
 
   const history = useHistory();
   const API = useApi();
@@ -51,14 +51,11 @@ const View = () => {
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
       const actionRes = await API.delete({ path: `/action/${action._id}` });
-      if (actionRes.ok) {
-        setActions((actions) => actions.filter((a) => a._id !== action._id));
-        for (let comment of comments.filter((c) => c.action === action._id)) {
-          const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-          if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
-        }
-      }
       if (!actionRes.ok) return;
+      setRefreshTrigger({
+        status: true,
+        options: { showFullScreen: false, initialLoad: false },
+      }); // to get all deleted in cascade
       toastr.success('Suppression réussie');
       history.goBack();
     }

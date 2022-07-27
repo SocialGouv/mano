@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Alert, Platform } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { createMaterialTopTabNavigator } from '@react-navigation/material-top-tabs';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import PersonSummary from './PersonSummary';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -17,11 +17,10 @@ import {
   personsState,
   preparePersonForEncryption,
 } from '../../recoil/persons';
-import { actionsState } from '../../recoil/actions';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
-import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
+import { refreshTriggerState } from '../../components/Loader';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -35,12 +34,11 @@ const Person = ({ route, navigation }) => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
 
   const [persons, setPersons] = useRecoilState(personsState);
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [comments, setComments] = useRecoilState(commentsState);
+  const setComments = useSetRecoilState(commentsState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
-  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const personDB = useMemo(() => persons.find((p) => p._id === route.params?._id), [persons, route.params?._id]);
 
@@ -164,37 +162,17 @@ const Person = ({ route, navigation }) => {
     if (res.error) {
       if (res.error === 'Not Found') {
         setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
-      } else {
-        Alert.alert(res.error);
-        return false;
+        return true;
       }
-    }
-    for (const action of actions.filter((a) => a.person === personDB._id)) {
-      const actionRes = await API.delete({ path: `/action/${action._id}` });
-      if (actionRes.ok) {
-        setActions((actions) => actions.filter((a) => a._id !== action._id));
-        for (let comment of comments.filter((c) => c.action === action._id)) {
-          const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-          if (commentRes.ok) {
-            setComments((comments) => comments.filter((p) => p._id !== comment._id));
-          }
-        }
-      }
-    }
-    for (let comment of comments.filter((c) => c.person === personDB._id)) {
-      const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-      if (commentRes.ok) {
-        setComments((comments) => comments.filter((p) => p._id !== comment._id));
-      }
-    }
-    for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === personDB._id)) {
-      const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-      if (res.ok) {
-        setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
-      }
+      Alert.alert(res.error);
+      return false;
     }
     setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
     setDeleting(false);
+    setRefreshTrigger({
+      status: true,
+      options: { showFullScreen: false, initialLoad: false },
+    }); // to get all deleted in cascade
     Alert.alert('Personne supprimée !');
     return true;
   };

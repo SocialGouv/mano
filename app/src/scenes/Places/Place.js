@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, View } from 'react-native';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -9,9 +9,9 @@ import Button from '../../components/Button';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
-import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import API from '../../services/api';
 import { sortByName } from '../../utils/sortByName';
+import { refreshTriggerState } from '../../components/Loader';
 
 const Place = ({ navigation, route }) => {
   const [name, setName] = useState(false);
@@ -20,7 +20,7 @@ const Place = ({ navigation, route }) => {
   const [places, setPlaces] = useRecoilState(placesState);
   const placeDB = useMemo(() => places.find((p) => p._id === route.params._id), [places, route?.params?._id]);
 
-  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   const backRequestHandledRef = useRef(null);
   const handleBeforeRemove = (e) => {
@@ -90,10 +90,10 @@ const Place = ({ navigation, route }) => {
     }
     if (response.ok) {
       setPlaces((places) => places.filter((p) => p._id !== placeDB._id));
-      for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === placeDB._id)) {
-        await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-      }
-      setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel.place !== placeDB._id));
+      setRefreshTrigger({
+        status: true,
+        options: { showFullScreen: false, initialLoad: false },
+      }); // to get all deleted in cascade
       setUpdating(false);
       Alert.alert('Lieu supprimé !');
       onBack();

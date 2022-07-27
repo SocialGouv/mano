@@ -14,7 +14,6 @@ import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from 
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
@@ -22,7 +21,6 @@ const View = () => {
   const { id } = useParams();
   const history = useHistory();
   const [territories, setTerritories] = useRecoilState(territoriesState);
-  const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territory = territories.find((t) => t._id === id);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const API = useApi();
@@ -103,12 +101,10 @@ const View = () => {
                     const res = await API.delete({ path: `/territory/${id}` });
                     if (res.ok) {
                       setTerritories((territories) => territories.filter((t) => t._id !== id));
-                      for (let obs of territoryObservations.filter((o) => o.territory === id)) {
-                        const res = await API.delete({ path: `/territory-observation/${obs._id}` });
-                        if (res.ok) {
-                          setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obs._id));
-                        }
-                      }
+                      setRefreshTrigger({
+                        status: true,
+                        options: { showFullScreen: false, initialLoad: false },
+                      }); // to get all deleted in cascade
                       toastr.success('Suppression réussie');
                       history.goBack();
                     }

@@ -97,12 +97,10 @@ const View = () => {
                   const placeRes = await API.delete({ path: `/place/${id}` });
                   if (placeRes.ok) {
                     setPlaces((places) => places.filter((p) => p._id !== id));
-                    for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === id)) {
-                      const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-                      if (res.ok) {
-                        setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
-                      }
-                    }
+                    setRefreshTrigger({
+                      status: true,
+                      options: { showFullScreen: false, initialLoad: false },
+                    }); // to get all deleted in cascade
                     toastr.success('Suppression réussie');
                     history.goBack();
                   }

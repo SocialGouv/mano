@@ -22,13 +22,14 @@ import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
 import { actionsState, DONE, CANCEL, TODO, prepareActionForEncryption, mappedIdsToLabels } from '../../recoil/actions';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { personsState } from '../../recoil/persons';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
+import { refreshTriggerState } from '../../components/Loader';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -67,6 +68,7 @@ const Action = ({ navigation, route }) => {
   const [updating, setUpdating] = useState(false);
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
+  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
   useEffect(() => {
     if (route?.params?.duplicate) {
@@ -342,13 +344,11 @@ const Action = ({ navigation, route }) => {
   const deleteAction = async (id) => {
     const res = await API.delete({ path: `/action/${id}` });
     if (res.ok) {
-      for (let comment of comments.filter((c) => c.action === id)) {
-        const res = await API.delete({ path: `/comment/${comment._id}` });
-        if (res.ok) {
-          setComments((comments) => comments.filter((p) => p._id !== comment._id));
-        }
-      }
       setActions((actions) => actions.filter((a) => a._id !== id));
+      setRefreshTrigger({
+        status: true,
+        options: { showFullScreen: false, initialLoad: false },
+      }); // to get all deleted in cascade
     }
     return res;
   };
