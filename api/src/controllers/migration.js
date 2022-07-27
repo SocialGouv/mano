@@ -244,7 +244,6 @@ router.put(
 
             for (const encryptedTerritoryObservation of req.body.encryptedTerritoryObservations) {
               try {
-                // 82f44110-5aa0-43a6-a389-a60a966e919a
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),

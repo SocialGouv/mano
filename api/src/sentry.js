@@ -18,8 +18,7 @@ if (sentryEnabled) {
 
 function capture(err, context = {}) {
   if (!sentryEnabled) {
-    console.log("capture", err);
-    // console.log("capture", err, JSON.stringify(context));
+    console.log("capture", err, JSON.stringify(context));
     return;
   }
 

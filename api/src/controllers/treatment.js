@@ -19,7 +19,7 @@ router.post(
       z.object({
         encrypted: z.string(),
         encryptedEntityKey: z.string(),
-        person: z.string().regex(looseUuidRegex).optional(),
+        person: z.string().regex(looseUuidRegex),
       }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in treatment creation: ${e}`);

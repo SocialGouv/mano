@@ -31,7 +31,6 @@ router.post(
         user: req.user._id,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
-        territory: req.body.territory,
       },
       { returning: true }
     );
@@ -43,7 +42,6 @@ router.post(
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
         user: data.user,
-        territory: data.territory,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -105,7 +103,6 @@ router.put(
       z.object({
         encrypted: z.string(),
         encryptedEntityKey: z.string(),
-        territory: z.string().regex(looseUuidRegex),
       }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in territory put: ${e}`);
