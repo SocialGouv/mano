@@ -2,9 +2,11 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { z } = require("zod");
+const sequelize = require("../db/sequelize");
 const { looseUuidRegex } = require("../utils");
 const { catchErrors } = require("../errors");
 const Team = require("../models/team");
+const Report = require("../models/report");
 const RelUserTeam = require("../models/relUserTeam");
 const validateUser = require("../middleware/validateUser");
 
@@ -102,8 +104,13 @@ router.delete(
       error.status = 400;
       return next(error);
     }
-    await RelUserTeam.destroy({ where: { team: req.params._id } });
-    await Team.destroy({ where: { _id: req.params._id, organisation: req.user.organisation } });
+
+    await sequelize.transaction(async (tx) => {
+      await RelUserTeam.destroy({ where: { team: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await Report.destroy({ where: { team: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await Team.destroy({ where: { _id: req.params._id, organisation: req.user.organisation }, transaction: tx });
+    });
+
     res.status(200).send({ ok: true });
   })
 );

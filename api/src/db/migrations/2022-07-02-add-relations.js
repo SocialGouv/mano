@@ -3,6 +3,11 @@ const sequelize = require("../sequelize");
 
 module.exports = async () => {
   try {
+    /*
+
+    TEAM relation
+
+    */
     for (const table of ["Action", "Passage", "Comment", "TerritoryObservation"]) {
       await sequelize.query(`
       alter table "mano"."${table}"
@@ -19,6 +24,11 @@ module.exports = async () => {
         `);
     }
 
+    /*
+
+    USER relation
+
+    */
     for (const table of [
       "Action",
       "Passage",
@@ -38,6 +48,11 @@ module.exports = async () => {
         `);
     }
 
+    /*
+
+    PERSON relation
+
+    */
     for (const table of ["MedicalFile", "Action", "Passage", "Comment", "Consultation", "Treatment", "RelPersonPlace"]) {
       await sequelize.query(`
       alter table "mano"."${table}"
@@ -45,19 +60,33 @@ module.exports = async () => {
             constraint "${table}_person_fkey" references mano."Person" on update cascade on delete cascade;
         `);
     }
+    /*
 
+    PLACE relation
+
+    */
     await sequelize.query(`
     alter table "mano"."RelPersonPlace"
       add column if not exists "place" uuid
           constraint "RelPersonPlace_place_fkey" references mano."Place" on update cascade on delete cascade;
       `);
 
+    /*
+
+    ACTION relation
+
+    */
     await sequelize.query(`
     alter table "mano"."Comment"
       add column if not exists "action" uuid
           constraint "Comment_action_fkey" references mano."Action" on update cascade on delete cascade;
       `);
 
+    /*
+
+    TERRITORY relation
+
+    */
     await sequelize.query(`
     alter table "mano"."TerritoryObservation"
       add column if not exists "territory" uuid

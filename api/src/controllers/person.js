@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
+const sequelize = require("../db/sequelize");
 const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
@@ -9,6 +10,13 @@ const crypto = require("crypto");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const Person = require("../models/person");
+const Action = require("../models/action");
+const Comment = require("../models/comment");
+const Passage = require("../models/passage");
+const RelPersonPlace = require("../models/relPersonPlace");
+const Consultation = require("../models/consultation");
+const Treatment = require("../models/treatment");
+const MedicalFile = require("../models/medicalFile");
 const { STORAGE_DIRECTORY } = require("../config");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
@@ -316,7 +324,23 @@ router.delete(
     let person = await Person.findOne(query);
     if (!person) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    await person.destroy();
+    await sequelize.transaction(async (tx) => {
+      const actions = await Action.findAll({ where: { person: req.params._id, organisation: req.user.organisation } });
+      for (const action of actions) {
+        await Comment.destroy({ where: { action: action._id, organisation: req.user.organisation }, transaction: tx });
+      }
+      await Comment.destroy({ where: { person: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await Action.destroy({ where: { person: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await Passage.destroy({ where: { person: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await RelPersonPlace.destroy({ where: { person: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await Consultation.destroy({ where: { person: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await Treatment.destroy({ where: { person: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await MedicalFile.destroy({ where: { person: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      const dir = personDocumentBasedir(req.user.organisation, req.params._id);
+      if (fs.existsSync(dir)) fs.rmdirSync(dir);
+      await person.destroy({ transaction: tx });
+    });
+
     res.status(200).send({ ok: true });
   })
 );

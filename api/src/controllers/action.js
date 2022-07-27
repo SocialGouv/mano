@@ -3,10 +3,12 @@ const { z } = require("zod");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
+const sequelize = require("../db/sequelize");
 const { catchErrors } = require("../errors");
 const validateUser = require("../middleware/validateUser");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const Action = require("../models/action");
+const Comment = require("../models/comment");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 const TODO = "A FAIRE";
@@ -232,7 +234,10 @@ router.delete(
     });
     if (!action) return res.status(200).send({ ok: true });
 
-    await action.destroy();
+    await sequelize.transaction(async (tx) => {
+      await Comment.destroy({ where: { action: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await action.destroy({ transaction: tx });
+    });
 
     res.status(200).send({ ok: true });
   })

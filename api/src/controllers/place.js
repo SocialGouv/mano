@@ -2,11 +2,13 @@ const express = require("express");
 const router = express.Router();
 const passport = require("passport");
 const { Op } = require("sequelize");
+const sequelize = require("../db/sequelize");
 const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const validateUser = require("../middleware/validateUser");
 const Place = require("../models/place");
+const RelPersonPlace = require("../models/relPersonPlace");
 const { looseUuidRegex, positiveIntegerRegex } = require("../utils");
 
 router.post(
@@ -156,7 +158,11 @@ router.delete(
     const place = await Place.findOne(query);
     if (!place) return res.status(404).send({ ok: false, error: "Not Found" });
 
-    await place.destroy();
+    await sequelize.transaction(async (tx) => {
+      await RelPersonPlace.destroy({ where: { place: req.params._id, organisation: req.user.organisation }, transaction: tx });
+      await place.destroy({ transaction: tx });
+    });
+
     res.status(200).send({ ok: true });
   })
 );
