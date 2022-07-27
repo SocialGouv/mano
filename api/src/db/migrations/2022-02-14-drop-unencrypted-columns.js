@@ -6,12 +6,9 @@ module.exports = async () => {
       `ALTER TABLE "mano"."Action"
       DROP COLUMN IF EXISTS "name",
       DROP COLUMN IF EXISTS "description",
-      DROP COLUMN IF EXISTS "person",
       DROP COLUMN IF EXISTS "withTime",
       DROP COLUMN IF EXISTS "category",
-      DROP COLUMN IF EXISTS "team",
       DROP COLUMN IF EXISTS "structure",
-      DROP COLUMN IF EXISTS "user",
       DROP COLUMN IF EXISTS "categories";`
     );
 
@@ -19,11 +16,7 @@ module.exports = async () => {
       `ALTER TABLE "mano"."Comment"
       DROP COLUMN IF EXISTS "type",
       DROP COLUMN IF EXISTS "item",
-      DROP COLUMN IF EXISTS "comment",
-      DROP COLUMN IF EXISTS "user",
-      DROP COLUMN IF EXISTS "team",
-      DROP COLUMN IF EXISTS "action",
-      DROP COLUMN IF EXISTS "person";`
+      DROP COLUMN IF EXISTS "comment";`
     );
 
     await sequelize.query(
@@ -32,7 +25,6 @@ module.exports = async () => {
       DROP COLUMN IF EXISTS "gender",
       DROP COLUMN IF EXISTS "birthdate",
       DROP COLUMN IF EXISTS "description",
-      DROP COLUMN IF EXISTS "user",
       DROP COLUMN IF EXISTS "healthInsurance",
       DROP COLUMN IF EXISTS "vulnerabilities",
       DROP COLUMN IF EXISTS "consumptions",
@@ -58,22 +50,13 @@ module.exports = async () => {
 
     await sequelize.query(
       `ALTER TABLE "mano"."Place"
-      DROP COLUMN IF EXISTS "name",
-      DROP COLUMN IF EXISTS "user";`
-    );
-
-    await sequelize.query(
-      `ALTER TABLE "mano"."RelPersonPlace"
-      DROP COLUMN IF EXISTS "person",
-      DROP COLUMN IF EXISTS "user",
-      DROP COLUMN IF EXISTS "place";`
+      DROP COLUMN IF EXISTS "name"`
     );
 
     await sequelize.query(
       `ALTER TABLE "mano"."Report"
       DROP COLUMN IF EXISTS "description",
       DROP COLUMN IF EXISTS "date",
-      DROP COLUMN IF EXISTS "team",
       DROP COLUMN IF EXISTS "services",
       DROP COLUMN IF EXISTS "passages",
       DROP COLUMN IF EXISTS "collaborations";`
@@ -83,8 +66,7 @@ module.exports = async () => {
       `ALTER TABLE "mano"."Territory"
       DROP COLUMN IF EXISTS "name",
       DROP COLUMN IF EXISTS "types",
-      DROP COLUMN IF EXISTS "perimeter",
-      DROP COLUMN IF EXISTS "user";`
+      DROP COLUMN IF EXISTS "perimeter"`
     );
 
     await sequelize.query(
@@ -95,9 +77,6 @@ module.exports = async () => {
       DROP COLUMN IF EXISTS "atmosphere",
       DROP COLUMN IF EXISTS "mediation",
       DROP COLUMN IF EXISTS "comment",
-      DROP COLUMN IF EXISTS "territory",
-      DROP COLUMN IF EXISTS "team",
-      DROP COLUMN IF EXISTS "user",
       DROP COLUMN IF EXISTS "personsMale",
       DROP COLUMN IF EXISTS "personsFemale";`
     );

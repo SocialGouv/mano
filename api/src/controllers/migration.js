@@ -139,13 +139,16 @@ router.put(
                   extra: { encryptedAction, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
-            for (const encryptedPassage of req.body.encryptedPassages) {
+            // there was a bug on 2022-04-12 where some passages got `person: "e"` `person: "1"` as a person
+            // from _id 596f932f-77e9-4057-b95a-6432802e49f9 to _id 635bb2b8-4d5c-4299-83c0-b1c4e76b4a6a
+            // and maybe more
+            // consisting of `person` being only one char of a UUID, instead of a whole UUID
+            // we need to remove them because it's stale data
+            for (const encryptedPassage of req.body.encryptedPassages.filter((p) => p.person?.length !== 1)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -160,9 +163,7 @@ router.put(
                   extra: { encryptedPassage, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -179,9 +180,7 @@ router.put(
                   extra: { encryptedPerson, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -198,9 +197,7 @@ router.put(
                   extra: { encryptedPlace, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -217,9 +214,7 @@ router.put(
                   extra: { encryptedTerritory, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -236,9 +231,7 @@ router.put(
                   extra: { encryptedReport, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -257,13 +250,13 @@ router.put(
                   extra: { encryptedTerritoryObservation, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
-            for (const encryptedRelPersonPlace of req.body.encryptedRelsPersonPlace) {
+            // there are some stale relPersonPlace, probably due to wrong cascade deletion before this migration
+            // we need to delete it
+            for (const encryptedRelPersonPlace of req.body.encryptedRelsPersonPlace.filter((r) => !!r.person && !!r.place)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -278,9 +271,7 @@ router.put(
                   extra: { encryptedRelPersonPlace, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -302,9 +293,7 @@ router.put(
                   extra: { encryptedComment, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -356,17 +345,28 @@ router.put(
               );
             }
 
-            for (const { encrypted, encryptedEntityKey, person, user, team, _id } of encryptedPassages) {
-              await Passage.update(
-                {
-                  encrypted,
-                  encryptedEntityKey,
-                  person: persons.includes(person) ? person : null,
-                  user: users.includes(user) ? user : null,
-                  team: teams.includes(team) ? team : null,
-                },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
-              );
+            // there was a bug on 2022-04-12 where some passages got `person: "e"` `person: "1"` as a person
+            // from _id 596f932f-77e9-4057-b95a-6432802e49f9 to _id 635bb2b8-4d5c-4299-83c0-b1c4e76b4a6a
+            // and maybe more
+            // consisting of `person` being only one char of a UUID, instead of a whole UUID
+            // we need to remove them because it's stale data
+            for (const encryptedPassage of encryptedPassages) {
+              const isStale = encryptedPassage.person !== null && encryptedPassage.person?.length < 36;
+              if (isStale) {
+                await Passage.destroy({ where: { _id: encryptedPassage._id }, transaction: tx });
+              } else {
+                const { encrypted, encryptedEntityKey, person, user, team, _id } = encryptedPassage;
+                await Passage.update(
+                  {
+                    encrypted,
+                    encryptedEntityKey,
+                    person: persons.includes(person) ? person : null,
+                    user: users.includes(user) ? user : null,
+                    team: teams.includes(team) ? team : null,
+                  },
+                  { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                );
+              }
             }
 
             for (const { encrypted, encryptedEntityKey, user, _id } of encryptedPersons) {
@@ -392,15 +392,21 @@ router.put(
             }
 
             for (const { encrypted, encryptedEntityKey, person, place, _id } of encryptedRelsPersonPlace) {
-              await RelPersonPlace.update(
-                {
-                  encrypted,
-                  encryptedEntityKey,
-                  person: persons.includes(person) ? person : null,
-                  place: places.includes(place) ? place : null,
-                },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
-              );
+              // there are some stale relPersonPlace, probably due to wrong cascade deletion before this migration
+              // we need to delete it
+              if (!persons.includes(person) || places.includes(place)) {
+                await Passage.destroy({ where: { _id }, transaction: tx });
+              } else {
+                await RelPersonPlace.update(
+                  {
+                    encrypted,
+                    encryptedEntityKey,
+                    person: persons.includes(person) ? person : null,
+                    place: places.includes(place) ? place : null,
+                  },
+                  { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                );
+              }
             }
 
             for (const { encrypted, encryptedEntityKey, team, _id } of encryptedReports) {
@@ -460,9 +466,7 @@ router.put(
                   extra: { encryptedConsultation, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -480,9 +484,7 @@ router.put(
                   extra: { encryptedTreatment, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
             }
 
@@ -499,50 +501,48 @@ router.put(
                   extra: { encryptedMedicalFile, version: req.headers.version },
                   user: req.user,
                 });
-                return res
-                  .status(500)
-                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
+                throw e;
               }
+            }
+
+            const { encryptedConsultations, encryptedMedicalFiles, encryptedTreatments } = req.body;
+
+            const users = (await User.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+            const persons = (await Person.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+
+            for (const { encrypted, encryptedEntityKey, person, user, _id } of encryptedConsultations) {
+              await Consultation.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  person: persons.includes(person) ? person : null,
+                  user: users.includes(user) ? user : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, person, _id } of encryptedMedicalFiles) {
+              await MedicalFile.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  person: persons.includes(person) ? person : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, person, user, _id } of encryptedTreatments) {
+              await Treatment.update(
+                { encrypted, encryptedEntityKey, person: persons.includes(person) ? person : null, user: users.includes(user) ? user : null },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
             }
           } catch (e) {
             const error = new Error(`Invalid request in add-relations-to-db-models migration: ${e}`);
             error.status = 400;
             throw error;
-          }
-
-          const { encryptedConsultations, encryptedMedicalFiles, encryptedTreatments } = req.body;
-
-          const users = (await User.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
-          const persons = (await Person.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
-
-          for (const { encrypted, encryptedEntityKey, person, user, _id } of encryptedConsultations) {
-            await Consultation.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                person: persons.includes(person) ? person : null,
-                user: users.includes(user) ? user : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, person, _id } of encryptedMedicalFiles) {
-            await MedicalFile.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                person: persons.includes(person) ? person : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, person, user, _id } of encryptedTreatments) {
-            await Treatment.update(
-              { encrypted, encryptedEntityKey, person: persons.includes(person) ? person : null, user: users.includes(user) ? user : null },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
           }
         }
 
@@ -554,6 +554,7 @@ router.put(
         await organisation.save({ transaction: tx });
       });
     } catch (e) {
+      req.body = null; // because it's too much data to send to Sentry
       organisation.set({ migrating: false });
       await organisation.save();
       return next(e);
