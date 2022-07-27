@@ -21,7 +21,7 @@ const View = () => {
   const { id } = useParams();
   const history = useHistory();
   const [places, setPlaces] = useRecoilState(placesState);
-  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const persons = useRecoilValue(personsState);
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
