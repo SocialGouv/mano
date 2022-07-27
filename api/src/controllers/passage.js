@@ -105,13 +105,16 @@ router.put(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      if (req.body.createdAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.createdAt);
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
-      z.string().regex(looseUuidRegex).parse(req.body.person);
-      z.string().regex(looseUuidRegex).parse(req.body.team);
-      z.string().regex(looseUuidRegex).parse(req.body.user);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
+      z.object({
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+        person: z.string().regex(looseUuidRegex),
+        team: z.string().regex(looseUuidRegex),
+        user: z.string().regex(looseUuidRegex),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in passage put: ${e}`);
       error.status = 400;

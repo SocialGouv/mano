@@ -65,9 +65,13 @@ router.put(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.optional(z.string()).parse(req.body.name);
-      z.optional(z.boolean()).parse(req.body.nightSession);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
+      z.object({
+        name: z.string(),
+        nightSession: z.boolean().optional(),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in team put: ${e}`);
       error.status = 400;

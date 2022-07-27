@@ -122,13 +122,19 @@ router.put(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.person));
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.action));
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.team));
-      z.optional(z.string().regex(looseUuidRegex).parse(req.body.user));
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
+      z.object({
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+        team: z.string().regex(looseUuidRegex),
+        person: z.string().regex(looseUuidRegex).optional().nullable(),
+        action: z.string().regex(looseUuidRegex).optional().nullable(),
+        user: z.string().regex(looseUuidRegex).optional().nullable(),
+      })
+        .refine((comment) => !!comment.person || !!comment.action)
+        .parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in comment put: ${e}`);
       error.status = 400;

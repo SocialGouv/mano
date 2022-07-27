@@ -102,12 +102,16 @@ router.put(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
-      z.string().regex(looseUuidRegex).parse(req.body.user);
-      z.string().regex(looseUuidRegex).parse(req.body.team);
-      z.string().regex(looseUuidRegex).parse(req.body.territory);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
+      z.object({
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+        user: z.string().regex(looseUuidRegex),
+        team: z.string().regex(looseUuidRegex),
+        territory: z.string().regex(looseUuidRegex),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in observation put: ${e}`);
       error.status = 400;
