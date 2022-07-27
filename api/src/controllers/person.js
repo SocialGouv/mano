@@ -167,8 +167,10 @@ router.post(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in person creation: ${e}`);
       error.status = 400;

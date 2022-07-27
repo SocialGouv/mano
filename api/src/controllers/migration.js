@@ -130,14 +130,18 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  person: z.string().regex(looseUuidRegex),
-                  user: z.string().regex(looseUuidRegex).optional(),
+                  person: z.string().regex(looseUuidRegex).optional(),
+                  user: z.string().regex(looseUuidRegex).optional().nullable(),
                   team: z.string().regex(looseUuidRegex),
                 }).parse(encryptedAction);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedActions: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedActions: ${e}`), {
+                  extra: { encryptedAction, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -147,14 +151,18 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  person: z.string().regex(looseUuidRegex).optional(),
-                  user: z.string().regex(looseUuidRegex).optional(),
+                  person: z.string().regex(looseUuidRegex).optional().nullable(),
+                  user: z.string().regex(looseUuidRegex).optional().nullable(),
                   team: z.string().regex(looseUuidRegex),
                 }).parse(encryptedPassage);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedPassages: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedPassage: ${e}`), {
+                  extra: { encryptedPassage, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -164,12 +172,16 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  user: z.string().regex(looseUuidRegex).optional(),
+                  user: z.string().regex(looseUuidRegex).optional().nullable(),
                 }).parse(encryptedPerson);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedPersons: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedPerson: ${e}`), {
+                  extra: { encryptedPerson, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -179,12 +191,16 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  user: z.string().regex(looseUuidRegex).optional(),
+                  user: z.string().regex(looseUuidRegex).optional().nullable(),
                 }).parse(encryptedPlace);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedPlaces: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedPlace: ${e}`), {
+                  extra: { encryptedPlace, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -194,12 +210,16 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  user: z.string().regex(looseUuidRegex).optional(),
+                  user: z.string().regex(looseUuidRegex).optional().nullable(),
                 }).parse(encryptedTerritory);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedTerritories: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedTerritory: ${e}`), {
+                  extra: { encryptedTerritory, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -212,26 +232,35 @@ router.put(
                   team: z.string().regex(looseUuidRegex),
                 }).parse(encryptedReport);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedReports: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedReport: ${e}`), {
+                  extra: { encryptedReport, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
             for (const encryptedTerritoryObservation of req.body.encryptedTerritoryObservations) {
               try {
+                // 82f44110-5aa0-43a6-a389-a60a966e919a
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
                   territory: z.string().regex(looseUuidRegex),
-                  user: z.string().regex(looseUuidRegex),
+                  user: z.string().regex(looseUuidRegex).optional().nullable(),
                   team: z.string().regex(looseUuidRegex),
                 }).parse(encryptedTerritoryObservation);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedTerritoryObservations: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedTerritoryObservation: ${e}`), {
+                  extra: { encryptedTerritoryObservation, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -243,29 +272,16 @@ router.put(
                   encryptedEntityKey: z.string(),
                   person: z.string().regex(looseUuidRegex),
                   place: z.string().regex(looseUuidRegex),
-                  user: z.string().regex(looseUuidRegex),
+                  user: z.string().regex(looseUuidRegex).optional().nullable(),
                 }).parse(encryptedRelPersonPlace);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedRelsPersonPlace: ${e}`);
-                error.status = 400;
-                throw error;
-              }
-            }
-
-            for (const encryptedRelPersonPlace of req.body.encryptedRelsPersonPlace) {
-              try {
-                z.object({
-                  _id: z.string().regex(looseUuidRegex),
-                  encrypted: z.string(),
-                  encryptedEntityKey: z.string(),
-                  person: z.string().regex(looseUuidRegex),
-                  place: z.string().regex(looseUuidRegex),
-                  user: z.string().regex(looseUuidRegex),
-                }).parse(encryptedRelPersonPlace);
-              } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedRelsPersonPlace: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedRelPersonPlace: ${e}`), {
+                  extra: { encryptedRelPersonPlace, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -275,167 +291,157 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  person: z.string().regex(looseUuidRegex),
-                  user: z.string().regex(looseUuidRegex).optional(),
-                  team: z.string().regex(looseUuidRegex),
-                }).parse(encryptedComment);
+                  team: z.string().regex(looseUuidRegex).optional(),
+                  person: z.string().regex(looseUuidRegex).optional(),
+                  action: z.string().regex(looseUuidRegex).optional(),
+                  user: z.string().regex(looseUuidRegex).optional().nullable(),
+                })
+                  .refine((comment) => !!comment.person || !!comment.action)
+                  .parse(encryptedComment);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models person encryptedComments: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedComment: ${e}`), {
+                  extra: { encryptedComment, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
-            for (const encryptedComment of req.body.encryptedComments.filter((c) => Boolean(c.action))) {
-              try {
-                z.object({
-                  _id: z.string().regex(looseUuidRegex),
-                  encrypted: z.string(),
-                  encryptedEntityKey: z.string(),
-                  action: z.string().regex(looseUuidRegex),
-                  user: z.string().regex(looseUuidRegex).optional(),
-                  team: z.string().regex(looseUuidRegex),
-                }).parse(encryptedComment);
-              } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models action encryptedComments: ${e}`);
-                error.status = 400;
-                throw error;
-              }
+            const {
+              encryptedActions,
+              encryptedComments,
+              encryptedPassages,
+              encryptedPersons,
+              encryptedPlaces,
+              encryptedRelsPersonPlace,
+              encryptedReports,
+              encryptedTerritories,
+              encryptedTerritoryObservations,
+            } = req.body;
+
+            const teams = (await Team.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+            const users = (await User.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+            const persons = (await Person.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+            const places = (await Place.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+            const actions = (await Action.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
+            const territories = (await Territory.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map(
+              (item) => item._id
+            );
+
+            for (const { encrypted, encryptedEntityKey, person, user, team, _id } of encryptedActions) {
+              await Action.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  person: persons.includes(person) ? person : null,
+                  user: users.includes(user) ? user : null,
+                  team: teams.includes(team) ? team : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, person, action, user, team, _id } of encryptedComments) {
+              await Comment.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  person: !!person && persons.includes(person) ? person : null,
+                  action: !!action && actions.includes(action) ? action : null,
+                  user: users.includes(user) ? user : null,
+                  team: teams.includes(team) ? team : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, person, user, team, _id } of encryptedPassages) {
+              await Passage.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  person: persons.includes(person) ? person : null,
+                  user: users.includes(user) ? user : null,
+                  team: teams.includes(team) ? team : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, user, _id } of encryptedPersons) {
+              await Person.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  user: users.includes(user) ? user : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, user, _id } of encryptedPlaces) {
+              await Place.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  user: users.includes(user) ? user : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, person, place, _id } of encryptedRelsPersonPlace) {
+              await RelPersonPlace.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  person: persons.includes(person) ? person : null,
+                  place: places.includes(place) ? place : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, team, _id } of encryptedReports) {
+              await Report.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  team: teams.includes(team) ? team : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, user, _id } of encryptedTerritories) {
+              await Territory.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  user: users.includes(user) ? user : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
+            }
+
+            for (const { encrypted, encryptedEntityKey, territory, user, team, _id } of encryptedTerritoryObservations) {
+              await TerritoryObservation.update(
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  territory: territories.includes(territory) ? territory : null,
+                  user: users.includes(user) ? user : null,
+                  team: teams.includes(team) ? team : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+              );
             }
           } catch (e) {
             const error = new Error(`Invalid request in add-relations-to-db-models migration: ${e}`);
             error.status = 400;
             throw error;
-          }
-
-          const {
-            encryptedActions,
-            encryptedComments,
-            encryptedPassages,
-            encryptedPersons,
-            encryptedPlaces,
-            encryptedRelsPersonPlace,
-            encryptedReports,
-            encryptedTerritories,
-            encryptedTerritoryObservations,
-          } = req.body;
-
-          const teams = (await Team.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
-          const users = (await User.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
-          const persons = (await Person.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
-          const places = (await Place.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
-          const actions = (await Action.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map((item) => item._id);
-          const territories = (await Territory.findAll({ where: { organisation: req.user.organisation }, attributes: ["_id"] })).map(
-            (item) => item._id
-          );
-
-          for (const { encrypted, encryptedEntityKey, person, user, team, _id } of encryptedActions) {
-            await Action.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                person: persons.includes(person) ? person : null,
-                user: users.includes(user) ? user : null,
-                team: teams.includes(team) ? team : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, person, action, user, team, _id } of encryptedComments) {
-            await Comment.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                person: !!person && persons.includes(person) ? person : null,
-                action: !!action && actions.includes(action) ? action : null,
-                user: users.includes(user) ? user : null,
-                team: teams.includes(team) ? team : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, person, user, team, _id } of encryptedPassages) {
-            await Passage.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                person: persons.includes(person) ? person : null,
-                user: users.includes(user) ? user : null,
-                team: teams.includes(team) ? team : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, user, _id } of encryptedPersons) {
-            await Person.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                user: users.includes(user) ? user : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, user, _id } of encryptedPlaces) {
-            await Place.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                user: users.includes(user) ? user : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, person, place, _id } of encryptedRelsPersonPlace) {
-            await RelPersonPlace.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                person: persons.includes(person) ? person : null,
-                place: places.includes(place) ? place : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, team, _id } of encryptedReports) {
-            await Report.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                team: teams.includes(team) ? team : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, user, _id } of encryptedTerritories) {
-            await Territory.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                user: users.includes(user) ? user : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
-          }
-
-          for (const { encrypted, encryptedEntityKey, territory, user, team, _id } of encryptedTerritoryObservations) {
-            await TerritoryObservation.update(
-              {
-                encrypted,
-                encryptedEntityKey,
-                territory: territories.includes(territory) ? territory : null,
-                user: users.includes(user) ? user : null,
-                team: teams.includes(team) ? team : null,
-              },
-              { where: { _id, organisation: req.user.organisation }, transaction: tx }
-            );
           }
         }
 
@@ -451,9 +457,13 @@ router.put(
                   user: z.string().regex(looseUuidRegex).optional(),
                 }).parse(encryptedConsultation);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedConsultations: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedConsultation: ${e}`), {
+                  extra: { encryptedConsultation, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -467,9 +477,13 @@ router.put(
                   user: z.string().regex(looseUuidRegex).optional(),
                 }).parse(encryptedTreatment);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedTreatments: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedTreatment: ${e}`), {
+                  extra: { encryptedTreatment, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
 
@@ -482,9 +496,13 @@ router.put(
                   person: z.string().regex(looseUuidRegex),
                 }).parse(encryptedMedicalFile);
               } catch (e) {
-                const error = new Error(`Invalid request in add-relations-to-db-models encryptedMedicalFiles: ${e}`);
-                error.status = 400;
-                throw error;
+                capture(new Error(`Invalid request in add-relations-to-db-models encryptedMedicalFile: ${e}`), {
+                  extra: { encryptedMedicalFile, version: req.headers.version },
+                  user: req.user,
+                });
+                return res
+                  .status(500)
+                  .send({ ok: false, code: "SERVER_ERROR", error: "Désolé, une erreur est survenue, l'équipe technique est prévenue." });
               }
             }
           } catch (e) {
@@ -537,7 +555,6 @@ router.put(
         await organisation.save({ transaction: tx });
       });
     } catch (e) {
-      capture("error migrating", e);
       organisation.set({ migrating: false });
       await organisation.save();
       return next(e);

@@ -14,8 +14,10 @@ router.post(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.body.name);
-      z.optional(z.boolean()).parse(req.body.nightSession);
+      z.object({
+        name: z.string(),
+        nightSession: z.boolean().optional(),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in team creation: ${e}`);
       error.status = 400;

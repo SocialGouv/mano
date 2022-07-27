@@ -19,7 +19,7 @@ router.post(
       z.object({
         encrypted: z.string(),
         encryptedEntityKey: z.string(),
-        person: z.optional(z.string().regex(looseUuidRegex)),
+        person: z.string().regex(looseUuidRegex).optional(),
         team: z.string().regex(looseUuidRegex),
       }).parse(req.body);
     } catch (e) {

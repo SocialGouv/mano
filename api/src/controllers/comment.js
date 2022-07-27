@@ -20,8 +20,8 @@ router.post(
         encrypted: z.string(),
         encryptedEntityKey: z.string(),
         team: z.string().regex(looseUuidRegex),
-        person: z.optional(z.string().regex(looseUuidRegex)),
-        action: z.optional(z.string().regex(looseUuidRegex)),
+        person: z.string().regex(looseUuidRegex).optional().nullable(),
+        action: z.string().regex(looseUuidRegex).optional().nullable(),
       })
         .refine((comment) => !!comment.person || !!comment.action)
         .parse(req.body);

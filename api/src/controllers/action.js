@@ -21,20 +21,22 @@ router.post(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.enum(STATUS).parse(req.body.status);
-      z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
-      if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
-      z.string().regex(looseUuidRegex).parse(req.body.person);
-      z.string().regex(looseUuidRegex).parse(req.body.team);
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        status: z.enum(STATUS),
+        dueAt: z.preprocess((input) => new Date(input), z.date()),
+        completedAt: z.preprocess((input) => new Date(input), z.date()).optional(),
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+        team: z.string().regex(looseUuidRegex),
+        person: z.string().regex(looseUuidRegex),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in action creation: ${e}`);
       error.status = 400;
       return next(error);
     }
 
-    const { status, dueAt, completedAt, encrypted, encryptedEntityKey, person, team, user } = req.body;
+    const { status, dueAt, completedAt, encrypted, encryptedEntityKey, person, team } = req.body;
     const action = {
       organisation: req.user.organisation,
       user: req.user._id,

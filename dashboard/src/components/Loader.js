@@ -418,8 +418,13 @@ const Loader = () => {
         saveInCache: false,
         API,
       });
+
       const encryptedTerritoryObservations = await Promise.all(
-        allObservations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem(hashedOrgEncryptionKey))
+        allObservations
+          .filter((o) => !!o.territory)
+          .map((obs) => (typeof obs.user === 'string' ? obs : { ...obs, user: null }))
+          .map(prepareObsForEncryption(customFieldsObs))
+          .map(encryptItem(hashedOrgEncryptionKey))
       );
 
       const response = await API.put({
