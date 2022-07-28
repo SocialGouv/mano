@@ -1,3 +1,10 @@
+# [1.141.0](https://github.com/SocialGouv/mano/compare/v1.140.6...v1.141.0) (2022-07-28)
+
+
+### Features
+
+* **app,dashboard:** new fields in ressources and situation ([#821](https://github.com/SocialGouv/mano/issues/821)) ([a01dfe7](https://github.com/SocialGouv/mano/commit/a01dfe7ad98075a40f26892002bf7755412103dc))
+
 ## [1.140.6](https://github.com/SocialGouv/mano/compare/v1.140.5...v1.140.6) (2022-07-28)
 
 
