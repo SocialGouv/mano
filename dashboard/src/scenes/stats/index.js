@@ -111,7 +111,7 @@ const Stats = () => {
       .map((p) => ({ ...p, type: !!p.person ? 'Non-anonyme' : 'Anonyme' }))
       .map((passage) => ({
         ...passage,
-        gender: !passage.person ? null : allPersons.find((person) => person._id === passage.person)?.gender || 'Non précisé',
+        gender: !passage.person ? null : allPersons.find((person) => person._id === passage.person)?.gender || 'Non renseigné',
       })),
     period,
     currentTeam,
@@ -388,16 +388,12 @@ const Stats = () => {
             />
             <CustomResponsivePie
               title="Nombre de personnes différentes passées (passages anonymes exclus)"
-              data={getPieData(
-                personsInPassagesOfPeriod.filter((p) => !!p.gender),
-                'gender',
-                { options: [...genderOptions, 'Non précisé'] }
-              )}
+              data={getPieData(personsInPassagesOfPeriod, 'gender', { options: [...genderOptions, 'Non précisé'] })}
             />
             <CustomResponsivePie
               title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
               data={getPieData(
-                personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)).filter((p) => !!p.gender),
+                personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
                 'gender',
                 { options: [...genderOptions, 'Non précisé'] }
               )}

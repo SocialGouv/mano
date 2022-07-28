@@ -6,7 +6,7 @@ import { theme } from '../config';
 import { Col, Row } from 'reactstrap';
 import { ResponsiveBar } from '@nivo/bar';
 
-export const CustomResponsivePie = ({ data, title, onAddFilter, field }) => {
+export const CustomResponsivePie = ({ data = [], title, onAddFilter, field }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const onClick = ({ id }) => {
