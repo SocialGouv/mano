@@ -140,7 +140,7 @@ export function MedicalFile({ person }) {
               window.print();
             }}
             color="primary"
-            title={'📋&nbsp;&nbsp;Imprimer le dossier PDF'}
+            title={'📋\u00A0\u00A0Imprimer le dossier PDF'}
             padding="12px 24px"
           />
         </ButtonsFloatingRight>
@@ -292,7 +292,7 @@ export function MedicalFile({ person }) {
               });
             }}
             color="primary"
-            title={'💊&nbsp;&nbsp;Ajouter un traitement'}
+            title={'💊\u00A0\u00A0Ajouter un traitement'}
             padding="12px 24px"
           />
         </ButtonsFloatingRight>
@@ -433,7 +433,7 @@ export function MedicalFile({ person }) {
               });
             }}
             color="primary"
-            title={'🩺&nbsp;&nbsp;Ajouter une consultation'}
+            title={'🩺\u00A0\u00A0Ajouter une consultation'}
             padding="12px 24px"
           />
         </ButtonsFloatingRight>
