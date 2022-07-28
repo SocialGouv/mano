@@ -31,7 +31,7 @@ const ButtonCustom = ({
       </SpinnerContainer>
       <Content padding={padding}>
         {!!icon && <Icon color={color} icon={icon} />}
-        <Title dangerouslySetInnerHTML={{ __html: title }} transparent={loading} />
+        <Title transparent={loading}>{title}</Title>
       </Content>
     </ButtonWrapper>
   );
