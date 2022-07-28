@@ -33,7 +33,7 @@ export const customFieldsPersonsSocialSelector = selector({
   get: ({ get }) => {
     const organisation = get(organisationState);
     if (Array.isArray(organisation.customFieldsPersonsSocial)) return organisation.customFieldsPersonsSocial;
-    return defaultMedicalCustomFields;
+    return [];
   },
 });
 
@@ -105,15 +105,6 @@ export const defaultMedicalCustomFields = [
     enabled: true,
     required: false,
     showInStats: true,
-  },
-  {
-    name: 'numeroSecuriteSociale',
-    label: 'Numéro de sécurité sociale',
-    type: 'text',
-    options: null,
-    enabled: true,
-    required: false,
-    showInStats: false,
   },
 ];
 
