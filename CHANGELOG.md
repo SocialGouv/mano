@@ -1,3 +1,11 @@
+## [1.140.5](https://github.com/SocialGouv/mano/compare/v1.140.4...v1.140.5) (2022-07-28)
+
+
+### Bug Fixes
+
+* **dashboard:** passages stats ([#818](https://github.com/SocialGouv/mano/issues/818)) ([604a64c](https://github.com/SocialGouv/mano/commit/604a64cda3c14f37eded2cf4a1742277554c8533))
+* **dashboard,app:** no default for custom social fields ([#817](https://github.com/SocialGouv/mano/issues/817)) ([e4571c7](https://github.com/SocialGouv/mano/commit/e4571c7c6e068ff6bfd297c637e35f0f7f11131d))
+
 ## [1.140.4](https://github.com/SocialGouv/mano/compare/v1.140.3...v1.140.4) (2022-07-28)
 
 
