@@ -28,6 +28,7 @@ export const prepareMedicalFileForEncryption = (customFieldsMedicalFile) => (med
     _id: medicalFile._id,
     createdAt: medicalFile.createdAt,
     updatedAt: medicalFile.updatedAt,
+    deletedAt: medicalFile.deletedAt,
     organisation: medicalFile.organisation,
     person: medicalFile.person,
 

@@ -318,6 +318,7 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
     user: person.user,
     createdAt: person.createdAt,
     updatedAt: person.updatedAt,
+    deletedAt: person.deletedAt,
     outOfActiveList: person.outOfActiveList,
 
     decrypted,

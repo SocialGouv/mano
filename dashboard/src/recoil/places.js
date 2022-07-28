@@ -19,6 +19,7 @@ export const preparePlaceForEncryption = (place) => {
     _id: place._id,
     createdAt: place.createdAt,
     updatedAt: place.updatedAt,
+    deletedAt: place.deletedAt,
     organisation: place.organisation,
     user: place.user,
 

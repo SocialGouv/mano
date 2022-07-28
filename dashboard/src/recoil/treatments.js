@@ -17,6 +17,7 @@ export const prepareTreatmentForEncryption = (treatment) => {
     _id: treatment._id,
     createdAt: treatment.createdAt,
     updatedAt: treatment.updatedAt,
+    deletedAt: treatment.deletedAt,
     organisation: treatment.organisation,
     person: treatment.person,
     user: treatment.user,

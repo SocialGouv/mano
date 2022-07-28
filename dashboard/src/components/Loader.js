@@ -326,6 +326,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedActions = await Promise.all(allActions.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
@@ -336,6 +337,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedComments = await Promise.all(allComments.map(prepareCommentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
@@ -346,6 +348,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedPersons = await Promise.all(
@@ -358,6 +361,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedPassages = await Promise.all(allPassages.map(preparePassageForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
@@ -368,6 +372,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedPlaces = await Promise.all(allPlaces.map(preparePlaceForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
@@ -378,6 +383,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedRelsPersonPlace = await Promise.all(
@@ -390,6 +396,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
 
@@ -406,6 +413,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedTerritories = await Promise.all(allTerritories.map(prepareTerritoryForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
@@ -416,6 +424,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
 
@@ -463,6 +472,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedTreatments = await Promise.all(
@@ -478,6 +488,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedConsultations = await Promise.all(
@@ -493,6 +504,7 @@ const Loader = () => {
         withDeleted: true,
         lastRefresh: 0,
         saveInCache: false,
+        returnWithDeletedData: true,
         API,
       });
       const encryptedMedicalFiles = await Promise.all(

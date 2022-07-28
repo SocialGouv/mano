@@ -130,7 +130,7 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  person: z.string().regex(looseUuidRegex).optional(),
+                  person: z.string().regex(looseUuidRegex).optional(), // when a person has been deleted before soft delete, person === null
                   user: z.string().regex(looseUuidRegex).optional().nullable(),
                   team: z.string().regex(looseUuidRegex),
                 }).parse(encryptedAction);
@@ -148,13 +148,14 @@ router.put(
             // and maybe more
             // consisting of `person` being only one char of a UUID, instead of a whole UUID
             // we need to remove them because it's stale data
-            for (const encryptedPassage of req.body.encryptedPassages.filter((p) => p.person?.length !== 1)) {
+            // + there are some deleted passages with no team/no person, I can't recall why... but we can escape them too
+            for (const encryptedPassage of req.body.encryptedPassages.filter((p) => p.person?.length !== 1).filter((p) => !p.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  person: z.string().regex(looseUuidRegex).optional().nullable(),
+                  person: z.string().regex(looseUuidRegex).optional().nullable(), // anonymous
                   user: z.string().regex(looseUuidRegex).optional().nullable(),
                   team: z.string().regex(looseUuidRegex),
                 }).parse(encryptedPassage);
@@ -281,7 +282,7 @@ router.put(
                   _id: z.string().regex(looseUuidRegex),
                   encrypted: z.string(),
                   encryptedEntityKey: z.string(),
-                  team: z.string().regex(looseUuidRegex).optional(),
+                  team: z.string().regex(looseUuidRegex).optional(), // sometimes there is no team - perhaps a historical bug
                   person: z.string().regex(looseUuidRegex).optional(),
                   action: z.string().regex(looseUuidRegex).optional(),
                   user: z.string().regex(looseUuidRegex).optional().nullable(),
@@ -319,6 +320,7 @@ router.put(
             );
 
             for (const { encrypted, encryptedEntityKey, person, user, team, _id } of encryptedActions) {
+              if (_id === "9bc46b98-1f75-4e83-b607-c85c38ce50e8") console.log({ encrypted, encryptedEntityKey, person, user, team, _id });
               await Action.update(
                 {
                   encrypted,
@@ -327,7 +329,7 @@ router.put(
                   user: users.includes(user) ? user : null,
                   team: teams.includes(team) ? team : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
 
@@ -341,7 +343,7 @@ router.put(
                   user: users.includes(user) ? user : null,
                   team: teams.includes(team) ? team : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
 
@@ -364,7 +366,7 @@ router.put(
                     user: users.includes(user) ? user : null,
                     team: teams.includes(team) ? team : null,
                   },
-                  { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                  { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
                 );
               }
             }
@@ -376,7 +378,7 @@ router.put(
                   encryptedEntityKey,
                   user: users.includes(user) ? user : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
 
@@ -387,7 +389,7 @@ router.put(
                   encryptedEntityKey,
                   user: users.includes(user) ? user : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
 
@@ -404,7 +406,7 @@ router.put(
                     person: persons.includes(person) ? person : null,
                     place: places.includes(place) ? place : null,
                   },
-                  { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                  { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
                 );
               }
             }
@@ -416,7 +418,7 @@ router.put(
                   encryptedEntityKey,
                   team: teams.includes(team) ? team : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
 
@@ -427,7 +429,7 @@ router.put(
                   encryptedEntityKey,
                   user: users.includes(user) ? user : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
 
@@ -440,7 +442,7 @@ router.put(
                   user: users.includes(user) ? user : null,
                   team: teams.includes(team) ? team : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
           } catch (e) {
@@ -518,7 +520,7 @@ router.put(
                   person: persons.includes(person) ? person : null,
                   user: users.includes(user) ? user : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
 
@@ -529,14 +531,19 @@ router.put(
                   encryptedEntityKey,
                   person: persons.includes(person) ? person : null,
                 },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
 
             for (const { encrypted, encryptedEntityKey, person, user, _id } of encryptedTreatments) {
               await Treatment.update(
-                { encrypted, encryptedEntityKey, person: persons.includes(person) ? person : null, user: users.includes(user) ? user : null },
-                { where: { _id, organisation: req.user.organisation }, transaction: tx }
+                {
+                  encrypted,
+                  encryptedEntityKey,
+                  person: persons.includes(person) ? person : null,
+                  user: users.includes(user) ? user : null,
+                },
+                { where: { _id, organisation: req.user.organisation }, transaction: tx, paranoid: false }
               );
             }
           } catch (e) {

@@ -20,6 +20,7 @@ export const prepareActionForEncryption = (action) => {
     organisation: action.organisation,
     createdAt: action.createdAt,
     updatedAt: action.updatedAt,
+    deletedAt: action.deletedAt,
 
     completedAt: action.completedAt,
     person: action.person,

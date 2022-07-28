@@ -19,6 +19,7 @@ export const preparePassageForEncryption = (passage) => {
     _id: passage._id,
     createdAt: passage.createdAt,
     updatedAt: passage.updatedAt,
+    deletedAt: passage.deletedAt,
     organisation: passage.organisation,
     person: passage.person,
     team: passage.team,

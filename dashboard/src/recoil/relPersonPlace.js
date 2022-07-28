@@ -19,6 +19,7 @@ export const prepareRelPersonPlaceForEncryption = (relPersonPlace) => {
     _id: relPersonPlace._id,
     createdAt: relPersonPlace.createdAt,
     updatedAt: relPersonPlace.updatedAt,
+    deletedAt: relPersonPlace.deletedAt,
     organisation: relPersonPlace.organisation,
     user: relPersonPlace.user,
     person: relPersonPlace.person,

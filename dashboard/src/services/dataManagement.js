@@ -2,20 +2,23 @@
 import localforage from 'localforage';
 import { capture } from './sentry';
 
-export const mergeNewUpdatedData = (newData, oldData) => {
+export const mergeNewUpdatedData = (newData, oldData, returnWithDeletedData = false) => {
   const oldDataIds = oldData.map((p) => p._id);
   const updatedItems = newData.filter((p) => oldDataIds.includes(p._id));
   const newItems = newData.filter((p) => !oldDataIds.includes(p._id));
   const deletedItemsIds = newData.filter((p) => !!p.deletedAt).map((p) => p._id);
 
-  return [
+  const mergedItems = [
     ...newItems,
     ...oldData.map((person) => {
       const updatedItem = updatedItems.find((p) => p._id === person._id);
       if (updatedItem) return updatedItem;
       return person;
     }),
-  ].filter((p) => !deletedItemsIds.includes(p._id));
+  ];
+
+  if (returnWithDeletedData) return mergedItems;
+  return mergedItems.filter((p) => !deletedItemsIds.includes(p._id));
 };
 
 export let manoCacheStorage = undefined;
@@ -86,6 +89,7 @@ export async function getData({
   setBatchData = null,
   lastRefresh = 0,
   withDeleted = false,
+  returnWithDeletedData = false,
   saveInCache = true,
 }) {
   if (isInitialization) {
@@ -102,7 +106,7 @@ export async function getData({
   if (!response.ok) console.log({ message: `Error getting ${collectionName} data`, response });
   if (!response.decryptedData?.length && !isInitialization) return null;
 
-  data = mergeNewUpdatedData(response.decryptedData, data);
+  data = mergeNewUpdatedData(response.decryptedData, data, returnWithDeletedData);
   if (saveInCache) {
     await setCacheItem(collectionName, data);
   } else {

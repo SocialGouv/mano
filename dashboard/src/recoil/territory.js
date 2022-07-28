@@ -19,6 +19,7 @@ export const prepareTerritoryForEncryption = (territory) => {
     _id: territory._id,
     createdAt: territory.createdAt,
     updatedAt: territory.updatedAt,
+    deletedAt: territory.deletedAt,
     organisation: territory.organisation,
     user: territory.user,
 

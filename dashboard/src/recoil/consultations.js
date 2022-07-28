@@ -20,6 +20,7 @@ export const prepareConsultationForEncryption = (customFieldsConsultations) => (
     organisation: consultation.organisation,
     createdAt: consultation.createdAt,
     updatedAt: consultation.updatedAt,
+    deletedAt: consultation.deletedAt,
 
     person: consultation.person,
     user: consultation.user,
