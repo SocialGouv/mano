@@ -124,7 +124,9 @@ router.put(
 
         if (req.params.migrationName === "add-relations-to-db-models") {
           try {
-            for (const encryptedAction of req.body.encryptedActions) {
+            // we zod-test only undeleted docs because there is too much stale data in the soft deleted one
+            // for soft delete, we just recover the best we can !
+            for (const encryptedAction of req.body.encryptedActions.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -148,8 +150,7 @@ router.put(
             // and maybe more
             // consisting of `person` being only one char of a UUID, instead of a whole UUID
             // we need to remove them because it's stale data
-            // + there are some deleted passages with no team/no person, I can't recall why... but we can escape them too
-            for (const encryptedPassage of req.body.encryptedPassages.filter((p) => p.person?.length !== 1).filter((p) => !p.deletedAt)) {
+            for (const encryptedPassage of req.body.encryptedPassages.filter((p) => p.person?.length !== 1).filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -168,7 +169,7 @@ router.put(
               }
             }
 
-            for (const encryptedPerson of req.body.encryptedPersons) {
+            for (const encryptedPerson of req.body.encryptedPersons.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -185,7 +186,7 @@ router.put(
               }
             }
 
-            for (const encryptedPlace of req.body.encryptedPlaces) {
+            for (const encryptedPlace of req.body.encryptedPlaces.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -202,7 +203,7 @@ router.put(
               }
             }
 
-            for (const encryptedTerritory of req.body.encryptedTerritories) {
+            for (const encryptedTerritory of req.body.encryptedTerritories.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -219,7 +220,7 @@ router.put(
               }
             }
 
-            for (const encryptedReport of req.body.encryptedReports) {
+            for (const encryptedReport of req.body.encryptedReports.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -236,7 +237,7 @@ router.put(
               }
             }
 
-            for (const encryptedTerritoryObservation of req.body.encryptedTerritoryObservations) {
+            for (const encryptedTerritoryObservation of req.body.encryptedTerritoryObservations.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -257,7 +258,9 @@ router.put(
 
             // there are some stale relPersonPlace, probably due to wrong cascade deletion before this migration
             // we need to delete it
-            for (const encryptedRelPersonPlace of req.body.encryptedRelsPersonPlace.filter((r) => !!r.person && !!r.place)) {
+            for (const encryptedRelPersonPlace of req.body.encryptedRelsPersonPlace
+              .filter((r) => !!r.person && !!r.place)
+              .filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -276,7 +279,7 @@ router.put(
               }
             }
 
-            for (const encryptedComment of req.body.encryptedComments.filter((c) => Boolean(c.person))) {
+            for (const encryptedComment of req.body.encryptedComments.filter((c) => Boolean(c.person)).filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -454,7 +457,7 @@ router.put(
 
         if (req.params.migrationName === "add-relations-of-medical-data-to-db-models") {
           try {
-            for (const encryptedConsultation of req.body.encryptedConsultations) {
+            for (const encryptedConsultation of req.body.encryptedConsultations.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -472,7 +475,7 @@ router.put(
               }
             }
 
-            for (const encryptedTreatment of req.body.encryptedTreatments) {
+            for (const encryptedTreatment of req.body.encryptedTreatments.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
@@ -490,7 +493,7 @@ router.put(
               }
             }
 
-            for (const encryptedMedicalFile of req.body.encryptedMedicalFiles) {
+            for (const encryptedMedicalFile of req.body.encryptedMedicalFiles.filter((item) => !item.deletedAt)) {
               try {
                 z.object({
                   _id: z.string().regex(looseUuidRegex),
