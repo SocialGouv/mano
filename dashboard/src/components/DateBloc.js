@@ -9,7 +9,7 @@ dayjs.locale('fr');
 
 const DateBloc = ({ date }) => {
   if (!date) return <div />;
-  date = dayjs.utc(date);
+  date = dayjs(date);
   return (
     <Container>
       <DayText>{date && date.format('dddd')}</DayText>
