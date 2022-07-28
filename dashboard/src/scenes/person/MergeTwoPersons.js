@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Button, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
@@ -61,6 +61,9 @@ const MergeTwoPersons = ({ person }) => {
   const [open, setOpen] = useState(false);
 
   const [originPerson, setOriginPerson] = useState(person);
+  useEffect(() => {
+    setOriginPerson(person);
+  }, [person]);
   const [personToMergeAndDelete, setPersonToMergeAndDelete] = useState(null);
 
   const [persons, setPersons] = useRecoilState(personsState);
@@ -392,10 +395,15 @@ const StyledModal = styled(Modal)`
     flex-grow: 1;
     padding: auto;
   }
+
+  .form-group {
+    margin-bottom: 0;
+  }
 `;
 
 const Field = styled.p`
   font-weight: bold;
+  margin-bottom: 0;
 `;
 
 export default MergeTwoPersons;
