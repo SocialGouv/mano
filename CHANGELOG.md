@@ -1,3 +1,10 @@
+## [1.140.3](https://github.com/SocialGouv/mano/compare/v1.140.2...v1.140.3) (2022-07-28)
+
+
+### Bug Fixes
+
+* **dashboard:** design issues buttons merge ([#815](https://github.com/SocialGouv/mano/issues/815)) ([4964cae](https://github.com/SocialGouv/mano/commit/4964cae57071e4236d945d6f0cbdb0fd48812349))
+
 ## [1.140.2](https://github.com/SocialGouv/mano/compare/v1.140.1...v1.140.2) (2022-07-26)
 
 
