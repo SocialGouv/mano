@@ -99,6 +99,7 @@ const Loader = () => {
   const setCollectionsToLoad = useSetRecoilState(collectionsToLoadState);
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
+  const [checkingDataConsistencyRequest, setCheckingDataConsistencyRequest] = useState(false);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
@@ -133,6 +134,7 @@ const Loader = () => {
   }, [lastRefreshReady]);
 
   const migrationIsDone = (updatedOrganisation) => {
+    setLastRefresh(0);
     setOrganisation(updatedOrganisation);
     /* FIXME ?:
     the `setOrganisation(response.organisation)` doesn't provide an updated version of `organisation`
@@ -152,13 +154,8 @@ const Loader = () => {
     }));
   };
 
-  const refresh = async () => {
-    clearInterval(autoRefreshInterval.current);
-    autoRefreshInterval.current = null;
-
-    const { showFullScreen, initialLoad } = refreshTrigger.options;
-    setFullScreen(showFullScreen);
-    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
+  const migrate = async () => {
+    const { initialLoad } = refreshTrigger.options;
 
     /*
     Play organisation internal migrations (things that requires the database to be fully loaded locally).
@@ -302,6 +299,274 @@ const Loader = () => {
       }
       return migrationIsDone(response.organisation);
     }
+  };
+
+  const downloadData = async (dataToDownload, { initialLoad, total, lastRefresh }) => {
+    /*
+    Get persons
+    */
+    if (dataToDownload.persons) {
+      setLoading('Chargement des personnes');
+      const refreshedPersons = await getData({
+        collectionName: 'person',
+        data: persons,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
+        API,
+      });
+      if (refreshedPersons)
+        setPersons(
+          refreshedPersons
+            .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
+            .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
+        );
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'person'));
+    /*
+    Get consultations
+    */
+    if (dataToDownload.consultations) {
+      setLoading('Chargement des consultations');
+      const refreshedConsultations = await getData({
+        collectionName: 'consultation',
+        data: consultations,
+        isInitialization: initialLoad,
+        withDeleted: true,
+        saveInCache: false,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+        setBatchData: (newConsultations) =>
+          setConsultations((oldConsultations) =>
+            initialLoad
+              ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
+              : mergeItems(
+                  oldConsultations,
+                  newConsultations.map((c) => whitelistAllowedData(c, user))
+                )
+          ),
+        API,
+      });
+      if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
+      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
+    }
+    if (['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
+      /*
+    Get treatments
+    */
+      if (dataToDownload.treatments) {
+        setLoading('Chargement des traitements');
+        const refreshedTreatments = await getData({
+          collectionName: 'treatment',
+          data: treatments,
+          isInitialization: initialLoad,
+          withDeleted: true,
+          saveInCache: false,
+          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+          setBatchData: (newTreatments) =>
+            setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
+          API,
+        });
+        if (refreshedTreatments) setTreatments(refreshedTreatments);
+      }
+      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'treatment'));
+      /*
+      Get medicalFiles
+      */
+      if (dataToDownload.medicalFiles) {
+        setLoading('Chargement des informations médicales');
+        const refreshedMedicalFiles = await getData({
+          collectionName: 'medical-file',
+          data: medicalFiles,
+          isInitialization: initialLoad,
+          withDeleted: true,
+          saveInCache: false,
+          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+          setBatchData: (newMedicalFiles) =>
+            setMedicalFiles((oldMedicalFiles) =>
+              initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
+            ),
+          API,
+        });
+        if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
+      }
+      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'medical-file'));
+    }
+    /*
+    Get reports
+    */
+    /*
+    NOTA:
+    From commit ef6e2751 (2022/02/08) until commit d76fcc35 (2022/02/25), commit of full encryption
+    we had a bug where no encryption was save on report creation
+    (https://github.com/SocialGouv/mano/blob/ef6e2751ce02f6f34933cf2472492b1d5cd028d6/api/src/controllers/report.js#L67)
+    therefore, no date nor team was encryptely saved and those reports are just pollution
+    TODO: migration to delete all those reports from each organisation
+    QUICK WIN: filter those reports from recoil state
+    */
+
+    if (dataToDownload.reports) {
+      setLoading('Chargement des comptes-rendus');
+      const refreshedReports = await getData({
+        collectionName: 'report',
+        data: reports,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newReports) => setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports))),
+        API,
+      });
+      if (refreshedReports) setReports(refreshedReports.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'report'));
+
+    /*
+    Get passages
+    */
+    if (dataToDownload.passages) {
+      setLoading('Chargement des passages');
+      const refreshedPassages = await getData({
+        collectionName: 'passage',
+        data: passages,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newPassages) =>
+          setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
+        API,
+      });
+      if (refreshedPassages) setPassages(refreshedPassages.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'passage'));
+    /*
+    Switch to not full screen
+    */
+    setFullScreen(false);
+
+    /*
+    Get actions
+    */
+    if (dataToDownload.actions) {
+      setLoading('Chargement des actions');
+      const refreshedActions = await getData({
+        collectionName: 'action',
+        data: actions,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newActions) => setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions))),
+        API,
+      });
+      if (refreshedActions) setActions(refreshedActions);
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'action'));
+    /*
+    Get territories
+    */
+    if (dataToDownload.territories) {
+      setLoading('Chargement des territoires');
+      const refreshedTerritories = await getData({
+        collectionName: 'territory',
+        data: territories,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newTerritories) =>
+          setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
+        API,
+      });
+      if (refreshedTerritories) setTerritories(refreshedTerritories);
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory'));
+
+    /*
+    Get places
+    */
+    if (dataToDownload.places) {
+      setLoading('Chargement des lieux');
+      const refreshedPlaces = await getData({
+        collectionName: 'place',
+        data: places,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
+        API,
+      });
+      if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
+    }
+    if (dataToDownload.relsPersonPlace) {
+      const refreshedRelPersonPlaces = await getData({
+        collectionName: 'relPersonPlace',
+        data: relsPersonPlace,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newRelPerPlace) =>
+          setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
+        API,
+      });
+      if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'place'));
+    /*
+    Get observations territories
+    */
+    if (dataToDownload.territoryObservations) {
+      setLoading('Chargement des observations');
+      const refreshedObs = await getData({
+        collectionName: 'territory-observation',
+        data: territoryObservations,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
+        API,
+      });
+      if (refreshedObs) setTerritoryObs(refreshedObs);
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory-observation'));
+    /*
+    Get comments
+    */
+    if (dataToDownload.comments) {
+      setLoading('Chargement des commentaires');
+      const refreshedComments = await getData({
+        collectionName: 'comment',
+        data: comments,
+        isInitialization: initialLoad,
+        withDeleted: Boolean(lastRefresh),
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newComments) =>
+          setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
+        API,
+      });
+      if (refreshedComments) setComments(refreshedComments);
+    }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'comment'));
+  };
+
+  const refresh = async () => {
+    clearInterval(autoRefreshInterval.current);
+    autoRefreshInterval.current = null;
+
+    const { showFullScreen, initialLoad } = refreshTrigger.options;
+    setFullScreen(showFullScreen);
+    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
+
+    await migrate();
 
     /*
     Get number of data to download to show the appropriate loading progress bar
@@ -358,264 +623,28 @@ const Loader = () => {
       setProgress(1);
       await new Promise((res) => setTimeout(res, 500));
     }
-    /*
-    Get persons
-    */
-    if (response.data.persons || initialLoad) {
-      setLoading('Chargement des personnes');
-      const refreshedPersons = await getData({
-        collectionName: 'person',
-        data: persons,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+
+    await downloadData(
+      {
+        actions: Boolean(response.data.actions || initialLoad),
+        persons: Boolean(response.data.persons || initialLoad),
+        territories: Boolean(response.data.territories || initialLoad),
+        territoryObservations: Boolean(response.data.territoryObservations || initialLoad),
+        places: Boolean(response.data.places || initialLoad),
+        comments: Boolean(response.data.comments || initialLoad),
+        passages: Boolean(response.data.passages || initialLoad),
+        reports: Boolean(response.data.reports || initialLoad),
+        relsPersonPlace: Boolean(response.data.relsPersonPlace || initialLoad),
+        consultations: Boolean(medicalDataResponse.data.consultations || initialLoad),
+        treatments: !!user.healthcareProfessional && Boolean(medicalDataResponse.data.treatments || initialLoad),
+        medicalFiles: !!user.healthcareProfessional && Boolean(medicalDataResponse.data.medicalFiles || initialLoad),
+      },
+      {
+        initialLoad,
+        total,
         lastRefresh,
-        setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
-        API,
-      });
-      if (refreshedPersons)
-        setPersons(
-          refreshedPersons
-            .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
-            .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
-        );
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'person'));
-    /*
-    Get consultations
-    */
-    if (medicalDataResponse.data.consultations || initialLoad) {
-      setLoading('Chargement des consultations');
-      const refreshedConsultations = await getData({
-        collectionName: 'consultation',
-        data: consultations,
-        isInitialization: initialLoad,
-        withDeleted: true,
-        saveInCache: false,
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-        setBatchData: (newConsultations) =>
-          setConsultations((oldConsultations) =>
-            initialLoad
-              ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
-              : mergeItems(
-                  oldConsultations,
-                  newConsultations.map((c) => whitelistAllowedData(c, user))
-                )
-          ),
-        API,
-      });
-      if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
-      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
-    }
-    if (['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
-      /*
-    Get treatments
-    */
-      if (medicalDataResponse.data.treatments || initialLoad) {
-        setLoading('Chargement des traitements');
-        const refreshedTreatments = await getData({
-          collectionName: 'treatment',
-          data: treatments,
-          isInitialization: initialLoad,
-          withDeleted: true,
-          saveInCache: false,
-          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-          setBatchData: (newTreatments) =>
-            setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
-          API,
-        });
-        if (refreshedTreatments) setTreatments(refreshedTreatments);
       }
-      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'treatment'));
-      /*
-      Get medicalFiles
-      */
-      if (medicalDataResponse.data.medicalFiles || initialLoad) {
-        setLoading('Chargement des informations médicales');
-        const refreshedMedicalFiles = await getData({
-          collectionName: 'medical-file',
-          data: medicalFiles,
-          isInitialization: initialLoad,
-          withDeleted: true,
-          saveInCache: false,
-          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-          setBatchData: (newMedicalFiles) =>
-            setMedicalFiles((oldMedicalFiles) =>
-              initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
-            ),
-          API,
-        });
-        if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
-      }
-      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'medical-file'));
-    }
-    /*
-    Get reports
-    */
-    /*
-    NOTA:
-    From commit ef6e2751 (2022/02/08) until commit d76fcc35 (2022/02/25), commit of full encryption
-    we had a bug where no encryption was save on report creation
-    (https://github.com/SocialGouv/mano/blob/ef6e2751ce02f6f34933cf2472492b1d5cd028d6/api/src/controllers/report.js#L67)
-    therefore, no date nor team was encryptely saved and those reports are just pollution
-    TODO: migration to delete all those reports from each organisation
-    QUICK WIN: filter those reports from recoil state
-    */
-
-    if (response.data.reports || initialLoad) {
-      setLoading('Chargement des comptes-rendus');
-      const refreshedReports = await getData({
-        collectionName: 'report',
-        data: reports,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newReports) => {
-          newReports = newReports.filter((r) => !!r.team && !!r.date);
-          setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
-        },
-        API,
-      });
-      if (refreshedReports)
-        setReports(refreshedReports.filter((r) => !!r.team && !!r.date).sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'report'));
-
-    /*
-    Get passages
-    */
-    if (response.data.passages || initialLoad) {
-      setLoading('Chargement des passages');
-      const refreshedPassages = await getData({
-        collectionName: 'passage',
-        data: passages,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newPassages) =>
-          setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
-        API,
-      });
-      if (refreshedPassages) setPassages(refreshedPassages.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'passage'));
-    /*
-    Switch to not full screen
-    */
-    setFullScreen(false);
-
-    /*
-    Get actions
-    */
-    if (response.data.actions || initialLoad) {
-      setLoading('Chargement des actions');
-      const refreshedActions = await getData({
-        collectionName: 'action',
-        data: actions,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newActions) => setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions))),
-        API,
-      });
-      if (refreshedActions) setActions(refreshedActions);
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'action'));
-    /*
-    Get territories
-    */
-    if (response.data.territories || initialLoad) {
-      setLoading('Chargement des territoires');
-      const refreshedTerritories = await getData({
-        collectionName: 'territory',
-        data: territories,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newTerritories) =>
-          setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
-        API,
-      });
-      if (refreshedTerritories) setTerritories(refreshedTerritories);
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory'));
-
-    /*
-    Get places
-    */
-    if (response.data.places || initialLoad) {
-      setLoading('Chargement des lieux');
-      const refreshedPlaces = await getData({
-        collectionName: 'place',
-        data: places,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
-        API,
-      });
-      if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
-    }
-    if (response.data.relsPersonPlace || initialLoad) {
-      const refreshedRelPersonPlaces = await getData({
-        collectionName: 'relPersonPlace',
-        data: relsPersonPlace,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newRelPerPlace) =>
-          setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
-        API,
-      });
-      if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'place'));
-    /*
-    Get observations territories
-    */
-    if (response.data.territoryObservations || initialLoad) {
-      setLoading('Chargement des observations');
-      const refreshedObs = await getData({
-        collectionName: 'territory-observation',
-        data: territoryObservations,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
-        API,
-      });
-      if (refreshedObs) setTerritoryObs(refreshedObs);
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'territory-observation'));
-    /*
-    Get comments
-    */
-    if (response.data.comments || initialLoad) {
-      setLoading('Chargement des commentaires');
-      const refreshedComments = await getData({
-        collectionName: 'comment',
-        data: comments,
-        isInitialization: initialLoad,
-        withDeleted: Boolean(lastRefresh),
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newComments) =>
-          setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
-        API,
-      });
-      if (refreshedComments) setComments(refreshedComments);
-    }
-    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'comment'));
+    );
 
     /*
     Reset refresh trigger
@@ -630,6 +659,59 @@ const Loader = () => {
       status: false,
       options: { showFullScreen: false, initialLoad: false },
     });
+    setCheckingDataConsistencyRequest(true);
+  };
+
+  const checkDataConsistency = async () => {
+    setCheckingDataConsistencyRequest(false);
+    setLoading('Vérification du bon téléchargement des données...');
+    if (lastRefresh <= 0) {
+      // no data downloaded yet
+      setLoading('');
+      return;
+    }
+    /*
+    Get number of data to download to show the appropriate loading progress bar
+    */
+    const response = await API.get({
+      path: '/organisation/stats',
+      query: { organisation: organisationId, lastRefresh: 0, withDeleted: false },
+    });
+    if (!response.ok) return;
+
+    const differences = {
+      actions: response.data.actions - actions.length,
+      persons: response.data.persons - persons.length,
+      territories: response.data.territories - territories.length,
+      territoryObservations: response.data.territoryObservations - territoryObservations.length,
+      places: response.data.places - places.length,
+      comments: response.data.comments - comments.length,
+      passages: response.data.passages - passages.length,
+      reports: response.data.reports - reports.length,
+      relsPersonPlace: response.data.relsPersonPlace - relsPersonPlace.length,
+      consultations: response.data.consultations - consultations.length,
+      treatments: !user.healthcareProfessional ? 0 : response.data.treatments - treatments.length,
+      medicalFiles: !user.healthcareProfessional ? 0 : response.data.medicalFiles - medicalFiles.length,
+    };
+
+    const totalDifferences = Object.values(differences).reduce((total, diff) => total + diff);
+
+    if (!totalDifferences) {
+      setLoading('');
+      return;
+    }
+
+    await downloadData(differences, { initialLoad: true, total: totalDifferences, lastRefresh: 0 });
+    await new Promise((res) => setTimeout(res, 150));
+    setLastRefresh(Date.now());
+    setLoading('');
+    setProgress(0);
+    setFullScreen(false);
+    setRefreshTrigger({
+      status: false,
+      options: { showFullScreen: false, initialLoad: false },
+    });
+    setCheckingDataConsistencyRequest(true);
   };
 
   useEffect(() => {
@@ -638,6 +720,11 @@ const Loader = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status, lastRefreshReady]);
+
+  useEffect(() => {
+    if (checkingDataConsistencyRequest) checkDataConsistency();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [checkingDataConsistencyRequest]);
 
   // useEffect(() => {
   //   if (!autoRefreshInterval.current && initialLoadDone.current) {
