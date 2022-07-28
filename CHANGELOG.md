@@ -1,3 +1,10 @@
+## [1.140.4](https://github.com/SocialGouv/mano/compare/v1.140.3...v1.140.4) (2022-07-28)
+
+
+### Bug Fixes
+
+* **dashboard:** remove utc on date display ([#816](https://github.com/SocialGouv/mano/issues/816)) ([03375c2](https://github.com/SocialGouv/mano/commit/03375c21b2c3bee046ef184bf68bde695281dff6))
+
 ## [1.140.3](https://github.com/SocialGouv/mano/compare/v1.140.2...v1.140.3) (2022-07-28)
 
 
