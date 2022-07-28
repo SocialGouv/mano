@@ -1,3 +1,10 @@
+## [1.140.6](https://github.com/SocialGouv/mano/compare/v1.140.5...v1.140.6) (2022-07-28)
+
+
+### Bug Fixes
+
+* **dashboard:** out of active list filter ([#820](https://github.com/SocialGouv/mano/issues/820)) ([f7ad342](https://github.com/SocialGouv/mano/commit/f7ad342dc3bc937cfd6503acd9cb996dfe10177a))
+
 ## [1.140.5](https://github.com/SocialGouv/mano/compare/v1.140.4...v1.140.5) (2022-07-28)
 
 
