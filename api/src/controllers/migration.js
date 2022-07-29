@@ -98,6 +98,19 @@ router.put(
           }
         }
 
+        if (req.params.migrationName === "clean-reports-with-no-team-nor-date") {
+          try {
+            z.array(z.string().regex(looseUuidRegex)).parse(req.body.reportIdsToDelete);
+          } catch (e) {
+            const error = new Error(`Invalid request in reports-from-real-date-to-date-id migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const _id of req.body.reportIdsToDelete) {
+            await Report.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+          }
+        }
+
         organisation.set({
           migrations: [...(organisation.migrations || []), req.params.migrationName],
           migrating: false,

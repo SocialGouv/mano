@@ -272,6 +272,37 @@ const Loader = () => {
       return migrationIsDone(response.organisation);
     }
 
+    if (!organisation.migrations?.includes('clean-reports-with-no-team-nor-date')) {
+      await new Promise((res) => setTimeout(res, 500));
+      setLoading('Mise à jour des données de votre organisation, veuillez patienter quelques instants...');
+      const allReports = await getData({
+        collectionName: 'report',
+        data: reports,
+        isInitialization: true,
+        withDeleted: false,
+        saveInCache: false,
+        setBatchData: (newReports) => setReports((oldReports) => [...oldReports, ...newReports]),
+        API,
+      });
+
+      const reportIdsToDelete = allReports.filter((r) => !r.team || !r.date).map((r) => r._id);
+
+      const response = await API.put({
+        path: `/migration/clean-reports-with-no-team-nor-date`,
+        body: {
+          reportIdsToDelete,
+        },
+      });
+      if (!response.ok) {
+        if (response.error) {
+          setLoading(response.error);
+          setProgress(1);
+        }
+        return;
+      }
+      return migrationIsDone(response.organisation);
+    }
+
     /*
     Get number of data to download to show the appropriate loading progress bar
     */
