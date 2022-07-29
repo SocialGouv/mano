@@ -1,3 +1,10 @@
+## [1.141.1](https://github.com/SocialGouv/mano/compare/v1.141.0...v1.141.1) (2022-07-29)
+
+
+### Bug Fixes
+
+* remove stale reports ([#823](https://github.com/SocialGouv/mano/issues/823)) ([fa96b2c](https://github.com/SocialGouv/mano/commit/fa96b2c6035f24c6bef797953e9ae347f2609bb8))
+
 # [1.141.0](https://github.com/SocialGouv/mano/compare/v1.140.6...v1.141.0) (2022-07-28)
 
 
