@@ -6,7 +6,7 @@ import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../services/date';
 
-const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 6, disabled, hideLabel = false }) => {
+const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
     if (['text', 'number'].includes(field.type)) return `${model}-custom-input-${field.name}`;
     if (['textarea'].includes(field.type)) return `${model}-custom-textarea-${field.name}`;

@@ -251,7 +251,7 @@ export function MedicalFile({ person }) {
                     {customFieldsMedicalFile
                       .filter((f) => f.enabled)
                       .map((field) => (
-                        <CustomFieldInput colWidth={4} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                        <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                       ))}
                   </Row>
                   <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
