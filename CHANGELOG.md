@@ -1,3 +1,10 @@
+## [1.141.2](https://github.com/SocialGouv/mano/compare/v1.141.1...v1.141.2) (2022-07-29)
+
+
+### Bug Fixes
+
+* bump app version ([#824](https://github.com/SocialGouv/mano/issues/824)) ([b81cdf9](https://github.com/SocialGouv/mano/commit/b81cdf9b5b17e64dae766ae6cf789c039af57ab7))
+
 ## [1.141.1](https://github.com/SocialGouv/mano/compare/v1.141.0...v1.141.1) (2022-07-29)
 
 
