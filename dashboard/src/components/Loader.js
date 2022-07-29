@@ -225,9 +225,10 @@ const Loader = () => {
           setLoading(response.error);
           setProgress(1);
         }
-        return;
+        return false;
       }
-      return migrationIsDone(response.organisation);
+      migrationIsDone(response.organisation);
+      return false;
     }
 
     if (!organisation.migrations?.includes('reports-from-real-date-to-date-id')) {
@@ -264,9 +265,10 @@ const Loader = () => {
           setLoading(response.error);
           setProgress(1);
         }
-        return;
+        return false;
       }
-      return migrationIsDone(response.organisation);
+      migrationIsDone(response.organisation);
+      return false;
     }
 
     if (!organisation.migrations?.includes('clean-reports-with-no-team-nor-date')) {
@@ -295,10 +297,12 @@ const Loader = () => {
           setLoading(response.error);
           setProgress(1);
         }
-        return;
+        return false;
       }
-      return migrationIsDone(response.organisation);
+      migrationIsDone(response.organisation);
+      return false;
     }
+    return true;
   };
 
   const downloadData = async (dataToDownload, { initialLoad, total, lastRefresh }) => {
@@ -566,7 +570,8 @@ const Loader = () => {
     setFullScreen(showFullScreen);
     setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
 
-    await migrate();
+    const migrationsAreComplete = await migrate();
+    if (!migrationsAreComplete) return;
 
     /*
     Get number of data to download to show the appropriate loading progress bar
