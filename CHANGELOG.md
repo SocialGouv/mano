@@ -1,3 +1,10 @@
+## [1.141.5](https://github.com/SocialGouv/mano/compare/v1.141.4...v1.141.5) (2022-08-04)
+
+
+### Bug Fixes
+
+* bug with medical file print in Chrome ([812fea6](https://github.com/SocialGouv/mano/commit/812fea6728b9f67648003800856d9759b6ea6366))
+
 ## [1.141.4](https://github.com/SocialGouv/mano/compare/v1.141.3...v1.141.4) (2022-08-04)
 
 
