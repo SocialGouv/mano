@@ -17,8 +17,9 @@ const ReportDescriptionModale = ({ report }) => {
     <>
       <ButtonCustom
         onClick={() => setOpen(true)}
-        title={!report?.description?.length ? 'Ajouter une description' : '&#9998;'}
+        title={!report?.description?.length ? 'Ajouter une description' : '(cliquez ici pour modifier)'}
         color={!report?.description?.length ? 'info' : 'link'}
+        style={{ marginBottom: '0.5rem' }}
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Description</ModalHeader>
