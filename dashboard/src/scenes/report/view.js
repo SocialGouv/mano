@@ -1120,14 +1120,16 @@ const DescriptionAndCollaborations = ({ report }) => {
                     <Label htmlFor="description">Description</Label>
                     <ReportDescriptionModale report={report} />
                   </div>
-                  <p style={{ border: '1px solid #ccc', borderRadius: 5, padding: '0.5rem' }}>
-                    {report?.description?.split('\n').map((sentence, index) => (
-                      <React.Fragment key={index}>
-                        {sentence}
-                        <br />
-                      </React.Fragment>
-                    ))}
-                  </p>
+                  {report?.description && (
+                    <p style={{ border: '1px solid #ccc', borderRadius: 5, padding: '0.5rem' }}>
+                      {report?.description?.split('\n').map((sentence, index) => (
+                        <React.Fragment key={index}>
+                          {sentence}
+                          <br />
+                        </React.Fragment>
+                      ))}
+                    </p>
+                  )}
                 </FormGroup>
               </Col>
             </Row>
