@@ -21,6 +21,7 @@ import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 import { treatmentsState } from '../recoil/treatments';
 import { medicalFileState } from '../recoil/medicalFiles';
+import { capture } from '../services/sentry';
 
 // Update to flush cache.
 const currentCacheKey = 'mano-last-refresh-2022-05-30';
@@ -667,6 +668,7 @@ const Loader = () => {
     setCheckingDataConsistencyRequest(true);
   };
 
+  const consistencyDifferences = useRef(null);
   const checkDataConsistency = async () => {
     setCheckingDataConsistencyRequest(false);
     setLoading('Vérification du bon téléchargement des données...');
@@ -703,8 +705,28 @@ const Loader = () => {
 
     if (!totalDifferences) {
       setLoading('');
+      consistencyDifferences.current = null;
       return;
     }
+
+    if (consistencyDifferences.current !== null) {
+      capture('data still not consistent', {
+        extra: { firstTimeDifferences: consistencyDifferences.current, secondTimeDifferences: differences, totalDifferences, organisation, response },
+        user,
+      });
+      // do not try to get consistency again because
+      // it could create an infinite loop
+      // just try once, check if it's good -> if it's still no good, there is a bug somewhere - stop the process
+      setLoading('');
+      consistencyDifferences.current = null;
+      return;
+    }
+
+    consistencyDifferences.current = differences;
+    capture('data not consistent', {
+      extra: { firstTimeDifferences: consistencyDifferences.current, organisation, totalDifferences, response },
+      user,
+    });
 
     await downloadData(differences, { initialLoad: true, total: totalDifferences, lastRefresh: 0 });
     await new Promise((res) => setTimeout(res, 150));
@@ -716,6 +738,7 @@ const Loader = () => {
       status: false,
       options: { showFullScreen: false, initialLoad: false },
     });
+
     setCheckingDataConsistencyRequest(true);
   };
 
