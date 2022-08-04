@@ -1,3 +1,10 @@
+## [1.141.6](https://github.com/SocialGouv/mano/compare/v1.141.5...v1.141.6) (2022-08-04)
+
+
+### Bug Fixes
+
+* can activate/desactivate custom fields + get latest organisation settings on tab change ([#829](https://github.com/SocialGouv/mano/issues/829)) ([061d3c1](https://github.com/SocialGouv/mano/commit/061d3c1f38e79c79cdb9619d3fd4195e965be30d))
+
 ## [1.141.5](https://github.com/SocialGouv/mano/compare/v1.141.4...v1.141.5) (2022-08-04)
 
 
