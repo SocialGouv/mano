@@ -1,3 +1,10 @@
+## [1.141.3](https://github.com/SocialGouv/mano/compare/v1.141.2...v1.141.3) (2022-08-04)
+
+
+### Bug Fixes
+
+* edit button for report description ([ae26fb8](https://github.com/SocialGouv/mano/commit/ae26fb8b4cc2de09c8ee6148a94ae91d6dac0a92))
+
 ## [1.141.2](https://github.com/SocialGouv/mano/compare/v1.141.1...v1.141.2) (2022-07-29)
 
 
