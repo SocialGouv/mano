@@ -706,8 +706,8 @@ export function MedicalFile({ person }) {
                       title: 'Voulez-vous enregistrer vos modifications ?',
                       buttons: [
                         {
-                          text: 'Oui',
-                          onClick: handleSubmit,
+                          text: 'Annuler',
+                          style: 'cancel',
                         },
                         {
                           text: 'Non',
@@ -715,8 +715,8 @@ export function MedicalFile({ person }) {
                           onClick: resetCurrentConsultation,
                         },
                         {
-                          text: 'Annuler',
-                          style: 'cancel',
+                          text: 'Oui',
+                          onClick: handleSubmit,
                         },
                       ],
                     },
@@ -901,8 +901,8 @@ export function MedicalFile({ person }) {
                       title: 'Voulez-vous enregistrer vos modifications ?',
                       buttons: [
                         {
-                          text: 'Oui',
-                          onClick: handleSubmit,
+                          text: 'Annuler',
+                          style: 'cancel',
                         },
                         {
                           text: 'Non',
@@ -910,8 +910,8 @@ export function MedicalFile({ person }) {
                           onClick: resetCurrentTreatment,
                         },
                         {
-                          text: 'Annuler',
-                          style: 'cancel',
+                          text: 'Oui',
+                          onClick: handleSubmit,
                         },
                       ],
                     },

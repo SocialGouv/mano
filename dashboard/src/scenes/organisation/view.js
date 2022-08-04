@@ -63,8 +63,21 @@ const View = () => {
   const scrollContainer = useRef(null);
   useTitle(`Organisation - ${getSettingTitle(tab)}`);
 
+  const updateOrganisation = async () => {
+    // we update the organisation on each tab change to mitigate
+    // to mitigate the sync problem between all the users of an organisation
+
+    const { user } = await API.get({
+      path: '/user/signin-token',
+      skipEncryption: '/user/signin-token',
+    });
+    setOrganisation(user.organisation);
+  };
+
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });
+    updateOrganisation();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
   return (
