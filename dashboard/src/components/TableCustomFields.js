@@ -124,7 +124,7 @@ const TableCustomFields = ({
       <Table
         data={mutableData}
         // use this key prop to reset table and reset sortablejs on each element added/removed
-        key={(keyPrefix || customFields) + tableKey}
+        key={(keyPrefix || customFields) + tableKey + organisation}
         rowKey="name"
         isSortable
         onSort={handleSort}
@@ -162,7 +162,12 @@ const TableCustomFields = ({
             render: (f) => <CellWrapper>{!['enum', 'multi-choice'].includes(f.type) ? null : (f?.options || []).join(', ')}</CellWrapper>,
             show: true,
           },
-          { title: 'Activé', dataKey: 'enabled', render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} /> },
+          {
+            title: 'Activé',
+            show: true,
+            dataKey: 'enabled',
+            render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} />,
+          },
           {
             title: (
               <>
