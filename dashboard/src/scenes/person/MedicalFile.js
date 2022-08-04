@@ -210,7 +210,7 @@ export function MedicalFile({ person }) {
                   />
                 </Col>
               </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
                 <ButtonCustom
                   title={'Mettre à jour'}
                   disabled={JSON.stringify(person) === JSON.stringify(values)}
@@ -254,7 +254,7 @@ export function MedicalFile({ person }) {
                         <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                       ))}
                   </Row>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
                     <ButtonCustom
                       title={'Mettre à jour'}
                       disabled={JSON.stringify(medicalFile) === JSON.stringify(values)}
@@ -1050,7 +1050,6 @@ const ButtonsFloatingRight = styled.div`
   flex: 1;
   display: flex;
   justify-content: flex-end;
-  column-gap: 1rem;
 `;
 
 const TitleWithButtonsContainer = styled.div`
