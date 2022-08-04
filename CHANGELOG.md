@@ -1,3 +1,10 @@
+## [1.141.4](https://github.com/SocialGouv/mano/compare/v1.141.3...v1.141.4) (2022-08-04)
+
+
+### Bug Fixes
+
+* dont show description when no description ([12eba82](https://github.com/SocialGouv/mano/commit/12eba829ab0eb44f24b525cc635d38fe67ba1be2))
+
 ## [1.141.3](https://github.com/SocialGouv/mano/compare/v1.141.2...v1.141.3) (2022-08-04)
 
 
