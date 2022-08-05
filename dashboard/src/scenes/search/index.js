@@ -22,7 +22,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import PersonName from '../../components/PersonName';
 import { formatBirthDate, formatDateWithFullMonth, formatTime } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
+import { refreshTriggerState, useRefreshOnFocus } from '../../components/Loader';
 import { placesState } from '../../recoil/places';
 import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
@@ -34,6 +34,7 @@ const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires'
 
 const View = () => {
   useTitle('Recherche');
+  useRefreshOnFocus('search');
 
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 

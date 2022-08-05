@@ -25,7 +25,7 @@ import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
-import { loadingState, refreshTriggerState } from '../../components/Loader';
+import { loadingState, refreshTriggerState, useRefreshOnFocus } from '../../components/Loader';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
@@ -34,6 +34,7 @@ const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 const List = () => {
   const history = useHistory();
   useTitle('Agenda');
+  useRefreshOnFocus('agenda');
   const [modalOpen, setModalOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);

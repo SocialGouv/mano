@@ -16,7 +16,7 @@ import SelectCustom from '../../components/SelectCustom';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { formatDateWithFullMonth } from '../../services/date';
-import { refreshTriggerState, loadingState } from '../../components/Loader';
+import { refreshTriggerState, loadingState, useRefreshOnFocus } from '../../components/Loader';
 import useApi from '../../services/api';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
@@ -26,6 +26,7 @@ const List = () => {
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
   useTitle('Territoires');
+  useRefreshOnFocus('territories');
 
   const [page, setPage] = useSearchParamState('page', 0);
   const [search, setSearch] = useSearchParamState('search', '');

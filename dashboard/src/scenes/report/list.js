@@ -9,7 +9,7 @@ import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday } from
 import { currentTeamState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { refreshTriggerState, loadingState } from '../../components/Loader';
+import { refreshTriggerState, loadingState, useRefreshOnFocus } from '../../components/Loader';
 import useApi from '../../services/api';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import useTitle from '../../services/useTitle';
@@ -19,6 +19,7 @@ const List = () => {
   const loading = useRecoilValue(loadingState);
   const currentTeam = useRecoilValue(currentTeamState);
   useTitle('Comptes rendus');
+  useRefreshOnFocus('reports');
 
   return (
     <>
