@@ -1,3 +1,10 @@
+## [1.141.7](https://github.com/SocialGouv/mano/compare/v1.141.6...v1.141.7) (2022-08-09)
+
+
+### Bug Fixes
+
+* **dashboard:** person creation modale did not disappear when one person or more have no name ([fc5ce32](https://github.com/SocialGouv/mano/commit/fc5ce32038ffa8294d068ab4084bc684d97a3c83))
+
 ## [1.141.6](https://github.com/SocialGouv/mano/compare/v1.141.5...v1.141.6) (2022-08-04)
 
 
