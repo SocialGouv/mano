@@ -1,3 +1,10 @@
+## [1.141.9](https://github.com/SocialGouv/mano/compare/v1.141.8...v1.141.9) (2022-08-09)
+
+
+### Bug Fixes
+
+* **dashboard:** post after operation when one person or more have no name ([2d8b9bd](https://github.com/SocialGouv/mano/commit/2d8b9bd53e4961874c843d529b49663d543b1134))
+
 ## [1.141.8](https://github.com/SocialGouv/mano/compare/v1.141.7...v1.141.8) (2022-08-09)
 
 
