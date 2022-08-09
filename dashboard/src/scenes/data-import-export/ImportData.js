@@ -133,7 +133,7 @@ const ImportData = () => {
     if (window.confirm(`Voulez-vous vraiment importer ${dataToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
       const response = await API.post({ path: '/person/import', body: dataToImport });
       if (response.ok) toastr.success('Importation réussie !');
-      setAllPersons((oldPersons) => [...oldPersons, ...response.decryptedData].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+      setAllPersons((oldPersons) => [...oldPersons, ...response.decryptedData].sort((p1, p2) => (p1.name || '').localeCompare(p2.name || '')));
       setShowImpotSummary(false);
     }
   };
