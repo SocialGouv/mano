@@ -1,3 +1,10 @@
+## [1.141.8](https://github.com/SocialGouv/mano/compare/v1.141.7...v1.141.8) (2022-08-09)
+
+
+### Bug Fixes
+
+* **dashboard:** can not update a person without giving a name ([db4d390](https://github.com/SocialGouv/mano/commit/db4d3905759619db8edb50f282a3e0f8f4c4f475))
+
 ## [1.141.7](https://github.com/SocialGouv/mano/compare/v1.141.6...v1.141.7) (2022-08-09)
 
 
