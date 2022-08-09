@@ -1,3 +1,10 @@
+# [1.142.0](https://github.com/SocialGouv/mano/compare/v1.141.9...v1.142.0) (2022-08-09)
+
+
+### Features
+
+* **dashboard:** improve xlsx import (including name is mandatory) ([#833](https://github.com/SocialGouv/mano/issues/833)) ([1747cbf](https://github.com/SocialGouv/mano/commit/1747cbf7a180ad7ced1623293ba0d7be8a0fccb5))
+
 ## [1.141.9](https://github.com/SocialGouv/mano/compare/v1.141.8...v1.141.9) (2022-08-09)
 
 
