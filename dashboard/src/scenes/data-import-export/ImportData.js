@@ -2,7 +2,7 @@ import React, { useMemo, useRef, useState } from 'react';
 import XLSX from 'xlsx';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toastr } from 'react-redux-toastr';
-import { Modal, ModalBody, ModalHeader } from 'reactstrap';
+import { Modal, ModalBody, ModalHeader, Alert } from 'reactstrap';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
   customFieldsPersonsMedicalSelector,
@@ -89,6 +89,18 @@ const ImportData = () => {
       setImportedFields(headersCellsToImport.map((headerKey) => personsSheet[headerKey].v?.trim()));
       const lastRow = parseInt(personsSheet['!ref'].split(':')[1].replace(/\D+/g, ''), 10);
 
+      const nameField = importableFields.find((f) => f.name === 'name');
+
+      if (!headerColumnsAndField.find((e) => e[1]?.name === 'name')) {
+        toastr.error(
+          `La colonne "${nameField.label}" est requise.`,
+          "Vérifiez votre fichier pour vous assurer que cette colonne existe et est correctement nommée. Vous pouvez vérifier avec le fichier d'exemple que les colonnes sont bien identiques.",
+          { timeOut: 5000 }
+        );
+        setReloadKey((k) => k + 1);
+        return;
+      }
+
       const persons = [];
       for (let i = 2; i <= lastRow; i++) {
         const person = {};
@@ -104,6 +116,11 @@ const ImportData = () => {
         }
         if (Object.keys(person).length) {
           person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ''}`;
+          if (!person.name) {
+            toastr.error(`La colonne "${nameField.label}" ne doit pas être vide`, `Vérifiez la ligne ${i} du fichier.`, { timeOut: 5000 });
+            setReloadKey((k) => k + 1);
+            return;
+          }
           persons.push(person);
         }
       }
@@ -153,31 +170,48 @@ const ImportData = () => {
         onChange={onParseData}
       />
       <Modal isOpen={showImportSummary} toggle={() => setShowImpotSummary(false)} size="lg" backdrop="static">
-        <ModalHeader toggle={() => setShowImpotSummary(false)}>Résumé</ModalHeader>
+        <ModalHeader toggle={() => setShowImpotSummary(false)}>Résumé de l'import de personnes</ModalHeader>
         <ModalBody>
-          <ul style={{ overflow: 'auto', maxHeight: '62vh' }}>
-            <li>Nombre de personnes à importer: {dataToImport.length}</li>
-            <li>
-              Champs importés ({importedFields.length}):
-              <ul>
-                {importedFields.map((label) => (
-                  <li key={label}>
-                    <code>{label}</code>
-                  </li>
-                ))}
-              </ul>
-            </li>
-            <li>
-              Champs ignorés ({ignoredFields.length}):
-              <ul>
-                {ignoredFields.map((label) => (
-                  <li key={label}>
-                    <code>{label}</code>
-                  </li>
-                ))}
-              </ul>
-            </li>
+          <p>
+            Nombre de personnes à importer&nbsp;: <strong>{dataToImport.length}</strong>
+          </p>
+          <Alert color="warning">
+            Vérifiez bien la liste des champs ci-dessous. S'il manque un champ (par exemple parce qu'une colonne ne contient pas le nom exact indiqué
+            dans Mano), alors <strong>ce champ ne sera pas considéré</strong> et votre file active sera donc corrompue. Les corrections devront être
+            effectuées à la main au cas par cas, ce qui peut être un peu long.
+          </Alert>
+          {Boolean(ignoredFields.length) && (
+            <>
+              <Alert color="danger">Certaines colonnes n'ont pas été trouvées dans Mano, consultez le détail ci-dessous.</Alert>
+              <p>
+                Les colonnes suivantes seront <strong>ignorées</strong> ({ignoredFields.length}) :<br />
+                <small>
+                  Ces colonnes sont présentes dans votre fichier mais n'ont pas de correspondance sur Mano, vérifiez votre fichier avant d'importer
+                  (problèmes de majuscules, de caractères accentués, etc.)
+                </small>
+              </p>
+            </>
+          )}
+
+          <ul>
+            {ignoredFields.map((label) => (
+              <li key={label}>
+                <code>{label}</code>
+              </li>
+            ))}
           </ul>
+
+          <p>
+            Les colonnes suivantes seront <strong>importées</strong> ({importedFields.length}) :
+            <ul>
+              {importedFields.map((label) => (
+                <li key={label}>
+                  <code style={{ color: 'black' }}>{label}</code>
+                </li>
+              ))}
+            </ul>
+          </p>
+
           <ButtonCustom onClick={onImportData} color="primary" title="Importer" padding="12px 24px" />
         </ModalBody>
       </Modal>
