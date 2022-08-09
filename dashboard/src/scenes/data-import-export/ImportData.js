@@ -117,11 +117,7 @@ const ImportData = () => {
         if (Object.keys(person).length) {
           person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ''}`;
           if (!person.name) {
-            toastr.error(
-              `La colonne "${nameField.label}" est requise.`,
-              "Vérifiez votre fichier pour vous assurer que cette colonne existe et est correctement nommée. Vous pouvez comparer avec le fichier d'exemple pour vous assurer que les colonnes sont bien identiques.",
-              { timeOut: 5000 }
-            );
+            toastr.error(`La colonne "${nameField.label}" ne doit pas être vide`, `Vérifiez la ligne ${i} du fichier.`, { timeOut: 5000 });
             setReloadKey((k) => k + 1);
             return;
           }
@@ -184,14 +180,18 @@ const ImportData = () => {
             dans Mano), alors <strong>ce champ ne sera pas considéré</strong> et votre file active sera donc corrompue. Les corrections devront être
             effectuées à la main au cas par cas, ce qui peut être un peu long.
           </Alert>
-          <Alert color="danger">Certaines colonnes n'ont pas été trouvées dans Mano, consultez le détail ci-dessous.</Alert>
-          <p>
-            Les colonnes suivantes seront <strong>ignorées</strong> ({ignoredFields.length}) :<br />
-            <small>
-              Ces colonnes sont présentes dans votre fichier mais n'ont pas de correspondance sur Mano, vérifiez votre fichier avant d'importer
-              (problèmes de majuscules, de caractères accentués, etc.)
-            </small>
-          </p>
+          {Boolean(ignoredFields.length) && (
+            <>
+              <Alert color="danger">Certaines colonnes n'ont pas été trouvées dans Mano, consultez le détail ci-dessous.</Alert>
+              <p>
+                Les colonnes suivantes seront <strong>ignorées</strong> ({ignoredFields.length}) :<br />
+                <small>
+                  Ces colonnes sont présentes dans votre fichier mais n'ont pas de correspondance sur Mano, vérifiez votre fichier avant d'importer
+                  (problèmes de majuscules, de caractères accentués, etc.)
+                </small>
+              </p>
+            </>
+          )}
 
           <ul>
             {ignoredFields.map((label) => (
@@ -202,7 +202,7 @@ const ImportData = () => {
           </ul>
 
           <p>
-            Champs importés ({importedFields.length}) :
+            Les colonnes suivantes seront <strong>importées</strong> ({importedFields.length}) :
             <ul>
               {importedFields.map((label) => (
                 <li key={label}>
