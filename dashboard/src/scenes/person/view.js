@@ -229,6 +229,7 @@ const Summary = ({ person }) => {
         enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
+          if (!body.name?.trim()?.length) return toastr.error('Une personne doit avoir un nom');
           if (!body.followedSince) body.followedSince = person.createdAt;
           body.entityKey = person.entityKey;
           const response = await API.put({
