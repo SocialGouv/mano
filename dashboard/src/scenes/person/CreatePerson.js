@@ -70,7 +70,7 @@ const CreatePerson = ({ refreshable }) => {
                 body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
               });
               if (response.ok) {
-                setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+                setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => (p1.name || '').localeCompare(p2.name || '')));
                 toastr.success('Création réussie !');
                 setOpen(false);
                 actions.setSubmitting(false);
