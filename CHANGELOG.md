@@ -1,3 +1,10 @@
+# [1.143.0](https://github.com/SocialGouv/mano/compare/v1.142.0...v1.143.0) (2022-08-10)
+
+
+### Features
+
+* **dashboard:** refresh on focus ([#830](https://github.com/SocialGouv/mano/issues/830)) ([1f51bfb](https://github.com/SocialGouv/mano/commit/1f51bfb07c44ea81931d66de007d4f5f13128ee7))
+
 # [1.142.0](https://github.com/SocialGouv/mano/compare/v1.141.9...v1.142.0) (2022-08-09)
 
 
