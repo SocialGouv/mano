@@ -17,7 +17,7 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import { personsState } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { collectionsToLoadState, useRefreshOnFocus } from '../../components/Loader';
+import { collectionsToLoadState, useRefreshOnMount } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
@@ -101,7 +101,7 @@ const todaysPassagesSelector = selector({
 
 const Reception = () => {
   useTitle('Accueil');
-  useRefreshOnFocus('reception');
+  useRefreshOnMount();
 
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);

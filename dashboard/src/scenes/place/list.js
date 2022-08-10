@@ -17,7 +17,7 @@ import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateWithFullMonth } from '../../services/date';
-import { loadingState, refreshTriggerState, useRefreshOnFocus } from '../../components/Loader';
+import { loadingState, refreshTriggerState, useRefreshOnMount } from '../../components/Loader';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
@@ -31,7 +31,7 @@ const filterPlaces = (places, { page, limit, search }) => {
 
 const List = () => {
   useTitle('Lieux fréquentés');
-  useRefreshOnFocus('places');
+  useRefreshOnMount();
 
   const history = useHistory();
 

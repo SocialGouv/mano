@@ -84,11 +84,10 @@ export const lastRefreshState = atom({
   ],
 });
 
-export const useRefreshOnFocus = (debug) => {
+export const useRefreshOnMount = () => {
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   useEffect(() => {
     if (refreshTrigger.status !== true) {
-      // if (debug) console.log('refresh from ', debug);
       setRefreshTrigger({
         status: true,
         options: { showFullScreen: false, initialLoad: false },
