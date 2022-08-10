@@ -104,7 +104,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch(
       `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`
     );
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     expect(await getInputValue("input#Café-count")).toBe("1");
     expect(await getInputValue("input#Bain-count")).toBe("3");
 

@@ -27,9 +27,11 @@ import { commentsState } from '../../recoil/comments';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
+import { useRefreshOnMount } from '../../components/Loader';
 
 const List = () => {
   useTitle('Personnes');
+  useRefreshOnMount();
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
@@ -41,6 +43,7 @@ const List = () => {
   const [page, setPage] = useSearchParamState('page', 0);
   const currentTeam = useRecoilValue(currentTeamState);
   const persons = useRecoilValue(personsWithPlacesSelector);
+
   const personsFiltered = useMemo(() => {
     let pFiltered = persons;
     if (!!filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);

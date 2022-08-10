@@ -84,6 +84,20 @@ export const lastRefreshState = atom({
   ],
 });
 
+export const useRefreshOnMount = () => {
+  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
+  useEffect(() => {
+    if (refreshTrigger.status !== true) {
+      setRefreshTrigger({
+        status: true,
+        options: { showFullScreen: false, initialLoad: false },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+  return null;
+};
+
 const mergeItems = (oldItems, newItems) => {
   const newItemsIds = newItems.map((i) => i._id);
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
@@ -638,36 +652,6 @@ const Loader = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status, lastRefreshReady]);
-
-  // useEffect(() => {
-  //   if (!autoRefreshInterval.current && initialLoadDone.current) {
-  //     autoRefreshInterval.current = setInterval(async () => {
-  //       const response = await API.get({
-  //         path: '/organisation/stats',
-  //         query: { organisation: organisationId, lastRefresh },
-  //       });
-  //       if (!response.ok) return;
-
-  //       let total =
-  //         response.data.actions +
-  //         response.data.persons +
-  //         response.data.territories +
-  //         response.data.territoryObservations +
-  //         response.data.places +
-  //         response.data.comments +
-  //         response.data.passages +
-  //         response.data.reports +
-  //         response.data.relsPersonPlace;
-
-  //       if (total) {
-  //         setRefreshTrigger({
-  //           status: true,
-  //           options: { showFullScreen: false, initialLoad: false },
-  //         });
-  //       }
-  //     }, 2 * 60 * 1000);
-  //   }
-  // }, [lastRefresh, organisationId, API, setRefreshTrigger]);
 
   useEffect(() => {
     setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);

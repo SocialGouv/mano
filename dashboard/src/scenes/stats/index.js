@@ -29,7 +29,7 @@ import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesState } from '../../recoil/territory';
 import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
-import { loadingState, refreshTriggerState } from '../../components/Loader';
+import { loadingState, refreshTriggerState, useRefreshOnMount } from '../../components/Loader';
 import { passagesState } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
 import { consultationsState } from '../../recoil/consultations';
@@ -74,6 +74,7 @@ const Stats = () => {
   const [actionsStatuses, setActionsStatuses] = useState(DONE);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
+  useRefreshOnMount();
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
