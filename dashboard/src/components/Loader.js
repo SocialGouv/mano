@@ -122,10 +122,6 @@ const Loader = () => {
   const [comments, setComments] = useRecoilState(commentsState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
 
-  // to prevent auto-refresh to trigger on the first render
-  const initialLoadDone = useRef(null);
-  const autoRefreshInterval = useRef(null);
-
   useEffect(() => {
     if (lastRefreshReady) return;
     (async () => {
@@ -156,9 +152,6 @@ const Loader = () => {
   };
 
   const refresh = async () => {
-    clearInterval(autoRefreshInterval.current);
-    autoRefreshInterval.current = null;
-
     const { showFullScreen, initialLoad } = refreshTrigger.options;
     setFullScreen(showFullScreen);
     setLoading(initialLoad ? 'Chargement...' : 'Mise à jour...');
@@ -540,7 +533,6 @@ const Loader = () => {
     /*
     Reset refresh trigger
     */
-    initialLoadDone.current = true;
     await new Promise((res) => setTimeout(res, 150));
     setLastRefresh(Date.now());
     setLoading('');
