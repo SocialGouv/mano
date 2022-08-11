@@ -1,9 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { theme } from '../config';
-import picture1 from '../assets/MANO_livraison_elements-07_green.png';
-import picture2 from '../assets/MANO_livraison_elements-08_green.png';
-import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail_green.png';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { getCacheItem, getData, setCacheItem } from '../services/dataManagement';
 import { organisationState, teamsState, userState } from '../recoil/auth';
@@ -21,14 +18,10 @@ import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 import { treatmentsState } from '../recoil/treatments';
 import { medicalFileState } from '../recoil/medicalFiles';
+import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 
 // Update to flush cache.
 const currentCacheKey = 'mano-last-refresh-2022-05-30';
-
-function randomIntFromInterval(min, max) {
-  // min and max included
-  return Math.floor(Math.random() * (max - min + 1) + min);
-}
 
 export const loadingState = atom({
   key: 'loadingState',
@@ -87,12 +80,11 @@ export const lastRefreshState = atom({
 export const useRefreshOnMount = () => {
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   useEffect(() => {
-    if (refreshTrigger.status !== true) {
-      setRefreshTrigger({
-        status: true,
-        options: { showFullScreen: false, initialLoad: false },
-      });
-    }
+    if (refreshTrigger.status === true) return;
+    setRefreshTrigger({
+      status: true,
+      options: { showFullScreen: false, initialLoad: false },
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
   return null;
@@ -106,7 +98,6 @@ const mergeItems = (oldItems, newItems) => {
 
 const Loader = () => {
   const API = useApi();
-  const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
   const [lastRefresh, setLastRefresh] = useRecoilState(lastRefreshState);
   const [lastRefreshReady, setLastRefreshReady] = useState(false);
   const [loading, setLoading] = useRecoilState(loadingState);
@@ -643,23 +634,12 @@ const Loader = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status, lastRefreshReady]);
 
-  useEffect(() => {
-    setPicture([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  }, [fullScreen]);
-
-  if (!loading)
-    return (
-      <Hidden>
-        <Picture src={picture1} />
-        <Picture src={picture2} />
-        <Picture src={picture3} />
-      </Hidden>
-    );
+  if (!loading) return <RandomPicturePreloader />;
   if (fullScreen) {
     return (
       <FullScreenContainer>
         <InsideContainer>
-          <Picture src={picture} />
+          <RandomPicture />
           <ProgressContainer>
             <Progress progress={progress} />
           </ProgressContainer>
@@ -678,14 +658,6 @@ const Loader = () => {
     </Container>
   );
 };
-
-const Hidden = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
-`;
 
 const FullScreenContainer = styled.div`
   width: 100%;
@@ -711,15 +683,6 @@ const InsideContainer = styled.div`
   max-height: 50vw;
   justify-content: center;
   align-items: center;
-`;
-
-const Picture = styled.div`
-  background-image: url(${(props) => props.src});
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-position: center;
-  width: 100%;
-  height: 80%;
 `;
 
 const Container = styled.div`
