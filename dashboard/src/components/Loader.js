@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { getCacheItem, getData, setCacheItem } from '../services/dataManagement';
-import { organisationState, teamsState, userState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
 import { territoriesState } from '../recoil/territory';
@@ -13,7 +13,7 @@ import { commentsState } from '../recoil/comments';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import dayjs from 'dayjs';
-import { passagesState, preparePassageForEncryption } from '../recoil/passages';
+import { passagesState } from '../recoil/passages';
 import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 import { treatmentsState } from '../recoil/treatments';
 import { medicalFileState } from '../recoil/medicalFiles';
@@ -105,7 +105,6 @@ const Loader = () => {
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisationId = organisation?._id;
 
