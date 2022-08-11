@@ -90,7 +90,8 @@ export const useRefreshOnMount = () => {
   return null;
 };
 
-const mergeItems = (oldItems, newItems) => {
+const mergeItems = (oldItems, newItems, initialLoad) => {
+  if (initialLoad) return [...oldItems, ...newItems];
   const newItemsIds = newItems.map((i) => i._id);
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
   return [...oldItemsPurged, ...newItems];
@@ -283,7 +284,7 @@ const Loader = () => {
         withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPersons) => setPersons((oldPersons) => (initialLoad ? [...oldPersons, ...newPersons] : mergeItems(oldPersons, newPersons))),
+        setBatchData: (newPersons) => setPersons((oldPersons) => mergeItems(oldPersons, newPersons, initialLoad)),
         API,
       });
       if (refreshedPersons)
@@ -309,12 +310,11 @@ const Loader = () => {
         lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
         setBatchData: (newConsultations) =>
           setConsultations((oldConsultations) =>
-            initialLoad
-              ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
-              : mergeItems(
-                  oldConsultations,
-                  newConsultations.map((c) => whitelistAllowedData(c, user))
-                )
+            mergeItems(
+              oldConsultations,
+              newConsultations.map((c) => whitelistAllowedData(c, user)),
+              initialLoad
+            )
           ),
         API,
       });
@@ -335,8 +335,7 @@ const Loader = () => {
           saveInCache: false,
           setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
           lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-          setBatchData: (newTreatments) =>
-            setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
+          setBatchData: (newTreatments) => setTreatments((oldTreatments) => mergeItems(oldTreatments, newTreatments, initialLoad)),
           API,
         });
         if (refreshedTreatments) setTreatments(refreshedTreatments);
@@ -355,10 +354,7 @@ const Loader = () => {
           saveInCache: false,
           setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
           lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-          setBatchData: (newMedicalFiles) =>
-            setMedicalFiles((oldMedicalFiles) =>
-              initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
-            ),
+          setBatchData: (newMedicalFiles) => setMedicalFiles((oldMedicalFiles) => mergeItems(oldMedicalFiles, newMedicalFiles, initialLoad)),
           API,
         });
         if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
@@ -389,7 +385,7 @@ const Loader = () => {
         lastRefresh,
         setBatchData: (newReports) => {
           newReports = newReports.filter((r) => !!r.team && !!r.date);
-          setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
+          setReports((oldReports) => mergeItems(oldReports, newReports, initialLoad));
         },
         API,
       });
@@ -410,8 +406,7 @@ const Loader = () => {
         withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPassages) =>
-          setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
+        setBatchData: (newPassages) => setPassages((oldPassages) => mergeItems(oldPassages, newPassages, initialLoad)),
         API,
       });
       if (refreshedPassages) setPassages(refreshedPassages.sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
@@ -434,7 +429,7 @@ const Loader = () => {
         withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newActions) => setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions))),
+        setBatchData: (newActions) => setActions((oldActions) => mergeItems(oldActions, newActions, initialLoad)),
         API,
       });
       if (refreshedActions) setActions(refreshedActions);
@@ -452,8 +447,7 @@ const Loader = () => {
         withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newTerritories) =>
-          setTerritories((oldTerritories) => (initialLoad ? [...oldTerritories, ...newTerritories] : mergeItems(oldTerritories, newTerritories))),
+        setBatchData: (newTerritories) => setTerritories((oldTerritories) => mergeItems(oldTerritories, newTerritories, initialLoad)),
         API,
       });
       if (refreshedTerritories) setTerritories(refreshedTerritories);
@@ -472,7 +466,7 @@ const Loader = () => {
         withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newPlaces) => setPlaces((oldPlaces) => (initialLoad ? [...oldPlaces, ...newPlaces] : mergeItems(oldPlaces, newPlaces))),
+        setBatchData: (newPlaces) => setPlaces((oldPlaces) => mergeItems(oldPlaces, newPlaces, initialLoad)),
         API,
       });
       if (refreshedPlaces) setPlaces(refreshedPlaces.sort((p1, p2) => p1.name.localeCompare(p2.name)));
@@ -485,8 +479,7 @@ const Loader = () => {
         withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newRelPerPlace) =>
-          setRelsPersonPlace((oldRelPerPlace) => (initialLoad ? [...oldRelPerPlace, ...newRelPerPlace] : mergeItems(oldRelPerPlace, newRelPerPlace))),
+        setBatchData: (newRelPerPlace) => setRelsPersonPlace((oldRelPerPlace) => mergeItems(oldRelPerPlace, newRelPerPlace, initialLoad)),
         API,
       });
       if (refreshedRelPersonPlaces) setRelsPersonPlace(refreshedRelPersonPlaces);
@@ -504,7 +497,7 @@ const Loader = () => {
         withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newObs) => setTerritoryObs((oldObs) => (initialLoad ? [...oldObs, ...newObs] : mergeItems(oldObs, newObs))),
+        setBatchData: (newObs) => setTerritoryObs((oldObs) => mergeItems(oldObs, newObs, initialLoad)),
         API,
       });
       if (refreshedObs) setTerritoryObs(refreshedObs);
@@ -522,8 +515,7 @@ const Loader = () => {
         withDeleted: Boolean(lastRefresh),
         setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
         lastRefresh,
-        setBatchData: (newComments) =>
-          setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
+        setBatchData: (newComments) => setComments((oldComments) => mergeItems(oldComments, newComments, initialLoad)),
         API,
       });
       if (refreshedComments) setComments(refreshedComments);
