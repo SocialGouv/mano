@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { getCacheItem, getData, setCacheItem } from '../services/dataManagement';
-import { organisationState, teamsState, userState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
 import { personsState } from '../recoil/persons';
 import { territoriesState } from '../recoil/territory';
@@ -13,7 +13,7 @@ import { commentsState } from '../recoil/comments';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import dayjs from 'dayjs';
-import { passagesState, preparePassageForEncryption } from '../recoil/passages';
+import { passagesState } from '../recoil/passages';
 import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 import { treatmentsState } from '../recoil/treatments';
 import { medicalFileState } from '../recoil/medicalFiles';
@@ -105,7 +105,6 @@ const Loader = () => {
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisationId = organisation?._id;
 
@@ -167,73 +166,6 @@ const Loader = () => {
     /*
     Play organisation internal migrations (things that requires the database to be fully loaded locally).
     */
-
-    if (!organisation.migrations?.includes('passages-from-comments-to-table')) {
-      await new Promise((res) => setTimeout(res, 500));
-      setLoading('Mise à jour des données de votre organisation, veuillez patienter quelques instants...');
-      const allReports = await getData({
-        collectionName: 'report',
-        data: reports,
-        isInitialization: initialLoad,
-        withDeleted: false,
-        setBatchData: (newReports) => {
-          newReports = newReports.filter((r) => !!r.team && !!r.date);
-          setReports((oldReports) => (initialLoad ? [...oldReports, ...newReports] : mergeItems(oldReports, newReports)));
-        },
-        API,
-      });
-      const commentsToMigrate = await getData({
-        collectionName: 'comment',
-        data: comments,
-        isInitialization: initialLoad,
-        withDeleted: false,
-        setBatchData: (newComments) =>
-          setComments((oldComments) => (initialLoad ? [...oldComments, ...newComments] : mergeItems(oldComments, newComments))),
-        API,
-      });
-      // Anonymous passages
-      const reportsToMigrate = allReports.filter((r) => r.passages > 0);
-      const newPassages = [];
-      for (const report of reportsToMigrate) {
-        for (let i = 1; i <= report.passages; i++) {
-          newPassages.push({
-            person: null,
-            team: report.team,
-            user: null,
-            date: dayjs(report.date)
-              .startOf('day')
-              .add(teams.find((t) => t._id === report.team).nightSession ? 12 : 0, 'hour'),
-          });
-        }
-      }
-      const passagesComments = commentsToMigrate.filter((c) => c?.comment?.includes('Passage enregistré'));
-      for (const passage of passagesComments) {
-        newPassages.push({
-          person: passage.person,
-          team: passage.team,
-          user: passage.user,
-          date: dayjs(passage.createdAt),
-        });
-      }
-      const commentIdsToDelete = passagesComments.map((p) => p._id);
-      setComments((comments) => comments.filter((c) => !commentIdsToDelete.includes(c._id)));
-      const encryptedPassages = await Promise.all(newPassages.map(preparePassageForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
-      const encryptedReportsToMigrate = await Promise.all(reportsToMigrate.map(prepareReportForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
-      const response = await API.put({
-        path: `/migration/passages-from-comments-to-table`,
-        body: {
-          newPassages: encryptedPassages,
-          commentIdsToDelete,
-          reportsToMigrate: encryptedReportsToMigrate,
-        },
-      });
-      if (response.ok) return migrationIsDone(response.organisation);
-      if (response.error) {
-        setLoading(response.error);
-        setProgress(1);
-      }
-      return;
-    }
 
     if (!organisation.migrations?.includes('reports-from-real-date-to-date-id')) {
       await new Promise((res) => setTimeout(res, 500));
