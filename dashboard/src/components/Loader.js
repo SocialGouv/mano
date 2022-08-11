@@ -128,12 +128,11 @@ const Loader = () => {
   const autoRefreshInterval = useRef(null);
 
   useEffect(() => {
-    if (!lastRefreshReady) {
-      (async () => {
-        setLastRefresh((await getCacheItem(currentCacheKey)) || 0);
-        setLastRefreshReady(true);
-      })();
-    }
+    if (lastRefreshReady) return;
+    (async () => {
+      setLastRefresh((await getCacheItem(currentCacheKey)) || 0);
+      setLastRefreshReady(true);
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [lastRefreshReady]);
 
@@ -163,7 +162,7 @@ const Loader = () => {
 
     const { showFullScreen, initialLoad } = refreshTrigger.options;
     setFullScreen(showFullScreen);
-    setLoading(initialLoad ? 'Chargement...' : 'Rafraichissement...');
+    setLoading(initialLoad ? 'Chargement...' : 'Mise à jour...');
 
     /*
     Play organisation internal migrations (things that requires the database to be fully loaded locally).
@@ -228,14 +227,12 @@ const Loader = () => {
           reportsToMigrate: encryptedReportsToMigrate,
         },
       });
-      if (!response.ok) {
-        if (response.error) {
-          setLoading(response.error);
-          setProgress(1);
-        }
-        return;
+      if (response.ok) return migrationIsDone(response.organisation);
+      if (response.error) {
+        setLoading(response.error);
+        setProgress(1);
       }
-      return migrationIsDone(response.organisation);
+      return;
     }
 
     if (!organisation.migrations?.includes('reports-from-real-date-to-date-id')) {
@@ -267,14 +264,12 @@ const Loader = () => {
           reportsToMigrate: encryptedReportsToMigrate,
         },
       });
-      if (!response.ok) {
-        if (response.error) {
-          setLoading(response.error);
-          setProgress(1);
-        }
-        return;
+      if (response.ok) return migrationIsDone(response.organisation);
+      if (response.error) {
+        setLoading(response.error);
+        setProgress(1);
       }
-      return migrationIsDone(response.organisation);
+      return;
     }
 
     if (!organisation.migrations?.includes('clean-reports-with-no-team-nor-date')) {
@@ -298,14 +293,12 @@ const Loader = () => {
           reportIdsToDelete,
         },
       });
-      if (!response.ok) {
-        if (response.error) {
-          setLoading(response.error);
-          setProgress(1);
-        }
-        return;
+      if (response.ok) return migrationIsDone(response.organisation);
+      if (response.error) {
+        setLoading(response.error);
+        setProgress(1);
       }
-      return migrationIsDone(response.organisation);
+      return;
     }
 
     /*
@@ -628,9 +621,8 @@ const Loader = () => {
   };
 
   useEffect(() => {
-    if (refreshTrigger.status === true && lastRefreshReady) {
-      refresh();
-    }
+    if (!(refreshTrigger.status === true && lastRefreshReady)) return;
+    refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refreshTrigger.status, lastRefreshReady]);
 
