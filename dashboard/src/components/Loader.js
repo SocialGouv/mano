@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import styled from 'styled-components';
-import { theme } from '../config';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { getCacheItem, getData, setCacheItem } from '../services/dataManagement';
 import { organisationState, teamsState, userState } from '../recoil/auth';
@@ -19,6 +18,7 @@ import { consultationsState, whitelistAllowedData } from '../recoil/consultation
 import { treatmentsState } from '../recoil/treatments';
 import { medicalFileState } from '../recoil/medicalFiles';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
+import ProgressBar from './LoaderProgressBar';
 
 // Update to flush cache.
 const currentCacheKey = 'mano-last-refresh-2022-05-30';
@@ -640,10 +640,7 @@ const Loader = () => {
       <FullScreenContainer>
         <InsideContainer>
           <RandomPicture />
-          <ProgressContainer>
-            <Progress progress={progress} />
-          </ProgressContainer>
-          <Caption>{loading}</Caption>
+          <ProgressBar progress={progress} loadingText={loading} />
         </InsideContainer>
       </FullScreenContainer>
     );
@@ -651,10 +648,7 @@ const Loader = () => {
 
   return (
     <Container>
-      <ProgressContainer>
-        <Progress progress={progress} />
-      </ProgressContainer>
-      <Caption>{loading}</Caption>
+      <ProgressBar progress={progress} loadingText={loading} />
     </Container>
   );
 };
@@ -692,28 +686,6 @@ const Container = styled.div`
   top: 0;
   left: 0;
   box-sizing: border-box;
-`;
-
-const Caption = styled.span`
-  width: 100%;
-  color: ${theme.main};
-  padding: 0px 5px;
-  text-align: left;
-  display: block;
-  box-sizing: border-box;
-  font-size: 10px;
-`;
-
-const ProgressContainer = styled.div`
-  width: 100%;
-  /* height: 7px; */
-`;
-
-const Progress = styled.div`
-  width: ${(p) => p.progress * 100}%;
-  min-width: 10%;
-  height: 5px;
-  background-color: ${theme.main};
 `;
 
 export default Loader;
