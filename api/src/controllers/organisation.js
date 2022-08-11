@@ -34,6 +34,7 @@ router.get(
     try {
       z.string().regex(looseUuidRegex).parse(req.query.organisation);
       z.optional(z.enum(["true", "false"])).parse(req.query.withDeleted);
+      z.optional(z.enum(["true", "false"])).parse(req.query.withAllMedicalData);
       z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.after);
     } catch (e) {
       const error = new Error(`Invalid request in stats get: ${e}`);
@@ -42,7 +43,7 @@ router.get(
     }
 
     const query = { where: { organisation: req.query.organisation } };
-    const { after, withDeleted } = req.query;
+    const { after, withDeleted, withAllMedicalData } = req.query;
     if (withDeleted === "true") query.paranoid = false;
     if (after && !isNaN(Number(after)) && withDeleted === "true") {
       query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(after)) } }, { deletedAt: { [Op.gte]: new Date(Number(after)) } }];
@@ -53,15 +54,25 @@ router.get(
     const places = await Place.count(query);
     const relsPersonPlace = await RelPersonPlace.count(query);
     const actions = await Action.count(query);
-    const consultations = await Consultation.count(query);
-    const treatments = req.user.healthcareProfessional ? await Treatment.count(query) : [];
-    const medicalFiles = req.user.healthcareProfessional ? await MedicalFile.count(query) : [];
     const persons = await Person.count(query);
     const comments = await Comment.count(query);
     const passages = await Passage.count(query);
     const reports = await Report.count(query);
     const territoryObservations = await TerritoryObservation.count(query);
     const territories = await Territory.count(query);
+
+    // Medical data is never saved in cache so we always have to download all at every page reload.
+    // In other words "after" param is intentionnaly ignored for consultations, treatments and medical files.
+    const medicalDataQuery =
+      withAllMedicalData !== "true" ? query : { where: { organisation: req.query.organisation }, paranoid: withDeleted === "true" };
+    const consultations = await Consultation.count(medicalDataQuery);
+    let treatments = 0;
+    let medicalFiles = 0;
+    if (req.user.healthcareProfessional) {
+      medicalFiles = await MedicalFile.count(medicalDataQuery);
+      treatments = await Treatment.count(medicalDataQuery);
+    }
+
     return res.status(200).send({
       ok: true,
       data: {
