@@ -322,7 +322,13 @@ const Loader = () => {
     */
     const response = await API.get({
       path: '/organisation/stats',
-      query: { organisation: organisationId, after: lastRefresh, withDeleted: true },
+      query: {
+        organisation: organisationId,
+        after: lastRefresh,
+        withDeleted: true,
+        // Medical data is never saved in cache so we always have to download all at every page reload
+        withAllMedicalData: initialLoad,
+      },
     });
     if (!response.ok) {
       setRefreshTrigger({
@@ -341,33 +347,17 @@ const Loader = () => {
       response.data.comments +
       response.data.passages +
       response.data.reports +
-      response.data.relsPersonPlace;
-
-    // medical data is never saved in cache
-    // so we always have to download all at every page reload
-    const medicalDataResponse = await API.get({
-      path: '/organisation/stats',
-      query: { organisation: organisationId, after: initialLoad ? 0 : lastRefresh, withDeleted: true },
-    });
-    if (!medicalDataResponse.ok) {
-      setRefreshTrigger({
-        status: false,
-        options: { showFullScreen: false, initialLoad: false },
-      });
-      return;
-    }
-
-    total =
-      total +
-      medicalDataResponse.data.consultations +
-      (!user.healthcareProfessional ? 0 : medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles);
+      response.data.relsPersonPlace +
+      response.data.consultations +
+      response.data.treatments +
+      response.data.medicalFiles;
 
     if (initialLoad) {
       total = total + collections.length; // for the progress bar to be beautiful
     }
 
     if (!total) {
-      // if nothing to load, just show a beautiful progress bar
+      // If nothing to load, just show a beautiful progress bar
       setLoading('');
       setProgress(1);
       await new Promise((res) => setTimeout(res, 500));
