@@ -326,7 +326,7 @@ const Loader = () => {
         organisation: organisationId,
         after: lastRefresh,
         withDeleted: true,
-        // Medical data is never saved in cache so we always have to download all at every page reload
+        // Medical data is never saved in cache so we always have to download all at every page reload.
         withAllMedicalData: initialLoad,
       },
     });
@@ -388,7 +388,7 @@ const Loader = () => {
     /*
     Get consultations
     */
-    if (medicalDataResponse.data.consultations || initialLoad) {
+    if (response.data.consultations || initialLoad) {
       setLoading('Chargement des consultations');
       const refreshedConsultations = await getData({
         collectionName: 'consultation',
@@ -416,7 +416,7 @@ const Loader = () => {
       /*
     Get treatments
     */
-      if (medicalDataResponse.data.treatments || initialLoad) {
+      if (response.data.treatments || initialLoad) {
         setLoading('Chargement des traitements');
         const refreshedTreatments = await getData({
           collectionName: 'treatment',
@@ -436,7 +436,7 @@ const Loader = () => {
       /*
       Get medicalFiles
       */
-      if (medicalDataResponse.data.medicalFiles || initialLoad) {
+      if (response.data.medicalFiles || initialLoad) {
         setLoading('Chargement des informations médicales');
         const refreshedMedicalFiles = await getData({
           collectionName: 'medical-file',
