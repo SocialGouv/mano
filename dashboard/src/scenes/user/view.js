@@ -26,15 +26,15 @@ const View = () => {
   const API = useApi();
   useTitle(`Utilisateur ${user?.name}`);
 
-  const getData = useCallback(async () => {
+  const getUserData = useCallback(async () => {
     const { data } = await API.get({ path: `/user/${id}` });
     setLocalUser(data);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
-    getData();
-  }, [getData, id]);
+    getUserData();
+  }, [getUserData, id]);
 
   if (!localUser) return <Loading />;
 
