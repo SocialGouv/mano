@@ -108,7 +108,7 @@ export const getIsDayWithinHoursOffsetOfPeriod = (dayToTest, { referenceStartDay
   // Source: https://day.js.org/docs/en/plugin/is-between
   // we need '[)' because
   // -> the date of reports is at the start of the day
-  // -> the date of anonymous passages migrated with passages-from-comments-to-table is at the start of the day
+  // -> the date of anonymous passages is at the start of the day
   return dayjs(dayToTest).isBetween(startDate, endDate, null, '[)');
 };
 
