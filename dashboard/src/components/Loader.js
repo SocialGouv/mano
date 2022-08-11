@@ -319,12 +319,14 @@ const Loader = () => {
         API,
       });
       if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
-      setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
     }
+    setCollectionsToLoad((c) => c.filter((collectionName) => collectionName !== 'consultation'));
+
+    // Only for healthcare professionals.
     if (['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
       /*
-    Get treatments
-    */
+      Get treatments
+      */
       if (response.data.treatments || initialLoad) {
         setLoading('Chargement des traitements');
         const refreshedTreatments = await getData({
