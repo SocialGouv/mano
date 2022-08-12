@@ -72,6 +72,10 @@ export async function getCacheItem(key) {
   return (await getManoCacheStorage())?.getItem(key);
 }
 
+export async function getCacheItemDefaultValue(key, defaultValue) {
+  return (await (await getManoCacheStorage())?.getItem(key)) || defaultValue;
+}
+
 export async function removeCacheItem(key) {
   return (await getManoCacheStorage())?.removeItem(key);
 }

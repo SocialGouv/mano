@@ -5,24 +5,35 @@ import { useEffect, useState } from 'react';
 import { personsState } from '../recoil/persons';
 import styled from 'styled-components';
 import { organisationState, userState } from '../recoil/auth';
-import { setCacheItem } from '../services/dataManagement';
+import { getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
+import { lastRefreshState } from './Loader';
+import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 
 // Update to flush cache.
 const currentCacheKey = 'mano-last-refresh-2022-05-30';
-const fullRefreshList = ['person'];
 
 export const refreshTriggerDataLoaderState = atom({
   key: 'refreshTriggerDataLoaderState',
   default: false,
 });
 
+function mergeItems(oldItems, newItems) {
+  const newItemsIds = newItems.map((i) => i._id);
+  const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
+  return [...oldItemsPurged, ...newItems];
+}
+
 export default function DataLoader() {
   const API = useApi();
+  const user = useRecoilValue(userState);
+
   const [persons, setPersons] = useRecoilState(personsState);
+  const [consultations, setConsultations] = useRecoilState(consultationsState);
+
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const [refreshTriggerDataLoader, setRefreshTriggerDataLoader] = useRecoilState(refreshTriggerDataLoaderState);
-  const user = useRecoilValue(userState);
+  const [lastRefresh, setLastRefresh] = useRecoilState(lastRefreshState);
 
   const [refreshList, setRefreshList] = useState({ list: [], offset: 0 });
   const [progressBuffer, setProgressBuffer] = useState(null);
@@ -31,40 +42,26 @@ export default function DataLoader() {
   const [progress, setProgress] = useState(null);
   const [total, setTotal] = useState(null);
 
+  useEffect(initLoader, [progress, total, refreshTriggerDataLoader, refreshList.list.length]);
+  useEffect(updateProgress, [progress, progressBuffer]);
+  useEffect(refresh, [refreshList]);
+
   const organisationId = organisation?._id;
   const initialLoad = true; // TODO: fix
 
-  /*
-  useEffect(
-    function initRefreshList() {
-      if (refreshTriggerDataLoader) {
-        console.log(1);
-        setRefreshTriggerDataLoader(false);
-        setRefreshList({ list: fullRefreshList, offset: 0 });
-      }
-    },
-    [refreshTriggerDataLoader]
-  );
-  */
+  function initLoader() {
+    console.log(progress, total, refreshList.list.length);
+    if (refreshList.list.length > 0) return;
 
-  useEffect(
-    function initLoader() {
-      console.log(progress, total, refreshList.list.length);
-      if (refreshList.list.length > 0) return;
-
-      if (progress !== null && total !== null) {
-        console.log('oups');
-        setProgress(null);
-        setTotal(null);
-        return;
-      }
-      if (progress === null && refreshTriggerDataLoader) {
-        console.log('BIM');
+    if (progress === null && total === null && refreshTriggerDataLoader) {
+      console.log('Initialisation');
+      getCacheItem(currentCacheKey).then((lastRefreshValue) => {
+        setLastRefresh(lastRefreshValue || 0);
         API.get({
           path: '/organisation/stats',
           query: {
             organisation: organisationId,
-            after: 0, // TODO: lastRefresh fix
+            after: lastRefreshValue || 0,
             withDeleted: true,
             // Medical data is never saved in cache so we always have to download all at every page reload.
             withAllMedicalData: initialLoad,
@@ -73,64 +70,69 @@ export default function DataLoader() {
           const newList = [];
           let total = 0 + stats.persons;
           if (stats.persons) newList.push('person');
-          setRefreshList({ list: newList, offset: 0 });
-          setRefreshTriggerDataLoader(false);
-          setProgress(0);
-          setTotal(total);
+          if (stats.consultations) newList.push('consultation');
+          if (stats.treatments) newList.push('treatment');
+          if (stats.medicalFiles) newList.push('medicalFile');
+
+          Promise.resolve()
+            .then(() => getCacheItemDefaultValue('person', []))
+            .then((persons) => setPersons([...persons]))
+            .then(() => {
+              setRefreshList({ list: newList, offset: 0 });
+              setRefreshTriggerDataLoader(false);
+              setProgress(0);
+              setTotal(total);
+            });
         });
+      });
+    }
+    if (progress !== null && total !== null) {
+      console.log('Finalisation');
+      setLastRefresh(Date.now());
+      setProgress(null);
+      setTotal(null);
+      return;
+    }
+  }
+
+  function updateProgress() {
+    if (progressBuffer !== null) {
+      setProgressBuffer(null);
+      setProgress((progress || 0) + progressBuffer);
+    }
+  }
+
+  function refresh() {
+    (async () => {
+      if (refreshList.list.length === 0) return;
+
+      const [current] = refreshList.list;
+      const query = { organisation: organisationId, limit: String(500), page: String(refreshList.offset), after: lastRefresh };
+
+      function handleMore(hasMore) {
+        if (hasMore) setRefreshList({ list: refreshList.list, offset: refreshList.offset + 1 });
+        else setRefreshList({ list: refreshList.list.slice(1), offset: 0 });
       }
-    },
-    [progress, total, refreshTriggerDataLoader, refreshList.list.length]
-  );
 
-  useEffect(
-    function updateProgress() {
-      if (progressBuffer !== null) {
-        setProgressBuffer(null);
-        setProgress((progress || 0) + progressBuffer);
+      if (current === 'person') {
+        setLoadingText('Chargement des personnes');
+        const res = await API.get({ path: '/person', query });
+        setPersons(
+          mergeItems(persons, res.decryptedData)
+            .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
+            .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
+        );
+        handleMore(res.hasMore);
+        setProgressBuffer(res.data.length);
+      } else if (current === 'consultation') {
+        setLoadingText('Chargement des consultations');
+        const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastRefresh } });
+        setConsultations(mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user)));
+        handleMore(res.hasMore);
+        setProgressBuffer(res.data.length);
       }
-    },
-    [progress, progressBuffer]
-  );
-
-  useEffect(
-    function refresh() {
-      (async () => {
-        if (refreshList.list.length === 0) return;
-
-        const [current] = refreshList.list;
-        const options = { query: { organisation: organisationId, limit: String(500), page: String(refreshList.offset) } };
-
-        function handleMore(hasMore) {
-          if (hasMore) setRefreshList({ list: refreshList.list, offset: refreshList.offset + 1 });
-          else setRefreshList({ list: refreshList.list.slice(1), offset: 0 });
-        }
-
-        if (current === 'person') {
-          setLoadingText('Chargement des personnes');
-          const res = await API.get({ path: '/person', ...options });
-          setPersons([
-            ...persons,
-            ...res.decryptedData
-              .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
-              .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || '')),
-          ]);
-          handleMore(res.hasMore);
-          setProgressBuffer(res.data.length);
-        }
-
-        /*
-setLastRefresh(Date.now());
-    setLoading('');
-    setProgress(0);
-    setFullScreen(false);
-        */
-      })();
-    },
-    [refreshList]
-  );
-
-  console.log(progress);
+    })();
+  }
 
   if (!refreshList.list?.length) return <RandomPicturePreloader />;
 
