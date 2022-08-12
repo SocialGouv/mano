@@ -28,7 +28,7 @@ const ProgressContainer = styled.div`
 `;
 
 const Progress = styled.div`
-  width: ${(p) => p.progress * 100}%;
+  width: ${(p) => Math.min(p.progress, 1) * 100}%;
   min-width: 5%;
   height: 5px;
   background-color: ${theme.main};
