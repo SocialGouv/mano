@@ -78,6 +78,7 @@ export const lastRefreshState = atom({
 });
 
 export const useRefreshOnMount = () => {
+  /*
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   useEffect(() => {
     if (refreshTrigger.status === true) return;
@@ -87,6 +88,7 @@ export const useRefreshOnMount = () => {
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+  */
   return null;
 };
 

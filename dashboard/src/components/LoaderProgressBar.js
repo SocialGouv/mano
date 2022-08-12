@@ -29,7 +29,7 @@ const ProgressContainer = styled.div`
 
 const Progress = styled.div`
   width: ${(p) => p.progress * 100}%;
-  min-width: 10%;
+  min-width: 5%;
   height: 5px;
   background-color: ${theme.main};
 `;

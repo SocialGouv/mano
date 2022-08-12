@@ -16,6 +16,7 @@ import useApi, { setOrgEncryptionKey } from '../../services/api';
 import { AppSentry } from '../../services/sentry';
 import { refreshTriggerState, loadingState, lastRefreshState } from '../../components/Loader';
 import { clearCache } from '../../services/dataManagement';
+import { refreshTriggerDataLoaderState } from '../../components/DataLoader';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -34,22 +35,26 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authViaCookie, setAuthViaCookie] = useState(false);
+  const [refreshTriggerDataLoader, setRefreshTriggerDataLoader] = useRecoilState(refreshTriggerDataLoaderState);
   const API = useApi();
 
   useEffect(() => {
-    if (refreshTrigger.status !== true) return;
+    if (refreshTriggerDataLoader !== true) return;
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
       history.push('/action');
     }
-  }, [history, organisation, refreshTrigger]);
+  }, [history, organisation, refreshTriggerDataLoader]);
 
   const onSigninValidated = async () => {
+    /*
     setRefreshTrigger({
       status: true,
       options: { initialLoad: true, showFullScreen: true },
     });
+    */
+    setRefreshTriggerDataLoader(true);
     setGlobalLoading('Initialisation...');
   };
 

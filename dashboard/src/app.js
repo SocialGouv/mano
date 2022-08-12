@@ -31,6 +31,7 @@ import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 import ModalConfirm from './components/ModalConfirm';
+import DataLoader from './components/DataLoader';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -119,7 +120,8 @@ export default function ContextedApp() {
       <Provider store={store}>
         <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
         <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-        <Loader />
+        {/* <Loader /> */}
+        <DataLoader />
         <ModalConfirm />
       </Provider>
     </RecoilRoot>
