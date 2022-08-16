@@ -21,12 +21,12 @@ import SelectTeam from '../../components/SelectTeam';
 
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption } from '../../recoil/actions';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { dateForDatePicker, now } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
+import { useDataLoader } from '../../components/DataLoader';
 
 const View = () => {
   const { id } = useParams();
@@ -34,12 +34,12 @@ const View = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [actions, setActions] = useRecoilState(actionsState);
   const [comments, setComments] = useRecoilState(commentsState);
 
   const history = useHistory();
   const API = useApi();
+  const { refresh } = useDataLoader();
 
   const action = actions.find((a) => a._id === id);
 
@@ -68,14 +68,7 @@ const View = () => {
 
   return (
     <>
-      <SmallHeaderWithBackButton
-        onRefresh={() =>
-          setRefreshTrigger({
-            status: true,
-            options: { showFullScreen: false, initialLoad: false },
-          })
-        }
-      />
+      <SmallHeaderWithBackButton refreshButton />
       <Title>
         {`${action?.name}`}
         <UserName id={action.user} wrapper={(name) => ` (créée par ${name})`} />
@@ -117,10 +110,7 @@ const View = () => {
               if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
             }
             toastr.success('Mise à jour !');
-            setRefreshTrigger({
-              status: true,
-              options: { showFullScreen: false, initialLoad: false },
-            });
+            refresh();
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => {

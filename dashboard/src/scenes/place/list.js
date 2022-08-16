@@ -17,10 +17,10 @@ import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateWithFullMonth } from '../../services/date';
-import { loadingState, refreshTriggerState, useRefreshOnMount } from '../../components/Loader';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
+import { useDataLoader } from '../../components/DataLoader';
 
 const filterPlaces = (places, { page, limit, search }) => {
   if (search?.length) places = filterBySearch(search, places);
@@ -31,7 +31,7 @@ const filterPlaces = (places, { page, limit, search }) => {
 
 const List = () => {
   useTitle('Lieux fréquentés');
-  useRefreshOnMount();
+  useDataLoader(true);
 
   const history = useHistory();
 
@@ -105,24 +105,14 @@ const List = () => {
 
 const Create = () => {
   const [open, setOpen] = useState(false);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const loading = useRecoilValue(loadingState);
   const setPlaces = useSetRecoilState(placesState);
   const API = useApi();
+  const { isLoading, refresh } = useDataLoader();
 
   return (
     <CreateWrapper style={{ marginBottom: 0 }}>
-      <LinkButton
-        disabled={!!loading}
-        onClick={() => {
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          });
-        }}
-        color="link"
-        style={{ marginRight: 10 }}>
+      <LinkButton disabled={isLoading} onClick={() => refresh()} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
       <ButtonCustom

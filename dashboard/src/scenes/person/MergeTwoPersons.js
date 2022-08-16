@@ -28,7 +28,7 @@ import { consultationsState, prepareConsultationForEncryption } from '../../reco
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
 import { theme } from '../../config';
-import { refreshTriggerState } from '../../components/Loader';
+import { useDataLoader } from '../../components/DataLoader';
 
 const getRawValue = (field, value) => {
   try {
@@ -77,8 +77,7 @@ const MergeTwoPersons = ({ person }) => {
   const consultations = useRecoilValue(consultationsState);
   const medicalFiles = useRecoilValue(medicalFileState);
   const treatments = useRecoilValue(treatmentsState);
-
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  const { refresh } = useDataLoader();
 
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
@@ -280,10 +279,7 @@ const MergeTwoPersons = ({ person }) => {
 
                 setPersons((persons) => persons.filter((p) => p._id !== personToMergeAndDelete._id));
 
-                setRefreshTrigger({
-                  status: true,
-                  options: { initialLoad: false, showFullScreen: false },
-                });
+                refresh();
 
                 setOpen(false);
                 setSubmitting(false);

@@ -58,7 +58,7 @@ export const loaderFullScreenState = atom({
 });
 
 export const refreshTriggerState = atom({
-  key: 'refreshTriggerState',
+  key: 'refreshTriggerStateLALALALA',
   default: {
     status: false,
     options: { showFullScreen: false, initialLoad: false },
@@ -66,7 +66,7 @@ export const refreshTriggerState = atom({
 });
 
 export const lastRefreshState = atom({
-  key: 'lastRefreshState',
+  key: 'lastRefreshStateLOLDLLDLD',
   default: null,
   effects: [
     ({ onSet }) => {

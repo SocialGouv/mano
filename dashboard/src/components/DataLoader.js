@@ -1,13 +1,12 @@
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
-import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useEffect, useState } from 'react';
 import { personsState } from '../recoil/persons';
 import styled from 'styled-components';
 import { organisationState, userState } from '../recoil/auth';
-import { getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
-import { lastRefreshState } from './Loader';
+import { clearCache, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
+import useApi from '../services/api';
 import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 import { treatmentsState } from '../recoil/treatments';
 import { actionsState } from '../recoil/actions';
@@ -24,16 +23,18 @@ import { dayjsInstance } from '../services/date';
 // Update to flush cache.
 const currentCacheKey = 'mano-last-refresh-2022-05-30';
 
-export const refreshTriggerDataLoaderState = atom({
-  key: 'refreshTriggerDataLoaderState',
-  default: false,
-});
+const cacheEffect = ({ onSet }) => {
+  onSet(async (newValue) => {
+    await setCacheItem(currentCacheKey, newValue);
+  });
+};
 
-function mergeItems(oldItems, newItems) {
-  const newItemsIds = newItems.map((i) => i._id);
-  const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
-  return [...oldItemsPurged, ...newItems];
-}
+const loaderTriggerState = atom({ key: 'loaderTriggerState', default: false });
+const isLoadingState = atom({ key: 'isLoadingState', default: false });
+const initialLoadState = atom({ key: 'isInitialLoadState', default: false });
+const fullScreenState = atom({ key: 'fullScreenState', default: true });
+const loadingTextState = atom({ key: 'loadingTextState', default: 'Chargement des données' });
+const lastLoadState = atom({ key: 'lastLoadState', default: null, effects: [cacheEffect] });
 
 export default function DataLoader() {
   const API = useApi();
@@ -52,44 +53,45 @@ export default function DataLoader() {
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [comments, setComments] = useRecoilState(commentsState);
 
-  const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const [refreshTriggerDataLoader, setRefreshTriggerDataLoader] = useRecoilState(refreshTriggerDataLoaderState);
-  const [lastRefresh, setLastRefresh] = useRecoilState(lastRefreshState);
+  const [loaderTrigger, setLoaderTrigger] = useRecoilState(loaderTriggerState);
+  const [lastLoad, setLastLoad] = useRecoilState(lastLoadState);
+  const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
+  const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
+  const [loadingText, setLoadingText] = useRecoilState(loadingTextState);
+  const organisation = useRecoilValue(organisationState);
+  const initialLoad = useRecoilValue(initialLoadState);
 
-  const [refreshList, setRefreshList] = useState({ list: [], offset: 0 });
+  const [loadList, setLoadList] = useState({ list: [], offset: 0 });
   const [progressBuffer, setProgressBuffer] = useState(null);
-  const [loadingText, setLoadingText] = useState('Chargement des données...');
-  const [fullScreen, setFullScreen] = useState(true);
   const [progress, setProgress] = useState(null);
   const [total, setTotal] = useState(null);
 
-  useEffect(initLoader, [progress, total, refreshTriggerDataLoader, refreshList.list.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(initLoader, [progress, total, loaderTrigger, loadList.list.length]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  useEffect(fetchData, [loadList]);
   useEffect(updateProgress, [progress, progressBuffer]);
-  useEffect(refresh, [refreshList]);
 
   const organisationId = organisation?._id;
-  const initialLoad = true; // TODO: fix
 
   function initLoader() {
-    console.log(progress, total, refreshList.list.length);
-    if (refreshList.list.length > 0) return;
+    if (loadList.list.length > 0) return;
 
-    if (progress === null && total === null && refreshTriggerDataLoader) {
-      console.log('Initialisation');
-      getCacheItem(currentCacheKey).then((lastRefreshValue) => {
-        setLastRefresh(lastRefreshValue || 0);
+    if (progress === null && total === null && loaderTrigger && isLoading) {
+      getCacheItem(currentCacheKey).then((lastLoadValue) => {
+        setLastLoad(lastLoadValue || 0);
         API.get({
           path: '/organisation/stats',
           query: {
             organisation: organisationId,
-            after: lastRefreshValue || 0,
+            after: lastLoadValue || 0,
             withDeleted: true,
             // Medical data is never saved in cache so we always have to download all at every page reload.
             withAllMedicalData: initialLoad,
           },
         }).then(({ data: stats }) => {
           const newList = [];
-          let total =
+          let itemsCount =
             0 +
             stats.persons +
             stats.consultations +
@@ -116,6 +118,13 @@ export default function DataLoader() {
           if (stats.territoryObservations) newList.push('territoryObservation');
           if (stats.comments) newList.push('comment');
 
+          // In case this is not the initial load, we don't have to load from cache again.
+          if (!initialLoad) {
+            startLoader(newList, itemsCount);
+            return;
+          }
+
+          setLoadingText('Récupération des données dans le cache');
           Promise.resolve()
             .then(() => getCacheItemDefaultValue('person', []))
             .then((persons) => setPersons([...persons]))
@@ -135,58 +144,45 @@ export default function DataLoader() {
             .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
             .then(() => getCacheItemDefaultValue('comment', []))
             .then((comments) => setComments([...comments]))
-            .then(() => {
-              setFullScreen(true);
-              setRefreshList({ list: newList, offset: 0 });
-              setRefreshTriggerDataLoader(false);
-              setProgress(0);
-              setTotal(total);
-            });
+            .then(() => startLoader(newList, itemsCount));
         });
       });
     }
-    if (progress !== null && total !== null) {
-      console.log('Finalisation');
-      setLastRefresh(Date.now());
-      setProgress(null);
-      setTotal(null);
-      return;
-    }
+    if (progress !== null && total !== null && isLoading) stopLoader();
   }
 
-  function updateProgress() {
-    if (progressBuffer !== null) {
-      setProgressBuffer(null);
-      setProgress((progress || 0) + progressBuffer);
-    }
-  }
-
-  function refresh() {
+  function fetchData() {
     (async () => {
-      if (refreshList.list.length === 0) return;
+      if (loadList.list.length === 0) return;
 
-      const [current] = refreshList.list;
-      const query = { organisation: organisationId, limit: String(500), page: String(refreshList.offset), after: lastRefresh };
+      const [current] = loadList.list;
+      const query = { organisation: organisationId, limit: String(500), page: String(loadList.offset), after: lastLoad };
 
       function handleMore(hasMore) {
-        if (hasMore) setRefreshList({ list: refreshList.list, offset: refreshList.offset + 1 });
-        else setRefreshList({ list: refreshList.list.slice(1), offset: 0 });
+        if (hasMore) setLoadList({ list: loadList.list, offset: loadList.offset + 1 });
+        else setLoadList({ list: loadList.list.slice(1), offset: 0 });
       }
 
       if (current === 'person') {
         setLoadingText('Chargement des personnes');
         const res = await API.get({ path: '/person', query });
         setPersons(
-          mergeItems(persons, res.decryptedData)
-            .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
-            .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
+          res.hasMore
+            ? mergeItems(persons, res.decryptedData)
+            : mergeItems(persons, res.decryptedData)
+                .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
+                .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
         );
         handleMore(res.hasMore);
         setProgressBuffer(res.data.length);
       } else if (current === 'consultation') {
         setLoadingText('Chargement des consultations');
-        const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastRefresh } });
-        setConsultations(mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user)));
+        const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastLoad } });
+        setConsultations(
+          res.hasMore
+            ? mergeItems(consultations, res.decryptedData)
+            : mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user))
+        );
         handleMore(res.hasMore);
         setProgressBuffer(res.data.length);
       } else if (current === 'treatment') {
@@ -205,9 +201,11 @@ export default function DataLoader() {
         setLoadingText('Chargement des rapports');
         const res = await API.get({ path: '/report', query });
         setReports(
-          mergeItems(reports, res.decryptedData)
-            .map((r) => !!r.team && !!r.date)
-            .sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
+          res.hasMore
+            ? mergeItems(reports, res.decryptedData)
+            : mergeItems(reports, res.decryptedData)
+                .map((r) => !!r.team && !!r.date)
+                .sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
         );
         handleMore(res.hasMore);
         setProgressBuffer(res.data.length);
@@ -215,7 +213,9 @@ export default function DataLoader() {
         setLoadingText('Chargement des passages');
         const res = await API.get({ path: '/passage', query });
         setPassages(
-          mergeItems(passages, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
+          res.hasMore
+            ? mergeItems(passages, res.decryptedData)
+            : mergeItems(passages, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
         );
         handleMore(res.hasMore);
         setProgressBuffer(res.data.length);
@@ -260,24 +260,37 @@ export default function DataLoader() {
     })();
   }
 
-  if (!refreshList.list?.length && !refreshTriggerDataLoader) return <RandomPicturePreloader />;
-
-  if (refreshTriggerDataLoader && fullScreen) {
-    return (
-      <FullScreenContainer>
-        <InsideContainer>
-          <ProgressBar progress={0} loadingText={loadingText} />
-        </InsideContainer>
-      </FullScreenContainer>
-    );
+  function startLoader(list, itemsCount) {
+    setLoadList({ list, offset: 0 });
+    setLoaderTrigger(false);
+    setProgress(0);
+    setTotal(itemsCount);
   }
 
-  if (fullScreen && refreshList.list?.length) {
+  function stopLoader() {
+    setIsLoading(false);
+    setLastLoad(Date.now());
+    setProgressBuffer(null);
+    setProgress(null);
+    setTotal(null);
+  }
+
+  function updateProgress() {
+    if (progressBuffer !== null) {
+      setProgressBuffer(null);
+      setProgress((progress || 0) + progressBuffer);
+    }
+  }
+
+  if (!isLoading) return <RandomPicturePreloader />;
+  if (!total && !fullScreen) return null;
+
+  if (fullScreen) {
     return (
       <FullScreenContainer>
         <InsideContainer>
           <RandomPicture />
-          <ProgressBar progress={progress / total} loadingText={loadingText} />
+          <ProgressBar progress={progress} total={total} loadingText={loadingText} />
         </InsideContainer>
       </FullScreenContainer>
     );
@@ -285,10 +298,60 @@ export default function DataLoader() {
 
   return (
     <Container>
-      <ProgressBar progress={progress / total} loadingText={loadingText} />
+      <ProgressBar progress={progress} total={total} loadingText={loadingText} />
     </Container>
   );
 }
+
+export function useDataLoader(shouldRefreshOnMount = false) {
+  const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
+  const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
+  const setLoaderTrigger = useSetRecoilState(loaderTriggerState);
+  const setInitialLoad = useSetRecoilState(initialLoadState);
+  const setLoadingText = useSetRecoilState(loadingTextState);
+  const setLastLoad = useSetRecoilState(lastLoadState);
+
+  useEffect(function refreshOnMount() {
+    if (shouldRefreshOnMount && !isLoading) refresh();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function refresh() {
+    setFullScreen(false);
+    setInitialLoad(false);
+    setLoaderTrigger(true);
+    setIsLoading(true);
+    setLoadingText('Mise à jour des données');
+  }
+  function load() {
+    setFullScreen(true);
+    setInitialLoad(true);
+    setLoaderTrigger(true);
+    setIsLoading(true);
+    setLoadingText('Chargement des données');
+  }
+
+  function resetCache() {
+    return clearCache().then(() => {
+      setLastLoad(0);
+    });
+  }
+
+  return {
+    refresh,
+    load,
+    resetCache,
+    isLoading: Boolean(isLoading),
+    isFullScreen: Boolean(fullScreen),
+  };
+}
+
+function mergeItems(oldItems, newItems) {
+  const newItemsIds = newItems.map((i) => i._id);
+  const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
+  return [...oldItemsPurged, ...newItems];
+}
+
 const FullScreenContainer = styled.div`
   width: 100%;
   z-index: 1000;

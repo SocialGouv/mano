@@ -25,16 +25,16 @@ import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
-import { loadingState, refreshTriggerState, useRefreshOnMount } from '../../components/Loader';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
+import { useDataLoader } from '../../components/DataLoader';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
 const List = () => {
   const history = useHistory();
   useTitle('Agenda');
-  useRefreshOnMount();
+  const { isLoading, refresh } = useDataLoader();
   const [modalOpen, setModalOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);
@@ -43,8 +43,6 @@ const List = () => {
   const persons = useRecoilValue(personsWithPlacesSelector);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
-  const loading = useRecoilValue(loadingState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
   const [search, setSearch] = useSearchParamState('search', '');
@@ -128,16 +126,7 @@ const List = () => {
       <Row style={{ marginBottom: 20, justifyContent: 'center' }}>
         <Col md={12}>
           <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-            <Button
-              onClick={() => {
-                setRefreshTrigger({
-                  status: true,
-                  options: { showFullScreen: false, initialLoad: false },
-                });
-              }}
-              disabled={!!loading}
-              color="link"
-              style={{ marginRight: 10 }}>
+            <Button onClick={() => refresh()} disabled={isLoading} color="link" style={{ marginRight: 10 }}>
               Rafraichir
             </Button>
             <ButtonCustom

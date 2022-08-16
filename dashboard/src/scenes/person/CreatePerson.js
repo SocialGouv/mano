@@ -14,35 +14,25 @@ import {
   preparePersonForEncryption,
 } from '../../recoil/persons';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
-import { refreshTriggerState, loadingState } from '../../components/Loader';
 import useApi from '../../services/api';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
+import { useDataLoader } from '../../components/DataLoader';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
   const [persons, setPersons] = useRecoilState(personsState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const loading = useRecoilValue(loadingState);
   const API = useApi();
+  const { refresh, isLoading } = useDataLoader();
 
   return (
     <>
       {!!refreshable && (
-        <LinkButton
-          onClick={() => {
-            setRefreshTrigger({
-              status: true,
-              options: { initialLoad: false, showFullScreen: false },
-            });
-          }}
-          disabled={!!loading}
-          color="link"
-          style={{ marginRight: 10 }}>
+        <LinkButton onClick={() => refresh()} disabled={isLoading} color="link" style={{ marginRight: 10 }}>
           Rafraichir
         </LinkButton>
       )}

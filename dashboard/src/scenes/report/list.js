@@ -9,17 +9,15 @@ import { formatDateWithFullMonth, getDaysOfMonth, getMonths, isAfterToday } from
 import { currentTeamState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { refreshTriggerState, loadingState, useRefreshOnMount } from '../../components/Loader';
 import useApi from '../../services/api';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import useTitle from '../../services/useTitle';
+import { useDataLoader } from '../../components/DataLoader';
 
 const List = () => {
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const loading = useRecoilValue(loadingState);
   const currentTeam = useRecoilValue(currentTeamState);
   useTitle('Comptes rendus');
-  useRefreshOnMount();
+  useDataLoader(true);
 
   return (
     <>
@@ -30,13 +28,7 @@ const List = () => {
             <b>{currentTeam?.name || ''}</b>
           </span>
         }
-        onRefresh={() => {
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          });
-        }}
-        loading={!!loading}
+        refreshButton
       />
       {getMonths().map((date, index) => (
         <HitMonth debug={index === 0} date={date} key={date} />

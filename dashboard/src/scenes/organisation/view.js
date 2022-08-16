@@ -25,12 +25,12 @@ import DownloadExample from '../data-import-export/DownloadExample';
 import { theme } from '../../config';
 import SortableGrid from '../../components/SortableGrid';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
-import { refreshTriggerState } from '../../components/Loader';
 import useTitle from '../../services/useTitle';
 import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { capture } from '../../services/sentry';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
+import { useDataLoader } from '../../components/DataLoader';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -51,13 +51,13 @@ const View = () => {
   const user = useRecoilValue(userState);
   const actions = useRecoilValue(actionsState);
   const reports = useRecoilValue(reportsState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
+  const { refresh } = useDataLoader();
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
@@ -262,10 +262,7 @@ const View = () => {
                                   },
                                 });
                                 if (response.ok) {
-                                  setRefreshTrigger({
-                                    status: true,
-                                    options: { showFullScreen: false, initialLoad: false },
-                                  });
+                                  refresh();
                                   handleChange({ target: { value: newCategories, name: 'categories' } });
                                   setOrganisation({ ...organisation, categories: newCategories });
                                   toastr.success(
@@ -389,10 +386,7 @@ const View = () => {
                                   },
                                 });
                                 if (response.ok) {
-                                  setRefreshTrigger({
-                                    status: true,
-                                    options: { showFullScreen: false, initialLoad: false },
-                                  });
+                                  refresh();
                                   handleChange({ target: { value: newServices, name: 'services' } });
                                   setOrganisation({ ...organisation, services: newServices });
                                   toastr.success(
@@ -589,10 +583,10 @@ const View = () => {
 
 function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const [orgConsultations, setOrgConsultations] = useState([]);
   const allConsultations = useRecoilValue(consultationsState);
 
+  const { refresh } = useDataLoader();
   const API = useApi();
   const consultationsSortable = useMemo(() => orgConsultations.map((e) => e.name), [orgConsultations]);
   useEffect(() => {
@@ -650,10 +644,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
               },
             });
             if (response.ok) {
-              setRefreshTrigger({
-                status: true,
-                options: { showFullScreen: false, initialLoad: false },
-              });
+              refresh();
               handleChange({ target: { value: orgConsultations, name: 'consultations' } });
               setOrganisation({ ...organisation, consultations: newConsultations });
               toastr.success('Consultation mise à jour', "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
