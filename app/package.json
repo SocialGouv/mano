@@ -71,7 +71,7 @@
     "react-native-safe-area-context": "^3.2.0",
     "react-native-screens": "^2.18.1",
     "react-native-sodium": "^0.4.0",
-    "react-native-svg": "^12.1.1",
+    "react-native-svg": "^13.0.0",
     "react-native-tab-view": "^2.x",
     "recoil": "^0.7.0",
     "recompose": "^0.30.0",
