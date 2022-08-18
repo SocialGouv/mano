@@ -1,22 +1,5 @@
-/* eslint-disable no-throw-literal */
 import localforage from 'localforage';
 import { capture } from './sentry';
-
-export const mergeNewUpdatedData = (newData, oldData) => {
-  const oldDataIds = oldData.map((p) => p._id);
-  const updatedItems = newData.filter((p) => oldDataIds.includes(p._id));
-  const newItems = newData.filter((p) => !oldDataIds.includes(p._id));
-  const deletedItemsIds = newData.filter((p) => !!p.deletedAt).map((p) => p._id);
-
-  return [
-    ...newItems,
-    ...oldData.map((person) => {
-      const updatedItem = updatedItems.find((p) => p._id === person._id);
-      if (updatedItem) return updatedItem;
-      return person;
-    }),
-  ].filter((p) => !deletedItemsIds.includes(p._id));
-};
 
 export let manoCacheStorage = undefined;
 
@@ -74,43 +57,4 @@ export async function getCacheItem(key) {
 
 export async function getCacheItemDefaultValue(key, defaultValue) {
   return (await (await getManoCacheStorage())?.getItem(key)) || defaultValue;
-}
-
-export async function removeCacheItem(key) {
-  return (await getManoCacheStorage())?.removeItem(key);
-}
-
-// Get data from server (no cache yet).
-export async function getData({
-  API,
-  collectionName,
-  data = [],
-  isInitialization = false,
-  setProgress = () => {},
-  setBatchData = null,
-  lastRefresh = 0,
-  withDeleted = false,
-  saveInCache = true,
-}) {
-  if (isInitialization) {
-    data = (await getCacheItem(collectionName)) || [];
-  }
-  const response = await API.get({
-    path: `/${collectionName}`,
-    batch: 1000,
-    setProgress,
-    query: { after: lastRefresh, withDeleted },
-    setBatchData,
-  });
-
-  if (!response.ok) console.log({ message: `Error getting ${collectionName} data`, response });
-  if (!response.decryptedData?.length && !isInitialization) return null;
-
-  data = mergeNewUpdatedData(response.decryptedData, data);
-  if (saveInCache) {
-    await setCacheItem(collectionName, data);
-  } else {
-    await removeCacheItem(collectionName);
-  }
-  return data;
 }

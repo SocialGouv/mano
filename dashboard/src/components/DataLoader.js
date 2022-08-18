@@ -1,13 +1,8 @@
-import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
-import ProgressBar from './LoaderProgressBar';
-import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { useEffect, useState } from 'react';
-import { personsState } from '../recoil/persons';
 import styled from 'styled-components';
-import { organisationState, userState } from '../recoil/auth';
-import { clearCache, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import useApi from '../services/api';
-import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
+import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+
+import { personsState } from '../recoil/persons';
 import { treatmentsState } from '../recoil/treatments';
 import { actionsState } from '../recoil/actions';
 import { medicalFileState } from '../recoil/medicalFiles';
@@ -17,8 +12,16 @@ import { territoriesState } from '../recoil/territory';
 import { placesState } from '../recoil/places';
 import { relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { territoryObservationsState } from '../recoil/territoryObservations';
+import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
 import { commentsState } from '../recoil/comments';
+import { organisationState, userState } from '../recoil/auth';
+
+import { clearCache, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
+import useApi from '../services/api';
 import { dayjsInstance } from '../services/date';
+import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
+import ProgressBar from './LoaderProgressBar';
+import useDataMigrator from './DataMigrator';
 
 // Update to flush cache.
 const currentCacheKey = 'mano-last-refresh-2022-05-30';
@@ -33,12 +36,13 @@ const loaderTriggerState = atom({ key: 'loaderTriggerState', default: false });
 const isLoadingState = atom({ key: 'isLoadingState', default: false });
 const initialLoadState = atom({ key: 'isInitialLoadState', default: false });
 const fullScreenState = atom({ key: 'fullScreenState', default: true });
-const loadingTextState = atom({ key: 'loadingTextState', default: 'Chargement des données' });
 const lastLoadState = atom({ key: 'lastLoadState', default: null, effects: [cacheEffect] });
+export const loadingTextState = atom({ key: 'loadingTextState', default: 'Chargement des données' });
 
 export default function DataLoader() {
   const API = useApi();
   const user = useRecoilValue(userState);
+  const { migrateData } = useDataMigrator();
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
@@ -74,89 +78,100 @@ export default function DataLoader() {
 
   const organisationId = organisation?._id;
 
+  // Loader initialization: get data from cache, check stats, init recoils states, and start loader.
   function initLoader() {
     if (loadList.list.length > 0) return;
 
     if (progress === null && total === null && loaderTrigger && isLoading) {
-      getCacheItem(currentCacheKey).then((lastLoadValue) => {
-        setLastLoad(lastLoadValue || 0);
-        API.get({
-          path: '/organisation/stats',
-          query: {
-            organisation: organisationId,
-            after: lastLoadValue || 0,
-            withDeleted: true,
-            // Medical data is never saved in cache so we always have to download all at every page reload.
-            withAllMedicalData: initialLoad,
-          },
-        }).then(({ data: stats }) => {
-          const newList = [];
-          let itemsCount =
-            0 +
-            stats.persons +
-            stats.consultations +
-            stats.treatments +
-            stats.medicalFiles +
-            stats.passages +
-            stats.reports +
-            stats.territories +
-            stats.places +
-            stats.relsPersonPlace +
-            stats.territoryObservations +
-            stats.comments;
+      Promise.resolve()
+        .then(() => (initialLoad ? migrateData() : Promise.resolve()))
+        .then(() => getCacheItem(currentCacheKey))
+        .then((lastLoadValue) => {
+          setLastLoad(lastLoadValue || 0);
+          API.get({
+            path: '/organisation/stats',
+            query: {
+              organisation: organisationId,
+              after: lastLoadValue || 0,
+              withDeleted: true,
+              // Medical data is never saved in cache so we always have to download all at every page reload.
+              withAllMedicalData: initialLoad,
+            },
+          }).then(({ data: stats }) => {
+            const newList = [];
+            let itemsCount =
+              0 +
+              stats.persons +
+              stats.consultations +
+              stats.treatments +
+              stats.medicalFiles +
+              stats.passages +
+              stats.reports +
+              stats.territories +
+              stats.places +
+              stats.relsPersonPlace +
+              stats.territoryObservations +
+              stats.comments;
 
-          if (stats.persons) newList.push('person');
-          if (stats.consultations) newList.push('consultation');
-          if (stats.treatments) newList.push('treatment');
-          if (stats.medicalFiles) newList.push('medicalFile');
-          if (stats.reports) newList.push('report');
-          if (stats.passages) newList.push('passage');
-          if (stats.actions) newList.push('action');
-          if (stats.territories) newList.push('territory');
-          if (stats.places) newList.push('place');
-          if (stats.relsPersonPlace) newList.push('relsPersonPlace');
-          if (stats.territoryObservations) newList.push('territoryObservation');
-          if (stats.comments) newList.push('comment');
+            if (stats.persons) newList.push('person');
+            if (stats.consultations) newList.push('consultation');
+            if (stats.treatments) newList.push('treatment');
+            if (stats.medicalFiles) newList.push('medicalFile');
+            if (stats.reports) newList.push('report');
+            if (stats.passages) newList.push('passage');
+            if (stats.actions) newList.push('action');
+            if (stats.territories) newList.push('territory');
+            if (stats.places) newList.push('place');
+            if (stats.relsPersonPlace) newList.push('relsPersonPlace');
+            if (stats.territoryObservations) newList.push('territoryObservation');
+            if (stats.comments) newList.push('comment');
 
-          // In case this is not the initial load, we don't have to load from cache again.
-          if (!initialLoad) {
-            startLoader(newList, itemsCount);
-            return;
-          }
+            // In case this is not the initial load, we don't have to load from cache again.
+            if (!initialLoad) {
+              startLoader(newList, itemsCount);
+              return;
+            }
 
-          setLoadingText('Récupération des données dans le cache');
-          Promise.resolve()
-            .then(() => getCacheItemDefaultValue('person', []))
-            .then((persons) => setPersons([...persons]))
-            .then(() => getCacheItemDefaultValue('report', []))
-            .then((reports) => setReports([...reports]))
-            .then(() => getCacheItemDefaultValue('passage', []))
-            .then((passages) => setPassages([...passages]))
-            .then(() => getCacheItemDefaultValue('action', []))
-            .then((actions) => setActions([...actions]))
-            .then(() => getCacheItemDefaultValue('territory', []))
-            .then((territories) => setTerritories([...territories]))
-            .then(() => getCacheItemDefaultValue('place', []))
-            .then((places) => setPlaces([...places]))
-            .then(() => getCacheItemDefaultValue('relsPersonPlace', []))
-            .then((relsPersonPlace) => setRelsPersonPlace([...relsPersonPlace]))
-            .then(() => getCacheItemDefaultValue('territoryObservation', []))
-            .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
-            .then(() => getCacheItemDefaultValue('comment', []))
-            .then((comments) => setComments([...comments]))
-            .then(() => startLoader(newList, itemsCount));
+            setLoadingText('Récupération des données dans le cache');
+            Promise.resolve()
+              .then(() => getCacheItemDefaultValue('person', []))
+              .then((persons) => setPersons([...persons]))
+              .then(() => getCacheItemDefaultValue('report', []))
+              .then((reports) => setReports([...reports]))
+              .then(() => getCacheItemDefaultValue('passage', []))
+              .then((passages) => setPassages([...passages]))
+              .then(() => getCacheItemDefaultValue('action', []))
+              .then((actions) => setActions([...actions]))
+              .then(() => getCacheItemDefaultValue('territory', []))
+              .then((territories) => setTerritories([...territories]))
+              .then(() => getCacheItemDefaultValue('place', []))
+              .then((places) => setPlaces([...places]))
+              .then(() => getCacheItemDefaultValue('relsPersonPlace', []))
+              .then((relsPersonPlace) => setRelsPersonPlace([...relsPersonPlace]))
+              .then(() => getCacheItemDefaultValue('territoryObservation', []))
+              .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
+              .then(() => getCacheItemDefaultValue('comment', []))
+              .then((comments) => setComments([...comments]))
+              .then(() => startLoader(newList, itemsCount));
+          });
         });
-      });
     }
     if (progress !== null && total !== null && isLoading) stopLoader();
   }
 
+  // Fetch data from API, handle loader progress.
   function fetchData() {
     (async () => {
       if (loadList.list.length === 0) return;
 
       const [current] = loadList.list;
-      const query = { organisation: organisationId, limit: String(500), page: String(loadList.offset), after: lastLoad };
+      const query = {
+        organisation: organisationId,
+        limit: String(1000),
+        page: String(loadList.offset),
+        after: lastLoad,
+        withDeleted: Boolean(lastLoad),
+      };
 
       function handleMore(hasMore) {
         if (hasMore) setLoadList({ list: loadList.list, offset: loadList.offset + 1 });
@@ -187,13 +202,13 @@ export default function DataLoader() {
         setProgressBuffer(res.data.length);
       } else if (current === 'treatment') {
         setLoadingText('Chargement des traitements');
-        const res = await API.get({ path: '/treatment', query });
+        const res = await API.get({ path: '/treatment', query: { ...query, after: initialLoad ? 0 : lastLoad } });
         setTreatments(mergeItems(treatments, res.decryptedData));
         handleMore(res.hasMore);
         setProgressBuffer(res.data.length);
       } else if (current === 'medicalFile') {
         setLoadingText('Chargement des fichiers médicaux');
-        const res = await API.get({ path: '/medical-file', query });
+        const res = await API.get({ path: '/medical-file', query: { ...query, after: initialLoad ? 0 : lastLoad } });
         setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
         handleMore(res.hasMore);
         setProgressBuffer(res.data.length);
@@ -204,7 +219,8 @@ export default function DataLoader() {
           res.hasMore
             ? mergeItems(reports, res.decryptedData)
             : mergeItems(reports, res.decryptedData)
-                .map((r) => !!r.team && !!r.date)
+                // This line should be removed when `clean-reports-with-no-team-nor-date` migration has run on all organisations.
+                .filter((r) => !!r.team && !!r.date)
                 .sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
         );
         handleMore(res.hasMore);
@@ -332,9 +348,7 @@ export function useDataLoader(shouldRefreshOnMount = false) {
   }
 
   function resetCache() {
-    return clearCache().then(() => {
-      setLastLoad(0);
-    });
+    return clearCache().then(() => setLastLoad(0));
   }
 
   return {
@@ -349,7 +363,7 @@ export function useDataLoader(shouldRefreshOnMount = false) {
 function mergeItems(oldItems, newItems) {
   const newItemsIds = newItems.map((i) => i._id);
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
-  return [...oldItemsPurged, ...newItems];
+  return [...oldItemsPurged, ...newItems].filter((e) => !e.deletedAt);
 }
 
 const FullScreenContainer = styled.div`

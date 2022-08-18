@@ -210,7 +210,16 @@ const useApi = () => {
     return response.json();
   };
 
-  const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false } = {}) => {
+  const execute = async ({
+    method,
+    path = '',
+    body = null,
+    query = {},
+    headers = {},
+    debug = false,
+    skipEncryption = false,
+    forceMigrationLastUpdate = null,
+  } = {}) => {
     try {
       if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
       const options = {
@@ -231,7 +240,7 @@ const useApi = () => {
         query = {
           encryptionLastUpdateAt,
           encryptionEnabled,
-          migrationLastUpdateAt,
+          migrationLastUpdateAt: forceMigrationLastUpdate || migrationLastUpdateAt,
           ...query,
         };
       }
