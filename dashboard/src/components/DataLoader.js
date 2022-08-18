@@ -71,7 +71,7 @@ export default function DataLoader() {
   const [total, setTotal] = useState(null);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(initLoader, [progress, total, loaderTrigger, loadList.list.length]);
+  useEffect(initLoader, [progress, total, loaderTrigger, loadList.list.length, isLoading]);
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(fetchData, [loadList]);
   useEffect(updateProgress, [progress, progressBuffer]);
@@ -335,17 +335,17 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   }, []);
 
   function refresh() {
+    setIsLoading(true);
     setFullScreen(false);
     setInitialLoad(false);
     setLoaderTrigger(true);
-    setIsLoading(true);
     setLoadingText('Mise à jour des données');
   }
   function load() {
+    setIsLoading(true);
     setFullScreen(true);
     setInitialLoad(true);
     setLoaderTrigger(true);
-    setIsLoading(true);
     setLoadingText('Chargement des données');
   }
 
