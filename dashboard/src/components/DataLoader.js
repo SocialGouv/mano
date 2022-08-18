@@ -82,7 +82,10 @@ export default function DataLoader() {
   function initLoader() {
     if (loadList.list.length > 0) return;
 
-    if (progress === null && total === null && loaderTrigger && isLoading) {
+    const shouldStart = progress === null && total === null && loaderTrigger && isLoading;
+    const shouldStop = progress !== null && total !== null && isLoading;
+
+    if (shouldStart) {
       Promise.resolve()
         .then(() => (initialLoad ? migrateData() : Promise.resolve()))
         .then(() => getCacheItem(currentCacheKey))
@@ -155,8 +158,7 @@ export default function DataLoader() {
               .then(() => startLoader(newList, itemsCount));
           });
         });
-    }
-    if (progress !== null && total !== null && isLoading) stopLoader();
+    } else if (shouldStop) stopLoader();
   }
 
   // Fetch data from API, handle loader progress.
@@ -319,7 +321,7 @@ export default function DataLoader() {
   );
 }
 
-export function useDataLoader({ refreshOnMount = false }) {
+export function useDataLoader(options = { refreshOnMount: false }) {
   const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
   const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
   const setLoaderTrigger = useSetRecoilState(loaderTriggerState);
@@ -328,7 +330,7 @@ export function useDataLoader({ refreshOnMount = false }) {
   const setLastLoad = useSetRecoilState(lastLoadState);
 
   useEffect(function refreshOnMountEffect() {
-    if (refreshOnMount && !isLoading) refresh();
+    if (options.refreshOnMount && !isLoading) refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
