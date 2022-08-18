@@ -34,7 +34,7 @@ const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires'
 
 const View = () => {
   useTitle('Recherche');
-  useDataLoader(true);
+  useDataLoader({ refreshOnMount: true });
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [activeTab, setActiveTab] = useSearchParamState('tab', 0);

@@ -119,7 +119,6 @@ export default function ContextedApp() {
       <Provider store={store}>
         <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
         <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-        {/* <Loader /> */}
         <DataLoader />
         <ModalConfirm />
       </Provider>

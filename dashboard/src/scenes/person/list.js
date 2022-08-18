@@ -31,7 +31,7 @@ import { useDataLoader } from '../../components/DataLoader';
 
 const List = () => {
   useTitle('Personnes');
-  useDataLoader(true);
+  useDataLoader({ refreshOnMount: true });
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);

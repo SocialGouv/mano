@@ -319,7 +319,7 @@ export default function DataLoader() {
   );
 }
 
-export function useDataLoader(shouldRefreshOnMount = false) {
+export function useDataLoader({ refreshOnMount = false }) {
   const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
   const [isLoading, setIsLoading] = useRecoilState(isLoadingState);
   const setLoaderTrigger = useSetRecoilState(loaderTriggerState);
@@ -327,8 +327,8 @@ export function useDataLoader(shouldRefreshOnMount = false) {
   const setLoadingText = useSetRecoilState(loadingTextState);
   const setLastLoad = useSetRecoilState(lastLoadState);
 
-  useEffect(function refreshOnMount() {
-    if (shouldRefreshOnMount && !isLoading) refresh();
+  useEffect(function refreshOnMountEffect() {
+    if (refreshOnMount && !isLoading) refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

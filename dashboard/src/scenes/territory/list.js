@@ -26,7 +26,7 @@ const List = () => {
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
   useTitle('Territoires');
-  useDataLoader(true);
+  useDataLoader({ refreshOnMount: true });
 
   const [page, setPage] = useSearchParamState('page', 0);
   const [search, setSearch] = useSearchParamState('search', '');

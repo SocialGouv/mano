@@ -31,7 +31,7 @@ const filterPlaces = (places, { page, limit, search }) => {
 
 const List = () => {
   useTitle('Lieux fréquentés');
-  useDataLoader(true);
+  useDataLoader({ refreshOnMount: true });
 
   const history = useHistory();
 

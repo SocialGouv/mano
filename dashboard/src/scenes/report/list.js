@@ -17,7 +17,7 @@ import { useDataLoader } from '../../components/DataLoader';
 const List = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   useTitle('Comptes rendus');
-  useDataLoader(true);
+  useDataLoader({ refreshOnMount: true });
 
   return (
     <>
