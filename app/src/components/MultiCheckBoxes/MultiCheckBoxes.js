@@ -5,6 +5,7 @@ import InputLabelled from '../InputLabelled';
 import Label from '../Label';
 
 const MultiCheckBoxes = ({ label, source, values, onChange, editable, emptyValue }) => {
+  if (!Array.isArray(values)) values = [];
   if (!editable) {
     return <InputLabelled label={label} value={values.length ? values.join(', ') : emptyValue} editable={false} />;
   }
