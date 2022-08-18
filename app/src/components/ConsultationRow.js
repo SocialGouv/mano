@@ -15,7 +15,7 @@ import { StyleSheet } from 'react-native';
 import { personsState } from '../recoil/persons';
 
 const isVisibleByMe = (consultation, me) => {
-  if (!me.healthcareProfessional) return false;
+  if (!me?.healthcareProfessional) return false;
   if (!consultation?.onlyVisibleBy?.length) return true;
   return consultation.onlyVisibleBy.includes(me._id);
 };
