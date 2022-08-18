@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Button, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { toastr } from 'react-redux-toastr';
 import dayjs from 'dayjs';
 import ButtonCustom from '../../components/ButtonCustom';

@@ -3,7 +3,7 @@ import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import EncryptionKey from '../../components/EncryptionKey';

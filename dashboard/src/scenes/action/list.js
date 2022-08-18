@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Label, Row, Button } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';

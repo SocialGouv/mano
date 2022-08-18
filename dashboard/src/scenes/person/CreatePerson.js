@@ -13,7 +13,7 @@ import {
   personsState,
   preparePersonForEncryption,
 } from '../../recoil/persons';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import useApi from '../../services/api';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { useDataLoader } from '../../components/DataLoader';
