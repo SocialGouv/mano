@@ -87,7 +87,7 @@ const Action = ({ navigation, route }) => {
   const backRequestHandledRef = useRef(false);
   const onBack = () => {
     backRequestHandledRef.current = true;
-    const { routes } = navigation.dangerouslyGetState();
+    const { routes } = navigation.getState();
     Sentry.setContext('action', {});
     // FIXME there is no perfect solution yet to handle the navigation
     // fromRoute parameter is good but sometimes not so good...

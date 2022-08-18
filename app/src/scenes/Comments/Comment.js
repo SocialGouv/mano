@@ -49,7 +49,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
         })
       );
       setUpdating(false);
-      Alert.alert('Commentaire mis-à-jour !', null, [{ text: 'OK', onPress: onBack }]);
+      Alert.alert('Commentaire mis à jour !', null, [{ text: 'OK', onPress: onBack }]);
     }
     return response;
   };

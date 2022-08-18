@@ -16,7 +16,7 @@ const FoldersStack = createStackNavigator();
 const FoldersNavigator = (props) => {
   const user = useRecoilValue(userState);
   return (
-    <FoldersStack.Navigator headerMode="none" initialRouteName="FoldersSummary">
+    <FoldersStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="FoldersSummary">
       <FoldersStack.Screen name="FoldersSummary">{(stackProps) => <FoldersSummary {...props} {...stackProps} />}</FoldersStack.Screen>
       <FoldersStack.Screen name="InformationsSocial">{(stackProps) => <InformationsSocial {...props} {...stackProps} />}</FoldersStack.Screen>
       <FoldersStack.Screen name="InformationsMedical">{(stackProps) => <InformationsMedical {...props} {...stackProps} />}</FoldersStack.Screen>

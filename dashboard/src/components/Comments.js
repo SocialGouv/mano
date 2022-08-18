@@ -87,7 +87,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
       );
     }
     if (!response.ok) return;
-    toastr.success('Commentaire mis-à-jour');
+    toastr.success('Commentaire mis à jour');
     setEditing(null);
   };
 

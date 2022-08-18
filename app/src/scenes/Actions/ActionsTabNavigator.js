@@ -15,16 +15,15 @@ const ActionsTabNavigator = () => {
       <TabNavigator.Navigator
         tabBar={(props) => (
           <>
-            <ScreenTitle title="Agenda" forceTop />
+            <ScreenTitle title="Agenda" />
             <Tabs numberOfTabs={3} forceTop {...props} />
           </>
         )}
-        lazy
         removeClippedSubviews={Platform.OS === 'android'}
-        swipeEnabled>
-        <TabNavigator.Screen name={TODO} options={{ tabBarLabel: 'À Faire' }} component={ActionsList} initialParams={{ status: TODO }} />
-        <TabNavigator.Screen name={DONE} options={{ tabBarLabel: 'Faites' }} component={ActionsList} initialParams={{ status: DONE }} />
-        <TabNavigator.Screen name={CANCEL} options={{ tabBarLabel: 'Annulées' }} component={ActionsList} initialParams={{ status: CANCEL }} />
+        screenOptions={{ swipeEnabled: true }}>
+        <TabNavigator.Screen lazy name={TODO} options={{ tabBarLabel: 'À Faire' }} component={ActionsList} initialParams={{ status: TODO }} />
+        <TabNavigator.Screen lazy name={DONE} options={{ tabBarLabel: 'Faites' }} component={ActionsList} initialParams={{ status: DONE }} />
+        <TabNavigator.Screen lazy name={CANCEL} options={{ tabBarLabel: 'Annulées' }} component={ActionsList} initialParams={{ status: CANCEL }} />
       </TabNavigator.Navigator>
     </SceneContainer>
   );

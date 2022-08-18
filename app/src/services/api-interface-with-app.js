@@ -2,7 +2,7 @@ import { Alert, Linking, Platform } from 'react-native';
 import { MANO_DOWNLOAD_URL } from '../config';
 import API from './api';
 import fetchRetry from 'fetch-retry';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 API.fetch = fetchRetry(fetch);
 

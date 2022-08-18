@@ -55,7 +55,7 @@ import Consultation from './scenes/Persons/Consultation';
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
   return (
-    <ActionsStack.Navigator headerMode="none" initialRouteName="ActionsList">
+    <ActionsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="ActionsList">
       <ActionsStack.Screen name="ActionsList" component={ActionsTabNavigator} />
       <ActionsStack.Screen name="Action" component={Action} />
       <ActionsStack.Screen name="NewActionForm" component={NewActionForm} />
@@ -76,7 +76,7 @@ const ActionsNavigator = () => {
 const PersonsStack = createStackNavigator();
 const PersonsNavigator = () => {
   return (
-    <PersonsStack.Navigator headerMode="none" initialRouteName="PersonsList">
+    <PersonsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="PersonsList">
       <PersonsStack.Screen name="PersonsList" component={PersonsList} />
       <PersonsStack.Screen name="Person" component={Person} />
       <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
@@ -100,7 +100,7 @@ const PersonsNavigator = () => {
 const StructuresStack = createStackNavigator();
 const StructuresNavigator = () => {
   return (
-    <StructuresStack.Navigator headerMode="none" initialRouteName="StructuresList">
+    <StructuresStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="StructuresList">
       <StructuresStack.Screen name="StructuresList" component={StructuresList} />
       <StructuresStack.Screen name="NewStructureForm" component={NewStructureForm} />
       <StructuresStack.Screen name="Structure" component={Structure} />
@@ -111,7 +111,7 @@ const StructuresNavigator = () => {
 const TerritoriesStack = createStackNavigator();
 const TerritoriesNavigator = () => {
   return (
-    <TerritoriesStack.Navigator headerMode="none" initialRouteName="TerritoriesList" screenOptions={{ gestureEnabled: false }}>
+    <TerritoriesStack.Navigator screenOptions={{ headerShown: false, gestureEnabled: false }} initialRouteName="TerritoriesList">
       <TerritoriesStack.Screen name="TerritoriesList" component={TerritoriesList} />
       <TerritoriesStack.Screen name="NewTerritoryForm" component={NewTerritoryForm} />
       <TerritoriesStack.Screen name="Territory" component={Territory} />
@@ -123,8 +123,8 @@ const TerritoriesNavigator = () => {
 const NotificationsStack = createStackNavigator();
 const NotificationsNavigator = () => {
   return (
-    <NotificationsStack.Navigator headerMode="none" initialRouteName="Notifications">
-      <NotificationsStack.Screen name="Notifications" component={Notifications} />
+    <NotificationsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Notifications">
+      <NotificationsStack.Screen name="NotificationsList" component={Notifications} />
       <NotificationsStack.Screen name="ActionComment" component={Comment} />
       <NotificationsStack.Screen name="PersonComment" component={Comment} />
     </NotificationsStack.Navigator>
@@ -134,7 +134,7 @@ const NotificationsNavigator = () => {
 const ReportsStack = createStackNavigator();
 const ReportsNavigator = () => {
   return (
-    <ReportsStack.Navigator headerMode="none" initialRouteName="ReportsCalendar">
+    <ReportsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="ReportsCalendar">
       <ReportsStack.Screen name="ReportsCalendar" component={ReportsCalendar} />
       <ReportsStack.Screen name="Report" component={Report} />
       <ReportsStack.Screen name="Collaborations" component={Collaborations} />
@@ -163,7 +163,7 @@ const ReportsNavigator = () => {
 const MenuStack = createStackNavigator();
 const MenuNavigator = () => {
   return (
-    <MenuStack.Navigator headerMode="none" initialRouteName="Menu">
+    <MenuStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Menu">
       <MenuStack.Screen name="Menu" component={Menu} />
       <MenuStack.Screen name="Reports" component={ReportsNavigator} />
       <MenuStack.Screen name="Structures" component={StructuresNavigator} />
@@ -180,16 +180,15 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => (
   <Tab.Navigator
-    lazy
     initialRouteName="Agenda"
-    tabBarOptions={{
-      activeTintColor: colors.app.color,
-      inactiveTintColor: '#aaa',
-    }}
     screenOptions={{
       gestureEnabled: false,
+      headerShown: false,
+      tabBarActiveTintColor: colors.app.color,
+      tabBarnactiveTintColor: '#aaa',
     }}>
     <Tab.Screen
+      lazy
       name="Agenda"
       component={ActionsNavigator}
       options={{
@@ -199,6 +198,7 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
+      lazy
       name="Territories"
       component={TerritoriesNavigator}
       options={{
@@ -208,6 +208,7 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
+      lazy
       name="Persons"
       component={PersonsNavigator}
       options={{
@@ -217,6 +218,7 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
+      lazy
       name="Notifications"
       component={NotificationsNavigator}
       options={{
@@ -226,6 +228,7 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
+      lazy
       name="Menu"
       component={MenuNavigator}
       options={{
@@ -239,7 +242,7 @@ const TabNavigator = () => (
 
 const LoginStack = createStackNavigator();
 const LoginNavigator = () => (
-  <LoginStack.Navigator initialRouteName="Login" headerMode="none">
+  <LoginStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
     <LoginStack.Screen name="Login" component={Login} />
     <LoginStack.Screen name="TeamSelection" component={TeamSelection} />
     <LoginStack.Screen name="CharteAcceptance" component={CharteAcceptance} />
@@ -276,7 +279,7 @@ const App = () => {
     <RecoilRoot>
       <ActionSheetProvider>
         <NavigationContainer>
-          <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
+          <AppStack.Navigator initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false, headerShown: false }}>
             <AppStack.Screen name="LoginStack" component={LoginNavigator} />
             <AppStack.Screen name="Home" component={TabNavigator} />
           </AppStack.Navigator>

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { Alert, Keyboard, Linking, StatusBar, TouchableWithoutFeedback, View } from 'react-native';
 import RNBootSplash from 'react-native-bootsplash';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useMMKVNumber, useMMKVString } from 'react-native-mmkv';
 import API from '../../services/api';
 import SceneContainer from '../../components/SceneContainer';
