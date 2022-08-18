@@ -305,7 +305,7 @@ const useApi = () => {
     }
   };
 
-  const get = async (args) => execute({ method: 'GET', ...args });
+  const get = (args) => execute({ method: 'GET', ...args });
   const post = (args) => execute({ method: 'POST', ...args });
   const put = (args) => execute({ method: 'PUT', ...args });
 
