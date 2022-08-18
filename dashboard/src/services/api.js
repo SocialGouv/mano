@@ -305,32 +305,7 @@ const useApi = () => {
     }
   };
 
-  const get = async (args) => {
-    if (args.batch) {
-      let hasMore = true;
-      let page = 0;
-      let limit = args.batch;
-      let data = [];
-      let decryptedData = [];
-      while (hasMore) {
-        let query = { ...args.query, limit, page };
-        const response = await execute({ method: 'GET', ...args, query });
-        if (!response.ok) return { ok: false, data: [] };
-        data.push(...response.data);
-        decryptedData.push(...(response.decryptedData || []));
-        hasMore = response.hasMore;
-        page = response.hasMore ? page + 1 : page;
-        // at least 1 for showing progress
-        if (args.setProgress) args.setProgress(response.data.length || 1);
-        if (args.setBatchData) args.setBatchData(response.data);
-        await new Promise((res) => setTimeout(res, 50));
-      }
-      return { ok: true, data, decryptedData };
-    } else {
-      return execute({ method: 'GET', ...args });
-    }
-  };
-
+  const get = async (args) => execute({ method: 'GET', ...args });
   const post = (args) => execute({ method: 'POST', ...args });
   const put = (args) => execute({ method: 'PUT', ...args });
 
