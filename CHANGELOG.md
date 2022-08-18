@@ -1,3 +1,10 @@
+## [1.143.2](https://github.com/SocialGouv/mano/compare/v1.143.1...v1.143.2) (2022-08-18)
+
+
+### Bug Fixes
+
+* fix #MANO-CX ([c2a9513](https://github.com/SocialGouv/mano/commit/c2a951379a792e79a9edf79dd3e60660b989a08b))
+
 ## [1.143.1](https://github.com/SocialGouv/mano/compare/v1.143.0...v1.143.1) (2022-08-18)
 
 
