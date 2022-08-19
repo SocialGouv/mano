@@ -265,7 +265,7 @@ const MergeTwoPersons = ({ person }) => {
                     mergedPassages: await Promise.all(mergedPassages.map(encryptItem(hashedOrgEncryptionKey))),
                     mergedConsultations: await Promise.all(mergedConsultations.map(encryptItem(hashedOrgEncryptionKey))),
                     mergedTreatments: await Promise.all(mergedTreatments.map(encryptItem(hashedOrgEncryptionKey))),
-                    mergedMedicalFile: await encryptItem(hashedOrgEncryptionKey)(mergedMedicalFile),
+                    mergedMedicalFile: mergedMedicalFile ? await encryptItem(hashedOrgEncryptionKey)(mergedMedicalFile) : undefined,
                     personToDeleteId: personToMergeAndDelete._id,
                     medicalFileToDeleteId,
                   },
