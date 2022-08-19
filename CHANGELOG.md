@@ -1,3 +1,10 @@
+## [1.143.3](https://github.com/SocialGouv/mano/compare/v1.143.2...v1.143.3) (2022-08-19)
+
+
+### Bug Fixes
+
+* fix merge persons when none have a medical file ([94a6378](https://github.com/SocialGouv/mano/commit/94a6378938e345bad7358aeb8739318c14d2f820))
+
 ## [1.143.2](https://github.com/SocialGouv/mano/compare/v1.143.1...v1.143.2) (2022-08-18)
 
 
