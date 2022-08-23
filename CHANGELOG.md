@@ -1,3 +1,10 @@
+## [1.143.4](https://github.com/SocialGouv/mano/compare/v1.143.3...v1.143.4) (2022-08-23)
+
+
+### Bug Fixes
+
+* restricted access account have error due to consultations ([a2bf8a5](https://github.com/SocialGouv/mano/commit/a2bf8a58b4a228d58afd023152be0cdeaac5de27))
+
 ## [1.143.3](https://github.com/SocialGouv/mano/compare/v1.143.2...v1.143.3) (2022-08-19)
 
 
