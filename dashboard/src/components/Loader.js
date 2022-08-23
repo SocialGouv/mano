@@ -298,7 +298,7 @@ const Loader = () => {
     /*
     Get consultations
     */
-    if (response.data.consultations || initialLoad) {
+    if (['admin', 'normal'].includes(user.role) && (response.data.consultations || initialLoad)) {
       setLoading('Chargement des consultations');
       const refreshedConsultations = await getData({
         collectionName: 'consultation',
