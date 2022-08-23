@@ -117,9 +117,11 @@ export default function DataLoader() {
               stats.comments;
 
             if (stats.persons) newList.push('person');
-            if (stats.consultations) newList.push('consultation');
-            if (stats.treatments) newList.push('treatment');
-            if (stats.medicalFiles) newList.push('medicalFile');
+            if (['admin', 'normal'].includes(user.role)) {
+              if (stats.consultations) newList.push('consultation');
+              if (stats.treatments) newList.push('treatment');
+              if (stats.medicalFiles) newList.push('medicalFile');
+            }
             if (stats.reports) newList.push('report');
             if (stats.passages) newList.push('passage');
             if (stats.actions) newList.push('action');
