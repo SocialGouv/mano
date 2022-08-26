@@ -47,7 +47,7 @@ const TopBar = () => {
       </TopBarLogo>
 
       <TopBarAccount>
-        <Notification />
+        {!['restricted-access'].includes(user.role) && <Notification />}
         <ButtonDropdown direction="left" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
           <DropdownToggleStyled>
             {user?.name}
