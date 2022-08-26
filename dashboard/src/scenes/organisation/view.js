@@ -708,7 +708,6 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
             </small>
             <TableCustomFields
               customFields="consultations"
-              hideStats
               keyPrefix={consultation.name}
               mergeData={(newData) => {
                 return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));
