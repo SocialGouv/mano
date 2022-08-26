@@ -1,3 +1,10 @@
+## [1.143.8](https://github.com/SocialGouv/mano/compare/v1.143.7...v1.143.8) (2022-08-26)
+
+
+### Bug Fixes
+
+* **dashboard:** fix NaN% on charts ([fde8dc0](https://github.com/SocialGouv/mano/commit/fde8dc04bd40bd71d4c87856bb24bac8b6e43c7f))
+
 ## [1.143.7](https://github.com/SocialGouv/mano/compare/v1.143.6...v1.143.7) (2022-08-26)
 
 
