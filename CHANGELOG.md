@@ -1,3 +1,10 @@
+## [1.143.9](https://github.com/SocialGouv/mano/compare/v1.143.8...v1.143.9) (2022-08-26)
+
+
+### Bug Fixes
+
+* **dashboard:** remove hideStats option for custom fields table ([52d43b9](https://github.com/SocialGouv/mano/commit/52d43b905a7881e41de4c9bf7b4f70a56f64ffdb))
+
 ## [1.143.8](https://github.com/SocialGouv/mano/compare/v1.143.7...v1.143.8) (2022-08-26)
 
 
