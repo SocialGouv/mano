@@ -651,7 +651,7 @@ export function MedicalFile({ person }) {
         }}
       />
       <div style={{ height: '50vh' }} className="noprint" />
-      <Modal isOpen={showAddConsultation} toggle={resetCurrentConsultation} size="lg" backdrop="static">
+      <Modal keyboard={false} isOpen={showAddConsultation} toggle={resetCurrentConsultation} size="lg" backdrop="static">
         <Formik
           enableReinitialize
           initialValues={currentConsultation}
