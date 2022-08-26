@@ -1,3 +1,10 @@
+## [1.143.7](https://github.com/SocialGouv/mano/compare/v1.143.6...v1.143.7) (2022-08-26)
+
+
+### Bug Fixes
+
+* **dashboard:** filter for custom yes-no was broken ([8fe8c0a](https://github.com/SocialGouv/mano/commit/8fe8c0adcc3caf69c41de97d7c116804d04d0765))
+
 ## [1.143.6](https://github.com/SocialGouv/mano/compare/v1.143.5...v1.143.6) (2022-08-26)
 
 
