@@ -1,3 +1,10 @@
+## [1.143.6](https://github.com/SocialGouv/mano/compare/v1.143.5...v1.143.6) (2022-08-26)
+
+
+### Bug Fixes
+
+* disable esc key on consultation creation ([0e059fe](https://github.com/SocialGouv/mano/commit/0e059fe713c0e666aae213152ab6efae124655fd))
+
 ## [1.143.5](https://github.com/SocialGouv/mano/compare/v1.143.4...v1.143.5) (2022-08-26)
 
 
