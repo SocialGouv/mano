@@ -28,13 +28,13 @@ export const CustomResponsivePie = ({ data = [], title, onAddFilter, field }) =>
                 <tr key={key + label + value}>
                   <td>{label}</td>
                   <td>{value}</td>
-                  <td>{`${Math.round((value / total) * 1000) / 10}%`}</td>
+                  {total ? <td>{`${Math.round((value / total) * 1000) / 10}%`}</td> : <></>}
                 </tr>
               ))}
             <tr>
               <td>Total</td>
               <td>{total}</td>
-              <td>100%</td>
+              {total ? <td>100%</td> : <></>}
             </tr>
           </tbody>
         </Data>
@@ -42,7 +42,7 @@ export const CustomResponsivePie = ({ data = [], title, onAddFilter, field }) =>
       <Col md={8}>
         <PieContainer>
           <ResponsivePie
-            data={data}
+            data={total ? data : []}
             sortByValue
             fit
             margin={{ top: 40, right: 0, bottom: 40, left: 0 }}
