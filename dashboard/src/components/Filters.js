@@ -59,6 +59,14 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   filters = !!filters.length ? filters : [{}];
   const onAddFilter = () => onChange([...filters, {}], saveInURLParams);
 
+  function getFilterValuesByField(field, base) {
+    if (!field) return [];
+    const current = base.find((filter) => filter.field === field);
+    if (current?.options?.length) return [...current?.options, 'Non renseigné'];
+    if (current.type === 'yes-no') return ['Oui', 'Non', 'Non renseigné'];
+    return ['Non renseigné'];
+  }
+
   return (
     <Container>
       <Subcontainer>
@@ -76,7 +84,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
         </Row>
         {filters.map(({ field, value }, index) => {
           const filterFields = base.filter((f) => f.field !== 'alertness').map((filter) => filter.field);
-          const filterValues = !!field ? [...(base.find((filter) => filter.field === field)?.options || []), 'Non renseigné'] : [];
+          const filterValues = getFilterValuesByField(field, base);
           const { type } = base.find((filter) => filter.field === field) || {};
 
           const onChangeField = (newField) =>
