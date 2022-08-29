@@ -16,6 +16,7 @@ import { passagesState } from '../../recoil/passages';
 import { useHistory } from 'react-router-dom';
 import ButtonCustom from '../../components/ButtonCustom';
 import { userState } from '../../recoil/auth';
+import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
 function removeDiatricsAndAccents(str) {
   return (str || '')
@@ -169,7 +170,7 @@ const Person = ({ person }) => {
         <div className="person-name">
           <b>{person.name}</b>
           {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
-          {!!person.alertness && <Alertness>!</Alertness>}
+          {!!person.alertness && <ExclamationMarkButton />}
         </div>
         <ButtonCustom
           onClick={(e) => {
@@ -208,14 +209,6 @@ const AdditionalInfo = ({ label, value }) => {
     </div>
   );
 };
-
-const Alertness = styled.span`
-  display: inline-block;
-  margin-left: 1rem;
-  text-align: center;
-  color: red;
-  font-weight: bold;
-`;
 
 const AdditionalInfoLabel = styled.span`
   font-weight: bold;

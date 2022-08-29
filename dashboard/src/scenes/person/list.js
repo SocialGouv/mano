@@ -28,6 +28,7 @@ import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
+import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
 const List = () => {
   useTitle('Personnes');
@@ -252,7 +253,9 @@ const List = () => {
           {
             title: 'Vigilance',
             dataKey: 'alertness',
-            render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
+            render: (p) => {
+              return p.alertness ? <ExclamationMarkButton /> : null;
+            },
           },
           { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
           {
@@ -284,13 +287,6 @@ const PersonsActionsStyled = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
-`;
-
-const Alertness = styled.span`
-  display: block;
-  text-align: center;
-  color: red;
-  font-weight: bold;
 `;
 
 export default List;

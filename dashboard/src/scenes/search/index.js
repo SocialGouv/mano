@@ -29,6 +29,7 @@ import { commentsState } from '../../recoil/comments';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
+import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -146,13 +147,6 @@ const Actions = ({ search, onUpdateResults }) => {
   );
 };
 
-const Alertness = styled.span`
-  display: block;
-  text-align: center;
-  color: red;
-  font-weight: bold;
-`;
-
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
@@ -202,7 +196,7 @@ const Persons = ({ search, onUpdateResults }) => {
             {
               title: 'Vigilance',
               dataKey: 'alertness',
-              render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
+              render: (p) => (p.alertness ? <ExclamationMarkButton /> : null),
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
             { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },
