@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { SmallHeader } from '../../components/header';
 import Loading from '../../components/loading';
 import {
@@ -29,7 +29,7 @@ import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesState } from '../../recoil/territory';
 import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
-import { loadingState, refreshTriggerState, useRefreshOnMount } from '../../components/Loader';
+import { useDataLoader } from '../../components/DataLoader';
 import { passagesState } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
 import { consultationsState } from '../../recoil/consultations';
@@ -64,8 +64,7 @@ const Stats = () => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const territories = useRecoilValue(territoriesState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const loading = useRecoilValue(loadingState);
+  const { isLoading } = useDataLoader({ refreshOnMount: true });
   const [territory, setTerritory] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
@@ -74,7 +73,6 @@ const Stats = () => {
   const [actionsStatuses, setActionsStatuses] = useState(DONE);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
-  useRefreshOnMount();
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
@@ -164,7 +162,7 @@ const Stats = () => {
     ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
   ];
 
-  if (loading) return <Loading />;
+  if (isLoading) return <Loading />;
 
   return (
     <>
@@ -184,13 +182,7 @@ const Stats = () => {
             )}
           </span>
         }
-        onRefresh={() => {
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          });
-        }}
-        loading={!!loading}
+        refreshButton
       />
       <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
         <Col md={4} style={{ flexShrink: 0, minWidth: '15rem', padding: 0 }}>

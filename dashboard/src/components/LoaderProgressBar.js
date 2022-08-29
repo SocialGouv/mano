@@ -2,11 +2,12 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-export default function ProgressBar({ loadingText, progress }) {
+export default function ProgressBar({ loadingText, progress, total }) {
+  const status = progress !== null && total !== null ? progress / total : 0.01;
   return (
     <>
       <ProgressContainer>
-        <Progress progress={progress} />
+        <Progress status={status} />
       </ProgressContainer>
       <Caption>{loadingText}</Caption>
     </>
@@ -28,8 +29,8 @@ const ProgressContainer = styled.div`
 `;
 
 const Progress = styled.div`
-  width: ${(p) => p.progress * 100}%;
-  min-width: 10%;
+  width: ${(p) => Math.min(p.status, 1) * 100}%;
+  min-width: 5%;
   height: 5px;
   background-color: ${theme.main};
 `;

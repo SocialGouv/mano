@@ -3,17 +3,23 @@ import { Button as LinkButton } from 'reactstrap';
 import styled from 'styled-components';
 import { theme } from '../../config';
 import BackButton from '../backButton';
+import { useDataLoader } from '../DataLoader';
 
-const Header = ({ title, onRefresh, loading, style = {}, titleStyle = {}, className = '' }) => {
+const Header = ({ title, refreshButton = false, style = {}, titleStyle = {}, className = '' }) => {
   return (
     <HeaderStyled style={style} className={className}>
       <Title style={titleStyle}>{title}</Title>
-      {!!onRefresh && (
-        <LinkButton onClick={onRefresh} disabled={loading} color="link" style={{ marginRight: 10 }}>
-          Rafraichir
-        </LinkButton>
-      )}
+      {Boolean(refreshButton) && <RefreshButton />}
     </HeaderStyled>
+  );
+};
+
+const RefreshButton = () => {
+  const { refresh, isLoading } = useDataLoader();
+  return (
+    <LinkButton onClick={() => refresh()} disabled={isLoading} color="link" style={{ marginRight: 10 }}>
+      Rafraichir
+    </LinkButton>
   );
 };
 

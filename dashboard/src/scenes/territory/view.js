@@ -11,8 +11,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Observations from '../territory-observations/list';
 import SelectCustom from '../../components/SelectCustom';
 import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from '../../recoil/territory';
-import { useRecoilState, useSetRecoilState } from 'recoil';
-import { refreshTriggerState } from '../../components/Loader';
+import { useRecoilState } from 'recoil';
 import useApi from '../../services/api';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
@@ -24,7 +23,6 @@ const View = () => {
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territory = territories.find((t) => t._id === id);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const API = useApi();
 
   useTitle(`${territory?.name} - Territoire`);
@@ -33,14 +31,7 @@ const View = () => {
 
   return (
     <>
-      <SmallHeaderWithBackButton
-        onRefresh={() =>
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          })
-        }
-      />
+      <SmallHeaderWithBackButton refreshButton />
       <Formik
         initialValues={territory}
         onSubmit={async (body) => {
