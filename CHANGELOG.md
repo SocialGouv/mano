@@ -1,3 +1,10 @@
+# [1.144.0](https://github.com/SocialGouv/mano/compare/v1.143.9...v1.144.0) (2022-08-29)
+
+
+### Features
+
+* **dashboard:** add access to person details from every selector ([#846](https://github.com/SocialGouv/mano/issues/846)) ([7d454d5](https://github.com/SocialGouv/mano/commit/7d454d53acf3d1762460c4159277f4f81ea133f2))
+
 ## [1.143.9](https://github.com/SocialGouv/mano/compare/v1.143.8...v1.143.9) (2022-08-26)
 
 
