@@ -23,7 +23,12 @@ export const urgentItemsSelector = selector({
     const actions = get(actionsState);
     const comments = get(commentsState);
     const actionsFiltered = actions
-      .filter((action) => action.team === currentTeam?._id && action.status === TODO && action.urgent)
+      .filter(
+        (action) =>
+          (Array.isArray(action.team) ? action.team.includes(currentTeam?._id) : action.team === currentTeam?._id) &&
+          action.status === TODO &&
+          action.urgent
+      )
       .map((c) => ({
         ...c,
         isAction: true,

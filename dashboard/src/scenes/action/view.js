@@ -27,6 +27,7 @@ import { refreshTriggerState } from '../../components/Loader';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 
 const View = () => {
   const { id } = useParams();
@@ -145,12 +146,13 @@ const View = () => {
                 </Col>
                 <Col md={3}>
                   <FormGroup>
-                    <Label htmlFor="team">Sous l'équipe</Label>
-                    <SelectTeam
-                      teams={user.role === 'admin' ? teams : user.teams}
-                      teamId={values.team}
-                      inputId="team"
-                      onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                    <Label htmlFor="team">Équipe(s) en charge</Label>
+                    <SelectTeamMultiple
+                      onChange={(teams) => handleChange({ target: { value: teams || [], name: 'team' } })}
+                      value={Array.isArray(values.team) ? values.team : [values.team].filter((e) => e)}
+                      colored
+                      inputId="person-select-assigned-team"
+                      classNamePrefix="person-select-assigned-team"
                     />
                   </FormGroup>
                 </Col>

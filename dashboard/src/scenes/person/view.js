@@ -683,7 +683,12 @@ const Actions = ({ person, onUpdateResults }) => {
           {
             title: 'Équipe',
             dataKey: 'team',
-            render: (action) => <TagTeam key={action.team} teamId={action.team} />,
+            render: (action) =>
+              Array.isArray(action.team) ? (
+                action.team.map((at) => <TagTeam key={at} teamId={at} />)
+              ) : (
+                <TagTeam key={action.team} teamId={action.team} />
+              ),
           },
         ].filter((c) => !c.noShow)}
       />

@@ -93,7 +93,7 @@ const Stats = () => {
     : persons.filter((p) => !p.outOfActiveList);
 
   const actions = getDataForPeriod(
-    allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
+    allActions.filter((e) => viewAllOrganisationData || (Array.isArray(e.team) ? e.team.includes(e.team) : e.team === currentTeam._id)),
     period,
     currentTeam,
     viewAllOrganisationData

@@ -34,7 +34,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
       <DateAndTimeCalendarDisplay date={dueAt} withTime={withTime} />
       <CaptionsContainer>
         <Name bold>{name}</Name>
-        {!!withTeamName && <TeamsTags teams={[action.team]} />}
+        {!!withTeamName && <TeamsTags teams={Array.isArray(action.team) ? action.team : [action.team]} />}
         {showStatus ? (
           <StatusContainer>
             <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>

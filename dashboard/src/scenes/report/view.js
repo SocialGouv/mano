@@ -429,7 +429,7 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   const data = useMemo(
     () =>
       allActions
-        ?.filter((a) => a.team === currentTeam._id)
+        ?.filter((a) => (Array.isArray(a.team) ? a.team.includes(currentTeam._id) : a.team === currentTeam._id))
         .filter((a) => a.status === status)
         .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0)),
     [allActions, currentTeam._id, currentTeam?.nightSession, status, date]
@@ -514,7 +514,7 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   const data = useMemo(
     () =>
       actions
-        ?.filter((a) => a.team === currentTeam._id)
+        ?.filter((a) => (Array.isArray(a.team) ? a.team.includes(currentTeam._id) : a.team === currentTeam._id))
         .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
         .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0)),
     [date, actions, currentTeam?._id, currentTeam?.nightSession]

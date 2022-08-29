@@ -60,7 +60,7 @@ const List = () => {
     () =>
       actions.filter(
         (action) =>
-          action.team === currentTeam._id &&
+          (Array.isArray(action.team) ? action.team.includes(currentTeam._id) : action.team === currentTeam._id) &&
           (!statuses.length || statuses.includes(action.status)) &&
           (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
       ),

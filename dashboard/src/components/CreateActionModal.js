@@ -16,6 +16,7 @@ import SelectPerson from './SelectPerson';
 import ButtonCustom from './ButtonCustom';
 import SelectStatus from './SelectStatus';
 import SelectCustom from './SelectCustom';
+import SelectTeamMultiple from './SelectTeamMultiple';
 
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
@@ -54,7 +55,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
           }}
           onSubmit={async (values, actions) => {
             if (!values.name) return toastr.error('Erreur!', 'Le nom est obligatoire');
-            if (!values.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
+            if (!values.team?.length) return toastr.error('Erreur!', "L'équipe est obligatoire");
             if (!isMulti && !values.person) return toastr.error('Erreur!', 'La personne suivie est obligatoire');
             if (isMulti && !values.person?.length) return toastr.error('Erreur!', 'Une personne suivie est obligatoire');
             if (!values.dueAt) return toastr.error('Erreur!', "La date d'échéance est obligatoire");
@@ -109,12 +110,13 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label htmlFor="create-action-team-select">Sous l'équipe</Label>
-                    <SelectTeam
-                      teams={user.role === 'admin' ? teams : user.teams}
-                      teamId={values.team}
-                      onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
-                      inputId="create-action-team-select"
+                    <Label htmlFor="create-action-team-select">Équipe(s) en charge</Label>
+                    <SelectTeamMultiple
+                      onChange={(teams) => handleChange({ target: { value: teams || [], name: 'team' } })}
+                      value={Array.isArray(values.team) ? values.team : [values.team].filter((e) => e)}
+                      colored
+                      inputId="person-select-assigned-team"
+                      classNamePrefix="person-select-assigned-team"
                     />
                   </FormGroup>
                 </Col>
