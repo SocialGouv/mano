@@ -27,11 +27,11 @@ import { commentsState } from '../../recoil/comments';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
-import { useRefreshOnMount } from '../../components/Loader';
+import { useDataLoader } from '../../components/DataLoader';
 
 const List = () => {
   useTitle('Personnes');
-  useRefreshOnMount();
+  useDataLoader({ refreshOnMount: true });
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);

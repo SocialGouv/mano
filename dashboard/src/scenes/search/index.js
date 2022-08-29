@@ -18,11 +18,11 @@ import { actionsState } from '../../recoil/actions';
 import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import PersonName from '../../components/PersonName';
 import { formatBirthDate, formatDateWithFullMonth, formatTime } from '../../services/date';
-import { refreshTriggerState, useRefreshOnMount } from '../../components/Loader';
+import { useDataLoader } from '../../components/DataLoader';
 import { placesState } from '../../recoil/places';
 import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
@@ -34,9 +34,7 @@ const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires'
 
 const View = () => {
   useTitle('Recherche');
-  useRefreshOnMount();
-
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  useDataLoader({ refreshOnMount: true });
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [activeTab, setActiveTab] = useSearchParamState('tab', 0);
@@ -88,15 +86,7 @@ const View = () => {
 
   return (
     <>
-      <Header
-        title="Rechercher"
-        onRefresh={() => {
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          });
-        }}
-      />
+      <Header title="Rechercher" refreshButton />
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <Search placeholder="Par mot clé" value={search} onChange={setSearch} />

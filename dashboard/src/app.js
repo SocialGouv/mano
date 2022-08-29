@@ -22,7 +22,6 @@ import User from './scenes/user';
 import Report from './scenes/report';
 import Person from './scenes/person';
 import Drawer from './components/drawer';
-import Loader, { loaderFullScreenState } from './components/Loader';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { userState } from './recoil/auth';
@@ -31,6 +30,7 @@ import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 import ModalConfirm from './components/ModalConfirm';
+import DataLoader, { useDataLoader } from './components/DataLoader';
 
 const store = createStore(combineReducers({ toastr }));
 
@@ -87,7 +87,7 @@ const App = ({ resetRecoil }) => {
 };
 
 const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
-  const fullScreen = useRecoilValue(loaderFullScreenState);
+  const { fullScreen } = useDataLoader();
   const user = useRecoilValue(userState);
   if (!!user && !user?.termsAccepted)
     return (
@@ -119,7 +119,7 @@ export default function ContextedApp() {
       <Provider store={store}>
         <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
         <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-        <Loader />
+        <DataLoader />
         <ModalConfirm />
       </Provider>
     </RecoilRoot>

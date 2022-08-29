@@ -16,17 +16,17 @@ import SelectCustom from '../../components/SelectCustom';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { formatDateWithFullMonth } from '../../services/date';
-import { refreshTriggerState, loadingState, useRefreshOnMount } from '../../components/Loader';
 import useApi from '../../services/api';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
+import { useDataLoader } from '../../components/DataLoader';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
   useTitle('Territoires');
-  useRefreshOnMount();
+  useDataLoader({ refreshOnMount: true });
 
   const [page, setPage] = useSearchParamState('page', 0);
   const [search, setSearch] = useSearchParamState('search', '');
@@ -92,26 +92,16 @@ const List = () => {
 
 const CreateTerritory = () => {
   const [open, setOpen] = useState(false);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const API = useApi();
-  const loading = useRecoilValue(loadingState);
   const setTerritories = useSetRecoilState(territoriesState);
+  const { refresh, isLoading } = useDataLoader();
 
   return (
     <CreateStyle>
-      <LinkButton
-        disabled={!!loading}
-        onClick={() => {
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          });
-        }}
-        color="link"
-        style={{ marginRight: 10 }}>
+      <LinkButton disabled={isLoading} onClick={() => refresh} color="link" style={{ marginRight: 10 }}>
         Rafraichir
       </LinkButton>
       <ButtonCustom

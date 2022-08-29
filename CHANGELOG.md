@@ -1,3 +1,10 @@
+# [1.145.0](https://github.com/SocialGouv/mano/compare/v1.144.0...v1.145.0) (2022-08-29)
+
+
+### Features
+
+* **dashboard:** new data loader ([#838](https://github.com/SocialGouv/mano/issues/838)) ([7b3567e](https://github.com/SocialGouv/mano/commit/7b3567eee2661a0d244fc466932bdbed69e9e8cf))
+
 # [1.144.0](https://github.com/SocialGouv/mano/compare/v1.143.9...v1.144.0) (2022-08-29)
 
 

@@ -14,20 +14,19 @@ import privacy from '../assets/privacy.pdf';
 import charte from '../assets/charte.pdf';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import useApi from '../services/api';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import Notification from './Notification';
-import { lastRefreshState } from './Loader';
-import { clearCache } from '../services/dataManagement';
 import { toastr } from 'react-redux-toastr';
+import { useDataLoader } from './DataLoader';
 
 const TopBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
-  const setLastRefresh = useSetRecoilState(lastRefreshState);
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
   const API = useApi();
+  const { resetCache } = useDataLoader();
 
   return (
     <TopBarStyled className="noprint" title="Choix de l'équipe et menu déroulant pour le Profil">
@@ -97,12 +96,15 @@ const TopBar = () => {
             </DropdownItem>
             <DropdownItem
               onClick={() => {
-                clearCache();
-                setLastRefresh(0);
-                API.logout();
-                setTimeout(() => {
-                  toastr.info('Vous êtes déconnecté(e)', 'Veuillez vérifier votre historique et le vider si besoin');
-                });
+                resetCache()
+                  .then(() => {
+                    return API.logout();
+                  })
+                  .then(() => {
+                    setTimeout(() => {
+                      toastr.info('Vous êtes déconnecté(e)', 'Veuillez vérifier votre historique et le vider si besoin');
+                    });
+                  });
               }}>
               Se déconnecter et supprimer toute trace de mon passage
             </DropdownItem>

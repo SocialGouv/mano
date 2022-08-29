@@ -14,15 +14,11 @@ import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import useApi, { setOrgEncryptionKey } from '../../services/api';
 import { AppSentry } from '../../services/sentry';
-import { refreshTriggerState, loadingState, lastRefreshState } from '../../components/Loader';
-import { clearCache } from '../../services/dataManagement';
+import { useDataLoader } from '../../components/DataLoader';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
-  const setGlobalLoading = useSetRecoilState(loadingState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
-  const setLastRefresh = useSetRecoilState(lastRefreshState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
   const [user, setUser] = useRecoilState(userState);
@@ -34,24 +30,19 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(true);
   const [authViaCookie, setAuthViaCookie] = useState(false);
+  const { load: runDataLoader, isLoading, resetCache } = useDataLoader();
   const API = useApi();
 
   useEffect(() => {
-    if (refreshTrigger.status !== true) return;
+    if (isLoading !== true) return;
     if (!!organisation?.receptionEnabled) {
       history.push('/reception');
     } else {
       history.push('/action');
     }
-  }, [history, organisation, refreshTrigger]);
+  }, [history, organisation, isLoading]);
 
-  const onSigninValidated = async () => {
-    setRefreshTrigger({
-      status: true,
-      options: { initialLoad: true, showFullScreen: true },
-    });
-    setGlobalLoading('Initialisation...');
-  };
+  const onSigninValidated = async () => runDataLoader();
 
   const onLogout = async () => {
     await API.logout();
@@ -73,8 +64,7 @@ const SignIn = () => {
         setAuthViaCookie(true);
         const { organisation } = user;
         if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
-          await clearCache();
-          setLastRefresh(0);
+          await resetCache();
         }
         window.localStorage.setItem('mano-organisationId', organisation._id);
         setOrganisation(organisation);
@@ -146,8 +136,7 @@ const SignIn = () => {
             }
             if (token) API.setToken(token);
             if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
-              await clearCache();
-              setLastRefresh(0);
+              await resetCache();
             }
             window.localStorage.setItem('mano-organisationId', organisation._id);
             setOrganisation(organisation);
