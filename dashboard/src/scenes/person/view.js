@@ -42,7 +42,7 @@ import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
-import { dateForDatePicker, formatTime } from '../../services/date';
+import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { MedicalFile } from './MedicalFile';
@@ -111,7 +111,8 @@ const View = () => {
       </Title>
       {person.outOfActiveList && (
         <Alert color="warning" className="noprint">
-          {person?.name} est en dehors de la file active, pour le motif suivant : <b>{person.outOfActiveListReason}</b>
+          {person?.name} est en dehors de la file active, pour le motif suivant : <b>{person.outOfActiveListReason}</b>{' '}
+          {person.outOfActiveListDate && `le ${formatDateWithFullMonth(person.outOfActiveListDate)}`}
         </Alert>
       )}
       <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }} className="noprint">

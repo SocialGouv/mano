@@ -297,6 +297,7 @@ export const personFields = [
     options: yesNoOptions,
     filterable: true,
   },
+  { name: 'outOfActiveListDate', type: 'date', label: '', encrypted: true, importable: false, filterable: false },
   { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
 ];
 
