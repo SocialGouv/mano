@@ -1,3 +1,10 @@
+# [1.146.0](https://github.com/SocialGouv/mano/compare/v1.145.0...v1.146.0) (2022-08-29)
+
+
+### Features
+
+* **app,dashboard:** add outOfActiveListDate ([#849](https://github.com/SocialGouv/mano/issues/849)) ([1ae5375](https://github.com/SocialGouv/mano/commit/1ae5375056156b3cc8d4c4749523b04122afed87))
+
 # [1.145.0](https://github.com/SocialGouv/mano/compare/v1.144.0...v1.145.0) (2022-08-29)
 
 
