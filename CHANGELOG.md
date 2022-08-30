@@ -1,3 +1,10 @@
+## [1.146.3](https://github.com/SocialGouv/mano/compare/v1.146.2...v1.146.3) (2022-08-30)
+
+
+### Bug Fixes
+
+* **dashboard:** fix data loader cache ([5b020ee](https://github.com/SocialGouv/mano/commit/5b020eecdca6372d49b5fe7192def8156ba30f7b))
+
 ## [1.146.2](https://github.com/SocialGouv/mano/compare/v1.146.1...v1.146.2) (2022-08-30)
 
 
