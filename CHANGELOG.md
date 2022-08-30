@@ -1,3 +1,10 @@
+## [1.146.4](https://github.com/SocialGouv/mano/compare/v1.146.3...v1.146.4) (2022-08-30)
+
+
+### Bug Fixes
+
+* **dashboard:** force refresh ([41cf4b9](https://github.com/SocialGouv/mano/commit/41cf4b98b9a94de608aabcc51ad45b5e435cf888))
+
 ## [1.146.3](https://github.com/SocialGouv/mano/compare/v1.146.2...v1.146.3) (2022-08-30)
 
 
