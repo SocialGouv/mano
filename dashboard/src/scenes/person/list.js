@@ -30,6 +30,8 @@ import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
+const limit = 20;
+
 const List = () => {
   useTitle('Personnes');
   useDataLoader({ refreshOnMount: true });
@@ -108,6 +110,11 @@ const List = () => {
     personsIdsFilteredByPersonsSearch,
   ]);
 
+  const data = useMemo(() => {
+    return personsFilteredBySearch.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
+  }, [personsFilteredBySearch, page]);
+  const total = useMemo(() => personsFilteredBySearch.length, [personsFilteredBySearch]);
+
   const teams = useRecoilValue(teamsState);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
@@ -141,11 +148,7 @@ const List = () => {
     },
   ];
 
-  const limit = 20;
   if (!personsFilteredBySearch) return <Loading />;
-
-  const data = personsFilteredBySearch.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  const total = personsFilteredBySearch.length;
 
   return (
     <>
