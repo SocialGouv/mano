@@ -1,3 +1,10 @@
+## [1.146.2](https://github.com/SocialGouv/mano/compare/v1.146.1...v1.146.2) (2022-08-30)
+
+
+### Bug Fixes
+
+* **dashboard:** memoize data in person list ([86b3f9a](https://github.com/SocialGouv/mano/commit/86b3f9af4eaf958c6a33ccd7e5fa0768af5ae7ef))
+
 ## [1.146.1](https://github.com/SocialGouv/mano/compare/v1.146.0...v1.146.1) (2022-08-30)
 
 
