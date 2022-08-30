@@ -21,7 +21,7 @@ const FoldersNavigator = (props) => {
       <FoldersStack.Screen name="InformationsSocial">{(stackProps) => <InformationsSocial {...props} {...stackProps} />}</FoldersStack.Screen>
       <FoldersStack.Screen name="InformationsMedical">{(stackProps) => <InformationsMedical {...props} {...stackProps} />}</FoldersStack.Screen>
       <FoldersStack.Screen name="Documents">{(stackProps) => <Documents {...props} {...stackProps} />}</FoldersStack.Screen>
-      {!!user.healthcareProfessional && (
+      {!!user?.healthcareProfessional && (
         <FoldersStack.Screen name="MedicalFile">{(stackProps) => <MedicalFile {...props} {...stackProps} />}</FoldersStack.Screen>
       )}
     </FoldersStack.Navigator>
