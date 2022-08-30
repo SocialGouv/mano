@@ -221,6 +221,20 @@ const useApi = () => {
     forceMigrationLastUpdate = null,
   } = {}) => {
     try {
+      // Force logout when one user has been logged in multiple tabs to different organisations.
+      if (
+        path !== '/user/logout' &&
+        organisation._id &&
+        window.localStorage.getItem('mano-organisationId') &&
+        organisation._id !== window.localStorage.getItem('mano-organisationId')
+      ) {
+        toastr.error(
+          'Veuillez vous reconnecter',
+          'Il semble que vous soyez connecté à plusieurs organisations dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.',
+          { timeOut: 8000 }
+        );
+        logout();
+      }
       if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
       const options = {
         method,
