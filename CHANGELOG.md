@@ -1,3 +1,10 @@
+## [1.146.1](https://github.com/SocialGouv/mano/compare/v1.146.0...v1.146.1) (2022-08-30)
+
+
+### Bug Fixes
+
+* **app:** fix #MANO-D2 ([469a805](https://github.com/SocialGouv/mano/commit/469a805ac6c643eb82ec1fe5a92c6d14fdc8e1d7)), closes [#MANO-D2](https://github.com/SocialGouv/mano/issues/MANO-D2)
+
 # [1.146.0](https://github.com/SocialGouv/mano/compare/v1.145.0...v1.146.0) (2022-08-29)
 
 
