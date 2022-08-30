@@ -122,7 +122,7 @@ const Reception = () => {
 
   const todaysReport = useRecoilValue(todaysReportSelector);
   const user = useRecoilValue(userState);
-  const reportsLoading = useMemo(() => !isLoading, [isLoading]);
+  const reportsLoading = useMemo(() => isLoading, [isLoading]);
   const API = useApi();
   const persons = useRecoilValue(personsState);
 
