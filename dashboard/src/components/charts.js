@@ -154,8 +154,10 @@ export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisT
 
 const CardWrapper = styled(Row)`
   background: ${theme.white};
+  border: 1px solid ${theme.main25};
   border-radius: 20px;
-  padding-bottom: 30px;
+  padding: 1rem;
+  margin: 1rem 0;
   width: 100%;
 `;
 
@@ -201,10 +203,10 @@ const BarContainer = styled.div`
 `;
 
 const CardTitle = styled.div`
-  font-weight: bold;
-  font-size: 16px;
+  font-weight: 500;
+  font-size: 18px;
   line-height: 24px;
   text-align: center;
   color: ${theme.black};
-  margin-bottom: 15px;
+  margin: 1rem 0 3rem;
 `;

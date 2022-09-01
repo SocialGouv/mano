@@ -237,18 +237,16 @@ const Stats = () => {
             <Row>
               <Block data={passages.length} title="Nombre de passages" />
             </Row>
-            <Row>
-              <CustomResponsivePie
-                title="Services"
-                data={organisation.services?.map((service) => {
-                  return {
-                    id: service,
-                    label: service,
-                    value: reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0),
-                  };
-                })}
-              />
-            </Row>
+            <CustomResponsivePie
+              title="Services"
+              data={organisation.services?.map((service) => {
+                return {
+                  id: service,
+                  label: service,
+                  value: reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0),
+                };
+              })}
+            />
           </TabPane>
         )}
         <TabPane tabId={2}>
@@ -371,29 +369,27 @@ const Stats = () => {
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des passages</Title>
-          <Row>
-            <CustomResponsivePie title="Nombre de passages" data={getPieData(passages, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
-            <CustomResponsivePie
-              title="Répartition des passages non-anonymes"
-              data={getPieData(
-                passages.filter((p) => !!p.gender),
-                'gender',
-                { options: [...genderOptions, 'Non précisé'] }
-              )}
-            />
-            <CustomResponsivePie
-              title="Nombre de personnes différentes passées (passages anonymes exclus)"
-              data={getPieData(personsInPassagesOfPeriod, 'gender', { options: [...genderOptions, 'Non précisé'] })}
-            />
-            <CustomResponsivePie
-              title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
-              data={getPieData(
-                personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
-                'gender',
-                { options: [...genderOptions, 'Non précisé'] }
-              )}
-            />
-          </Row>
+          <CustomResponsivePie title="Nombre de passages" data={getPieData(passages, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
+          <CustomResponsivePie
+            title="Répartition des passages non-anonymes"
+            data={getPieData(
+              passages.filter((p) => !!p.gender),
+              'gender',
+              { options: [...genderOptions, 'Non précisé'] }
+            )}
+          />
+          <CustomResponsivePie
+            title="Nombre de personnes différentes passées (passages anonymes exclus)"
+            data={getPieData(personsInPassagesOfPeriod, 'gender', { options: [...genderOptions, 'Non précisé'] })}
+          />
+          <CustomResponsivePie
+            title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
+            data={getPieData(
+              personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
+              'gender',
+              { options: [...genderOptions, 'Non précisé'] }
+            )}
+          />
         </TabPane>
         <TabPane tabId={5}>
           <Title>Statistiques des observations de territoire</Title>
@@ -436,7 +432,7 @@ const Stats = () => {
             {organisation.consultations.map((c) => {
               return (
                 <div key={c.name}>
-                  <h4 style={{ color: '#444', fontSize: '16px' }}>Statistiques des consultations de type « {c.name} »</h4>
+                  <h4 style={{ color: '#444', fontSize: '20px', margin: '2rem 0' }}>Statistiques des consultations de type « {c.name} »</h4>
                   <CustomFieldsStats data={consultations.filter((d) => d.type === c.name)} customFields={c.fields} />
                 </div>
               );
@@ -690,40 +686,52 @@ const BlockTotal = ({ title, unit, data, field }) => {
 };
 
 function CustomFieldsStats({ customFields, data }) {
+  function getColsSize(totalCols) {
+    if (totalCols === 1) return 12;
+    if (totalCols === 2) return 6;
+    if (totalCols % 4 === 0) return 3;
+    return 4;
+  }
+  const customFieldsNumber = customFields
+    .filter((f) => f)
+    .filter((f) => f.enabled)
+    .filter((f) => f.showInStats)
+    .filter((field) => ['number'].includes(field.type));
+  const customFieldsDate = customFields
+    .filter((f) => f)
+    .filter((f) => f.enabled)
+    .filter((f) => f.showInStats)
+    .filter((field) => ['date', 'date-with-time'].includes(field.type));
+  const customFieldsResponsivePie = customFields
+    .filter((f) => f)
+    .filter((f) => f.enabled)
+    .filter((f) => f.showInStats)
+    .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
+  const totalCols = customFieldsNumber.length + customFieldsDate.length;
+  const colSize = getColsSize(totalCols);
   return (
     <>
-      {customFields
-        .filter((f) => f)
-        .filter((f) => f.enabled)
-        .filter((f) => f.showInStats)
-        .filter((field) => ['number'].includes(field.type))
-        .map((field) => (
-          <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-            <BlockTotal title={field.label} data={data} field={field.name} />
-          </Col>
-        ))}
-      {customFields
-        .filter((f) => f)
-        .filter((f) => f.enabled)
-        .filter((f) => f.showInStats)
-        .filter((field) => ['date', 'date-with-time'].includes(field.type))
-        .map((field) => (
-          <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-            <BlockDateWithTime data={data} field={field} />
-          </Col>
-        ))}
-      {customFields
-        .filter((f) => f)
-        .filter((f) => f.enabled)
-        .filter((f) => f.showInStats)
-        .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
-        .map((field) => (
-          <CustomResponsivePie
-            title={field.label}
-            key={field.name}
-            data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
-          />
-        ))}
+      {totalCols > 0 && (
+        <Row>
+          {customFieldsNumber.map((field) => (
+            <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
+              <BlockTotal title={field.label} data={data} field={field.name} />
+            </Col>
+          ))}
+          {customFieldsDate.map((field) => (
+            <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
+              <BlockDateWithTime data={data} field={field} />
+            </Col>
+          ))}
+        </Row>
+      )}
+      {customFieldsResponsivePie.map((field) => (
+        <CustomResponsivePie
+          title={field.label}
+          key={field.name}
+          data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+        />
+      ))}
     </>
   );
 }
