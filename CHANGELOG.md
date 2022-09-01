@@ -1,3 +1,11 @@
+## [1.146.7](https://github.com/SocialGouv/mano/compare/v1.146.6...v1.146.7) (2022-09-01)
+
+
+### Bug Fixes
+
+* **dashboard:** improve stats display ([#852](https://github.com/SocialGouv/mano/issues/852)) ([025d40f](https://github.com/SocialGouv/mano/commit/025d40fbd39102fc43086efcf6be52346e6754e3))
+* **deps:** update dependency compare-versions to v5 ([#845](https://github.com/SocialGouv/mano/issues/845)) ([113fed2](https://github.com/SocialGouv/mano/commit/113fed251f63d8232c30e9704232fab53a573439))
+
 ## [1.146.6](https://github.com/SocialGouv/mano/compare/v1.146.5...v1.146.6) (2022-09-01)
 
 
