@@ -30,11 +30,13 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
 
   const comments = useMemo(
     () =>
-      allComments.filter((c) => {
-        if (!!personId) return c.person === personId;
-        if (!!actionId) return c.action === actionId;
-        return false;
-      }),
+      allComments
+        .filter((c) => {
+          if (!!personId) return c.person === personId;
+          if (!!actionId) return c.action === actionId;
+          return false;
+        })
+        .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)),
     [personId, actionId, allComments]
   );
 
