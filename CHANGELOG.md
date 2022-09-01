@@ -1,3 +1,10 @@
+## [1.146.8](https://github.com/SocialGouv/mano/compare/v1.146.7...v1.146.8) (2022-09-01)
+
+
+### Bug Fixes
+
+* **app:** MANO-CW ([5dfc3b5](https://github.com/SocialGouv/mano/commit/5dfc3b59ade7cf15a580d00fffabbad2852750a2))
+
 ## [1.146.7](https://github.com/SocialGouv/mano/compare/v1.146.6...v1.146.7) (2022-09-01)
 
 
