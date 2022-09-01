@@ -128,7 +128,7 @@ router.post(
       }
 
       let person = await Person.findOne({ where: { _id: personToDeleteId, organisation: req.user.organisation } });
-      await person.destroy({ transaction: tx });
+      if (person) await person.destroy({ transaction: tx });
 
       if (medicalFileToDeleteId) {
         let medicalFile = await MedicalFile.findOne({ where: { _id: medicalFileToDeleteId, organisation: req.user.organisation } });
