@@ -1,3 +1,10 @@
+## [1.146.9](https://github.com/SocialGouv/mano/compare/v1.146.8...v1.146.9) (2022-09-01)
+
+
+### Bug Fixes
+
+* **dashboard:** cannot read properties of null reading destroy ([01623e4](https://github.com/SocialGouv/mano/commit/01623e4d6ba0824873510cbd7eddcc070ef5bd04))
+
 ## [1.146.8](https://github.com/SocialGouv/mano/compare/v1.146.7...v1.146.8) (2022-09-01)
 
 
