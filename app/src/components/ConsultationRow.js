@@ -39,7 +39,7 @@ const ConsultationRow = ({ onConsultationPress, consultation, testID = 'consulta
   }, [consultation, onConsultationPress, visibleByMe, person]);
 
   const onPseudoContainerPress = useCallback(() => {
-    onPseudoPress(person);
+    if (onPseudoPress) onPseudoPress(person);
   }, [person, onPseudoPress]);
 
   return (
