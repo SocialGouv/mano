@@ -1,3 +1,10 @@
+## [1.146.11](https://github.com/SocialGouv/mano/compare/v1.146.10...v1.146.11) (2022-09-05)
+
+
+### Bug Fixes
+
+* **dashboard:** print consultation artefacts ([8143b3c](https://github.com/SocialGouv/mano/commit/8143b3cdea09946fa2c405443204927966c3326e))
+
 ## [1.146.10](https://github.com/SocialGouv/mano/compare/v1.146.9...v1.146.10) (2022-09-05)
 
 
