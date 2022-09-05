@@ -62,7 +62,7 @@ const Place = ({ navigation, route }) => {
           .sort(sortByName)
       );
       setUpdating(false);
-      Alert.alert('Lieu mis-à-jour !', null, [{ text: 'OK', onPress: onBack }]);
+      Alert.alert('Lieu mis à jour !', null, [{ text: 'OK', onPress: onBack }]);
     }
   };
 
