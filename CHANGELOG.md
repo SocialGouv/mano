@@ -1,3 +1,10 @@
+## [1.146.10](https://github.com/SocialGouv/mano/compare/v1.146.9...v1.146.10) (2022-09-05)
+
+
+### Bug Fixes
+
+* **dashboard:** fix loader ([94fc60e](https://github.com/SocialGouv/mano/commit/94fc60e7267d9bfa3d01d8b5c71b4876e1600a0c))
+
 ## [1.146.9](https://github.com/SocialGouv/mano/compare/v1.146.8...v1.146.9) (2022-09-01)
 
 
