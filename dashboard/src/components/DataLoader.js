@@ -101,6 +101,7 @@ export default function DataLoader() {
               withAllMedicalData: initialLoad,
             },
           }).then(({ data: stats }) => {
+            if (!stats) return;
             const newList = [];
             let itemsCount =
               0 +
