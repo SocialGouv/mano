@@ -299,11 +299,12 @@ export function MedicalFile({ person }) {
       </TitleWithButtonsContainer>
       <div className="printonly">
         {(treatments || []).map((c) => {
+          const hiddenKeys = ['_id', 'name', 'documents', 'encryptedEntityKey', 'entityKey', 'updatedAt', 'createdAt', 'person', 'organisation'];
           return (
             <div key={c._id} style={{ marginBottom: '2rem' }}>
               <h4>{c.name}</h4>
               {Object.entries(c)
-                .filter(([key, value]) => value && key !== '_id' && key !== 'name' && key !== 'documents')
+                .filter(([key, value]) => value && !hiddenKeys.includes(key))
                 .map(([key, value]) => {
                   let field = { type: 'text', label: key };
                   if (key === 'dosage') field = { type: 'text', label: 'Dosage' };
@@ -480,11 +481,25 @@ export function MedicalFile({ person }) {
       )}
       <div className="printonly">
         {consultations.map((c) => {
+          const hiddenKeys = [
+            '_id',
+            'name',
+            'documents',
+            'encryptedEntityKey',
+            'entityKey',
+            'onlyVisibleBy',
+            'updatedAt',
+            'createdAt',
+            'person',
+            'organisation',
+            'isConsultation',
+            'withTime',
+          ];
           return (
             <div key={c._id} style={{ marginBottom: '2rem' }}>
               <h4>{c.name}</h4>
               {Object.entries(c)
-                .filter(([key, value]) => value && key !== '_id' && key !== 'name' && key !== 'documents')
+                .filter(([key, value]) => value && !hiddenKeys.includes(key))
                 .map(([key, value]) => {
                   let field = organisation.consultations
                     .find((e) => e.name === (c.type || ''))
