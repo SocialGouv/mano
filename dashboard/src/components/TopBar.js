@@ -47,7 +47,7 @@ const TopBar = () => {
 
       <TopBarAccount>
         {!['restricted-access'].includes(user.role) && <Notification />}
-        <ButtonDropdown direction="left" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
+        <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
           <DropdownToggleStyled>
             {user?.name}
             <Burger>
@@ -58,10 +58,7 @@ const TopBar = () => {
           </DropdownToggleStyled>
           <DropdownMenu>
             <DropdownItem header disabled>
-              {user?.name}
-            </DropdownItem>
-            <DropdownItem header disabled>
-              Role : {user.role}
+              {user?.name} - {user.role}
             </DropdownItem>
             <DropdownItem divider />
             <DropdownItem tag="a" href="https://mano-app.fabrique.social.gouv.fr/faq/" target="_blank" rel="noreferrer">
@@ -174,26 +171,25 @@ const Organisation = styled.div`
 
 const DropdownToggleStyled = styled(DropdownToggle)`
   border-radius: 40px !important;
-  padding: 0px 20px;
-  height: 40px;
+  padding: 4px 16px;
   display: flex;
+  font-size: 12px;
   justify-content: space-between;
   align-items: center;
   background-color: ${theme.main};
   border-color: ${theme.main};
-  transform: scale(0.75);
+  margin: 0 0 0 1rem;
 `;
 
 const Burger = styled.div`
-  width: 25px;
+  width: 12px;
   margin-left: 10px;
-  height: 20px;
+  height: 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transform: scale(0.8);
   div {
-    height: 2px;
+    height: 1px;
     width: 100%;
     background-color: #fff;
     display: block;
