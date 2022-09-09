@@ -1,3 +1,10 @@
+## [1.148.2](https://github.com/SocialGouv/mano/compare/v1.148.1...v1.148.2) (2022-09-09)
+
+
+### Bug Fixes
+
+* **deps:** update nivo monorepo to ^0.80.0 ([#860](https://github.com/SocialGouv/mano/issues/860)) ([f27a8e6](https://github.com/SocialGouv/mano/commit/f27a8e617d78a9fdb3b6f82c946e13677e5391ff))
+
 ## [1.148.1](https://github.com/SocialGouv/mano/compare/v1.148.0...v1.148.1) (2022-09-09)
 
 
