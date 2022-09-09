@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
-import { SmallHeader } from '../../components/header';
+import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
 import {
   healthInsuranceOptions,
@@ -33,13 +33,14 @@ import { useDataLoader } from '../../components/DataLoader';
 import { passagesState } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
 import { consultationsState } from '../../recoil/consultations';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 
-const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
+const getDataForPeriod = (data, { startDate, endDate }, selectedTeams, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
   if (!startDate || !endDate) {
     return data;
   }
-  const offsetHours = !!viewAllOrganisationData ? 0 : currentTeam?.nightSession ? 12 : 0;
+  const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
 
   return data.filter((item) =>
     getIsDayWithinHoursOffsetOfPeriod(item[field] || item.createdAt, { referenceStartDay: startDate, referenceEndDay: endDate }, offsetHours)
@@ -71,6 +72,7 @@ const Stats = () => {
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
   const [actionsStatuses, setActionsStatuses] = useState(DONE);
+  const [selectedTeams, setSelectedTeams] = useState([currentTeam]);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
 
@@ -78,44 +80,37 @@ const Stats = () => {
     setFilterPersons((filters) => [...filters, { field, value }]);
   };
 
-  const persons = getDataForPeriod(
-    allPersons.filter((e) => viewAllOrganisationData || (e.assignedTeams || []).includes(currentTeam._id)),
-    period,
-    currentTeam,
-    viewAllOrganisationData,
-    { filters: filterPersons, field: 'followedSince' }
-  );
+  const filterByTeam = (elements, key) => {
+    return elements.filter((e) => viewAllOrganisationData || selectedTeams.some((f) => (e[key] || []).includes(f._id)));
+  };
+
+  const persons = getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, selectedTeams, viewAllOrganisationData, {
+    filters: filterPersons,
+    field: 'followedSince',
+  });
 
   const personsForStats = filterPersons.find((f) => f.field === 'outOfActiveList' && f.value === 'Oui')
     ? persons.filter((p) => p.outOfActiveList)
     : persons.filter((p) => !p.outOfActiveList);
 
-  const actions = getDataForPeriod(
-    allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
-    period,
-    currentTeam,
-    viewAllOrganisationData
-  );
-  const consultations = getDataForPeriod(allConsultations, period, currentTeam, true);
+  const actions = getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData);
+  const consultations = getDataForPeriod(allConsultations, period, selectedTeams, true);
   const observations = getDataForPeriod(
-    allObservations
-      .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
-      .filter((e) => !territory?._id || e.territory === territory._id),
+    filterByTeam(allObservations, 'team').filter((e) => !territory?._id || e.territory === territory._id),
     period,
-    currentTeam,
+    selectedTeams,
     viewAllOrganisationData,
     { field: 'observedAt' }
   );
   const passages = getDataForPeriod(
-    allPassages
-      .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
+    filterByTeam(allPassages, 'team')
       .map((p) => ({ ...p, type: !!p.person ? 'Non-anonyme' : 'Anonyme' }))
       .map((passage) => ({
         ...passage,
         gender: !passage.person ? null : allPersons.find((person) => person._id === passage.person)?.gender || 'Non renseigné',
       })),
     period,
-    currentTeam,
+    selectedTeams,
     viewAllOrganisationData,
     { field: 'date' }
   );
@@ -145,13 +140,7 @@ const Stats = () => {
     [passages, allPersons]
   );
 
-  const reports = getDataForPeriod(
-    allreports.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
-    period,
-    currentTeam,
-    viewAllOrganisationData,
-    { field: 'date' }
-  );
+  const reports = getDataForPeriod(filterByTeam(allreports, 'team'), period, selectedTeams, viewAllOrganisationData, { field: 'date' });
 
   const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
 
@@ -166,43 +155,41 @@ const Stats = () => {
 
   return (
     <>
-      <SmallHeader
-        title={
-          <span>
-            Statistiques{' '}
-            {viewAllOrganisationData ? (
-              <>
-                <b>globales</b> de <b>{organisation.name}</b>
-              </>
-            ) : (
-              <>
-                de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
-                <b>{currentTeam?.name || ''}</b>
-              </>
+      <HeaderStyled style={{ padding: '16px 0' }}>
+        <div style={{ display: 'flex', flexGrow: '1' }}>
+          <HeaderTitle style={{ fontWeight: '400', width: '260px' }}>
+            <span>Statistiques {viewAllOrganisationData ? <>globales</> : <>{selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"}</>}</span>
+          </HeaderTitle>
+          <div style={{ marginLeft: '1rem' }}>
+            <SelectTeamMultiple
+              onChange={(teamsId) => {
+                setSelectedTeams(teams.filter((t) => teamsId.includes(t._id)));
+              }}
+              value={selectedTeams.map((e) => e?._id)}
+              colored
+              isDisabled={viewAllOrganisationData}
+            />
+            {teams.length > 1 && (
+              <label htmlFor="viewAllOrganisationData" style={{ fontSize: '14px' }}>
+                <input
+                  id="viewAllOrganisationData"
+                  type="checkbox"
+                  style={{ marginRight: '0.5rem' }}
+                  onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                />
+                Statistiques de toute l'organisation
+              </label>
             )}
-          </span>
-        }
-        refreshButton
-      />
+          </div>
+        </div>
+      </HeaderStyled>
       <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
         <Col md={4} style={{ flexShrink: 0, minWidth: '15rem', padding: 0 }}>
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
         </Col>
-        <Col md={4} style={{ flexShrink: 0 }}>
-          {teams.length > 1 && (
-            <label htmlFor="viewAllOrganisationData">
-              <input
-                id="viewAllOrganisationData"
-                type="checkbox"
-                style={{ marginRight: '1rem' }}
-                onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
-              />
-              Statistiques de toute l'organisation
-            </label>
-          )}
-        </Col>
         {['admin'].includes(user.role) && (
-          <Col md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Col md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <RefreshButton />
             <ExportData />
           </Col>
         )}
