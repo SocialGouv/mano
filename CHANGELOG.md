@@ -1,3 +1,10 @@
+## [1.148.1](https://github.com/SocialGouv/mano/compare/v1.148.0...v1.148.1) (2022-09-09)
+
+
+### Bug Fixes
+
+* **dashboard:** display date ([bccbab0](https://github.com/SocialGouv/mano/commit/bccbab02660001e3565f8616113ff2de5019b52a))
+
 # [1.148.0](https://github.com/SocialGouv/mano/compare/v1.147.0...v1.148.0) (2022-09-09)
 
 
