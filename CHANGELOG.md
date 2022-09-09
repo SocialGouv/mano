@@ -1,3 +1,10 @@
+# [1.147.0](https://github.com/SocialGouv/mano/compare/v1.146.11...v1.147.0) (2022-09-09)
+
+
+### Features
+
+* **stats:** filter stats by teams (multiple selection) ([#858](https://github.com/SocialGouv/mano/issues/858)) ([95d28e7](https://github.com/SocialGouv/mano/commit/95d28e7b9267181605d68e6237dfde1aa93a873d))
+
 ## [1.146.11](https://github.com/SocialGouv/mano/compare/v1.146.10...v1.146.11) (2022-09-05)
 
 
