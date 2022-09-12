@@ -1,3 +1,10 @@
+## [1.148.3](https://github.com/SocialGouv/mano/compare/v1.148.2...v1.148.3) (2022-09-12)
+
+
+### Bug Fixes
+
+* **dashboard:** logout when one user has been logged in multiple tabs to different organisations ([#850](https://github.com/SocialGouv/mano/issues/850)) ([3ef76e4](https://github.com/SocialGouv/mano/commit/3ef76e4745c259c5cbbf1140143177be0ddebf19))
+
 ## [1.148.2](https://github.com/SocialGouv/mano/compare/v1.148.1...v1.148.2) (2022-09-09)
 
 
