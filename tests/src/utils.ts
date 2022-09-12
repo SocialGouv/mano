@@ -205,6 +205,7 @@ export async function useEncryptedOrga() {
       "forgotPasswordResetExpires",
       "forgotPasswordResetToken",
       "termsAccepted"
+      "healthcareProfessional"
     ) VALUES (
       $1,
       'Encrypted Orga Admin',
@@ -218,7 +219,8 @@ export async function useEncryptedOrga() {
       $5::date,
       null,
       null,
-      $4
+      $4,
+      true
     );`,
     [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
   );
