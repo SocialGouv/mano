@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from 'react';
+import * as Sentry from '@sentry/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
@@ -291,4 +292,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Sentry.wrap(App);
