@@ -3,7 +3,7 @@ import URI from 'urijs';
 import { toastr } from 'react-redux-toastr';
 import { useHistory } from 'react-router';
 import fetchRetry from 'fetch-retry';
-import { version } from '../../package.json';
+import packageInfo from '../../package.json';
 import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
@@ -175,7 +175,7 @@ const useApi = () => {
       mode: 'cors',
       credentials: 'include',
       body: formData,
-      headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: `JWT ${tokenCached}`, Accept: 'application/json', platform: 'dashboard', version: packageInfo.version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -189,7 +189,7 @@ const useApi = () => {
       method: 'GET',
       mode: 'cors',
       credentials: 'include',
-      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version: packageInfo.version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -203,7 +203,7 @@ const useApi = () => {
       method: 'DELETE',
       mode: 'cors',
       credentials: 'include',
-      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version },
+      headers: { Authorization: `JWT ${tokenCached}`, 'Content-Type': 'application/json', platform: 'dashboard', version: packageInfo.version },
     };
     const url = getUrl(path);
     const response = await fetch(url, options);
@@ -240,7 +240,7 @@ const useApi = () => {
         method,
         mode: 'cors',
         credentials: 'include',
-        headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: 'dashboard', version },
+        headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: 'dashboard', version: packageInfo.version },
       };
 
       if (body) {

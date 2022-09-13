@@ -1,4 +1,5 @@
 import libsodium from 'libsodium-wrappers';
+import { Buffer } from 'buffer';
 
 // TODO: consolidate the base 64 in both dashboard / app: it looks inconsistent right now
 
@@ -8,7 +9,7 @@ Utils
 
 */
 const _appendBuffer = function (buffer1, buffer2) {
-  var tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
+  const tmp = new Uint8Array(buffer1.byteLength + buffer2.byteLength);
   tmp.set(new Uint8Array(buffer1), 0);
   tmp.set(new Uint8Array(buffer2), buffer1.byteLength);
   return new Uint8Array(tmp.buffer);

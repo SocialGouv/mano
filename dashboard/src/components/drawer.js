@@ -1,7 +1,8 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
-import { version } from '../../package.json';
+import packageInfo from '../../package.json';
+
 import { theme } from '../config';
 
 import { organisationState, teamsState, userState } from '../recoil/auth';
@@ -113,7 +114,7 @@ const Drawer = () => {
         )}
       </Nav>
       <Footer>
-        <span>Version: {version}</span>
+        <span>Version: {packageInfo.version}</span>
         <span>Accessibilité: partielle</span>
       </Footer>
     </Sidebar>

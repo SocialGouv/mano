@@ -1,5 +1,5 @@
 import { useRecoilValue } from 'recoil';
-import XLSX from 'xlsx';
+import { utils, writeFile } from 'xlsx';
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState } from '../../recoil/auth';
 import { personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
@@ -24,9 +24,9 @@ export default function DownloadExample() {
     <ButtonCustom
       onClick={() => {
         const importable = personFieldsIncludingCustomFields.filter((f) => f.importable);
-        const ws = XLSX.utils.aoa_to_sheet([importable.map((f) => f.label), importable.map((f) => placeholder(f))]);
+        const ws = utils.aoa_to_sheet([importable.map((f) => f.label), importable.map((f) => placeholder(f))]);
         const workbook = { Sheets: { personne: ws }, SheetNames: ['personne'] };
-        XLSX.writeFile(workbook, 'data.xlsx');
+        writeFile(workbook, 'data.xlsx');
       }}
       color="primary"
       title="Télécharger un exemple"
