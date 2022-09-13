@@ -33,7 +33,7 @@ const { looseUuidRegex } = require("../utils");
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser("admin", { healthcareProfessional: true }),
+  validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
       const objectsKeys = [
