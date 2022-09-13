@@ -52,7 +52,7 @@ const PersonSummary = ({
   };
 
   const onAddActionRequest = () => {
-    navigation.push('NewActionForm', { fromRoute: 'Person', person: personDB?._id });
+    navigation.push('NewActionForm', { fromRoute: 'Person', person: personDB });
   };
 
   const scrollViewRef = useRef(null);
@@ -102,7 +102,7 @@ const PersonSummary = ({
   const onActionPress = useCallback(
     (action) => {
       Sentry.setContext('action', { _id: action._id });
-      navigation.push('Action', { _id: action._id, fromRoute: 'Person' });
+      navigation.push('Action', { action, fromRoute: 'Person' });
     },
     [navigation]
   );

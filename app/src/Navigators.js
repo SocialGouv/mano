@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import * as Sentry from '@sentry/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AgendaIcon, PersonIcon, TerritoryIcon } from './icons';
@@ -60,10 +60,11 @@ const ActionsNavigator = () => {
       <ActionsStack.Screen name="ActionsList" component={ActionsTabNavigator} />
       <ActionsStack.Screen name="Action" component={Action} />
       <ActionsStack.Screen name="NewActionForm" component={NewActionForm} />
+      <ActionsStack.Screen name="PersonsSearch" component={PersonsSearch} />
+      <ActionsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <ActionsStack.Screen name="ActionComment" component={Comment} />
 
       <ActionsStack.Screen name="Person" component={Person} />
-      <ActionsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <ActionsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
       <ActionsStack.Screen name="PersonPlace" component={Place} />
       <ActionsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
@@ -80,7 +81,6 @@ const PersonsNavigator = () => {
     <PersonsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="PersonsList">
       <PersonsStack.Screen name="PersonsList" component={PersonsList} />
       <PersonsStack.Screen name="Person" component={Person} />
-      <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <PersonsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
       <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
@@ -93,6 +93,7 @@ const PersonsNavigator = () => {
 
       <PersonsStack.Screen name="Action" component={Action} />
       <PersonsStack.Screen name="NewActionForm" component={NewActionForm} />
+      <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <PersonsStack.Screen name="ActionComment" component={Comment} />
     </PersonsStack.Navigator>
   );
@@ -142,10 +143,11 @@ const ReportsNavigator = () => {
 
       <ReportsStack.Screen name="Action" component={Action} />
       <ReportsStack.Screen name="NewActionForm" component={NewActionForm} />
+      <ReportsStack.Screen name="PersonsSearch" component={PersonsSearch} />
+      <ActionsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <ReportsStack.Screen name="ActionComment" component={Comment} />
 
       <ReportsStack.Screen name="Person" component={Person} />
-      <ReportsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <ReportsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
       <ReportsStack.Screen name="PersonPlace" component={Place} />
       <ReportsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
@@ -257,6 +259,8 @@ const AppStack = createStackNavigator();
 const App = () => {
   const appState = useRef(AppState.currentState);
   const appStateListener = useRef(null);
+  const navigationRef = useNavigationContainerRef();
+
   useEffect(() => {
     logEvents.initLogEvents().then(() => {
       logEvents.logAppVisit();
@@ -279,7 +283,11 @@ const App = () => {
   return (
     <RecoilRoot>
       <ActionSheetProvider>
-        <NavigationContainer>
+        <NavigationContainer
+          ref={navigationRef}
+          onReady={() => {
+            API.navigation = navigationRef;
+          }}>
           <AppStack.Navigator initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false, headerShown: false }}>
             <AppStack.Screen name="LoginStack" component={LoginNavigator} />
             <AppStack.Screen name="Home" component={TabNavigator} />

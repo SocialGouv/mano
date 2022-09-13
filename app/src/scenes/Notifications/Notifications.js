@@ -93,7 +93,7 @@ const Notifications = ({ navigation }) => {
       navigation.navigate('Agenda', {
         screen: 'Action',
         params: {
-          ...action,
+          action,
           fromRoute: 'ActionsList',
         },
       });

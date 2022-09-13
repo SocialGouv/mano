@@ -50,10 +50,9 @@ const NewPersonForm = ({ navigation, route }) => {
     if (response.ok) {
       backRequestHandledRef.current = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
       Sentry.setContext('person', { _id: response.data._id });
-      navigation.navigate(route.params.toRoute, {
+      navigation.replace(route.params.toRoute, {
         fromRoute: route.params.fromRoute,
-        _id: response.data._id,
-        person: response.data,
+        person: response.decryptedData,
         editable: true,
       });
       setTimeout(() => setPosting(false), 250);
@@ -96,7 +95,7 @@ const NewPersonForm = ({ navigation, route }) => {
 
   const onBack = () => {
     backRequestHandledRef.current = true;
-    navigation.navigate(route.params.fromRoute);
+    navigation.goBack();
     setTimeout(() => setPosting(false), 250);
   };
 

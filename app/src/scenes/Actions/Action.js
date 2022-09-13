@@ -57,13 +57,26 @@ const Action = ({ navigation, route }) => {
   const [comments, setComments] = useRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const actionDB = useMemo(() => {
-    const existingAction = actions.find((a) => a._id === route.params?._id);
+  const [actionDB, setActionDB] = useState(() => {
+    const existingAction = actions.find((a) => a._id === route.params?.action?._id);
     if (!existingAction) return {};
     return Object.assign({}, castToAction(existingAction), { _id: existingAction._id });
-  }, [actions, route.params]);
+  });
 
   const [action, setAction] = useState(() => castToAction(actionDB));
+  const [multipleActions] = useState(() => route?.params?.actions);
+  const isMultipleActions = multipleActions?.length > 1;
+  const canComment = !isMultipleActions;
+
+  const persons = useMemo(() => {
+    if (isMultipleActions) {
+      return multipleActions?.map((a) => allPersons.find((p) => p._id === a.person));
+    } else if (action.person) {
+      return [allPersons.find((p) => p._id === action.person)];
+    }
+    return [];
+  }, [isMultipleActions, multipleActions, allPersons, action?.person]);
+
   const [updating, setUpdating] = useState(false);
   const [writingComment, setWritingComment] = useState('');
   const [editable, setEditable] = useState(route?.params?.editable || false);
@@ -85,17 +98,10 @@ const Action = ({ navigation, route }) => {
   }, [actionDB, action]);
 
   const backRequestHandledRef = useRef(false);
-  const onBack = () => {
+  const onBack = async () => {
     backRequestHandledRef.current = true;
-    const { routes } = navigation.getState();
     Sentry.setContext('action', {});
-    // FIXME there is no perfect solution yet to handle the navigation
-    // fromRoute parameter is good but sometimes not so good...
-    navigation.navigate(
-      route.params.fromRoute === 'NewActionForm'
-        ? routes[routes.length - 3].name // example [{ name: AcionsList },{ name: NewActionForm },{ name: Action }]
-        : route.params.fromRoute
-    );
+    navigation.goBack();
     setUpdating(false);
   };
 
@@ -134,7 +140,7 @@ const Action = ({ navigation, route }) => {
     Alert.alert('Voulez-vous enregistrer cette action ?', null, [
       {
         text: 'Enregistrer',
-        onPress: onUpdateActionRequest,
+        onPress: onUpdateRequest,
       },
       {
         text: 'Ne pas enregistrer',
@@ -148,7 +154,7 @@ const Action = ({ navigation, route }) => {
     ]);
   };
 
-  const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'Action' });
+  const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'Action' }, { merge: true });
 
   const handleBeforeRemove = (e) => {
     if (backRequestHandledRef.current === true) return;
@@ -158,7 +164,7 @@ const Action = ({ navigation, route }) => {
 
   const handleFocus = () => {
     if (route.params?.person) {
-      setAction((a) => ({ ...a, person: route.params.person }));
+      setAction((a) => ({ ...a, person: route.params.person?._id }));
     }
   };
 
@@ -172,8 +178,18 @@ const Action = ({ navigation, route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route?.params?.person]);
 
-  const updateAction = async (action, { oldAction = null } = {}) => {
-    if (!oldAction) oldAction = actions.find((a) => a._id === action._id);
+  const updateAction = async (action) => {
+    if (!action.name.trim()) {
+      Alert.alert("Vous devez rentrer un nom d'action");
+      setUpdating(false);
+      return false;
+    }
+    if (!action.dueAt) {
+      Alert.alert("Vous devez rentrer une date d'échéance");
+      setUpdating(false);
+      return false;
+    }
+    const oldAction = actions.find((a) => a._id === action._id);
     const statusChanged = action.status && oldAction.status !== action.status;
     try {
       if (statusChanged) {
@@ -215,69 +231,48 @@ const Action = ({ navigation, route }) => {
     }
   };
 
-  const onUpdateActionRequest = async () => {
+  const onUpdateRequest = async () => {
     setUpdating(true);
-    const multipleActions = route?.params?.actions?.length > 1;
-    if (!action.name.trim()) {
-      Alert.alert("Vous devez rentrer un nom d'action");
-      setUpdating(false);
-      return false;
-    }
-    if (!action.dueAt) {
-      Alert.alert("Vous devez rentrer une date d'échéance");
-      setUpdating(false);
-      return false;
-    }
-    let response;
-    if (multipleActions) {
-      // Update multiple actions.
-      for (const a of route?.params?.actions) {
-        response = await updateAction(
-          Object.assign(
-            {},
-            castToAction(action),
-            { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
-            { _id: a._id, person: a.person, team: currentTeam._id }
-          )
-        );
+    if (isMultipleActions) {
+      for (const a of multipleActions) {
+        const response = await updateAction(Object.assign({}, castToAction(action), { _id: a._id, person: a.person, team: currentTeam._id }));
+        if (!response.ok) {
+          Alert.alert(response.error);
+          setUpdating(false);
+          return;
+        }
       }
-    } else {
-      response = await updateAction(
-        Object.assign(
-          {},
-          castToAction(action),
-          { completedAt: actionDB.status === TODO && action.status !== TODO ? new Date().toISOString() : null },
-          { _id: actionDB?._id, team: currentTeam._id }
-        )
-      );
+      Alert.alert('Actions mises à jour !', null, [{ text: 'OK', onPress: onBack }]);
+      return;
     }
-
-    if (response.error) {
-      Alert.alert(response.error);
-      setUpdating(false);
-      return false;
-    }
-    if (response.ok) {
-      setUpdating(false);
-      if (actionDB.status !== CANCEL && action.status === CANCEL) {
-        Alert.alert('Cette action est annulée, voulez-vous la dupliquer ?', 'Avec une date ultérieure par exemple', [
-          { text: 'OK', onPress: onDuplicate },
-          { text: 'Non merci !', onPress: onBack, style: 'cancel' },
-        ]);
-      } else {
-        Alert.alert(multipleActions ? 'Actions mises à jour !' : 'Action mise à jour !', null, [{ text: 'OK', onPress: onBack }]);
-        return true;
+    const actionCancelled = actionDB.status !== CANCEL && action.status === CANCEL;
+    const response = await updateAction(Object.assign({}, castToAction(action), { _id: actionDB?._id, team: currentTeam._id }));
+    setUpdating(false);
+    if (!response.ok) {
+      console.log('ON EST LA');
+      if (response.error) {
+        console.log('ON EST ICI');
+        Alert.alert(response.error);
       }
-      return true;
+      return;
     }
+    setActionDB(response.decryptedData);
+    if (actionCancelled) {
+      Alert.alert('Cette action est annulée, voulez-vous la dupliquer ?', 'Avec une date ultérieure par exemple', [
+        { text: 'OK', onPress: onDuplicate },
+        { text: 'Non merci !', onPress: onBack, style: 'cancel' },
+      ]);
+      return;
+    }
+    Alert.alert('Action mise à jour !', null, [{ text: 'OK', onPress: onBack }]);
   };
 
   useEffect(() => {
     if (!editable) {
-      if (action.status !== actionDB.status) onUpdateActionRequest();
+      if (action.status !== actionDB.status) onUpdateRequest();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editable, action.status]);
+  }, [editable, action.status, isMultipleActions]);
 
   const onDuplicate = async () => {
     setUpdating(true);
@@ -318,7 +313,7 @@ const Action = ({ navigation, route }) => {
     Sentry.setContext('action', { _id: response.decryptedData._id });
     backRequestHandledRef.current = true;
     navigation.replace('Action', {
-      ...response.decryptedData,
+      action: response.decryptedData,
       fromRoute: 'ActionsList',
       editable: true,
       duplicate: true,
@@ -354,10 +349,9 @@ const Action = ({ navigation, route }) => {
   };
 
   const onDelete = async () => {
-    const multipleActions = route?.params?.actions?.length > 1;
     let response;
-    if (multipleActions) {
-      for (const a of route?.params?.actions) {
+    if (isMultipleActions) {
+      for (const a of multipleActions) {
         response = await deleteAction(a._id);
       }
     } else {
@@ -365,7 +359,7 @@ const Action = ({ navigation, route }) => {
     }
     if (response.error) return Alert.alert(response.error);
     if (response.ok) {
-      Alert.alert(multipleActions ? 'Actions supprimées !' : 'Action supprimée !');
+      Alert.alert(isMultipleActions ? 'Actions supprimées !' : 'Action supprimée !');
       onBack();
     }
   };
@@ -387,17 +381,6 @@ const Action = ({ navigation, route }) => {
     }, 250);
   };
 
-  const persons = useMemo(() => {
-    if (route?.params?.actions?.length > 1) {
-      return route?.params?.actions?.map((a) => allPersons.find((p) => p._id === a.person));
-    } else if (action.person) {
-      return [allPersons.find((p) => p._id === action.person)];
-    }
-    return [];
-  }, [route?.params?.actions, allPersons, action?.person]);
-
-  const canComment = !route?.params?.actions || route?.params?.actions?.length <= 1;
-
   const { name, dueAt, withTime, description, categories, status, urgent } = action;
 
   return (
@@ -406,7 +389,7 @@ const Action = ({ navigation, route }) => {
         title={persons?.length && persons.length === 1 ? `${name} - ${persons[0]?.name}` : name}
         onBack={onGoBackRequested}
         onEdit={!editable ? () => setEditable(true) : null}
-        onSave={!editable || isUpdateDisabled ? null : onUpdateActionRequest}
+        onSave={!editable || isUpdateDisabled ? null : onUpdateRequest}
         saving={updating}
         testID="action"
       />
@@ -486,7 +469,7 @@ const Action = ({ navigation, route }) => {
           <ButtonDelete onPress={onDeleteRequest} />
           <Button
             caption={editable ? 'Mettre à jour' : 'Modifier'}
-            onPress={editable ? onUpdateActionRequest : () => setEditable(true)}
+            onPress={editable ? onUpdateRequest : () => setEditable(true)}
             disabled={editable ? isUpdateDisabled : false}
             loading={updating}
           />

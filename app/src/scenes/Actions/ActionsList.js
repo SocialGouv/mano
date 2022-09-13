@@ -35,10 +35,6 @@ const ActionsList = () => {
 
   const hasMore = useMemo(() => limit < total, [limit, total]);
 
-  useEffect(() => {
-    API.navigation = navigation;
-  }, [navigation]);
-
   const onRefresh = useCallback(async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   }, [setRefreshTrigger]);
@@ -64,7 +60,7 @@ const ActionsList = () => {
     (action) => {
       Sentry.setContext('action', { _id: action._id });
       navigation.push('Action', {
-        ...action,
+        action,
         fromRoute: 'ActionsList',
       });
     },

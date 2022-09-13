@@ -176,7 +176,6 @@ const Login = ({ navigation }) => {
       setStorageOrganisationId(response.user.organisation._id);
       setUsers(users);
       setTeams(teams);
-      API.navigation = navigation;
       // getting teams before going to team selection
       if (!__DEV__ && !response.user.lastChangePasswordAt) {
         navigation.navigate('ForceChangePassword');

@@ -37,11 +37,7 @@ const PersonsList = ({ navigation, route }) => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   };
 
-  const onCreatePersonRequest = () =>
-    navigation.navigate('NewPersonForm', {
-      fromRoute: 'PersonsList',
-      toRoute: 'Person',
-    });
+  const onCreatePersonRequest = () => navigation.navigate('NewPersonForm', { toRoute: 'Person' });
 
   const onFiltersPress = () => navigation.push('PersonsFilter', route.params);
 
@@ -53,7 +49,7 @@ const PersonsList = ({ navigation, route }) => {
   const renderPersonRow = ({ item: person }) => {
     const onPress = () => {
       Sentry.setContext('person', { _id: person._id });
-      navigation.push('Person', { ...person, fromRoute: 'PersonsList' });
+      navigation.push('Person', { person, fromRoute: 'PersonsList' });
     };
     return <PersonRow onPress={onPress} person={person} />;
   };

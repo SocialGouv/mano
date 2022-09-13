@@ -54,7 +54,7 @@ const Actions = ({ route, navigation }) => {
     (action) => {
       Sentry.setContext('action', { _id: action._id });
       navigation.push('Action', {
-        ...action,
+        action,
         fromRoute: 'ActionsList',
       });
     },

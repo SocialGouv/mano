@@ -15,7 +15,6 @@ import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
 import { actionsState, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { currentTeamState, userState } from '../../recoil/auth';
-import { personsState } from '../../recoil/persons';
 import API from '../../services/api';
 import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
@@ -24,12 +23,11 @@ const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-  const allPersons = useRecoilValue(personsState);
   const [name, setName] = useState('');
   const [dueAt, setDueAt] = useState(null);
   const [withTime, setWithTime] = useState(false);
   const [urgent, setUrgent] = useState(false);
-  const [persons, setPersons] = useState(route.params?.person ? [route.params?.person] : []);
+  const [actionPersons, setActionPersons] = useState(() => (route.params?.person ? [route.params?.person] : []));
   const [categories, setCategories] = useState([]);
   const forCurrentPerson = useRef(!!route.params?.person).current;
   const [posting, setPosting] = useState(false);
@@ -47,7 +45,7 @@ const NewActionForm = ({ route, navigation }) => {
     const handleFocus = () => {
       const newPerson = route?.params?.person;
       if (newPerson) {
-        setPersons((persons) => [...persons.filter((p) => p !== newPerson), newPerson]);
+        setActionPersons((actionPersons) => [...actionPersons.filter((p) => p._id !== newPerson._id), newPerson]);
       }
     };
     const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
@@ -65,12 +63,12 @@ const NewActionForm = ({ route, navigation }) => {
     setPosting(true);
     let newAction = null;
     const actions = [];
-    for (const person of persons) {
+    for (const person of actionPersons) {
       const response = await API.post({
         path: '/action',
         body: prepareActionForEncryption({
           name,
-          person,
+          person: person._id,
           team: currentTeam._id,
           dueAt,
           withTime,
@@ -83,7 +81,7 @@ const NewActionForm = ({ route, navigation }) => {
       });
       if (!response.ok) {
         setPosting(false);
-        Alert.alert(response.error || response.code);
+        if (response.status !== 401) Alert.alert(response.error || response.code);
         return;
       }
       if (!newAction) newAction = response.decryptedData;
@@ -93,10 +91,9 @@ const NewActionForm = ({ route, navigation }) => {
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
     backRequestHandledRef.current = true;
     Sentry.setContext('action', { _id: newAction._id });
-    navigation.navigate('Action', {
-      fromRoute: route.params.fromRoute,
+    navigation.replace('Action', {
       actions,
-      ...newAction,
+      action: newAction,
       editable: true,
     });
     setTimeout(() => setPosting(false), 250);
@@ -104,20 +101,20 @@ const NewActionForm = ({ route, navigation }) => {
 
   const onBack = () => {
     backRequestHandledRef.current = true;
-    navigation.navigate(route.params.fromRoute);
+    navigation.goBack();
   };
 
   const canGoBack = useMemo(() => {
-    if (!name.length && (forCurrentPerson || !persons.length) && !dueAt) return true;
+    if (!name.length && (forCurrentPerson || !actionPersons.length) && !dueAt) return true;
     return false;
-  }, [name, forCurrentPerson, persons, dueAt]);
+  }, [name, forCurrentPerson, actionPersons, dueAt]);
 
   const isReadyToSave = useMemo(() => {
     if (!name || !name.length || !name.trim().length) return false;
-    if (!persons.length) return false;
+    if (!actionPersons.length) return false;
     if (!dueAt) return false;
     return true;
-  }, [name, dueAt, persons]);
+  }, [name, dueAt, actionPersons]);
 
   const onGoBackRequested = () => {
     if (canGoBack) return onBack();
@@ -160,7 +157,7 @@ const NewActionForm = ({ route, navigation }) => {
           {forCurrentPerson ? (
             <InputFromSearchList
               label="Personne concernée"
-              value={allPersons.find((p) => p._id === persons[0])?.name || '-- Aucune --'}
+              value={actionPersons[0]?.name || '-- Aucune --'}
               onSearchRequest={onSearchPerson}
               disabled
             />
@@ -168,11 +165,11 @@ const NewActionForm = ({ route, navigation }) => {
             <>
               <Label label="Personne(s) concerné(es)" />
               <Tags
-                data={persons}
-                onChange={setPersons}
+                data={actionPersons}
+                onChange={setActionPersons}
                 editable
                 onAddRequest={onSearchPerson}
-                renderTag={(person) => <MyText>{allPersons.find((p) => p._id === person)?.name}</MyText>}
+                renderTag={(person) => <MyText>{person?.name}</MyText>}
               />
             </>
           )}

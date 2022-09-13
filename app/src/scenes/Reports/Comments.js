@@ -34,7 +34,7 @@ const Comments = ({ navigation, route }) => {
     (action) => {
       Sentry.setContext('action', { _id: action._id });
       navigation.navigate('Action', {
-        ...action,
+        action,
         fromRoute: 'Comments',
       });
     },

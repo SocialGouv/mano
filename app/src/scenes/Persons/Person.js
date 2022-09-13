@@ -42,7 +42,7 @@ const Person = ({ route, navigation }) => {
   const organisation = useRecoilValue(organisationState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
 
-  const personDB = useMemo(() => persons.find((p) => p._id === route.params?._id), [persons, route.params?._id]);
+  const [personDB, setPersonDB] = useState(() => persons.find((p) => p._id === route.params?.person?._id));
 
   const castToPerson = useCallback(
     (person = {}) => {
@@ -144,6 +144,7 @@ const Person = ({ route, navigation }) => {
       })
     );
     setPerson(castToPerson(newPerson));
+    setPersonDB(newPerson);
     const comment = commentForUpdatePerson({ newPerson, oldPerson });
     if (comment) {
       comment.user = user._id;

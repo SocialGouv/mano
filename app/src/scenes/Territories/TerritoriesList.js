@@ -24,10 +24,6 @@ const TerritoriesList = () => {
   const loading = useRecoilValue(loadingState);
   const territories = useRecoilValue(territoriesSearchSelector({ search }));
 
-  useEffect(() => {
-    API.navigation = navigation;
-  }, [navigation]);
-
   const onRefresh = async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   };

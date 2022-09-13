@@ -29,13 +29,11 @@ const PersonsSearch = ({ navigation, route }) => {
   };
 
   const onSelectPerson = (person) => {
-    navigation.navigate(route.params.fromRoute, {
-      person: person?._id,
-    });
+    navigation.navigate(route.params.fromRoute, { person }, { merge: true });
   };
 
   const onBack = async () => {
-    navigation.navigate(route.params.fromRoute);
+    navigation.goBack();
   };
 
   const keyExtractor = (person) => person._id;
