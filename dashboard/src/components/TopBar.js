@@ -14,20 +14,19 @@ import privacy from '../assets/privacy.pdf';
 import charte from '../assets/charte.pdf';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import useApi from '../services/api';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import Notification from './Notification';
-import { lastRefreshState } from './Loader';
-import { clearCache } from '../services/dataManagement';
 import { toastr } from 'react-redux-toastr';
+import { useDataLoader } from './DataLoader';
 
 const TopBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
-  const setLastRefresh = useSetRecoilState(lastRefreshState);
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
   const API = useApi();
+  const { resetCache } = useDataLoader();
 
   return (
     <TopBarStyled className="noprint" title="Choix de l'équipe et menu déroulant pour le Profil">
@@ -47,8 +46,8 @@ const TopBar = () => {
       </TopBarLogo>
 
       <TopBarAccount>
-        <Notification />
-        <ButtonDropdown direction="left" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
+        {!['restricted-access'].includes(user.role) && <Notification />}
+        <ButtonDropdown direction="down" isOpen={dropdownOpen} toggle={() => setDropdownOpen(!dropdownOpen)}>
           <DropdownToggleStyled>
             {user?.name}
             <Burger>
@@ -59,10 +58,7 @@ const TopBar = () => {
           </DropdownToggleStyled>
           <DropdownMenu>
             <DropdownItem header disabled>
-              {user?.name}
-            </DropdownItem>
-            <DropdownItem header disabled>
-              Role : {user.role}
+              {user?.name} - {user.role}
             </DropdownItem>
             <DropdownItem divider />
             <DropdownItem tag="a" href="https://mano-app.fabrique.social.gouv.fr/faq/" target="_blank" rel="noreferrer">
@@ -97,12 +93,15 @@ const TopBar = () => {
             </DropdownItem>
             <DropdownItem
               onClick={() => {
-                clearCache();
-                setLastRefresh(0);
-                API.logout();
-                setTimeout(() => {
-                  toastr.info('Vous êtes déconnecté(e)', 'Veuillez vérifier votre historique et le vider si besoin');
-                });
+                resetCache()
+                  .then(() => {
+                    return API.logout();
+                  })
+                  .then(() => {
+                    setTimeout(() => {
+                      toastr.info('Vous êtes déconnecté(e)', 'Veuillez vérifier votre historique et le vider si besoin');
+                    });
+                  });
               }}>
               Se déconnecter et supprimer toute trace de mon passage
             </DropdownItem>
@@ -172,26 +171,25 @@ const Organisation = styled.div`
 
 const DropdownToggleStyled = styled(DropdownToggle)`
   border-radius: 40px !important;
-  padding: 0px 20px;
-  height: 40px;
+  padding: 4px 16px;
   display: flex;
+  font-size: 12px;
   justify-content: space-between;
   align-items: center;
   background-color: ${theme.main};
   border-color: ${theme.main};
-  transform: scale(0.75);
+  margin: 0 0 0 1rem;
 `;
 
 const Burger = styled.div`
-  width: 25px;
+  width: 12px;
   margin-left: 10px;
-  height: 20px;
+  height: 12px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transform: scale(0.8);
   div {
-    height: 2px;
+    height: 1px;
     width: 100%;
     background-color: #fff;
     display: block;

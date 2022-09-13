@@ -45,20 +45,31 @@ router.post(
         return next(error);
       }
     }
-    const encryptedItems = ["mergedPerson", "mergedMedicalFile"];
-    for (const key of encryptedItems) {
-      try {
+    try {
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+      }).parse(req.body.mergedPerson);
+    } catch (e) {
+      const error = new Error(`Invalid request in merge two persons mergedPerson: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    try {
+      z.optional(
         z.object({
           _id: z.string().regex(looseUuidRegex),
           encrypted: z.string(),
           encryptedEntityKey: z.string(),
-        }).parse(req.body[key]);
-      } catch (e) {
-        const error = new Error(`Invalid request in merge two persons ${key}: ${e}`);
-        error.status = 400;
-        return next(error);
-      }
+        })
+      ).parse(req.body.mergedMedicalFile);
+    } catch (e) {
+      const error = new Error(`Invalid request in merge two persons mergedMedicalFile: ${e}`);
+      error.status = 400;
+      return next(error);
     }
+
     try {
       z.string().regex(looseUuidRegex).parse(req.body.personToDeleteId);
       z.optional(z.string().regex(looseUuidRegex)).parse(req.body.medicalFileToDeleteId);
@@ -98,8 +109,10 @@ router.post(
         await Treatment.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
-      for (let { encrypted, encryptedEntityKey, _id } of [mergedMedicalFile]) {
-        await MedicalFile.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
+      if (mergedMedicalFile) {
+        for (let { encrypted, encryptedEntityKey, _id } of [mergedMedicalFile]) {
+          await MedicalFile.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
+        }
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedComments) {
@@ -115,7 +128,7 @@ router.post(
       }
 
       let person = await Person.findOne({ where: { _id: personToDeleteId, organisation: req.user.organisation } });
-      await person.destroy({ transaction: tx });
+      if (person) await person.destroy({ transaction: tx });
 
       if (medicalFileToDeleteId) {
         let medicalFile = await MedicalFile.findOne({ where: { _id: medicalFileToDeleteId, organisation: req.user.organisation } });

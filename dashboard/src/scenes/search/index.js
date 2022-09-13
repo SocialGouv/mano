@@ -18,25 +18,24 @@ import { actionsState } from '../../recoil/actions';
 import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue } from 'recoil';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import PersonName from '../../components/PersonName';
 import { formatBirthDate, formatDateWithFullMonth, formatTime } from '../../services/date';
-import { refreshTriggerState, useRefreshOnMount } from '../../components/Loader';
+import { useDataLoader } from '../../components/DataLoader';
 import { placesState } from '../../recoil/places';
 import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
+import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
 const View = () => {
   useTitle('Recherche');
-  useRefreshOnMount();
-
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
+  useDataLoader({ refreshOnMount: true });
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [activeTab, setActiveTab] = useSearchParamState('tab', 0);
@@ -88,15 +87,7 @@ const View = () => {
 
   return (
     <>
-      <Header
-        title="Rechercher"
-        onRefresh={() => {
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          });
-        }}
-      />
+      <Header title="Rechercher" refreshButton />
       <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
         <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
           <Search placeholder="Par mot clé" value={search} onChange={setSearch} />
@@ -156,13 +147,6 @@ const Actions = ({ search, onUpdateResults }) => {
   );
 };
 
-const Alertness = styled.span`
-  display: block;
-  text-align: center;
-  color: red;
-  font-weight: bold;
-`;
-
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
@@ -212,7 +196,7 @@ const Persons = ({ search, onUpdateResults }) => {
             {
               title: 'Vigilance',
               dataKey: 'alertness',
-              render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
+              render: (p) => (p.alertness ? <ExclamationMarkButton /> : null),
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
             { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },

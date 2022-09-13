@@ -27,11 +27,14 @@ import { commentsState } from '../../recoil/comments';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
-import { useRefreshOnMount } from '../../components/Loader';
+import { useDataLoader } from '../../components/DataLoader';
+import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+
+const limit = 20;
 
 const List = () => {
   useTitle('Personnes');
-  useRefreshOnMount();
+  useDataLoader({ refreshOnMount: true });
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
@@ -107,6 +110,11 @@ const List = () => {
     personsIdsFilteredByPersonsSearch,
   ]);
 
+  const data = useMemo(() => {
+    return personsFilteredBySearch.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
+  }, [personsFilteredBySearch, page]);
+  const total = useMemo(() => personsFilteredBySearch.length, [personsFilteredBySearch]);
+
   const teams = useRecoilValue(teamsState);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
@@ -140,11 +148,7 @@ const List = () => {
     },
   ];
 
-  const limit = 20;
   if (!personsFilteredBySearch) return <Loading />;
-
-  const data = personsFilteredBySearch.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  const total = personsFilteredBySearch.length;
 
   return (
     <>
@@ -252,7 +256,9 @@ const List = () => {
           {
             title: 'Vigilance',
             dataKey: 'alertness',
-            render: (p) => <Alertness>{p.alertness ? '!' : ''}</Alertness>,
+            render: (p) => {
+              return p.alertness ? <ExclamationMarkButton /> : null;
+            },
           },
           { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
           {
@@ -284,13 +290,6 @@ const PersonsActionsStyled = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
-`;
-
-const Alertness = styled.span`
-  display: block;
-  text-align: center;
-  color: red;
-  font-weight: bold;
 `;
 
 export default List;

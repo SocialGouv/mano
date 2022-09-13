@@ -20,11 +20,11 @@ import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../rec
 import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
 import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
-import { loadingState } from './Loader';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import { consultationsState, prepareConsultationForEncryption } from '../recoil/consultations';
 import { prepareTreatmentForEncryption, treatmentsState } from '../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
+import { useDataLoader } from './DataLoader';
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -58,8 +58,8 @@ const EncryptionKey = ({ isMain }) => {
   const places = useRecoilValue(placesState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const reports = useRecoilValue(reportsState);
-  const loading = useRecoilValue(loadingState);
   const API = useApi();
+  const { isLoading } = useDataLoader();
 
   const totalToEncrypt =
     persons.length +
@@ -250,7 +250,7 @@ const EncryptionKey = ({ isMain }) => {
               <ButtonCustom
                 color="secondary"
                 id="encrypt"
-                disabled={loading || isSubmitting}
+                disabled={isLoading || isSubmitting}
                 onClick={() => !isSubmitting && handleSubmit()}
                 title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
               />
@@ -260,6 +260,14 @@ const EncryptionKey = ({ isMain }) => {
       </Formik>
     </ModalBody>
   );
+
+  if (organisation.encryptionEnabled && !user.healthcareProfessional)
+    return (
+      <em>
+        Vous ne pouvez pas changer la clé de chiffrement car vous n'êtes pas déclaré comme adminstrateur de type professionel de santé. Il est
+        nécessaire d'avoir accès à l'ensemble des données de l'organisation pour pouvoir changer son chiffrement.
+      </em>
+    );
 
   return (
     <>

@@ -210,8 +210,31 @@ const useApi = () => {
     return response.json();
   };
 
-  const execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false } = {}) => {
+  const execute = async ({
+    method,
+    path = '',
+    body = null,
+    query = {},
+    headers = {},
+    debug = false,
+    skipEncryption = false,
+    forceMigrationLastUpdate = null,
+  } = {}) => {
     try {
+      // Force logout when one user has been logged in multiple tabs to different organisations.
+      if (
+        path !== '/user/logout' &&
+        organisation._id &&
+        window.localStorage.getItem('mano-organisationId') &&
+        organisation._id !== window.localStorage.getItem('mano-organisationId')
+      ) {
+        toastr.error(
+          'Veuillez vous reconnecter',
+          'Il semble que vous soyez connecté à plusieurs organisations dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.',
+          { timeOut: 8000 }
+        );
+        logout();
+      }
       if (tokenCached) headers.Authorization = `JWT ${tokenCached}`;
       const options = {
         method,
@@ -231,7 +254,7 @@ const useApi = () => {
         query = {
           encryptionLastUpdateAt,
           encryptionEnabled,
-          migrationLastUpdateAt,
+          migrationLastUpdateAt: forceMigrationLastUpdate || migrationLastUpdateAt,
           ...query,
         };
       }
@@ -296,32 +319,7 @@ const useApi = () => {
     }
   };
 
-  const get = async (args) => {
-    if (args.batch) {
-      let hasMore = true;
-      let page = 0;
-      let limit = args.batch;
-      let data = [];
-      let decryptedData = [];
-      while (hasMore) {
-        let query = { ...args.query, limit, page };
-        const response = await execute({ method: 'GET', ...args, query });
-        if (!response.ok) return { ok: false, data: [] };
-        data.push(...response.data);
-        decryptedData.push(...(response.decryptedData || []));
-        hasMore = response.hasMore;
-        page = response.hasMore ? page + 1 : page;
-        // at least 1 for showing progress
-        if (args.setProgress) args.setProgress(response.data.length || 1);
-        if (args.setBatchData) args.setBatchData(response.data);
-        await new Promise((res) => setTimeout(res, 50));
-      }
-      return { ok: true, data, decryptedData };
-    } else {
-      return execute({ method: 'GET', ...args });
-    }
-  };
-
+  const get = (args) => execute({ method: 'GET', ...args });
   const post = (args) => execute({ method: 'POST', ...args });
   const put = (args) => execute({ method: 'PUT', ...args });
 

@@ -17,7 +17,6 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import { personsState } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { collectionsToLoadState, useRefreshOnMount } from '../../components/Loader';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
@@ -30,6 +29,7 @@ import PersonName from '../../components/PersonName';
 import Table from '../../components/table';
 import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
+import { useDataLoader } from '../../components/DataLoader';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -101,7 +101,7 @@ const todaysPassagesSelector = selector({
 
 const Reception = () => {
   useTitle('Accueil');
-  useRefreshOnMount();
+  const { isLoading } = useDataLoader();
 
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -122,8 +122,7 @@ const Reception = () => {
 
   const todaysReport = useRecoilValue(todaysReportSelector);
   const user = useRecoilValue(userState);
-  const collectionsToLoad = useRecoilValue(collectionsToLoadState);
-  const reportsLoading = useMemo(() => collectionsToLoad.includes('report'), [collectionsToLoad]);
+  const reportsLoading = useMemo(() => isLoading, [isLoading]);
   const API = useApi();
   const persons = useRecoilValue(personsState);
 

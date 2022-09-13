@@ -42,8 +42,7 @@ import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
-import { dateForDatePicker, formatTime } from '../../services/date';
-import { refreshTriggerState } from '../../components/Loader';
+import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { MedicalFile } from './MedicalFile';
@@ -71,7 +70,6 @@ const View = () => {
   const [persons, setPersons] = useRecoilState(personsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const [tabsContents, setTabsContents] = useState(initTabs);
@@ -87,15 +85,7 @@ const View = () => {
 
   return (
     <StyledContainer>
-      <SmallHeaderWithBackButton
-        className="noprint"
-        onRefresh={() =>
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          })
-        }
-      />
+      <SmallHeaderWithBackButton className="noprint" refreshButton />
       <Title className="noprint">
         {`Dossier de ${person?.name}`}
         <UserName
@@ -121,7 +111,8 @@ const View = () => {
       </Title>
       {person.outOfActiveList && (
         <Alert color="warning" className="noprint">
-          {person?.name} est en dehors de la file active, pour le motif suivant : <b>{person.outOfActiveListReason}</b>
+          {person?.name} est en dehors de la file active, pour le motif suivant : <b>{person.outOfActiveListReason}</b>{' '}
+          {person.outOfActiveListDate && `le ${formatDateWithFullMonth(person.outOfActiveListDate)}`}
         </Alert>
       )}
       <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }} className="noprint">

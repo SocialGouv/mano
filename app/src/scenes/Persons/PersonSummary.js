@@ -113,6 +113,7 @@ const PersonSummary = ({
         <AlterOutOfActiveList>
           <Text style={{ color: colors.app.colorWhite }}>
             {person?.name} est en dehors de la file active, pour le motif suivant : {person.outOfActiveListReason}
+            {person?.outOfActiveListDate && `le ${formatDateWithFullMonth(person.outOfActiveListDate)}`}
           </Text>
         </AlterOutOfActiveList>
       )}

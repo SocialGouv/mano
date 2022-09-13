@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
+import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toastr } from 'react-redux-toastr';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -14,6 +14,8 @@ import {
 } from '../../recoil/persons';
 import SelectAsInput from '../../components/SelectAsInput';
 import useApi from '../../services/api';
+import DatePicker from 'react-datepicker';
+import { dateForDatePicker } from '../../services/date';
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
@@ -25,14 +27,14 @@ const OutOfActiveList = ({ person }) => {
 
   const setPersons = useSetRecoilState(personsState);
 
-  const handleSetOutOfActiveList = async (outOfActiveListReason = '') => {
+  const handleSetOutOfActiveList = async (outOfActiveListReason = '', outOfActiveListDate = Date.now()) => {
     const outOfActiveList = !person.outOfActiveList;
     const response = await API.put({
       path: `/person/${person._id}`,
       body: preparePersonForEncryption(
         customFieldsPersonsMedical,
         customFieldsPersonsSocial
-      )({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReason }),
+      )({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReason, outOfActiveListDate }),
     });
     if (response.ok) {
       const newPerson = response.decryptedData;
@@ -60,7 +62,7 @@ const OutOfActiveList = ({ person }) => {
           <Formik
             initialValues={person}
             onSubmit={async (body) => {
-              await handleSetOutOfActiveList(body.outOfActiveListReason);
+              await handleSetOutOfActiveList(body.outOfActiveListReason, body.outOfActiveListDate);
               setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -81,6 +83,21 @@ const OutOfActiveList = ({ person }) => {
                           classNamePrefix="person-select-outOfActiveListReason"
                         />
                       </label>
+                    </FormGroup>
+                  </Col>
+                  <Col md={6}>
+                    <FormGroup>
+                      <Label htmlFor="person-birthdate">Date de sortie de file active</Label>
+                      <div>
+                        <DatePicker
+                          locale="fr"
+                          className="form-control"
+                          selected={dateForDatePicker(values.outOfActiveListDate || Date.now())}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'outOfActiveListDate' } })}
+                          dateFormat="dd/MM/yyyy"
+                          id="outOfActiveListDate"
+                        />
+                      </div>
                     </FormGroup>
                   </Col>
                 </Row>

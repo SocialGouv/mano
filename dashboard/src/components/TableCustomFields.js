@@ -32,15 +32,7 @@ const sanitizeFields = (field) => {
   return sanitizedField;
 };
 
-const TableCustomFields = ({
-  data,
-  customFields,
-  mergeData = null,
-  extractData = null,
-  keyPrefix = null,
-  hideStats = false,
-  onlyOptionsEditable,
-}) => {
+const TableCustomFields = ({ data, customFields, mergeData = null, extractData = null, keyPrefix = null, onlyOptionsEditable }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
@@ -178,7 +170,7 @@ const TableCustomFields = ({
             ),
             dataKey: 'showInStats',
             render: (f) => <input type="checkbox" checked={f.showInStats} onChange={onShowStatsChange(f)} />,
-            show: !onlyOptionsEditable && !hideStats,
+            show: !onlyOptionsEditable,
           },
           {
             title: '',

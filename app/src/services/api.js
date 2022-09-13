@@ -268,7 +268,9 @@ class ApiService {
     const res = await RNFS.readFile(response.path(), 'base64');
     const decrypted = await decryptFile(res, encryptedEntityKey, this.hashedOrgEncryptionKey);
     const newPath = RNFS.TemporaryDirectoryPath + '/' + document.file.originalname;
-    await RNFS.writeFile(newPath, decrypted, 'base64');
+    if (decrypted) {
+      await RNFS.writeFile(newPath, decrypted, 'base64');
+    }
     return { path: newPath, decrypted };
   };
 

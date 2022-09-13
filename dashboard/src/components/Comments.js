@@ -14,9 +14,9 @@ import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date';
-import { loadingState } from './Loader';
 import useApi from '../services/api';
 import ExclamationMarkButton from './ExclamationMarkButton';
+import { useDataLoader } from './DataLoader';
 
 const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
@@ -26,16 +26,17 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
-
-  const loading = useRecoilValue(loadingState);
+  const { isLoading } = useDataLoader();
 
   const comments = useMemo(
     () =>
-      allComments.filter((c) => {
-        if (!!personId) return c.person === personId;
-        if (!!actionId) return c.action === actionId;
-        return false;
-      }),
+      allComments
+        .filter((c) => {
+          if (!!personId) return c.person === personId;
+          if (!!actionId) return c.action === actionId;
+          return false;
+        })
+        .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)),
     [personId, actionId, allComments]
   );
 
@@ -98,7 +99,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
           <Title>Commentaires</Title>
         </Col>
       </Row>
-      {!comments.length && !!loading ? (
+      {!comments.length && !!isLoading ? (
         <Loading />
       ) : (
         <>
@@ -135,7 +136,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
               </StyledComment>
             );
           })}
-          {!!loading && <Loading />}
+          {!!isLoading && <Loading />}
         </>
       )}
       <EditingComment

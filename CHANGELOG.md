@@ -1,3 +1,193 @@
+## [1.148.4](https://github.com/SocialGouv/mano/compare/v1.148.3...v1.148.4) (2022-09-13)
+
+
+### Bug Fixes
+
+* **dashboard:** allow encrypt to healthcareProfessional only ([#862](https://github.com/SocialGouv/mano/issues/862)) ([18fedce](https://github.com/SocialGouv/mano/commit/18fedce777a2a426351ed837fb47ee74cadfe862))
+
+## [1.148.3](https://github.com/SocialGouv/mano/compare/v1.148.2...v1.148.3) (2022-09-12)
+
+
+### Bug Fixes
+
+* **dashboard:** logout when one user has been logged in multiple tabs to different organisations ([#850](https://github.com/SocialGouv/mano/issues/850)) ([3ef76e4](https://github.com/SocialGouv/mano/commit/3ef76e4745c259c5cbbf1140143177be0ddebf19))
+
+## [1.148.2](https://github.com/SocialGouv/mano/compare/v1.148.1...v1.148.2) (2022-09-09)
+
+
+### Bug Fixes
+
+* **deps:** update nivo monorepo to ^0.80.0 ([#860](https://github.com/SocialGouv/mano/issues/860)) ([f27a8e6](https://github.com/SocialGouv/mano/commit/f27a8e617d78a9fdb3b6f82c946e13677e5391ff))
+
+## [1.148.1](https://github.com/SocialGouv/mano/compare/v1.148.0...v1.148.1) (2022-09-09)
+
+
+### Bug Fixes
+
+* **dashboard:** display date ([bccbab0](https://github.com/SocialGouv/mano/commit/bccbab02660001e3565f8616113ff2de5019b52a))
+
+# [1.148.0](https://github.com/SocialGouv/mano/compare/v1.147.0...v1.148.0) (2022-09-09)
+
+
+### Features
+
+* **app:** release app ([a2964f4](https://github.com/SocialGouv/mano/commit/a2964f4a2fadde06af93b3cf6fc461082fecc333))
+
+# [1.147.0](https://github.com/SocialGouv/mano/compare/v1.146.11...v1.147.0) (2022-09-09)
+
+
+### Features
+
+* **stats:** filter stats by teams (multiple selection) ([#858](https://github.com/SocialGouv/mano/issues/858)) ([95d28e7](https://github.com/SocialGouv/mano/commit/95d28e7b9267181605d68e6237dfde1aa93a873d))
+
+## [1.146.11](https://github.com/SocialGouv/mano/compare/v1.146.10...v1.146.11) (2022-09-05)
+
+
+### Bug Fixes
+
+* **dashboard:** print consultation artefacts ([8143b3c](https://github.com/SocialGouv/mano/commit/8143b3cdea09946fa2c405443204927966c3326e))
+
+## [1.146.10](https://github.com/SocialGouv/mano/compare/v1.146.9...v1.146.10) (2022-09-05)
+
+
+### Bug Fixes
+
+* **dashboard:** fix loader ([94fc60e](https://github.com/SocialGouv/mano/commit/94fc60e7267d9bfa3d01d8b5c71b4876e1600a0c))
+
+## [1.146.9](https://github.com/SocialGouv/mano/compare/v1.146.8...v1.146.9) (2022-09-01)
+
+
+### Bug Fixes
+
+* **dashboard:** cannot read properties of null reading destroy ([01623e4](https://github.com/SocialGouv/mano/commit/01623e4d6ba0824873510cbd7eddcc070ef5bd04))
+
+## [1.146.8](https://github.com/SocialGouv/mano/compare/v1.146.7...v1.146.8) (2022-09-01)
+
+
+### Bug Fixes
+
+* **app:** MANO-CW ([5dfc3b5](https://github.com/SocialGouv/mano/commit/5dfc3b59ade7cf15a580d00fffabbad2852750a2))
+
+## [1.146.7](https://github.com/SocialGouv/mano/compare/v1.146.6...v1.146.7) (2022-09-01)
+
+
+### Bug Fixes
+
+* **dashboard:** improve stats display ([#852](https://github.com/SocialGouv/mano/issues/852)) ([025d40f](https://github.com/SocialGouv/mano/commit/025d40fbd39102fc43086efcf6be52346e6754e3))
+* **deps:** update dependency compare-versions to v5 ([#845](https://github.com/SocialGouv/mano/issues/845)) ([113fed2](https://github.com/SocialGouv/mano/commit/113fed251f63d8232c30e9704232fab53a573439))
+
+## [1.146.6](https://github.com/SocialGouv/mano/compare/v1.146.5...v1.146.6) (2022-09-01)
+
+
+### Bug Fixes
+
+* **dashboard:** sort comments by date desc ([3d4722a](https://github.com/SocialGouv/mano/commit/3d4722a13cb2d1fff717a31c61b9f4807cd999df))
+
+## [1.146.5](https://github.com/SocialGouv/mano/compare/v1.146.4...v1.146.5) (2022-08-30)
+
+
+### Bug Fixes
+
+* **dashboard:** fix today report ([fc5618a](https://github.com/SocialGouv/mano/commit/fc5618a58ea59265997abc36832839a04e8efc7e))
+
+## [1.146.4](https://github.com/SocialGouv/mano/compare/v1.146.3...v1.146.4) (2022-08-30)
+
+
+### Bug Fixes
+
+* **dashboard:** force refresh ([41cf4b9](https://github.com/SocialGouv/mano/commit/41cf4b98b9a94de608aabcc51ad45b5e435cf888))
+
+## [1.146.3](https://github.com/SocialGouv/mano/compare/v1.146.2...v1.146.3) (2022-08-30)
+
+
+### Bug Fixes
+
+* **dashboard:** fix data loader cache ([5b020ee](https://github.com/SocialGouv/mano/commit/5b020eecdca6372d49b5fe7192def8156ba30f7b))
+
+## [1.146.2](https://github.com/SocialGouv/mano/compare/v1.146.1...v1.146.2) (2022-08-30)
+
+
+### Bug Fixes
+
+* **dashboard:** memoize data in person list ([86b3f9a](https://github.com/SocialGouv/mano/commit/86b3f9af4eaf958c6a33ccd7e5fa0768af5ae7ef))
+
+## [1.146.1](https://github.com/SocialGouv/mano/compare/v1.146.0...v1.146.1) (2022-08-30)
+
+
+### Bug Fixes
+
+* **app:** fix #MANO-D2 ([469a805](https://github.com/SocialGouv/mano/commit/469a805ac6c643eb82ec1fe5a92c6d14fdc8e1d7)), closes [#MANO-D2](https://github.com/SocialGouv/mano/issues/MANO-D2)
+
+# [1.146.0](https://github.com/SocialGouv/mano/compare/v1.145.0...v1.146.0) (2022-08-29)
+
+
+### Features
+
+* **app,dashboard:** add outOfActiveListDate ([#849](https://github.com/SocialGouv/mano/issues/849)) ([1ae5375](https://github.com/SocialGouv/mano/commit/1ae5375056156b3cc8d4c4749523b04122afed87))
+
+# [1.145.0](https://github.com/SocialGouv/mano/compare/v1.144.0...v1.145.0) (2022-08-29)
+
+
+### Features
+
+* **dashboard:** new data loader ([#838](https://github.com/SocialGouv/mano/issues/838)) ([7b3567e](https://github.com/SocialGouv/mano/commit/7b3567eee2661a0d244fc466932bdbed69e9e8cf))
+
+# [1.144.0](https://github.com/SocialGouv/mano/compare/v1.143.9...v1.144.0) (2022-08-29)
+
+
+### Features
+
+* **dashboard:** add access to person details from every selector ([#846](https://github.com/SocialGouv/mano/issues/846)) ([7d454d5](https://github.com/SocialGouv/mano/commit/7d454d53acf3d1762460c4159277f4f81ea133f2))
+
+## [1.143.9](https://github.com/SocialGouv/mano/compare/v1.143.8...v1.143.9) (2022-08-26)
+
+
+### Bug Fixes
+
+* **dashboard:** remove hideStats option for custom fields table ([52d43b9](https://github.com/SocialGouv/mano/commit/52d43b905a7881e41de4c9bf7b4f70a56f64ffdb))
+
+## [1.143.8](https://github.com/SocialGouv/mano/compare/v1.143.7...v1.143.8) (2022-08-26)
+
+
+### Bug Fixes
+
+* **dashboard:** fix NaN% on charts ([fde8dc0](https://github.com/SocialGouv/mano/commit/fde8dc04bd40bd71d4c87856bb24bac8b6e43c7f))
+
+## [1.143.7](https://github.com/SocialGouv/mano/compare/v1.143.6...v1.143.7) (2022-08-26)
+
+
+### Bug Fixes
+
+* **dashboard:** filter for custom yes-no was broken ([8fe8c0a](https://github.com/SocialGouv/mano/commit/8fe8c0adcc3caf69c41de97d7c116804d04d0765))
+
+## [1.143.6](https://github.com/SocialGouv/mano/compare/v1.143.5...v1.143.6) (2022-08-26)
+
+
+### Bug Fixes
+
+* disable esc key on consultation creation ([0e059fe](https://github.com/SocialGouv/mano/commit/0e059fe713c0e666aae213152ab6efae124655fd))
+
+## [1.143.5](https://github.com/SocialGouv/mano/compare/v1.143.4...v1.143.5) (2022-08-26)
+
+
+### Bug Fixes
+
+* fix notification ([6ad23f7](https://github.com/SocialGouv/mano/commit/6ad23f7f56311ac7064d5decd88849f54257e0b5))
+
+## [1.143.4](https://github.com/SocialGouv/mano/compare/v1.143.3...v1.143.4) (2022-08-23)
+
+
+### Bug Fixes
+
+* restricted access account have error due to consultations ([a2bf8a5](https://github.com/SocialGouv/mano/commit/a2bf8a58b4a228d58afd023152be0cdeaac5de27))
+
+## [1.143.3](https://github.com/SocialGouv/mano/compare/v1.143.2...v1.143.3) (2022-08-19)
+
+
+### Bug Fixes
+
+* fix merge persons when none have a medical file ([94a6378](https://github.com/SocialGouv/mano/commit/94a6378938e345bad7358aeb8739318c14d2f820))
+
 ## [1.143.2](https://github.com/SocialGouv/mano/compare/v1.143.1...v1.143.2) (2022-08-18)
 
 

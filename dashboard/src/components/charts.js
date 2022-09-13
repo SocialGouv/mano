@@ -28,13 +28,13 @@ export const CustomResponsivePie = ({ data = [], title, onAddFilter, field }) =>
                 <tr key={key + label + value}>
                   <td>{label}</td>
                   <td>{value}</td>
-                  <td>{`${Math.round((value / total) * 1000) / 10}%`}</td>
+                  {total ? <td>{`${Math.round((value / total) * 1000) / 10}%`}</td> : <></>}
                 </tr>
               ))}
             <tr>
               <td>Total</td>
               <td>{total}</td>
-              <td>100%</td>
+              {total ? <td>100%</td> : <></>}
             </tr>
           </tbody>
         </Data>
@@ -42,7 +42,7 @@ export const CustomResponsivePie = ({ data = [], title, onAddFilter, field }) =>
       <Col md={8}>
         <PieContainer>
           <ResponsivePie
-            data={data}
+            data={total ? data : []}
             sortByValue
             fit
             margin={{ top: 40, right: 0, bottom: 40, left: 0 }}
@@ -154,8 +154,10 @@ export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisT
 
 const CardWrapper = styled(Row)`
   background: ${theme.white};
+  border: 1px solid ${theme.main25};
   border-radius: 20px;
-  padding-bottom: 30px;
+  padding: 1rem;
+  margin: 1rem 0;
   width: 100%;
 `;
 
@@ -201,10 +203,10 @@ const BarContainer = styled.div`
 `;
 
 const CardTitle = styled.div`
-  font-weight: bold;
-  font-size: 16px;
+  font-weight: 500;
+  font-size: 18px;
   line-height: 24px;
   text-align: center;
   color: ${theme.black};
-  margin-bottom: 15px;
+  margin: 1rem 0 3rem;
 `;

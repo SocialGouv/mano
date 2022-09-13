@@ -22,7 +22,7 @@ export default function Notification() {
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
   const actionsFiltered = useMemo(
-    () => actions.filter((action) => action.team === currentTeam?._id && action.status === TODO && action.urgent),
+    () => actions.filter((action) => action.team === currentTeam?._id && action.status === TODO && action.urgent).sort((a, b) => a.dueAt - b.dueAt),
     [actions, currentTeam?._id]
   );
 
@@ -46,7 +46,8 @@ export default function Notification() {
           }
           return commentPopulated;
         })
-        .filter((c) => c.action || c.person),
+        .filter((c) => c.action || c.person)
+        .sort((a, b) => dayjs(a.createdAt).diff(dayjs(b.createdAt))),
     [comments, persons, actions]
   );
 
@@ -142,6 +143,13 @@ const Comments = ({ setShowModal, comments }) => {
             history.push(`/${comment.type}/${comment[comment.type]._id}?tab=commentaires`);
           }}
           columns={[
+            {
+              title: 'Date',
+              dataKey: 'date' || '_id',
+              render: (comment) => {
+                return <DateBloc date={comment.date || comment.createdAt} />;
+              },
+            },
             {
               title: 'Heure',
               dataKey: 'date',

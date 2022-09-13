@@ -1,8 +1,8 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { SmallHeader } from '../../components/header';
+import { useRecoilValue } from 'recoil';
+import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
 import {
   healthInsuranceOptions,
@@ -29,17 +29,18 @@ import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesState } from '../../recoil/territory';
 import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
-import { loadingState, refreshTriggerState, useRefreshOnMount } from '../../components/Loader';
+import { useDataLoader } from '../../components/DataLoader';
 import { passagesState } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
 import { consultationsState } from '../../recoil/consultations';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 
-const getDataForPeriod = (data, { startDate, endDate }, currentTeam, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
+const getDataForPeriod = (data, { startDate, endDate }, selectedTeams, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
   if (!startDate || !endDate) {
     return data;
   }
-  const offsetHours = !!viewAllOrganisationData ? 0 : currentTeam?.nightSession ? 12 : 0;
+  const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
 
   return data.filter((item) =>
     getIsDayWithinHoursOffsetOfPeriod(item[field] || item.createdAt, { referenceStartDay: startDate, referenceEndDay: endDate }, offsetHours)
@@ -64,60 +65,52 @@ const Stats = () => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const territories = useRecoilValue(territoriesState);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-  const loading = useRecoilValue(loadingState);
+  const { isLoading } = useDataLoader({ refreshOnMount: true });
   const [territory, setTerritory] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
   const [actionsStatuses, setActionsStatuses] = useState(DONE);
+  const [selectedTeams, setSelectedTeams] = useState([currentTeam]);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
-  useRefreshOnMount();
 
   const addFilter = ({ field, value }) => {
     setFilterPersons((filters) => [...filters, { field, value }]);
   };
 
-  const persons = getDataForPeriod(
-    allPersons.filter((e) => viewAllOrganisationData || (e.assignedTeams || []).includes(currentTeam._id)),
-    period,
-    currentTeam,
-    viewAllOrganisationData,
-    { filters: filterPersons, field: 'followedSince' }
-  );
+  const filterByTeam = (elements, key) => {
+    return elements.filter((e) => viewAllOrganisationData || selectedTeams.some((f) => (e[key] || []).includes(f._id)));
+  };
+
+  const persons = getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, selectedTeams, viewAllOrganisationData, {
+    filters: filterPersons,
+    field: 'followedSince',
+  });
 
   const personsForStats = filterPersons.find((f) => f.field === 'outOfActiveList' && f.value === 'Oui')
     ? persons.filter((p) => p.outOfActiveList)
     : persons.filter((p) => !p.outOfActiveList);
 
-  const actions = getDataForPeriod(
-    allActions.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
-    period,
-    currentTeam,
-    viewAllOrganisationData
-  );
-  const consultations = getDataForPeriod(allConsultations, period, currentTeam, true);
+  const actions = getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData);
+  const consultations = getDataForPeriod(allConsultations, period, selectedTeams, true);
   const observations = getDataForPeriod(
-    allObservations
-      .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
-      .filter((e) => !territory?._id || e.territory === territory._id),
+    filterByTeam(allObservations, 'team').filter((e) => !territory?._id || e.territory === territory._id),
     period,
-    currentTeam,
+    selectedTeams,
     viewAllOrganisationData,
     { field: 'observedAt' }
   );
   const passages = getDataForPeriod(
-    allPassages
-      .filter((e) => viewAllOrganisationData || e.team === currentTeam._id)
+    filterByTeam(allPassages, 'team')
       .map((p) => ({ ...p, type: !!p.person ? 'Non-anonyme' : 'Anonyme' }))
       .map((passage) => ({
         ...passage,
         gender: !passage.person ? null : allPersons.find((person) => person._id === passage.person)?.gender || 'Non renseigné',
       })),
     period,
-    currentTeam,
+    selectedTeams,
     viewAllOrganisationData,
     { field: 'date' }
   );
@@ -147,13 +140,7 @@ const Stats = () => {
     [passages, allPersons]
   );
 
-  const reports = getDataForPeriod(
-    allreports.filter((e) => viewAllOrganisationData || e.team === currentTeam._id),
-    period,
-    currentTeam,
-    viewAllOrganisationData,
-    { field: 'date' }
-  );
+  const reports = getDataForPeriod(filterByTeam(allreports, 'team'), period, selectedTeams, viewAllOrganisationData, { field: 'date' });
 
   const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
 
@@ -164,53 +151,45 @@ const Stats = () => {
     ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
   ];
 
-  if (loading) return <Loading />;
+  if (isLoading) return <Loading />;
 
   return (
     <>
-      <SmallHeader
-        title={
-          <span>
-            Statistiques{' '}
-            {viewAllOrganisationData ? (
-              <>
-                <b>globales</b> de <b>{organisation.name}</b>
-              </>
-            ) : (
-              <>
-                de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
-                <b>{currentTeam?.name || ''}</b>
-              </>
+      <HeaderStyled style={{ padding: '16px 0' }}>
+        <div style={{ display: 'flex', flexGrow: '1' }}>
+          <HeaderTitle style={{ fontWeight: '400', width: '260px' }}>
+            <span>Statistiques {viewAllOrganisationData ? <>globales</> : <>{selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"}</>}</span>
+          </HeaderTitle>
+          <div style={{ marginLeft: '1rem' }}>
+            <SelectTeamMultiple
+              onChange={(teamsId) => {
+                setSelectedTeams(teams.filter((t) => teamsId.includes(t._id)));
+              }}
+              value={selectedTeams.map((e) => e?._id)}
+              colored
+              isDisabled={viewAllOrganisationData}
+            />
+            {teams.length > 1 && (
+              <label htmlFor="viewAllOrganisationData" style={{ fontSize: '14px' }}>
+                <input
+                  id="viewAllOrganisationData"
+                  type="checkbox"
+                  style={{ marginRight: '0.5rem' }}
+                  onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                />
+                Statistiques de toute l'organisation
+              </label>
             )}
-          </span>
-        }
-        onRefresh={() => {
-          setRefreshTrigger({
-            status: true,
-            options: { initialLoad: false, showFullScreen: false },
-          });
-        }}
-        loading={!!loading}
-      />
+          </div>
+        </div>
+      </HeaderStyled>
       <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
         <Col md={4} style={{ flexShrink: 0, minWidth: '15rem', padding: 0 }}>
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
         </Col>
-        <Col md={4} style={{ flexShrink: 0 }}>
-          {teams.length > 1 && (
-            <label htmlFor="viewAllOrganisationData">
-              <input
-                id="viewAllOrganisationData"
-                type="checkbox"
-                style={{ marginRight: '1rem' }}
-                onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
-              />
-              Statistiques de toute l'organisation
-            </label>
-          )}
-        </Col>
         {['admin'].includes(user.role) && (
-          <Col md={4} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <Col md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+            <RefreshButton />
             <ExportData />
           </Col>
         )}
@@ -245,18 +224,16 @@ const Stats = () => {
             <Row>
               <Block data={passages.length} title="Nombre de passages" />
             </Row>
-            <Row>
-              <CustomResponsivePie
-                title="Services"
-                data={organisation.services?.map((service) => {
-                  return {
-                    id: service,
-                    label: service,
-                    value: reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0),
-                  };
-                })}
-              />
-            </Row>
+            <CustomResponsivePie
+              title="Services"
+              data={organisation.services?.map((service) => {
+                return {
+                  id: service,
+                  label: service,
+                  value: reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0),
+                };
+              })}
+            />
           </TabPane>
         )}
         <TabPane tabId={2}>
@@ -379,29 +356,27 @@ const Stats = () => {
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des passages</Title>
-          <Row>
-            <CustomResponsivePie title="Nombre de passages" data={getPieData(passages, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
-            <CustomResponsivePie
-              title="Répartition des passages non-anonymes"
-              data={getPieData(
-                passages.filter((p) => !!p.gender),
-                'gender',
-                { options: [...genderOptions, 'Non précisé'] }
-              )}
-            />
-            <CustomResponsivePie
-              title="Nombre de personnes différentes passées (passages anonymes exclus)"
-              data={getPieData(personsInPassagesOfPeriod, 'gender', { options: [...genderOptions, 'Non précisé'] })}
-            />
-            <CustomResponsivePie
-              title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
-              data={getPieData(
-                personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
-                'gender',
-                { options: [...genderOptions, 'Non précisé'] }
-              )}
-            />
-          </Row>
+          <CustomResponsivePie title="Nombre de passages" data={getPieData(passages, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
+          <CustomResponsivePie
+            title="Répartition des passages non-anonymes"
+            data={getPieData(
+              passages.filter((p) => !!p.gender),
+              'gender',
+              { options: [...genderOptions, 'Non précisé'] }
+            )}
+          />
+          <CustomResponsivePie
+            title="Nombre de personnes différentes passées (passages anonymes exclus)"
+            data={getPieData(personsInPassagesOfPeriod, 'gender', { options: [...genderOptions, 'Non précisé'] })}
+          />
+          <CustomResponsivePie
+            title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
+            data={getPieData(
+              personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
+              'gender',
+              { options: [...genderOptions, 'Non précisé'] }
+            )}
+          />
         </TabPane>
         <TabPane tabId={5}>
           <Title>Statistiques des observations de territoire</Title>
@@ -444,7 +419,7 @@ const Stats = () => {
             {organisation.consultations.map((c) => {
               return (
                 <div key={c.name}>
-                  <h4 style={{ color: '#444', fontSize: '16px' }}>Statistiques des consultations de type « {c.name} »</h4>
+                  <h4 style={{ color: '#444', fontSize: '20px', margin: '2rem 0' }}>Statistiques des consultations de type « {c.name} »</h4>
                   <CustomFieldsStats data={consultations.filter((d) => d.type === c.name)} customFields={c.fields} />
                 </div>
               );
@@ -698,40 +673,52 @@ const BlockTotal = ({ title, unit, data, field }) => {
 };
 
 function CustomFieldsStats({ customFields, data }) {
+  function getColsSize(totalCols) {
+    if (totalCols === 1) return 12;
+    if (totalCols === 2) return 6;
+    if (totalCols % 4 === 0) return 3;
+    return 4;
+  }
+  const customFieldsNumber = customFields
+    .filter((f) => f)
+    .filter((f) => f.enabled)
+    .filter((f) => f.showInStats)
+    .filter((field) => ['number'].includes(field.type));
+  const customFieldsDate = customFields
+    .filter((f) => f)
+    .filter((f) => f.enabled)
+    .filter((f) => f.showInStats)
+    .filter((field) => ['date', 'date-with-time'].includes(field.type));
+  const customFieldsResponsivePie = customFields
+    .filter((f) => f)
+    .filter((f) => f.enabled)
+    .filter((f) => f.showInStats)
+    .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
+  const totalCols = customFieldsNumber.length + customFieldsDate.length;
+  const colSize = getColsSize(totalCols);
   return (
     <>
-      {customFields
-        .filter((f) => f)
-        .filter((f) => f.enabled)
-        .filter((f) => f.showInStats)
-        .filter((field) => ['number'].includes(field.type))
-        .map((field) => (
-          <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-            <BlockTotal title={field.label} data={data} field={field.name} />
-          </Col>
-        ))}
-      {customFields
-        .filter((f) => f)
-        .filter((f) => f.enabled)
-        .filter((f) => f.showInStats)
-        .filter((field) => ['date', 'date-with-time'].includes(field.type))
-        .map((field) => (
-          <Col md={3} style={{ marginBottom: '20px' }} key={field.name}>
-            <BlockDateWithTime data={data} field={field} />
-          </Col>
-        ))}
-      {customFields
-        .filter((f) => f)
-        .filter((f) => f.enabled)
-        .filter((f) => f.showInStats)
-        .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type))
-        .map((field) => (
-          <CustomResponsivePie
-            title={field.label}
-            key={field.name}
-            data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
-          />
-        ))}
+      {totalCols > 0 && (
+        <Row>
+          {customFieldsNumber.map((field) => (
+            <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
+              <BlockTotal title={field.label} data={data} field={field.name} />
+            </Col>
+          ))}
+          {customFieldsDate.map((field) => (
+            <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
+              <BlockDateWithTime data={data} field={field} />
+            </Col>
+          ))}
+        </Row>
+      )}
+      {customFieldsResponsivePie.map((field) => (
+        <CustomResponsivePie
+          title={field.label}
+          key={field.name}
+          data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
+        />
+      ))}
     </>
   );
 }

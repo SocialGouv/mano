@@ -41,7 +41,6 @@ import PersonName from '../../components/PersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import IncrementorSmall from '../../components/IncrementorSmall';
-import { refreshTriggerState } from '../../components/Loader';
 import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
 import Passage from '../../components/Passage';
@@ -51,6 +50,7 @@ import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
+import { useDataLoader } from '../../components/DataLoader';
 
 const tabs = [
   'Résumé',
@@ -79,8 +79,6 @@ const View = () => {
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
-  const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
-
   const setReports = useSetRecoilState(reportsState);
   const location = useLocation();
   const history = useHistory();
@@ -88,6 +86,7 @@ const View = () => {
   const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (['restricted-access'].includes(user.role) ? 1 : 0)));
   const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? [...tabs, ...healthcareTabs] : tabs);
   const API = useApi();
+  const { refresh, isLoading } = useDataLoader();
 
   const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
 
@@ -196,17 +195,7 @@ const View = () => {
                 {!['restricted-access'].includes(user.role) && <BackButtonWrapper caption="Supprimer" onClick={deleteData} />}
               </div>
               <div style={{ display: 'flex' }}>
-                <ButtonCustom
-                  color="link"
-                  className="noprint"
-                  title="Rafraichir"
-                  onClick={() =>
-                    setRefreshTrigger({
-                      status: true,
-                      options: { initialLoad: false, showFullScreen: false },
-                    })
-                  }
-                />
+                <ButtonCustom color="link" className="noprint" title="Rafraichir" onClick={() => refresh()} disabled={isLoading} />
                 <ButtonCustom
                   color="link"
                   className="noprint"
