@@ -123,7 +123,8 @@ export async function useSuperAdminAndOrga() {
       "lastChangePasswordAt",
       "forgotPasswordResetExpires",
       "forgotPasswordResetToken",
-      "termsAccepted"
+      "termsAccepted",
+      "healthcareProfessional"
     ) VALUES (
       $1,
       'Super Admin',
@@ -137,7 +138,8 @@ export async function useSuperAdminAndOrga() {
       $5::date,
       null,
       null,
-      $4
+      $4,
+      true
     );`,
     [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
   );
