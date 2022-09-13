@@ -261,6 +261,14 @@ const EncryptionKey = ({ isMain }) => {
     </ModalBody>
   );
 
+  if (organisation.encryptionEnabled && !user.healthcareProfessional)
+    return (
+      <em>
+        Vous ne pouvez pas changer la clé de chiffrement car vous n'êtes pas déclaré comme adminstrateur de type professionel de santé. Il est
+        nécessaire d'avoir accès à l'ensemble des données de l'organisation pour pouvoir changer son chiffrement.
+      </em>
+    );
+
   return (
     <>
       <ButtonCustom
