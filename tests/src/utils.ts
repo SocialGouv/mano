@@ -204,7 +204,7 @@ export async function useEncryptedOrga() {
       "lastChangePasswordAt",
       "forgotPasswordResetExpires",
       "forgotPasswordResetToken",
-      "termsAccepted"
+      "termsAccepted",
       "healthcareProfessional"
     ) VALUES (
       $1,
