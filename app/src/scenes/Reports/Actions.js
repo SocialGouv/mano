@@ -45,7 +45,7 @@ const Actions = ({ route, navigation }) => {
   const onPseudoPress = useCallback(
     (person) => {
       Sentry.setContext('person', { _id: person._id });
-      navigation.push('Person', { ...person, fromRoute: 'ActionsList' });
+      navigation.push('Person', { person, fromRoute: 'ActionsList' });
     },
     [navigation]
   );

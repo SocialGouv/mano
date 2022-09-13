@@ -25,9 +25,9 @@ const castToTerritory = (territory = {}) => ({
 
 const Territory = ({ route, navigation }) => {
   const [territories, setTerritories] = useRecoilState(territoriesState);
-  const territoryDB = useMemo(() => territories.find((territory) => territory._id === route.params?._id), [route.params?._id, territories]);
+  const [territoryDB, setTerritoryDB] = useState(() => territories.find((territory) => territory._id === route.params?.territory?._id));
 
-  const [territory, setTerritory] = useState(castToTerritory(route?.params));
+  const [territory, setTerritory] = useState(castToTerritory(route?.params?.territory));
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territoryObservations = useMemo(() => {
     return allTerritoryOservations
@@ -40,7 +40,7 @@ const Territory = ({ route, navigation }) => {
 
   const onBack = () => {
     backRequestHandledRef.current = true;
-    navigation.navigate(route.params.fromRoute);
+    navigation.goBack();
   };
 
   const backRequestHandledRef = useRef(null);
@@ -78,6 +78,7 @@ const Territory = ({ route, navigation }) => {
           return a;
         })
       );
+      setTerritoryDB(response.decryptedData);
       Alert.alert('Territoire mis à jour !');
       setUpdating(false);
       setEditable(false);
@@ -109,8 +110,8 @@ const Territory = ({ route, navigation }) => {
 
   const onNewObservation = () => navigation.navigate('TerritoryObservation', { territory: territoryDB, editable: true });
 
-  const onUpdateObservation = (observation) => {
-    navigation.navigate('TerritoryObservation', { ...observation, territory: territoryDB, editable: true });
+  const onUpdateObservation = (obs) => {
+    navigation.navigate('TerritoryObservation', { obs, territory: territoryDB, editable: true });
   };
 
   const onGoBackRequested = () => {

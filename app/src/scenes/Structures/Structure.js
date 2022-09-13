@@ -38,7 +38,10 @@ const castToStructure = (structure = {}) => ({
 
 const Structure = ({ navigation, route }) => {
   const [structures, setStructures] = useRecoilState(structuresState);
-  const structureDB = useMemo(() => structures.find((s) => s._id === route.params?._id), [route.params?._id, structures]);
+  const [structureDB, setStructureDB] = useMemo(
+    () => structures.find((s) => s._id === route.params?.structure?._id),
+    [route.params?.structure?._id, structures]
+  );
 
   const [structure, setStructure] = useState(() => castToStructure(route?.params));
   const [updating, setUpdating] = useState(false);
@@ -47,7 +50,7 @@ const Structure = ({ navigation, route }) => {
 
   const onBack = () => {
     backRequestHandledRef.current = true;
-    navigation.navigate(route.params.fromRoute);
+    navigation.goBack();
   };
 
   const backRequestHandledRef = useRef(null);

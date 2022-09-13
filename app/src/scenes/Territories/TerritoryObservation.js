@@ -25,7 +25,7 @@ const TerritoryObservation = ({ route, navigation }) => {
   const organisation = useRecoilValue(organisationState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
-  const obsDB = useMemo(() => allTerritoryOservations.find((obs) => obs._id === route.params?._id), [allTerritoryOservations, route.params?._id]);
+  const [obsDB, setObsDB] = useState(() => allTerritoryOservations.find((obs) => obs._id === route.params?.obs?._id) || {});
 
   const castToTerritoryObservation = useCallback(
     (territoryObservation = {}) => {
@@ -45,7 +45,7 @@ const TerritoryObservation = ({ route, navigation }) => {
 
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
-  const [obs, setObs] = useState(castToTerritoryObservation(route.params));
+  const [obs, setObs] = useState(castToTerritoryObservation(route.params.obs));
   const onChange = (newProps) => setObs((o) => ({ ...o, ...newProps }));
 
   const onBack = () => {
@@ -99,6 +99,7 @@ const TerritoryObservation = ({ route, navigation }) => {
       Alert.alert('Nouvelle observation créée !');
       setObs(castToTerritoryObservation(response.decryptedData));
       setTerritoryObservations((territoryObservations) => [response.decryptedData, ...territoryObservations]);
+      setObsDB(response.decryptedData);
       setUpdating(false);
       setEditable(false);
       return onBack();
@@ -132,6 +133,7 @@ const TerritoryObservation = ({ route, navigation }) => {
           return a;
         })
       );
+      setObsDB(response.decryptedData);
       Alert.alert('Observation mise à jour !');
       setUpdating(false);
       setEditable(false);

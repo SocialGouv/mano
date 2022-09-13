@@ -32,19 +32,12 @@ const Structures = ({ navigation }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const onCreateStructureRequest = () => navigation.navigate('NewStructureForm', { fromRoute: 'StructuresList' });
+  const onCreateStructureRequest = () => navigation.navigate('NewStructureForm');
 
   const keyExtractor = (structure) => structure._id;
   const renderRow = ({ item: structure }) => {
     const { name } = structure;
-    return (
-      <Row
-        withNextButton
-        onPress={() => navigation.push('Structure', { ...structure, fromRoute: 'StructuresList' })}
-        Icon={PersonIcon}
-        caption={name}
-      />
-    );
+    return <Row withNextButton onPress={() => navigation.push('Structure', { structure })} Icon={PersonIcon} caption={name} />;
   };
   return (
     <SceneContainer>
