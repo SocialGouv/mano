@@ -1,3 +1,10 @@
+## [1.148.4](https://github.com/SocialGouv/mano/compare/v1.148.3...v1.148.4) (2022-09-13)
+
+
+### Bug Fixes
+
+* **dashboard:** allow encrypt to healthcareProfessional only ([#862](https://github.com/SocialGouv/mano/issues/862)) ([18fedce](https://github.com/SocialGouv/mano/commit/18fedce777a2a426351ed837fb47ee74cadfe862))
+
 ## [1.148.3](https://github.com/SocialGouv/mano/compare/v1.148.2...v1.148.3) (2022-09-12)
 
 
