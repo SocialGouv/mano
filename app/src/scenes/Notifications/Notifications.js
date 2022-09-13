@@ -82,7 +82,7 @@ const Notifications = ({ navigation }) => {
   const onPseudoPress = useCallback(
     (person) => {
       Sentry.setContext('person', { _id: person._id });
-      navigation.navigate('Persons', { screen: 'Person', params: { ...person, fromRoute: 'Notifications' } });
+      navigation.navigate('Persons', { screen: 'Person', params: { person, fromRoute: 'Notifications' } });
     },
     [navigation]
   );

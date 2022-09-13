@@ -25,7 +25,7 @@ const Comments = ({ navigation, route }) => {
   const onPseudoPress = useCallback(
     (person) => {
       Sentry.setContext('person', { _id: person._id });
-      navigation.navigate('Person', { ...person, fromRoute: 'Comments' });
+      navigation.navigate('Person', { person, fromRoute: 'Comments' });
     },
     [navigation]
   );
