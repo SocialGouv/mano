@@ -38,12 +38,12 @@ const castToStructure = (structure = {}) => ({
 
 const Structure = ({ navigation, route }) => {
   const [structures, setStructures] = useRecoilState(structuresState);
-  const [structureDB, setStructureDB] = useMemo(
+  const [structureDB, setStructureDB] = useState(
     () => structures.find((s) => s._id === route.params?.structure?._id),
     [route.params?.structure?._id, structures]
   );
 
-  const [structure, setStructure] = useState(() => castToStructure(route?.params));
+  const [structure, setStructure] = useState(() => castToStructure(route?.params?.structure));
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route.params?.editable || false);
   const [cagetoriesUpdated, setCagetoriesUpdated] = useState(false);
@@ -121,6 +121,7 @@ const Structure = ({ navigation, route }) => {
           return s;
         })
       );
+      setStructureDB(response.data);
       setUpdating(false);
       setEditable(false);
       return true;
