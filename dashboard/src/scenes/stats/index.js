@@ -66,6 +66,7 @@ const Stats = () => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const territories = useRecoilValue(territoriesState);
   const { isLoading } = useDataLoader({ refreshOnMount: true });
+
   const [territory, setTerritory] = useState(null);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);

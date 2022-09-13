@@ -70,11 +70,19 @@ export default function DataLoader() {
   const [progress, setProgress] = useState(null);
   const [total, setTotal] = useState(null);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(initLoader, [progress, total, loaderTrigger, loadList.list.length, isLoading]);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(fetchData, [loadList]);
-  useEffect(updateProgress, [progress, progressBuffer]);
+  useEffect(() => {
+    initLoader();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress, total, loaderTrigger, loadList.list.length, isLoading]);
+
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadList]);
+  useEffect(() => {
+    updateProgress();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [progress, progressBuffer, loadList.list.length]);
 
   const organisationId = organisation?._id;
 
@@ -165,120 +173,118 @@ export default function DataLoader() {
   }
 
   // Fetch data from API, handle loader progress.
-  function fetchData() {
-    (async () => {
-      if (loadList.list.length === 0) return;
+  async function fetchData() {
+    if (loadList.list.length === 0) return;
 
-      const [current] = loadList.list;
-      const query = {
-        organisation: organisationId,
-        limit: String(1000),
-        page: String(loadList.offset),
-        after: lastLoad,
-        withDeleted: Boolean(lastLoad),
-      };
+    const [current] = loadList.list;
+    const query = {
+      organisation: organisationId,
+      limit: String(1000),
+      page: String(loadList.offset),
+      after: lastLoad,
+      withDeleted: Boolean(lastLoad),
+    };
 
-      function handleMore(hasMore) {
-        if (hasMore) setLoadList({ list: loadList.list, offset: loadList.offset + 1 });
-        else setLoadList({ list: loadList.list.slice(1), offset: 0 });
-      }
+    function handleMore(hasMore) {
+      if (hasMore) setLoadList({ list: loadList.list, offset: loadList.offset + 1 });
+      else setLoadList({ list: loadList.list.slice(1), offset: 0 });
+    }
 
-      if (current === 'person') {
-        setLoadingText('Chargement des personnes');
-        const res = await API.get({ path: '/person', query });
-        setPersons(
-          res.hasMore
-            ? mergeItems(persons, res.decryptedData)
-            : mergeItems(persons, res.decryptedData)
-                .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
-                .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
-        );
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'consultation') {
-        setLoadingText('Chargement des consultations');
-        const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastLoad } });
-        setConsultations(
-          res.hasMore
-            ? mergeItems(consultations, res.decryptedData)
-            : mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user))
-        );
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'treatment') {
-        setLoadingText('Chargement des traitements');
-        const res = await API.get({ path: '/treatment', query: { ...query, after: initialLoad ? 0 : lastLoad } });
-        setTreatments(mergeItems(treatments, res.decryptedData));
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'medicalFile') {
-        setLoadingText('Chargement des fichiers médicaux');
-        const res = await API.get({ path: '/medical-file', query: { ...query, after: initialLoad ? 0 : lastLoad } });
-        setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'report') {
-        setLoadingText('Chargement des rapports');
-        const res = await API.get({ path: '/report', query });
-        setReports(
-          res.hasMore
-            ? mergeItems(reports, res.decryptedData)
-            : mergeItems(reports, res.decryptedData)
-                // This line should be removed when `clean-reports-with-no-team-nor-date` migration has run on all organisations.
-                .filter((r) => !!r.team && !!r.date)
-                .sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
-        );
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'passage') {
-        setLoadingText('Chargement des passages');
-        const res = await API.get({ path: '/passage', query });
-        setPassages(
-          res.hasMore
-            ? mergeItems(passages, res.decryptedData)
-            : mergeItems(passages, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
-        );
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'action') {
-        setFullScreen(false);
-        setLoadingText('Chargement des actions');
-        const res = await API.get({ path: '/action', query });
-        setActions(mergeItems(actions, res.decryptedData));
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'territory') {
-        setLoadingText('Chargement des territoires');
-        const res = await API.get({ path: '/territory', query });
-        setTerritories(mergeItems(territories, res.decryptedData));
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'place') {
-        setLoadingText('Chargement des lieux');
-        const res = await API.get({ path: '/place', query });
-        setPlaces(mergeItems(places, res.decryptedData));
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'relsPersonPlace') {
-        setLoadingText('Chargement des relations personne-lieu');
-        const res = await API.get({ path: '/relPersonPlace', query });
-        setRelsPersonPlace(mergeItems(relsPersonPlace, res.decryptedData));
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'territoryObservation') {
-        setLoadingText('Chargement des observations de territoire');
-        const res = await API.get({ path: '/territory-observation', query });
-        setTerritoryObservations(mergeItems(territoryObservations, res.decryptedData));
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      } else if (current === 'comment') {
-        setLoadingText('Chargement des commentaires');
-        const res = await API.get({ path: '/comment', query });
-        setComments(mergeItems(comments, res.decryptedData));
-        handleMore(res.hasMore);
-        setProgressBuffer(res.data.length);
-      }
-    })();
+    if (current === 'person') {
+      setLoadingText('Chargement des personnes');
+      const res = await API.get({ path: '/person', query });
+      setPersons(
+        res.hasMore
+          ? mergeItems(persons, res.decryptedData)
+          : mergeItems(persons, res.decryptedData)
+              .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
+              .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
+      );
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'consultation') {
+      setLoadingText('Chargement des consultations');
+      const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastLoad } });
+      setConsultations(
+        res.hasMore
+          ? mergeItems(consultations, res.decryptedData)
+          : mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user))
+      );
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'treatment') {
+      setLoadingText('Chargement des traitements');
+      const res = await API.get({ path: '/treatment', query: { ...query, after: initialLoad ? 0 : lastLoad } });
+      setTreatments(mergeItems(treatments, res.decryptedData));
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'medicalFile') {
+      setLoadingText('Chargement des fichiers médicaux');
+      const res = await API.get({ path: '/medical-file', query: { ...query, after: initialLoad ? 0 : lastLoad } });
+      setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'report') {
+      setLoadingText('Chargement des rapports');
+      const res = await API.get({ path: '/report', query });
+      setReports(
+        res.hasMore
+          ? mergeItems(reports, res.decryptedData)
+          : mergeItems(reports, res.decryptedData)
+              // This line should be removed when `clean-reports-with-no-team-nor-date` migration has run on all organisations.
+              .filter((r) => !!r.team && !!r.date)
+              .sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
+      );
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'passage') {
+      setLoadingText('Chargement des passages');
+      const res = await API.get({ path: '/passage', query });
+      setPassages(
+        res.hasMore
+          ? mergeItems(passages, res.decryptedData)
+          : mergeItems(passages, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
+      );
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'action') {
+      setFullScreen(false);
+      setLoadingText('Chargement des actions');
+      const res = await API.get({ path: '/action', query });
+      setActions(mergeItems(actions, res.decryptedData));
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'territory') {
+      setLoadingText('Chargement des territoires');
+      const res = await API.get({ path: '/territory', query });
+      setTerritories(mergeItems(territories, res.decryptedData));
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'place') {
+      setLoadingText('Chargement des lieux');
+      const res = await API.get({ path: '/place', query });
+      setPlaces(mergeItems(places, res.decryptedData));
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'relsPersonPlace') {
+      setLoadingText('Chargement des relations personne-lieu');
+      const res = await API.get({ path: '/relPersonPlace', query });
+      setRelsPersonPlace(mergeItems(relsPersonPlace, res.decryptedData));
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'territoryObservation') {
+      setLoadingText('Chargement des observations de territoire');
+      const res = await API.get({ path: '/territory-observation', query });
+      setTerritoryObservations(mergeItems(territoryObservations, res.decryptedData));
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'comment') {
+      setLoadingText('Chargement des commentaires');
+      const res = await API.get({ path: '/comment', query });
+      setComments(mergeItems(comments, res.decryptedData));
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    }
   }
 
   function startLoader(list, itemsCount) {
@@ -297,9 +303,11 @@ export default function DataLoader() {
   }
 
   function updateProgress() {
+    if (!loadList.list.length) return;
+
     if (progressBuffer !== null) {
-      setProgressBuffer(null);
       setProgress((progress || 0) + progressBuffer);
+      setProgressBuffer(null);
     }
   }
 

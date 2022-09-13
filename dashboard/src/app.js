@@ -115,15 +115,13 @@ export default function ContextedApp() {
   // https://github.com/facebookexperimental/Recoil/issues/758#issuecomment-737471220
   const [recoilKey, setRecoilKey] = useState(0);
   return (
-    <React.StrictMode>
-      <RecoilRoot key={recoilKey}>
-        <Provider store={store}>
-          <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
-          <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-          <DataLoader />
-          <ModalConfirm />
-        </Provider>
-      </RecoilRoot>
-    </React.StrictMode>
+    <RecoilRoot key={recoilKey}>
+      <Provider store={store}>
+        <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
+        <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
+        <DataLoader />
+        <ModalConfirm />
+      </Provider>
+    </RecoilRoot>
   );
 }
