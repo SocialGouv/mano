@@ -232,7 +232,7 @@ const TabNavigator = () => (
     />
     <Tab.Screen
       lazy
-      name="Menu"
+      name="MenuTab"
       component={MenuNavigator}
       options={{
         tabBarIcon: ({ size, color }) => <DotsIcon size={size} color={color} />,
