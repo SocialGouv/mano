@@ -75,6 +75,7 @@ const View = () => {
       </Title>
       <Formik
         initialValues={action}
+        enableReinitialize
         onSubmit={async (body) => {
           const statusChanged = body.status && action.status !== body.status;
           if (statusChanged) {

@@ -34,6 +34,7 @@ const View = () => {
       <SmallHeaderWithBackButton refreshButton />
       <Formik
         initialValues={territory}
+        enableReinitialize
         onSubmit={async (body) => {
           const res = await API.put({
             path: `/territory/${territory._id}`,

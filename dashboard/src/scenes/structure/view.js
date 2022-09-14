@@ -37,6 +37,7 @@ const View = () => {
       <SmallHeaderWithBackButton />
       <Formik
         initialValues={structure}
+        enableReinitialize
         onSubmit={async (body) => {
           const res = await API.put({ path: `/structure/${id}`, body });
           if (res.ok) toastr.success('Structure modifiée avec succès');
