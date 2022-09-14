@@ -1,3 +1,10 @@
+## [1.148.5](https://github.com/SocialGouv/mano/compare/v1.148.4...v1.148.5) (2022-09-14)
+
+
+### Bug Fixes
+
+* **deps:** update dependency uuid to v9 ([#857](https://github.com/SocialGouv/mano/issues/857)) ([f0dcb11](https://github.com/SocialGouv/mano/commit/f0dcb11b3affcdbdbbaddbd8e4adeba76c7a72dd))
+
 ## [1.148.4](https://github.com/SocialGouv/mano/compare/v1.148.3...v1.148.4) (2022-09-13)
 
 
