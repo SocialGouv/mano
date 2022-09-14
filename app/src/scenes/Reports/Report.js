@@ -1,10 +1,12 @@
 import { useIsFocused } from '@react-navigation/native';
+import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert } from 'react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import InputLabelled from '../../components/InputLabelled';
 import Label from '../../components/Label';
+import Loader from '../../components/Loader';
 import { MyText } from '../../components/MyText';
 import Row from '../../components/Row';
 import SceneContainer from '../../components/SceneContainer';
@@ -30,12 +32,28 @@ const Report = ({ navigation, route }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const [reports, setReports] = useRecoilState(reportsState);
 
-  const reportDB = useMemo(() => reports.find((r) => r._id === route.params._id), [reports, route.params._id]);
-  const [report, setReport] = useState(castToReport(route?.params));
+  const [day] = useState(() => route.params?.day);
+  const [reportDB, setReportDB] = useState(() => route.params?.report || {});
+  const [report, setReport] = useState(() => castToReport(reportDB));
 
   const isFocused = useIsFocused();
   useEffect(() => {
-    if (isFocused) setReport(castToReport(reportDB)); // to update collaborations
+    if (isFocused) {
+      if (!route.params?.report) {
+        (async () => {
+          const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: day }) });
+          const newReport = res.decryptedData;
+          setReports((reports) => [newReport, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+          setReportDB(newReport);
+          setReport(castToReport(newReport));
+        })();
+      } else {
+        // to update collaborations
+        const freshReport = reports.find((r) => r._id === reportDB._id);
+        setReportDB(freshReport);
+        setReport(castToReport(freshReport));
+      }
+    }
   }, [isFocused, reportDB]);
 
   const actionsCreated = useRecoilValue(actionsCreatedForReport({ date: reportDB.date }));
@@ -79,12 +97,14 @@ const Report = ({ navigation, route }) => {
       return false;
     }
     if (response.ok) {
-      setReports((territories) =>
-        territories.map((a) => {
+      setReports((reports) =>
+        reports.map((a) => {
           if (a._id === reportDB._id) return response.decryptedData;
           return a;
         })
       );
+      setReportDB(response.decryptedData);
+      setReport(castToReport(response.decryptedData));
       Alert.alert('Compte-rendu mis à jour !');
       setUpdating(false);
       setEditable(false);
@@ -123,9 +143,27 @@ const Report = ({ navigation, route }) => {
   }, []);
 
   const title = useMemo(
-    () => `Compte rendu de l'équipe ${currentTeam?.name || ''}\n${getPeriodTitle(reportDB.date, currentTeam?.nightSession)}`,
-    [currentTeam?.name, currentTeam?.nightSession, reportDB.date]
+    () => `Compte rendu de l'équipe ${currentTeam?.name || ''}\n${getPeriodTitle(day, currentTeam?.nightSession)}`,
+    [currentTeam?.name, currentTeam?.nightSession, day]
   );
+
+  if (!report) {
+    return (
+      <SceneContainer>
+        <ScreenTitle
+          title={title}
+          onBack={onGoBackRequested}
+          onEdit={!editable ? onEdit : null}
+          onSave={!editable || isUpdateDisabled ? null : onUpdateReport}
+          saving={updating}
+          testID="report"
+        />
+        <ScrollContainer noPadding>
+          <Loader />
+        </ScrollContainer>
+      </SceneContainer>
+    );
+  }
 
   return (
     <SceneContainer>

@@ -1,14 +1,13 @@
 import dayjs from 'dayjs';
 import React, { useCallback, useState } from 'react';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { selector, useRecoilState, useRecoilValue } from 'recoil';
 import { RefreshControl } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import ScrollContainer from '../../components/ScrollContainer';
 import { currentTeamState } from '../../recoil/auth';
-import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
-import API from '../../services/api';
+import { reportsState } from '../../recoil/reports';
 import colors from '../../utils/colors';
 import { refreshTriggerState } from '../../components/Loader';
 
@@ -53,6 +52,7 @@ export const mappedReportsToCalendarDaysSelector = selector({
           dotColor: '#000000',
         };
       }
+      dates[report.date].report = report;
     }
     return dates;
   },
@@ -60,8 +60,6 @@ export const mappedReportsToCalendarDaysSelector = selector({
 
 const ReportsCalendar = ({ navigation }) => {
   const dates = useRecoilValue(mappedReportsToCalendarDaysSelector);
-  const reports = useRecoilValue(currentTeamReportsSelector);
-  const setReports = useSetRecoilState(reportsState);
   const currentTeam = useRecoilValue(currentTeamState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const onRefresh = useCallback(() => {
@@ -74,17 +72,8 @@ const ReportsCalendar = ({ navigation }) => {
     if (submiting) return;
     setSubmiting(true);
     const day = dayjs(dateString).startOf('day').format('YYYY-MM-DD');
-    const report = reports.find((rep) => rep.date === day);
-    if (report) {
-      navigation.navigate('Report', { ...report });
-      setSubmiting(false);
-      return;
-    }
-    const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: day }) });
-    const newReport = res.decryptedData;
-    setReports((reports) => [newReport, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+    navigation.navigate('Report', { report: dates[day]?.report, day });
     setSubmiting(false);
-    navigation.navigate('Report', { ...newReport });
   };
 
   return (
