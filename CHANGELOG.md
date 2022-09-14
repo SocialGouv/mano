@@ -1,3 +1,10 @@
+## [1.148.6](https://github.com/SocialGouv/mano/compare/v1.148.5...v1.148.6) (2022-09-14)
+
+
+### Bug Fixes
+
+* **dashboard:** set enableReinitialize when necessary ([#871](https://github.com/SocialGouv/mano/issues/871)) ([fcf7a47](https://github.com/SocialGouv/mano/commit/fcf7a4763d87fe81eedd628bcb14b3d772654ae2))
+
 ## [1.148.5](https://github.com/SocialGouv/mano/compare/v1.148.4...v1.148.5) (2022-09-14)
 
 
