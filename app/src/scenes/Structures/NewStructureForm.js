@@ -18,7 +18,7 @@ const NewStructureForm = ({ navigation, route }) => {
 
   const onBack = () => {
     backRequestHandledRef.current = true;
-    navigation.navigate(route.params.fromRoute);
+    navigation.goBack();
   };
 
   const backRequestHandledRef = useRef(null);
@@ -50,9 +50,8 @@ const NewStructureForm = ({ navigation, route }) => {
     if (response.ok) {
       backRequestHandledRef.current = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
       setStructures((structures) => [...structures, response.data].sort(sortByName));
-      navigation.navigate('Structure', {
-        fromRoute: route.params.fromRoute,
-        ...response.data,
+      navigation.replace('Structure', {
+        structure: response.data,
         editable: true,
       });
       setTimeout(() => setPosting(false), 250);

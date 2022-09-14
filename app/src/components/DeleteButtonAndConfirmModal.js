@@ -17,7 +17,7 @@ const DeleteButtonAndConfirmModal = ({ children, title, onDelete, onBack, textTo
   const user = useRecoilValue(userState);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [textConfirmed, setTextConfirmed] = useState('');
-  const [deleting, setDeleting] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   const onDeleteRequest = () => {
     if (!['admin'].includes(user.role)) {

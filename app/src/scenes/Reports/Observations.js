@@ -24,11 +24,11 @@ const Observations = ({ navigation, route }) => {
   }, [setRefreshTrigger]);
 
   const onUpdatObs = useCallback(
-    (obs) => navigation.navigate('TerritoryObservation', { ...obs, territory: territories.find((t) => t._id === obs.territory), editable: true }),
+    (obs) => navigation.navigate('TerritoryObservation', { obs, territory: territories.find((t) => t._id === obs.territory), editable: true }),
     [navigation, territories]
   );
 
-  const onTerritoryPress = useCallback((territory) => navigation.navigate('Territory', { ...territory, fromRoute: 'Observations' }), [navigation]);
+  const onTerritoryPress = useCallback((territory) => navigation.push('Territory', { territory }), [navigation]);
 
   const renderItem = ({ item }) => {
     const obs = item;

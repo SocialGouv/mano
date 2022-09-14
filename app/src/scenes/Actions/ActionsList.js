@@ -35,10 +35,6 @@ const ActionsList = () => {
 
   const hasMore = useMemo(() => limit < total, [limit, total]);
 
-  useEffect(() => {
-    API.navigation = navigation;
-  }, [navigation]);
-
   const onRefresh = useCallback(async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   }, [setRefreshTrigger]);
@@ -55,7 +51,7 @@ const ActionsList = () => {
   const onPseudoPress = useCallback(
     (person) => {
       Sentry.setContext('person', { _id: person._id });
-      navigation.push('Person', { ...person, fromRoute: 'ActionsList' });
+      navigation.push('Person', { person, fromRoute: 'ActionsList' });
     },
     [navigation]
   );
@@ -64,7 +60,7 @@ const ActionsList = () => {
     (action) => {
       Sentry.setContext('action', { _id: action._id });
       navigation.push('Action', {
-        ...action,
+        action,
         fromRoute: 'ActionsList',
       });
     },

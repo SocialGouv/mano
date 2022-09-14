@@ -49,7 +49,7 @@ const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, o
           {(customFieldsPersonsMedical || [])
             .filter((f) => f)
             .filter((f) => f.enabled)
-            .filter((f) => !f.onlyHealthcareProfessional || user.healthcareProfessional)
+            .filter((f) => !f.onlyHealthcareProfessional || user?.healthcareProfessional)
             .map((field) => {
               const { label, name } = field;
               return (

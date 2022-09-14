@@ -42,7 +42,7 @@ const Person = ({ route, navigation }) => {
   const organisation = useRecoilValue(organisationState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
 
-  const personDB = useMemo(() => persons.find((p) => p._id === route.params?._id), [persons, route.params?._id]);
+  const [personDB, setPersonDB] = useState(() => persons.find((p) => p._id === route.params?.person?._id));
 
   const castToPerson = useCallback(
     (person = {}) => {
@@ -144,6 +144,7 @@ const Person = ({ route, navigation }) => {
       })
     );
     setPerson(castToPerson(newPerson));
+    setPersonDB(newPerson);
     const comment = commentForUpdatePerson({ newPerson, oldPerson });
     if (comment) {
       comment.user = user._id;
@@ -275,10 +276,9 @@ const Person = ({ route, navigation }) => {
               backgroundColor={!person?.outOfActiveList ? colors.app.backgroundColor : colors.app.colorBackgroundDarkGrey}
             />
           )}
-          lazy
           removeClippedSubviews={Platform.OS === 'android'}
-          swipeEnabled>
-          <TabNavigator.Screen name="Summary" options={{ tabBarLabel: 'Résumé' }}>
+          screenOptions={{ swipeEnabled: true }}>
+          <TabNavigator.Screen lazy name="Summary" options={{ tabBarLabel: 'Résumé' }}>
             {() => (
               <PersonSummary
                 navigation={navigation}
@@ -298,7 +298,7 @@ const Person = ({ route, navigation }) => {
               />
             )}
           </TabNavigator.Screen>
-          <TabNavigator.Screen name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
+          <TabNavigator.Screen lazy name="Folders" options={{ tabBarLabel: 'Dossiers' }}>
             {() => (
               <FoldersNavigator
                 navigation={navigation}

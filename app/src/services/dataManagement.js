@@ -1,6 +1,6 @@
 import API from '../services/api';
 import { MMKV } from 'react-native-mmkv';
-import AsyncStorage from '@react-native-community/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const mergeNewUpdatedData = (newData, oldData) => {
   const oldDataIds = oldData.map((p) => p._id);

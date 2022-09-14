@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
+import * as Sentry from '@sentry/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AgendaIcon, PersonIcon, TerritoryIcon } from './icons';
@@ -55,14 +56,15 @@ import Consultation from './scenes/Persons/Consultation';
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
   return (
-    <ActionsStack.Navigator headerMode="none" initialRouteName="ActionsList">
+    <ActionsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="ActionsList">
       <ActionsStack.Screen name="ActionsList" component={ActionsTabNavigator} />
       <ActionsStack.Screen name="Action" component={Action} />
       <ActionsStack.Screen name="NewActionForm" component={NewActionForm} />
+      <ActionsStack.Screen name="PersonsSearch" component={PersonsSearch} />
+      <ActionsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <ActionsStack.Screen name="ActionComment" component={Comment} />
 
       <ActionsStack.Screen name="Person" component={Person} />
-      <ActionsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <ActionsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
       <ActionsStack.Screen name="PersonPlace" component={Place} />
       <ActionsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
@@ -76,10 +78,9 @@ const ActionsNavigator = () => {
 const PersonsStack = createStackNavigator();
 const PersonsNavigator = () => {
   return (
-    <PersonsStack.Navigator headerMode="none" initialRouteName="PersonsList">
+    <PersonsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="PersonsList">
       <PersonsStack.Screen name="PersonsList" component={PersonsList} />
       <PersonsStack.Screen name="Person" component={Person} />
-      <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <PersonsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
       <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
@@ -92,6 +93,7 @@ const PersonsNavigator = () => {
 
       <PersonsStack.Screen name="Action" component={Action} />
       <PersonsStack.Screen name="NewActionForm" component={NewActionForm} />
+      <PersonsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <PersonsStack.Screen name="ActionComment" component={Comment} />
     </PersonsStack.Navigator>
   );
@@ -100,7 +102,7 @@ const PersonsNavigator = () => {
 const StructuresStack = createStackNavigator();
 const StructuresNavigator = () => {
   return (
-    <StructuresStack.Navigator headerMode="none" initialRouteName="StructuresList">
+    <StructuresStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="StructuresList">
       <StructuresStack.Screen name="StructuresList" component={StructuresList} />
       <StructuresStack.Screen name="NewStructureForm" component={NewStructureForm} />
       <StructuresStack.Screen name="Structure" component={Structure} />
@@ -111,7 +113,7 @@ const StructuresNavigator = () => {
 const TerritoriesStack = createStackNavigator();
 const TerritoriesNavigator = () => {
   return (
-    <TerritoriesStack.Navigator headerMode="none" initialRouteName="TerritoriesList" screenOptions={{ gestureEnabled: false }}>
+    <TerritoriesStack.Navigator screenOptions={{ headerShown: false, gestureEnabled: false }} initialRouteName="TerritoriesList">
       <TerritoriesStack.Screen name="TerritoriesList" component={TerritoriesList} />
       <TerritoriesStack.Screen name="NewTerritoryForm" component={NewTerritoryForm} />
       <TerritoriesStack.Screen name="Territory" component={Territory} />
@@ -123,8 +125,8 @@ const TerritoriesNavigator = () => {
 const NotificationsStack = createStackNavigator();
 const NotificationsNavigator = () => {
   return (
-    <NotificationsStack.Navigator headerMode="none" initialRouteName="Notifications">
-      <NotificationsStack.Screen name="Notifications" component={Notifications} />
+    <NotificationsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Notifications">
+      <NotificationsStack.Screen name="NotificationsList" component={Notifications} />
       <NotificationsStack.Screen name="ActionComment" component={Comment} />
       <NotificationsStack.Screen name="PersonComment" component={Comment} />
     </NotificationsStack.Navigator>
@@ -134,17 +136,18 @@ const NotificationsNavigator = () => {
 const ReportsStack = createStackNavigator();
 const ReportsNavigator = () => {
   return (
-    <ReportsStack.Navigator headerMode="none" initialRouteName="ReportsCalendar">
+    <ReportsStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="ReportsCalendar">
       <ReportsStack.Screen name="ReportsCalendar" component={ReportsCalendar} />
       <ReportsStack.Screen name="Report" component={Report} />
       <ReportsStack.Screen name="Collaborations" component={Collaborations} />
 
       <ReportsStack.Screen name="Action" component={Action} />
       <ReportsStack.Screen name="NewActionForm" component={NewActionForm} />
+      <ReportsStack.Screen name="PersonsSearch" component={PersonsSearch} />
+      <ActionsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <ReportsStack.Screen name="ActionComment" component={Comment} />
 
       <ReportsStack.Screen name="Person" component={Person} />
-      <ReportsStack.Screen name="PersonsSearch" component={PersonsSearch} />
       <ReportsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
       <ReportsStack.Screen name="PersonPlace" component={Place} />
       <ReportsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
@@ -163,7 +166,7 @@ const ReportsNavigator = () => {
 const MenuStack = createStackNavigator();
 const MenuNavigator = () => {
   return (
-    <MenuStack.Navigator headerMode="none" initialRouteName="Menu">
+    <MenuStack.Navigator screenOptions={{ headerShown: false }} initialRouteName="Menu">
       <MenuStack.Screen name="Menu" component={Menu} />
       <MenuStack.Screen name="Reports" component={ReportsNavigator} />
       <MenuStack.Screen name="Structures" component={StructuresNavigator} />
@@ -180,16 +183,15 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigator = () => (
   <Tab.Navigator
-    lazy
     initialRouteName="Agenda"
-    tabBarOptions={{
-      activeTintColor: colors.app.color,
-      inactiveTintColor: '#aaa',
-    }}
     screenOptions={{
       gestureEnabled: false,
+      headerShown: false,
+      tabBarActiveTintColor: colors.app.color,
+      tabBarnactiveTintColor: '#aaa',
     }}>
     <Tab.Screen
+      lazy
       name="Agenda"
       component={ActionsNavigator}
       options={{
@@ -199,6 +201,7 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
+      lazy
       name="Territories"
       component={TerritoriesNavigator}
       options={{
@@ -208,6 +211,7 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
+      lazy
       name="Persons"
       component={PersonsNavigator}
       options={{
@@ -217,6 +221,7 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
+      lazy
       name="Notifications"
       component={NotificationsNavigator}
       options={{
@@ -226,7 +231,8 @@ const TabNavigator = () => (
       }}
     />
     <Tab.Screen
-      name="Menu"
+      lazy
+      name="MenuTab"
       component={MenuNavigator}
       options={{
         tabBarIcon: ({ size, color }) => <DotsIcon size={size} color={color} />,
@@ -239,7 +245,7 @@ const TabNavigator = () => (
 
 const LoginStack = createStackNavigator();
 const LoginNavigator = () => (
-  <LoginStack.Navigator initialRouteName="Login" headerMode="none">
+  <LoginStack.Navigator initialRouteName="Login" screenOptions={{ headerShown: false }}>
     <LoginStack.Screen name="Login" component={Login} />
     <LoginStack.Screen name="TeamSelection" component={TeamSelection} />
     <LoginStack.Screen name="CharteAcceptance" component={CharteAcceptance} />
@@ -253,6 +259,8 @@ const AppStack = createStackNavigator();
 const App = () => {
   const appState = useRef(AppState.currentState);
   const appStateListener = useRef(null);
+  const navigationRef = useNavigationContainerRef();
+
   useEffect(() => {
     logEvents.initLogEvents().then(() => {
       logEvents.logAppVisit();
@@ -275,8 +283,12 @@ const App = () => {
   return (
     <RecoilRoot>
       <ActionSheetProvider>
-        <NavigationContainer>
-          <AppStack.Navigator headerMode="none" initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false }}>
+        <NavigationContainer
+          ref={navigationRef}
+          onReady={() => {
+            API.navigation = navigationRef;
+          }}>
+          <AppStack.Navigator initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false, headerShown: false }}>
             <AppStack.Screen name="LoginStack" component={LoginNavigator} />
             <AppStack.Screen name="Home" component={TabNavigator} />
           </AppStack.Navigator>
@@ -288,4 +300,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default Sentry.wrap(App);

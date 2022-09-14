@@ -17,7 +17,7 @@ const NewTerritoryForm = ({ navigation, route }) => {
 
   const onBack = () => {
     backRequestHandledRef.current = true;
-    navigation.navigate(route.params.fromRoute);
+    navigation.goBack();
   };
 
   const backRequestHandledRef = useRef(null);
@@ -46,9 +46,8 @@ const NewTerritoryForm = ({ navigation, route }) => {
     if (response.ok) {
       backRequestHandledRef.current = true; // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
       setTerritories((territories) => [response.decryptedData, ...territories]);
-      navigation.navigate('Territory', {
-        fromRoute: route.params.fromRoute,
-        ...response.decryptedData,
+      navigation.replace('Territory', {
+        territory: response.decryptedData,
         editable: true,
       });
       setTimeout(() => setPosting(false), 250);

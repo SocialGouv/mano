@@ -137,7 +137,7 @@ const Loader = () => {
     total =
       total +
       medicalDataResponse.data.consultations +
-      (!user.healthcareProfessional ? 0 : medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles);
+      (!user?.healthcareProfessional ? 0 : medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles);
 
     if (initialLoad) {
       const numberOfCollections = 9;
@@ -187,7 +187,7 @@ const Loader = () => {
     /*
     Get treatments
     */
-    if (['admin', 'normal'].includes(user.role) && user.healthcareProfessional) {
+    if (['admin', 'normal'].includes(user?.role) && user?.healthcareProfessional) {
       if (medicalDataResponse.data.treatments || initialLoad) {
         setLoading('Chargement des traitements');
         const refreshedTreatments = await getData({

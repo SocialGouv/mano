@@ -24,19 +24,11 @@ const TerritoriesList = () => {
   const loading = useRecoilValue(loadingState);
   const territories = useRecoilValue(territoriesSearchSelector({ search }));
 
-  useEffect(() => {
-    API.navigation = navigation;
-  }, [navigation]);
-
   const onRefresh = async () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   };
 
-  const onCreateTerritoryRequest = () =>
-    navigation.navigate('NewTerritoryForm', {
-      fromRoute: 'TerritoriesList',
-      toRoute: 'Territory',
-    });
+  const onCreateTerritoryRequest = () => navigation.navigate('NewTerritoryForm');
 
   const keyExtractor = (territory) => territory._id;
   const ListFooterComponent = () => {
@@ -48,7 +40,7 @@ const TerritoriesList = () => {
     return (
       <Row
         withNextButton
-        onPress={() => navigation.push('Territory', { ...territory, fromRoute: 'TerritoriesList' })}
+        onPress={() => navigation.push('Territory', { territory })}
         Icon={TerritoryIcon}
         caption={name}
         testID={`territory-row-${name?.split(' ').join('-').toLowerCase()}-button`}
