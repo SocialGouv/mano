@@ -22,18 +22,18 @@ const Menu = ({ navigation }) => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const onLogoutRequest = (clearAll = false) => {
+  const onLogoutRequest = async (clearAll = false) => {
     setIsLoggingOut(true);
-    API.logout();
     resetOrganisation();
     resetUser();
     resetTeams();
     resetCurrentTeam();
     if (clearAll) {
-      clearCache();
+      await clearCache();
       setLastRefresh(0);
-      Alert.alert('Vous êtes déconnecté(e)', 'Vous pouvez aussi supprimer Mano pour plus de sécurité');
     }
+    API.logout();
+    if (clearAll) Alert.alert('Vous êtes déconnecté(e)', 'Vous pouvez aussi supprimer Mano pour plus de sécurité');
   };
 
   return (

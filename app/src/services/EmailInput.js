@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useIsFocused } from '@react-navigation/native';
 import React, { useEffect, useState } from 'react';
 import InputLabelled from '../components/InputLabelled';
 
@@ -22,13 +23,21 @@ const EmailInput = ({ innerRef, onChange, onFocus, onSubmitEditing, testID = 'em
     });
   };
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
     (async () => {
       const storedEmail = await AsyncStorage.getItem('persistent_email');
-      if (storedEmail) onInputChange(storedEmail);
+      if (storedEmail) {
+        setEmail(storedEmail);
+        onInputChange(storedEmail);
+      } else {
+        setEmail('');
+        onInputChange('');
+      }
     })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isFocused]);
 
   return (
     <InputLabelled
