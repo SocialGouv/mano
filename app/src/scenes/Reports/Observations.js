@@ -3,7 +3,7 @@ import React, { useCallback } from 'react';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import { refreshTriggerState } from '../../components/Loader';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import { ListNoMoreObservations } from '../../components/ListEmptyContainer';
 import { observationsForReport } from './selectors';
 import { getPeriodTitle } from './utils';
@@ -47,12 +47,13 @@ const Observations = ({ navigation, route }) => {
   return (
     <SceneContainer>
       <ScreenTitle title={`Observations\n${getPeriodTitle(date, currentTeam?.nightSession)}`} onBack={navigation.goBack} />
-      <FlatListStyled
+      <FlashListStyled
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
         data={observations}
         initialNumToRender={5}
         renderItem={renderItem}
+        estimatedItemSize={545}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={0.3}
         ListFooterComponent={ListNoMoreObservations}

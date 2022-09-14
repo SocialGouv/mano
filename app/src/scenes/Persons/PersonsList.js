@@ -7,7 +7,7 @@ import PersonRow from './PersonRow';
 import Spinner from '../../components/Spinner';
 import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import Search from '../../components/Search';
 import { personsFullSearchSelector } from '../../recoil/selectors';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -79,14 +79,16 @@ const PersonsList = ({ navigation, route }) => {
         parentScroll={scrollY}
         onChange={setSearch}
       />
-      <FlatListStyled
+      <FlashListStyled
         ref={listref}
+        withHeaderSearch
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
         onScroll={onScroll}
         parentScroll={scrollY}
         data={filteredPersons}
         extraData={filteredPersons}
+        estimatedItemSize={114}
         renderItem={renderPersonRow}
         keyExtractor={keyExtractor}
         ListEmptyComponent={loading ? Spinner : ListEmptyPersons}

@@ -5,7 +5,7 @@ import ScreenTitle from '../../components/ScreenTitle';
 import Spinner from '../../components/Spinner';
 import { ListEmptyTerritories, ListNoMoreTerritories } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import Search from '../../components/Search';
 import Row from '../../components/Row';
 import { TerritoryIcon } from '../../icons';
@@ -72,11 +72,13 @@ const TerritoriesList = () => {
         onFocus={() => listRef.current.scrollToOffset({ offset: 100 })}
         parentScroll={scrollY}
       />
-      <FlatListStyled
+      <FlashListStyled
         ref={listRef}
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
+        withHeaderSearch
         onScroll={onScroll}
+        estimatedItemSize={80}
         parentScroll={scrollY}
         data={territories}
         renderItem={renderRow}

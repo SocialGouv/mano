@@ -9,7 +9,7 @@ import Row from '../../components/Row';
 import Spinner from '../../components/Spinner';
 import { ListEmptyStructures } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import { structuresState } from '../../recoil/structures';
 
 const Structures = ({ navigation }) => {
@@ -42,9 +42,10 @@ const Structures = ({ navigation }) => {
   return (
     <SceneContainer>
       <ScreenTitle title="Structures" onBack={navigation.goBack} />
-      <FlatListStyled
+      <FlashListStyled
         refreshing={refreshing}
         onRefresh={getStructures}
+        estimatedItemSize={80}
         data={structures}
         renderItem={renderRow}
         keyExtractor={keyExtractor}

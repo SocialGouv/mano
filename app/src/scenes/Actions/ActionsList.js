@@ -2,30 +2,28 @@ import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import SceneContainer from '../../components/SceneContainer';
 import ActionRow from '../../components/ActionRow';
 import Spinner from '../../components/Spinner';
 import { ListEmptyActions, ListNoMoreActions } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
 import { MyText } from '../../components/MyText';
-import FlatListStyled, { SectionListStyled } from '../../components/FlatListStyled';
+import { FlashListStyled, SectionListStyled } from '../../components/Lists';
 import { TODO } from '../../recoil/actions';
-import API from '../../services/api';
 import { actionsByStatusSelector, totalActionsByStatusSelector } from '../../recoil/selectors';
 import { useNavigation, useRoute } from '@react-navigation/native';
-import { refreshTriggerState, loadingState } from '../../components/Loader';
+import { refreshTriggerState, loadingState, loaderFullScreenState } from '../../components/Loader';
 import Button from '../../components/Button';
 import ConsultationRow from '../../components/ConsultationRow';
 
-const emptyArray = [];
 const keyExtractor = (action) => action._id;
-const SectionHeader = ({ section: { title } }) => <SectionHeaderStyled heavy>{title}</SectionHeaderStyled>;
 
 const limitSteps = 100;
 
 const ActionsList = () => {
   const navigation = useNavigation();
   const loading = useRecoilValue(loadingState);
+  const fullScreen = useRecoilValue(loaderFullScreenState);
+
   const status = useRoute().params.status;
   const [limit, setLimit] = useState(limitSteps);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
@@ -41,11 +39,12 @@ const ActionsList = () => {
 
   const onCreateAction = useCallback(() => navigation.navigate('NewActionForm', { fromRoute: 'ActionsList' }), [navigation]);
 
-  const SectionListFooterComponent = useMemo(() => (!actionsByStatus.length ? null : ListNoMoreActions), [actionsByStatus.length]);
   const FlatListFooterComponent = useMemo(() => {
+    if ([TODO].includes(status)) return !actionsByStatus.length ? null : ListNoMoreActions;
     if (hasMore) return <Button caption="Montrer plus d'actions" onPress={() => setLimit((l) => l + limitSteps)} testID="show-more-actions" />;
     return ListNoMoreActions;
-  }, [hasMore]);
+  }, [hasMore, status, actionsByStatus.length]);
+
   const ListEmptyComponent = useMemo(() => (loading ? Spinner : ListEmptyActions), [loading]);
 
   const onPseudoPress = useCallback(
@@ -74,42 +73,35 @@ const ActionsList = () => {
     [navigation]
   );
 
-  const renderItem = (item) => {
-    if (item.item.isConsultation) {
-      return <ConsultationRow consultation={item.item} onConsultationPress={onConsultationPress} onPseudoPress={onPseudoPress} withBadge />;
+  const renderItem = ({ item }) => {
+    if (item.type === 'title') return <SectionHeaderStyled heavy>{item.title}</SectionHeaderStyled>;
+    if (item.isConsultation) {
+      return <ConsultationRow consultation={item} onConsultationPress={onConsultationPress} onPseudoPress={onPseudoPress} withBadge />;
     }
-    return <ActionRow action={item.item} onPseudoPress={onPseudoPress} onActionPress={onActionPress} />;
+    return <ActionRow action={item} onPseudoPress={onPseudoPress} onActionPress={onActionPress} />;
   };
 
+  const getItemType = (item) => item.type || 'action';
+
+  if (fullScreen) return null;
+
   return (
-    <SceneContainer testID="actions-list">
-      {[TODO].includes(status) ? (
-        <SectionListStyled
-          refreshing={refreshTrigger.status}
-          onRefresh={onRefresh}
-          sections={actionsByStatus || emptyArray}
-          initialNumToRender={5}
-          renderItem={renderItem}
-          renderSectionHeader={SectionHeader}
-          keyExtractor={keyExtractor}
-          ListEmptyComponent={ListEmptyComponent}
-          ListFooterComponent={SectionListFooterComponent}
-        />
-      ) : (
-        <FlatListStyled
-          refreshing={refreshTrigger.status}
-          onRefresh={onRefresh}
-          data={actionsByStatus}
-          initialNumToRender={5}
-          renderItem={renderItem}
-          keyExtractor={keyExtractor}
-          ListEmptyComponent={ListEmptyComponent}
-          onEndReachedThreshold={0.3}
-          ListFooterComponent={FlatListFooterComponent}
-        />
-      )}
+    <>
+      <FlashListStyled
+        refreshing={refreshTrigger.status}
+        onRefresh={onRefresh}
+        data={actionsByStatus}
+        estimatedItemSize={126}
+        getItemType={getItemType}
+        initialNumToRender={5}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
+        ListEmptyComponent={ListEmptyComponent}
+        onEndReachedThreshold={0.3}
+        ListFooterComponent={FlatListFooterComponent}
+      />
       <FloatAddButton onPress={onCreateAction} />
-    </SceneContainer>
+    </>
   );
 };
 

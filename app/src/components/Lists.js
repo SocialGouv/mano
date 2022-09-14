@@ -1,9 +1,10 @@
+import { AnimatedFlashList, FlashList } from '@shopify/flash-list';
 import React from 'react';
-import { StyleSheet, Animated } from 'react-native';
+import { StyleSheet, Animated, Dimensions } from 'react-native';
 
 // repeat all the props so that VSCode can auto complete
 
-const FlatListStyled = React.forwardRef(
+export const FlatListStyled = React.forwardRef(
   (
     {
       renderItem,
@@ -145,6 +146,28 @@ export const SectionListStyled = React.forwardRef(
   )
 );
 
+export const FlashListStyled = React.forwardRef(
+  (
+    {
+      parentScroll,
+      withHeaderSearch = false,
+      estimatedListSize = {
+        height: Dimensions.get('window').height * 0.8,
+        width: Dimensions.get('window').width,
+      },
+      ...props
+    },
+    ref
+  ) => (
+    <AnimatedFlashList
+      ref={ref}
+      contentContainerStyle={styles.flashListContentContainerStyle(withHeaderSearch)}
+      estimatedListSize={estimatedListSize}
+      {...props}
+    />
+  )
+);
+
 const styles = StyleSheet.create({
   content: (parentScroll) => ({
     transform: [
@@ -169,6 +192,10 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 16,
     backgroundColor: '#fff',
   },
+  flashListContentContainerStyle: (withHeaderSearch) => ({
+    paddingTop: 30 + (withHeaderSearch ? 60 : 0),
+    backgroundColor: '#fff',
+  }),
 });
 
 export default FlatListStyled;

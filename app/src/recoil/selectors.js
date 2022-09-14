@@ -177,7 +177,10 @@ const formatData = (data) => {
       return { ...section, data: [...section.data, action] };
     });
   }, sections);
-  return dataInSections;
+
+  return dataInSections.reduce((actions, section) => {
+    return [...actions, { type: 'title', title: section.title, _id: section.title }, ...section.data];
+  }, []);
 };
 
 /*

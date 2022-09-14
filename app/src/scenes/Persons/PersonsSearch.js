@@ -5,7 +5,7 @@ import PersonRow from './PersonRow';
 import Spinner from '../../components/Spinner';
 import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyContainer';
 import Search from '../../components/Search';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { personsSearchSelector } from '../../recoil/selectors';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
@@ -47,11 +47,12 @@ const PersonsSearch = ({ navigation, route }) => {
     <SceneContainer>
       <ScreenTitle title="Choisissez une personne" onBack={onBack} onAdd={onCreatePersonRequest} />
       <Search placeholder="Rechercher une personne..." onChange={setSearch} />
-      <FlatListStyled
+      <FlashListStyled
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
         data={filteredPersons}
         extraData={filteredPersons}
+        estimatedItemSize={114}
         renderItem={renderPersonRow}
         keyExtractor={keyExtractor}
         initialNumToRender={10}

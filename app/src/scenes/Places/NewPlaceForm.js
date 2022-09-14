@@ -6,7 +6,7 @@ import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Button from '../../components/Button';
 import Search from '../../components/Search';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import { ListEmptyPlaceWithName } from '../../components/ListEmptyContainer';
 import Row from '../../components/Row';
 import Spacer from '../../components/Spacer';
@@ -131,8 +131,9 @@ const NewPlaceForm = ({ route, navigation }) => {
     <SceneContainer>
       <ScreenTitle title={`Nouveau lieu - ${person.name}`} onBack={onGoBackRequested} />
       <Search results={data} placeholder="Rechercher un lieu..." onChange={setName} />
-      <FlatListStyled
+      <FlashListStyled
         data={data}
+        estimatedItemSize={77}
         ListHeaderComponent={() => (
           <>
             <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreatePlace} loading={posting} />
