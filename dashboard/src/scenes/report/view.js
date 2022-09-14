@@ -1065,6 +1065,7 @@ const DescriptionAndCollaborations = ({ report }) => {
         <Formik
           className="noprint"
           initialValues={report}
+          enableReinitialize
           onSubmit={async (body) => {
             const reportUpdate = {
               ...report,

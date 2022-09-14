@@ -35,6 +35,7 @@ const View = () => {
       <SmallHeaderWithBackButton refreshButton />
       <Formik
         initialValues={place}
+        enableReinitialize
         onSubmit={async (body) => {
           const response = await API.put({
             path: `/place/${place._id}`,

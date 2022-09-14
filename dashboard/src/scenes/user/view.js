@@ -49,6 +49,7 @@ const View = () => {
           role: localUser.role,
           healthcareProfessional: localUser.healthcareProfessional,
         }}
+        enableReinitialize
         onSubmit={async (body, actions) => {
           try {
             if (!body.team?.length) return toastr.error('Erreur !', 'Au moins une équipe est obligatoire');
