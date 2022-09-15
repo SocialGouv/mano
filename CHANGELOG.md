@@ -1,3 +1,10 @@
+## [1.148.7](https://github.com/SocialGouv/mano/compare/v1.148.6...v1.148.7) (2022-09-15)
+
+
+### Bug Fixes
+
+* **app:** back to person from medical file ([#872](https://github.com/SocialGouv/mano/issues/872)) ([ce0d53d](https://github.com/SocialGouv/mano/commit/ce0d53d8cc9c85281edd108672e790010781a537))
+
 ## [1.148.6](https://github.com/SocialGouv/mano/compare/v1.148.5...v1.148.6) (2022-09-14)
 
 
