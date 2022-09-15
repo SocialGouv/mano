@@ -102,7 +102,6 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
       isMulti
       isSearchable
       onChange={onChange}
-      menuIsOpen
       placeholder={'Entrez un nom, une date de naissance…'}
       onCreateOption={async (name) => {
         if (!autoCreate) {
