@@ -67,7 +67,7 @@ const Stats = () => {
   const territories = useRecoilValue(territoriesState);
   const { isLoading } = useDataLoader({ refreshOnMount: true });
 
-  const [territory, setTerritory] = useState(null);
+  const [selectedTerritories, setSelectedTerritories] = useState([]);
   const [activeTab, setActiveTab] = useState(0);
   const [filterPersons, setFilterPersons] = useState([]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
@@ -97,7 +97,7 @@ const Stats = () => {
   const actions = getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData);
   const consultations = getDataForPeriod(allConsultations, period, selectedTeams, true);
   const observations = getDataForPeriod(
-    filterByTeam(allObservations, 'team').filter((e) => !territory?._id || e.territory === territory._id),
+    filterByTeam(allObservations, 'team').filter((e) => !selectedTerritories.length || selectedTerritories.some((t) => e.territory === t._id)),
     period,
     selectedTeams,
     viewAllOrganisationData,
@@ -381,14 +381,15 @@ const Stats = () => {
         </TabPane>
         <TabPane tabId={5}>
           <Title>Statistiques des observations de territoire</Title>
-          <div style={{ maxWidth: '350px', marginBottom: '2rem' }}>
+          <div style={{ marginBottom: '2rem' }}>
             <Label htmlFor="filter-territory">Filter par territoire</Label>
             <SelectCustom
+              isMulti
               options={territories}
               name="place"
               placeholder="Tous les territoires"
               onChange={(t) => {
-                setTerritory(t);
+                setSelectedTerritories(t);
               }}
               isClearable={true}
               inputId="filter-territory"
