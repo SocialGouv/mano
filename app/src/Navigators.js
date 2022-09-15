@@ -52,6 +52,8 @@ import Observations from './scenes/Reports/Observations';
 import Collaborations from './scenes/Reports/Collaborations';
 import Treatment from './scenes/Persons/Treatment';
 import Consultation from './scenes/Persons/Consultation';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useState } from 'react';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -261,6 +263,9 @@ const App = () => {
   const appStateListener = useRef(null);
   const navigationRef = useNavigationContainerRef();
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [resetLoginStackKey, setResetLoginStackKey] = useState(0);
+
   useEffect(() => {
     logEvents.initLogEvents().then(() => {
       logEvents.logAppVisit();
@@ -274,6 +279,22 @@ const App = () => {
         appState.current = nextAppState;
       });
     });
+
+    API.onLogIn = () => setIsLoggedIn(true);
+    API.logout = () => {
+      setResetLoginStackKey((k) => k + 1);
+      API.token = null;
+      AsyncStorage.removeItem('persistent_token');
+      API.enableEncrypt = null;
+      API.wrongKeyWarned = null;
+      API.hashedOrgEncryptionKey = null;
+      API.orgEncryptionKey = null;
+      API.sendCaptureError = null;
+      API.blockEncrypt = null;
+      API.organisation = null;
+      setIsLoggedIn(false);
+    };
+
     return () => {
       logEvents.logAppClose();
       appStateListener.current.remove();
@@ -289,8 +310,8 @@ const App = () => {
             API.navigation = navigationRef;
           }}>
           <AppStack.Navigator initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false, headerShown: false }}>
-            <AppStack.Screen name="LoginStack" component={LoginNavigator} />
-            <AppStack.Screen name="Home" component={TabNavigator} />
+            <AppStack.Screen name="LoginStack" component={LoginNavigator} key={resetLoginStackKey} />
+            {!!isLoggedIn && <AppStack.Screen name="Home" component={TabNavigator} />}
           </AppStack.Navigator>
           <Loader />
           <EnvironmentIndicator />

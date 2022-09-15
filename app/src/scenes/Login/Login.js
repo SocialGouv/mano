@@ -20,6 +20,7 @@ import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import { clearCache } from '../../services/dataManagement';
 import { refreshTriggerState } from '../../components/Loader';
+import { useIsFocused } from '@react-navigation/native';
 
 const Login = ({ navigation }) => {
   const [authViaCookie, setAuthViaCookie] = useState(false);
@@ -42,8 +43,11 @@ const Login = ({ navigation }) => {
   const [storageOrganisationId, setStorageOrganisationId] = useMMKVString('organisationId');
   const setRefreshTrigger = useSetRecoilState(refreshTriggerState);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    setTimeout(async () => {
+    if (!isFocused) return;
+    const initTimeout = setTimeout(async () => {
       // check version
       const response = await API.get({ path: '/version' });
       if (response.ok && VERSION !== response.data) {
@@ -69,6 +73,7 @@ const Login = ({ navigation }) => {
       });
       if (ok && token && user) {
         setAuthViaCookie(true);
+        API.onLogIn();
         const { organisation } = user;
         if (organisation._id !== storageOrganisationId) {
           clearCache();
@@ -84,8 +89,10 @@ const Login = ({ navigation }) => {
       RNBootSplash.hide({ duration: 250 });
       return setLoading(false);
     }, 500);
+
+    return () => clearTimeout(initTimeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [isFocused]);
 
   const toggleShowPassword = () => setShowPassword((show) => !show);
 
@@ -145,6 +152,7 @@ const Login = ({ navigation }) => {
     if (response.ok) {
       Keyboard.dismiss();
       API.token = response.token;
+      API.onLogIn();
       await AsyncStorage.setItem('persistent_token', response.token);
       API.showTokenExpiredError = true;
       API.organisation = response.user.organisation;

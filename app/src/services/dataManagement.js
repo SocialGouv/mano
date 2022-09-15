@@ -19,9 +19,9 @@ export const mergeNewUpdatedData = (newData, oldData) => {
 
 export const storage = new MMKV();
 
-export function clearCache() {
+export async function clearCache() {
   storage.clearAll();
-  AsyncStorage.clear();
+  await AsyncStorage.clear();
 }
 
 // Get data from cache or fetch from server.
