@@ -17,6 +17,7 @@ import { useHistory } from 'react-router-dom';
 import ButtonCustom from '../../components/ButtonCustom';
 import { userState } from '../../recoil/auth';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import { theme } from '../../config';
 
 function removeDiatricsAndAccents(str) {
   return (str || '')
@@ -101,6 +102,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
       isMulti
       isSearchable
       onChange={onChange}
+      menuIsOpen
       placeholder={'Entrez un nom, une date de naissance…'}
       onCreateOption={async (name) => {
         if (!autoCreate) {
@@ -144,7 +146,7 @@ const PersonSelected = ({ person }) => {
   return (
     <div>
       <div style={{ display: 'flex', alignItems: 'center' }}>
-        {person.name}
+        <span style={{ color: theme.black50 }}>{person.name}</span>
         {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
         <ButtonCustom
           onClick={(e) => {
@@ -168,7 +170,7 @@ const Person = ({ person }) => {
     <PersonWrapper>
       <PersonMainInfo>
         <div className="person-name">
-          <b>{person.name}</b>
+          {person.outOfActiveList ? <b style={{ color: theme.black25 }}>Sortie de file active : {person.name}</b> : <b>{person.name}</b>}
           {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
           {!!person.alertness && <ExclamationMarkButton />}
         </div>
@@ -182,6 +184,15 @@ const Person = ({ person }) => {
           padding="0px"
         />
       </PersonMainInfo>
+      {person.outOfActiveList && (
+        <AdditionalInfoWrapper>
+          <AdditionalInfo
+            label="Date de sortie de file active"
+            value={person.outOfActiveListDate ? formatCalendarDate(person.outOfActiveListDate) : 'Non renseignée'}
+          />
+          <AdditionalInfo label="Motif" value={person.outOfActiveListReason} />
+        </AdditionalInfoWrapper>
+      )}
       <AdditionalInfoWrapper>
         <AdditionalInfo
           label="Dernière action"
