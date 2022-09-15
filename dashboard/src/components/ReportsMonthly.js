@@ -49,9 +49,9 @@ export default function ReportsMonthly({ onReportClick }) {
         {[...Array(7)].map((_, index) => {
           const day = firstDayToShow.add(index, 'day');
           return (
-            <DayContainer key={day.format('YYYY-MM-DD')} disabled>
+            <DayButton key={day.format('YYYY-MM-DD')} disabled>
               <span style={{ fontSize: '11px' }}>{day.format('ddd')}</span>
-            </DayContainer>
+            </DayButton>
           );
         })}
       </WeekContainer>
@@ -64,10 +64,10 @@ export default function ReportsMonthly({ onReportClick }) {
             const dateString = day.format('YYYY-MM-DD');
             const report = reports.find((rep) => rep.date === dateString);
             return (
-              <DayContainer key={dateString} isOutOfMonth={isOutOfMonth} onClick={() => onReportClick(report, dateString)}>
-                <DayButton isToday={isToday}>{day.format('D')}</DayButton>
+              <DayButton aria-label={dateString} key={dateString} isOutOfMonth={isOutOfMonth} onClick={() => onReportClick(report, dateString)}>
+                <DayContent isToday={isToday}>{process.env.REACT_APP_TEST === 'true' ? '' : day.format('D')}</DayContent>
                 {!!report && <Dot />}
-              </DayContainer>
+              </DayButton>
             );
           })}
         </WeekContainer>
@@ -86,7 +86,7 @@ const WeekContainer = styled.div`
 const outOfMonthCss = css`
   opacity: 0.2;
 `;
-const DayContainer = styled.button`
+const DayButton = styled.button`
   position: relative;
   display: flex;
   justify-content: center;
@@ -111,7 +111,7 @@ const todayCss = css`
   line-height: 36px;
 `;
 
-const DayButton = styled.span`
+const DayContent = styled.span`
   display: inline-flex;
   justify-content: center;
   align-items: center;
