@@ -1,3 +1,11 @@
+# [1.149.0](https://github.com/SocialGouv/mano/compare/v1.148.8...v1.149.0) (2022-09-15)
+
+
+### Features
+
+* **dashboard:** new report display by monthly calendar ([#873](https://github.com/SocialGouv/mano/issues/873)) ([385e902](https://github.com/SocialGouv/mano/commit/385e902bfa3dfb7e77a00e6f4ef22e343ab2c2c2))
+* **dashboard:** update cra ([#864](https://github.com/SocialGouv/mano/issues/864)) ([c08dc7d](https://github.com/SocialGouv/mano/commit/c08dc7dbbbe7f738cf47a9642ffa46ae1f6ec6a6))
+
 ## [1.148.8](https://github.com/SocialGouv/mano/compare/v1.148.7...v1.148.8) (2022-09-15)
 
 
