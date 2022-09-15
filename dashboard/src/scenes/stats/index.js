@@ -665,8 +665,21 @@ const BlockTotal = ({ title, unit, data, field }) => {
     if (!data.length) {
       return <Card title={title} unit={unit} count={0} />;
     }
-    const total = data.filter((e) => !isNaN(Number(e[field]))).reduce((total, item) => total + Number(item[field]), 0);
-    return <Card title={title} unit={unit} count={total} />;
+    const dataWithOnlyNumbers = data.filter((e) => !isNaN(Number(e[field])));
+    const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);
+    const avg = Math.round((total / dataWithOnlyNumbers.length) * 100) / 100;
+    return (
+      <Card
+        title={title}
+        unit={unit}
+        count={total}
+        children={
+          <span className="font-weight-normal">
+            Moyenne: <strong>{avg}</strong>
+          </span>
+        }
+      />
+    );
   } catch (errorBlockTotal) {
     console.log('error block total', errorBlockTotal, { title, unit, data, field });
   }
