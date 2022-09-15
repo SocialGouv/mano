@@ -1,5 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
-import XLSX from 'xlsx';
+import { read } from 'xlsx';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toastr } from 'react-redux-toastr';
 import { Modal, ModalBody, ModalHeader, Alert } from 'reactstrap';
@@ -55,7 +55,7 @@ const ImportData = () => {
       const data = await file.arrayBuffer();
       // See: https://stackoverflow.com/a/57802737/978690
       // I only took one part of the code, because we use "w" only.
-      const workbook = XLSX.read(data, { dateNF: 'yyyy-mm-dd' });
+      const workbook = read(data, { dateNF: 'yyyy-mm-dd' });
       const { SheetNames, Sheets } = workbook;
       const personsSheetName = SheetNames.find((name) => name.toLocaleLowerCase().includes('person'));
       const personsSheet = Sheets[personsSheetName];

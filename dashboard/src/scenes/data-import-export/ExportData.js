@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import XLSX from 'xlsx';
+import { utils, writeFile } from 'xlsx';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import { personsState } from '../../recoil/persons';
@@ -59,7 +59,7 @@ const createSheet = (data) => {
     },
     [header]
   );
-  return XLSX.utils.aoa_to_sheet(sheet);
+  return utils.aoa_to_sheet(sheet);
 };
 
 const ExportData = () => {
@@ -82,7 +82,7 @@ const ExportData = () => {
     setIsExporting(true);
     // just to trigger the loading state, sorry Raph :)
     await new Promise((res) => setTimeout(res));
-    const workbook = XLSX.utils.book_new();
+    const workbook = utils.book_new();
 
     const persons = allPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }));
     const reports = allReports.map((r) => {
@@ -98,17 +98,17 @@ const ExportData = () => {
       return report;
     });
     // actions
-    XLSX.utils.book_append_sheet(workbook, createSheet(allActions), 'actions');
-    XLSX.utils.book_append_sheet(workbook, createSheet(persons), 'personnes suivies');
-    XLSX.utils.book_append_sheet(workbook, createSheet(comments), 'comments');
-    XLSX.utils.book_append_sheet(workbook, createSheet(territories), 'territoires');
-    XLSX.utils.book_append_sheet(workbook, createSheet(allObservations), 'observations de territoires');
-    XLSX.utils.book_append_sheet(workbook, createSheet(places), 'lieux fréquentés');
-    XLSX.utils.book_append_sheet(workbook, createSheet(teams), 'équipes');
-    XLSX.utils.book_append_sheet(workbook, createSheet(users), 'utilisateurs');
-    XLSX.utils.book_append_sheet(workbook, createSheet(reports), 'comptes rendus');
-    XLSX.utils.book_append_sheet(workbook, createSheet(allPassages), 'passages');
-    XLSX.writeFile(workbook, 'data.xlsx');
+    utils.book_append_sheet(workbook, createSheet(allActions), 'actions');
+    utils.book_append_sheet(workbook, createSheet(persons), 'personnes suivies');
+    utils.book_append_sheet(workbook, createSheet(comments), 'comments');
+    utils.book_append_sheet(workbook, createSheet(territories), 'territoires');
+    utils.book_append_sheet(workbook, createSheet(allObservations), 'observations de territoires');
+    utils.book_append_sheet(workbook, createSheet(places), 'lieux fréquentés');
+    utils.book_append_sheet(workbook, createSheet(teams), 'équipes');
+    utils.book_append_sheet(workbook, createSheet(users), 'utilisateurs');
+    utils.book_append_sheet(workbook, createSheet(reports), 'comptes rendus');
+    utils.book_append_sheet(workbook, createSheet(allPassages), 'passages');
+    writeFile(workbook, 'data.xlsx');
     setIsExporting(false);
   };
 

@@ -1,4 +1,4 @@
-import { version } from '../package.json';
+import packageInfo from '../package.json';
 // main color based on
 // https://www.gouvernement.fr/charte/charte-graphique-les-fondamentaux/les-couleurs
 // Menthe
@@ -32,7 +32,7 @@ const getHost = () => {
 const HOST = getHost();
 const SCHEME = process.env.NODE_ENV === 'development' || process.env.REACT_APP_TEST === 'true' ? process.env.REACT_APP_SCHEME : 'https';
 const ENV = process.env.NODE_ENV || 'production';
-const VERSION = version;
+const VERSION = packageInfo.version;
 const DEFAULT_ORGANISATION_KEY = ENV === 'development' ? process.env.REACT_APP_DEFAULT_ORGANISATION_KEY : '';
 
 export { theme, HOST, SCHEME, ENV, VERSION, DEFAULT_ORGANISATION_KEY };

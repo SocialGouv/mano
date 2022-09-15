@@ -7,7 +7,7 @@ import { toastr } from 'react-redux-toastr';
 import styled from 'styled-components';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { detect } from 'detect-browser';
-import { version } from '../../../package.json';
+import packageInfo from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { DEFAULT_ORGANISATION_KEY, theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
@@ -267,7 +267,7 @@ const SignIn = () => {
                   display: 'block',
                   textAlign: 'center',
                 }}>
-                Version: {version}
+                Version: {packageInfo.version}
               </p>
             </form>
           );
