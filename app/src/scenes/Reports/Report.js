@@ -2,7 +2,7 @@ import { useIsFocused } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert } from 'react-native';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import InputLabelled from '../../components/InputLabelled';
 import Label from '../../components/Label';
@@ -28,39 +28,55 @@ const castToReport = (report = {}) => ({
   date: report.date,
 });
 
+const currentTeamReportsSelector = selector({
+  key: 'currentTeamReportsSelector',
+  get: ({ get }) => {
+    const reports = get(reportsState);
+    const currentTeam = get(currentTeamState);
+    return reports.filter((r) => r.team === currentTeam._id);
+  },
+});
+
 const Report = ({ navigation, route }) => {
   const currentTeam = useRecoilValue(currentTeamState);
-  const [reports, setReports] = useRecoilState(reportsState);
+  const setReports = useSetRecoilState(reportsState);
+  const teamsReports = useRecoilValue(currentTeamReportsSelector);
 
   const [day] = useState(() => route.params?.day);
-  const [reportDB, setReportDB] = useState(() => route.params?.report || {});
-  const [report, setReport] = useState(() => castToReport(reportDB));
+  const [reportDB, setReportDB] = useState(null);
+  const [report, setReport] = useState(null);
 
   const isFocused = useIsFocused();
   useEffect(() => {
     if (isFocused) {
-      if (!route.params?.report) {
+      if (!reportDB?._id) {
         (async () => {
-          const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: day }) });
-          const newReport = res.decryptedData;
-          setReports((reports) => [newReport, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
-          setReportDB(newReport);
-          setReport(castToReport(newReport));
+          const report = teamsReports.find((r) => r.date === day);
+          if (report) {
+            setReportDB(report);
+            setReport(castToReport(report));
+          } else {
+            const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: day }) });
+            const newReport = res.decryptedData;
+            setReports((reports) => [newReport, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
+            setReportDB(newReport);
+            setReport(castToReport(newReport));
+          }
         })();
       } else {
         // to update collaborations
-        const freshReport = reports.find((r) => r._id === reportDB._id);
+        const freshReport = teamsReports.find((r) => r._id === reportDB?._id);
         setReportDB(freshReport);
         setReport(castToReport(freshReport));
       }
     }
   }, [isFocused, reportDB]);
 
-  const actionsCreated = useRecoilValue(actionsCreatedForReport({ date: reportDB.date }));
-  const actionsCompleted = useRecoilValue(actionsCompletedOrCanceledForReport({ date: reportDB.date, status: DONE }));
-  const actionsCanceled = useRecoilValue(actionsCompletedOrCanceledForReport({ date: reportDB.date, status: CANCEL }));
-  const comments = useRecoilValue(commentsForReport({ date: reportDB.date }));
-  const observations = useRecoilValue(observationsForReport({ date: reportDB.date }));
+  const actionsCreated = useRecoilValue(actionsCreatedForReport({ date: reportDB?.date }));
+  const actionsCompleted = useRecoilValue(actionsCompletedOrCanceledForReport({ date: reportDB?.date, status: DONE }));
+  const actionsCanceled = useRecoilValue(actionsCompletedOrCanceledForReport({ date: reportDB?.date, status: CANCEL }));
+  const comments = useRecoilValue(commentsForReport({ date: reportDB?.date }));
+  const observations = useRecoilValue(observationsForReport({ date: reportDB?.date }));
 
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
@@ -78,6 +94,7 @@ const Report = ({ navigation, route }) => {
   };
 
   const isUpdateDisabled = useMemo(() => {
+    if (!reportDB) return true;
     const newReport = { ...reportDB, ...castToReport(report) };
     if (JSON.stringify(castToReport(reportDB)) !== JSON.stringify(castToReport(newReport))) return false;
     return true;
@@ -88,7 +105,7 @@ const Report = ({ navigation, route }) => {
   const onUpdateReport = async () => {
     setUpdating(true);
     const response = await API.put({
-      path: `/report/${reportDB._id}`,
+      path: `/report/${reportDB?._id}`,
       body: prepareReportForEncryption({ ...reportDB, ...castToReport(report) }),
     });
     if (response.error) {
@@ -99,7 +116,7 @@ const Report = ({ navigation, route }) => {
     if (response.ok) {
       setReports((reports) =>
         reports.map((a) => {
-          if (a._id === reportDB._id) return response.decryptedData;
+          if (a._id === reportDB?._id) return response.decryptedData;
           return a;
         })
       );
@@ -197,33 +214,33 @@ const Report = ({ navigation, route }) => {
         <Row
           withNextButton
           caption={`Actions complétées (${actionsCompleted.length})`}
-          onPress={() => navigation.navigate('Actions', { date: reportDB.date, status: DONE })}
+          onPress={() => navigation.navigate('Actions', { date: reportDB?.date, status: DONE })}
           disabled={!actionsCompleted.length}
         />
         <Row
           withNextButton
           caption={`Actions créées (${actionsCreated.length})`}
-          onPress={() => navigation.navigate('Actions', { date: reportDB.date, status: null })}
+          onPress={() => navigation.navigate('Actions', { date: reportDB?.date, status: null })}
           disabled={!actionsCreated.length}
         />
         <Row
           withNextButton
           caption={`Actions annulées (${actionsCanceled.length})`}
-          onPress={() => navigation.navigate('Actions', { date: reportDB.date, status: CANCEL })}
+          onPress={() => navigation.navigate('Actions', { date: reportDB?.date, status: CANCEL })}
           disabled={!actionsCanceled.length}
         />
         <Spacer height={30} />
         <Row
           withNextButton
           caption={`Commentaires (${comments.length})`}
-          onPress={() => navigation.navigate('Comments', { date: reportDB.date })}
+          onPress={() => navigation.navigate('Comments', { date: reportDB?.date })}
           disabled={!comments.length}
         />
         <Spacer height={30} />
         <Row
           withNextButton
           caption={`Observations (${observations.length})`}
-          onPress={() => navigation.navigate('Observations', { date: reportDB.date })}
+          onPress={() => navigation.navigate('Observations', { date: reportDB?.date })}
           disabled={!observations.length}
         />
       </ScrollContainer>

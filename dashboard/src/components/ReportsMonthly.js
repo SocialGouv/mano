@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from 'reactstrap';
 import styled, { css } from 'styled-components';
 import { selectorFamily, useRecoilValue } from 'recoil';
-import { dayjsInstance } from '../services/date';
+import { dayjsInstance, getIsDayWithinHoursOffsetOfDay } from '../services/date';
 import { reportsState } from '../recoil/reports';
 import { actionsState } from '../recoil/actions';
 import { passagesState } from '../recoil/passages';
@@ -16,6 +16,7 @@ const dottedReportsFromMonthSelector = selectorFamily({
   get:
     ({ startOfMonth, teamIds }) =>
     ({ get }) => {
+      const currentTeam = get(currentTeamState);
       const reports = get(reportsState);
       const teamsReports = reports.filter((report) => teamIds.includes(report.team));
       const actions = get(actionsState);
@@ -34,30 +35,40 @@ const dottedReportsFromMonthSelector = selectorFamily({
       const lastDayToShow = endOfMonth.endOf('week');
 
       const dottedReports = {};
-      for (let i = 0; i < lastDayToShow.diff(firstDayToShow, 'days'); i++) {
+      for (let i = 0; i <= lastDayToShow.diff(firstDayToShow, 'days'); i++) {
         const day = firstDayToShow.add(i, 'days');
         const teamsReportsFromDay = teamsReports.filter(
           (report) => dayjsInstance(report.date).isSame(day, 'day') && (!!report.description || !!report.collaborations?.length)
         );
-        const teamsActionsCreatedAtFromDay = teamsActions.filter((action) => dayjsInstance(action.createdAt).isSame(day, 'day'));
-        const teamsActionsDueAtFromDay = teamsActions.filter((action) => dayjsInstance(action.dueAt).isSame(day, 'day'));
-        const teamsActionsCompletedAtFromDay = teamsActions.filter((action) => dayjsInstance(action.completedAt).isSame(day, 'day'));
-        const passagesFromDay = teamsPassages.filter((passage) => dayjsInstance(passage.date).isSame(day, 'day'));
-        const commentsFromDay = teamsComments.filter((comment) => dayjsInstance(comment.date).isSame(day, 'day'));
-        const observationsFromDay = teamsObservations.filter((obs) => dayjsInstance(obs.observedAt).isSame(day, 'day'));
-        const consultationsCreatedAtFromDay = consultations.filter((consultation) => dayjsInstance(consultation.createdAt).isSame(day, 'day'));
-        const consultationsDueAtFromDay = consultations.filter((consultation) => dayjsInstance(consultation.dueAt).isSame(day, 'day'));
-        const consultationsCompletedAtFromDay = consultations.filter((consultation) => dayjsInstance(consultation.completedAt).isSame(day, 'day'));
+        const teamsActionsCreatedAtFromDay = teamsActions
+          .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, day, currentTeam?.nightSession ? 12 : 0))
+          .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, day, currentTeam?.nightSession ? 12 : 0));
+        const teamsActionsCompletedAtFromDay = teamsActions.filter((a) =>
+          getIsDayWithinHoursOffsetOfDay(a.completedAt, day, currentTeam?.nightSession ? 12 : 0)
+        );
+        const passagesFromDay = teamsPassages.filter((p) =>
+          getIsDayWithinHoursOffsetOfDay(p.date || p.createdAt, day, currentTeam?.nightSession ? 12 : 0)
+        );
+        const commentsFromDay = teamsComments.filter((c) =>
+          getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, day, currentTeam?.nightSession ? 12 : 0)
+        );
+        const observationsFromDay = teamsObservations.filter((o) =>
+          getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, day, currentTeam?.nightSession ? 12 : 0)
+        );
+        const consultationsCreatedAtFromDay = consultations
+          .filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, day, currentTeam?.nightSession ? 12 : 0))
+          .filter((c) => !getIsDayWithinHoursOffsetOfDay(c.completedAt, day, currentTeam?.nightSession ? 12 : 0));
+        const consultationsCompletedAtFromDay = consultations.filter((c) =>
+          getIsDayWithinHoursOffsetOfDay(c.completedAt, day, currentTeam?.nightSession ? 12 : 0)
+        );
         const dotted =
           teamsReportsFromDay.length ||
           teamsActionsCreatedAtFromDay.length ||
-          teamsActionsDueAtFromDay.length ||
           teamsActionsCompletedAtFromDay.length ||
           passagesFromDay.length ||
           commentsFromDay.length ||
           observationsFromDay.length ||
           consultationsCreatedAtFromDay.length ||
-          consultationsDueAtFromDay.length ||
           consultationsCompletedAtFromDay.length;
 
         dottedReports[day.format('YYYY-MM-DD')] = dotted;

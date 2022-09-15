@@ -16,6 +16,9 @@ import { consultationsState } from '../../recoil/consultations';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import { useEffect } from 'react';
 import { useLayoutEffect } from 'react';
+import { getIsDayWithinHoursOffsetOfDay } from '../../services/dateDayjs';
+import { MyText } from '../../components/MyText';
+import styled from 'styled-components';
 
 LocaleConfig.locales.fr = {
   monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
@@ -65,28 +68,28 @@ const currentTeamConsultationsSelector = selector({
 const currentTeamObservationsSelector = selector({
   key: 'currentTeamObservationsSelector',
   get: ({ get }) => {
-    const consultations = get(onlyFilledObservationsTerritories);
+    const obs = get(onlyFilledObservationsTerritories);
     const currentTeam = get(currentTeamState);
-    return consultations.filter((c) => c.team === currentTeam._id);
+    return obs.filter((c) => c.team === currentTeam._id);
   },
 });
 
 const dottedDatesFromMonthSelector = selectorFamily({
   key: 'dottedDatesFromMonthSelector',
   get:
-    ({ startOfMonth }) =>
+    ({ monthToLoad }) =>
     ({ get }) => {
-      console.log('INSIDE');
-      if (!startOfMonth) return {};
+      if (!monthToLoad) return [{}, null];
+      const currentTeam = get(currentTeamState);
       const reports = get(currentTeamReportsSelector);
       const actions = get(currentTeamActionsSelector);
       const comments = get(currentTeamCommentsSelector);
       // const consultations = get(currentTeamConsultationsSelector);
       const observations = get(currentTeamObservationsSelector);
 
-      const firstDayOfMonth = dayjs(startOfMonth).startOf('month');
+      const firstDayOfMonth = dayjs(monthToLoad).startOf('month');
       const firstDayToShow = firstDayOfMonth.startOf('week');
-      const endOfMonth = dayjs(startOfMonth).endOf('month');
+      const endOfMonth = dayjs(monthToLoad).endOf('month');
       const lastDayToShow = endOfMonth.endOf('week');
 
       const today = dayjs().format('YYYY-MM-DD');
@@ -101,23 +104,28 @@ const dottedDatesFromMonthSelector = selectorFamily({
         },
       };
 
-      for (let i = 0; i < lastDayToShow.diff(firstDayToShow, 'days'); i++) {
+      for (let i = 0; i <= lastDayToShow.diff(firstDayToShow, 'days'); i++) {
         const day = firstDayToShow.add(i, 'days');
-        const reportsFromDay = reports.filter(
-          (report) => dayjs(report.date).isSame(day, 'day') && (!!report.description || !!report.collaborations?.length)
+        const reportFromDay = reports.find((report) => dayjs(report.date).isSame(day, 'day'));
+        const reportIsFilled = !!reportFromDay?.description || !!reportFromDay?.collaborations?.length;
+        const actionsCreatedAtFromDay = actions
+          .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, day, currentTeam?.nightSession ? 12 : 0))
+          .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, day, currentTeam?.nightSession ? 12 : 0));
+        const actionsCompletedAtFromDay = actions.filter((a) =>
+          getIsDayWithinHoursOffsetOfDay(a.completedAt, day, currentTeam?.nightSession ? 12 : 0)
         );
-        const actionsCreatedAtFromDay = actions.filter((action) => dayjs(action.createdAt).isSame(day, 'day'));
-        const actionsDueAtFromDay = actions.filter((action) => dayjs(action.dueAt).isSame(day, 'day'));
-        const actionsCompletedAtFromDay = actions.filter((action) => dayjs(action.completedAt).isSame(day, 'day'));
-        const commentsFromDay = comments.filter((comment) => dayjs(comment.date).isSame(day, 'day'));
-        const observationsFromDay = observations.filter((obs) => dayjs(obs.observedAt).isSame(day, 'day'));
+        const commentsFromDay = comments.filter((c) =>
+          getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, day, currentTeam?.nightSession ? 12 : 0)
+        );
+        const observationsFromDay = observations.filter((o) =>
+          getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, day, currentTeam?.nightSession ? 12 : 0)
+        );
         // const consultationsCreatedAtFromDay = consultations.filter((consultation) => dayjs(consultation.createdAt).isSame(day, 'day'));
         // const consultationsDueAtFromDay = consultations.filter((consultation) => dayjs(consultation.dueAt).isSame(day, 'day'));
         // const consultationsCompletedAtFromDay = consultations.filter((consultation) => dayjs(consultation.completedAt).isSame(day, 'day'));
         const dotted =
-          reportsFromDay.length ||
+          !!reportIsFilled ||
           actionsCreatedAtFromDay.length ||
-          actionsDueAtFromDay.length ||
           actionsCompletedAtFromDay.length ||
           commentsFromDay.length ||
           observationsFromDay.length;
@@ -125,23 +133,23 @@ const dottedDatesFromMonthSelector = selectorFamily({
         // consultationsDueAtFromDay.length ||
         // consultationsCompletedAtFromDay.length;
 
-        if (!dotted) continue;
         if (dayjs(today).isSame(day, 'day')) {
-          dates[today].marked = true;
+          dates[today].marked = !!dotted;
         } else {
           dates[day.format('YYYY-MM-DD')] = {
-            marked: true,
+            marked: !!dotted,
             dotColor: '#000000',
           };
         }
       }
-      return dates;
+      return [dates, monthToLoad];
     },
 });
 
 const ReportsCalendar = ({ navigation }) => {
-  const [startOfMonth, setStartOfMonth] = useState(null);
-  const dates = useRecoilValue(dottedDatesFromMonthSelector({ startOfMonth }));
+  const [startOfMonth, setStartOfMonth] = useState(() => dayjs().startOf('month').format('YYYY-MM-DD'));
+  const [monthToLoad, setMonthToLoad] = useState(null);
+  const [dates, monthLoaded] = useRecoilValue(dottedDatesFromMonthSelector({ monthToLoad }));
   const currentTeam = useRecoilValue(currentTeamState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const onRefresh = useCallback(() => {
@@ -154,24 +162,28 @@ const ReportsCalendar = ({ navigation }) => {
     if (submiting) return;
     setSubmiting(true);
     const day = dayjs(dateString).startOf('day').format('YYYY-MM-DD');
-    navigation.navigate('Report', { report: dates[day]?.report, day });
+    navigation.navigate('Report', { day });
     setSubmiting(false);
   };
 
-  useLayoutEffect(() => {
-    // for smoother loading
-    setStartOfMonth(dayjs().startOf('month').format('YYYY-MM-DD'));
-  });
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      // timeout for better UX: load calendar first, then load dots
+      setMonthToLoad(startOfMonth);
+    }, 500);
+    return () => clearTimeout(timeout);
+  }, [startOfMonth]);
+
+  const isLoading = monthLoaded !== startOfMonth;
 
   return (
     <SceneContainer>
       <ScreenTitle title={`Comptes-rendus de l'équipe ${currentTeam?.name}`} onBack={navigation.goBack} />
       <ScrollContainer refreshControl={<RefreshControl refreshing={refreshTrigger.status} onRefresh={onRefresh} />}>
+        <LoadingPhrase isLoading={isLoading}>Chargement des informations du mois...</LoadingPhrase>
         <Calendar
           onDayPress={onDayPress}
-          onMonthChange={(month) => {
-            setStartOfMonth(dayjs(month.dateString).startOf('month').format('YYYY-MM-DD'));
-          }}
+          onMonthChange={(month) => setStartOfMonth(dayjs(month.dateString).startOf('month').format('YYYY-MM-DD'))}
           pastScrollRange={50}
           futureScrollRange={50}
           scrollEnabled={true}
@@ -195,5 +207,11 @@ const theme = {
   selectedDayTextColor: '#000',
   todayDotColor: '#000000',
 };
+
+const LoadingPhrase = styled(MyText)`
+  align-self: center;
+  opacity: 0.5;
+  ${(p) => !p.isLoading && 'opacity: 0;'}
+`;
 
 export default ReportsCalendar;
