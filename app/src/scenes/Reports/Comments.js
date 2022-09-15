@@ -4,7 +4,7 @@ import React, { useCallback } from 'react';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import { refreshTriggerState } from '../../components/Loader';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import CommentRow from '../Comments/CommentRow';
 import { ListNoMoreComments } from '../../components/ListEmptyContainer';
 import { commentsForReport } from './selectors';
@@ -67,11 +67,12 @@ const Comments = ({ navigation, route }) => {
   return (
     <SceneContainer>
       <ScreenTitle title={`Commentaires \n${getPeriodTitle(date, currentTeam?.nightSession)}`} onBack={navigation.goBack} />
-      <FlatListStyled
+      <FlashListStyled
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
         data={comments}
         initialNumToRender={5}
+        estimatedItemSize={545}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         onEndReachedThreshold={0.3}

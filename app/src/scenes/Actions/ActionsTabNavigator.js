@@ -6,10 +6,14 @@ import ScreenTitle from '../../components/ScreenTitle';
 import ActionsList from './ActionsList';
 import Tabs from '../../components/Tabs';
 import { CANCEL, DONE, TODO } from '../../recoil/actions';
+import { loaderFullScreenState } from '../../components/Loader';
+import { useRecoilValue } from 'recoil';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
 const ActionsTabNavigator = () => {
+  const fullScreen = useRecoilValue(loaderFullScreenState);
+  if (fullScreen) return null;
   return (
     <SceneContainer>
       <TabNavigator.Navigator

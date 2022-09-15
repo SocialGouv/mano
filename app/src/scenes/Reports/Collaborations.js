@@ -6,7 +6,7 @@ import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import Button from '../../components/Button';
 import Search from '../../components/Search';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import { ListEmptyCollaboration } from '../../components/ListEmptyContainer';
 import Row from '../../components/Row';
 import Spacer from '../../components/Spacer';
@@ -128,8 +128,9 @@ const Collaborations = ({ route, navigation }) => {
     <SceneContainer>
       <ScreenTitle title={`Collaboration - ${getPeriodTitle(report.date, currentTeam?.nightSession)}`} onBack={onGoBackRequested} />
       <Search results={data} placeholder="Rechercher une collaboration..." onChange={setCollaboration} />
-      <FlatListStyled
+      <FlashListStyled
         data={data}
+        estimatedItemSize={77}
         ListHeaderComponent={() => (
           <>
             <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateCollaboration} loading={posting} />

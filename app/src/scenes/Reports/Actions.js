@@ -6,7 +6,7 @@ import ActionRow from '../../components/ActionRow';
 import Spinner from '../../components/Spinner';
 import { ListEmptyActions, ListNoMoreActions } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
-import FlatListStyled from '../../components/FlatListStyled';
+import { FlashListStyled } from '../../components/Lists';
 import { refreshTriggerState, loadingState } from '../../components/Loader';
 import { actionsCompletedOrCanceledForReport, actionsCreatedForReport } from './selectors';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -74,9 +74,10 @@ const Actions = ({ route, navigation }) => {
         )}`}
         onBack={navigation.goBack}
       />
-      <FlatListStyled
+      <FlashListStyled
         refreshing={refreshTrigger.status}
         onRefresh={onRefresh}
+        estimatedItemSize={126}
         data={actionsToShow}
         initialNumToRender={5}
         renderItem={renderItem}
