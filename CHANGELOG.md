@@ -1,3 +1,10 @@
+## [1.150.2](https://github.com/SocialGouv/mano/compare/v1.150.1...v1.150.2) (2022-09-15)
+
+
+### Bug Fixes
+
+* **app:** create report on Report view instead of ReportsCalendar ([#869](https://github.com/SocialGouv/mano/issues/869)) ([890640c](https://github.com/SocialGouv/mano/commit/890640c05605eb13c06b0a70a9e3f90de4c2b6d3))
+
 ## [1.150.1](https://github.com/SocialGouv/mano/compare/v1.150.0...v1.150.1) (2022-09-15)
 
 
