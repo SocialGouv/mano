@@ -1,3 +1,10 @@
+## [1.150.4](https://github.com/SocialGouv/mano/compare/v1.150.3...v1.150.4) (2022-09-15)
+
+
+### Bug Fixes
+
+* include consult/medicalFile/treatment in search for healthcarePro ([#876](https://github.com/SocialGouv/mano/issues/876)) ([b47bfdb](https://github.com/SocialGouv/mano/commit/b47bfdb6e98b383c98a4bdda92643225c9a9c664))
+
 ## [1.150.3](https://github.com/SocialGouv/mano/compare/v1.150.2...v1.150.3) (2022-09-15)
 
 
