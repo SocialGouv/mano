@@ -317,6 +317,7 @@ const Stats = () => {
           />
           <AgeRangeBar persons={personsForStats} />
           <StatsCreatedAtRangeBar persons={personsForStats} />
+          <StatsWanderingAtRangeBar persons={personsForStats} />
           <CustomResponsivePie onAddFilter={addFilter} title="Type d'hébergement" data={getAdressPieData(personsForStats)} />
           <CustomResponsivePie
             onAddFilter={addFilter}
@@ -587,6 +588,54 @@ const StatsCreatedAtRangeBar = ({ persons }) => {
       categories={categories}
       data={data}
       axisTitleX="Temps de suivi"
+      axisTitleY="Nombre de personnes"
+    />
+  );
+};
+
+const StatsWanderingAtRangeBar = ({ persons }) => {
+  const categories = ['0-6 mois', '6-12 mois', '1-2 ans', '2-5 ans', '5-10 ans', '+ 10 ans'];
+
+  let data = persons.reduce((newData, person) => {
+    if (!person.wanderingAt || !person.wanderingAt.length) {
+      return newData;
+    }
+    const parsedDate = Date.parse(person.wanderingAt);
+    const fromNowInMonths = (Date.now() - parsedDate) / 1000 / 60 / 60 / 24 / (365.25 / 12);
+    if (fromNowInMonths < 6) {
+      newData['0-6 mois']++;
+      return newData;
+    }
+    if (fromNowInMonths < 12) {
+      newData['6-12 mois']++;
+      return newData;
+    }
+    if (fromNowInMonths < 24) {
+      newData['1-2 ans']++;
+      return newData;
+    }
+    if (fromNowInMonths < 60) {
+      newData['2-5 ans']++;
+      return newData;
+    }
+    if (fromNowInMonths < 120) {
+      newData['5-10 ans']++;
+      return newData;
+    }
+    newData['+ 10 ans']++;
+    return newData;
+  }, initCategories(categories));
+
+  data = Object.keys(data)
+    .filter((key) => data[key] > 0)
+    .map((key) => ({ name: key, [key]: data[key] }));
+
+  return (
+    <CustomResponsiveBar
+      title="Temps d'errance (par tranche)"
+      categories={categories}
+      data={data}
+      axisTitleX="Temps d'errance"
       axisTitleY="Nombre de personnes"
     />
   );
