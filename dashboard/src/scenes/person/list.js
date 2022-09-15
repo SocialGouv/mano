@@ -29,6 +29,9 @@ import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import { consultationsState } from '../../recoil/consultations';
+import { medicalFileState } from '../../recoil/medicalFiles';
+import { treatmentsState } from '../../recoil/treatments';
 
 const limit = 20;
 
@@ -38,6 +41,9 @@ const List = () => {
   const places = useRecoilValue(placesState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
+  const consultations = useRecoilValue(consultationsState);
+  const medicalFiles = useRecoilValue(medicalFileState);
+  const treatments = useRecoilValue(treatmentsState);
   const [search, setSearch] = useSearchParamState('search', '');
   const [alertness, setFilterAlertness] = useSearchParamState('alertness', false);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrganisationData', []);
@@ -69,12 +75,36 @@ const List = () => {
 
   // The next memos are used to filter by search (empty array when search is empty).
   const personsFilteredIds = useMemo(() => personsFiltered.map((p) => p._id), [personsFiltered]);
+  const consultationsOfFilteredPersons = useMemo(
+    () => consultations.filter((a) => personsFilteredIds.includes(a.person)),
+    [consultations, personsFilteredIds]
+  );
+  const medicalFilesOfFilteredPersons = useMemo(
+    () => medicalFiles.filter((a) => personsFilteredIds.includes(a.person)),
+    [medicalFiles, personsFilteredIds]
+  );
+  const treatmentsOfFilteredPersons = useMemo(
+    () => treatments.filter((a) => personsFilteredIds.includes(a.person)),
+    [treatments, personsFilteredIds]
+  );
   const actionsOfFilteredPersons = useMemo(() => actions.filter((a) => personsFilteredIds.includes(a.person)), [actions, personsFilteredIds]);
   const actionsOfFilteredPersonsIds = useMemo(() => actionsOfFilteredPersons.map((a) => a._id), [actionsOfFilteredPersons]);
   const commentsOfFilteredPersons = useMemo(() => comments.filter((c) => personsFilteredIds.includes(c.person)), [comments, personsFilteredIds]);
   const commentsOfFilteredActions = useMemo(
     () => comments.filter((c) => actionsOfFilteredPersonsIds.includes(c.action)),
     [actionsOfFilteredPersonsIds, comments]
+  );
+  const personsIdsFilteredByConsultationSearch = useMemo(
+    () => filterBySearch(search, consultationsOfFilteredPersons).map((c) => c.person),
+    [consultationsOfFilteredPersons, search]
+  );
+  const personsIdsFilteredByMedicalFileSearch = useMemo(
+    () => filterBySearch(search, medicalFilesOfFilteredPersons).map((c) => c.person),
+    [medicalFilesOfFilteredPersons, search]
+  );
+  const personsIdsFilteredByTreatmentSearch = useMemo(
+    () => filterBySearch(search, treatmentsOfFilteredPersons).map((c) => c.person),
+    [treatmentsOfFilteredPersons, search]
   );
   const personsIdsFilteredByActionsSearch = useMemo(
     () => filterBySearch(search, actionsOfFilteredPersons).map((a) => a.person),
@@ -88,12 +118,16 @@ const List = () => {
     () => filterBySearch(search, commentsOfFilteredActions).map((c) => c.person),
     [commentsOfFilteredActions, search]
   );
+
   const personsIdsFilteredByPersonsSearch = useMemo(() => filterBySearch(search, personsFiltered).map((c) => c._id), [personsFiltered, search]);
 
   const personsFilteredBySearch = useMemo(() => {
     if (!search?.length) return personsFiltered;
     const personsIdsFilterBySearch = [
       ...new Set([
+        ...personsIdsFilteredByConsultationSearch,
+        ...personsIdsFilteredByMedicalFileSearch,
+        ...personsIdsFilteredByTreatmentSearch,
         ...personsIdsFilteredByActionsSearch,
         ...personsIdsFilteredByActionsCommentsSearch,
         ...personsIdsFilteredByPersonsCommentsSearch,
@@ -104,6 +138,9 @@ const List = () => {
   }, [
     search?.length,
     personsFiltered,
+    personsIdsFilteredByConsultationSearch,
+    personsIdsFilteredByMedicalFileSearch,
+    personsIdsFilteredByTreatmentSearch,
     personsIdsFilteredByActionsSearch,
     personsIdsFilteredByActionsCommentsSearch,
     personsIdsFilteredByPersonsCommentsSearch,
