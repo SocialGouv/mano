@@ -20,6 +20,8 @@ import ConsultationRow from '../../components/ConsultationRow';
 import TreatmentRow from '../../components/TreatmentRow';
 import Document from '../../components/Document';
 import DocumentsManager from '../../components/DocumentsManager';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { MyText } from '../../components/MyText';
 
 const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, editable, onEdit, isUpdateDisabled, backgroundColor, onChange }) => {
   const organisation = useRecoilValue(organisationState);
@@ -127,6 +129,9 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
 
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
+      <BackButton onPress={navigation.goBack}>
+        <MyText color={colors.app.color}>{'<'} Retour vers la personne</MyText>
+      </BackButton>
       <InputLabelled
         label="Nom prénom ou Pseudonyme"
         onChangeText={(name) => onChange({ name })}
@@ -213,6 +218,11 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
 
 const DocumentRow = styled.View`
   margin-horizontal: 30px;
+`;
+
+const BackButton = styled.TouchableOpacity`
+  margin-right: auto;
+  margin-bottom: 25px;
 `;
 
 export default MedicalFile;
