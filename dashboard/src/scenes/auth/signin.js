@@ -169,12 +169,7 @@ const SignIn = () => {
               return;
             }
             // basic login
-            if (process.env.NODE_ENV === 'development' && process.env.REACT_APP_SKIP_TEAMS === 'true') {
-              setCurrentTeam(teams[0]);
-              onSigninValidated();
-              return;
-            }
-            if (user.teams.length === 1) {
+            if (user.teams.length === 1 || (process.env.NODE_ENV === 'development' && process.env.REACT_APP_SKIP_TEAMS === 'true')) {
               setCurrentTeam(user.teams[0]);
               onSigninValidated();
               return;
