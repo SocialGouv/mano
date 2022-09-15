@@ -1,3 +1,10 @@
+# [1.150.0](https://github.com/SocialGouv/mano/compare/v1.149.0...v1.150.0) (2022-09-15)
+
+
+### Features
+
+* **app:** replaced FlatList with FlashList ([#867](https://github.com/SocialGouv/mano/issues/867)) ([ab275f8](https://github.com/SocialGouv/mano/commit/ab275f8b5dc94b0753ba8144b03c8e70b99045a8))
+
 # [1.149.0](https://github.com/SocialGouv/mano/compare/v1.148.8...v1.149.0) (2022-09-15)
 
 
