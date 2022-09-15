@@ -665,7 +665,7 @@ const BlockTotal = ({ title, unit, data, field }) => {
     if (!data.length) {
       return <Card title={title} unit={unit} count={0} />;
     }
-    const total = data.reduce((total, item) => total + Number(item[field]), 0);
+    const total = data.filter((e) => !isNaN(Number(e[field]))).reduce((total, item) => total + Number(item[field]), 0);
     return <Card title={title} unit={unit} count={total} />;
   } catch (errorBlockTotal) {
     console.log('error block total', errorBlockTotal, { title, unit, data, field });
@@ -696,6 +696,7 @@ function CustomFieldsStats({ customFields, data }) {
     .filter((f) => f.showInStats)
     .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
   const totalCols = customFieldsNumber.length + customFieldsDate.length;
+  console.log(customFieldsNumber);
   const colSize = getColsSize(totalCols);
   return (
     <>
