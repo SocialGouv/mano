@@ -1,3 +1,10 @@
+## [1.148.8](https://github.com/SocialGouv/mano/compare/v1.148.7...v1.148.8) (2022-09-15)
+
+
+### Bug Fixes
+
+* **dashboard:** show out of active list in select ([#874](https://github.com/SocialGouv/mano/issues/874)) ([589dfa7](https://github.com/SocialGouv/mano/commit/589dfa7b3344a578b534fda947c67b83ddffd55d))
+
 ## [1.148.7](https://github.com/SocialGouv/mano/compare/v1.148.6...v1.148.7) (2022-09-15)
 
 
