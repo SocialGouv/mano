@@ -1,3 +1,10 @@
+## [1.150.3](https://github.com/SocialGouv/mano/compare/v1.150.2...v1.150.3) (2022-09-15)
+
+
+### Bug Fixes
+
+* **dashboard:** remove NaN on stats ([beeb4b7](https://github.com/SocialGouv/mano/commit/beeb4b7cd60ae30dc31a8c88f943342ab7014764))
+
 ## [1.150.2](https://github.com/SocialGouv/mano/compare/v1.150.1...v1.150.2) (2022-09-15)
 
 
