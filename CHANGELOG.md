@@ -1,3 +1,10 @@
+## [1.150.1](https://github.com/SocialGouv/mano/compare/v1.150.0...v1.150.1) (2022-09-15)
+
+
+### Bug Fixes
+
+* api service in app ([#868](https://github.com/SocialGouv/mano/issues/868)) ([d8effe7](https://github.com/SocialGouv/mano/commit/d8effe7ef6379e349f0ebf3c0423afac846eb4ac))
+
 # [1.150.0](https://github.com/SocialGouv/mano/compare/v1.149.0...v1.150.0) (2022-09-15)
 
 
