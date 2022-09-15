@@ -8,9 +8,7 @@ import {
   navigateWithReactRouter,
   useEncryptedOrga,
   scrollDown,
-  scrollTop,
   getInputValue,
-  getInnerText,
 } from "../utils";
 
 dayjs.extend(utc);
@@ -54,9 +52,7 @@ describe("Organisation CRUD", () => {
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
-    await expect(page).toClick("button", {
-      text: dayjs().format("D MMMM YYYY"),
-    });
+    await expect(page).toClick("button", { text: dayjs().format("D") });
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Compte rendu de l'équipe Encrypted Orga Team`);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
@@ -70,9 +66,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await page.waitForTimeout(500);
-    await expect(page).toClick("button", {
-      text: dayjs().add(-1, "day").format("D MMMM YYYY"),
-    });
+    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D") });
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);
@@ -112,9 +106,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await page.waitForTimeout(500);
-    await expect(page).toClick("button", {
-      text: dayjs().add(-1, "day").format("D MMMM YYYY"),
-    });
+    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D") });
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);
@@ -127,9 +119,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await page.waitForTimeout(500);
-    await expect(page).toClick("button", {
-      text: dayjs().format("D MMMM YYYY"),
-    });
+    await expect(page).toClick("button", { text: dayjs().format("D") });
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);

@@ -60,9 +60,7 @@ describe("Organisation CRUD", () => {
     await navigateWithReactRouter("/person");
     await expect(page).toMatch("Personnes suivies par l'organisation");
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", {
-      text: "Créer une nouvelle personne",
-    });
+    await expect(page).toClick("button", { text: "Créer une nouvelle personne" });
     await expect(page).toFill('input[name="name"]', "Ma première personne");
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(1000);
@@ -116,9 +114,7 @@ Accéder au dossier`
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
-    await expect(page).toClick("button", {
-      text: dayjs().format("D MMMM YYYY"),
-    });
+    await expect(page).toClick("button", { text: dayjs().format("D") });
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Compte rendu de l'équipe Encrypted Orga Team`);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
@@ -129,9 +125,7 @@ Accéder au dossier`
     await page.waitForTimeout(2000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", {
-      text: dayjs().add(-1, "day").format("D MMMM YYYY"),
-    });
+    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D") });
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await expect(page).toClick("button", { text: "Suivant" });
@@ -247,9 +241,7 @@ Accéder au dossier`
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
-    await expect(page).toClick("button", {
-      text: dayjs().add(-1, "day").format("D MMMM YYYY"),
-    });
+    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D") });
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await page.waitForTimeout(1000);
@@ -268,9 +260,7 @@ Accéder au dossier`
     await navigateWithReactRouter("/report");
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Comptes rendus de l'équipe Encrypted Orga Team");
-    await expect(page).toClick("button", {
-      text: dayjs().add(-1, "day").format("D MMMM YYYY"),
-    });
+    await expect(page).toClick("button", { text: dayjs().add(-1, "day").format("D") });
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`);
     await page.waitForTimeout(1000);
