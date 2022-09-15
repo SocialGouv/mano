@@ -65,7 +65,7 @@ export default function ReportsMonthly({ onReportClick }) {
             const report = reports.find((rep) => rep.date === dateString);
             return (
               <DayButton aria-label={dateString} key={dateString} isOutOfMonth={isOutOfMonth} onClick={() => onReportClick(report, dateString)}>
-                <DayContent isToday={isToday}>{process.env.REACT_APP_TEST === 'true' ? '' : day.format('D')}</DayContent>
+                <DayContent isToday={isToday}>{isOutOfMonth && process.env.REACT_APP_TEST === 'true' ? '' : day.format('D')}</DayContent>
                 {!!report && <Dot />}
               </DayButton>
             );
