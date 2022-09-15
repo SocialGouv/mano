@@ -1,15 +1,77 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Button } from 'reactstrap';
 import styled, { css } from 'styled-components';
-import { useRecoilValue } from 'recoil';
-import { currentTeamReportsSelector } from '../recoil/selectors';
+import { selectorFamily, useRecoilValue } from 'recoil';
 import { dayjsInstance } from '../services/date';
+import { reportsState } from '../recoil/reports';
+import { actionsState } from '../recoil/actions';
+import { passagesState } from '../recoil/passages';
+import { commentsState } from '../recoil/comments';
+import { currentTeamState } from '../recoil/auth';
+import { consultationsState } from '../recoil/consultations';
+import { territoryObservationsState } from '../recoil/territoryObservations';
 
-// TODO: remove inline style when UI is stabilized.
+const dottedReportsFromMonthSelector = selectorFamily({
+  key: 'dottedReportsFromMonthSelector',
+  get:
+    ({ startOfMonth, teamIds }) =>
+    ({ get }) => {
+      const reports = get(reportsState);
+      const teamsReports = reports.filter((report) => teamIds.includes(report.team));
+      const actions = get(actionsState);
+      const teamsActions = actions.filter((action) => teamIds.includes(action.team));
+      const passages = get(passagesState);
+      const teamsPassages = passages.filter((passage) => teamIds.includes(passage.team));
+      const comments = get(commentsState);
+      const teamsComments = comments.filter((comment) => teamIds.includes(comment.team));
+      const consultations = get(consultationsState);
+      const observations = get(territoryObservationsState);
+      const teamsObservations = observations.filter((obs) => teamIds.includes(obs.team));
+
+      const firstDayOfMonth = dayjsInstance(startOfMonth).startOf('month');
+      const firstDayToShow = firstDayOfMonth.startOf('week');
+      const endOfMonth = dayjsInstance(startOfMonth).endOf('month');
+      const lastDayToShow = endOfMonth.endOf('week');
+
+      const dottedReports = {};
+      for (let i = 0; i < lastDayToShow.diff(firstDayToShow, 'days'); i++) {
+        const day = firstDayToShow.add(i, 'days');
+        const teamsReportsFromDay = teamsReports.filter(
+          (report) => dayjsInstance(report.date).isSame(day, 'day') && (!!report.description || !!report.collaborations?.length)
+        );
+        const teamsActionsCreatedAtFromDay = teamsActions.filter((action) => dayjsInstance(action.createdAt).isSame(day, 'day'));
+        const teamsActionsDueAtFromDay = teamsActions.filter((action) => dayjsInstance(action.dueAt).isSame(day, 'day'));
+        const teamsActionsCompletedAtFromDay = teamsActions.filter((action) => dayjsInstance(action.completedAt).isSame(day, 'day'));
+        const passagesFromDay = teamsPassages.filter((passage) => dayjsInstance(passage.date).isSame(day, 'day'));
+        const commentsFromDay = teamsComments.filter((comment) => dayjsInstance(comment.date).isSame(day, 'day'));
+        const observationsFromDay = teamsObservations.filter((obs) => dayjsInstance(obs.observedAt).isSame(day, 'day'));
+        const consultationsCreatedAtFromDay = consultations.filter((consultation) => dayjsInstance(consultation.createdAt).isSame(day, 'day'));
+        const consultationsDueAtFromDay = consultations.filter((consultation) => dayjsInstance(consultation.dueAt).isSame(day, 'day'));
+        const consultationsCompletedAtFromDay = consultations.filter((consultation) => dayjsInstance(consultation.completedAt).isSame(day, 'day'));
+        const dotted =
+          teamsReportsFromDay.length ||
+          teamsActionsCreatedAtFromDay.length ||
+          teamsActionsDueAtFromDay.length ||
+          teamsActionsCompletedAtFromDay.length ||
+          passagesFromDay.length ||
+          commentsFromDay.length ||
+          observationsFromDay.length ||
+          consultationsCreatedAtFromDay.length ||
+          consultationsDueAtFromDay.length ||
+          consultationsCompletedAtFromDay.length;
+
+        dottedReports[day.format('YYYY-MM-DD')] = dotted;
+      }
+
+      return dottedReports;
+    },
+});
 
 export default function ReportsMonthly({ onReportClick }) {
-  const reports = useRecoilValue(currentTeamReportsSelector);
   const [startOfMonth, setStartOfMonth] = useState(dayjsInstance(window.localStorage.getItem('startOfMonth') || new Date()).startOf('month'));
+  const currentTeam = useRecoilValue(currentTeamState);
+  const teamIds = useMemo(() => [currentTeam._id], [currentTeam]);
+  const dottedReports = useRecoilValue(dottedReportsFromMonthSelector({ startOfMonth, teamIds }));
 
   const endOfMonth = useMemo(() => dayjsInstance(startOfMonth).endOf('month'), [startOfMonth]);
   const firstDayToShow = useMemo(() => dayjsInstance(startOfMonth).startOf('week'), [startOfMonth]);
@@ -62,11 +124,10 @@ export default function ReportsMonthly({ onReportClick }) {
             const isToday = day.isSame(dayjsInstance(), 'day');
             const isOutOfMonth = !day.isSame(startOfMonth, 'month');
             const dateString = day.format('YYYY-MM-DD');
-            const report = reports.find((rep) => rep.date === dateString);
             return (
-              <DayButton aria-label={dateString} key={dateString} isOutOfMonth={isOutOfMonth} onClick={() => onReportClick(report, dateString)}>
+              <DayButton aria-label={dateString} key={dateString} isOutOfMonth={isOutOfMonth} onClick={() => onReportClick(dateString)}>
                 <DayContent isToday={isToday}>{isOutOfMonth && process.env.REACT_APP_TEST === 'true' ? '' : day.format('D')}</DayContent>
-                {!!report && <Dot />}
+                {!!dottedReports[dateString] && <Dot />}
               </DayButton>
             );
           })}

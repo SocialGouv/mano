@@ -22,8 +22,7 @@ const List = () => {
 
   const history = useHistory();
 
-  const onReportClick = async (report, date) => {
-    if (report) return history.push(`/report/${report._id}`);
+  const onReportClick = async (date) => {
     if (submiting) return;
     setSubmiting(true);
     const existingReport = reports.find((r) => r.date === date && r.team === currentTeam._id);
