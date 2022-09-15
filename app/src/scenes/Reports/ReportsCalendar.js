@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import React, { useCallback, useState } from 'react';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
-import { selector, useRecoilState, useRecoilValue } from 'recoil';
+import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil';
 import { RefreshControl } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -10,6 +10,12 @@ import { currentTeamState } from '../../recoil/auth';
 import { reportsState } from '../../recoil/reports';
 import colors from '../../utils/colors';
 import { refreshTriggerState } from '../../components/Loader';
+import { actionsState } from '../../recoil/actions';
+import { commentsState } from '../../recoil/comments';
+import { consultationsState } from '../../recoil/consultations';
+import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
+import { useEffect } from 'react';
+import { useLayoutEffect } from 'react';
 
 LocaleConfig.locales.fr = {
   monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
@@ -29,37 +35,113 @@ const currentTeamReportsSelector = selector({
   },
 });
 
-export const mappedReportsToCalendarDaysSelector = selector({
-  key: 'mappedReportsToCalendarDaysSelector',
+const currentTeamActionsSelector = selector({
+  key: 'currentTeamActionsSelector',
   get: ({ get }) => {
-    const reports = get(currentTeamReportsSelector);
-    const today = dayjs().format('YYYY-MM-DD');
-    const dates = {
-      [today]: {
-        selected: true,
-        startingDay: true,
-        endingDay: true,
-        color: colors.app.color,
-        dotColor: '#000000',
-      },
-    };
-    for (const report of reports) {
-      if (report.date === today) {
-        dates[report.date].marked = true;
-      } else {
-        dates[report.date] = {
-          marked: true,
-          dotColor: '#000000',
-        };
-      }
-      dates[report.date].report = report;
-    }
-    return dates;
+    const actions = get(actionsState);
+    const currentTeam = get(currentTeamState);
+    return actions.filter((a) => a.team === currentTeam._id);
   },
 });
 
+const currentTeamCommentsSelector = selector({
+  key: 'currentTeamCommentsSelector',
+  get: ({ get }) => {
+    const comments = get(commentsState);
+    const currentTeam = get(currentTeamState);
+    return comments.filter((c) => c.team === currentTeam._id);
+  },
+});
+
+const currentTeamConsultationsSelector = selector({
+  key: 'currentTeamConsultationsSelector',
+  get: ({ get }) => {
+    const consultations = get(consultationsState);
+    const currentTeam = get(currentTeamState);
+    return consultations.filter((c) => c.team === currentTeam._id);
+  },
+});
+
+const currentTeamObservationsSelector = selector({
+  key: 'currentTeamObservationsSelector',
+  get: ({ get }) => {
+    const consultations = get(onlyFilledObservationsTerritories);
+    const currentTeam = get(currentTeamState);
+    return consultations.filter((c) => c.team === currentTeam._id);
+  },
+});
+
+const dottedDatesFromMonthSelector = selectorFamily({
+  key: 'dottedDatesFromMonthSelector',
+  get:
+    ({ startOfMonth }) =>
+    ({ get }) => {
+      console.log('INSIDE');
+      if (!startOfMonth) return {};
+      const reports = get(currentTeamReportsSelector);
+      const actions = get(currentTeamActionsSelector);
+      const comments = get(currentTeamCommentsSelector);
+      // const consultations = get(currentTeamConsultationsSelector);
+      const observations = get(currentTeamObservationsSelector);
+
+      const firstDayOfMonth = dayjs(startOfMonth).startOf('month');
+      const firstDayToShow = firstDayOfMonth.startOf('week');
+      const endOfMonth = dayjs(startOfMonth).endOf('month');
+      const lastDayToShow = endOfMonth.endOf('week');
+
+      const today = dayjs().format('YYYY-MM-DD');
+
+      const dates = {
+        [today]: {
+          selected: true,
+          startingDay: true,
+          endingDay: true,
+          color: colors.app.color,
+          dotColor: '#000000',
+        },
+      };
+
+      for (let i = 0; i < lastDayToShow.diff(firstDayToShow, 'days'); i++) {
+        const day = firstDayToShow.add(i, 'days');
+        const reportsFromDay = reports.filter(
+          (report) => dayjs(report.date).isSame(day, 'day') && (!!report.description || !!report.collaborations?.length)
+        );
+        const actionsCreatedAtFromDay = actions.filter((action) => dayjs(action.createdAt).isSame(day, 'day'));
+        const actionsDueAtFromDay = actions.filter((action) => dayjs(action.dueAt).isSame(day, 'day'));
+        const actionsCompletedAtFromDay = actions.filter((action) => dayjs(action.completedAt).isSame(day, 'day'));
+        const commentsFromDay = comments.filter((comment) => dayjs(comment.date).isSame(day, 'day'));
+        const observationsFromDay = observations.filter((obs) => dayjs(obs.observedAt).isSame(day, 'day'));
+        // const consultationsCreatedAtFromDay = consultations.filter((consultation) => dayjs(consultation.createdAt).isSame(day, 'day'));
+        // const consultationsDueAtFromDay = consultations.filter((consultation) => dayjs(consultation.dueAt).isSame(day, 'day'));
+        // const consultationsCompletedAtFromDay = consultations.filter((consultation) => dayjs(consultation.completedAt).isSame(day, 'day'));
+        const dotted =
+          reportsFromDay.length ||
+          actionsCreatedAtFromDay.length ||
+          actionsDueAtFromDay.length ||
+          actionsCompletedAtFromDay.length ||
+          commentsFromDay.length ||
+          observationsFromDay.length;
+        // consultationsCreatedAtFromDay.length ||
+        // consultationsDueAtFromDay.length ||
+        // consultationsCompletedAtFromDay.length;
+
+        if (!dotted) continue;
+        if (dayjs(today).isSame(day, 'day')) {
+          dates[today].marked = true;
+        } else {
+          dates[day.format('YYYY-MM-DD')] = {
+            marked: true,
+            dotColor: '#000000',
+          };
+        }
+      }
+      return dates;
+    },
+});
+
 const ReportsCalendar = ({ navigation }) => {
-  const dates = useRecoilValue(mappedReportsToCalendarDaysSelector);
+  const [startOfMonth, setStartOfMonth] = useState(null);
+  const dates = useRecoilValue(dottedDatesFromMonthSelector({ startOfMonth }));
   const currentTeam = useRecoilValue(currentTeamState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const onRefresh = useCallback(() => {
@@ -76,17 +158,25 @@ const ReportsCalendar = ({ navigation }) => {
     setSubmiting(false);
   };
 
+  useLayoutEffect(() => {
+    // for smoother loading
+    setStartOfMonth(dayjs().startOf('month').format('YYYY-MM-DD'));
+  });
+
   return (
     <SceneContainer>
       <ScreenTitle title={`Comptes-rendus de l'équipe ${currentTeam?.name}`} onBack={navigation.goBack} />
       <ScrollContainer refreshControl={<RefreshControl refreshing={refreshTrigger.status} onRefresh={onRefresh} />}>
         <Calendar
           onDayPress={onDayPress}
+          onMonthChange={(month) => {
+            setStartOfMonth(dayjs(month.dateString).startOf('month').format('YYYY-MM-DD'));
+          }}
           pastScrollRange={50}
           futureScrollRange={50}
           scrollEnabled={true}
           showScrollIndicator={true}
-          hideExtraDays={true}
+          hideExtraDays={false}
           showWeekNumbers
           showSixWeeks
           enableSwipeMonths
