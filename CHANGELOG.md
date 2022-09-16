@@ -1,3 +1,10 @@
+# [1.155.0](https://github.com/SocialGouv/mano/compare/v1.154.0...v1.155.0) (2022-09-16)
+
+
+### Features
+
+* **dashboard:** add avg in numbers blocks for stats ([#880](https://github.com/SocialGouv/mano/issues/880)) ([fe49a1a](https://github.com/SocialGouv/mano/commit/fe49a1a2a21042eec300fe99bd1a592397976690))
+
 # [1.154.0](https://github.com/SocialGouv/mano/compare/v1.153.0...v1.154.0) (2022-09-16)
 
 
