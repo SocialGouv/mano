@@ -302,6 +302,7 @@ export const personFields = [
   },
   { name: 'outOfActiveListDate', type: 'date', label: '', encrypted: true, importable: false, filterable: false },
   { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
+  { name: 'history', type: 'history', label: 'Historique', encrypted: true, importable: false, filterable: false },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
