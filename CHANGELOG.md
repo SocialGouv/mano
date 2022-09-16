@@ -1,3 +1,10 @@
+# [1.152.0](https://github.com/SocialGouv/mano/compare/v1.151.0...v1.152.0) (2022-09-16)
+
+
+### Features
+
+* **dashboard:** add apatride ([#883](https://github.com/SocialGouv/mano/issues/883)) ([257702d](https://github.com/SocialGouv/mano/commit/257702d55ff894783d9f795a122e6422da6c8cf3))
+
 # [1.151.0](https://github.com/SocialGouv/mano/compare/v1.150.4...v1.151.0) (2022-09-16)
 
 
