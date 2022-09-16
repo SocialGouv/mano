@@ -1,3 +1,11 @@
+# [1.151.0](https://github.com/SocialGouv/mano/compare/v1.150.4...v1.151.0) (2022-09-16)
+
+
+### Features
+
+* **dashboard:** observation multiple territories ([#878](https://github.com/SocialGouv/mano/issues/878)) ([2c9a22b](https://github.com/SocialGouv/mano/commit/2c9a22b707e940f1378c7e206153848395727c77))
+* **dashboard:** stats wandering at by range ([#879](https://github.com/SocialGouv/mano/issues/879)) ([30314b3](https://github.com/SocialGouv/mano/commit/30314b31211922c03ffce7e1e0c4d1e77b147df6))
+
 ## [1.150.4](https://github.com/SocialGouv/mano/compare/v1.150.3...v1.150.4) (2022-09-15)
 
 
