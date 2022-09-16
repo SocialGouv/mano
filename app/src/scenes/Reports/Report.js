@@ -18,22 +18,19 @@ import { currentTeamState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import API from '../../services/api';
 import colors from '../../utils/colors';
-import { actionsCompletedOrCanceledForReport, actionsCreatedForReport, commentsForReport, observationsForReport } from './selectors';
+import {
+  actionsCompletedOrCanceledForReport,
+  actionsCreatedForReport,
+  commentsForReport,
+  currentTeamReportsSelector,
+  observationsForReport,
+} from './selectors';
 import { getPeriodTitle } from './utils';
 
 const castToReport = (report = {}) => ({
   description: report.description?.trim() || '',
   collaborations: report.collaborations || [],
   date: report.date,
-});
-
-const currentTeamReportsSelector = selector({
-  key: 'currentTeamReportsSelector',
-  get: ({ get }) => {
-    const reports = get(reportsState);
-    const currentTeam = get(currentTeamState);
-    return reports.filter((r) => r.team === currentTeam._id);
-  },
 });
 
 const ReportLoading = ({ navigation, route }) => {

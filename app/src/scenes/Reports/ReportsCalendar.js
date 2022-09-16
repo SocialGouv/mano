@@ -10,6 +10,7 @@ import { currentTeamState } from '../../recoil/auth';
 import { reportsState } from '../../recoil/reports';
 import colors from '../../utils/colors';
 import { refreshTriggerState } from '../../components/Loader';
+import { currentTeamReportsSelector } from './selectors';
 
 LocaleConfig.locales.fr = {
   monthNames: ['Janvier', 'Février', 'Mars', 'Avril', 'Mai', 'Juin', 'Juillet', 'Août', 'Septembre', 'Octobre', 'Novembre', 'Décembre'],
@@ -19,15 +20,6 @@ LocaleConfig.locales.fr = {
   today: "Aujourd'hui",
 };
 LocaleConfig.defaultLocale = 'fr';
-
-const currentTeamReportsSelector = selector({
-  key: 'currentTeamReportsSelector',
-  get: ({ get }) => {
-    const reports = get(reportsState);
-    const currentTeam = get(currentTeamState);
-    return reports.filter((r) => r.team === currentTeam._id);
-  },
-});
 
 export const mappedReportsToCalendarDaysSelector = selector({
   key: 'mappedReportsToCalendarDaysSelector',

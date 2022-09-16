@@ -6,6 +6,15 @@ import { personsState } from '../../recoil/persons';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { getIsDayWithinHoursOffsetOfDay } from '../../services/dateDayjs';
 
+export const currentTeamReportsSelector = selector({
+  key: 'currentTeamReportsSelector',
+  get: ({ get }) => {
+    const reports = get(reportsState);
+    const currentTeam = get(currentTeamState);
+    return reports.filter((r) => r.team === currentTeam._id);
+  },
+});
+
 export const actionsCreatedForReport = selectorFamily({
   key: 'actionsCreatedForReport',
   get:
