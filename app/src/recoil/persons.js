@@ -1,6 +1,5 @@
 import { storage } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
-import { capture } from '../services/sentry';
 import { organisationState } from './auth';
 
 export const personsState = atom({

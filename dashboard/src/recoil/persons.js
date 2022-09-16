@@ -1,6 +1,5 @@
 import { setCacheItem } from '../services/dataManagement';
 import { atom, selector } from 'recoil';
-import { capture } from '../services/sentry';
 import { organisationState } from './auth';
 
 const collectionName = 'person';
