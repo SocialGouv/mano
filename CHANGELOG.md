@@ -1,3 +1,10 @@
+## [1.152.1](https://github.com/SocialGouv/mano/compare/v1.152.0...v1.152.1) (2022-09-16)
+
+
+### Bug Fixes
+
+* report shoing in app ([#884](https://github.com/SocialGouv/mano/issues/884)) ([a2e2b0f](https://github.com/SocialGouv/mano/commit/a2e2b0fe086067392587cc8cd54e57b217061611))
+
 # [1.152.0](https://github.com/SocialGouv/mano/compare/v1.151.0...v1.152.0) (2022-09-16)
 
 
