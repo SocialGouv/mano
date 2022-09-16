@@ -287,6 +287,6 @@ Accéder au dossier`
     await page.waitForTimeout(2000);
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Description", { timeout: 2000 });
-    await expect(page).toMatch("Ceci est une description", { timeout: 2000 });
+    await expect(page).toMatch("Ceci est une description");
   });
 });
