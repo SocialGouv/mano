@@ -2,7 +2,7 @@ import dayjs from 'dayjs';
 import React, { useCallback, useState } from 'react';
 import { Calendar, LocaleConfig } from 'react-native-calendars';
 import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil';
-import { RefreshControl } from 'react-native';
+import { InteractionManager, RefreshControl } from 'react-native';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import ScrollContainer from '../../components/ScrollContainer';
@@ -80,6 +80,8 @@ const dottedDatesFromMonthSelector = selectorFamily({
     ({ monthToLoad }) =>
     ({ get }) => {
       if (!monthToLoad) return [{}, null];
+      const now = Date.now();
+      console.log('dottedDatesFromMonthSelector start');
       const currentTeam = get(currentTeamState);
       const reports = get(currentTeamReportsSelector);
       const actions = get(currentTeamActionsSelector);
@@ -106,6 +108,7 @@ const dottedDatesFromMonthSelector = selectorFamily({
 
       for (let i = 0; i <= lastDayToShow.diff(firstDayToShow, 'days'); i++) {
         const day = firstDayToShow.add(i, 'days');
+        console.log(day.format('YYYY-MM-DD'));
         const reportFromDay = reports.find((report) => dayjs(report.date).isSame(day, 'day'));
         const reportIsFilled = !!reportFromDay?.description || !!reportFromDay?.collaborations?.length;
         const actionsCreatedAtFromDay = actions
@@ -142,6 +145,7 @@ const dottedDatesFromMonthSelector = selectorFamily({
           };
         }
       }
+      console.log('dottedDatesFromMonthSelector end', Date.now() - now);
       return [dates, monthToLoad];
     },
 });
@@ -167,11 +171,12 @@ const ReportsCalendar = ({ navigation }) => {
   };
 
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      // timeout for better UX: load calendar first, then load dots
+    console.log('in effect', startOfMonth);
+    InteractionManager.runAfterInteractions(() => {
+      // ...long-running synchronous task...
+      console.log('start');
       setMonthToLoad(startOfMonth);
-    }, 500);
-    return () => clearTimeout(timeout);
+    });
   }, [startOfMonth]);
 
   const isLoading = monthLoaded !== startOfMonth;

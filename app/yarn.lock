@@ -7081,7 +7081,7 @@ react-native-blob-util@^0.16.2:
     base-64 "0.1.0"
     glob "^7.1.6"
 
-react-native-bootsplash@^4.1.5:
+react-native-bootsplash@^4.3.2:
   version "4.3.2"
   resolved "https://registry.yarnpkg.com/react-native-bootsplash/-/react-native-bootsplash-4.3.2.tgz#347b024975dc344310ee4d95cb3be56b0b39e381"
   integrity sha512-HzXl6AKk4sRjEtV+1C7q4gSXP5kYMhpzGaB4DllZNObdZ8oVH8Ac7Y9ShKZ8wLQLJaG/TtzyGHKIDaNi0oNGJA==
