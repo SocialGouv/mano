@@ -1,3 +1,10 @@
+## [1.155.3](https://github.com/SocialGouv/mano/compare/v1.155.2...v1.155.3) (2022-09-16)
+
+
+### Bug Fixes
+
+* **app:** import atom ([5831885](https://github.com/SocialGouv/mano/commit/58318856c9a1aa6d66cf18d7133c93737c42c46a))
+
 ## [1.155.2](https://github.com/SocialGouv/mano/compare/v1.155.1...v1.155.2) (2022-09-16)
 
 
