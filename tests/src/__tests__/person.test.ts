@@ -243,7 +243,7 @@ describe("Organisation CRUD", () => {
   */
 
   it("should be able to create a comment for this person", async () => {
-    await expect(page).toClick("a", { text: "Commentaires (1)" });
+    await expect(page).toClick("a", { text: "Commentaires (0)" });
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
     await expect(page).toMatch("Créer un commentaire", { timeout: 10000 });
     await expect(page).toFill(
@@ -257,7 +257,7 @@ describe("Organisation CRUD", () => {
 
   it("should be able to create another comment for this person", async () => {
     await page.waitForTimeout(2000);
-    await expect(page).toClick("a", { text: "Commentaires (2)" });
+    await expect(page).toClick("a", { text: "Commentaires (1)" });
     await page.waitForTimeout(2000);
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
     await expect(page).toMatch("Créer un commentaire", { timeout: 10000 });
@@ -395,7 +395,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Retour" });
     await expect(page).toClick("a", { text: "Documents (0)" });
     /* Comments */
-    await expect(page).toClick("a", { text: "Commentaires (3)" });
+    await expect(page).toClick("a", { text: "Commentaires (2)" });
     await expect(page).toMatch("Ceci est un commentaire");
     await expect(page).toMatch("Ceci est un autre commentaire");
     /* Places */
