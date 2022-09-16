@@ -1,3 +1,4 @@
+import dayjs from 'dayjs';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentTeamState } from '../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
@@ -11,6 +12,7 @@ const useCreateReportAtDateIfNotExist = () => {
   const API = useApi();
 
   return async (date) => {
+    date = dayjs(date).startOf('day').format('YYYY-MM-DD');
     const reportAtDate = currentTeamReports.find((report) => report.date === date);
     if (!!reportAtDate) return;
     const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date }) });
