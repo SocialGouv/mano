@@ -299,6 +299,7 @@ export const personFields = [
   },
   { name: 'outOfActiveListDate', type: 'date', label: '', encrypted: true, importable: false, filterable: false },
   { name: 'documents', type: 'files', label: 'Documents', encrypted: true, importable: false, filterable: false },
+  { name: 'history', type: 'history', label: 'Historique', encrypted: true, importable: false, filterable: false },
 ];
 
 export const encryptedFields = personFields.filter((f) => f.encrypted).map((f) => f.name);
@@ -325,70 +326,4 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
   };
 };
 
-export const commentForUpdatePerson = ({ newPerson, oldPerson }) => {
-  try {
-    const commentbody = {
-      person: newPerson._id,
-    };
-    const notifyChange = (field, before, now) => `Changement ${field}:
-    Avant: ${before || 'Non renseigné'}
-    Désormais: ${now}`;
-
-    const fieldChanged = (field, stringifyForCheck = false) => {
-      const next = stringifyForCheck ? JSON.stringify(newPerson[field]) : newPerson[field];
-      const prev = stringifyForCheck ? JSON.stringify(oldPerson[field]) : oldPerson[field];
-      if (!next && !prev) return false;
-      if (!next && !prev) return false;
-      if (!next && !!prev) return true;
-      if (!!next && !prev) return true;
-      if (next === prev) return false;
-      return true;
-    };
-
-    let comment = [];
-
-    if (fieldChanged('personalSituation')) {
-      comment.push(notifyChange('de situation personnelle', oldPerson.personalSituation, newPerson.personalSituation));
-    }
-    if (fieldChanged('nationalitySituation')) {
-      comment.push(notifyChange('de nationalité', oldPerson.nationalitySituation, newPerson.nationalitySituation));
-    }
-    if (fieldChanged('structureSocial')) {
-      comment.push(notifyChange('de structure de suivi social', oldPerson.structureSocial, newPerson.structureSocial));
-    }
-    if (fieldChanged('structureMedical')) {
-      comment.push(notifyChange('de structure de suivi médical', oldPerson.structureMedical, newPerson.structureMedical));
-    }
-    if (fieldChanged('employment')) {
-      comment.push(notifyChange("d'emploi", oldPerson.employment, newPerson.employment));
-    }
-    if (fieldChanged('address') || fieldChanged('addressDetail')) {
-      const prev = oldPerson.address === 'Oui' ? oldPerson.addressDetail : oldPerson.address;
-      const next = newPerson.address === 'Oui' ? newPerson.addressDetail : newPerson.address;
-      comment.push(notifyChange("d'hébergement", prev, next));
-    }
-    if (fieldChanged('resources', true)) {
-      comment.push(notifyChange('de ressources', (oldPerson.resources || []).join(', '), (newPerson.resources || []).join(', ')));
-    }
-    if (fieldChanged('healthInsurance')) {
-      comment.push(notifyChange('de couverture médicale', oldPerson.healthInsurance, newPerson.healthInsurance));
-    }
-
-    if (comment.length) {
-      return {
-        ...commentbody,
-        comment: comment.join('\n'),
-      };
-    }
-  } catch (error) {
-    capture(error, {
-      extra: {
-        message: 'error in formatting comment for update person',
-        newPerson,
-        oldPerson,
-      },
-    });
-  }
-  return null;
-};
 export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ name, ...rest }) => ({ field: name, ...rest }));

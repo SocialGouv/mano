@@ -1,15 +1,13 @@
 import React, { useState } from 'react';
 import { View } from 'react-native';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import Button from '../../components/Button';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import ScrollContainer from '../../components/ScrollContainer';
 import OutOfActiveListReasonSelect from '../../components/Selects/OutOfActiveListReasonSelect';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { userState } from '../../recoil/auth';
 import {
-  commentForUpdatePerson,
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
   personsState,
@@ -24,13 +22,21 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const user = useRecoilValue(userState);
-  const currentTeam = useRecoilValue(currentTeamState);
-  const organisation = useRecoilValue(organisationState);
-  const setComments = useSetRecoilState(commentsState);
 
   const updatePerson = async () => {
     const person = { ...route.params.person, outOfActiveListReason: reason, outOfActiveList: true };
     const oldPerson = persons.find((a) => a._id === person._id);
+
+    const historyEntry = {
+      date: new Date(),
+      user: user._id,
+      data: {},
+    };
+    for (const key in person) {
+      if (person[key] !== oldPerson[key]) historyEntry.data[key] = { oldValue: oldPerson[key], newValue: person[key] };
+    }
+    person.history = [...(oldPerson.history || []), historyEntry];
+
     const response = await API.put({
       path: `/person/${person._id}`,
       body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(person),
@@ -43,14 +49,6 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
           return p;
         })
       );
-      const comment = commentForUpdatePerson({ newPerson, oldPerson });
-      if (comment) {
-        comment.user = user._id;
-        comment.team = currentTeam._id;
-        comment.organisation = organisation._id;
-        const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-        if (commentResponse.ok) setComments((comments) => [response.decryptedData, ...comments]);
-      }
     }
     return response;
   };
