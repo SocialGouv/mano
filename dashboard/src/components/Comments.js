@@ -89,7 +89,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
           return c;
         })
       );
-      createReportAtDateIfNotExist(response.decryptedData.date);
+      createReportAtDateIfNotExist(response.decryptedData.date || response.decryptedData.createdAt);
     }
     if (!response.ok) return;
     toast.success('Commentaire mis à jour');
