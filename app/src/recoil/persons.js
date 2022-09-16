@@ -191,7 +191,7 @@ export const personalSituationOptions = ['Aucune', 'Homme isolé', 'Femme isolé
 
 export const genderOptions = ['Aucun', 'Homme', 'Femme', 'Homme transgenre', 'Femme transgenre', 'Non binaire', 'Autre'];
 
-export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française'];
+export const nationalitySituationOptions = ['Hors UE', 'UE', 'Française', 'Apatride'];
 
 export const yesNoOptions = ['Oui', 'Non'];
 
