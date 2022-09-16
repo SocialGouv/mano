@@ -238,27 +238,6 @@ describe("Organisation CRUD", () => {
     );
   });
 
-  it("should be able to see the comment for an updated person", async () => {
-    await page.waitForTimeout(2000);
-    await expect(page).toClick("a", { text: "Historique" });
-    await expect(page).toMatch("Situation personnelle");
-    await expect(page).toMatch("Homme isolé");
-    await expect(page).toMatch("Nationalité");
-    await expect(page).toMatch("Hors UE");
-    await expect(page).toMatch("Structure de suivi social");
-    await expect(page).toMatch("Une structure sociale");
-    await expect(page).toMatch("Structure de suivi médical");
-    await expect(page).toMatch("Une structure médicale");
-    await expect(page).toMatch("Emploi");
-    await expect(page).toMatch("DPH");
-    await expect(page).toMatch("Hébergement");
-    await expect(page).toMatch("Mise à l'abri");
-    await expect(page).toMatch("Ressources");
-    await expect(page).toMatch("SANS");
-    await expect(page).toMatch("Couverture médicale");
-    await expect(page).toMatch("Aucune");
-  });
-
   /*
   COMMENT CREATION
   */
