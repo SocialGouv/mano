@@ -202,10 +202,12 @@ Accéder au dossier`
     await expect(page).toClick("div.update-action-select-status__option:nth-of-type(3)");
     expect(await getInnerText("div.update-action-select-status__single-value")).toBe("ANNULÉE");
     await scrollDown();
+    await page.evaluate(`window.originalConfirm = window.confirm;window.confirm = () => false; `); // to skip the confirmation
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mise à jour !");
     await expect(page).toClick("div.close-toastr");
     await page.waitForTimeout(1000);
+    await page.evaluate(`window.confirm = window.originalConfirm;`); // to put back the original behavior
     await expect(page).toClick("a", { text: "Retour" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Actions complétées (0)" });
