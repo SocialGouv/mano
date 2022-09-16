@@ -44,7 +44,7 @@ import { currentTeamState, organisationState, teamsState, userState } from '../.
 import Documents from '../../components/Documents';
 import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { commentsState } from '../../recoil/comments';
 import { MedicalFile } from './MedicalFile';
 import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
