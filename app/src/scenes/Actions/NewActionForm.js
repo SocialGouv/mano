@@ -18,6 +18,7 @@ import { currentTeamState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 
 const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
@@ -32,6 +33,7 @@ const NewActionForm = ({ route, navigation }) => {
   const forCurrentPerson = useRef(!!route.params?.person).current;
   const [posting, setPosting] = useState(false);
   const [status, setStatus] = useState(TODO);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const backRequestHandledRef = useRef(null);
 
@@ -88,6 +90,7 @@ const NewActionForm = ({ route, navigation }) => {
       setActions((actions) => [response.decryptedData, ...actions]);
       actions.push(response.decryptedData);
     }
+    createReportAtDateIfNotExist(newAction.completedAt || newAction.createdAt);
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
     backRequestHandledRef.current = true;
     Sentry.setContext('action', { _id: newAction._id });

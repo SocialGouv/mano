@@ -11,6 +11,8 @@ const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions, itemName, o
   const user = useRecoilValue(userState);
   const setComments = useSetRecoilState(commentsState);
 
+  console.log({ comment });
+
   const onMorePress = async () => {
     const options = ['Supprimer', 'Annuler'];
     if (onUpdate && comment.user === user._id) options.unshift('Modifier');

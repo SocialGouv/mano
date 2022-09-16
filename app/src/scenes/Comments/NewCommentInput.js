@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Alert, Keyboard } from 'react-native';
+import dayjs from 'dayjs';
 import Button from '../../components/Button';
 import InputMultilineAutoAdjust from '../../components/InputMultilineAutoAdjust';
 import Spacer from '../../components/Spacer';
@@ -9,7 +10,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
-import dayjs from 'dayjs';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 
 const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }) => {
   const [comment, setComment] = useState('');
@@ -18,6 +19,7 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const onCreateComment = async () => {
     setPosting(true);
@@ -37,13 +39,12 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
       Alert.alert(response.error || response.code);
       return;
     }
-    if (response.ok) {
-      setComments((comments) => [response.decryptedData, ...comments]);
-      Keyboard.dismiss();
-      setPosting(false);
-      setComment('');
-      onCommentWrite?.('');
-    }
+    setComments((comments) => [response.decryptedData, ...comments]);
+    createReportAtDateIfNotExist(response.decryptedData.date);
+    Keyboard.dismiss();
+    setPosting(false);
+    setComment('');
+    onCommentWrite?.('');
   };
 
   const onCancelRequest = () => {

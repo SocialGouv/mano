@@ -13,6 +13,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -26,6 +27,7 @@ const TerritoryObservation = ({ route, navigation }) => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const [allTerritoryOservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [obsDB, setObsDB] = useState(() => allTerritoryOservations.find((obs) => obs._id === route.params?.obs?._id) || {});
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const castToTerritoryObservation = useCallback(
     (territoryObservation = {}) => {
@@ -95,15 +97,14 @@ const TerritoryObservation = ({ route, navigation }) => {
       Alert.alert(response.error || response.code);
       return false;
     }
-    if (response.ok) {
-      Alert.alert('Nouvelle observation créée !');
-      setObs(castToTerritoryObservation(response.decryptedData));
-      setTerritoryObservations((territoryObservations) => [response.decryptedData, ...territoryObservations]);
-      setObsDB(response.decryptedData);
-      setUpdating(false);
-      setEditable(false);
-      return onBack();
-    }
+    Alert.alert('Nouvelle observation créée !');
+    setObs(castToTerritoryObservation(response.decryptedData));
+    setTerritoryObservations((territoryObservations) => [response.decryptedData, ...territoryObservations]);
+    createReportAtDateIfNotExist(response.decryptedData.observedAt);
+    setObsDB(response.decryptedData);
+    setUpdating(false);
+    setEditable(false);
+    return onBack();
   };
 
   const onUpdateTerritoryObservation = async () => {
@@ -125,20 +126,19 @@ const TerritoryObservation = ({ route, navigation }) => {
       Alert.alert(response.error);
       return false;
     }
-    if (response.ok) {
-      setObs(castToTerritoryObservation(response.decryptedData));
-      setTerritoryObservations((territoryObservations) =>
-        territoryObservations.map((a) => {
-          if (a._id === obsDB._id) return response.decryptedData;
-          return a;
-        })
-      );
-      setObsDB(response.decryptedData);
-      Alert.alert('Observation mise à jour !');
-      setUpdating(false);
-      setEditable(false);
-      return true;
-    }
+    setObs(castToTerritoryObservation(response.decryptedData));
+    setTerritoryObservations((territoryObservations) =>
+      territoryObservations.map((a) => {
+        if (a._id === obsDB._id) return response.decryptedData;
+        return a;
+      })
+    );
+    createReportAtDateIfNotExist(response.decryptedData.observedAt);
+    setObsDB(response.decryptedData);
+    Alert.alert('Observation mise à jour !');
+    setUpdating(false);
+    setEditable(false);
+    return true;
   };
 
   const onDeleteRequest = () => {
