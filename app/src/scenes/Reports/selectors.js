@@ -3,6 +3,7 @@ import { actionsState } from '../../recoil/actions';
 import { currentTeamState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
 import { personsState } from '../../recoil/persons';
+import { reportsState } from '../../recoil/reports';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { getIsDayWithinHoursOffsetOfDay } from '../../services/dateDayjs';
 
