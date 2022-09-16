@@ -202,6 +202,7 @@ Accéder au dossier`
     await expect(page).toClick("div.update-action-select-status__option:nth-of-type(3)");
     expect(await getInnerText("div.update-action-select-status__single-value")).toBe("ANNULÉE");
     await scrollDown();
+    await page.evaluate(`window.confirm = () => false`); // to skip the confirmation
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mise à jour !");
     await expect(page).toClick("div.close-toastr");
