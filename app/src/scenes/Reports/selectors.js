@@ -1,4 +1,4 @@
-import { selectorFamily } from 'recoil';
+import { selector, selectorFamily } from 'recoil';
 import { actionsState } from '../../recoil/actions';
 import { currentTeamState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
