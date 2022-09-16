@@ -9,6 +9,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
+import dayjs from 'dayjs';
 
 const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }) => {
   const [comment, setComment] = useState('');
@@ -23,6 +24,7 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
 
     const body = {
       comment,
+      date: dayjs(),
     };
     if (person) body.person = person;
     if (action) body.action = action;
