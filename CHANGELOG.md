@@ -1,3 +1,10 @@
+# [1.154.0](https://github.com/SocialGouv/mano/compare/v1.153.0...v1.154.0) (2022-09-16)
+
+
+### Features
+
+* **dashboard:** can duplicate action in dashboard ([#887](https://github.com/SocialGouv/mano/issues/887)) ([b1933fe](https://github.com/SocialGouv/mano/commit/b1933fec0c7e4211cfd6a15674f100cfd8646269))
+
 # [1.153.0](https://github.com/SocialGouv/mano/compare/v1.152.1...v1.153.0) (2022-09-16)
 
 
