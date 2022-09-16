@@ -1,3 +1,10 @@
+## [1.155.2](https://github.com/SocialGouv/mano/compare/v1.155.1...v1.155.2) (2022-09-16)
+
+
+### Bug Fixes
+
+* **app:** import selector ([8ecd73b](https://github.com/SocialGouv/mano/commit/8ecd73bdccaee61d04241e9b965cd15a3446a749))
+
 ## [1.155.1](https://github.com/SocialGouv/mano/compare/v1.155.0...v1.155.1) (2022-09-16)
 
 
