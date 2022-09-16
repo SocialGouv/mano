@@ -159,6 +159,7 @@ export const ressourcesOptions = [
   'RSA',
   'AAH',
   'ADA',
+  'ATA',
   'Retraite',
   'Salaire',
   'Allocation Chômage',
@@ -167,6 +168,8 @@ export const ressourcesOptions = [
   'Aide financière CCAS',
   'Revenus de Formations',
   "Pension d'invalidité",
+  "Contrat d'engagement jeune",
+  'Contrat jeune majeur',
   'Autre',
 ];
 
