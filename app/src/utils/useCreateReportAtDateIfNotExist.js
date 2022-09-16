@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { currentTeamState } from '../recoil/auth';
-import { reportsState } from '../recoil/reports';
+import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import { currentTeamReportsSelector } from '../scenes/Reports/selectors';
 import API from '../services/api';
 
