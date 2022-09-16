@@ -20,7 +20,7 @@ import SelectCustom from '../../components/SelectCustom';
 import SelectTeam from '../../components/SelectTeam';
 
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption } from '../../recoil/actions';
+import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { dateForDatePicker, now } from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
@@ -65,6 +65,43 @@ const View = () => {
   };
 
   const catsSelect = [...(organisation.categories || [])];
+
+  const onDuplicate = async () => {
+    const { name, person, dueAt, withTime, description, categories, urgent } = action;
+    const response = await API.post({
+      path: '/action',
+      body: prepareActionForEncryption({
+        name,
+        person,
+        team: currentTeam._id,
+        user: user._id,
+        dueAt,
+        withTime,
+        status: TODO,
+        description,
+        categories,
+        urgent,
+      }),
+    });
+    if (!response.ok) {
+      return;
+    }
+    setActions((actions) => [response.decryptedData, ...actions]);
+    for (let c of comments.filter((c) => c.action === action._id).filter((c) => !c.comment.includes('a changé le status'))) {
+      const body = {
+        comment: c.comment,
+        action: response.decryptedData._id,
+        user: c.user,
+        team: c.team,
+        organisation: c.organisation,
+      };
+      const res = await API.post({ path: '/comment', body: prepareCommentForEncryption(body) });
+      if (res.ok) {
+        setComments((comments) => [res.decryptedData, ...comments]);
+      }
+    }
+    history.replace(`/action/${response.decryptedData._id}`);
+  };
 
   return (
     <>
@@ -112,6 +149,10 @@ const View = () => {
             }
             toastr.success('Mise à jour !');
             refresh();
+            const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
+            if (actionCancelled && window.confirm('Cette action est annulée, voulez-vous la dupliquer ? Avec une date ultérieure par exemple')) {
+              onDuplicate();
+            }
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
