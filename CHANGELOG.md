@@ -1,3 +1,10 @@
+## [1.155.1](https://github.com/SocialGouv/mano/compare/v1.155.0...v1.155.1) (2022-09-16)
+
+
+### Bug Fixes
+
+* **app:** refacto atom for reports by team ([#889](https://github.com/SocialGouv/mano/issues/889)) ([9879f88](https://github.com/SocialGouv/mano/commit/9879f88fe670289a2b3c845e7f1f928df5a17e6b))
+
 # [1.155.0](https://github.com/SocialGouv/mano/compare/v1.154.0...v1.155.0) (2022-09-16)
 
 
