@@ -16,6 +16,7 @@ import SelectPerson from './SelectPerson';
 import ButtonCustom from './ButtonCustom';
 import SelectStatus from './SelectStatus';
 import SelectCustom from './SelectCustom';
+import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
@@ -24,11 +25,13 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
   const setActions = useSetRecoilState(actionsState);
   const history = useHistory();
   const API = useApi();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const onAddAction = async (body) => {
     if (body.status !== TODO) body.completedAt = completedAt || Date.now();
     const response = await API.post({ path: '/action', body: prepareActionForEncryption(body) });
     if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
+    createReportAtDateIfNotExist(response.decryptedData.date);
     return response;
   };
 

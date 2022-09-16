@@ -13,12 +13,14 @@ import useApi from '../services/api';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
 import SelectTeam from './SelectTeam';
 import SelectPerson from './SelectPerson';
+import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 
 const Passage = ({ passage, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
   const API = useApi();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const setPassages = useSetRecoilState(passagesState);
 
@@ -78,6 +80,7 @@ const Passage = ({ passage, onFinished }) => {
                     });
                     if (response.ok) {
                       setPassages((passages) => [response.decryptedData, ...passages]);
+                      createReportAtDateIfNotExist(response.decryptedData.date);
                     }
                   }
                 } else if (showMultiSelect) {
@@ -88,6 +91,7 @@ const Passage = ({ passage, onFinished }) => {
                     });
                     if (response.ok) {
                       setPassages((passages) => [response.decryptedData, ...passages]);
+                      createReportAtDateIfNotExist(response.decryptedData.date);
                     }
                   }
                 } else {
@@ -97,6 +101,7 @@ const Passage = ({ passage, onFinished }) => {
                   });
                   if (response.ok) {
                     setPassages((passages) => [response.decryptedData, ...passages]);
+                    createReportAtDateIfNotExist(response.decryptedData.date);
                   }
                 }
 
@@ -117,6 +122,7 @@ const Passage = ({ passage, onFinished }) => {
                     return p;
                   })
                 );
+                createReportAtDateIfNotExist(response.decryptedData.date);
               }
               if (!response.ok) return;
               setOpen(false);

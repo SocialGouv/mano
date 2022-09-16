@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -29,7 +29,7 @@ import PersonName from '../../components/PersonName';
 import Table from '../../components/table';
 import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
-import { useDataLoader } from '../../components/DataLoader';
+import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -101,7 +101,6 @@ const todaysPassagesSelector = selector({
 
 const Reception = () => {
   useTitle('Accueil');
-  const { isLoading } = useDataLoader();
 
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -114,6 +113,7 @@ const Reception = () => {
   const consultationsByStatus = useRecoilValue(consultationsByStatusSelector({ status }));
   const [todaysPassagesOpen, setTodaysPassagesOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const dataConsolidated = useMemo(
     () => [...actionsByStatus, ...consultationsByStatus].sort((a, b) => new Date(b.dueAt || b.date) - new Date(a.dueAt || a.date)),
@@ -122,7 +122,6 @@ const Reception = () => {
 
   const todaysReport = useRecoilValue(todaysReportSelector);
   const user = useRecoilValue(userState);
-  const reportsLoading = useMemo(() => isLoading, [isLoading]);
   const API = useApi();
   const persons = useRecoilValue(personsState);
 
@@ -137,21 +136,6 @@ const Reception = () => {
     if (!params) return [];
     return params.map((id) => persons.find((p) => p._id === id)).filter(Boolean);
   });
-
-  const createReport = async () => {
-    if (!!todaysReport) return;
-    const res = await API.post({
-      path: '/report',
-      body: prepareReportForEncryption({ team: currentTeam._id, date: startOfToday().format('YYYY-MM-DD') }),
-    });
-    if (!res.ok) return;
-    setReports((reports) => [res.decryptedData, ...reports].sort((r1, r2) => r2.date.localeCompare(r1.date)));
-  };
-
-  useEffect(() => {
-    if (!reportsLoading && !todaysReport && !!currentTeam?._id) createReport();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [reportsLoading, currentTeam?._id]);
 
   const services = todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {};
 
@@ -169,28 +153,24 @@ const Reception = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
-  const updateReport = async (report) => {
-    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(report) });
-    if (res.ok) {
-      setReports((reports) =>
-        reports.map((a) => {
-          if (a._id === report._id) return res.decryptedData;
-          return a;
-        })
-      );
-    }
-    return res;
-  };
-
   const onServiceUpdate = async (service, newCount) => {
+    const reportToUpdate = todaysReport || (await createReportAtDateIfNotExist(startOfToday().format('YYYY-MM-DD')));
     const reportUpdate = {
-      ...todaysReport,
+      ...reportToUpdate,
       services: JSON.stringify({
         ...services,
         [service]: newCount,
       }),
     };
-    await updateReport(reportUpdate);
+    const res = await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
+    if (res.ok) {
+      setReports((reports) =>
+        reports.map((a) => {
+          if (a._id === reportUpdate._id) return res.decryptedData;
+          return a;
+        })
+      );
+    }
   };
 
   const onAddAnonymousPassage = async () => {
@@ -206,6 +186,7 @@ const Reception = () => {
     const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
     if (response.ok) {
       setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
+      createReportAtDateIfNotExist(response.decryptedData.date);
     }
   };
 
@@ -229,6 +210,7 @@ const Reception = () => {
         const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
         if (response.ok) {
           setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
+          createReportAtDateIfNotExist(response.decryptedData.date);
         }
       }
       setAddingPassage(false);
@@ -302,15 +284,17 @@ const Reception = () => {
               {passages.length} passage{passages.length > 1 ? 's' : ''}
             </h5>
             <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-              <ButtonCustom
-                onClick={() => history.push(`/report/${todaysReport._id}?tab=6`)}
-                color="link"
-                title="Modifier les passages"
-                padding="0px"
-              />
-              <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
-            </div>
+            {!!todaysReport?._id && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <ButtonCustom
+                  onClick={() => history.push(`/report/${todaysReport?._id}?tab=6`)}
+                  color="link"
+                  title="Modifier les passages"
+                  padding="0px"
+                />
+                <ButtonCustom onClick={() => setTodaysPassagesOpen(true)} color="link" title="Voir les passages d'aujourd'hui" padding="0px" />
+              </div>
+            )}
           </PassagesWrapper>
           <ServicesWrapper>
             <h5 className="services-title">Services</h5>

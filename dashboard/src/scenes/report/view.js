@@ -91,22 +91,26 @@ const View = () => {
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
 
-  const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
+  const reportDoesntExist = id.startsWith('new__');
+  const report = useMemo(() => {
+    if (reportDoesntExist) return { team: currentTeam._id, date: id.replace('new__', '') };
+    return currentTeamReports.find((r) => r._id === id);
+  }, [currentTeam._id, currentTeamReports, id, reportDoesntExist]);
 
-  const report = currentTeamReports[reportIndex];
   useTitle(report?.date ? `${dayjs(report.date).format('DD-MM-YYYY')} - Compte rendu` : 'Compte rendu');
 
-  const onFirstBeforeReport = () => {
-    if (reportIndex === currentTeamReports.length - 1) return;
-    const prevReport = currentTeamReports[reportIndex + 1];
-    if (!prevReport) return;
-    history.push(`/report/${prevReport._id}`);
+  const onPreviousReportRequest = () => {
+    const prevDate = dayjs(report.date).subtract(1, 'day').format('YYYY-MM-DD');
+    const prevReport = currentTeamReports.find((r) => r.date === prevDate);
+    if (!!prevReport) return history.push(`/report/${prevReport._id}`);
+    history.push(`/report/new__${prevDate}`);
   };
-  const onFirstLaterReport = () => {
-    if (reportIndex === 0) return;
-    const nextReport = currentTeamReports[reportIndex - 1];
-    if (!nextReport) return;
-    history.push(`/report/${nextReport._id}`);
+
+  const onNextReportRequest = () => {
+    const nextDate = dayjs(report.date).add(1, 'day').format('YYYY-MM-DD');
+    const nextReport = currentTeamReports.find((r) => r.date === nextDate);
+    if (!!nextReport) return history.push(`/report/${nextReport._id}`);
+    history.push(`/report/new__${nextDate}`);
   };
 
   const deleteData = async () => {
@@ -200,14 +204,14 @@ const View = () => {
               </div>
               <div style={{ display: 'flex' }}>
                 <ButtonCustom color="link" className="noprint" title="Rafraichir" onClick={() => refresh()} disabled={isLoading} />
+                <ButtonCustom color="link" className="noprint" title="Précédent" onClick={onPreviousReportRequest} />
                 <ButtonCustom
                   color="link"
                   className="noprint"
-                  title="Précédent"
-                  disabled={reportIndex === currentTeamReports.length - 1}
-                  onClick={onFirstBeforeReport}
+                  title="Suivant"
+                  disabled={report.date === dayjs().format('YYYY-MM-DD')}
+                  onClick={onNextReportRequest}
                 />
-                <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onFirstLaterReport} />
               </div>
             </div>
             <div style={{ padding: '0 2rem', fontWeight: '400' }}>
@@ -221,7 +225,7 @@ const View = () => {
         className="noprint"
         style={{ height: '100%', display: 'flex', overflow: 'hidden', flex: 1, marginTop: '1rem', borderTop: '1px solid #eee' }}>
         <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
-          <Drawer title="Navigation dans les réglages de l'organisation">
+          <Drawer title="Navigation dans les catégories du compte-rendu">
             {tabsContents.map((tabCaption, index) => {
               if (!organisation.receptionEnabled && index === 1) return null;
               if (['restricted-access'].includes(user.role)) {
@@ -362,13 +366,18 @@ const Reception = ({ report }) => {
         [service]: newCount,
       }),
     };
-    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+    const isNew = !report._id;
+    const res = isNew
+      ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+      : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
     if (res.ok) {
       setReports((reports) =>
-        reports.map((a) => {
-          if (a._id === report._id) return res.decryptedData;
-          return a;
-        })
+        isNew
+          ? [res.decryptedData, ...reports]
+          : reports.map((a) => {
+              if (a._id === report._id) return res.decryptedData;
+              return a;
+            })
       );
     }
   };
@@ -1180,13 +1189,18 @@ const DescriptionAndCollaborations = ({ report }) => {
               ...report,
               ...body,
             };
-            const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+            const isNew = !report._id;
+            const res = isNew
+              ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+              : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
             if (res.ok) {
               setReports((reports) =>
-                reports.map((a) => {
-                  if (a._id === report._id) return res.decryptedData;
-                  return a;
-                })
+                isNew
+                  ? [res.decryptedData, ...reports]
+                  : reports.map((a) => {
+                      if (a._id === report._id) return res.decryptedData;
+                      return a;
+                    })
               );
               toast.success('Mis à jour !');
             }

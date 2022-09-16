@@ -53,8 +53,10 @@ router.post(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in report creation: ${e}`);
       error.status = 400;
@@ -91,9 +93,12 @@ router.put(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+        organisation: z.string().regex(looseUuidRegex),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in report put: ${e}`);
       error.status = 400;

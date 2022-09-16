@@ -27,6 +27,7 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
 import { useDataLoader } from '../../components/DataLoader';
+import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 
 const View = () => {
   const { id } = useParams();
@@ -36,6 +37,7 @@ const View = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const [actions, setActions] = useRecoilState(actionsState);
   const [comments, setComments] = useRecoilState(commentsState);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const history = useHistory();
   const API = useApi();
@@ -136,6 +138,7 @@ const View = () => {
                 return a;
               })
             );
+            createReportAtDateIfNotExist(newAction.completedAt || newAction.createdAt);
             if (statusChanged) {
               const comment = {
                 comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,

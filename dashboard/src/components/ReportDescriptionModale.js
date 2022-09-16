@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
-import { toast } from 'react-toastify';
 
 import ButtonCustom from './ButtonCustom';
 import { Formik } from 'formik';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import useApi from '../services/api';
 import { useSetRecoilState } from 'recoil';
+import { useHistory } from 'react-router-dom';
 
 const ReportDescriptionModale = ({ report }) => {
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
   const [open, setOpen] = useState(false);
+  const history = useHistory();
 
   return (
     <>
@@ -32,15 +33,20 @@ const ReportDescriptionModale = ({ report }) => {
                 ...report,
                 ...body,
               };
-              const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+              const isNew = !report._id;
+              const res = isNew
+                ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+                : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
               if (res.ok) {
                 setReports((reports) =>
-                  reports.map((a) => {
-                    if (a._id === report._id) return res.decryptedData;
-                    return a;
-                  })
+                  isNew
+                    ? [res.decryptedData, ...reports]
+                    : reports.map((a) => {
+                        if (a._id === report._id) return res.decryptedData;
+                        return a;
+                      })
                 );
-                toast.success('Mis à jour !');
+                if (isNew) history.replace(`/report/${res.decryptedData._id}`);
                 setOpen(false);
                 window.sessionStorage.removeItem('currentReportDescription');
               }

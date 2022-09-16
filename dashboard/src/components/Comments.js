@@ -17,6 +17,7 @@ import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date
 import useApi from '../services/api';
 import ExclamationMarkButton from './ExclamationMarkButton';
 import { useDataLoader } from './DataLoader';
+import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 
 const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
   const [editingId, setEditing] = useState(null);
@@ -27,6 +28,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const { isLoading } = useDataLoader();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const comments = useMemo(
     () =>
@@ -71,6 +73,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
     if (!response.ok) return;
     setComments((comments) => [response.decryptedData, ...comments]);
     toast.success('Commentaire ajouté !');
+    createReportAtDateIfNotExist(response.decryptedData.date);
     setClearNewCommentKey((k) => k + 1);
   };
 
@@ -86,6 +89,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
           return c;
         })
       );
+      createReportAtDateIfNotExist(response.decryptedData.date);
     }
     if (!response.ok) return;
     toast.success('Commentaire mis à jour');
