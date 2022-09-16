@@ -59,7 +59,7 @@ const View = () => {
 
   const { refresh } = useDataLoader();
   const API = useApi();
-  const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
+  const [tab, setTab] = useState('encryption');
   const scrollContainer = useRef(null);
   useTitle(`Organisation - ${getSettingTitle(tab)}`);
 
@@ -95,7 +95,7 @@ const View = () => {
           <DrawerButton className={tab === 'reception' ? 'active' : ''} onClick={() => setTab('reception')}>
             Accueil de jour
           </DrawerButton>
-          <DrawerButton className={tab === 'persons' ? 'active' : ''} onClick={() => setTab('persons')} disabled={!organisation.encryptionEnabled}>
+          <DrawerButton className={tab === 'persons' ? 'active' : ''} onClick={() => setTab('persons')}>
             Personnes suivies
           </DrawerButton>
           <DrawerButton className={tab === 'medicalFile' ? 'active' : ''} onClick={() => setTab('medicalFile')}>
@@ -108,10 +108,7 @@ const View = () => {
           <DrawerButton className={tab === 'actions' ? 'active' : ''} onClick={() => setTab('actions')}>
             Actions
           </DrawerButton>
-          <DrawerButton
-            className={tab === 'territories' ? 'active' : ''}
-            onClick={() => setTab('territories')}
-            disabled={!organisation.encryptionEnabled}>
+          <DrawerButton className={tab === 'territories' ? 'active' : ''} onClick={() => setTab('territories')}>
             Territoires
           </DrawerButton>
           <hr />
@@ -195,32 +192,15 @@ const View = () => {
                   return (
                     <>
                       <SubTitle>Dossier Médical</SubTitle>
-                      {organisation.encryptionEnabled ? (
-                        <>
-                          <p>
-                            Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
-                          </p>
-                          <hr />
-                          <Row>
-                            <Label>Champs personnalisés</Label>
-                            <TableCustomFields customFields="customFieldsMedicalFile" key="customFieldsMedicalFile" data={customFieldsMedicalFile} />
-                          </Row>
-                        </>
-                      ) : (
-                        <>
-                          <Row>
-                            <Col md={10}>
-                              <p>
-                                Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour le dossier médical des personnes
-                                suivies n'existe que pour les organisations chiffrées.
-                              </p>
-                            </Col>
-                          </Row>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                            <EncryptionKey />
-                          </div>
-                        </>
-                      )}
+
+                      <p>
+                        Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
+                      </p>
+                      <hr />
+                      <Row>
+                        <Label>Champs personnalisés</Label>
+                        <TableCustomFields customFields="customFieldsMedicalFile" key="customFieldsMedicalFile" data={customFieldsMedicalFile} />
+                      </Row>
                     </>
                   );
                 case 'actions':
@@ -436,76 +416,38 @@ const View = () => {
                   return (
                     <>
                       <SubTitle>Territoires</SubTitle>
-                      {organisation.encryptionEnabled ? (
-                        <>
-                          <Label>Champs personnalisés</Label>
-                          <TableCustomFields
-                            customFields="customFieldsObs"
-                            key="customFieldsObs"
-                            data={(() => {
-                              if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
-                              return defaultCustomFields;
-                            })()}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <Row>
-                            <Col md={10}>
-                              <p>
-                                Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les observations de territoires
-                                n'existe que pour les organisations chiffrées.
-                              </p>
-                            </Col>
-                          </Row>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                            <EncryptionKey />
-                          </div>
-                        </>
-                      )}
+
+                      <Label>Champs personnalisés</Label>
+                      <TableCustomFields
+                        customFields="customFieldsObs"
+                        key="customFieldsObs"
+                        data={(() => {
+                          if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
+                          return defaultCustomFields;
+                        })()}
+                      />
                     </>
                   );
                 case 'persons':
                   return (
                     <>
                       <SubTitle>Personnes suivies</SubTitle>
-                      {organisation.encryptionEnabled ? (
-                        <>
-                          <Label>Champs permanents - options modulables</Label>
-                          <TableCustomFields
-                            customFields="fieldsPersonsCustomizableOptions"
-                            key="fieldsPersonsCustomizableOptions"
-                            data={fieldsPersonsCustomizableOptions}
-                            onlyOptionsEditable
-                          />
-                          <Label>Champs personnalisés - informations sociales</Label>
-                          <TableCustomFields
-                            customFields="customFieldsPersonsSocial"
-                            key="customFieldsPersonsSocial"
-                            data={customFieldsPersonsSocial}
-                          />
-                          <Label>Champs personnalisés - informations médicales</Label>
-                          <TableCustomFields
-                            customFields="customFieldsPersonsMedical"
-                            key="customFieldsPersonsMedical"
-                            data={customFieldsPersonsMedical}
-                          />
-                        </>
-                      ) : (
-                        <>
-                          <Row>
-                            <Col md={10}>
-                              <p>
-                                Désolé, cette fonctionnalité qui consiste à personnaliser les champs disponibles pour les personnes suivies n'existe
-                                que pour les organisations chiffrées.
-                              </p>
-                            </Col>
-                          </Row>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                            <EncryptionKey />
-                          </div>
-                        </>
-                      )}
+
+                      <Label>Champs permanents - options modulables</Label>
+                      <TableCustomFields
+                        customFields="fieldsPersonsCustomizableOptions"
+                        key="fieldsPersonsCustomizableOptions"
+                        data={fieldsPersonsCustomizableOptions}
+                        onlyOptionsEditable
+                      />
+                      <Label>Champs personnalisés - informations sociales</Label>
+                      <TableCustomFields customFields="customFieldsPersonsSocial" key="customFieldsPersonsSocial" data={customFieldsPersonsSocial} />
+                      <Label>Champs personnalisés - informations médicales</Label>
+                      <TableCustomFields
+                        customFields="customFieldsPersonsMedical"
+                        key="customFieldsPersonsMedical"
+                        data={customFieldsPersonsMedical}
+                      />
                     </>
                   );
                 case 'export':
