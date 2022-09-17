@@ -143,7 +143,6 @@ const Report = ({ navigation, route }) => {
   const onUpdateReport = async () => {
     const reportToUpdate = reportDB || (await createReportAtDateIfNotExist(day));
     setUpdating(true);
-    console.log({ ...reportToUpdate, ...castToReport(report) });
     const response = await API.put({
       path: `/report/${reportToUpdate?._id}`,
       body: prepareReportForEncryption({ ...reportToUpdate, ...castToReport(report) }),
