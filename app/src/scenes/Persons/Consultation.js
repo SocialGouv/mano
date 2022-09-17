@@ -217,7 +217,7 @@ const Consultation = ({ navigation, route }) => {
           />
           <Spacer />
           <ActionStatusSelect value={consultation.status} onSelect={(status) => onChange({ status })} editable testID="consultation-status" />
-          <DateAndTimeInput label="Date" date={consultation.dueAt} setDate={(dueAt) => onChange({ dueAt })} editable showYear />
+          <DateAndTimeInput label="Date" date={consultation.dueAt} setDate={(dueAt) => onChange({ dueAt })} editable showYear showTime withTime />
           <CheckboxLabelled
             label="Seulement visible par moi"
             alone
