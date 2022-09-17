@@ -56,7 +56,7 @@ const formatDate = (date, withTime) => {
 const DateAndTimeInput = ({
   required,
   withTime,
-  setWithTime,
+  setWithTime = () => null,
   label,
   date,
   editable = true,
