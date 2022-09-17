@@ -1,7 +1,7 @@
 import { useIsFocused } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert } from 'react-native';
+import { ActivityIndicator, Alert, InteractionManager } from 'react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import InputLabelled from '../../components/InputLabelled';
@@ -45,9 +45,9 @@ const ReportLoading = ({ navigation, route }) => {
   );
 
   useEffect(() => {
-    setTimeout(() => {
+    InteractionManager.runAfterInteractions(() => {
       setIsLoading(false);
-    }, 500);
+    });
   }, []);
 
   if (isLoading) {
