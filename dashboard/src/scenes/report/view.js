@@ -53,6 +53,7 @@ import { consultationsState, disableConsultationRow } from '../../recoil/consult
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
+import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 
 const tabs = [
   'Résumé',
@@ -69,6 +70,7 @@ const tabs = [
 const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
 const tabsForRestrictedRole = ['Accueil', 'Passages', 'Rencontres'];
 const spaceAfterTab = [0, 1, 4, 5, 7, 8, 9];
+const tabsWithHealth = [...tabs, ...healthcareTabs];
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -87,9 +89,10 @@ const View = () => {
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (['restricted-access'].includes(user.role) ? 1 : 0)));
-  const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? [...tabs, ...healthcareTabs] : tabs);
+  const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? tabsWithHealth : tabs);
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const reportDoesntExist = id.startsWith('new__');
   const report = useMemo(() => {
@@ -124,7 +127,11 @@ const View = () => {
       }
     }
   };
-  const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
+
+  const updateTabContent = (tabIndex, total) => {
+    setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? `${tabsWithHealth[tabIndex]} (${total})` : c)));
+    if (total > 0 && !report?._id && report.date) createReportAtDateIfNotExist(report.date);
+  };
 
   useEffect(() => {
     if (!!currentTeam?._id && (!report || report.team !== currentTeam._id)) history.goBack();
@@ -275,29 +282,21 @@ const View = () => {
             {!['restricted-access'].includes(user.role) && (
               <>
                 <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCompletedAt
-                    date={report.date}
-                    status={DONE}
-                    onUpdateResults={(total) => updateTabContent(2, `Actions complétées (${total})`)}
-                  />
+                  <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(2, total)} />
                 </div>
                 <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, `Actions créées (${total})`)} />
+                  <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, total)} />
                 </div>
                 <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCompletedAt
-                    date={report.date}
-                    status={CANCEL}
-                    onUpdateResults={(total) => updateTabContent(4, `Actions annulées (${total})`)}
-                  />
+                  <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(4, total)} />
                 </div>
                 <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Commentaires (${total})`)} />
+                  <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, total)} />
                 </div>
               </>
             )}
             <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, `Passages (${total})`)} />
+              <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, total)} />
             </div>
             <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
               <RencontresCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(7, `Rencontres (${total})`)} />
@@ -305,32 +304,21 @@ const View = () => {
             {!['restricted-access'].includes(user.role) && (
               <>
                 <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Observations (${total})`)} />
+                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, total)} />
                 </div>
                 <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, `Personnes créées (${total})`)} />
+                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, total)} />
                 </div>
                 {!!user.healthcareProfessional && (
                   <>
                     <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <Consultations
-                        date={report.date}
-                        onUpdateResults={(total) => updateTabContent(10, `Consultations faites (${total})`)}
-                        status={DONE}
-                      />
+                      <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(10, total)} status={DONE} />
                     </div>
                     <div style={activeTab !== 11 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <ConsultationsCreatedAt
-                        date={report.date}
-                        onUpdateResults={(total) => updateTabContent(11, `Consultations créées (${total})`)}
-                      />
+                      <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(11, total)} />
                     </div>
                     <div style={activeTab !== 12 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <Consultations
-                        date={report.date}
-                        onUpdateResults={(total) => updateTabContent(12, `Consultations annulées (${total})`)}
-                        status={CANCEL}
-                      />
+                      <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(12, total)} status={CANCEL} />
                     </div>
                   </>
                 )}
