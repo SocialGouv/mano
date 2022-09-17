@@ -1,3 +1,10 @@
+## [1.155.5](https://github.com/SocialGouv/mano/compare/v1.155.4...v1.155.5) (2022-09-17)
+
+
+### Bug Fixes
+
+* **app:** show time in consultation ([#894](https://github.com/SocialGouv/mano/issues/894)) ([8338ce7](https://github.com/SocialGouv/mano/commit/8338ce75b1ba5090ed35b891c80d781d08e9fcd1))
+
 ## [1.155.4](https://github.com/SocialGouv/mano/compare/v1.155.3...v1.155.4) (2022-09-16)
 
 
