@@ -1,3 +1,10 @@
+# [1.157.0](https://github.com/SocialGouv/mano/compare/v1.156.1...v1.157.0) (2022-09-19)
+
+
+### Features
+
+* **dashboard:** add observations count in territory stats ([252bb28](https://github.com/SocialGouv/mano/commit/252bb284fe360c1bd9f7208e16e04be90b028dac))
+
 ## [1.156.1](https://github.com/SocialGouv/mano/compare/v1.156.0...v1.156.1) (2022-09-19)
 
 
