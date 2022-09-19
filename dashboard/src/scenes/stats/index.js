@@ -399,7 +399,16 @@ const Stats = () => {
             />
           </div>
           <Row>
-            <CustomFieldsStats data={observations} customFields={customFieldsObs} />
+            <CustomFieldsStats
+              data={observations}
+              customFields={customFieldsObs}
+              additionalCols={[
+                {
+                  title: "Nombre d'observation de territoire",
+                  value: observations.length,
+                },
+              ]}
+            />
           </Row>
         </TabPane>
         <TabPane tabId={6}>
@@ -736,7 +745,7 @@ const BlockTotal = ({ title, unit, data, field }) => {
   return null;
 };
 
-function CustomFieldsStats({ customFields, data }) {
+function CustomFieldsStats({ customFields, data, additionalCols = [] }) {
   function getColsSize(totalCols) {
     if (totalCols === 1) return 12;
     if (totalCols === 2) return 6;
@@ -758,13 +767,19 @@ function CustomFieldsStats({ customFields, data }) {
     .filter((f) => f.enabled)
     .filter((f) => f.showInStats)
     .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
-  const totalCols = customFieldsNumber.length + customFieldsDate.length;
+  const totalCols = customFieldsNumber.length + customFieldsDate.length + additionalCols.length;
   console.log(customFieldsNumber);
   const colSize = getColsSize(totalCols);
   return (
     <>
       {totalCols > 0 && (
         <Row>
+          {additionalCols.map((col) => (
+            <Col md={colSize} style={{ marginBottom: 20 }}>
+              {/* TODO: fix alignment. */}
+              <Card title={col.title} count={col.value} children={<div></div>} />
+            </Col>
+          ))}
           {customFieldsNumber.map((field) => (
             <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
               <BlockTotal title={field.label} data={data} field={field.name} />
