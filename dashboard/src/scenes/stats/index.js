@@ -145,7 +145,7 @@ const Stats = () => {
 
   const rencontres = getDataForPeriod(
     filterByTeam(allRencontres, 'team')
-      .map((p) => ({ ...p, type: !!p.person ? 'Non-anonyme' : 'Anonyme' }))
+      .map((p) => ({ ...p, type: 'Rencontres' }))
       .map((rencontre) => ({
         ...rencontre,
         gender: !rencontre.person ? null : allPersons.find((person) => person._id === rencontre.person)?.gender || 'Non renseigné',

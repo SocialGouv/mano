@@ -166,18 +166,18 @@ const View = () => {
           <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
         <TabPane tabId={5}>
-          <Rencontres personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Rencontres (${total})`)} />
+          <Rencontres personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Rencontres (${total})`)} />
         </TabPane>
         {!['restricted-access'].includes(user.role) && (
           <>
             <TabPane tabId={6}>
-              <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
+              <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(6, `Lieux (${total})`)} />
             </TabPane>
             <TabPane tabId={7}>
               {
                 <PersonDocuments
                   person={person}
-                  onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)}
+                  onUpdateResults={(total) => updateTabContent(7, `Documents (${total})`)}
                   onGoToMedicalFiles={async () => {
                     const searchParams = new URLSearchParams(location.search);
                     searchParams.set('tab', 'dossier médical');

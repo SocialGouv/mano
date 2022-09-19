@@ -301,30 +301,30 @@ const View = () => {
             {!['restricted-access'].includes(user.role) && (
               <>
                 <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />
+                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Observations (${total})`)} />
                 </div>
                 <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Personnes créées (${total})`)} />
+                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, `Personnes créées (${total})`)} />
                 </div>
                 {!!user.healthcareProfessional && (
                   <>
                     <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <Consultations
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(9, `Consultations faites (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(10, `Consultations faites (${total})`)}
                         status={DONE}
                       />
                     </div>
                     <div style={activeTab !== 11 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <ConsultationsCreatedAt
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(10, `Consultations créées (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(11, `Consultations créées (${total})`)}
                       />
                     </div>
                     <div style={activeTab !== 12 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <Consultations
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(11, `Consultations annulées (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(12, `Consultations annulées (${total})`)}
                         status={CANCEL}
                       />
                     </div>
@@ -998,19 +998,11 @@ const RencontresCreatedAt = ({ date, onUpdateResults = () => null }) => {
           />
         </div>
         <Row style={{ marginBottom: 20 }}>
-          <Col md={2} />
-          <Col md={4}>
-            <Card
-              countId="report-rencontres-anonymous-count"
-              title="Nombre de rencontres anonymes"
-              count={numberOfAnonymousRencontres}
-              unit={`rencontre${numberOfAnonymousRencontres > 1 ? 's' : ''}`}
-            />
-          </Col>
-          <Col md={4}>
+          <Col md={3} />
+          <Col md={6}>
             <Card
               countId="report-rencontres-non-anonymous-count"
-              title="Nombre de rencontres non-anonymes"
+              title="Nombre de rencontres"
               count={numberOfNonAnonymousRencontres}
               unit={`rencontre${numberOfNonAnonymousRencontres > 1 ? 's' : ''}`}
             />

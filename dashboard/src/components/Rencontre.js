@@ -58,8 +58,6 @@ const Rencontre = ({ rencontre, onFinished }) => {
               if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
               if (!body.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
-              if (body.anonymous && !body.anonymousNumberOfRencontres)
-                return toastr.error('Erreur!', 'Veuillez spécifier le nombre de rencontres anonymes');
               if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length))
                 return toastr.error('Erreur!', 'Veuillez spécifier une personne');
 
@@ -71,17 +69,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
                   comment: body.comment,
                 };
 
-                if (body.anonymous) {
-                  for (let i = 0; i < body.anonymousNumberOfRencontres; i++) {
-                    const response = await API.post({
-                      path: '/rencontre',
-                      body: prepareRencontreForEncryption(newRencontre),
-                    });
-                    if (response.ok) {
-                      setRencontres((rencontres) => [response.decryptedData, ...rencontres]);
-                    }
-                  }
-                } else if (showMultiSelect) {
+                if (showMultiSelect) {
                   for (const person of body.persons) {
                     const response = await API.post({
                       path: '/rencontre',
@@ -129,24 +117,6 @@ const Rencontre = ({ rencontre, onFinished }) => {
               return (
                 <React.Fragment>
                   <Row>
-                    {!!isNew && !isForPerson && (
-                      <Col md={12}>
-                        <FormGroup>
-                          <Label htmlFor="create-anonymous-rencontres">
-                            <input
-                              type="checkbox"
-                              id="create-anonymous-rencontres"
-                              style={{ marginRight: '0.5rem' }}
-                              name="anonymous"
-                              checked={values.anonymous}
-                              onChange={() => handleChange({ target: { value: !values.anonymous, name: 'anonymous' } })}
-                            />
-                            Rencontre(s) anonyme(s) <br />
-                            <small className="text-muted">Cochez cette case pour enregistrer plutôt des rencontres anonymes</small>
-                          </Label>
-                        </FormGroup>
-                      </Col>
-                    )}
                     <Col md={6}>
                       <FormGroup>
                         <Label htmlFor="date">Date</Label>
@@ -166,18 +136,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
                     </Col>
                     <Col md={6}>
                       <FormGroup>
-                        {values.anonymous ? (
-                          <>
-                            <Label htmlFor="number-of-anonymous-rencontres">Nombre de rencontres anonymes</Label>
-                            <Input
-                              name="anonymousNumberOfRencontres"
-                              type="number"
-                              value={values.anonymousNumberOfRencontres}
-                              onChange={handleChange}
-                              id="number-of-anonymous-rencontres"
-                            />
-                          </>
-                        ) : showMultiSelect ? (
+                        {showMultiSelect ? (
                           <SelectPerson value={values.persons} onChange={handleChange} isClearable isMulti name="persons" />
                         ) : (
                           <SelectPerson value={values.person} onChange={handleChange} />

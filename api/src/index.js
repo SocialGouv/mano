@@ -68,6 +68,7 @@ app.use("/action", require("./controllers/action"));
 app.use("/structure", require("./controllers/structure"));
 app.use("/comment", require("./controllers/comment"));
 app.use("/passage", require("./controllers/passage"));
+app.use("/rencontre", require("./controllers/rencontre"));
 app.use("/report", require("./controllers/report"));
 app.use("/place", require("./controllers/place"));
 app.use("/relPersonPlace", require("./controllers/relPersonPlace"));
