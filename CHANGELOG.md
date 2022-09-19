@@ -1,3 +1,10 @@
+# [1.156.0](https://github.com/SocialGouv/mano/compare/v1.155.5...v1.156.0) (2022-09-19)
+
+
+### Features
+
+* **dashboard,app:** remove comment for update person ([#888](https://github.com/SocialGouv/mano/issues/888)) ([473155d](https://github.com/SocialGouv/mano/commit/473155dd3547a85118afcbf84b2ea315189dd525))
+
 ## [1.155.5](https://github.com/SocialGouv/mano/compare/v1.155.4...v1.155.5) (2022-09-17)
 
 
