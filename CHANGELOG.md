@@ -1,3 +1,10 @@
+## [1.156.1](https://github.com/SocialGouv/mano/compare/v1.156.0...v1.156.1) (2022-09-19)
+
+
+### Bug Fixes
+
+* **app:** disable autocomplete for android ([#896](https://github.com/SocialGouv/mano/issues/896)) ([a917b13](https://github.com/SocialGouv/mano/commit/a917b1334b9f7ee27c21dc452226e767c4b46569))
+
 # [1.156.0](https://github.com/SocialGouv/mano/compare/v1.155.5...v1.156.0) (2022-09-19)
 
 
