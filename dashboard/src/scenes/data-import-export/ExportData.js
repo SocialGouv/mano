@@ -12,6 +12,7 @@ import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import { useRecoilValue } from 'recoil';
 import { passagesState } from '../../recoil/passages';
+import { rencontresState } from '../../recoil/rencontres';
 
 const createSheet = (data) => {
   /*
@@ -77,6 +78,7 @@ const ExportData = () => {
   const allObservations = useRecoilValue(territoryObservationsState);
   const places = useRecoilValue(placesState);
   const allPassages = useRecoilValue(passagesState);
+  const allRencontres = useRecoilValue(rencontresState);
 
   const onExportToCSV = async () => {
     setIsExporting(true);
@@ -108,6 +110,7 @@ const ExportData = () => {
     utils.book_append_sheet(workbook, createSheet(users), 'utilisateurs');
     utils.book_append_sheet(workbook, createSheet(reports), 'comptes rendus');
     utils.book_append_sheet(workbook, createSheet(allPassages), 'passages');
+    utils.book_append_sheet(workbook, createSheet(allRencontres), 'rencontres');
     writeFile(workbook, 'data.xlsx');
     setIsExporting(false);
   };

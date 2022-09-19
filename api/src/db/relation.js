@@ -14,6 +14,7 @@ const Treatment = require("../models/treatment");
 const MedicalFile = require("../models/medicalFile");
 const Comment = require("../models/comment");
 const Passage = require("../models/passage");
+const Rencontre = require("../models/rencontre");
 const Territory = require("../models/territory");
 const TerritoryObservation = require("../models/territoryObservation");
 
@@ -62,6 +63,10 @@ Organisation.hasMany(Comment, organisationForeignKey);
 // Passage
 Passage.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(Passage, organisationForeignKey);
+
+// Rencontre
+Rencontre.belongsTo(Organisation, organisationForeignKey);
+Organisation.hasMany(Rencontre, organisationForeignKey);
 
 // Action
 Action.belongsTo(Organisation, organisationForeignKey);

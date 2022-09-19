@@ -21,6 +21,7 @@ import { encryptVerificationKey } from '../services/encryption';
 import { capture } from '../services/sentry';
 import useApi, { setOrgEncryptionKey, encryptItem } from '../services/api';
 import { passagesState, preparePassageForEncryption } from '../recoil/passages';
+import { prepareRencontreForEncryption, rencontresState } from '../recoil/rencontres';
 import { consultationsState, prepareConsultationForEncryption } from '../recoil/consultations';
 import { prepareTreatmentForEncryption, treatmentsState } from '../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
@@ -49,6 +50,7 @@ const EncryptionKey = ({ isMain }) => {
   const medicalFiles = useRecoilValue(medicalFileState);
   const comments = useRecoilValue(commentsState);
   const passages = useRecoilValue(passagesState);
+  const rencontres = useRecoilValue(rencontresState);
   const territories = useRecoilValue(territoriesState);
   const observations = useRecoilValue(territoryObservationsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
@@ -69,6 +71,7 @@ const EncryptionKey = ({ isMain }) => {
     medicalFiles.length +
     comments.length +
     passages.length +
+    rencontres.length +
     territories.length +
     observations.length +
     relsPersonPlace.length +
@@ -102,6 +105,7 @@ const EncryptionKey = ({ isMain }) => {
       );
       const encryptedComments = await Promise.all(comments.map(prepareCommentForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedPassages = await Promise.all(passages.map(preparePassageForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedRencontres = await Promise.all(rencontres.map(prepareRencontreForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedTerritories = await Promise.all(territories.map(prepareTerritoryForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedTerritoryObservations = await Promise.all(
         observations.map(prepareObsForEncryption(customFieldsObs)).map(encryptItem(hashedOrgEncryptionKey))
@@ -130,6 +134,7 @@ const EncryptionKey = ({ isMain }) => {
           medicalFiles: encryptedMedicalFiles,
           comments: encryptedComments,
           passages: encryptedPassages,
+          rencontres: encryptedRencontres,
           territories: encryptedTerritories,
           observations: encryptedTerritoryObservations,
           places: encryptedPlaces,
