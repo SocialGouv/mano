@@ -31,7 +31,7 @@ import {
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
   preparePersonForEncryption,
-  commentForUpdatePerson,
+  personFieldsIncludingCustomFieldsSelector,
 } from '../../recoil/persons';
 import { actionsState, mappedIdsToLabels } from '../../recoil/actions';
 import UserName from '../../components/UserName';
@@ -40,11 +40,11 @@ import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
 import ActionName from '../../components/ActionName';
 import OutOfActiveList from './OutOfActiveList';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
-import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { commentsState } from '../../recoil/comments';
 import { MedicalFile } from './MedicalFile';
 import { passagesState } from '../../recoil/passages';
 import DateBloc from '../../components/DateBloc';
@@ -59,7 +59,7 @@ import { treatmentsState } from '../../recoil/treatments';
 import MergeTwoPersons from './MergeTwoPersons';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 
-const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents'];
+const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents', 'Historique'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages'];
 
 const View = () => {
@@ -185,6 +185,9 @@ const View = () => {
                 />
               }
             </TabPane>
+            <TabPane tabId={7}>
+              <PersonHistory person={person} />
+            </TabPane>
           </>
         )}
       </TabContent>
@@ -192,12 +195,70 @@ const View = () => {
   );
 };
 
+const PersonHistory = ({ person }) => {
+  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const teams = useRecoilValue(teamsState);
+  const history = person.history || [];
+  return (
+    <div>
+      <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
+        <Col md={4}>
+          <Title>Historique</Title>
+        </Col>
+      </Row>
+      <table className="table table-striped table-bordered">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Utilisateur</th>
+            <th>Donnée</th>
+          </tr>
+        </thead>
+        <tbody className="small">
+          {history.map((h) => {
+            return (
+              <tr key={h.date}>
+                <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
+                <td>
+                  <UserName id={h.user} />
+                </td>
+                <td>
+                  <div>
+                    {Object.entries(h.data).map(([key, value]) => {
+                      const personField = personFieldsIncludingCustomFields.find((f) => f.name === key);
+                      if (key === 'assignedTeams') {
+                        return (
+                          <div>
+                            {personField?.label} : <br />
+                            {(value.oldValue || []).map((teamId) => {
+                              const team = teams.find((t) => t._id === teamId);
+                              return <div key={teamId}>{team?.name}</div>;
+                            })}
+                          </div>
+                        );
+                      }
+                      return (
+                        <div>
+                          {personField?.label} : <br />
+                          <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
 const Summary = ({ person }) => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
-  const currentTeam = useRecoilValue(currentTeamState);
-  const organisation = useRecoilValue(organisationState);
   const setPersons = useSetRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
   const [comments, setComments] = useRecoilState(commentsState);
@@ -223,6 +284,17 @@ const Summary = ({ person }) => {
           if (!body.name?.trim()?.length) return toastr.error('Une personne doit avoir un nom');
           if (!body.followedSince) body.followedSince = person.createdAt;
           body.entityKey = person.entityKey;
+
+          const historyEntry = {
+            date: new Date(),
+            user: user._id,
+            data: {},
+          };
+          for (const key in body) {
+            if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
+          }
+          body.history = [...(person.history || []), historyEntry];
+
           const response = await API.put({
             path: `/person/${person._id}`,
             body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
@@ -235,14 +307,6 @@ const Summary = ({ person }) => {
                 return p;
               })
             );
-            const comment = commentForUpdatePerson({ newPerson, oldPerson: person });
-            if (comment) {
-              comment.user = user._id;
-              comment.team = currentTeam._id;
-              comment.organisation = organisation._id;
-              const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-              if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
-            }
           }
           if (response.ok) {
             toastr.success('Mis à jour !');

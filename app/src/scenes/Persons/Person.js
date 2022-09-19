@@ -11,16 +11,15 @@ import FoldersNavigator from './FoldersNavigator';
 import Tabs from '../../components/Tabs';
 import colors from '../../utils/colors';
 import {
-  commentForUpdatePerson,
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
   personsState,
   preparePersonForEncryption,
 } from '../../recoil/persons';
 import { actionsState } from '../../recoil/actions';
-import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { commentsState } from '../../recoil/comments';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { userState } from '../../recoil/auth';
 import API from '../../services/api';
 
 const TabNavigator = createMaterialTopTabNavigator();
@@ -38,8 +37,6 @@ const Person = ({ route, navigation }) => {
   const [actions, setActions] = useRecoilState(actionsState);
   const [comments, setComments] = useRecoilState(commentsState);
   const user = useRecoilValue(userState);
-  const currentTeam = useRecoilValue(currentTeamState);
-  const organisation = useRecoilValue(organisationState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
 
   const [personDB, setPersonDB] = useState(() => persons.find((p) => p._id === route.params?.person?._id));
@@ -127,6 +124,17 @@ const Person = ({ route, navigation }) => {
       _id: personDB._id,
     });
     const oldPerson = persons.find((a) => a._id === personDB._id);
+
+    const historyEntry = {
+      date: new Date(),
+      user: user._id,
+      data: {},
+    };
+    for (const key in personToUpdate) {
+      if (personToUpdate[key] !== oldPerson[key]) historyEntry.data[key] = { oldValue: oldPerson[key], newValue: personToUpdate[key] };
+    }
+    personToUpdate.history = [...(oldPerson.history || []), historyEntry];
+
     const response = await API.put({
       path: `/person/${personDB._id}`,
       body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(personToUpdate),
@@ -145,14 +153,6 @@ const Person = ({ route, navigation }) => {
     );
     setPerson(castToPerson(newPerson));
     setPersonDB(newPerson);
-    const comment = commentForUpdatePerson({ newPerson, oldPerson });
-    if (comment) {
-      comment.user = user._id;
-      comment.team = currentTeam._id;
-      comment.organisation = organisation._id;
-      const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
-      if (commentResponse.ok) setComments((comments) => [response.decryptedData, ...comments]);
-    }
     if (alert) Alert.alert('Personne mise à jour !');
     setUpdating(false);
     setEditable(false);
