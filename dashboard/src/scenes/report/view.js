@@ -977,7 +977,6 @@ const RencontresCreatedAt = ({ date, onUpdateResults = () => null }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rencontres.length]);
 
-  const numberOfAnonymousRencontres = useMemo(() => rencontres.filter((p) => !p.person)?.length, [rencontres]);
   const numberOfNonAnonymousRencontres = useMemo(() => rencontres.filter((p) => !!p.person)?.length, [rencontres]);
 
   return (
