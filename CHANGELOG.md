@@ -1,3 +1,10 @@
+## [1.157.1](https://github.com/SocialGouv/mano/compare/v1.157.0...v1.157.1) (2022-09-20)
+
+
+### Bug Fixes
+
+* **deps:** update dependency web-vitals to v3 ([#875](https://github.com/SocialGouv/mano/issues/875)) ([88cbcad](https://github.com/SocialGouv/mano/commit/88cbcadf5429f9e1ab820d02fc98d7dff567b45c))
+
 # [1.157.0](https://github.com/SocialGouv/mano/compare/v1.156.1...v1.157.0) (2022-09-19)
 
 
