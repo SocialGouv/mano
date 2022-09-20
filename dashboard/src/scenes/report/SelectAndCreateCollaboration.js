@@ -1,5 +1,5 @@
 import React from 'react';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import SelectCustom from '../../components/SelectCustom';
 import { organisationState } from '../../recoil/auth';
@@ -20,7 +20,7 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
   };
 
   const onCreateOption = async (collab) => {
-    toastr.info('Création de la nouvelle collaboration...');
+    toast.info('Création de la nouvelle collaboration...');
     onChangeRequest([...(values || []), collab]);
     const response = await API.put({
       path: `/organisation/${organisation._id}`,
@@ -29,8 +29,8 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
       },
     });
     if (response.ok) {
-      toastr.clean();
-      toastr.success('Collaboration créée !');
+      toast.clean();
+      toast.success('Collaboration créée !');
       setOrganisation(response.data);
       onChangeRequest([...(values || []), collab]);
     } else {

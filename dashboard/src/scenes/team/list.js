@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { SmallHeader } from '../../components/header';
@@ -77,7 +77,7 @@ const Create = () => {
             initialValues={{ name: '' }}
             onSubmit={async (values, actions) => {
               if (!values.name) {
-                toastr.error('Vous devez choisir un nom');
+                toast.error('Vous devez choisir un nom');
                 actions.setSubmitting(false);
                 return;
               }
@@ -93,10 +93,10 @@ const Create = () => {
                 setUser(meResponse.user);
                 AppSentry.setUser(meResponse.user);
                 setCurrentTeam(meResponse.user.teams[0]);
-                toastr.success('Création réussie !', `Vous êtes dans l'équipe ${newTeamRes.data.name}`);
+                toast.success(`Création réussie ! Vous êtes dans l'équipe ${newTeamRes.data.name}`);
                 setOnboardingEndModalOpen(true);
               } else {
-                toastr.success('Création réussie !');
+                toast.success('Création réussie !');
               }
               actions.setSubmitting(false);
               const { data: teams } = await API.get({ path: '/team' });

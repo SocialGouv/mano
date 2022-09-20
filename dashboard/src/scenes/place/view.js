@@ -3,7 +3,7 @@ import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 
 import { SmallHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
@@ -50,9 +50,9 @@ const View = () => {
                 })
                 .sort((p1, p2) => p1.name.localeCompare(p2.name))
             );
-            toastr.success('Mise à jour !');
+            toast.success('Mise à jour !');
           } else {
-            toastr.error('Erreur!', response.error);
+            toast.error(response.error);
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -95,7 +95,7 @@ const View = () => {
                         setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
                       }
                     }
-                    toastr.success('Suppression réussie');
+                    toast.success('Suppression réussie');
                     history.goBack();
                   }
                 }}>

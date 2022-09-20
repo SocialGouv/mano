@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
 import styled from 'styled-components';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
@@ -160,7 +160,7 @@ export function MedicalFile({ person }) {
               return p;
             })
           );
-          toastr.success('Mise à jour effectuée !');
+          toast.success('Mise à jour effectuée !');
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
           return (
@@ -242,7 +242,7 @@ export function MedicalFile({ person }) {
                   return m;
                 })
               );
-              toastr.success('Mise à jour effectuée !');
+              toast.success('Mise à jour effectuée !');
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => {
               return (
@@ -398,7 +398,7 @@ export function MedicalFile({ person }) {
                   const response = await API.delete({ path: `/treatment/${treatment._id}` });
                   if (!response.ok) return;
                   setAllTreatments((all) => all.filter((t) => t._id !== treatment._id));
-                  toastr.success('Traitement supprimé !');
+                  toast.success('Traitement supprimé !');
                 }}
                 color="danger"
                 title="Supprimer"
@@ -587,7 +587,7 @@ export function MedicalFile({ person }) {
                   const response = await API.delete({ path: `/consultation/${consultation._id}` });
                   if (!response.ok) return;
                   setAllConsultations((all) => all.filter((t) => t._id !== consultation._id));
-                  toastr.success('Consultation supprimée !');
+                  toast.success('Consultation supprimée !');
                 }}
                 color="danger"
                 title="Supprimer"
@@ -891,7 +891,7 @@ export function MedicalFile({ person }) {
             if (!treatmentResponse.ok) return;
             if (isNewTreatment) {
               setAllTreatments((all) => [...all, treatmentResponse.decryptedData].sort((a, b) => new Date(b.startDate) - new Date(a.startDate)));
-              toastr.success('Traitement créé !');
+              toast.success('Traitement créé !');
             } else {
               setAllTreatments((all) =>
                 all
@@ -901,7 +901,7 @@ export function MedicalFile({ person }) {
                   })
                   .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
               );
-              toastr.success('Traitement mis à jour !');
+              toast.success('Traitement mis à jour !');
             }
             resetCurrentTreatment();
           }}>

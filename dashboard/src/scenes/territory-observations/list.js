@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Col, Row } from 'reactstrap';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import Observation from './view';
@@ -30,7 +30,7 @@ const List = ({ territory = {} }) => {
         setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== id));
       }
       if (!res.ok) return;
-      toastr.success('Suppression réussie');
+      toast.success('Suppression réussie');
     }
   };
 

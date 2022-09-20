@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Col, FormGroup, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useHistory } from 'react-router-dom';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
@@ -77,14 +77,14 @@ const AddPlace = ({ personId }) => {
           <Formik
             initialValues={{ place: null }}
             onSubmit={async (body, actions) => {
-              if (!body.place) return toastr.error('Veuillez sélectionner un lieu');
+              if (!body.place) return toast.error('Veuillez sélectionner un lieu');
               const res = await API.post({
                 path: '/relPersonPlace',
                 body: prepareRelPersonPlaceForEncryption({ place: body.place._id, person: personId, user: user._id }),
               });
               if (res.ok) {
                 setRelsPersonPlace((relsPersonPlace) => [res.decryptedData, ...relsPersonPlace]);
-                toastr.success('Lieu ajouté !');
+                toast.success('Lieu ajouté !');
                 setOpen(false);
               }
               actions.setSubmitting(false);

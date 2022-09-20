@@ -1,7 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { read } from 'xlsx';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { Modal, ModalBody, ModalHeader, Alert } from 'reactstrap';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
@@ -92,7 +92,7 @@ const ImportData = () => {
       const nameField = importableFields.find((f) => f.name === 'name');
 
       if (!headerColumnsAndField.find((e) => e[1]?.name === 'name')) {
-        toastr.error(
+        toast.error(
           `La colonne "${nameField.label}" est requise.`,
           "Vérifiez votre fichier pour vous assurer que cette colonne existe et est correctement nommée. Vous pouvez vérifier avec le fichier d'exemple que les colonnes sont bien identiques.",
           { timeOut: 5000 }
@@ -117,7 +117,7 @@ const ImportData = () => {
         if (Object.keys(person).length) {
           person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ''}`;
           if (!person.name) {
-            toastr.error(`La colonne "${nameField.label}" ne doit pas être vide`, `Vérifiez la ligne ${i} du fichier.`, { timeOut: 5000 });
+            toast.error(`La colonne "${nameField.label}" ne doit pas être vide`, `Vérifiez la ligne ${i} du fichier.`, { timeOut: 5000 });
             setReloadKey((k) => k + 1);
             return;
           }
@@ -141,7 +141,7 @@ const ImportData = () => {
       setShowImpotSummary(true);
     } catch (e) {
       console.log(e);
-      toastr.error("Désolé, nous n'avons pas pu lire votre fichier.", 'Mais vous pouvez réssayer !');
+      toast.error("Désolé, nous n'avons pas pu lire votre fichier.", 'Mais vous pouvez réssayer !');
     }
     setReloadKey((k) => k + 1);
   };
@@ -149,7 +149,7 @@ const ImportData = () => {
   const onImportData = async () => {
     if (window.confirm(`Voulez-vous vraiment importer ${dataToImport.length} personnes dans Mano ? Cette opération est irréversible.`)) {
       const response = await API.post({ path: '/person/import', body: dataToImport });
-      if (response.ok) toastr.success('Importation réussie !');
+      if (response.ok) toast.success('Importation réussie !');
       setAllPersons((oldPersons) => [...oldPersons, ...response.decryptedData].sort((p1, p2) => (p1.name || '').localeCompare(p2.name || '')));
       setShowImpotSummary(false);
     }

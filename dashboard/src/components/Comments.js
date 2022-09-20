@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 
 import ButtonCustom from '../components/ButtonCustom';
@@ -51,7 +51,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
       const res = await API.delete({ path: `/comment/${id}` });
       if (res.ok) setComments((comments) => comments.filter((p) => p._id !== id));
       if (!res.ok) return;
-      toastr.success('Suppression réussie');
+      toast.success('Suppression réussie');
     }
   };
 
@@ -70,7 +70,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
     const response = await API.post({ path: '/comment', body: prepareCommentForEncryption(commentBody) });
     if (!response.ok) return;
     setComments((comments) => [response.decryptedData, ...comments]);
-    toastr.success('Commentaire ajouté !');
+    toast.success('Commentaire ajouté !');
     setClearNewCommentKey((k) => k + 1);
   };
 
@@ -88,7 +88,7 @@ const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
       );
     }
     if (!response.ok) return;
-    toastr.success('Commentaire mis à jour');
+    toast.success('Commentaire mis à jour');
     setEditing(null);
   };
 
@@ -175,9 +175,9 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
           <Formik
             initialValues={{ ...value, comment: value.comment || window.sessionStorage.getItem('currentComment') }}
             onSubmit={async (body, actions) => {
-              if (!body.user && !newComment) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
-              if (!body.date && !newComment) return toastr.error('Erreur!', 'La date est obligatoire');
-              if (!body.comment) return toastr.error('Erreur!', 'Le commentaire est obligatoire');
+              if (!body.user && !newComment) return toast.error("L'utilisateur est obligatoire");
+              if (!body.date && !newComment) return toast.error('La date est obligatoire');
+              if (!body.comment) return toast.error('Le commentaire est obligatoire');
               await onSubmit({ ...value, ...body });
               actions.setSubmitting(false);
               window.sessionStorage.removeItem('currentComment');

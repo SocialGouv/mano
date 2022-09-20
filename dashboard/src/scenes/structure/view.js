@@ -3,7 +3,7 @@ import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import { SmallHeaderWithBackButton } from '../../components/header';
@@ -40,7 +40,7 @@ const View = () => {
         enableReinitialize
         onSubmit={async (body) => {
           const res = await API.put({ path: `/structure/${id}`, body });
-          if (res.ok) toastr.success('Structure modifiée avec succès');
+          if (res.ok) toast.success('Structure modifiée avec succès');
           history.goBack();
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -65,7 +65,7 @@ const View = () => {
                 textToConfirm={structure.name}
                 onConfirm={async () => {
                   const response = await API.delete({ path: `/structure/${id}` });
-                  if (response.ok) toastr.success('Suppression réussie');
+                  if (response.ok) toast.success('Suppression réussie');
                   history.goBack();
                 }}>
                 <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>

@@ -8,7 +8,7 @@ import Loading from '../../components/loading';
 import Table from '../../components/table';
 import CreateWrapper from '../../components/createWrapper';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
 import { currentTeamState } from '../../recoil/auth';
@@ -93,13 +93,13 @@ const Create = ({ onChange }) => {
                 const res = await API.post({ path: '/structure', body });
                 actions.setSubmitting(false);
                 if (res.ok) {
-                  toastr.success('Création réussie !');
+                  toast.success('Création réussie !');
                   onChange();
                   setOpen(false);
                 }
               } catch (errorCreatingStructure) {
                 console.log('error in creating structure', errorCreatingStructure);
-                toastr.error('Erreur!', errorCreatingStructure.message);
+                toast.error(errorCreatingStructure.message);
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (

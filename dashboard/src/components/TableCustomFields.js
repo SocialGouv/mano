@@ -1,6 +1,6 @@
 import { Formik } from 'formik';
 import React, { useState } from 'react';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
@@ -78,14 +78,14 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
         body: { [customFields]: mergeData ? mergeData(newData) : newData },
       });
       if (response.ok) {
-        toastr.success('Mise à jour !');
+        toast.success('Mise à jour !');
         setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
         setTableKey((k) => k + 1);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
-      toastr.error('Erreur!', orgUpdateError.message);
+      toast.error(orgUpdateError.message);
     }
     setIsSubmitting(false);
   };
@@ -99,14 +99,14 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
         body: { [customFields]: mergeData ? mergeData(dataForApi) : dataForApi },
       });
       if (response.ok) {
-        toastr.success('Mise à jour !');
+        toast.success('Mise à jour !');
         setMutableData(extractData ? extractData(response.data[customFields]) : response.data[customFields]);
         setOrganisation(response.data);
         setTableKey((k) => k + 1);
       }
     } catch (orgUpdateError) {
       console.log('error in updating organisation', orgUpdateError);
-      toastr.error('Erreur!', orgUpdateError.message);
+      toast.error(orgUpdateError.message);
     }
     setIsSubmitting(false);
   };

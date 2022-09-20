@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
 
@@ -81,9 +81,9 @@ const EncryptionKey = ({ isMain }) => {
 
   const onEncrypt = async (values) => {
     try {
-      if (!values.encryptionKey) return toastr.error('Erreur!', 'La clé est obligatoire');
-      if (!values.encryptionKeyConfirm) return toastr.error('Erreur!', 'La validation de la clé est obligatoire');
-      if (values.encryptionKey !== values.encryptionKeyConfirm) return toastr.error('Erreur!', 'Les clés ne sont pas identiques');
+      if (!values.encryptionKey) return toast.error('La clé est obligatoire');
+      if (!values.encryptionKeyConfirm) return toast.error('La validation de la clé est obligatoire');
+      if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error('Les clés ne sont pas identiques');
       setEncryptionKey(values.encryptionKey.trim());
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
       setEncryptingStatus('Chiffrement des données...');
@@ -151,12 +151,12 @@ const EncryptionKey = ({ isMain }) => {
         if (onboardingForTeams) {
           history.push('/team');
         } else {
-          toastr.success('Données chiffrées !', 'Veuillez noter la clé puis vous reconnecter');
+          toast.success('Données chiffrées ! Veuillez noter la clé puis vous reconnecter');
         }
       }
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);
-      toastr.error('Erreur!', orgEncryptionError.message, { timeOut: 0 });
+      toast.error(orgEncryptionError.message, { timeOut: 0 });
       API.logout();
       setEncryptingProgress(0);
       setEncryptionKey('');

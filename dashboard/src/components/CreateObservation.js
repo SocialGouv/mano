@@ -3,7 +3,7 @@ import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from 'react
 import DatePicker from 'react-datepicker';
 import styled from 'styled-components';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
 import SelectTeam from './SelectTeam';
@@ -62,8 +62,8 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
             key={open}
             initialValues={observation}
             onSubmit={async (values, actions) => {
-              if (!values.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
-              if (!values.territory) return toastr.error('Erreur!', 'Le territoire est obligatoire');
+              if (!values.team) return toast.error("L'équipe est obligatoire");
+              if (!values.territory) return toast.error('Le territoire est obligatoire');
               const body = {
                 observedAt: values.observedAt,
                 team: values.team,
@@ -77,7 +77,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               const res = observation._id ? await updateTerritoryObs(body) : await addTerritoryObs(body);
               actions.setSubmitting(false);
               if (res.ok) {
-                toastr.success(observation._id ? 'Observation mise à jour' : 'Création réussie !');
+                toast.success(observation._id ? 'Observation mise à jour' : 'Création réussie !');
                 setOpen(false);
               }
             }}>

@@ -3,7 +3,7 @@ import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, N
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
@@ -281,7 +281,7 @@ const Summary = ({ person }) => {
         enableReinitialize
         initialValues={person}
         onSubmit={async (body) => {
-          if (!body.name?.trim()?.length) return toastr.error('Une personne doit avoir un nom');
+          if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
           if (!body.followedSince) body.followedSince = person.createdAt;
           body.entityKey = person.entityKey;
 
@@ -309,7 +309,7 @@ const Summary = ({ person }) => {
             );
           }
           if (response.ok) {
-            toastr.success('Mis à jour !');
+            toast.success('Mis à jour !');
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
@@ -601,7 +601,7 @@ const Summary = ({ person }) => {
                           }
                         }
                         if (personRes?.ok) {
-                          toastr.success('Suppression réussie');
+                          toast.success('Suppression réussie');
                           history.goBack();
                         }
                       }}>

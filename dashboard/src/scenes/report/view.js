@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Col, Row, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import {
   addOneDay,
@@ -112,7 +112,7 @@ const View = () => {
       const res = await API.delete({ path: `/report/${id}` });
       if (res.ok) {
         setReports((reports) => reports.filter((p) => p._id !== id));
-        toastr.success('Suppression réussie');
+        toast.success('Suppression réussie');
         history.goBack();
       }
     }
@@ -1079,7 +1079,7 @@ const DescriptionAndCollaborations = ({ report }) => {
                   return a;
                 })
               );
-              toastr.success('Mis à jour !');
+              toast.success('Mis à jour !');
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (

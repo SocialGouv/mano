@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
@@ -129,12 +129,12 @@ const View = () => {
               try {
                 const response = await API.put({ path: `/organisation/${organisation._id}`, body });
                 if (response.ok) {
-                  toastr.success('Mise à jour !');
+                  toast.success('Mise à jour !');
                   setOrganisation(response.data);
                 }
               } catch (orgUpdateError) {
                 console.log('error in updating organisation', orgUpdateError);
-                toastr.error('Erreur!', orgUpdateError.message);
+                toast.error(orgUpdateError.message);
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => {
@@ -160,12 +160,12 @@ const View = () => {
                             try {
                               const res = await API.delete({ path: `/organisation/${organisation._id}` });
                               if (res.ok) {
-                                toastr.success('Organisation supprimée');
+                                toast.success('Organisation supprimée');
                                 API.logout();
                               }
                             } catch (organisationDeleteError) {
                               capture(organisationDeleteError, { extra: { organisation }, user });
-                              toastr.error('Erreur!', organisationDeleteError.message);
+                              toast.error(organisationDeleteError.message);
                             }
                           }}>
                           <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
@@ -240,7 +240,7 @@ const View = () => {
                               }
                               onEditItem={async ({ content, newContent }) => {
                                 if (!newContent) {
-                                  toastr.error('Erreur', 'Vous devez saisir un nom pour la catégorie');
+                                  toast.error('Vous devez saisir un nom pour la catégorie');
                                   return;
                                 }
                                 const encryptedActions = await Promise.all(
@@ -265,12 +265,11 @@ const View = () => {
                                   refresh();
                                   handleChange({ target: { value: newCategories, name: 'categories' } });
                                   setOrganisation({ ...organisation, categories: newCategories });
-                                  toastr.success(
-                                    'Catégorie mise à jour',
-                                    "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
+                                  toast.success(
+                                    "Catégorie mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
                                   );
                                 } else {
-                                  toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+                                  toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
                                 }
                               }}
                             />
@@ -342,7 +341,7 @@ const View = () => {
                               }
                               onEditItem={async ({ content, newContent }) => {
                                 if (!newContent) {
-                                  toastr.error('Erreur', 'Vous devez saisir un nom pour le service');
+                                  toast.error('Vous devez saisir un nom pour le service');
                                   return;
                                 }
                                 // two cases:
@@ -389,12 +388,11 @@ const View = () => {
                                   refresh();
                                   handleChange({ target: { value: newServices, name: 'services' } });
                                   setOrganisation({ ...organisation, services: newServices });
-                                  toastr.success(
-                                    'Service mis à jour',
-                                    "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
+                                  toast.success(
+                                    "Service mis à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
                                   );
                                 } else {
-                                  toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+                                  toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
                                 }
                               }}
                             />
@@ -624,7 +622,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
           }}
           onEditItem={async ({ content, newContent }) => {
             if (!newContent) {
-              toastr.error('Erreur', 'Vous devez saisir un nom pour le type de consultation');
+              toast.error('Vous devez saisir un nom pour le type de consultation');
               return;
             }
             const newConsultations = orgConsultations.map((e) => (e.name === content ? { ...e, name: newContent } : e));
@@ -647,9 +645,9 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
               refresh();
               handleChange({ target: { value: orgConsultations, name: 'consultations' } });
               setOrganisation({ ...organisation, consultations: newConsultations });
-              toastr.success('Consultation mise à jour', "Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+              toast.success("Consultation mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
             } else {
-              toastr.error('Erreur!', "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+              toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
             }
           }}
         />

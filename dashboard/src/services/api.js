@@ -1,6 +1,6 @@
 import { atom, useRecoilValue, useSetRecoilState } from 'recoil';
 import URI from 'urijs';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useHistory } from 'react-router';
 import fetchRetry from 'fetch-retry';
 import packageInfo from '../../package.json';
@@ -31,7 +31,7 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
   if (!!encryptedVerificationKey) {
     const encryptionKeyIsValid = await checkEncryptedVerificationKey(encryptedVerificationKey, newHashedOrgEncryptionKey);
     if (!encryptionKeyIsValid) {
-      toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+      toast.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
       return false;
     }
   }
@@ -75,7 +75,7 @@ const decryptDBItem = async (item, { logout, debug = false, encryptedVerificatio
     try {
       JSON.parse(content);
     } catch (errorDecryptParsing) {
-      toastr.error(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
+      toast.error(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
       console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
     }
 
@@ -97,7 +97,7 @@ const decryptDBItem = async (item, { logout, debug = false, encryptedVerificatio
       sendCaptureError++;
     }
     if (!!encryptedVerificationKey) {
-      toastr.error(
+      toast.error(
         "Désolé, un élément n'a pas pu être déchiffré",
         "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
       );
@@ -105,7 +105,7 @@ const decryptDBItem = async (item, { logout, debug = false, encryptedVerificatio
     }
     if (!wrongKeyWarned) {
       wrongKeyWarned = true;
-      toastr.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
+      toast.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
       logout();
     }
     // prevent false admin with bad key to be able to change the key
@@ -116,11 +116,11 @@ const decryptDBItem = async (item, { logout, debug = false, encryptedVerificatio
 
 const handleApiError = (res) => {
   if (res?.error?.message) {
-    toastr?.error('Erreur !', res?.error?.message);
+    toast?.error(res?.error?.message);
   } else if (res?.error) {
-    toastr?.error('Erreur !', res?.error);
+    toast?.error(res?.error);
   } else if (res?.code) {
-    toastr?.error('Erreur !', res?.code);
+    toast?.error(res?.code);
   } else {
     capture('api error unhandled', { extra: { res } });
   }
@@ -156,7 +156,7 @@ const useApi = () => {
     if (window.location.pathname !== '/auth') {
       if (history) {
         history.push('/auth');
-        if (status === '401') toastr.error('Votre session a expiré, veuillez vous reconnecter');
+        if (status === '401') toast.error('Votre session a expiré, veuillez vous reconnecter');
       } else {
         window.location.replace('/auth');
       }
@@ -228,7 +228,7 @@ const useApi = () => {
         window.localStorage.getItem('mano-organisationId') &&
         organisation._id !== window.localStorage.getItem('mano-organisationId')
       ) {
-        toastr.error(
+        toast.error(
           'Veuillez vous reconnecter',
           'Il semble que vous soyez connecté à plusieurs organisations dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.',
           { timeOut: 8000 }
@@ -308,11 +308,11 @@ const useApi = () => {
         },
       });
       if (typeof errorExecuteApi === 'string') {
-        toastr.error(errorExecuteApi, 'Désolé une erreur est survenue');
+        toast.error(errorExecuteApi, 'Désolé une erreur est survenue');
       } else if (errorExecuteApi?.message) {
-        toastr.error(errorExecuteApi.message, 'Désolé une erreur est survenue');
+        toast.error(errorExecuteApi.message, 'Désolé une erreur est survenue');
       } else {
-        toastr.error('Une erreur est survenue', 'Désolé une erreur est survenue');
+        toast.error('Une erreur est survenue', 'Désolé une erreur est survenue');
       }
 
       throw errorExecuteApi;

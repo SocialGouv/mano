@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import { SmallHeader } from '../../components/header';
@@ -113,12 +113,12 @@ const Create = ({ onChange }) => {
                 const { ok } = await API.post({ path: '/user', body });
                 actions.setSubmitting(false);
                 if (!ok) return;
-                toastr.success('Création réussie !');
+                toast.success('Création réussie !');
                 onChange();
                 setOpen(false);
               } catch (errorCreatingUser) {
                 console.log('error in creating user', errorCreatingUser);
-                toastr.error('Erreur !', errorCreatingUser.message);
+                toast.error(errorCreatingUser.message);
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting, errors, touched }) => (

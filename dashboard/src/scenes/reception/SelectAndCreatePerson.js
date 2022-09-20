@@ -1,6 +1,6 @@
 import React, { useMemo, useRef } from 'react';
 import styled from 'styled-components';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -108,14 +108,14 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
           onChange([...value, { value: `temporary-id-${Date.now()}`, label: `${name} (en cours de création)`, name }]);
         } else {
           const existingPerson = persons.find((p) => p.name === name);
-          if (existingPerson) return toastr.error('Un utilisateur existe déjà à ce nom');
+          if (existingPerson) return toast.error('Un utilisateur existe déjà à ce nom');
           const personResponse = await API.post({
             path: '/person',
             body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name }),
           });
           if (personResponse.ok) {
             setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
-            toastr.success('Nouvelle personne ajoutée !');
+            toast.success('Nouvelle personne ajoutée !');
             onChange([...value, personResponse.decryptedData]);
           }
         }

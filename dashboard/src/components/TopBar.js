@@ -16,7 +16,7 @@ import { currentTeamState, organisationState, teamsState, userState } from '../r
 import useApi from '../services/api';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Notification from './Notification';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useDataLoader } from './DataLoader';
 
 const TopBar = () => {
@@ -99,7 +99,7 @@ const TopBar = () => {
                   })
                   .then(() => {
                     setTimeout(() => {
-                      toastr.info('Vous êtes déconnecté(e)', 'Veuillez vérifier votre historique et le vider si besoin');
+                      toast.info('Vous êtes déconnecté(e)', 'Veuillez vérifier votre historique et le vider si besoin');
                     });
                   });
               }}>

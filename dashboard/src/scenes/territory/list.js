@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { SmallHeader } from '../../components/header';
@@ -123,7 +123,7 @@ const CreateTerritory = () => {
               }
               actions.setSubmitting(false);
               if (res.ok) {
-                toastr.success('Création réussie !');
+                toast.success('Création réussie !');
                 setOpen(false);
                 history.push(`/territory/${res.data._id}`);
               }
