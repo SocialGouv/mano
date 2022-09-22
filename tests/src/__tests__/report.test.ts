@@ -67,7 +67,7 @@ describe("Organisation CRUD", () => {
     });
     await expect(page).toFill('input[name="name"]', "Ma première personne");
     await expect(page).toClick("button", { text: "Sauvegarder" });
-    await page.waitForTimeout(1000);
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Création réussie !");
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Dossier de Ma première personne");
@@ -213,6 +213,7 @@ Accéder au dossier`
     ).toBe("FAITE");
     await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Mise à jour !");
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toClick("a", { text: "Retour" });
@@ -242,6 +243,7 @@ Accéder au dossier`
       `window.originalConfirm = window.confirm;window.confirm = () => false; `
     ); // to skip the confirmation
     await expect(page).toClick("button", { text: "Mettre à jour" });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Mise à jour !");
     await expect(page).toClick("button.Toastify__close-button");
     await page.waitForTimeout(1000);
@@ -278,6 +280,7 @@ Accéder au dossier`
     );
     await expect(page).toClick("div.report-select-collaboration__option");
     await expect(page).toClick("button", { text: "Mettre à jour" });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Mis à jour !");
     await expect(page).toClick("button.Toastify__close-button");
     // await expect(page).toMatch("Ma première collab");
@@ -303,6 +306,7 @@ Accéder au dossier`
     await expect(page).toClick("input#report-select-collaboration");
     await expect(page).toClick("div.report-select-collaboration__option");
     await expect(page).toClick("button", { text: "Mettre à jour" });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Mis à jour !");
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Description", { timeout: 2000 });
@@ -331,6 +335,7 @@ Accéder au dossier`
       'textarea[name="description"]',
       "Ceci est une description"
     );
+    await page.waitForTimeout(2000);
     await expect(page).toClick("button", { text: "Enregistrer" });
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Description", { timeout: 2000 });

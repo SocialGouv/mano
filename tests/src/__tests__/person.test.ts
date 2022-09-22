@@ -157,6 +157,7 @@ describe("Organisation CRUD", () => {
       "Mon historique médical"
     );
     await expect(page).toClick("button", { text: "Mettre à jour" });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Mis à jour !");
     await expect(page).toClick("button.Toastify__close-button");
   });
@@ -272,6 +273,7 @@ describe("Organisation CRUD", () => {
       "Ceci est un commentaire"
     );
     await expect(page).toClick("button", { text: "Sauvegarder" });
+    await page.waitForTimeout(2000);
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Ceci est un commentaire");
   });
@@ -317,6 +319,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("div.add-place-select-place__option");
     await expect(page).toMatch("Mon lieu fréquenté");
     await expect(page).toClick("button", { text: "Sauvegarder" });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Lieu ajouté !");
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Mon lieu fréquenté");
@@ -433,6 +436,7 @@ describe("Organisation CRUD", () => {
       "div.person-select-outOfActiveListReason__option"
     );
     await expect(page).toClick("button", { text: "Sauvegarder" });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Mise à jour réussie");
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Réintégrer dans la file active");
@@ -463,6 +467,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", {
       text: "Réintégrer dans la file active",
     });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Mise à jour réussie");
     await expect(page).toClick("button.Toastify__close-button");
   });
