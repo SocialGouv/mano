@@ -44,7 +44,7 @@ const OutOfActiveList = ({ person }) => {
           return p;
         })
       );
-      toast.success(person.name + (person.outOfActiveList ? ' est hors de la file active.' : ' est dans file active.'));
+      toast.success(person.name + (outOfActiveList ? ' est hors de la file active.' : ' est dans la file active.'));
     }
   };
 

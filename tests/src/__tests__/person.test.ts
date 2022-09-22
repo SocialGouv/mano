@@ -437,7 +437,9 @@ describe("Organisation CRUD", () => {
     );
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);
-    await expect(page).toMatch("Mise à jour réussie");
+    await expect(page).toMatch(
+      "Ma première personne est hors de la file active."
+    );
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Réintégrer dans la file active");
     await scrollTop();
@@ -468,7 +470,7 @@ describe("Organisation CRUD", () => {
       text: "Réintégrer dans la file active",
     });
     await page.waitForTimeout(2000);
-    await expect(page).toMatch("Mise à jour réussie");
+    await expect(page).toMatch("Ma première personne est dans la file active.");
     await expect(page).toClick("button.Toastify__close-button");
   });
 
