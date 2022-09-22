@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 
 import ButtonCustom from './ButtonCustom';
 import { Formik } from 'formik';
@@ -40,7 +40,7 @@ const ReportDescriptionModale = ({ report }) => {
                     return a;
                   })
                 );
-                toastr.success('Mis à jour !');
+                toast.success('Mis à jour !');
                 setOpen(false);
                 window.sessionStorage.removeItem('currentReportDescription');
               }

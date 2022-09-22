@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, FormGroup, Input, Label } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 
 import { SmallHeaderWithBackButton } from '../../components/header';
@@ -47,7 +47,7 @@ const View = () => {
                 return a;
               })
             );
-            toastr.success('Mis à jour !');
+            toast.success('Mis à jour !');
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
@@ -101,7 +101,7 @@ const View = () => {
                           setTerritoryObservations((territoryObservations) => territoryObservations.filter((p) => p._id !== obs._id));
                         }
                       }
-                      toastr.success('Suppression réussie');
+                      toast.success('Suppression réussie');
                       history.goBack();
                     }
                   }}>

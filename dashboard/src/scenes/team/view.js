@@ -3,7 +3,7 @@ import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 
 import { SmallHeaderWithBackButton } from '../../components/header';
 import Loading from '../../components/loading';
@@ -48,7 +48,7 @@ const View = () => {
           try {
             const response = await API.put({ path: `/team/${team._id}`, body });
             if (response.ok) {
-              toastr.success('Mise à jour !');
+              toast.success('Mise à jour !');
               setTeams(
                 teams.map((t) => {
                   if (t._id !== id) return t;
@@ -59,7 +59,7 @@ const View = () => {
             }
           } catch (errorUpdatingTeam) {
             console.log('error in updating team', errorUpdatingTeam);
-            toastr.error('Erreur!', errorUpdatingTeam.message);
+            toast.error(errorUpdatingTeam.message);
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -91,7 +91,7 @@ const View = () => {
                   const res = await API.delete({ path: `/team/${id}` });
                   if (!res.ok) return;
                   setTeams(teams.filter((t) => t._id !== id));
-                  toastr.success('Suppression réussie');
+                  toast.success('Suppression réussie');
                   history.goBack();
                 }}>
                 <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>

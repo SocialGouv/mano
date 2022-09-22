@@ -3,7 +3,7 @@ import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
 import classnames from 'classnames';
 import validator from 'validator';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 
 import { theme } from '../../config';
@@ -46,10 +46,10 @@ const View = () => {
               body,
             });
             actions.setSubmitting(false);
-            if (response.ok) toastr.success('Envoyé');
+            if (response.ok) toast.success('Envoyé');
             setDone(true);
           } catch (errorPasswordReset) {
-            toastr.error('Erreur', errorPasswordReset);
+            toast.error(errorPasswordReset);
           }
         }}>
         {({ values, errors, isSubmitting, handleChange, handleSubmit }) => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
@@ -50,9 +50,9 @@ const CreatePerson = ({ refreshable }) => {
           <Formik
             initialValues={{ name: '', assignedTeams: [currentTeam?._id] }}
             onSubmit={async (body, actions) => {
-              if (!body.name?.trim()?.length) return toastr.error('Une personne doit avoir un nom');
+              if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
               const existingPerson = persons.find((p) => p.name === body.name);
-              if (existingPerson) return toastr.error('Une personne existe déjà à ce nom');
+              if (existingPerson) return toast.error('Une personne existe déjà à ce nom');
               body.followedSince = new Date();
               body.user = user._id;
               const response = await API.post({
@@ -61,7 +61,7 @@ const CreatePerson = ({ refreshable }) => {
               });
               if (response.ok) {
                 setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => (p1.name || '').localeCompare(p2.name || '')));
-                toastr.success('Création réussie !');
+                toast.success('Création réussie !');
                 setOpen(false);
                 actions.setSubmitting(false);
                 history.push(`/person/${response.decryptedData._id}`);

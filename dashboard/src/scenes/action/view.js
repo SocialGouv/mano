@@ -1,7 +1,7 @@
 import React from 'react';
 import { Row, Col, FormGroup, Input, Label } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 
 import DatePicker from 'react-datepicker';
@@ -59,7 +59,7 @@ const View = () => {
         }
       }
       if (!actionRes.ok) return;
-      toastr.success('Suppression réussie');
+      toast.success('Suppression réussie');
       history.goBack();
     }
   };
@@ -147,7 +147,7 @@ const View = () => {
               const commentResponse = await API.post({ path: '/comment', body: prepareCommentForEncryption(comment) });
               if (commentResponse.ok) setComments((comments) => [commentResponse.decryptedData, ...comments]);
             }
-            toastr.success('Mise à jour !');
+            toast.success('Mise à jour !');
             refresh();
             const actionCancelled = action.status !== CANCEL && body.status === CANCEL;
             if (actionCancelled && window.confirm('Cette action est annulée, voulez-vous la dupliquer ? Avec une date ultérieure par exemple')) {

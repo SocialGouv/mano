@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { SmallHeader } from '../../components/header';
 import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
@@ -234,7 +234,7 @@ const Reception = () => {
       setAddingPassage(false);
     } catch (e) {
       capture(e, { extra: { selectedPersons, currentTeam }, user });
-      toastr.error("Désolé une erreur est survenue, l'équipe technique est prévenue");
+      toast.error("Désolé une erreur est survenue, l'équipe technique est prévenue");
     }
   };
 

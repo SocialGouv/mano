@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -118,12 +118,12 @@ const List = () => {
                     try {
                       const res = await API.delete({ path: `/organisation/${organisation._id}` });
                       if (res.ok) {
-                        toastr.success('Organisation supprimée');
+                        toast.success('Organisation supprimée');
                         setRefresh(true);
                       }
                     } catch (organisationDeleteError) {
                       capture(organisationDeleteError, { extra: { organisation }, user });
-                      toastr.error('Erreur!', organisationDeleteError.message);
+                      toast.error(organisationDeleteError.message);
                     }
                   }}>
                   <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
@@ -177,12 +177,12 @@ const Create = ({ onChange }) => {
                 const orgRes = await API.post({ path: '/organisation', skipEncryption: '/organisation', body });
                 actions.setSubmitting(false);
                 if (!orgRes.ok) return;
-                toastr.success('Création réussie !');
+                toast.success('Création réussie !');
                 onChange();
                 setOpen(false);
               } catch (orgCreationError) {
                 console.log('error in creating organisation', orgCreationError);
-                toastr.error('Erreur!', orgCreationError.message);
+                toast.error(orgCreationError.message);
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (

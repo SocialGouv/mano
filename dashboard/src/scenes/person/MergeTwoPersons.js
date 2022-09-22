@@ -3,7 +3,7 @@ import { Col, Button, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
@@ -271,11 +271,11 @@ const MergeTwoPersons = ({ person }) => {
                 });
 
                 if (!response.ok) {
-                  toastr.error('Échec de la fusion');
+                  toast.error('Échec de la fusion');
                   setSubmitting(false);
                   return;
                 }
-                toastr.success('Fusion réussie !');
+                toast.success('Fusion réussie !');
 
                 setPersons((persons) => persons.filter((p) => p._id !== personToMergeAndDelete._id));
 

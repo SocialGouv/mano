@@ -1,6 +1,5 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import 'react-redux-toastr/lib/css/react-redux-toastr.min.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import './index.scss';
 import App from './app';

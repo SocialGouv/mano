@@ -3,7 +3,7 @@ import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 
 import { useParams, useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import { SmallHeaderWithBackButton } from '../../components/header';
@@ -52,7 +52,7 @@ const View = () => {
         enableReinitialize
         onSubmit={async (body, actions) => {
           try {
-            if (!body.team?.length) return toastr.error('Erreur !', 'Au moins une équipe est obligatoire');
+            if (!body.team?.length) return toast.error('Au moins une équipe est obligatoire');
             body.organisation = organisation._id;
             const res = await API.put({ path: `/user/${id}`, body });
             if (!res.ok) return actions.setSubmitting(false);
@@ -62,10 +62,10 @@ const View = () => {
               AppSentry.setUser(data);
             }
             actions.setSubmitting(false);
-            toastr.success('Mis à jour !');
+            toast.success('Mis à jour !');
           } catch (errorUpdatingUser) {
             console.log('error in updating user', errorUpdatingUser);
-            toastr.error('Erreur!', errorUpdatingUser.message);
+            toast.error(errorUpdatingUser.message);
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -131,7 +131,7 @@ const View = () => {
                   onConfirm={async () => {
                     const res = await API.delete({ path: `/user/${id}` });
                     if (!res.ok) return;
-                    toastr.success('Suppression réussie');
+                    toast.success('Suppression réussie');
                     history.goBack();
                   }}>
                   <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>Cette opération est irréversible</span>

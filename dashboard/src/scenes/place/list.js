@@ -2,7 +2,7 @@ import React, { Fragment, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Button as LinkButton, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { SmallHeader } from '../../components/header';
 import ButtonCustom from '../../components/ButtonCustom';
 import Loading from '../../components/loading';
@@ -131,9 +131,9 @@ const Create = () => {
               const response = await API.post({ path: '/place', body: preparePlaceForEncryption(body) });
               if (response.ok) {
                 setPlaces((places) => [response.decryptedData, ...places].sort((p1, p2) => p1.name.localeCompare(p2.name)));
-                toastr.success('Création réussie !');
+                toast.success('Création réussie !');
               } else {
-                toastr.error('Erreur!', response.error);
+                toast.error(response.error);
               }
               actions.setSubmitting(false);
               setOpen(false);

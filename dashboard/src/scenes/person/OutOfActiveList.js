@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from 'reactstrap';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
@@ -44,7 +44,7 @@ const OutOfActiveList = ({ person }) => {
           return p;
         })
       );
-      toastr.success('Mise à jour réussie', person.name + (person.outOfActiveList ? ' est hors de la file active.' : ' est dans file active.'));
+      toast.success(person.name + (outOfActiveList ? ' est hors de la file active.' : ' est dans la file active.'));
     }
   };
 

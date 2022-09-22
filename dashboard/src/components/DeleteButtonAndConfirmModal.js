@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Col, Button, FormGroup, Row, Modal, ModalBody, ModalHeader, Input } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
@@ -18,7 +18,7 @@ const DeleteButtonAndConfirmModal = ({ title, children, textToConfirm, onConfirm
         title="Supprimer"
         color="danger"
         onClick={() => {
-          if (!['admin', 'superadmin'].includes(user.role)) return toastr.error("Désolé, seul un admin peut supprimer ce type d'élément");
+          if (!['admin', 'superadmin'].includes(user.role)) return toast.error("Désolé, seul un admin peut supprimer ce type d'élément");
           setOpen(true);
         }}
         width={buttonWidth}
@@ -41,12 +41,12 @@ const DeleteButtonAndConfirmModal = ({ title, children, textToConfirm, onConfirm
           <Formik
             initialValues={{ textToConfirm: '' }}
             onSubmit={async (values, { setSubmitting }) => {
-              if (!values.textToConfirm) return toastr.error('Veuillez rentrer le texte demandé');
+              if (!values.textToConfirm) return toast.error('Veuillez rentrer le texte demandé');
               if (values.textToConfirm.trim().toLocaleLowerCase() !== textToConfirm.trim().toLocaleLowerCase()) {
-                return toastr.error('Le texte renseigné est incorrect');
+                return toast.error('Le texte renseigné est incorrect');
               }
               if (values.textToConfirm.trim() !== textToConfirm.trim()) {
-                return toastr.error('Veuillez respecter les minuscules/majuscules');
+                return toast.error('Veuillez respecter les minuscules/majuscules');
               }
               await onConfirm();
               setOpen(false);

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 
 import Header from '../components/header';
@@ -27,14 +27,14 @@ const Account = () => {
           try {
             const response = await API.put({ path: '/user', body });
             if (response.ok) {
-              toastr.success('Mis à jour !');
+              toast.success('Mis à jour !');
               const { user } = await API.get({ path: '/user/me' });
               setUser(user);
               AppSentry.setUser(user);
             }
           } catch (userUpdateError) {
             console.log('error in user update', userUpdateError);
-            toastr.error('Erreur!', userUpdateError.message);
+            toast.error(userUpdateError.message);
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => (

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import styled from 'styled-components';
 import { FormGroup, Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 
 import ButtonCustom from './ButtonCustom';
 import PasswordInput from './PasswordInput';
@@ -62,10 +62,10 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
       onSubmit={async (body, actions) => {
         try {
           if (checkErrorPassword(body.newPassword.trim())) {
-            return toastr.error(codesToErrors[checkErrorPassword(body.newPassword)]);
+            return toast.error(codesToErrors[checkErrorPassword(body.newPassword)]);
           }
           if (body.newPassword.trim() !== body.verifyPassword.trim()) {
-            return toastr.error('Les mots de passe ne sont pas identiques !');
+            return toast.error('Les mots de passe ne sont pas identiques !');
           }
           onFinished({
             body: {
@@ -77,12 +77,12 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
           const res = await onSubmit(body);
           actions.setSubmitting(false);
           if (res.ok) {
-            toastr.success('Mot de passe mis à jour!');
+            toast.success('Mot de passe mis à jour!');
             onFinished(true);
           }
         } catch (errorUpdatePassword) {
           console.log('error in updating password', errorUpdatePassword);
-          toastr.error('Erreur', errorUpdatePassword);
+          toast.error(errorUpdatePassword);
         }
       }}>
       {({ values, isSubmitting, handleChange, handleSubmit }) => {

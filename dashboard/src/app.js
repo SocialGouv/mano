@@ -5,9 +5,6 @@ import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import lifecycle from 'page-lifecycle';
-import { Provider } from 'react-redux';
-import { combineReducers, createStore } from 'redux';
-import ReduxToastr, { reducer as toastr } from 'react-redux-toastr';
 import Account from './scenes/account';
 import Auth from './scenes/auth';
 import Organisation from './scenes/organisation';
@@ -31,8 +28,8 @@ import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 import ModalConfirm from './components/ModalConfirm';
 import DataLoader, { useDataLoader } from './components/DataLoader';
-
-const store = createStore(combineReducers({ toastr }));
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 registerLocale('fr', fr);
 
@@ -59,6 +56,7 @@ const App = ({ resetRecoil }) => {
 
   return (
     <div className="main-container">
+      <ToastContainer />
       <VersionOutdatedAlert />
       <Router>
         <ScrollToTop />
@@ -116,12 +114,9 @@ export default function ContextedApp() {
   const [recoilKey, setRecoilKey] = useState(0);
   return (
     <RecoilRoot key={recoilKey}>
-      <Provider store={store}>
-        <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
-        <ReduxToastr transitionIn="fadeIn" transitionOut="fadeOut" />
-        <DataLoader />
-        <ModalConfirm />
-      </Provider>
+      <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
+      <DataLoader />
+      <ModalConfirm />
     </RecoilRoot>
   );
 }

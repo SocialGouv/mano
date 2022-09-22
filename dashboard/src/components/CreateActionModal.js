@@ -2,7 +2,7 @@ import React from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
@@ -53,11 +53,11 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
             urgent: false,
           }}
           onSubmit={async (values, actions) => {
-            if (!values.name) return toastr.error('Erreur!', 'Le nom est obligatoire');
-            if (!values.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
-            if (!isMulti && !values.person) return toastr.error('Erreur!', 'La personne suivie est obligatoire');
-            if (isMulti && !values.person?.length) return toastr.error('Erreur!', 'Une personne suivie est obligatoire');
-            if (!values.dueAt) return toastr.error('Erreur!', "La date d'échéance est obligatoire");
+            if (!values.name) return toast.error('Le nom est obligatoire');
+            if (!values.team) return toast.error("L'équipe est obligatoire");
+            if (!isMulti && !values.person) return toast.error('La personne suivie est obligatoire');
+            if (isMulti && !values.person?.length) return toast.error('Une personne suivie est obligatoire');
+            if (!values.dueAt) return toast.error("La date d'échéance est obligatoire");
             const body = {
               name: values.name,
               team: values.team,
@@ -74,7 +74,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
               const res = await onAddAction(body);
               actions.setSubmitting(false);
               if (res.ok) {
-                toastr.success('Création réussie !');
+                toast.success('Création réussie !');
                 history.push(`/action/${res.data._id}`);
                 setOpen(false);
               }
@@ -85,7 +85,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
               const res = await onAddAction(body);
               actions.setSubmitting(false);
               if (res.ok) {
-                toastr.success('Création réussie !');
+                toast.success('Création réussie !');
                 history.push(`/action/${res.data._id}`);
               }
             } else {
@@ -94,7 +94,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                 if (!res.ok) break;
               }
               actions.setSubmitting(false);
-              toastr.success('Création réussie !');
+              toast.success('Création réussie !');
               setOpen(false);
             }
           }}>

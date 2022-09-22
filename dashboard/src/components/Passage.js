@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import { Formik } from 'formik';
 
@@ -36,7 +36,7 @@ const Passage = ({ passage, onFinished }) => {
     if (confirm) {
       const passageRes = await API.delete({ path: `/passage/${passage._id}` });
       if (passageRes.ok) {
-        toastr.success('Suppression réussie');
+        toast.success('Suppression réussie');
         setOpen(false);
         setPassages((passages) => passages.filter((p) => p._id !== passage._id));
       }
@@ -55,13 +55,12 @@ const Passage = ({ passage, onFinished }) => {
           <Formik
             initialValues={{ ...passage, anonymousNumberOfPassages: 1, persons: passage?.person ? [passage.person] : [] }}
             onSubmit={async (body, actions) => {
-              if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
-              if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
-              if (!body.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
-              if (body.anonymous && !body.anonymousNumberOfPassages)
-                return toastr.error('Erreur!', 'Veuillez spécifier le nombre de passages anonymes');
+              if (!body.user) return toast.error("L'utilisateur est obligatoire");
+              if (!body.date) return toast.error('La date est obligatoire');
+              if (!body.team) return toast.error("L'équipe est obligatoire");
+              if (body.anonymous && !body.anonymousNumberOfPassages) return toast.error('Veuillez spécifier le nombre de passages anonymes');
               if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length))
-                return toastr.error('Erreur!', 'Veuillez spécifier une personne');
+                return toast.error('Veuillez spécifier une personne');
 
               if (isNew) {
                 const newPassage = {
@@ -103,7 +102,7 @@ const Passage = ({ passage, onFinished }) => {
 
                 setOpen(false);
                 onFinished();
-                toastr.success(body.person.length > 1 ? 'Passage enregistré' : 'Passages enregistrés');
+                toast.success(body.person.length > 1 ? 'Passage enregistré' : 'Passages enregistrés');
                 actions.setSubmitting(false);
                 return;
               }
@@ -122,7 +121,7 @@ const Passage = ({ passage, onFinished }) => {
               if (!response.ok) return;
               setOpen(false);
               onFinished();
-              toastr.success('Passage mis à jour');
+              toast.success('Passage mis à jour');
               actions.setSubmitting(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => {

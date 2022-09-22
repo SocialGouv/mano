@@ -8,7 +8,7 @@ import { download } from '../utils';
 import ButtonCustom from './ButtonCustom';
 import { formatDateWithFullMonth } from '../services/date';
 import { capture } from '../services/sentry';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import useApi from '../services/api';
 import { Col, Row } from 'reactstrap';
 
@@ -47,7 +47,7 @@ const Documents = ({
                     });
                     if (!docResponse.ok || !docResponse.data) {
                       capture('Error uploading document', { extra: { docResponse } });
-                      toastr.error('Erreur', "Une erreur est survenue lors de l'envoi du document");
+                      toast.error("Une erreur est survenue lors de l'envoi du document");
                       return;
                     }
                     onAdd(docResponse);

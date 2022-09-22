@@ -3,7 +3,7 @@ import { FormGroup } from 'reactstrap';
 import { Formik, Field } from 'formik';
 import validator from 'validator';
 import { Link, useHistory } from 'react-router-dom';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { detect } from 'detect-browser';
@@ -177,7 +177,7 @@ const SignIn = () => {
             setShowSelectTeam(true);
           } catch (signinError) {
             console.log('error signin', signinError);
-            toastr.error('Mauvais identifiants', signinError.message);
+            toast.error('Mauvais identifiants', signinError.message);
           }
         }}>
         {({ values, errors, isSubmitting, handleChange, handleSubmit }) => {
