@@ -29,7 +29,7 @@ const SelectAndCreateCollaboration = ({ values, onChange }) => {
       },
     });
     if (response.ok) {
-      toast.clean();
+      toast.dismiss();
       toast.success('Collaboration créée !');
       setOrganisation(response.data);
       onChangeRequest([...(values || []), collab]);
