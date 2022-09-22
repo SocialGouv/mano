@@ -99,7 +99,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(500);
     await expect(page).toFill('input[name="newContent"]', "Bain");
     await expect(page).toClick("button", { text: "Enregistrer" });
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Bain");
   });
 

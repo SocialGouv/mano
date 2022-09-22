@@ -39,7 +39,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);
     await expect(page).toMatch("Création réussie !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Dossier de Ma première personne");
   });
 
@@ -78,7 +78,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);
     await expect(page).toMatch("Création réussie !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Mon action");
     await expect(page).toMatch("À FAIRE");
     await expect(page).toMatch("(créée par Encrypted Orga Admin)");
@@ -158,7 +158,7 @@ describe("Organisation CRUD", () => {
     );
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
   });
 
   it("should see created person", async () => {
@@ -272,7 +272,7 @@ describe("Organisation CRUD", () => {
       "Ceci est un commentaire"
     );
     await expect(page).toClick("button", { text: "Sauvegarder" });
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Ceci est un commentaire");
   });
 
@@ -288,7 +288,7 @@ describe("Organisation CRUD", () => {
     );
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Ceci est un commentaire");
     await expect(page).toMatch("Ceci est un autre commentaire");
   });
@@ -307,7 +307,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toFill("input#create-place-name", "Mon lieu fréquenté");
     await expect(page).toClick("button#create-place-button");
     await page.waitForTimeout(2000);
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
     // await scrollTop();
@@ -318,7 +318,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Mon lieu fréquenté");
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await expect(page).toMatch("Lieu ajouté !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Mon lieu fréquenté");
     await expect(page).toMatch("Lieux (1)");
   });
@@ -434,7 +434,7 @@ describe("Organisation CRUD", () => {
     );
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await expect(page).toMatch("Mise à jour réussie");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Réintégrer dans la file active");
     await scrollTop();
     await expect(page).toMatch(
@@ -464,7 +464,7 @@ describe("Organisation CRUD", () => {
       text: "Réintégrer dans la file active",
     });
     await expect(page).toMatch("Mise à jour réussie");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
   });
 
   // TODO

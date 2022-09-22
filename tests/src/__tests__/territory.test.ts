@@ -34,7 +34,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     expect(await getInputValue('input[name="name"]')).toBe(
       "Mon premier territoire"
     );
@@ -68,7 +68,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch(
       "Nombre de personnes non connues hommes rencontrées: 4"
     );

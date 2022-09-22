@@ -69,7 +69,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Dossier de Ma première personne");
     await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Actions (0)" });
@@ -83,7 +83,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Création réussie !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
   });
 
   it("should be able to see the action in reception", async () => {
@@ -214,7 +214,7 @@ Accéder au dossier`
     await scrollDown();
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mise à jour !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toClick("a", { text: "Retour" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("a", { text: "Actions annulées (0)" });
@@ -243,7 +243,7 @@ Accéder au dossier`
     ); // to skip the confirmation
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mise à jour !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await page.waitForTimeout(1000);
     await page.evaluate(`window.confirm = window.originalConfirm;`); // to put back the original behavior
     await expect(page).toClick("a", { text: "Retour" });
@@ -279,7 +279,7 @@ Accéder au dossier`
     await expect(page).toClick("div.report-select-collaboration__option");
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     // await expect(page).toMatch("Ma première collab");
     await expect(page).toMatch("Ma deuxième collab");
   });
@@ -304,7 +304,7 @@ Accéder au dossier`
     await expect(page).toClick("div.report-select-collaboration__option");
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await expect(page).toMatch("Mis à jour !");
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Description", { timeout: 2000 });
     await expect(page).toMatch("Ma deuxième collab");
   });
@@ -332,7 +332,7 @@ Accéder au dossier`
       "Ceci est une description"
     );
     await expect(page).toClick("button", { text: "Enregistrer" });
-    await expect(page).toClick("div.Toastify__close-button");
+    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Description", { timeout: 2000 });
     await expect(page).toMatch("Ceci est une description");
   });
