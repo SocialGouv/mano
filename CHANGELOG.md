@@ -1,3 +1,10 @@
+# [1.158.0](https://github.com/SocialGouv/mano/compare/v1.157.1...v1.158.0) (2022-09-26)
+
+
+### Features
+
+* add rencontre ([#897](https://github.com/SocialGouv/mano/issues/897)) ([b1ff940](https://github.com/SocialGouv/mano/commit/b1ff940d4f42d25f527a8ab9b205349a0598cbca))
+
 ## [1.157.1](https://github.com/SocialGouv/mano/compare/v1.157.0...v1.157.1) (2022-09-20)
 
 
