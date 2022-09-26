@@ -81,7 +81,6 @@ const OutOfActiveListContainer = styled.View`
 
 const CaptionsContainer = styled.View`
   margin: 0 12px;
-  // border: red 1px solid;
   flex-grow: 1;
 `;
 
