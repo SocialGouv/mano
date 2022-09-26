@@ -837,7 +837,7 @@ const Rencontres = ({ personId, onUpdateResults }) => {
       <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
         <Title>Rencontres</Title>
         <ButtonCustom
-          title="Ajouter un rencontre"
+          title="Ajouter une rencontre"
           style={{ marginLeft: 'auto', marginBottom: '10px' }}
           onClick={() =>
             setRencontreToEdit({
