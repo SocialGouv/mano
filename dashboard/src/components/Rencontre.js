@@ -151,7 +151,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
                     </Col>
                     <Col md={6}>
                       <FormGroup>
-                        <Label htmlFor="update-rencontre-user-select">Créé par</Label>
+                        <Label htmlFor="update-rencontre-user-select">Créée par</Label>
                         <SelectUser
                           inputId="update-rencontre-user-select"
                           value={values.user || user._id}
