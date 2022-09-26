@@ -162,7 +162,6 @@ const EncryptionKey = ({ isMain }) => {
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);
       toast.error(orgEncryptionError.message, { timeOut: 0 });
-      API.logout();
       setEncryptingProgress(0);
       setEncryptionKey('');
       setEncryptingStatus("Erreur lors du chiffrement, veuillez contacter l'administrateur");
