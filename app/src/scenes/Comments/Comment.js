@@ -7,15 +7,18 @@ import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
-import { useRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
+import { currentTeamState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 
 const Comment = ({ navigation, route, onCommentWrite }) => {
   const [comments, setComments] = useRecoilState(commentsState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
   const commentDB = useMemo(() => comments.find((c) => c._id === route.params?._id), [comments, route?.params]);
-
+  const isNewComment = useMemo(() => !commentDB, [commentDB]);
   const [comment, setComment] = useState(route?.params?.comment?.split('\\n').join('\u000A') || '');
   const [urgent, setUrgent] = useState(route?.params?.urgent || false);
   const [updating, setUpdating] = useState(false);
@@ -36,6 +39,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
         urgent,
       }),
     });
+
     if (response.error) {
       setUpdating(false);
       Alert.alert(response.error);
@@ -50,6 +54,33 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
       );
       setUpdating(false);
       Alert.alert('Commentaire mis à jour !', null, [{ text: 'OK', onPress: onBack }]);
+    }
+    return response;
+  };
+
+  const onCreateComment = async () => {
+    setUpdating(true);
+    const response = await API.post({
+      path: '/comment',
+      body: prepareCommentForEncryption({
+        comment: comment.trim(),
+        person: route.params?.person?._id,
+        action: route.params?.action?._id,
+        user: user?._id,
+        team: currentTeam?._id,
+        urgent,
+      }),
+    });
+
+    if (response.error) {
+      setUpdating(false);
+      Alert.alert(response.error);
+      return false;
+    }
+    if (response.ok) {
+      setComments((comments) => [response.decryptedData, ...comments]);
+      setUpdating(false);
+      Alert.alert('Commentaire ajouté', null, [{ text: 'OK', onPress: onBack }]);
     }
     return response;
   };
@@ -91,7 +122,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
     Alert.alert('Voulez-vous enregistrer ce commentaire ?', null, [
       {
         text: 'Enregistrer',
-        onPress: onUpdateComment,
+        onPress: isNewComment ? onCreateComment : onUpdateComment,
       },
       {
         text: 'Ne pas enregistrer',
@@ -127,7 +158,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title={`${route?.params?.name} - Commentaire`} onBack={onGoBackRequested} testID="comment" />
+      <ScreenTitle title={`${route?.params?.name || route?.params?.person?.name} - Commentaire`} onBack={onGoBackRequested} testID="comment" />
       <ScrollContainer>
         <View>
           <InputLabelled label="Commentaire" onChangeText={onChangeText} value={comment} placeholder="Description" multiline />
@@ -139,7 +170,12 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
           />
           <ButtonsContainer>
             <ButtonDelete onPress={onDeleteRequest} />
-            <Button caption="Mettre à jour" onPress={onUpdateComment} disabled={isUpdateDisabled} loading={updating} />
+            <Button
+              caption={isNewComment ? 'Créer' : 'Mettre à jour'}
+              onPress={isNewComment ? onCreateComment : onUpdateComment}
+              disabled={isUpdateDisabled}
+              loading={updating}
+            />
           </ButtonsContainer>
         </View>
       </ScrollContainer>
