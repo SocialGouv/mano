@@ -872,7 +872,7 @@ const Rencontres = ({ personId, onUpdateResults }) => {
             render: (rencontre) => <TagTeam key={rencontre.team} teamId={rencontre.team} />,
           },
           {
-            title: 'Enregistré par',
+            title: 'Enregistrée par',
             dataKey: 'user',
             render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
           },
