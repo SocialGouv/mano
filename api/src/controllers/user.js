@@ -640,7 +640,7 @@ router.put(
         }),
         body: z.object({
           name: z.optional(z.string().min(1)),
-          email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
+          email: z.optional(z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal("")))),
           password: z.optional(z.string().min(1)),
           team: z.optional(z.array(z.string().regex(looseUuidRegex))),
           healthcareProfessional: z.optional(z.boolean()),

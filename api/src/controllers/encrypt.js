@@ -68,7 +68,7 @@ router.post(
     }
     try {
       z.object({
-        encryptionLastUpdateAt: z.preprocess((input) => new Date(input), z.date()),
+        encryptionLastUpdateAt: z.optional(z.preprocess((input) => new Date(input), z.date())),
         encryptedVerificationKey: z.string(),
       }).parse(req.body);
     } catch (e) {
