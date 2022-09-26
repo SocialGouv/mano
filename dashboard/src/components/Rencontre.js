@@ -50,7 +50,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
   return (
     <>
       <Modal isOpen={!!open && !!rencontre} toggle={onCancelRequest} size="lg" backdrop="static">
-        <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer un rencontre' : 'Éditer le rencontre'}</ModalHeader>
+        <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer une rencontre' : 'Éditer la rencontre'}</ModalHeader>
         <ModalBody>
           <Formik
             initialValues={{ ...rencontre, anonymousNumberOfRencontres: 1, persons: rencontre?.person ? [rencontre.person] : [] }}
