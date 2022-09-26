@@ -10,6 +10,7 @@ import TeamsTags from '../../components/TeamsTags';
 import colors from '../../utils/colors';
 import { useNavigation } from '@react-navigation/native';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
+import ButtonRight from '../../components/ButtonRight';
 
 const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReason } }) => {
   if (outOfActiveList) {
@@ -23,7 +24,7 @@ const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReason } }
   return <Name>{name}</Name>;
 };
 
-const PersonRow = ({ onPress, person, buttonRight = '>', showActionSheetWithOptions }) => {
+const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionSheetWithOptions }) => {
   const { outOfActiveList, birthdate, alertness } = person;
   const navigation = useNavigation();
 
@@ -63,12 +64,13 @@ const PersonRow = ({ onPress, person, buttonRight = '>', showActionSheetWithOpti
             </ExclamationMarkButtonDiv>
           )}
           <PersonName person={person} />
-          <ButtonTopPlus onPress={onMorePress} caption={buttonRight} />
+          {!isPersonsSearchRow && <ButtonTopPlus onPress={onMorePress} />}
         </CaptionsFirstLine>
         {birthdate && !outOfActiveList && <Birthdate>{displayBirthDate(birthdate)}</Birthdate>}
         {birthdate && outOfActiveList && <BirthdateMuted>{displayBirthDate(birthdate)}</BirthdateMuted>}
         <TeamsTags teams={person.assignedTeams} />
       </CaptionsContainer>
+      {isPersonsSearchRow && <ButtonRight onPress={onPress} caption="+" />}
     </RowContainer>
   );
 };
