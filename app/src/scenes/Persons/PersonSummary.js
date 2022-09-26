@@ -234,7 +234,7 @@ const PersonSummary = ({
           textToConfirm={personDB?.name}
           onDelete={onDelete}>
           Cette opération est irréversible{'\n'}et entrainera la suppression définitive{'\n'}de toutes les données liées à la personne&nbsp;:{'\n\n'}
-          actions, commentaires, lieux visités, passages, documents...
+          actions, commentaires, lieux visités, passages, rencontres, documents...
         </DeleteButtonAndConfirmModal>
         <Button
           caption={editable ? 'Mettre à jour' : 'Modifier'}

@@ -13,6 +13,7 @@ const Treatment = require("../models/treatment");
 const MedicalFile = require("../models/medicalFile");
 const Comment = require("../models/comment");
 const Passage = require("../models/passage");
+const Rencontre = require("../models/rencontre");
 const Territory = require("../models/territory");
 const Report = require("../models/report");
 const TerritoryObservation = require("../models/territoryObservation");
@@ -47,6 +48,7 @@ router.post(
         "observations",
         "places",
         "passages",
+        "rencontres",
         "reports",
         "relsPersonPlace",
       ];
@@ -84,6 +86,7 @@ router.post(
           persons = [],
           comments = [],
           passages = [],
+          rencontres = [],
           territories = [],
           observations = [],
           places = [],
@@ -123,6 +126,10 @@ router.post(
 
         for (let { encrypted, encryptedEntityKey, _id } of passages) {
           await Passage.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        }
+
+        for (let { encrypted, encryptedEntityKey, _id } of rencontres) {
+          await Rencontre.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of territories) {

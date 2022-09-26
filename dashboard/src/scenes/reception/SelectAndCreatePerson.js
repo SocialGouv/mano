@@ -13,6 +13,7 @@ import useApi from '../../services/api';
 import { formatBirthDate, formatCalendarDate } from '../../services/date';
 import { actionsState } from '../../recoil/actions';
 import { passagesState } from '../../recoil/passages';
+import { rencontresState } from '../../recoil/rencontres';
 import { useHistory } from 'react-router-dom';
 import ButtonCustom from '../../components/ButtonCustom';
 import { userState } from '../../recoil/auth';
@@ -26,13 +27,14 @@ function removeDiatricsAndAccents(str) {
     .replace(/[\u0300-\u036f]/g, '');
 }
 
-function personsToOptions(persons, actions, passages) {
+function personsToOptions(persons, actions, passages, rencontres) {
   return persons.slice(0, 50).map((person) => ({
     value: person._id,
     label: person.name,
     ...person,
     lastAction: actions.find((action) => action.person === person._id),
     lastPassage: passages.find((passage) => passage.person === person._id),
+    lastRencontre: rencontres.find((rencontre) => rencontre.person === person._id),
   }));
 }
 
@@ -40,6 +42,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
   const [persons, setPersons] = useRecoilState(personsState);
   const actions = useRecoilValue(actionsState);
   const passages = useRecoilValue(passagesState);
+  const rencontres = useRecoilValue(rencontresState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
@@ -85,6 +88,22 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
     );
   }, [passages]);
 
+  const lastRencontres = useMemo(() => {
+    return Object.values(
+      rencontres
+        .filter((passage) => Boolean(passage.person))
+        .reduce((acc, passage) => {
+          if (!acc[passage.person] || passage.date > acc[passage.person].date) {
+            acc[passage.person] = {
+              date: passage.date,
+              person: passage.person,
+            };
+          }
+          return acc;
+        }, {})
+    );
+  }, [rencontres]);
+
   return (
     <AsyncSelect
       loadOptions={(inputValue) => {
@@ -92,12 +111,13 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
         const options = personsToOptions(
           searchablePersons.filter((person) => person.searchString.includes(formattedInputValue)),
           lastActions,
-          lastPassages
+          lastPassages,
+          lastRencontres
         );
         optionsExist.current = options.length;
         return Promise.resolve(options);
       }}
-      defaultOptions={personsToOptions(searchablePersons, lastActions, lastPassages)}
+      defaultOptions={personsToOptions(searchablePersons, lastActions, lastPassages, lastRencontres)}
       name="persons"
       isMulti
       isSearchable

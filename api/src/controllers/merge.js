@@ -11,6 +11,7 @@ const Treatment = require("../models/treatment");
 const MedicalFile = require("../models/medicalFile");
 const Comment = require("../models/comment");
 const Passage = require("../models/passage");
+const Rencontre = require("../models/rencontre");
 const sequelize = require("../db/sequelize");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");
@@ -27,6 +28,7 @@ router.post(
       "mergedConsultations",
       "mergedTreatments",
       "mergedPassages",
+      "mergedRencontres",
       "mergedComments",
       "mergedRelsPersonPlace",
     ];
@@ -88,6 +90,7 @@ router.post(
         mergedMedicalFile,
         mergedComments,
         mergedPassages,
+        mergedRencontres,
         mergedRelsPersonPlace,
         personToDeleteId,
         medicalFileToDeleteId,
@@ -121,6 +124,10 @@ router.post(
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedPassages) {
         await Passage.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
+      }
+
+      for (let { encrypted, encryptedEntityKey, _id } of mergedRencontres) {
+        await Rencontre.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation }, transaction: tx });
       }
 
       for (let { encrypted, encryptedEntityKey, _id } of mergedRelsPersonPlace) {

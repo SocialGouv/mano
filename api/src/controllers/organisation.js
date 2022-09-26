@@ -16,6 +16,7 @@ const Territory = require("../models/territory");
 const Report = require("../models/report");
 const Comment = require("../models/comment");
 const Passage = require("../models/passage");
+const Rencontre = require("../models/rencontre");
 const mailservice = require("../utils/mailservice");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, customFieldSchema, positiveIntegerRegex } = require("../utils");
@@ -57,6 +58,7 @@ router.get(
     const persons = await Person.count(query);
     const comments = await Comment.count(query);
     const passages = await Passage.count(query);
+    const rencontres = await Rencontre.count(query);
     const reports = await Report.count(query);
     const territoryObservations = await TerritoryObservation.count(query);
     const territories = await Territory.count(query);
@@ -81,6 +83,7 @@ router.get(
         treatments,
         comments,
         passages,
+        rencontres,
         medicalFiles,
         persons,
         places,
@@ -177,6 +180,7 @@ router.get(
     const reports = (await Report.findAll(countQuery)).map((item) => item.toJSON());
     const comments = (await Comment.findAll(countQuery)).map((item) => item.toJSON());
     const passages = (await Passage.findAll(countQuery)).map((item) => item.toJSON());
+    const rencontres = (await Rencontre.findAll(countQuery)).map((item) => item.toJSON());
 
     return res.status(200).send({
       ok: true,
@@ -192,6 +196,9 @@ router.get(
             reports: reports.find((r) => r.organisation === org._id) ? Number(reports.find((r) => r.organisation === org._id).countByOrg) : 0,
             comments: comments.find((r) => r.organisation === org._id) ? Number(comments.find((r) => r.organisation === org._id).countByOrg) : 0,
             passages: passages.find((r) => r.organisation === org._id) ? Number(passages.find((r) => r.organisation === org._id).countByOrg) : 0,
+            rencontres: rencontres.find((r) => r.organisation === org._id)
+              ? Number(rencontres.find((r) => r.organisation === org._id).countByOrg)
+              : 0,
           };
           return {
             ...org,

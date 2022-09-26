@@ -23,6 +23,7 @@ import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api'
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
+import { rencontresState, prepareRencontreForEncryption } from '../../recoil/rencontres';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { consultationsState, prepareConsultationForEncryption } from '../../recoil/consultations';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
@@ -73,6 +74,7 @@ const MergeTwoPersons = ({ person }) => {
   const comments = useRecoilValue(commentsState);
   const actions = useRecoilValue(actionsState);
   const passages = useRecoilValue(passagesState);
+  const rencontres = useRecoilValue(rencontresState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const consultations = useRecoilValue(consultationsState);
   const medicalFiles = useRecoilValue(medicalFileState);
@@ -219,6 +221,11 @@ const MergeTwoPersons = ({ person }) => {
                   .map((passage) => preparePassageForEncryption({ ...passage, person: originPerson._id }))
                   .map(encryptItem(hashedOrgEncryptionKey));
 
+                const mergedRencontres = rencontres
+                  .filter((r) => r.person === personToMergeAndDelete._id)
+                  .map((rencontre) => prepareRencontreForEncryption({ ...rencontre, person: originPerson._id }))
+                  .map(encryptItem(hashedOrgEncryptionKey));
+
                 const mergedConsultations = consultations
                   .filter((consultation) => consultation.person === personToMergeAndDelete._id)
                   .map((consultation) => prepareConsultationForEncryption(organisation.consultations)({ ...consultation, person: originPerson._id }));
@@ -262,6 +269,7 @@ const MergeTwoPersons = ({ person }) => {
                     mergedComments: await Promise.all(mergedComments.map(encryptItem(hashedOrgEncryptionKey))),
                     mergedRelsPersonPlace: await Promise.all(mergedRelsPersonPlace.map(encryptItem(hashedOrgEncryptionKey))),
                     mergedPassages: await Promise.all(mergedPassages.map(encryptItem(hashedOrgEncryptionKey))),
+                    mergedRencontres: await Promise.all(mergedRencontres.map(encryptItem(hashedOrgEncryptionKey))),
                     mergedConsultations: await Promise.all(mergedConsultations.map(encryptItem(hashedOrgEncryptionKey))),
                     mergedTreatments: await Promise.all(mergedTreatments.map(encryptItem(hashedOrgEncryptionKey))),
                     mergedMedicalFile: mergedMedicalFile ? await encryptItem(hashedOrgEncryptionKey)(mergedMedicalFile) : undefined,

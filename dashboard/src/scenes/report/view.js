@@ -43,6 +43,7 @@ import { currentTeamReportsSelector } from '../../recoil/selectors';
 import IncrementorSmall from '../../components/IncrementorSmall';
 import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
+import { rencontresState } from '../../recoil/rencontres';
 import Passage from '../../components/Passage';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
@@ -51,6 +52,7 @@ import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
+import Rencontre from '../../components/Rencontre';
 
 const tabs = [
   'Résumé',
@@ -60,12 +62,13 @@ const tabs = [
   'Actions annulées',
   'Commentaires',
   'Passages',
+  'Rencontres',
   'Observations',
   'Personnes créées',
 ];
 const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
-const tabsForRestrictedRole = ['Accueil', 'Passages'];
-const spaceAfterTab = [0, 1, 4, 5, 6, 7, 8];
+const tabsForRestrictedRole = ['Accueil', 'Passages', 'Rencontres'];
+const spaceAfterTab = [0, 1, 4, 5, 7, 8, 9];
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -161,6 +164,7 @@ const View = () => {
           </>
         )}
         <PassagesCreatedAt date={report.date} report={report} />
+        <RencontresCreatedAt date={report.date} report={report} />
         {!['restricted-access'].includes(user.role) && (
           <>
             <TerritoryObservationsCreatedAt date={report.date} />
@@ -291,33 +295,36 @@ const View = () => {
             <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
               <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, `Passages (${total})`)} />
             </div>
+            <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+              <RencontresCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(7, `Rencontres (${total})`)} />
+            </div>
             {!['restricted-access'].includes(user.role) && (
               <>
-                <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(7, `Observations (${total})`)} />
-                </div>
                 <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Personnes créées (${total})`)} />
+                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Observations (${total})`)} />
+                </div>
+                <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, `Personnes créées (${total})`)} />
                 </div>
                 {!!user.healthcareProfessional && (
                   <>
-                    <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                    <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <Consultations
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(9, `Consultations faites (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(10, `Consultations faites (${total})`)}
                         status={DONE}
                       />
                     </div>
-                    <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                    <div style={activeTab !== 11 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <ConsultationsCreatedAt
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(10, `Consultations créées (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(11, `Consultations créées (${total})`)}
                       />
                     </div>
-                    <div style={activeTab !== 11 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                    <div style={activeTab !== 12 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
                       <Consultations
                         date={report.date}
-                        onUpdateResults={(total) => updateTabContent(11, `Consultations annulées (${total})`)}
+                        onUpdateResults={(total) => updateTabContent(12, `Consultations annulées (${total})`)}
                         status={CANCEL}
                       />
                     </div>
@@ -932,6 +939,108 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
                 title: 'Enregistré par',
                 dataKey: 'user',
                 render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+              },
+              { title: 'Commentaire', dataKey: 'comment' },
+            ]}
+          />
+        )}
+      </StyledBox>
+    </>
+  );
+};
+
+const RencontresCreatedAt = ({ date, onUpdateResults = () => null }) => {
+  const allRencontres = useRecoilValue(rencontresState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
+  const [rencontreToEdit, setRencontreToEdit] = useState(null);
+
+  const rencontres = useMemo(
+    () =>
+      allRencontres
+        .filter((p) => p.team === currentTeam._id)
+        .filter((p) =>
+          getIsDayWithinHoursOffsetOfPeriod(
+            p.date,
+            {
+              referenceStartDay: date,
+              referenceEndDay: date,
+            },
+            currentTeam?.nightSession ? 12 : 0
+          )
+        ),
+    [allRencontres, currentTeam._id, currentTeam?.nightSession, date]
+  );
+
+  useEffect(() => {
+    onUpdateResults(rencontres.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rencontres.length]);
+
+  const numberOfNonAnonymousRencontres = useMemo(() => rencontres.filter((p) => !!p.person)?.length, [rencontres]);
+
+  return (
+    <>
+      <StyledBox>
+        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
+          <TabTitle>Rencontres enregistrés le {formatDateWithFullMonth(date)}</TabTitle>
+          <ButtonCustom
+            title="Ajouter un rencontre ce jour"
+            style={{ marginLeft: 'auto', marginBottom: '10px' }}
+            onClick={() =>
+              setRencontreToEdit({
+                date: dayjs(date),
+                user: user._id,
+                team: currentTeam._id,
+              })
+            }
+          />
+        </div>
+        <Row style={{ marginBottom: 20 }}>
+          <Col md={3} />
+          <Col md={6}>
+            <Card
+              countId="report-rencontres-non-anonymous-count"
+              title="Nombre de rencontres"
+              count={numberOfNonAnonymousRencontres}
+              unit={`rencontre${numberOfNonAnonymousRencontres > 1 ? 's' : ''}`}
+            />
+          </Col>
+        </Row>
+        <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
+        {!!rencontres.length && (
+          <Table
+            className="Table"
+            onRowClick={setRencontreToEdit}
+            data={rencontres}
+            rowKey={'_id'}
+            columns={[
+              {
+                title: 'Heure',
+                dataKey: 'date',
+                render: (rencontre) => {
+                  const time = dayjs(rencontre.date).format('HH:mm');
+                  // anonymous comment migrated from `report.rencontres`
+                  // have no time
+                  // have no user assigned either
+                  if (time === '00:00' && !rencontre.user) return null;
+                  return <span>{time}</span>;
+                },
+              },
+              {
+                title: 'Personne suivie',
+                dataKey: 'person',
+                render: (rencontre) =>
+                  rencontre.person ? (
+                    <PersonName item={rencontre} redirectToTab="rencontres" />
+                  ) : (
+                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
+                  ),
+              },
+              {
+                title: 'Enregistré par',
+                dataKey: 'user',
+                render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
               },
               { title: 'Commentaire', dataKey: 'comment' },
             ]}

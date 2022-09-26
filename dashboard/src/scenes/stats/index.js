@@ -31,6 +31,7 @@ import { territoriesState } from '../../recoil/territory';
 import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import { useDataLoader } from '../../components/DataLoader';
 import { passagesState } from '../../recoil/passages';
+import { rencontresState } from '../../recoil/rencontres';
 import useTitle from '../../services/useTitle';
 import { consultationsState } from '../../recoil/consultations';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
@@ -47,7 +48,7 @@ const getDataForPeriod = (data, { startDate, endDate }, selectedTeams, viewAllOr
   );
 };
 
-const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Observations', 'Comptes-rendus', 'Consultations'];
+const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Rencontres', 'Observations', 'Comptes-rendus', 'Consultations'];
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -60,6 +61,7 @@ const Stats = () => {
   const allreports = useRecoilValue(reportsState);
   const allObservations = useRecoilValue(territoryObservationsState);
   const allPassages = useRecoilValue(passagesState);
+  const allRencontres = useRecoilValue(rencontresState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
@@ -141,6 +143,44 @@ const Stats = () => {
     [passages, allPersons]
   );
 
+  const rencontres = getDataForPeriod(
+    filterByTeam(allRencontres, 'team')
+      .map((p) => ({ ...p, type: 'Rencontres' }))
+      .map((rencontre) => ({
+        ...rencontre,
+        gender: !rencontre.person ? null : allPersons.find((person) => person._id === rencontre.person)?.gender || 'Non renseigné',
+      })),
+    period,
+    selectedTeams,
+    viewAllOrganisationData,
+    { field: 'date' }
+  );
+  const personsInRencontresBeforePeriod = useMemo(() => {
+    if (!period?.startDate) return [];
+    const rencontresIds = rencontres.map((p) => p._id);
+    const rencontresNotIncludedInPeriod = allRencontres
+      .filter((p) => !rencontresIds.includes(p._id))
+      .filter((p) => dayjsInstance(p.date).isBefore(period.startDate));
+    return rencontresNotIncludedInPeriod
+      .reduce((personsIds, rencontre) => {
+        if (!rencontre.person) return personsIds;
+        if (personsIds.includes(rencontre.person)) return personsIds;
+        return [...personsIds, rencontre.person];
+      }, [])
+      .map((personId) => allPersons.find((p) => p._id === personId) || { _id: personId, gender: 'Non précisé' });
+  }, [allRencontres, rencontres, period.startDate, allPersons]);
+  const personsInRencontresOfPeriod = useMemo(
+    () =>
+      rencontres
+        .reduce((personsIds, rencontre) => {
+          if (!rencontre.person) return personsIds;
+          if (personsIds.includes(rencontre.person)) return personsIds;
+          return [...personsIds, rencontre.person];
+        }, [])
+        .map((personId) => allPersons.find((p) => p._id === personId) || { _id: personId, gender: 'Non précisé' }),
+    [rencontres, allPersons]
+  );
+
   const reports = getDataForPeriod(filterByTeam(allreports, 'team'), period, selectedTeams, viewAllOrganisationData, { field: 'date' });
 
   const reportsServices = reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean);
@@ -213,10 +253,9 @@ const Stats = () => {
         <TabPane tabId={0}>
           <Title>Statistiques générales</Title>
           <Row style={{ marginBottom: '20px' }}>
-            <Col md={2} />
             <Block data={personsForStats} title="Nombre de personnes suivies" />
             <Block data={actions} title="Nombre d'actions" />
-            <Col md={2} />
+            <Block data={rencontres.length} title="Nombre de rencontres" />
           </Row>
         </TabPane>
         {!!organisation.receptionEnabled && (
@@ -381,6 +420,30 @@ const Stats = () => {
           />
         </TabPane>
         <TabPane tabId={5}>
+          <Title>Statistiques des rencontres</Title>
+          <CustomResponsivePie title="Nombre de rencontres" data={getPieData(rencontres, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
+          <CustomResponsivePie
+            title="Répartition des rencontres"
+            data={getPieData(
+              rencontres.filter((p) => !!p.gender),
+              'gender',
+              { options: [...genderOptions, 'Non précisé'] }
+            )}
+          />
+          <CustomResponsivePie
+            title="Nombre de personnes différentes rencontrées"
+            data={getPieData(personsInRencontresOfPeriod, 'gender', { options: [...genderOptions, 'Non précisé'] })}
+          />
+          <CustomResponsivePie
+            title="Nombre de nouvelles personnes rencontrées"
+            data={getPieData(
+              personsInRencontresOfPeriod.filter((personId) => !personsInRencontresBeforePeriod.includes(personId)),
+              'gender',
+              { options: [...genderOptions, 'Non précisé'] }
+            )}
+          />
+        </TabPane>
+        <TabPane tabId={6}>
           <Title>Statistiques des observations de territoire</Title>
           <div style={{ marginBottom: '2rem' }}>
             <Label htmlFor="filter-territory">Filter par territoire</Label>
@@ -411,7 +474,7 @@ const Stats = () => {
             />
           </Row>
         </TabPane>
-        <TabPane tabId={6}>
+        <TabPane tabId={7}>
           <Title>Statistiques des comptes-rendus</Title>
           <CustomResponsivePie
             title="Répartition des comptes-rendus par collaboration"
@@ -419,7 +482,7 @@ const Stats = () => {
           />
         </TabPane>
         {user.healthcareProfessional && (
-          <TabPane tabId={7}>
+          <TabPane tabId={8}>
             <Title>Statistiques des consultations</Title>
             <Row style={{ marginBottom: '20px' }}>
               <Col md={4} />

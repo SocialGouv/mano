@@ -47,6 +47,7 @@ import useApi from '../../services/api';
 import { commentsState } from '../../recoil/comments';
 import { MedicalFile } from './MedicalFile';
 import { passagesState } from '../../recoil/passages';
+import { rencontresState } from '../../recoil/rencontres';
 import DateBloc from '../../components/DateBloc';
 import Passage from '../../components/Passage';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
@@ -58,9 +59,10 @@ import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
 import MergeTwoPersons from './MergeTwoPersons';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
+import Rencontre from '../../components/Rencontre';
 
-const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Lieux', 'Documents', 'Historique'];
-const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages'];
+const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Rencontres', 'Lieux', 'Documents', 'Historique'];
+const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages', 'Rencontres'];
 
 const View = () => {
   const { id } = useParams();
@@ -163,16 +165,19 @@ const View = () => {
         <TabPane tabId={4}>
           <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
+        <TabPane tabId={5}>
+          <Rencontres personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Rencontres (${total})`)} />
+        </TabPane>
         {!['restricted-access'].includes(user.role) && (
           <>
-            <TabPane tabId={5}>
-              <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Lieux (${total})`)} />
-            </TabPane>
             <TabPane tabId={6}>
+              <Places personId={person?._id} onUpdateResults={(total) => updateTabContent(6, `Lieux (${total})`)} />
+            </TabPane>
+            <TabPane tabId={7}>
               {
                 <PersonDocuments
                   person={person}
-                  onUpdateResults={(total) => updateTabContent(6, `Documents (${total})`)}
+                  onUpdateResults={(total) => updateTabContent(7, `Documents (${total})`)}
                   onGoToMedicalFiles={async () => {
                     const searchParams = new URLSearchParams(location.search);
                     searchParams.set('tab', 'dossier médical');
@@ -185,7 +190,7 @@ const View = () => {
                 />
               }
             </TabPane>
-            <TabPane tabId={7}>
+            <TabPane tabId={8}>
               <PersonHistory person={person} />
             </TabPane>
           </>
@@ -263,6 +268,7 @@ const Summary = ({ person }) => {
   const [actions, setActions] = useRecoilState(actionsState);
   const [comments, setComments] = useRecoilState(commentsState);
   const [passages, setPassages] = useRecoilState(passagesState);
+  const [rencontres, setRencontres] = useRecoilState(rencontresState);
   const [consultations, setConsultations] = useRecoilState(consultationsState);
   const [treatments, setTreatments] = useRecoilState(treatmentsState);
   const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
@@ -587,6 +593,11 @@ const Summary = ({ person }) => {
                             const passageRes = await API.delete({ path: `/passage/${passage._id}` });
                             if (passageRes.ok) setPassages((passages) => passages.filter((c) => c._id !== passage._id));
                           }
+                          for (let rencontre of rencontres.filter((c) => c.person === person._id)) {
+                            const rencontreRes = await API.delete({ path: `/rencontre/${rencontre._id}` });
+                            if (rencontreRes.ok) setRencontres((rencontres) => rencontres.filter((c) => c._id !== rencontre._id));
+                          }
+
                           for (let medicalFile of medicalFiles.filter((c) => c.person === person._id)) {
                             const medicalFileRes = await API.delete({ path: `/medical-file/${medicalFile._id}` });
                             if (medicalFileRes.ok) setMedicalFiles((medicalFiles) => medicalFiles.filter((c) => c._id !== medicalFile._id));
@@ -610,7 +621,7 @@ const Summary = ({ person }) => {
                         <br />
                         et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;:
                         <br />
-                        actions, commentaires, lieux visités, passages, documents...
+                        actions, commentaires, lieux visités, passages, rencontres, documents...
                       </span>
                     </DeleteButtonAndConfirmModal>
                   </>
@@ -801,6 +812,69 @@ const Passages = ({ personId, onUpdateResults }) => {
             title: 'Enregistré par',
             dataKey: 'user',
             render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
+          },
+          { title: 'Commentaire', dataKey: 'comment' },
+        ]}
+      />
+    </React.Fragment>
+  );
+};
+
+const Rencontres = ({ personId, onUpdateResults }) => {
+  const rencontres = useRecoilValue(rencontresState);
+  const personRencontres = useMemo(() => rencontres.filter((rencontre) => rencontre.person === personId), [personId, rencontres]);
+  const [rencontreToEdit, setRencontreToEdit] = useState(null);
+  const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
+
+  useEffect(() => {
+    onUpdateResults(personRencontres.length);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [personRencontres.length]);
+
+  return (
+    <React.Fragment>
+      <div style={{ display: 'flex', margin: '30px 0 20px', alignItems: 'center' }}>
+        <Title>Rencontres</Title>
+        <ButtonCustom
+          title="Ajouter une rencontre"
+          style={{ marginLeft: 'auto', marginBottom: '10px' }}
+          onClick={() =>
+            setRencontreToEdit({
+              user: user._id,
+              team: currentTeam._id,
+              person: personId,
+            })
+          }
+        />
+      </div>
+      <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
+      <Table
+        data={personRencontres}
+        rowKey={'_id'}
+        onRowClick={(rencontre) => setRencontreToEdit(rencontre)}
+        columns={[
+          {
+            title: 'Date',
+            dataKey: 'date',
+            render: (rencontre) => {
+              return <DateBloc date={rencontre.date} />;
+            },
+          },
+          {
+            title: 'Heure',
+            dataKey: 'time',
+            render: (rencontre) => formatTime(rencontre.date),
+          },
+          {
+            title: 'Équipe',
+            dataKey: 'team',
+            render: (rencontre) => <TagTeam key={rencontre.team} teamId={rencontre.team} />,
+          },
+          {
+            title: 'Enregistrée par',
+            dataKey: 'user',
+            render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
           },
           { title: 'Commentaire', dataKey: 'comment' },
         ]}

@@ -7,6 +7,7 @@ import { treatmentsState } from '../recoil/treatments';
 import { actionsState } from '../recoil/actions';
 import { medicalFileState } from '../recoil/medicalFiles';
 import { passagesState } from '../recoil/passages';
+import { rencontresState } from '../recoil/rencontres';
 import { reportsState } from '../recoil/reports';
 import { territoriesState } from '../recoil/territory';
 import { placesState } from '../recoil/places';
@@ -50,6 +51,7 @@ export default function DataLoader() {
   const [treatments, setTreatments] = useRecoilState(treatmentsState);
   const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
   const [passages, setPassages] = useRecoilState(passagesState);
+  const [rencontres, setRencontres] = useRecoilState(rencontresState);
   const [reports, setReports] = useRecoilState(reportsState);
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [places, setPlaces] = useRecoilState(placesState);
@@ -118,6 +120,7 @@ export default function DataLoader() {
               stats.treatments +
               stats.medicalFiles +
               stats.passages +
+              stats.rencontres +
               stats.reports +
               stats.territories +
               stats.places +
@@ -133,6 +136,7 @@ export default function DataLoader() {
             }
             if (stats.reports) newList.push('report');
             if (stats.passages) newList.push('passage');
+            if (stats.rencontres) newList.push('rencontre');
             if (stats.actions) newList.push('action');
             if (stats.territories) newList.push('territory');
             if (stats.places) newList.push('place');
@@ -154,6 +158,8 @@ export default function DataLoader() {
               .then((reports) => setReports([...reports]))
               .then(() => getCacheItemDefaultValue('passage', []))
               .then((passages) => setPassages([...passages]))
+              .then(() => getCacheItemDefaultValue('rencontre', []))
+              .then((rencontres) => setRencontres([...rencontres]))
               .then(() => getCacheItemDefaultValue('action', []))
               .then((actions) => setActions([...actions]))
               .then(() => getCacheItemDefaultValue('territory', []))
@@ -244,6 +250,16 @@ export default function DataLoader() {
         res.hasMore
           ? mergeItems(passages, res.decryptedData)
           : mergeItems(passages, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
+      );
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'rencontre') {
+      setLoadingText('Chargement des rencontres');
+      const res = await API.get({ path: '/rencontre', query });
+      setRencontres(
+        res.hasMore
+          ? mergeItems(rencontres, res.decryptedData)
+          : mergeItems(rencontres, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
       );
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);

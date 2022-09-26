@@ -18,4 +18,5 @@
   await require("./2022-04-25_soft-delete")();
   await require("./2022-05-03_add_medical_file_tables")();
   await require("./2022-06-17-custom-fields-persons-2")();
+  await require("./2022-09-19_add_rencontre_table")();
 })();
