@@ -53,7 +53,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
         <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer une rencontre' : 'Éditer la rencontre'}</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ ...rencontre, anonymousNumberOfRencontres: 1, persons: rencontre?.person ? [rencontre.person] : [] }}
+            initialValues={{ date: new Date(), ...rencontre, anonymousNumberOfRencontres: 1, persons: rencontre?.person ? [rencontre.person] : [] }}
             onSubmit={async (body, actions) => {
               if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
               if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
