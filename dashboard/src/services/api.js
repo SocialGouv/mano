@@ -66,6 +66,7 @@ const decryptDBItem = async (item, { logout, path, debug = false, encryptedVerif
   if (wrongKeyWarned) return item;
   if (!enableEncrypt) return item;
   if (!item.encrypted) return item;
+  if (!!item.deletedAt) return item;
   if (!item.encryptedEntityKey) return item;
   try {
     const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, hashedOrgEncryptionKey);
