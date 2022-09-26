@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
-import { toastr } from 'react-redux-toastr';
+import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import { Formik } from 'formik';
 
@@ -36,7 +36,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
     if (confirm) {
       const rencontreRes = await API.delete({ path: `/rencontre/${rencontre._id}` });
       if (rencontreRes.ok) {
-        toastr.success('Suppression réussie');
+        toast.success('Suppression réussie');
         setOpen(false);
         setRencontres((rencontres) => rencontres.filter((p) => p._id !== rencontre._id));
       }
@@ -55,11 +55,11 @@ const Rencontre = ({ rencontre, onFinished }) => {
           <Formik
             initialValues={{ date: new Date(), ...rencontre, anonymousNumberOfRencontres: 1, persons: rencontre?.person ? [rencontre.person] : [] }}
             onSubmit={async (body, actions) => {
-              if (!body.user) return toastr.error('Erreur!', "L'utilisateur est obligatoire");
-              if (!body.date) return toastr.error('Erreur!', 'La date est obligatoire');
-              if (!body.team) return toastr.error('Erreur!', "L'équipe est obligatoire");
+              if (!body.user) return toast.error("L'utilisateur est obligatoire");
+              if (!body.date) return toast.error('La date est obligatoire');
+              if (!body.team) return toast.error("L'équipe est obligatoire");
               if (!body.anonymous && (showMultiSelect ? !body.persons?.length : !body.person?.length))
-                return toastr.error('Erreur!', 'Veuillez spécifier une personne');
+                return toast.error('Veuillez spécifier une personne');
 
               if (isNew) {
                 const newRencontre = {
@@ -91,7 +91,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
 
                 setOpen(false);
                 onFinished();
-                toastr.success(body.person.length > 1 ? 'Rencontre enregistrée' : 'Rencontres enregistrées');
+                toast.success(body.person.length > 1 ? 'Rencontre enregistrée' : 'Rencontres enregistrées');
                 actions.setSubmitting(false);
                 return;
               }
@@ -110,7 +110,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
               if (!response.ok) return;
               setOpen(false);
               onFinished();
-              toastr.success('Rencontre mis à jour');
+              toast.success('Rencontre mise à jour');
               actions.setSubmitting(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => {
