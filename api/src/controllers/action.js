@@ -13,7 +13,6 @@ const TODO = "A FAIRE";
 const DONE = "FAIT";
 const CANCEL = "ANNULEE";
 const STATUS = [TODO, DONE, CANCEL];
-
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
@@ -21,11 +20,13 @@ router.post(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.enum(STATUS).parse(req.body.status);
-      z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
-      if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        status: z.enum(STATUS),
+        dueAt: z.preprocess((input) => new Date(input), z.date()),
+        ...(req.body.completedAt ? { completedAt: z.preprocess((input) => new Date(input), z.date()) } : {}),
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in action creation: ${e}`);
       error.status = 400;
@@ -67,10 +68,12 @@ router.get(
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
-      z.optional(z.enum(["true", "false"])).parse(req.query.withDeleted);
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.after);
+      z.object({
+        limit: z.optional(z.string().regex(positiveIntegerRegex)),
+        page: z.optional(z.string().regex(positiveIntegerRegex)),
+        after: z.optional(z.string().regex(positiveIntegerRegex)),
+        withDeleted: z.optional(z.enum(["true", "false"])),
+      }).parse(req.query);
     } catch (e) {
       const error = new Error(`Invalid request in action get: ${e}`);
       error.status = 400;
@@ -137,12 +140,18 @@ router.put(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.enum(STATUS).parse(req.body.status);
-      z.preprocess((input) => new Date(input), z.date()).parse(req.body.dueAt);
-      if (req.body.completedAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.completedAt);
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        params: z.object({
+          _id: z.string().regex(looseUuidRegex),
+        }),
+        body: z.object({
+          status: z.enum(STATUS),
+          dueAt: z.preprocess((input) => new Date(input), z.date()),
+          ...(req.body.completedAt ? { completedAt: z.preprocess((input) => new Date(input), z.date()) } : {}),
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        }),
+      }).parse(req);
     } catch (e) {
       const error = new Error(`Invalid request in action put: ${e}`);
       error.status = 400;
@@ -191,7 +200,9 @@ router.delete(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in action delete: ${e}`);
       error.status = 400;

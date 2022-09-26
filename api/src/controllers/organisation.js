@@ -33,10 +33,12 @@ router.get(
   validateUser(["superadmin", "admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.query.organisation);
-      z.optional(z.enum(["true", "false"])).parse(req.query.withDeleted);
-      z.optional(z.enum(["true", "false"])).parse(req.query.withAllMedicalData);
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.after);
+      z.object({
+        organisation: z.string().regex(looseUuidRegex),
+        after: z.optional(z.string().regex(positiveIntegerRegex)),
+        withAllMedicalData: z.optional(z.enum(["true", "false"])),
+        withDeleted: z.optional(z.enum(["true", "false"])),
+      }).parse(req.query);
     } catch (e) {
       const error = new Error(`Invalid request in stats get: ${e}`);
       error.status = 400;
@@ -102,9 +104,11 @@ router.post(
   validateUser("superadmin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().min(1).parse(req.body.orgName);
-      z.string().min(1).parse(req.body.name);
-      z.string().email().parse(req.body.email);
+      z.object({
+        orgName: z.string().min(1),
+        name: z.string().min(1),
+        email: z.string().email(),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in organisation post: ${e}`);
       error.status = 400;
@@ -160,7 +164,9 @@ router.get(
   validateUser("superadmin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.optional(z.string()).parse(req.query.withCounters);
+      z.object({
+        withCounters: z.optional(z.enum(["true", "false"])),
+      }).parse(req.query);
     } catch (e) {
       const error = new Error(`Invalid request in organisation get: ${e}`);
       error.status = 400;
@@ -216,33 +222,37 @@ router.put(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      if (req.user.role !== "admin") {
-        z.array(z.string()).parse(req.body.collaborations);
-      } else {
-        z.optional(z.string().min(1)).parse(req.body.name);
-        z.optional(z.array(z.string().min(1))).parse(req.body.categories);
-        z.optional(z.array(z.string().min(1))).parse(req.body.collaborations);
-        z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsObs);
-        z.optional(z.array(customFieldSchema)).parse(req.body.fieldsPersonsCustomizableOptions);
-        z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsSocial);
-        z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsPersonsMedical);
-        z.optional(z.array(customFieldSchema)).parse(req.body.customFieldsMedicalFile);
-        z.optional(
+      const bodyToParse = {
+        name: z.optional(z.string().min(1)),
+        categories: z.optional(z.array(z.string().min(1))),
+        collaborations: z.optional(z.array(z.string().min(1))),
+        customFieldsObs: z.optional(z.array(customFieldSchema)),
+        fieldsPersonsCustomizableOptions: z.optional(z.array(customFieldSchema)),
+        customFieldsPersonsSocial: z.optional(z.array(customFieldSchema)),
+        customFieldsPersonsMedical: z.optional(z.array(customFieldSchema)),
+        customFieldsMedicalFile: z.optional(z.array(customFieldSchema)),
+        consultations: z.optional(
           z.array(
             z.object({
               name: z.string().min(1),
               fields: z.array(customFieldSchema),
             })
           )
-        ).parse(req.body.consultations);
-
-        z.optional(z.string().min(1)).parse(req.body.encryptedVerificationKey);
-        z.optional(z.boolean()).parse(req.body.encryptionEnabled);
-        if (req.body.encryptionLastUpdateAt) z.preprocess((input) => new Date(input), z.date()).parse(req.body.encryptionLastUpdateAt);
-        z.optional(z.boolean()).parse(req.body.receptionEnabled);
-        z.optional(z.array(z.string().min(1))).parse(req.body.services);
+        ),
+        encryptedVerificationKey: z.optional(z.string().min(1)),
+        encryptionEnabled: z.optional(z.boolean()),
+        receptionEnabled: z.optional(z.boolean()),
+        services: z.optional(z.array(z.string().min(1))),
+      };
+      if (req.body.encryptionLastUpdateAt) {
+        bodyToParse.encryptionLastUpdateAt = z.preprocess((input) => new Date(input), z.date());
       }
+      z.object({
+        params: z.object({
+          _id: z.string().regex(looseUuidRegex),
+        }),
+        body: z.object(req.user.role !== "admin" ? { collaborations: z.array(z.string()) } : bodyToParse),
+      });
     } catch (e) {
       const error = new Error(`Invalid request in organisation put: ${e}`);
       error.status = 400;
@@ -303,7 +313,9 @@ router.delete(
   validateUser(["superadmin", "admin"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in organisation delete: ${e}`);
       error.status = 400;

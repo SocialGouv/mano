@@ -20,8 +20,14 @@ router.put(
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.user.organisation);
-      z.string().min(1).parse(req.params.migrationName);
+      z.object({
+        user: z.object({
+          organisation: z.string().regex(looseUuidRegex),
+        }),
+        params: z.object({
+          migrationName: z.string().min(1),
+        }),
+      }).parse(req);
     } catch (e) {
       const error = new Error(`Invalid request in migration: ${e}`);
       error.status = 400;

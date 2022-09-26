@@ -36,23 +36,23 @@ router.post(
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
-    try {
-      const objectsKeys = [
-        "actions",
-        "consultations",
-        "treatments",
-        "medicalFiles",
-        "persons",
-        "comments",
-        "territories",
-        "observations",
-        "places",
-        "passages",
-        "rencontres",
-        "reports",
-        "relsPersonPlace",
-      ];
-      for (const objectKey of objectsKeys) {
+    const objectsKeys = [
+      "actions",
+      "consultations",
+      "treatments",
+      "medicalFiles",
+      "persons",
+      "comments",
+      "territories",
+      "observations",
+      "places",
+      "passages",
+      "rencontres",
+      "reports",
+      "relsPersonPlace",
+    ];
+    for (const objectKey of objectsKeys) {
+      try {
         z.array(
           z.object({
             _id: z.string().regex(looseUuidRegex),
@@ -60,11 +60,19 @@ router.post(
             encryptedEntityKey: z.string(),
           })
         ).parse(req.body[objectKey]);
+      } catch (e) {
+        const error = new Error(`Invalid request in encrypt objectKey ${objectKey}: ${e}`);
+        error.status = 400;
+        return next(error);
       }
-      z.preprocess((input) => new Date(input), z.date()).parse(req.body.encryptionLastUpdateAt || 0);
-      z.string().parse(req.body.encryptedVerificationKey);
+    }
+    try {
+      z.object({
+        encryptionLastUpdateAt: z.preprocess((input) => new Date(input), z.date()),
+        encryptedVerificationKey: z.string(),
+      }).parse(req.body);
     } catch (e) {
-      const error = new Error(`Invalid request in encryption: ${e}`);
+      const error = new Error(`Invalid request in encryption parameters: ${e}`);
       error.status = 400;
       return next(error);
     }

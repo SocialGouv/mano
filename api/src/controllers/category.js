@@ -18,14 +18,16 @@ router.put(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.array(
-        z.object({
-          _id: z.string().regex(looseUuidRegex),
-          encrypted: z.string(),
-          encryptedEntityKey: z.string(),
-        })
-      ).parse(req.body.actions);
-      z.array(z.string()).parse(req.body.categories);
+      z.object({
+        actions: z.array(
+          z.object({
+            _id: z.string().regex(looseUuidRegex),
+            encrypted: z.string(),
+            encryptedEntityKey: z.string(),
+          })
+        ),
+        categories: z.array(z.string()),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in category update: ${e}`);
       error.status = 400;
