@@ -1,3 +1,10 @@
+## [1.158.1](https://github.com/SocialGouv/mano/compare/v1.158.0...v1.158.1) (2022-09-26)
+
+
+### Bug Fixes
+
+* **dashboard:** merge issue ([4c309eb](https://github.com/SocialGouv/mano/commit/4c309eb1213cd7feb7554aa944b3684019d75e78))
+
 # [1.158.0](https://github.com/SocialGouv/mano/compare/v1.157.1...v1.158.0) (2022-09-26)
 
 
