@@ -91,7 +91,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
 
                 setOpen(false);
                 onFinished();
-                toastr.success(body.person.length > 1 ? 'Rencontre enregistré' : 'Rencontres enregistrés');
+                toastr.success(body.person.length > 1 ? 'Rencontre enregistrée' : 'Rencontres enregistrées');
                 actions.setSubmitting(false);
                 return;
               }
