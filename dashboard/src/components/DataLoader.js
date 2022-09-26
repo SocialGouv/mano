@@ -255,7 +255,7 @@ export default function DataLoader() {
       setProgressBuffer(res.data.length);
     } else if (current === 'rencontre') {
       setLoadingText('Chargement des rencontres');
-      const res = await API.get({ path: '/passage', query });
+      const res = await API.get({ path: '/rencontre', query });
       setRencontres(
         res.hasMore
           ? mergeItems(rencontres, res.decryptedData)
