@@ -18,7 +18,7 @@ const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions, itemName, o
       {
         options,
         cancelButtonIndex: options.length - 1,
-        destructiveButtonIndex: 1,
+        destructiveButtonIndex: options.findIndex((o) => o === 'Supprimer'),
       },
       async (buttonIndex) => {
         if (options[buttonIndex] === 'Modifier') onUpdate();

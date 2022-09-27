@@ -17,7 +17,7 @@ const PlaceRow = ({ place, relPersonPlace, personDB, showActionSheetWithOptions 
       {
         options,
         cancelButtonIndex: options.length - 1,
-        destructiveButtonIndex: 1,
+        destructiveButtonIndex: options.findIndex((o) => o === 'Retirer'),
       },
       async (buttonIndex) => {
         if (options[buttonIndex] === 'Modifier') {
