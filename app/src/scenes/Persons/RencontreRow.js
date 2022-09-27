@@ -18,7 +18,7 @@ const RencontreRow = ({ onUpdate, rencontre, showActionSheetWithOptions, itemNam
       {
         options,
         cancelButtonIndex: options.length - 1,
-        destructiveButtonIndex: 1,
+        destructiveButtonIndex: options.findIndex((o) => o === 'Supprimer'),
       },
       async (buttonIndex) => {
         if (options[buttonIndex] === 'Modifier') onUpdate();
