@@ -1,5 +1,5 @@
 import React from 'react';
-import { Text, View } from 'react-native';
+import { Text } from 'react-native';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import ButtonTopPlus from '../../components/ButtonTopPlus';
@@ -10,7 +10,6 @@ import TeamsTags from '../../components/TeamsTags';
 import colors from '../../utils/colors';
 import { useNavigation } from '@react-navigation/native';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
-import ButtonRight from '../../components/ButtonRight';
 
 const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReason } }) => {
   if (outOfActiveList) {
@@ -69,7 +68,6 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
         {birthdate && outOfActiveList && <BirthdateMuted>{displayBirthDate(birthdate)}</BirthdateMuted>}
         <TeamsTags teams={person.assignedTeams} />
       </CaptionsContainer>
-      {isPersonsSearchRow && <ButtonRight onPress={onPress} caption="+" />}
     </RowContainer>
   );
 };
@@ -101,6 +99,7 @@ const Name = styled(MyText)`
   font-weight: bold;
   font-size: 20px;
   flex-grow: 1;
+  flex-shrink: 1;
 `;
 
 const NameMuted = styled(Name)`

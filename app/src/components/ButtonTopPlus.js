@@ -1,7 +1,6 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import colors from '../utils/colors';
-import { TouchableOpacity } from 'react-native';
 import { MyText } from './MyText';
 
 const hitSlop = {
@@ -12,44 +11,34 @@ const hitSlop = {
 };
 
 const ButtonTopPlus = ({ onPress, color = '#fff', left = false, disabled = false }) => (
-  <ButtonContainer leftCss={left} disabled={disabled}>
-    <TouchableOpacity onPress={onPress} hitSlop={hitSlop}>
-      <Icon>
-        <Plus color={color}>+</Plus>
-      </Icon>
-    </TouchableOpacity>
+  <ButtonContainer disabled={disabled} onPress={onPress} hitSlop={hitSlop}>
+    <Plus color={color}>+</Plus>
   </ButtonContainer>
 );
 
-const leftCss = css`
-  margin-right: auto;
-`;
-
-const rightCss = css`
-  margin-left: auto;
-`;
-
-const ButtonContainer = styled.View`
-  margin-left: auto;
-  ${(props) => (props.leftCss ? leftCss : rightCss)}
-`;
-
 const iconSize = 30;
-const Icon = styled.View`
+const ButtonContainer = styled.TouchableOpacity`
   height: ${iconSize}px;
   width: ${iconSize}px;
-  border: 2px solid ${colors.app.color};
+  /* border: 1px solid ${colors.app.color}; */
   border-radius: ${iconSize}px;
-  background-color: ${colors.app.color};
+  justify-content: center;
+  align-items: center;
+  margin-left: auto;
+  flex-shrink: 0;
+  opacity: 0.5;
 `;
 
 const Plus = styled(MyText)`
   align-self: center;
-  font-weight: bold;
   font-size: ${iconSize - 2}px;
-  line-height: ${iconSize}px;
-  color: ${(props) => props.color};
+  line-height: ${(iconSize - 3) * 1.5}px;
+  height: ${iconSize}px;
+  width: ${iconSize}px;
+  color: ${colors.app.color};
   text-align: center;
+  justify-content: center;
+  align-items: center;
 `;
 
 export default ButtonTopPlus;
