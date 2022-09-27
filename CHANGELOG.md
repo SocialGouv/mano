@@ -1,3 +1,10 @@
+## [1.159.1](https://github.com/SocialGouv/mano/compare/v1.159.0...v1.159.1) (2022-09-27)
+
+
+### Bug Fixes
+
+* **dashboard:** create report only when activity on the day ([#885](https://github.com/SocialGouv/mano/issues/885)) ([ba8395b](https://github.com/SocialGouv/mano/commit/ba8395b5167a5332a32379f5aa7761760e4023c1)), closes [#898](https://github.com/SocialGouv/mano/issues/898)
+
 # [1.159.0](https://github.com/SocialGouv/mano/compare/v1.158.2...v1.159.0) (2022-09-27)
 
 
