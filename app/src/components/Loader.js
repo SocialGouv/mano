@@ -24,6 +24,7 @@ import { consultationsState, whitelistAllowedData } from '../recoil/consultation
 import { medicalFileState } from '../recoil/medicalFiles';
 import { treatmentsState } from '../recoil/treatments';
 import { sortByName } from '../utils/sortByName';
+import { rencontresState } from '../recoil/rencontres';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -80,6 +81,7 @@ const Loader = () => {
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
   const [comments, setComments] = useRecoilState(commentsState);
+  const [rencontres, setRencontres] = useRecoilState(rencontresState);
   const [reports, setReports] = useRecoilState(reportsState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
 
@@ -117,6 +119,7 @@ const Loader = () => {
       response.data.territoryObservations +
       response.data.places +
       response.data.comments +
+      response.data.rencontres +
       response.data.reports +
       response.data.relsPersonPlace;
 
@@ -323,6 +326,25 @@ const Loader = () => {
       });
       if (refreshedComments) setComments(refreshedComments);
     }
+
+    /*
+    Get rencontres
+    */
+    if (initialLoad || response.data.rencontres) {
+      setLoading('Chargement des rencontres');
+      const refreshedRencontres = await getData({
+        collectionName: 'rencontre',
+        data: rencontres,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newRencontres) =>
+          setRencontres((oldRencontres) => (initialLoad ? [...oldRencontres, ...newRencontres] : mergeItems(oldRencontres, newRencontres))),
+        API,
+      });
+      if (refreshedRencontres) setRencontres(refreshedRencontres);
+    }
+
     /*
     Get reports
     */

@@ -41,7 +41,7 @@ const PersonsSearch = ({ navigation, route }) => {
     if (!filteredPersons.length) return null;
     return <ListNoMorePersons />;
   };
-  const renderPersonRow = ({ item: person }) => <PersonRow onPress={() => onSelectPerson(person)} person={person} buttonRight="+" />;
+  const renderPersonRow = ({ item: person }) => <PersonRow onPress={() => onSelectPerson(person)} person={person} isPersonsSearchRow={true} />;
 
   return (
     <SceneContainer>

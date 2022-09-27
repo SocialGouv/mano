@@ -487,7 +487,7 @@ const Action = ({ navigation, route }) => {
                   ? () =>
                       navigation.push('ActionComment', {
                         ...comment,
-                        name,
+                        commentTitle: name,
                         fromRoute: 'Action',
                       })
                   : null
