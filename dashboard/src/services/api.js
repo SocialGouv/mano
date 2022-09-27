@@ -62,10 +62,11 @@ export const encryptItem =
     return item;
   };
 
-const decryptDBItem = async (item, { logout, debug = false, encryptedVerificationKey = null } = {}) => {
+const decryptDBItem = async (item, { logout, path, debug = false, encryptedVerificationKey = null } = {}) => {
   if (wrongKeyWarned) return item;
   if (!enableEncrypt) return item;
   if (!item.encrypted) return item;
+  if (!!item.deletedAt) return item;
   if (!item.encryptedEntityKey) return item;
   try {
     const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, hashedOrgEncryptionKey);
@@ -91,6 +92,7 @@ const decryptDBItem = async (item, { logout, debug = false, encryptedVerificatio
         extra: {
           message: 'ERROR DECRYPTING ITEM',
           item,
+          path,
           hashedOrgEncryptionKey,
         },
       });
@@ -279,7 +281,7 @@ const useApi = () => {
         if (!!res.data && Array.isArray(res.data)) {
           const decryptedData = [];
           for (const item of res.data) {
-            const decryptedItem = await decryptDBItem(item, { debug, logout, encryptedVerificationKey });
+            const decryptedItem = await decryptDBItem(item, { path, debug, logout, encryptedVerificationKey });
             if (wrongKeyWarned) {
               return { ok: false, data: [] };
             }
@@ -288,7 +290,7 @@ const useApi = () => {
           res.decryptedData = decryptedData;
           return res;
         } else if (res.data) {
-          res.decryptedData = await decryptDBItem(res.data, { debug, logout, encryptedVerificationKey });
+          res.decryptedData = await decryptDBItem(res.data, { path, debug, logout, encryptedVerificationKey });
           return res;
         } else {
           return res;

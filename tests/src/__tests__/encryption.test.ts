@@ -47,12 +47,14 @@ describe("Encryption", () => {
     await expect(page).toClick("button", {
       text: "Changer la clé de chiffrement",
     });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await expect(page).toMatch("Confirmez la clé de chiffrement");
     await expect(page).toFill('input[name="encryptionKey"]', "plaf");
     await expect(page).toFill('input[name="encryptionKeyConfirm"]', "plaf");
     await expect(page).toClick("button[type=submit]", {
       text: "Changer la clé de chiffrement",
     });
+    await new Promise((resolve) => setTimeout(resolve, 1000));
     await page.reload();
     await connectWith("adminEncrypted@example.org", "secret", "plaf");
     await new Promise((resolve) => setTimeout(resolve, 3000));

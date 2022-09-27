@@ -84,6 +84,8 @@ const EncryptionKey = ({ isMain }) => {
 
   const onEncrypt = async (values) => {
     try {
+      // just for the button to show loading state, sorry Raph I couldn't find anything better
+      await new Promise((resolve) => setTimeout(resolve, 100));
       if (!values.encryptionKey) return toast.error('La clé est obligatoire');
       if (!values.encryptionKeyConfirm) return toast.error('La validation de la clé est obligatoire');
       if (values.encryptionKey !== values.encryptionKeyConfirm) return toast.error('Les clés ne sont pas identiques');
@@ -162,7 +164,6 @@ const EncryptionKey = ({ isMain }) => {
     } catch (orgEncryptionError) {
       capture('erreur in organisation encryption', orgEncryptionError);
       toast.error(orgEncryptionError.message, { timeOut: 0 });
-      API.logout();
       setEncryptingProgress(0);
       setEncryptionKey('');
       setEncryptingStatus("Erreur lors du chiffrement, veuillez contacter l'administrateur");
@@ -256,7 +257,12 @@ const EncryptionKey = ({ isMain }) => {
                 color="secondary"
                 id="encrypt"
                 disabled={isLoading || isSubmitting}
-                onClick={() => !isSubmitting && handleSubmit()}
+                loading={isLoading || isSubmitting}
+                type="submit"
+                onClick={() => {
+                  if (isSubmitting) return;
+                  handleSubmit();
+                }}
                 title={organisation.encryptionEnabled ? 'Changer la clé de chiffrement' : 'Activer le chiffrement'}
               />
             </Row>
