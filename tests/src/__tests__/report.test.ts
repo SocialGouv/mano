@@ -285,7 +285,6 @@ Accéder au dossier`
     await expect(page).toFill('textarea[name="description"]', "Ceci est une description");
     await expect(page).toClick("button", { text: "Enregistrer" });
     await page.waitForTimeout(2000);
-    await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Description", { timeout: 2000 });
     await expect(page).toMatch("Ceci est une description");
   });
