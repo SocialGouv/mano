@@ -16,7 +16,7 @@ const AddRencontre = ({ navigation, route }) => {
   const personId = route.params.person._id;
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-  const [rencontre, setRencontre] = useState(() => ({ date: new Date(), user: user._id, team: currentTeam._id, person: personId }));
+  const [rencontre, setRencontre] = useState(() => ({ date: new Date().toISOString(), user: user._id, team: currentTeam._id, person: personId }));
   const [submitting, setSubmitting] = useState(false);
   const [rencontres, setRencontres] = useRecoilState(rencontresState);
 
@@ -44,8 +44,9 @@ const AddRencontre = ({ navigation, route }) => {
             setDate={(date) => setRencontre((a) => ({ ...a, date }))}
             date={rencontre.date}
             showDay
-            withTime={false}
-            editable={true}
+            showTime
+            withTime
+            editable
           />
           <InputMultilineAutoAdjust
             onChangeText={(x) => setRencontre((a) => ({ ...a, comment: x }))}

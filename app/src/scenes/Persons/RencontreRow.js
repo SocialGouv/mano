@@ -56,7 +56,7 @@ const RencontreRow = ({ onUpdate, rencontre, showActionSheetWithOptions, itemNam
       urgent={rencontre.urgent}
       itemName={itemName}
       onItemNamePress={onItemNamePress}
-      metaCaption="Rencontreaire de"
+      metaCaption="Rencontre faite par"
     />
   );
 };
