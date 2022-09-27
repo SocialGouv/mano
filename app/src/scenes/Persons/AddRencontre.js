@@ -20,8 +20,6 @@ const AddRencontre = ({ navigation, route }) => {
   const [submitting, setSubmitting] = useState(false);
   const [rencontres, setRencontres] = useRecoilState(rencontresState);
 
-  console.log(navigation, route, route.params.person._id, { date: new Date(), user: user._id, team: currentTeam._id, person: personId });
-
   const createRencontre = async () => {
     const response = await API.post({
       path: '/rencontre',

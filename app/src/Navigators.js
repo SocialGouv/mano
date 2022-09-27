@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
@@ -54,7 +54,6 @@ import Collaborations from './scenes/Reports/Collaborations';
 import Treatment from './scenes/Persons/Treatment';
 import Consultation from './scenes/Persons/Consultation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useState } from 'react';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
