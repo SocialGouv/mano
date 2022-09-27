@@ -710,7 +710,8 @@ export function MedicalFile({ person }) {
                   .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
               );
             }
-            createReportAtDateIfNotExist(consultationResponse.decryptedData.completedAt || consultationResponse.decryptedData.createdAt);
+            createReportAtDateIfNotExist(consultationResponse.decryptedData.createdAt);
+            if (consultationResponse.decryptedData.completedAt) createReportAtDateIfNotExist(consultationResponse.decryptedData.completedAt);
             resetCurrentConsultation();
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (

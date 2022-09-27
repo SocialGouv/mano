@@ -213,7 +213,8 @@ const Action = ({ navigation, route }) => {
           return a;
         })
       );
-      createReportAtDateIfNotExist(newAction.completedAt || newAction.createdAt);
+      createReportAtDateIfNotExist(newAction.createdAt);
+      if (newAction.completedAt) createReportAtDateIfNotExist(newAction.completedAt);
       if (!statusChanged) return response;
       const comment = {
         comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,

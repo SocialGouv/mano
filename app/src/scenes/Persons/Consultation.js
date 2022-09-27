@@ -113,7 +113,8 @@ const Consultation = ({ navigation, route }) => {
           .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
       );
     }
-    createReportAtDateIfNotExist(consultationResponse.decryptedData.completedAt || consultationResponse.decryptedData.createdAt);
+    createReportAtDateIfNotExist(consultationResponse.decryptedData.createdAt);
+    if (consultationResponse.decryptedData.completedAt) createReportAtDateIfNotExist(consultationResponse.decryptedData.completedAt);
     onBack();
   };
 
