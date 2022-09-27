@@ -25,7 +25,7 @@ const NewPlaceForm = ({ route, navigation }) => {
   const user = useRecoilValue(userState);
   const data = useMemo(() => {
     if (!name) return places;
-    return places.filter((p) => p.name.toLocaleLowerCase().includes(name.toLocaleLowerCase()));
+    return places.filter((p) => p?.name?.toLocaleLowerCase().includes(name?.toLocaleLowerCase()));
   }, [name, places]);
 
   const { person } = route.params;
