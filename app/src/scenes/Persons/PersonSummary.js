@@ -25,6 +25,8 @@ import { placesState } from '../../recoil/places';
 import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import { rencontresState } from '../../recoil/rencontres';
+import RencontreRow from './RencontreRow';
 
 const PersonSummary = ({
   navigation,
@@ -73,6 +75,7 @@ const PersonSummary = ({
   };
 
   const onRemoveFromActiveList = async () => navigation.push('PersonsOutOfActiveListReason', { person: personDB, fromRoute: 'Person' });
+  const onAddRencontre = async () => navigation.push('AddRencontre', { person: personDB, fromRoute: 'Person' });
 
   const onGetBackToActiveList = async () => {
     await onUpdatePerson(false, { outOfActiveListReason: '', outOfActiveList: false });
@@ -96,6 +99,9 @@ const PersonSummary = ({
 
   const allComments = useRecoilValue(commentsState);
   const comments = useMemo(() => allComments.filter((c) => c.person === personDB?._id), [allComments, personDB?._id]);
+
+  const allRencontres = useRecoilValue(rencontresState);
+  const rencontres = useMemo(() => allRencontres.filter((c) => c.person === personDB?._id), [allRencontres, personDB?._id]);
 
   const teams = useRecoilValue(teamsState);
 
@@ -275,6 +281,13 @@ const PersonSummary = ({
         />
       </SubList>
       <SubList
+        label="Rencontres"
+        onAdd={onAddRencontre}
+        data={rencontres}
+        renderItem={(rencontre) => <RencontreRow key={rencontre._id} rencontre={rencontre} />}
+        ifEmpty="Pas de rencontres"
+      />
+      <SubList
         label="Lieux fréquentés"
         onAdd={onAddPlaceRequest}
         data={relsPersonPlace}
@@ -291,6 +304,10 @@ const PersonSummary = ({
 const Row = styled.View`
   flex-direction: row;
   align-items: center;
+  margin-bottom: 30px;
+`;
+
+const ButtonContainer = styled.View`
   margin-bottom: 30px;
 `;
 

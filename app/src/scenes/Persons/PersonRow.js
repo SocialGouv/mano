@@ -1,49 +1,89 @@
 import React from 'react';
-import { View } from 'react-native';
 import styled from 'styled-components';
-import ButtonRight from '../../components/ButtonRight';
+import * as Sentry from '@sentry/react-native';
+import ButtonTopPlus from '../../components/ButtonTopPlus';
 import { displayBirthDate } from '../../components/DateAndTimeInput';
 import { MyText } from '../../components/MyText';
 import RowContainer from '../../components/RowContainer';
 import TeamsTags from '../../components/TeamsTags';
 import colors from '../../utils/colors';
+import { useNavigation } from '@react-navigation/native';
+import { connectActionSheet } from '@expo/react-native-action-sheet';
 
 const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReason } }) => {
   if (outOfActiveList) {
     return (
-      <View>
+      <OutOfActiveListContainer>
         <NameMuted>{name}</NameMuted>
         <ActiveListReasonText>Sortie de file active : {outOfActiveListReason}</ActiveListReasonText>
-      </View>
+      </OutOfActiveListContainer>
     );
   }
   return <Name>{name}</Name>;
 };
 
-const PersonRow = ({ onPress, person, buttonRight = '>' }) => {
+const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionSheetWithOptions }) => {
   const { outOfActiveList, birthdate, alertness } = person;
+  const navigation = useNavigation();
+
+  const onMorePress = async () => {
+    const options = ['Ajouter une rencontre', 'Ajouter une action', 'Ajouter un commentaire', 'Ajouter un lieu fréquenté', 'Annuler'];
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex: options.length - 1,
+      },
+      async (buttonIndex) => {
+        Sentry.setContext('person', { _id: person._id });
+        if (options[buttonIndex] === 'Ajouter une rencontre') {
+          navigation.push('AddRencontre', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
+        }
+        if (options[buttonIndex] === 'Ajouter une action') {
+          navigation.push('NewActionForm', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
+        }
+        if (options[buttonIndex] === 'Ajouter un commentaire') {
+          navigation.push('PersonComment', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
+        }
+        if (options[buttonIndex] === 'Ajouter un lieu fréquenté') {
+          navigation.push('NewPersonPlaceForm', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
+        }
+      }
+    );
+  };
 
   return (
     <RowContainer onPress={onPress}>
       <CaptionsContainer>
-        <PersonName person={person} />
+        <CaptionsFirstLine>
+          {Boolean(alertness) && (
+            <ExclamationMarkButtonDiv>
+              <ExclamationMark>!</ExclamationMark>
+            </ExclamationMarkButtonDiv>
+          )}
+          <PersonName person={person} />
+          {!isPersonsSearchRow && <ButtonTopPlus onPress={onMorePress} />}
+        </CaptionsFirstLine>
         {birthdate && !outOfActiveList && <Birthdate>{displayBirthDate(birthdate)}</Birthdate>}
         {birthdate && outOfActiveList && <BirthdateMuted>{displayBirthDate(birthdate)}</BirthdateMuted>}
         <TeamsTags teams={person.assignedTeams} />
       </CaptionsContainer>
-      {!!alertness && (
-        <AlertnessWrapper>
-          <AlertnessIndicator>!</AlertnessIndicator>
-        </AlertnessWrapper>
-      )}
-      <ButtonRight onPress={onPress} caption={buttonRight} />
     </RowContainer>
   );
 };
 
+const OutOfActiveListContainer = styled.View`
+  flex-grow: 1;
+`;
+
 const CaptionsContainer = styled.View`
   margin: 0 12px;
   flex-grow: 1;
+`;
+
+const CaptionsFirstLine = styled.View`
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
 `;
 
 const Birthdate = styled(MyText)`
@@ -58,6 +98,8 @@ const BirthdateMuted = styled(Birthdate)`
 const Name = styled(MyText)`
   font-weight: bold;
   font-size: 20px;
+  flex-grow: 1;
+  flex-shrink: 1;
 `;
 
 const NameMuted = styled(Name)`
@@ -69,24 +111,25 @@ const ActiveListReasonText = styled(MyText)`
   color: ${colors.app.colorGrey};
 `;
 
-const alertSize = 35;
-const AlertnessWrapper = styled.View`
-  line-height: ${alertSize}px;
-  height: ${alertSize}px;
-  width: ${alertSize}px;
-  border-radius: ${alertSize}px;
-  align-items: center;
+const ExclamationMarkButtonDiv = styled.View`
+  width: 20px;
+  height: 20px;
+  border-radius: 20px;
+  margin-right: 10px;
+  box-shadow: none;
+  border: 2px solid #dc2626;
+  display: flex;
   justify-content: center;
-  padding: 0 10px;
-`;
-const AlertnessIndicator = styled(MyText)`
-  font-weight: bold;
-  font-size: ${alertSize * 0.75}px;
-  line-height: ${alertSize}px;
   align-items: center;
-  justify-content: center;
-  text-align: right;
-  color: ${colors.app.secondary};
+  background-color: #fef2f2;
+  flex-shrink: 0;
 `;
 
-export default PersonRow;
+const ExclamationMark = styled(MyText)`
+  font-size: 14px;
+  line-height: 26px;
+  font-weight: bold;
+  color: #dc2626;
+`;
+
+export default connectActionSheet(PersonRow);

@@ -67,7 +67,9 @@ router.get(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in structure get by id: ${e}`);
       error.status = 400;
@@ -86,13 +88,19 @@ router.put(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.string().min(1).parse(req.body.name);
-      z.optional(z.string()).parse(req.body.description);
-      z.optional(z.string()).parse(req.body.city);
-      z.optional(z.string()).parse(req.body.postcode);
-      z.optional(z.string()).parse(req.body.adresse);
-      z.optional(z.string()).parse(req.body.phone);
+      z.object({
+        params: z.object({
+          _id: z.string().regex(looseUuidRegex),
+        }),
+        body: z.object({
+          name: z.string().min(1),
+          description: z.optional(z.string()),
+          city: z.optional(z.string()),
+          postcode: z.optional(z.string()),
+          adresse: z.optional(z.string()),
+          phone: z.optional(z.string()),
+        }),
+      }).parse(req);
     } catch (e) {
       const error = new Error(`Invalid request in structure put: ${e}`);
       error.status = 400;
@@ -120,7 +128,9 @@ router.delete(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in structure delete: ${e}`);
       error.status = 400;

@@ -208,6 +208,7 @@ class ApiService {
     if (this.wrongKeyWarned) return item;
     if (!this.enableEncrypt) return item;
     if (!item.encrypted) return item;
+    if (!!item.deletedAt) return item;
     if (!item.encryptedEntityKey) return item;
     try {
       const { content, entityKey } = await decrypt(item.encrypted, item.encryptedEntityKey, this.hashedOrgEncryptionKey);

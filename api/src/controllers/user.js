@@ -45,25 +45,27 @@ function logoutCookieOptions() {
 function updateUserDebugInfos(req, user) {
   if (req.headers.platform === "android") {
     try {
-      z.optional(z.number()).parse(req.body.apilevel);
-      z.optional(z.string()).parse(req.body.brand);
-      z.optional(z.string()).parse(req.body.carrier);
-      z.optional(z.string()).parse(req.body.device);
-      z.optional(z.string()).parse(req.body.deviceid);
-      z.optional(z.number()).parse(req.body.freediskstorage);
-      z.optional(z.string()).parse(req.body.hardware);
-      z.optional(z.string()).parse(req.body.manufacturer);
-      z.optional(z.number()).parse(req.body.maxmemory);
-      z.optional(z.string()).parse(req.body.model);
-      z.optional(z.string()).parse(req.body.product);
-      z.optional(z.string()).parse(req.body.readableversion);
-      z.optional(z.string()).parse(req.body.systemname);
-      z.optional(z.string()).parse(req.body.systemversion);
-      z.optional(z.string()).parse(req.body.buildid);
-      z.optional(z.number()).parse(req.body.totaldiskcapacity);
-      z.optional(z.number()).parse(req.body.totalmemory);
-      z.optional(z.string()).parse(req.body.useragent);
-      z.optional(z.boolean()).parse(req.body.tablet);
+      z.object({
+        apilevel: z.optional(z.number()),
+        brand: z.optional(z.string()),
+        carrier: z.optional(z.string()),
+        device: z.optional(z.string()),
+        deviceid: z.optional(z.string()),
+        freediskstorage: z.optional(z.number()),
+        hardware: z.optional(z.string()),
+        manufacturer: z.optional(z.string()),
+        maxmemory: z.optional(z.number()),
+        model: z.optional(z.string()),
+        product: z.optional(z.string()),
+        readableversion: z.optional(z.string()),
+        systemname: z.optional(z.string()),
+        systemversion: z.optional(z.string()),
+        buildid: z.optional(z.string()),
+        totaldiskcapacity: z.optional(z.number()),
+        totalmemory: z.optional(z.number()),
+        useragent: z.optional(z.string()),
+        tablet: z.optional(z.boolean()),
+      }).parse(req.body);
     } catch (e) {
       capture(e, { extra: { body: req.body }, user });
       return;
@@ -92,11 +94,17 @@ function updateUserDebugInfos(req, user) {
   }
   if (req.headers.platform === "dashboard") {
     try {
-      z.optional(z.string()).parse(req.body.browsertype);
-      z.optional(z.string()).parse(req.body.browsername);
-      z.optional(z.string()).parse(req.body.browserversion);
-      z.optional(z.string()).parse(req.body.browseros);
-      z.optional(z.string()).parse(req.headers.version);
+      z.object({
+        body: z.object({
+          browsertype: z.optional(z.string()),
+          browsername: z.optional(z.string()),
+          browserversion: z.optional(z.string()),
+          browseros: z.optional(z.string()),
+        }),
+        headers: z.object({
+          version: z.optional(z.string()),
+        }),
+      }).parse(req);
     } catch (e) {
       capture(e, { extra: { body: req.body }, user });
       return;
@@ -183,10 +191,10 @@ router.post(
   "/signin",
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.body.password);
-      z.string()
-        .email()
-        .parse((req.body.email || "").trim().toLowerCase());
+      z.object({
+        password: z.string(),
+        email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in signin: ${e}`);
       error.status = 400;
@@ -232,9 +240,15 @@ router.get(
   validateUser(["admin", "normal", "superadmin", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.optional(z.string().regex(jwtRegex)).parse(req.cookies.jwt);
-      z.optional(z.string().regex(headerJwtRegex)).parse(req.headers.auth);
-      z.enum(["android", "dashboard"]).parse(req.headers.platform);
+      z.object({
+        cookies: z.object({
+          jwt: z.optional(z.string().regex(jwtRegex)),
+        }),
+        headers: z.object({
+          auth: z.optional(z.string().regex(headerJwtRegex)),
+          platform: z.enum(["android", "dashboard"]),
+        }),
+      }).parse(req);
     } catch (e) {
       const error = new Error(`Invalid request in signin token: ${e}`);
       error.status = 400;
@@ -297,15 +311,20 @@ Si vous en êtes à l'origine, vous pouvez cliquer sur ce lien: ${link}`;
 
 router.post(
   "/forgot_password_reset",
-  catchErrors(async ({ body: { token, password } }, res) => {
+  catchErrors(async (req, res, next) => {
     try {
-      z.string().min(1).parse(token);
-      z.string().min(1).parse(password);
+      z.object({
+        token: z.string().min(1),
+        password: z.string().min(1),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in forget password reset: ${e}`);
       error.status = 400;
       return next(error);
     }
+    const {
+      body: { token, password },
+    } = req;
 
     if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
     const user = await User.findOne({ where: { forgotPasswordResetToken: token, forgotPasswordResetExpires: { [Op.gte]: new Date() } } });
@@ -328,11 +347,13 @@ router.post(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().min(1).parse(req.body.name);
-      z.string().email().parse(req.body.email);
-      z.boolean().parse(req.body.healthcareProfessional);
-      z.array(z.string().regex(looseUuidRegex)).parse(req.body.team);
-      z.enum(["admin", "normal", "restricted-access"]).parse(req.body.role);
+      z.object({
+        name: z.string().min(1),
+        email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
+        healthcareProfessional: z.boolean(),
+        team: z.array(z.string().regex(looseUuidRegex)),
+        role: z.enum(["admin", "normal", "restricted-access"]),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in user creation: ${e}`);
       error.status = 400;
@@ -411,6 +432,11 @@ router.post(
       z.string().min(1).parse(req.body.password);
       z.string().min(1).parse(req.body.newPassword);
       z.string().min(1).parse(req.body.verifyPassword);
+      z.object({
+        password: z.string().min(1),
+        newPassword: z.string().min(1),
+        verifyPassword: z.string().min(1),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in reset password: ${e}`);
       error.status = 400;
@@ -460,7 +486,9 @@ router.get(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in get user by id: ${e}`);
       error.status = 400;
@@ -545,15 +573,13 @@ router.put(
   validateUser(["admin", "normal", "superadmin", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.optional(z.string().min(1)).parse(req.body.name);
-      z.string()
-        .email()
-        .optional()
-        .or(z.literal(""))
-        .parse((req.body.email || "").trim().toLowerCase());
-      z.optional(z.string().min(1)).parse(req.body.password);
-      z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
-      if (req.body.termsAccepted) z.preprocess((input) => new Date(input), z.date()).parse(req.body.termsAccepted);
+      z.object({
+        name: z.optional(z.string().min(1)),
+        email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
+        password: z.optional(z.string().min(1)),
+        team: z.optional(z.array(z.string().regex(looseUuidRegex))),
+        ...(req.body.termsAccepted ? { termsAccepted: z.preprocess((input) => new Date(input), z.date()) } : {}),
+      });
     } catch (e) {
       const error = new Error(`Invalid request in put user by id: ${e}`);
       error.status = 400;
@@ -608,17 +634,18 @@ router.put(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.optional(z.string().min(1)).parse(req.body.name);
-
-      z.string()
-        .email()
-        .optional()
-        .or(z.literal(""))
-        .parse((req.body.email || "").trim().toLowerCase());
-      z.optional(z.array(z.string().regex(looseUuidRegex))).parse(req.body.team);
-      z.optional(z.boolean()).parse(req.body.healthcareProfessional);
-      z.optional(z.enum(["admin", "normal", "restricted-access"])).parse(req.body.role);
+      z.object({
+        params: z.object({
+          _id: z.string().regex(looseUuidRegex),
+        }),
+        body: z.object({
+          name: z.optional(z.string().min(1)),
+          email: z.optional(z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal("")))),
+          password: z.optional(z.string().min(1)),
+          team: z.optional(z.array(z.string().regex(looseUuidRegex))),
+          healthcareProfessional: z.optional(z.boolean()),
+        }),
+      }).parse(req);
     } catch (e) {
       const error = new Error(`Invalid request in put user by id: ${e}`);
       error.status = 400;
@@ -670,7 +697,9 @@ router.delete(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in delete user by id: ${e}`);
       error.status = 400;

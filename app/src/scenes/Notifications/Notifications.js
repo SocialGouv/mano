@@ -120,7 +120,7 @@ const Notifications = ({ navigation }) => {
               ? () =>
                   navigation.push(comment.type === 'action' ? 'ActionComment' : 'PersonComment', {
                     ...comment,
-                    name: commentedItem?.name,
+                    commentTitle: commentedItem?.name,
                     fromRoute: 'Notifications',
                   })
               : null

@@ -31,7 +31,9 @@ router.post(
     storage: multer.diskStorage({
       destination: (req, _file, cb) => {
         try {
-          z.string().regex(looseUuidRegex).parse(req.params.id);
+          z.object({
+            id: z.string().regex(looseUuidRegex),
+          }).parse(req.params);
         } catch (e) {
           capture("Invalid request in document creation", { extra: { e, params: req.params }, user: req.user });
           return res.status(400).send({ ok: false, error: "Invalid request" });
@@ -71,8 +73,10 @@ router.get(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params.id);
-      z.string().regex(cryptoHexRegex).parse(req.params.filename);
+      z.object({
+        id: z.string().regex(looseUuidRegex),
+        filename: z.string().regex(cryptoHexRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in document get: ${e}`);
       error.status = 400;
@@ -96,8 +100,10 @@ router.delete(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params.id);
-      z.string().regex(cryptoHexRegex).parse(req.params.filename);
+      z.object({
+        id: z.string().regex(looseUuidRegex),
+        filename: z.string().regex(cryptoHexRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in document delete: ${e}`);
       error.status = 400;
@@ -166,8 +172,10 @@ router.post(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in person creation: ${e}`);
       error.status = 400;
@@ -203,10 +211,12 @@ router.get(
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
-      z.optional(z.enum(["true", "false"])).parse(req.query.withDeleted);
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.after);
+      z.object({
+        limit: z.optional(z.string().regex(positiveIntegerRegex)),
+        page: z.optional(z.string().regex(positiveIntegerRegex)),
+        after: z.optional(z.string().regex(positiveIntegerRegex)),
+        withDeleted: z.optional(z.enum(["true", "false"])),
+      }).parse(req.query);
     } catch (e) {
       const error = new Error(`Invalid request in person get: ${e}`);
       error.status = 400;
@@ -249,9 +259,15 @@ router.put(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        params: z.object({
+          _id: z.string().regex(looseUuidRegex),
+        }),
+        body: z.object({
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        }),
+      }).parse(req);
     } catch (e) {
       const error = new Error(`Invalid request in person put: ${e}`);
       error.status = 400;
@@ -292,7 +308,9 @@ router.delete(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in person delete: ${e}`);
       error.status = 400;
