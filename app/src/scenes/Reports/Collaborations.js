@@ -13,11 +13,13 @@ import Spacer from '../../components/Spacer';
 import { currentTeamState, organisationState } from '../../recoil/auth';
 import { getPeriodTitle } from './utils';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 
 const Collaborations = ({ route, navigation }) => {
   const [collaboration, setCollaboration] = useState('');
   const [posting, setPosting] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const setReports = useSetRecoilState(reportsState);
@@ -27,7 +29,7 @@ const Collaborations = ({ route, navigation }) => {
     return collaborations.filter((c) => c.toLocaleLowerCase().includes(collaboration.toLocaleLowerCase()));
   }, [collaboration, collaborations]);
 
-  const { report } = route.params;
+  const { day } = route.params;
 
   const backRequestHandledRef = useRef(null);
   const handleBeforeRemove = (e) => {
@@ -60,17 +62,18 @@ const Collaborations = ({ route, navigation }) => {
   };
 
   const onSubmit = async (newCollaboration) => {
+    const reportToUpdate = route.params?.report || (await createReportAtDateIfNotExist(day));
     setPosting(true);
     const reportUpdate = {
-      ...report,
-      collaborations: [...new Set([...(report.collaborations || []), newCollaboration])],
+      ...reportToUpdate,
+      collaborations: [...new Set([...(reportToUpdate.collaborations || []), newCollaboration])],
     };
-    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+    const res = await API.put({ path: `/report/${reportToUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
     if (res.error) return Alert.alert(res.error);
     if (res.ok) {
       setReports((reports) =>
         reports.map((a) => {
-          if (a._id === report._id) return res.decryptedData;
+          if (a._id === reportToUpdate._id) return res.decryptedData;
           return a;
         })
       );
@@ -84,10 +87,10 @@ const Collaborations = ({ route, navigation }) => {
     setTimeout(() => setPosting(false), 250);
   };
 
-  const isReadyToSave = () => {
+  const isReadyToSave = useMemo(() => {
     if (!collaboration || !collaboration.length || !collaboration.trim().length) return false;
     return true;
-  };
+  }, [collaboration]);
 
   const onGoBackRequested = () => {
     if (!isReadyToSave) return onBack();
@@ -126,7 +129,7 @@ const Collaborations = ({ route, navigation }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title={`Collaboration - ${getPeriodTitle(report.date, currentTeam?.nightSession)}`} onBack={onGoBackRequested} />
+      <ScreenTitle title={`Collaboration - ${getPeriodTitle(day, currentTeam?.nightSession)}`} onBack={onGoBackRequested} />
       <Search results={data} placeholder="Rechercher une collaboration..." onChange={setCollaboration} />
       <FlashListStyled
         data={data}

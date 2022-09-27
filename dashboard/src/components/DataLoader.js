@@ -240,7 +240,6 @@ export default function DataLoader() {
           : mergeItems(reports, res.decryptedData)
               // This line should be removed when `clean-reports-with-no-team-nor-date` migration has run on all organisations.
               .filter((r) => !!r.team && !!r.date)
-              .sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
       );
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);

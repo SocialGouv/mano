@@ -20,6 +20,7 @@ import { CANCEL, DONE, TODO } from '../../recoil/actions';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -33,6 +34,7 @@ const Consultation = ({ navigation, route }) => {
   const personDB = route?.params?.personDB;
   const consultationDB = route?.params?.consultationDB;
   const isNew = !consultationDB?._id;
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const castToConsultation = useCallback(
     (consult = {}) => {
@@ -111,6 +113,8 @@ const Consultation = ({ navigation, route }) => {
           .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
       );
     }
+    createReportAtDateIfNotExist(consultationResponse.decryptedData.createdAt);
+    if (consultationResponse.decryptedData.completedAt) createReportAtDateIfNotExist(consultationResponse.decryptedData.completedAt);
     onBack();
   };
 

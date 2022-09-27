@@ -15,6 +15,7 @@ import { territoriesState } from '../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../services/date';
 import useApi from '../services/api';
+import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
 
@@ -31,11 +32,13 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const setTerritoryObs = useSetRecoilState(territoryObservationsState);
   const API = useApi();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const addTerritoryObs = async (obs) => {
     const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
       setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
+      createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
     return res;
   };
@@ -49,6 +52,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
           return a;
         })
       );
+      createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
     return res;
   };

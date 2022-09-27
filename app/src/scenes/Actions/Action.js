@@ -29,6 +29,7 @@ import API from '../../services/api';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { capture } from '../../services/sentry';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -56,6 +57,7 @@ const Action = ({ navigation, route }) => {
   const allPersons = useRecoilValue(personsState);
   const [comments, setComments] = useRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const [actionDB, setActionDB] = useState(() => {
     const existingAction = actions.find((a) => a._id === route.params?.action?._id);
@@ -203,18 +205,17 @@ const Action = ({ navigation, route }) => {
         path: `/action/${oldAction._id}`,
         body: prepareActionForEncryption(action),
       });
-      if (response.ok) {
-        setActions((actions) =>
-          actions.map((a) => {
-            if (a._id === response.decryptedData._id) return response.decryptedData;
-            return a;
-          })
-        );
-      }
       if (!response?.ok) return response;
       const newAction = response.decryptedData;
+      setActions((actions) =>
+        actions.map((a) => {
+          if (a._id === newAction._id) return newAction;
+          return a;
+        })
+      );
+      createReportAtDateIfNotExist(newAction.createdAt);
+      if (newAction.completedAt) createReportAtDateIfNotExist(newAction.completedAt);
       if (!statusChanged) return response;
-
       const comment = {
         comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
         action: actionDB?._id,
@@ -297,6 +298,8 @@ const Action = ({ navigation, route }) => {
       return;
     }
     setActions((actions) => [response.decryptedData, ...actions]);
+    createReportAtDateIfNotExist(response.decryptedData.createdAt);
+
     for (let c of comments.filter((c) => c.action === actionDB._id).filter((c) => !c.comment.includes('a changé le status'))) {
       const body = {
         comment: c.comment,

@@ -830,8 +830,9 @@ function CustomFieldsStats({ customFields, data, additionalCols = [] }) {
     .filter((f) => f.enabled)
     .filter((f) => f.showInStats)
     .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
+
   const totalCols = customFieldsNumber.length + customFieldsDate.length + additionalCols.length;
-  console.log(customFieldsNumber);
+
   const colSize = getColsSize(totalCols);
   return (
     <>

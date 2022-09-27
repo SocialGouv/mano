@@ -33,6 +33,7 @@ import { consultationsState, defaultConsultationFields, prepareConsultationForEn
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
 import { medicalFileState, prepareMedicalFileForEncryption, customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { modalConfirmState } from '../../components/ModalConfirm';
+import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -62,6 +63,7 @@ export function MedicalFile({ person }) {
   const user = useRecoilValue(userState);
   const users = useRecoilValue(usersState);
   const API = useApi();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const loadConsultation = (consultation) => {
     setShowAddConsultation(true);
@@ -708,6 +710,8 @@ export function MedicalFile({ person }) {
                   .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
               );
             }
+            createReportAtDateIfNotExist(consultationResponse.decryptedData.createdAt);
+            if (consultationResponse.decryptedData.completedAt) createReportAtDateIfNotExist(consultationResponse.decryptedData.completedAt);
             resetCurrentConsultation();
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (

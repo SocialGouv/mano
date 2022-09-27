@@ -53,6 +53,7 @@ import { consultationsState, disableConsultationRow } from '../../recoil/consult
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
+import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 
 const tabs = [
   'Résumé',
@@ -69,6 +70,7 @@ const tabs = [
 const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
 const tabsForRestrictedRole = ['Accueil', 'Passages', 'Rencontres'];
 const spaceAfterTab = [0, 1, 4, 5, 7, 8, 9];
+const tabsWithHealth = [...tabs, ...healthcareTabs];
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -87,26 +89,31 @@ const View = () => {
   const history = useHistory();
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (['restricted-access'].includes(user.role) ? 1 : 0)));
-  const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? [...tabs, ...healthcareTabs] : tabs);
+  const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? tabsWithHealth : tabs);
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
-  const reportIndex = currentTeamReports.findIndex((r) => r._id === id);
+  const reportDoesntExist = id.startsWith('new__');
+  const report = useMemo(() => {
+    if (reportDoesntExist) return { team: currentTeam._id, date: id.replace('new__', '') };
+    return currentTeamReports.find((r) => r._id === id);
+  }, [currentTeam._id, currentTeamReports, id, reportDoesntExist]);
 
-  const report = currentTeamReports[reportIndex];
   useTitle(report?.date ? `${dayjs(report.date).format('DD-MM-YYYY')} - Compte rendu` : 'Compte rendu');
 
-  const onFirstBeforeReport = () => {
-    if (reportIndex === currentTeamReports.length - 1) return;
-    const prevReport = currentTeamReports[reportIndex + 1];
-    if (!prevReport) return;
-    history.push(`/report/${prevReport._id}`);
+  const onPreviousReportRequest = () => {
+    const prevDate = dayjs(report.date).subtract(1, 'day').format('YYYY-MM-DD');
+    const prevReport = currentTeamReports.find((r) => r.date === prevDate);
+    if (!!prevReport) return history.push(`/report/${prevReport._id}`);
+    history.push(`/report/new__${prevDate}`);
   };
-  const onFirstLaterReport = () => {
-    if (reportIndex === 0) return;
-    const nextReport = currentTeamReports[reportIndex - 1];
-    if (!nextReport) return;
-    history.push(`/report/${nextReport._id}`);
+
+  const onNextReportRequest = () => {
+    const nextDate = dayjs(report.date).add(1, 'day').format('YYYY-MM-DD');
+    const nextReport = currentTeamReports.find((r) => r.date === nextDate);
+    if (!!nextReport) return history.push(`/report/${nextReport._id}`);
+    history.push(`/report/new__${nextDate}`);
   };
 
   const deleteData = async () => {
@@ -120,7 +127,11 @@ const View = () => {
       }
     }
   };
-  const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
+
+  const updateTabContent = (tabIndex, total) => {
+    setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? `${tabsWithHealth[tabIndex]} (${total})` : c)));
+    if (total > 0 && !report?._id && report.date) createReportAtDateIfNotExist(report.date);
+  };
 
   useEffect(() => {
     if (!!currentTeam?._id && (!report || report.team !== currentTeam._id)) history.goBack();
@@ -200,14 +211,14 @@ const View = () => {
               </div>
               <div style={{ display: 'flex' }}>
                 <ButtonCustom color="link" className="noprint" title="Rafraichir" onClick={() => refresh()} disabled={isLoading} />
+                <ButtonCustom color="link" className="noprint" title="Précédent" onClick={onPreviousReportRequest} />
                 <ButtonCustom
                   color="link"
                   className="noprint"
-                  title="Précédent"
-                  disabled={reportIndex === currentTeamReports.length - 1}
-                  onClick={onFirstBeforeReport}
+                  title="Suivant"
+                  disabled={report.date === dayjs().format('YYYY-MM-DD')}
+                  onClick={onNextReportRequest}
                 />
-                <ButtonCustom color="link" className="noprint" title="Suivant" disabled={reportIndex === 0} onClick={onFirstLaterReport} />
               </div>
             </div>
             <div style={{ padding: '0 2rem', fontWeight: '400' }}>
@@ -221,7 +232,7 @@ const View = () => {
         className="noprint"
         style={{ height: '100%', display: 'flex', overflow: 'hidden', flex: 1, marginTop: '1rem', borderTop: '1px solid #eee' }}>
         <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
-          <Drawer title="Navigation dans les réglages de l'organisation">
+          <Drawer title="Navigation dans les catégories du compte-rendu">
             {tabsContents.map((tabCaption, index) => {
               if (!organisation.receptionEnabled && index === 1) return null;
               if (['restricted-access'].includes(user.role)) {
@@ -271,29 +282,21 @@ const View = () => {
             {!['restricted-access'].includes(user.role) && (
               <>
                 <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCompletedAt
-                    date={report.date}
-                    status={DONE}
-                    onUpdateResults={(total) => updateTabContent(2, `Actions complétées (${total})`)}
-                  />
+                  <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(2, total)} />
                 </div>
                 <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, `Actions créées (${total})`)} />
+                  <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, total)} />
                 </div>
                 <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCompletedAt
-                    date={report.date}
-                    status={CANCEL}
-                    onUpdateResults={(total) => updateTabContent(4, `Actions annulées (${total})`)}
-                  />
+                  <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(4, total)} />
                 </div>
                 <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, `Commentaires (${total})`)} />
+                  <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, total)} />
                 </div>
               </>
             )}
             <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, `Passages (${total})`)} />
+              <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, total)} />
             </div>
             <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
               <RencontresCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(7, `Rencontres (${total})`)} />
@@ -301,32 +304,21 @@ const View = () => {
             {!['restricted-access'].includes(user.role) && (
               <>
                 <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, `Observations (${total})`)} />
+                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, total)} />
                 </div>
                 <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, `Personnes créées (${total})`)} />
+                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, total)} />
                 </div>
                 {!!user.healthcareProfessional && (
                   <>
                     <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <Consultations
-                        date={report.date}
-                        onUpdateResults={(total) => updateTabContent(10, `Consultations faites (${total})`)}
-                        status={DONE}
-                      />
+                      <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(10, total)} status={DONE} />
                     </div>
                     <div style={activeTab !== 11 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <ConsultationsCreatedAt
-                        date={report.date}
-                        onUpdateResults={(total) => updateTabContent(11, `Consultations créées (${total})`)}
-                      />
+                      <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(11, total)} />
                     </div>
                     <div style={activeTab !== 12 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <Consultations
-                        date={report.date}
-                        onUpdateResults={(total) => updateTabContent(12, `Consultations annulées (${total})`)}
-                        status={CANCEL}
-                      />
+                      <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(12, total)} status={CANCEL} />
                     </div>
                   </>
                 )}
@@ -362,13 +354,18 @@ const Reception = ({ report }) => {
         [service]: newCount,
       }),
     };
-    const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+    const isNew = !report._id;
+    const res = isNew
+      ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+      : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
     if (res.ok) {
       setReports((reports) =>
-        reports.map((a) => {
-          if (a._id === report._id) return res.decryptedData;
-          return a;
-        })
+        isNew
+          ? [res.decryptedData, ...reports]
+          : reports.map((a) => {
+              if (a._id === report._id) return res.decryptedData;
+              return a;
+            })
       );
     }
   };
@@ -1180,13 +1177,18 @@ const DescriptionAndCollaborations = ({ report }) => {
               ...report,
               ...body,
             };
-            const res = await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+            const isNew = !report._id;
+            const res = isNew
+              ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+              : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
             if (res.ok) {
               setReports((reports) =>
-                reports.map((a) => {
-                  if (a._id === report._id) return res.decryptedData;
-                  return a;
-                })
+                isNew
+                  ? [res.decryptedData, ...reports]
+                  : reports.map((a) => {
+                      if (a._id === report._id) return res.decryptedData;
+                      return a;
+                    })
               );
               toast.success('Mis à jour !');
             }

@@ -1,8 +1,8 @@
 import { useIsFocused } from '@react-navigation/native';
 import dayjs from 'dayjs';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, Alert } from 'react-native';
-import { selector, useRecoilValue, useSetRecoilState } from 'recoil';
+import { ActivityIndicator, Alert, InteractionManager } from 'react-native';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import InputLabelled from '../../components/InputLabelled';
 import Label from '../../components/Label';
@@ -18,6 +18,7 @@ import { currentTeamState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import API from '../../services/api';
 import colors from '../../utils/colors';
+import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import {
   actionsCompletedOrCanceledForReport,
   actionsCreatedForReport,
@@ -30,7 +31,6 @@ import { getPeriodTitle } from './utils';
 const castToReport = (report = {}) => ({
   description: report.description?.trim() || '',
   collaborations: report.collaborations || [],
-  date: report.date,
 });
 
 const ReportLoading = ({ navigation, route }) => {
@@ -45,9 +45,9 @@ const ReportLoading = ({ navigation, route }) => {
   );
 
   useEffect(() => {
-    setTimeout(() => {
+    InteractionManager.runAfterInteractions(() => {
       setIsLoading(false);
-    }, 500);
+    });
   }, []);
 
   if (isLoading) {
@@ -73,37 +73,49 @@ const Report = ({ navigation, route }) => {
   const [reportDB, setReportDB] = useState(() => route?.params?.report);
   const [report, setReport] = useState(() => castToReport(reportDB));
 
+  const actionsCreated = useRecoilValue(actionsCreatedForReport({ date: day }));
+  const actionsCompleted = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: DONE }));
+  const actionsCanceled = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: CANCEL }));
+  const comments = useRecoilValue(commentsForReport({ date: day }));
+  const observations = useRecoilValue(observationsForReport({ date: day }));
+
   const isFocused = useIsFocused();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+
   useEffect(() => {
-    if (isFocused) {
-      if (!reportDB?._id) {
+    if (!isFocused) return;
+    if (!reportDB?._id) {
+      // to update collaborations
+      const reportFoundByDate = teamsReports.find((r) => r.date === day);
+      if (reportFoundByDate) {
+        setReportDB(reportFoundByDate);
+        setReport(castToReport(reportFoundByDate));
+        return;
+      }
+      // to update regarding actions etc.
+      if (actionsCreated.length || actionsCompleted.length || actionsCanceled.length || comments.length || observations.length) {
         (async () => {
-          const report = teamsReports.find((r) => r.date === day);
-          if (report) {
-            setReportDB(report);
-            setReport(castToReport(report));
-          } else {
-            const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date: day }) });
-            const newReport = res.decryptedData;
-            setReports((reports) => [newReport, ...reports].sort((r1, r2) => (dayjs(r1.date).isBefore(dayjs(r2.date), 'day') ? 1 : -1)));
-            setReportDB(newReport);
-            setReport(castToReport(newReport));
-          }
+          const newReport = await createReportAtDateIfNotExist(day);
+          setReportDB(newReport);
+          setReport(castToReport(newReport));
         })();
-      } else {
-        // to update collaborations
-        const freshReport = teamsReports.find((r) => r._id === reportDB?._id);
-        setReportDB(freshReport);
-        setReport(castToReport(freshReport));
+        return;
       }
     }
-  }, [isFocused, reportDB]);
-
-  const actionsCreated = useRecoilValue(actionsCreatedForReport({ date: reportDB?.date }));
-  const actionsCompleted = useRecoilValue(actionsCompletedOrCanceledForReport({ date: reportDB?.date, status: DONE }));
-  const actionsCanceled = useRecoilValue(actionsCompletedOrCanceledForReport({ date: reportDB?.date, status: CANCEL }));
-  const comments = useRecoilValue(commentsForReport({ date: reportDB?.date }));
-  const observations = useRecoilValue(observationsForReport({ date: reportDB?.date }));
+    // to update collaborations
+    const freshReport = teamsReports.find((r) => r._id === reportDB?._id);
+    setReportDB(freshReport);
+    setReport(castToReport(freshReport));
+  }, [
+    isFocused,
+    reportDB?._id,
+    teamsReports,
+    actionsCreated.length,
+    actionsCompleted.length,
+    actionsCanceled.length,
+    comments.length,
+    observations.length,
+  ]);
 
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
@@ -121,8 +133,7 @@ const Report = ({ navigation, route }) => {
   };
 
   const isUpdateDisabled = useMemo(() => {
-    if (!reportDB) return true;
-    const newReport = { ...reportDB, ...castToReport(report) };
+    const newReport = { ...(reportDB || {}), ...castToReport(report) };
     if (JSON.stringify(castToReport(reportDB)) !== JSON.stringify(castToReport(newReport))) return false;
     return true;
   }, [reportDB, report]);
@@ -130,10 +141,11 @@ const Report = ({ navigation, route }) => {
   const onEdit = () => setEditable((e) => !e);
 
   const onUpdateReport = async () => {
+    const reportToUpdate = reportDB || (await createReportAtDateIfNotExist(day));
     setUpdating(true);
     const response = await API.put({
-      path: `/report/${reportDB?._id}`,
-      body: prepareReportForEncryption({ ...reportDB, ...castToReport(report) }),
+      path: `/report/${reportToUpdate?._id}`,
+      body: prepareReportForEncryption({ ...reportToUpdate, ...castToReport(report) }),
     });
     if (response.error) {
       setUpdating(false);
@@ -143,7 +155,7 @@ const Report = ({ navigation, route }) => {
     if (response.ok) {
       setReports((reports) =>
         reports.map((a) => {
-          if (a._id === reportDB?._id) return response.decryptedData;
+          if (a._id === reportToUpdate?._id) return response.decryptedData;
           return a;
         })
       );
@@ -191,24 +203,6 @@ const Report = ({ navigation, route }) => {
     [currentTeam?.name, currentTeam?.nightSession, day]
   );
 
-  if (!report) {
-    return (
-      <SceneContainer>
-        <ScreenTitle
-          title={title}
-          onBack={onGoBackRequested}
-          onEdit={!editable ? onEdit : null}
-          onSave={!editable || isUpdateDisabled ? null : onUpdateReport}
-          saving={updating}
-          testID="report"
-        />
-        <ScrollContainer noPadding>
-          <ActivityIndicator size="large" color={colors.app.color} />
-        </ScrollContainer>
-      </SceneContainer>
-    );
-  }
-
   return (
     <SceneContainer>
       <ScreenTitle
@@ -234,7 +228,7 @@ const Report = ({ navigation, route }) => {
             data={report.collaborations}
             onChange={(collaborations) => setReport((r) => ({ ...r, collaborations }))}
             editable={editable}
-            onAddRequest={() => navigation.navigate('Collaborations', { report: reportDB })}
+            onAddRequest={() => navigation.navigate('Collaborations', { report: reportDB, day })}
             renderTag={(collaboration) => <MyText>{collaboration}</MyText>}
           />
         </Summary>
