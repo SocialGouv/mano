@@ -117,6 +117,7 @@ export default function DataLoader() {
               0 +
               stats.persons +
               stats.consultations +
+              stats.actions +
               stats.treatments +
               stats.medicalFiles +
               stats.passages +
