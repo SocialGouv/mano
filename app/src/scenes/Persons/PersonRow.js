@@ -38,16 +38,16 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
       async (buttonIndex) => {
         Sentry.setContext('person', { _id: person._id });
         if (options[buttonIndex] === 'Ajouter une rencontre') {
-          navigation.push('AddRencontre', { person, fromRoute: 'PersonsList' });
+          navigation.push('AddRencontre', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
         }
         if (options[buttonIndex] === 'Ajouter une action') {
-          navigation.push('NewActionForm', { person, fromRoute: 'PersonsList' });
+          navigation.push('NewActionForm', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
         }
         if (options[buttonIndex] === 'Ajouter un commentaire') {
-          navigation.push('PersonComment', { person, fromRoute: 'PersonsList' });
+          navigation.push('PersonComment', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
         }
         if (options[buttonIndex] === 'Ajouter un lieu fréquenté') {
-          navigation.push('NewPersonPlaceForm', { person, fromRoute: 'PersonsList' });
+          navigation.push('NewPersonPlaceForm', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
         }
       }
     );

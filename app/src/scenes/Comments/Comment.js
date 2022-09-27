@@ -158,7 +158,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
 
   return (
     <SceneContainer>
-      <ScreenTitle title={`${route?.params?.name || route?.params?.person?.name} - Commentaire`} onBack={onGoBackRequested} testID="comment" />
+      <ScreenTitle title={`${route?.params?.commentTitle} - Commentaire`} onBack={onGoBackRequested} testID="comment" />
       <ScrollContainer>
         <View>
           <InputLabelled label="Commentaire" onChangeText={onChangeText} value={comment} placeholder="Description" multiline />

@@ -55,7 +55,7 @@ const Comments = ({ navigation, route }) => {
             ? () =>
                 navigation.push(comment.type === 'action' ? 'ActionComment' : 'PersonComment', {
                   ...comment,
-                  name: commentedItem?.name,
+                  commentTitle: commentedItem?.name,
                   fromRoute: 'Comments',
                 })
             : null
