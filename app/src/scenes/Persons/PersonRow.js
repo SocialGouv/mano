@@ -1,5 +1,4 @@
 import React from 'react';
-import { Text } from 'react-native';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import ButtonTopPlus from '../../components/ButtonTopPlus';
@@ -58,7 +57,7 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
         <CaptionsFirstLine>
           {Boolean(alertness) && (
             <ExclamationMarkButtonDiv>
-              <Text>!</Text>
+              <ExclamationMark>!</ExclamationMark>
             </ExclamationMarkButtonDiv>
           )}
           <PersonName person={person} />
@@ -84,6 +83,7 @@ const CaptionsContainer = styled.View`
 const CaptionsFirstLine = styled.View`
   flex-direction: row;
   width: 100%;
+  align-items: center;
 `;
 
 const Birthdate = styled(MyText)`
@@ -118,14 +118,18 @@ const ExclamationMarkButtonDiv = styled.View`
   margin-right: 10px;
   box-shadow: none;
   border: 2px solid #dc2626;
-  color: #dc2626;
-  font-size: 14px;
-  font-weight: bold;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: #fef2f2;
   flex-shrink: 0;
+`;
+
+const ExclamationMark = styled(MyText)`
+  font-size: 14px;
+  line-height: 26px;
+  font-weight: bold;
+  color: #dc2626;
 `;
 
 export default connectActionSheet(PersonRow);

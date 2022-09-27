@@ -27,6 +27,7 @@ const ButtonContainer = styled.TouchableOpacity`
   margin-left: auto;
   flex-shrink: 0;
   opacity: 0.5;
+  margin-bottom: auto;
 `;
 
 const Plus = styled(MyText)`
