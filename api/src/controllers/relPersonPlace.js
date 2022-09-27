@@ -16,8 +16,10 @@ router.post(
   validateEncryptionAndMigrations,
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.body.encrypted);
-      z.string().parse(req.body.encryptedEntityKey);
+      z.object({
+        encrypted: z.string(),
+        encryptedEntityKey: z.string(),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in relPersonPlace creation: ${e}`);
       error.status = 400;
@@ -54,10 +56,12 @@ router.get(
   validateUser(["admin", "normal", "restricted-access"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.limit);
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.page);
-      z.optional(z.enum(["true", "false"])).parse(req.query.withDeleted);
-      z.optional(z.string().regex(positiveIntegerRegex)).parse(req.query.after);
+      z.object({
+        limit: z.optional(z.string().regex(positiveIntegerRegex)),
+        page: z.optional(z.string().regex(positiveIntegerRegex)),
+        after: z.optional(z.string().regex(positiveIntegerRegex)),
+        withDeleted: z.optional(z.enum(["true", "false"])),
+      }).parse(req.query);
     } catch (e) {
       const error = new Error(`Invalid request in relPersonPlace get: ${e}`);
       error.status = 400;
@@ -94,7 +98,9 @@ router.delete(
   validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in relPersonPlace delete: ${e}`);
       error.status = 400;

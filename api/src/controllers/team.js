@@ -14,8 +14,10 @@ router.post(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().parse(req.body.name);
-      z.optional(z.boolean()).parse(req.body.nightSession);
+      z.object({
+        name: z.string(),
+        nightSession: z.optional(z.boolean()),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in team creation: ${e}`);
       error.status = 400;
@@ -44,7 +46,9 @@ router.get(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in team get by id: ${e}`);
       error.status = 400;
@@ -63,9 +67,15 @@ router.put(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
-      z.optional(z.string()).parse(req.body.name);
-      z.optional(z.boolean()).parse(req.body.nightSession);
+      z.object({
+        params: z.object({
+          _id: z.string().regex(looseUuidRegex),
+        }),
+        body: z.object({
+          name: z.string(),
+          nightSession: z.optional(z.boolean()),
+        }),
+      }).parse(req);
     } catch (e) {
       const error = new Error(`Invalid request in team put: ${e}`);
       error.status = 400;
@@ -90,7 +100,9 @@ router.delete(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.string().regex(looseUuidRegex).parse(req.params._id);
+      z.object({
+        _id: z.string().regex(looseUuidRegex),
+      }).parse(req.params);
     } catch (e) {
       const error = new Error(`Invalid request in team delete: ${e}`);
       error.status = 400;

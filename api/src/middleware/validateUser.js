@@ -8,10 +8,11 @@ const { looseUuidRegex } = require("../utils");
 function validateUser(roles = ["admin", "normal"], options = { healthcareProfessional: false }) {
   return async (req, res, next) => {
     try {
-      if (Array.isArray(roles)) z.enum(roles).parse(req.user.role);
-      else z.literal(roles).parse(req.user.role);
-      z.string().regex(looseUuidRegex).parse(req.user.organisation);
-      if (options && options.healthcareProfessional) z.literal(true).parse(req.user.healthcareProfessional);
+      z.object({
+        ...(Array.isArray(roles) ? { role: z.enum(roles) } : { role: z.literal(roles) }),
+        organisation: z.string().regex(looseUuidRegex),
+        ...(options && options.healthcareProfessional ? { healthcareProfessional: z.literal(true) } : {}),
+      }).parse(req.user);
     } catch (e) {
       const error = new Error(`Invalid user: ${e}`);
       error.status = 400;

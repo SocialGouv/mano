@@ -18,14 +18,16 @@ router.put(
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
     try {
-      z.array(
-        z.object({
-          _id: z.string().regex(looseUuidRegex),
-          encrypted: z.string(),
-          encryptedEntityKey: z.string(),
-        })
-      ).parse(req.body.reports);
-      z.array(z.string()).parse(req.body.services);
+      z.object({
+        reports: z.array(
+          z.object({
+            _id: z.string().regex(looseUuidRegex),
+            encrypted: z.string(),
+            encryptedEntityKey: z.string(),
+          })
+        ),
+        services: z.array(z.string()),
+      }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in services put: ${e}`);
       error.status = 400;
