@@ -88,7 +88,7 @@ const PersonsNavigator = () => {
       <PersonsStack.Screen name="NewPersonForm" component={NewPersonForm} />
       <PersonsStack.Screen name="PersonsFilter" component={PersonsFilter} />
       <PersonsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
-      <ActionsStack.Screen name="AddRencontre" component={AddRencontre} />
+      <PersonsStack.Screen name="AddRencontre" component={AddRencontre} />
       <PersonsStack.Screen name="PersonPlace" component={Place} />
       <PersonsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <PersonsStack.Screen name="PersonComment" component={Comment} />
@@ -154,7 +154,7 @@ const ReportsNavigator = () => {
 
       <ReportsStack.Screen name="Person" component={Person} />
       <ReportsStack.Screen name="PersonsOutOfActiveListReason" component={PersonsOutOfActiveListReason} />
-      <ActionsStack.Screen name="AddRencontre" component={AddRencontre} />
+      <ReportsStack.Screen name="AddRencontre" component={AddRencontre} />
       <ReportsStack.Screen name="PersonPlace" component={Place} />
       <ReportsStack.Screen name="NewPersonPlaceForm" component={NewPlaceForm} />
       <ReportsStack.Screen name="PersonComment" component={Comment} />
