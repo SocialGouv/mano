@@ -24,8 +24,8 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
   const [updating, setUpdating] = useState(false);
 
   const isUpdateDisabled = useMemo(() => {
-    if (commentDB?.comment !== comment) return false;
-    if (commentDB?.urgent !== urgent) return false;
+    if ((commentDB?.comment || '') !== comment) return false;
+    if ((commentDB?.urgent || false) !== urgent) return false;
     return true;
   }, [comment, commentDB, urgent]);
 
