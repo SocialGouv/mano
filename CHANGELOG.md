@@ -1,3 +1,10 @@
+## [1.158.2](https://github.com/SocialGouv/mano/compare/v1.158.1...v1.158.2) (2022-09-27)
+
+
+### Bug Fixes
+
+* **dashboard:** total elements in loader ([487c4ac](https://github.com/SocialGouv/mano/commit/487c4acdeeb5319a2a515b11b23c6f5f0f12c005))
+
 ## [1.158.1](https://github.com/SocialGouv/mano/compare/v1.158.0...v1.158.1) (2022-09-26)
 
 
