@@ -124,6 +124,7 @@ const Reception = () => {
   const user = useRecoilValue(userState);
   const API = useApi();
   const persons = useRecoilValue(personsState);
+  console.log({ persons });
 
   const history = useHistory();
   const location = useLocation();

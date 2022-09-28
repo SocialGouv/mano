@@ -1,5 +1,6 @@
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { organisationState } from '../recoil/auth';
+import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, preparePersonForEncryption } from '../recoil/persons';
 import { prepareReportForEncryption } from '../recoil/reports';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { dayjsInstance } from '../services/date';
@@ -11,6 +12,8 @@ export default function useDataMigrator() {
   const setLoadingText = useSetRecoilState(loadingTextState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const API = useApi();
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
 
   const organisationId = organisation?._id;
 
@@ -57,6 +60,60 @@ export default function useDataMigrator() {
         const response = await API.put({
           path: `/migration/clean-reports-with-no-team-nor-date`,
           body: { reportIdsToDelete },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
+      if (!organisation.migrations?.includes('all-data-within-persons')) {
+        setLoadingText(LOADING_TEXT);
+        const personRes = await API.get({
+          path: '/person',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const actionRes = await API.get({
+          path: '/action',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const commentsRes = await API.get({
+          path: '/comment',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const passagesRes = await API.get({
+          path: '/passage',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+
+        const actionsById = {};
+        for (const action of actionRes.decryptedData) {
+          actionsById[action._id] = { ...action, comments: [] };
+        }
+        for (const comment of commentsRes.decryptedData) {
+          if (!comment.action) continue;
+          if (!actionsById[comment.action]) continue;
+          actionsById[comment.action].comments.push(comment);
+        }
+
+        const personsToMigrate = [];
+        for (const person of personRes.decryptedData) {
+          const actions = Object.values(actionsById).filter((a) => a.person === person._id);
+          const comments = commentsRes.decryptedData.filter((c) => c.person === person._id);
+          const passages = passagesRes.decryptedData.filter((p) => p.person === person._id);
+          personsToMigrate.push({ ...person, actions, comments, passages });
+        }
+
+        console.log({ personsToMigrate });
+        const encryptedPersons = await Promise.all(
+          personsToMigrate
+            .map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial))
+            .map(encryptItem(hashedOrgEncryptionKey))
+        );
+        console.log({ encryptedPersons });
+        const response = await API.put({
+          path: `/migration/all-data-within-persons`,
+          body: { persons: encryptedPersons },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {

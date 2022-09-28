@@ -310,6 +310,10 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
     ...customFieldsMedical.map((f) => f.name),
     ...fieldsPersonsCustomizableOptions.map((f) => f.name),
     ...encryptedFields,
+    'actions',
+    'comments',
+    'passages',
+    'rencontres',
   ];
   const decrypted = {};
   for (let field of encryptedFieldsIncludingCustom) {

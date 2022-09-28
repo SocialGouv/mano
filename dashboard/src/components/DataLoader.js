@@ -116,17 +116,17 @@ export default function DataLoader() {
               0 +
               stats.persons +
               stats.consultations +
-              stats.actions +
+              // stats.actions +
               stats.treatments +
               stats.medicalFiles +
               stats.passages +
-              stats.rencontres +
+              // stats.rencontres +
               stats.reports +
               stats.territories +
               stats.places +
               stats.relsPersonPlace +
-              stats.territoryObservations +
-              stats.comments;
+              // stats.comments +
+              stats.territoryObservations;
 
             if (stats.persons) newList.push('person');
             if (['admin', 'normal'].includes(user.role)) {
@@ -135,14 +135,14 @@ export default function DataLoader() {
               if (stats.medicalFiles) newList.push('medicalFile');
             }
             if (stats.reports) newList.push('report');
-            if (stats.passages) newList.push('passage');
+            // if (stats.passages) newList.push('passage');
             if (stats.rencontres) newList.push('rencontre');
-            if (stats.actions) newList.push('action');
+            // if (stats.actions) newList.push('action');
             if (stats.territories) newList.push('territory');
             if (stats.places) newList.push('place');
             if (stats.relsPersonPlace) newList.push('relsPersonPlace');
             if (stats.territoryObservations) newList.push('territoryObservation');
-            if (stats.comments) newList.push('comment');
+            // if (stats.comments) newList.push('comment');
 
             // In case this is not the initial load, we don't have to load from cache again.
             if (!initialLoad) {
@@ -156,12 +156,12 @@ export default function DataLoader() {
               .then((persons) => setPersons([...persons]))
               .then(() => getCacheItemDefaultValue('report', []))
               .then((reports) => setReports([...reports]))
-              .then(() => getCacheItemDefaultValue('passage', []))
-              .then((passages) => setPassages([...passages]))
+              // .then(() => getCacheItemDefaultValue('passage', []))
+              // .then((passages) => setPassages([...passages]))
               .then(() => getCacheItemDefaultValue('rencontre', []))
               .then((rencontres) => setRencontres([...rencontres]))
-              .then(() => getCacheItemDefaultValue('action', []))
-              .then((actions) => setActions([...actions]))
+              // .then(() => getCacheItemDefaultValue('action', []))
+              // .then((actions) => setActions([...actions]))
               .then(() => getCacheItemDefaultValue('territory', []))
               .then((territories) => setTerritories([...territories]))
               .then(() => getCacheItemDefaultValue('place', []))
@@ -170,8 +170,8 @@ export default function DataLoader() {
               .then((relsPersonPlace) => setRelsPersonPlace([...relsPersonPlace]))
               .then(() => getCacheItemDefaultValue('territory-observation', []))
               .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
-              .then(() => getCacheItemDefaultValue('comment', []))
-              .then((comments) => setComments([...comments]))
+              // .then(() => getCacheItemDefaultValue('comment', []))
+              // .then((comments) => setComments([...comments]))
               .then(() => startLoader(newList, itemsCount));
           });
         });

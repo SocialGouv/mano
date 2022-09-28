@@ -8,6 +8,7 @@ const Organisation = require("../models/organisation");
 const Passage = require("../models/passage");
 const Comment = require("../models/comment");
 const Report = require("../models/report");
+const Person = require("../models/person");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
@@ -74,6 +75,12 @@ router.put(
           }
           for (const _id of req.body.reportIdsToDelete) {
             await Report.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+          }
+        }
+
+        if (req.params.migrationName === "all-data-within-persons") {
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.persons) {
+            await Person.update({ encrypted, encryptedEntityKey }, { where: { _id, organisation: req.user.organisation } });
           }
         }
 
