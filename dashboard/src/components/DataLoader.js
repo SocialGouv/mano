@@ -19,7 +19,6 @@ import { organisationState, userState } from '../recoil/auth';
 
 import { clearCache, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
 import useApi from '../services/api';
-import { dayjsInstance } from '../services/date';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
