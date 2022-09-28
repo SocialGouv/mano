@@ -246,21 +246,13 @@ export default function DataLoader() {
     } else if (current === 'passage') {
       setLoadingText('Chargement des passages');
       const res = await API.get({ path: '/passage', query });
-      setPassages(
-        res.hasMore
-          ? mergeItems(passages, res.decryptedData)
-          : mergeItems(passages, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
-      );
+      setPassages(mergeItems(passages, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'rencontre') {
       setLoadingText('Chargement des rencontres');
       const res = await API.get({ path: '/rencontre', query });
-      setRencontres(
-        res.hasMore
-          ? mergeItems(rencontres, res.decryptedData)
-          : mergeItems(rencontres, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
-      );
+      setRencontres(mergeItems(rencontres, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'action') {
@@ -297,7 +289,7 @@ export default function DataLoader() {
     } else if (current === 'comment') {
       setLoadingText('Chargement des commentaires');
       const res = await API.get({ path: '/comment', query });
-      setComments(mergeItems(comments, res.decryptedData).sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)));
+      setComments(mergeItems(comments, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     }

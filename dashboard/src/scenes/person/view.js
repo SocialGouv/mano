@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Nav, TabContent, TabPane, NavItem, NavLink, Alert, Button as LinkButton } from 'reactstrap';
 
 import { useParams, useHistory, useLocation } from 'react-router-dom';
@@ -799,7 +799,10 @@ const Actions = ({ onUpdateResults }) => {
 const Passages = ({ onUpdateResults }) => {
   const { personId } = useParams();
   const person = useRecoilValue(populatedPersonSelector({ personId }));
-  const personPassages = person?.passages || [];
+  const personPassages = useMemo(
+    () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    [person]
+  );
   const [passageToEdit, setPassageToEdit] = useState(null);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -863,7 +866,10 @@ const Passages = ({ onUpdateResults }) => {
 const Rencontres = ({ onUpdateResults }) => {
   const { personId } = useParams();
   const person = useRecoilValue(populatedPersonSelector({ personId }));
-  const personRencontres = person?.rencontres || [];
+  const personRencontres = useMemo(
+    () => [...(person?.rencontres || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    [person]
+  );
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
