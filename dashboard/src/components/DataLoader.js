@@ -186,7 +186,7 @@ export default function DataLoader() {
     const [current] = loadList.list;
     const query = {
       organisation: organisationId,
-      limit: String(1000),
+      limit: String(10000),
       page: String(loadList.offset),
       after: lastLoad,
       withDeleted: Boolean(lastLoad),
@@ -304,6 +304,7 @@ export default function DataLoader() {
   }
 
   function startLoader(list, itemsCount) {
+    console.time('LOAD DATA');
     setLoadList({ list, offset: 0 });
     setLoaderTrigger(false);
     setProgress(0);
@@ -311,6 +312,7 @@ export default function DataLoader() {
   }
 
   function stopLoader() {
+    console.timeEnd('LOAD DATA');
     setIsLoading(false);
     setLastLoad(Date.now());
     setProgressBuffer(null);

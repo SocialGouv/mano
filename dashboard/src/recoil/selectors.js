@@ -36,7 +36,6 @@ export const reportPerDateSelector = selectorFamily({
 const actionsWithCommentsSelector = selector({
   key: 'actionsWithCommentsSelector',
   get: ({ get }) => {
-    console.time('ACTIONS WITH COMMENTS');
     const actions = get(actionsState);
     const comments = get(commentsState);
     const actionsObject = {};
@@ -47,7 +46,6 @@ const actionsWithCommentsSelector = selector({
       if (!actionsObject[comment.action]) continue;
       actionsObject[comment.action].comments.push(comment);
     }
-    console.timeEnd('ACTIONS WITH COMMENTS');
     return actionsObject;
   },
 });
@@ -149,24 +147,14 @@ export const arrayOfitemsGroupedByPersonSelector = selector({
 export const itemsGroupedByActionSelector = selector({
   key: 'itemsGroupedByActionSelector',
   get: ({ get }) => {
-    console.time('ITEMS GROUPED BY ACTION');
-    console.time('GET ACTIONS WITH COMMENTS');
     const actionsWithCommentsObject = get(actionsWithCommentsSelector);
-    console.timeEnd('GET ACTIONS WITH COMMENTS');
-    console.time('GET ACTIONS WITH COMMENTS OBJECT');
-    console.timeEnd('GET ACTIONS WITH COMMENTS OBJECT');
-    console.time('GET PERSONS WITH PLACES OBJECT');
     const personsWithPlacesObject = get(personsWithPlacesSelector);
-    console.timeEnd('GET PERSONS WITH PLACES OBJECT');
 
-    console.time('POPULATE ACTIONS');
     const actionsObject = {};
     for (const actionId of Object.keys(actionsWithCommentsObject)) {
       const action = actionsWithCommentsObject[actionId];
       actionsObject[actionId] = { ...action, personPopulated: personsWithPlacesObject[action.person] };
     }
-    console.timeEnd('POPULATE ACTIONS');
-    console.timeEnd('ITEMS GROUPED BY ACTION');
     return actionsObject;
   },
 });
@@ -174,10 +162,8 @@ export const itemsGroupedByActionSelector = selector({
 export const arrayOfitemsGroupedByActionSelector = selector({
   key: 'arrayOfitemsGroupedByActionSelector',
   get: ({ get }) => {
-    console.time('ITEMS GROUPED BY ACTION ARRAY');
     const itemsGroupedByAction = get(itemsGroupedByActionSelector);
     const itemsGroupedByActionArray = Object.values(itemsGroupedByAction);
-    console.timeEnd('ITEMS GROUPED BY ACTION ARRAY');
     return itemsGroupedByActionArray;
   },
 });
@@ -185,7 +171,6 @@ export const arrayOfitemsGroupedByActionSelector = selector({
 export const itemsGroupedByConsultationSelector = selector({
   key: 'itemsGroupedByConsultationSelector',
   get: ({ get }) => {
-    console.time('ITEMS GROUPED BY CONSULTATION');
     const consultations = get(consultationsState);
     const personsWithPlacesObject = get(personsWithPlacesSelector);
 
@@ -193,7 +178,6 @@ export const itemsGroupedByConsultationSelector = selector({
     for (const consultation of consultations) {
       consultationObject[consultation._id] = { ...consultation, person: personsWithPlacesObject[consultation.person] };
     }
-    console.timeEnd('ITEMS GROUPED BY CONSULTATION');
     return consultationObject;
   },
 });
@@ -201,10 +185,8 @@ export const itemsGroupedByConsultationSelector = selector({
 export const arrayOfitemsGroupedByConsultationSelector = selector({
   key: 'arrayOfitemsGroupedByConsultationSelector',
   get: ({ get }) => {
-    console.time('ITEMS GROUPED BY CONSULTATION ARRAY');
     const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
     const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
-    console.timeEnd('ITEMS GROUPED BY CONSULTATION ARRAY');
     return itemsGroupedByConsultationArray;
   },
 });
@@ -212,7 +194,6 @@ export const arrayOfitemsGroupedByConsultationSelector = selector({
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
   get: ({ get }) => {
-    console.time('PERSONS WITH PLACES');
     const personsObjectImmutable = get(personsObjectSelector);
     const personsObject = JSON.parse(JSON.stringify(personsObjectImmutable));
     const relsPersonPlace = get(relsPersonPlaceState);
@@ -225,7 +206,6 @@ export const personsWithPlacesSelector = selector({
       personsObject[relPersonPlace.person].places = personsObject[relPersonPlace.person].places || {};
       personsObject[relPersonPlace.person].places[place._id] = place.name;
     }
-    console.timeEnd('PERSONS WITH PLACES');
     return personsObject;
   },
 });
