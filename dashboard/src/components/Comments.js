@@ -19,7 +19,7 @@ import ExclamationMarkButton from './ExclamationMarkButton';
 import { useDataLoader } from './DataLoader';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import { useParams } from 'react-router-dom';
-import { itemsGroupedByPersonSelector } from '../recoil/selectors';
+import { itemsGroupedByActionSelector, itemsGroupedByPersonSelector } from '../recoil/selectors';
 
 const commentsByActionOrPersonSelector = selectorFamily({
   key: 'commentsByActionOrPersonSelector',
@@ -30,6 +30,11 @@ const commentsByActionOrPersonSelector = selectorFamily({
         const persons = get(itemsGroupedByPersonSelector);
         const person = persons[personId];
         return person.comments || [];
+      }
+      if (actionId) {
+        const actions = get(itemsGroupedByActionSelector);
+        const action = actions[actionId];
+        return action.comments || [];
       }
       return [];
     },

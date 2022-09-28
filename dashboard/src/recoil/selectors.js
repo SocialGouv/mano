@@ -36,6 +36,7 @@ export const reportPerDateSelector = selectorFamily({
 const actionsWithCommentsSelector = selector({
   key: 'actionsWithCommentsSelector',
   get: ({ get }) => {
+    console.time('ACTIONS WITH COMMENTS');
     const actions = get(actionsState);
     const comments = get(commentsState);
     const actionsObject = {};
@@ -46,11 +47,12 @@ const actionsWithCommentsSelector = selector({
       if (!actionsObject[comment.action]) continue;
       actionsObject[comment.action].comments.push(comment);
     }
-    return Object.values(actionsObject);
+    console.timeEnd('ACTIONS WITH COMMENTS');
+    return actionsObject;
   },
 });
 
-export const placesObjectSelector = selector({
+const placesObjectSelector = selector({
   key: 'placesObjectSelector',
   get: ({ get }) => {
     const places = get(placesState);
@@ -79,7 +81,7 @@ export const itemsGroupedByPersonSelector = selector({
   key: 'itemsGroupedByPersonSelector',
   get: ({ get }) => {
     const personsObjectImmutable = get(personsObjectSelector);
-    const actions = get(actionsWithCommentsSelector);
+    const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
     const consultations = get(consultationsState);
     const treatments = get(treatmentsState);
@@ -144,32 +146,87 @@ export const arrayOfitemsGroupedByPersonSelector = selector({
   },
 });
 
+export const itemsGroupedByActionSelector = selector({
+  key: 'itemsGroupedByActionSelector',
+  get: ({ get }) => {
+    console.time('ITEMS GROUPED BY ACTION');
+    console.time('GET ACTIONS WITH COMMENTS');
+    const actionsWithCommentsObject = get(actionsWithCommentsSelector);
+    console.timeEnd('GET ACTIONS WITH COMMENTS');
+    console.time('GET ACTIONS WITH COMMENTS OBJECT');
+    console.timeEnd('GET ACTIONS WITH COMMENTS OBJECT');
+    console.time('GET PERSONS WITH PLACES OBJECT');
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+    console.timeEnd('GET PERSONS WITH PLACES OBJECT');
+
+    console.time('POPULATE ACTIONS');
+    const actionsObject = {};
+    for (const actionId of Object.keys(actionsWithCommentsObject)) {
+      const action = actionsWithCommentsObject[actionId];
+      actionsObject[actionId] = { ...action, personPopulated: personsWithPlacesObject[action.person] };
+    }
+    console.timeEnd('POPULATE ACTIONS');
+    console.timeEnd('ITEMS GROUPED BY ACTION');
+    return actionsObject;
+  },
+});
+
+export const arrayOfitemsGroupedByActionSelector = selector({
+  key: 'arrayOfitemsGroupedByActionSelector',
+  get: ({ get }) => {
+    console.time('ITEMS GROUPED BY ACTION ARRAY');
+    const itemsGroupedByAction = get(itemsGroupedByActionSelector);
+    const itemsGroupedByActionArray = Object.values(itemsGroupedByAction);
+    console.timeEnd('ITEMS GROUPED BY ACTION ARRAY');
+    return itemsGroupedByActionArray;
+  },
+});
+
+export const itemsGroupedByConsultationSelector = selector({
+  key: 'itemsGroupedByConsultationSelector',
+  get: ({ get }) => {
+    console.time('ITEMS GROUPED BY CONSULTATION');
+    const consultations = get(consultationsState);
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+
+    const consultationObject = {};
+    for (const consultation of consultations) {
+      consultationObject[consultation._id] = { ...consultation, person: personsWithPlacesObject[consultation.person] };
+    }
+    console.timeEnd('ITEMS GROUPED BY CONSULTATION');
+    return consultationObject;
+  },
+});
+
+export const arrayOfitemsGroupedByConsultationSelector = selector({
+  key: 'arrayOfitemsGroupedByConsultationSelector',
+  get: ({ get }) => {
+    console.time('ITEMS GROUPED BY CONSULTATION ARRAY');
+    const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
+    const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
+    console.timeEnd('ITEMS GROUPED BY CONSULTATION ARRAY');
+    return itemsGroupedByConsultationArray;
+  },
+});
+
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
   get: ({ get }) => {
-    const persons = get(personsState);
+    console.time('PERSONS WITH PLACES');
+    const personsObjectImmutable = get(personsObjectSelector);
+    const personsObject = JSON.parse(JSON.stringify(personsObjectImmutable));
     const relsPersonPlace = get(relsPersonPlaceState);
-    const places = get(placesState);
-    const personsObject = {};
-    for (const person of persons) {
-      personsObject[person._id] = { ...person };
-    }
+    const places = get(placesObjectSelector);
+
     for (const relPersonPlace of relsPersonPlace) {
       if (!personsObject[relPersonPlace.person]) continue;
-      personsObject[relPersonPlace.person].places = personsObject[relPersonPlace.person].places || [];
-      personsObject[relPersonPlace.person].places.push(places.find((p) => p._id === relPersonPlace.place));
+      const place = places[relPersonPlace.place];
+      if (!place) continue;
+      personsObject[relPersonPlace.person].places = personsObject[relPersonPlace.person].places || {};
+      personsObject[relPersonPlace.person].places[place._id] = place.name;
     }
-    return persons.map((p) => ({
-      ...p,
-      places: [
-        ...new Set(
-          relsPersonPlace
-            .filter((c) => c.person === p._id)
-            .map((rel) => places.find((place) => place._id === rel.place)?.name)
-            .filter(Boolean) // just to remove empty names in case it happens (it happened in dev)
-        ),
-      ],
-    }));
+    console.timeEnd('PERSONS WITH PLACES');
+    return personsObject;
   },
 });
 
