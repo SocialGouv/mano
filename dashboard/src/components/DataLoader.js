@@ -186,7 +186,7 @@ export default function DataLoader() {
     const [current] = loadList.list;
     const query = {
       organisation: organisationId,
-      limit: String(10000),
+      limit: String(50000),
       page: String(loadList.offset),
       after: lastLoad,
       withDeleted: Boolean(lastLoad),
