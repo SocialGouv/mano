@@ -38,8 +38,8 @@ const arrayOfitemsGroupedByPersonSelector = selector({
   },
 });
 
-const personsWithFormattedBirthDateSelector = selector({
-  key: 'personsWithFormattedBirthDateSelector',
+const personsPopulatedWithFormattedBirthDateSelector = selector({
+  key: 'personsPopulatedWithFormattedBirthDateSelector',
   get: ({ get }) => {
     const persons = get(arrayOfitemsGroupedByPersonSelector);
     const personsWithBirthdateFormatted = persons.map((person) => ({
@@ -55,7 +55,7 @@ const personsFilteredSelector = selectorFamily({
   get:
     ({ filterTeams, filters, alertness }) =>
     ({ get }) => {
-      const personWithBirthDate = get(personsWithFormattedBirthDateSelector);
+      const personWithBirthDate = get(personsPopulatedWithFormattedBirthDateSelector);
       let pFiltered = personWithBirthDate;
       if (!!filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);
       if (!!alertness) pFiltered = pFiltered.filter((p) => !!p.alertness);

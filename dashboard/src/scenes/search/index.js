@@ -18,15 +18,14 @@ import { actionsState } from '../../recoil/actions';
 import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
-import { useRecoilValue } from 'recoil';
-import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
+import { selector, selectorFamily, useRecoilValue } from 'recoil';
+import { onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
 import PersonName from '../../components/PersonName';
 import { formatBirthDate, formatDateWithFullMonth, formatTime } from '../../services/date';
 import { useDataLoader } from '../../components/DataLoader';
 import { placesState } from '../../recoil/places';
 import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
@@ -147,23 +146,34 @@ const Actions = ({ search, onUpdateResults }) => {
   );
 };
 
+const personsWithFormattedBirthDateSelector = selector({
+  key: 'personsWithFormattedBirthDateSelector',
+  get: ({ get }) => {
+    const persons = get(personsState);
+    const personsWithBirthdateFormatted = persons.map((person) => ({
+      ...person,
+      birthDate: formatBirthDate(person.birthDate),
+    }));
+    return personsWithBirthdateFormatted;
+  },
+});
+
+const personsFilteredBySearchSelector = selectorFamily({
+  key: 'personsFilteredBySearchSelector',
+  get:
+    ({ search }) =>
+    ({ get }) => {
+      const persons = get(personsWithFormattedBirthDateSelector);
+      if (!search?.length) return [];
+      return filterBySearch(search, persons);
+    },
+});
+
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
-  const persons = useRecoilValue(personsState);
 
-  const data = useMemo(() => {
-    if (!search?.length) return [];
-    return filterBySearch(
-      search,
-      persons.map((person) => {
-        return {
-          ...person,
-          formattedBirthDate: formatBirthDate(person.birthdate),
-        };
-      })
-    );
-  }, [search, persons]);
+  const data = useRecoilValue(personsFilteredBySearchSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -208,32 +218,64 @@ const Persons = ({ search, onUpdateResults }) => {
   );
 };
 
+const actionsObjectSelector = selector({
+  key: 'actionsObjectSelector',
+  get: ({ get }) => {
+    const actions = get(actionsState);
+    const actionsObject = {};
+    for (const action of actions) {
+      actionsObject[action._id] = { ...action };
+    }
+    return actionsObject;
+  },
+});
+
+const commentsPopulatedSelector = selector({
+  key: 'commentsPopulatedSelector',
+  get: ({ get }) => {
+    const comments = get(commentsState);
+    const persons = get(personsObjectSelector);
+    const actions = get(actionsObjectSelector);
+    const commentsObject = {};
+    for (const comment of comments) {
+      if (comment.person) {
+        commentsObject[comment._id] = {
+          ...comment,
+          person: persons[comment.person],
+          type: 'person',
+        };
+        continue;
+      }
+      if (comment.action) {
+        commentsObject[comment._id] = {
+          ...comment,
+          action: actions[comment.action],
+          type: 'action',
+        };
+        continue;
+      }
+    }
+    return commentsObject;
+  },
+});
+
+const commentsFilteredBySearchSelector = selectorFamily({
+  key: 'commentsFilteredBySearchSelector',
+  get:
+    ({ search }) =>
+    ({ get }) => {
+      const comments = get(commentsState);
+      const commentsPopulated = get(commentsPopulatedSelector);
+      if (!search?.length) return [];
+      const commentsFilteredBySearch = filterBySearch(search, comments);
+      return commentsFilteredBySearch.map((c) => commentsPopulated[c._id]).filter(Boolean);
+    },
+});
+
 const Comments = ({ search, onUpdateResults }) => {
   const history = useHistory();
 
-  const persons = useRecoilValue(personsState);
-  const actions = useRecoilValue(actionsState);
-  const comments = useRecoilValue(commentsState);
-
-  const data = useMemo(() => {
-    if (!search?.length) return [];
-    return filterBySearch(search, comments)
-      .map((comment) => {
-        const commentPopulated = { ...comment };
-        if (comment.person) {
-          commentPopulated.person = persons.find((p) => p._id === comment?.person);
-          commentPopulated.type = 'person';
-        }
-        if (comment.action) {
-          const action = actions.find((p) => p._id === comment?.action);
-          commentPopulated.action = action;
-          commentPopulated.person = persons.find((p) => p._id === action?.person);
-          commentPopulated.type = 'action';
-        }
-        return commentPopulated;
-      })
-      .filter((c) => c.action || c.person);
-  }, [search, comments, persons, actions]);
+  const data = useRecoilValue(commentsFilteredBySearchSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -423,23 +465,48 @@ const Places = ({ search, onUpdateResults }) => {
   );
 };
 
+const territoriesObjectSelector = selector({
+  key: 'territoriesObjectSelector',
+  get: ({ get }) => {
+    const territories = get(territoriesState);
+    const territoriesObject = {};
+    for (const territory of territories) {
+      territoriesObject[territory._id] = { ...territory };
+    }
+    return territoriesObject;
+  },
+});
+
+const populatedObservationsSelector = selector({
+  key: 'populatedObservationsSelector',
+  get: ({ get }) => {
+    const onlyFilledObservations = get(onlyFilledObservationsTerritories);
+    const territory = get(territoriesObjectSelector);
+    const populatedObservations = {};
+    for (const obs of onlyFilledObservations) {
+      populatedObservations[obs._id] = { ...obs, territory: territory[obs.territory] };
+    }
+    return populatedObservations;
+  },
+});
+
+const observationsBySerachSelector = selectorFamily({
+  key: 'observationsBySerachSelector',
+  get:
+    ({ search }) =>
+    ({ get }) => {
+      const populatedObservations = get(populatedObservationsSelector);
+      const observations = get(onlyFilledObservationsTerritories);
+      if (!search?.length) return [];
+      const observationsFilteredBySearch = filterBySearch(search, observations);
+      return observationsFilteredBySearch.map((obs) => populatedObservations[obs._id]).filter(Boolean);
+    },
+});
+
 const TerritoryObservations = ({ search, onUpdateResults }) => {
   const history = useHistory();
-  const territories = useRecoilValue(territoriesState);
 
-  const onlyFilledObservations = useRecoilValue(onlyFilledObservationsTerritories);
-  const observations = useRecoilValue(territoryObservationsState);
-
-  const data = useMemo(() => {
-    if (!search?.length) return [];
-    const obsIds = filterBySearch(search, onlyFilledObservations).map((obs) => obs._id);
-    return observations
-      .filter((obs) => obsIds.includes(obs._id))
-      .map((obs) => ({
-        ...obs,
-        territory: territories.find((t) => t._id === obs.territory),
-      }));
-  }, [search, territories, observations, onlyFilledObservations]);
+  const data = useRecoilValue(observationsBySerachSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
