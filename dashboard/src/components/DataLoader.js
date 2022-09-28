@@ -297,7 +297,9 @@ export default function DataLoader() {
     } else if (current === 'comment') {
       setLoadingText('Chargement des commentaires');
       const res = await API.get({ path: '/comment', query });
-      setComments(mergeItems(comments, res.decryptedData));
+      setComments((comments) =>
+        mergeItems(comments, res.decryptedData).sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt))
+      );
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     }

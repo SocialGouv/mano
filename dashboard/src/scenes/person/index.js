@@ -7,7 +7,7 @@ import View from './view';
 const Router = () => {
   return (
     <Switch>
-      <Route path="/person/:id" component={View} />
+      <Route path="/person/:personId" component={View} />
       <Route path="/" component={List} />
     </Switch>
   );

@@ -18,32 +18,27 @@ import {
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
 import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
-import { personsWithPlacesSelector } from '../../recoil/selectors';
+import { arrayOfitemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
 import { placesState } from '../../recoil/places';
-import { actionsState } from '../../recoil/actions';
-import { commentsState } from '../../recoil/comments';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
-import { consultationsState } from '../../recoil/consultations';
-import { medicalFileState } from '../../recoil/medicalFiles';
-import { treatmentsState } from '../../recoil/treatments';
 
 const limit = 20;
 
 const personsWithFormattedBirthDateSelector = selector({
   key: 'personsWithFormattedBirthDateSelector',
   get: ({ get }) => {
-    const persons = get(personsWithPlacesSelector);
-    console.log('CALCULATING PERSONS WITH BIRHT DATE');
-    return persons.map((person) => ({
+    const persons = get(arrayOfitemsGroupedByPersonSelector);
+    const personsWithBirthdateFormatted = persons.map((person) => ({
       ...person,
       birthDate: formatBirthDate(person.birthDate),
     }));
+    return personsWithBirthdateFormatted;
   },
 });
 
@@ -75,55 +70,41 @@ const personsFilteredBySearchSelector = selectorFamily({
     ({ get }) => {
       const personsFiltered = get(personsFilteredSelector({ filterTeams, filters, alertness }));
 
-      if (!search?.length) return personsFiltered;
+      if (!search?.length) {
+        return personsFiltered;
+      }
 
-      const personsFilteredIds = new Set(personsFiltered.map((p) => p._id));
-      const actions = get(actionsState);
-      const comments = get(commentsState);
-      const consultations = get(consultationsState);
-      const medicalFiles = get(medicalFileState);
-      const treatments = get(treatmentsState);
+      const personsfilteredBySearch = filterBySearch(search, personsFiltered);
 
-      const consultationsOfFilteredPersons = consultations.filter((a) => personsFilteredIds.has(a.person));
-      const medicalFilesOfFilteredPersons = medicalFiles.filter((a) => personsFilteredIds.has(a.person));
-      const treatmentsOfFilteredPersons = treatments.filter((a) => personsFilteredIds.has(a.person));
-
-      const actionsOfFilteredPersons = actions.filter((a) => personsFilteredIds.has(a.person));
-
-      const actionsOfFilteredPersonsIds = new Set(actionsOfFilteredPersons.map((a) => a._id));
-      const commentsOfFilteredPersons = comments.filter((c) => personsFilteredIds.has(c.person));
-
-      const commentsOfFilteredActions = comments.filter((c) => actionsOfFilteredPersonsIds.has(c.action));
-
-      const personsIdsFilteredByConsultationSearch = filterBySearch(search, consultationsOfFilteredPersons).map((c) => c.person);
-      const personsIdsFilteredByMedicalFileSearch = filterBySearch(search, medicalFilesOfFilteredPersons).map((c) => c.person);
-      const personsIdsFilteredByTreatmentSearch = filterBySearch(search, treatmentsOfFilteredPersons).map((c) => c.person);
-
-      const personsIdsFilteredByActionsSearch = filterBySearch(search, actionsOfFilteredPersons).map((a) => a.person);
-
-      const personsIdsFilteredByActionsCommentsSearch = filterBySearch(search, commentsOfFilteredPersons).map((c) => c.person);
-      const personsIdsFilteredByPersonsCommentsSearch = filterBySearch(search, commentsOfFilteredActions).map((c) => c.person);
-
-      const personsIdsFilteredByPersonsSearch = filterBySearch(search, personsFiltered).map((c) => c._id);
-
-      const personsIdsFilterBySearch = new Set([
-        ...personsIdsFilteredByConsultationSearch,
-        ...personsIdsFilteredByMedicalFileSearch,
-        ...personsIdsFilteredByTreatmentSearch,
-        ...personsIdsFilteredByActionsSearch,
-        ...personsIdsFilteredByActionsCommentsSearch,
-        ...personsIdsFilteredByPersonsCommentsSearch,
-        ...personsIdsFilteredByPersonsSearch,
-      ]);
-      return personsFiltered.filter((p) => personsIdsFilterBySearch.has(p._id));
+      return personsfilteredBySearch;
     },
 });
 
+const filterPersonsWithAllFieldsSelector = selector({
+  key: 'filterPersonsWithAllFieldsSelector',
+  get: ({ get }) => {
+    const places = get(placesState);
+    const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
+    const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
+    const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
+    return [
+      ...filterPersonsBase,
+      ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+      ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+      ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+      {
+        label: 'Lieux fréquentés',
+        field: 'places',
+        options: [...new Set(places.map((place) => place.name))],
+      },
+    ];
+  },
+});
+
 const List = () => {
-  console.time('START RENDER');
   useTitle('Personnes');
   useDataLoader({ refreshOnMount: true });
-  const places = useRecoilValue(placesState);
+  const filterPersonsWithAllFields = useRecoilValue(filterPersonsWithAllFieldsSelector);
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [alertness, setFilterAlertness] = useSearchParamState('alertness', false);
@@ -141,9 +122,6 @@ const List = () => {
   const total = useMemo(() => personsFilteredBySearch.length, [personsFilteredBySearch]);
 
   const teams = useRecoilValue(teamsState);
-  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
 
@@ -159,21 +137,6 @@ const List = () => {
     isMounted.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewAllOrganisationData, currentTeam, teams]);
-
-  // Add places and enabled custom fields in filters.
-  const filterPersonsWithAllFields = [
-    ...filterPersonsBase,
-    ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-    {
-      label: 'Lieux fréquentés',
-      field: 'places',
-      options: [...new Set(places.map((place) => place.name))],
-    },
-  ];
-
-  console.timeEnd('START RENDER');
 
   if (!personsFilteredBySearch) return <Loading />;
 

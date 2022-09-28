@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
@@ -12,35 +12,42 @@ import Loading from './loading';
 import { Formik } from 'formik';
 import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date';
 import useApi from '../services/api';
 import ExclamationMarkButton from './ExclamationMarkButton';
 import { useDataLoader } from './DataLoader';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
+import { useParams } from 'react-router-dom';
+import { itemsGroupedByPersonSelector } from '../recoil/selectors';
 
-const Comments = ({ personId = '', actionId = '', onUpdateResults }) => {
+const commentsByActionOrPersonSelector = selectorFamily({
+  key: 'commentsByActionOrPersonSelector',
+  get:
+    ({ personId, actionId }) =>
+    ({ get }) => {
+      if (personId) {
+        const persons = get(itemsGroupedByPersonSelector);
+        const person = persons[personId];
+        return person.comments || [];
+      }
+      return [];
+    },
+});
+
+const Comments = ({ onUpdateResults }) => {
+  const { personId, actionId } = useParams();
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
   const API = useApi();
-  const [allComments, setComments] = useRecoilState(commentsState);
+  const setComments = useSetRecoilState(commentsState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const organisation = useRecoilValue(organisationState);
   const { isLoading } = useDataLoader();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
-  const comments = useMemo(
-    () =>
-      allComments
-        .filter((c) => {
-          if (!!personId) return c.person === personId;
-          if (!!actionId) return c.action === actionId;
-          return false;
-        })
-        .sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)),
-    [personId, actionId, allComments]
-  );
+  const comments = useRecoilValue(commentsByActionOrPersonSelector({ personId, actionId }));
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults(comments.length);

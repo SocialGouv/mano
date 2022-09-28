@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Label, Row, Button } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { selector, useRecoilValue } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
@@ -31,6 +31,18 @@ import { useDataLoader } from '../../components/DataLoader';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
+const actionsObjectSelector = selector({
+  key: 'actionsObjectSelector',
+  get: ({ get }) => {
+    const actions = get(actionsState);
+    const actionsObject = {};
+    for (const action of actions) {
+      actionsObject[action._id] = action;
+    }
+    return actionsObject;
+  },
+});
+
 const List = () => {
   const history = useHistory();
   useTitle('Agenda');
@@ -38,6 +50,7 @@ const List = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const actions = useRecoilValue(actionsState);
+  const actionsObject = useRecoilValue(actionsObjectSelector);
   const consultations = useRecoilValue(consultationsState);
   const comments = useRecoilValue(commentsState);
   const persons = useRecoilValue(personsWithPlacesSelector);
