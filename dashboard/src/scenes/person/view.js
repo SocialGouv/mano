@@ -65,6 +65,7 @@ import { itemsGroupedByPersonSelector, personsObjectSelector } from '../../recoi
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Rencontres', 'Lieux', 'Documents', 'Historique'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages', 'Rencontres'];
 
+// we take this selector to go faster when a change happens
 const personSelector = selectorFamily({
   key: 'personSelector',
   get:

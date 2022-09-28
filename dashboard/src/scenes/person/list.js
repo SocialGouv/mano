@@ -18,7 +18,7 @@ import {
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
 import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
-import { arrayOfitemsGroupedByPersonSelector } from '../../recoil/selectors';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
 import { placesState } from '../../recoil/places';
@@ -29,6 +29,14 @@ import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 
 const limit = 20;
+
+const arrayOfitemsGroupedByPersonSelector = selector({
+  key: 'arrayOfitemsGroupedByPersonSelector',
+  get: ({ get }) => {
+    const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
+    return Object.values(itemsGroupedByPerson);
+  },
+});
 
 const personsWithFormattedBirthDateSelector = selector({
   key: 'personsWithFormattedBirthDateSelector',

@@ -78,7 +78,11 @@ export const personsObjectSelector = selector({
 export const itemsGroupedByPersonSelector = selector({
   key: 'itemsGroupedByPersonSelector',
   get: ({ get }) => {
-    const personsObjectImmutable = get(personsObjectSelector);
+    const persons = get(personsState);
+    const personsObject = {};
+    for (const person of persons) {
+      personsObject[person._id] = { ...person };
+    }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);
     const consultations = get(consultationsState);
@@ -88,7 +92,6 @@ export const itemsGroupedByPersonSelector = selector({
     const relsPersonPlace = get(relsPersonPlaceState);
     const places = get(placesObjectSelector);
     const rencontres = get(rencontresState);
-    const personsObject = JSON.parse(JSON.stringify(personsObjectImmutable));
     for (const action of actions) {
       if (!personsObject[action.person]) continue;
       personsObject[action.person].actions = personsObject[action.person].actions || [];
@@ -136,14 +139,6 @@ export const itemsGroupedByPersonSelector = selector({
   },
 });
 
-export const arrayOfitemsGroupedByPersonSelector = selector({
-  key: 'arrayOfitemsGroupedByPersonSelector',
-  get: ({ get }) => {
-    const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
-    return Object.values(itemsGroupedByPerson);
-  },
-});
-
 export const itemsGroupedByActionSelector = selector({
   key: 'itemsGroupedByActionSelector',
   get: ({ get }) => {
@@ -159,43 +154,14 @@ export const itemsGroupedByActionSelector = selector({
   },
 });
 
-export const arrayOfitemsGroupedByActionSelector = selector({
-  key: 'arrayOfitemsGroupedByActionSelector',
-  get: ({ get }) => {
-    const itemsGroupedByAction = get(itemsGroupedByActionSelector);
-    const itemsGroupedByActionArray = Object.values(itemsGroupedByAction);
-    return itemsGroupedByActionArray;
-  },
-});
-
-export const itemsGroupedByConsultationSelector = selector({
-  key: 'itemsGroupedByConsultationSelector',
-  get: ({ get }) => {
-    const consultations = get(consultationsState);
-    const personsWithPlacesObject = get(personsWithPlacesSelector);
-
-    const consultationObject = {};
-    for (const consultation of consultations) {
-      consultationObject[consultation._id] = { ...consultation, person: personsWithPlacesObject[consultation.person] };
-    }
-    return consultationObject;
-  },
-});
-
-export const arrayOfitemsGroupedByConsultationSelector = selector({
-  key: 'arrayOfitemsGroupedByConsultationSelector',
-  get: ({ get }) => {
-    const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
-    const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
-    return itemsGroupedByConsultationArray;
-  },
-});
-
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
   get: ({ get }) => {
-    const personsObjectImmutable = get(personsObjectSelector);
-    const personsObject = JSON.parse(JSON.stringify(personsObjectImmutable));
+    const persons = get(personsState);
+    const personsObject = {};
+    for (const person of persons) {
+      personsObject[person._id] = { ...person };
+    }
     const relsPersonPlace = get(relsPersonPlaceState);
     const places = get(placesObjectSelector);
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Label, Row, Button } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { selectorFamily, useRecoilValue } from 'recoil';
+import { selector, selectorFamily, useRecoilValue } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
@@ -17,18 +17,27 @@ import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
 import { mappedIdsToLabels, TODO } from '../../recoil/actions';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
+import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ConsultationButton from '../../components/ConsultationButton';
-import { disableConsultationRow } from '../../recoil/consultations';
+import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
+
+const arrayOfitemsGroupedByActionSelector = selector({
+  key: 'arrayOfitemsGroupedByActionSelector',
+  get: ({ get }) => {
+    const itemsGroupedByAction = get(itemsGroupedByActionSelector);
+    const itemsGroupedByActionArray = Object.values(itemsGroupedByAction);
+    return itemsGroupedByActionArray;
+  },
+});
 
 const actionsByTeamAndStatusSelector = selectorFamily({
   key: 'actionsByTeamAndStatusSelector',
@@ -47,6 +56,29 @@ const actionsByTeamAndStatusSelector = selectorFamily({
       console.timeEnd('ACTIONS BY TEAM AND STATUS');
       return actionsByTeamAndStatus;
     },
+});
+
+const itemsGroupedByConsultationSelector = selector({
+  key: 'itemsGroupedByConsultationSelector',
+  get: ({ get }) => {
+    const consultations = get(consultationsState);
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+
+    const consultationObject = {};
+    for (const consultation of consultations) {
+      consultationObject[consultation._id] = { ...consultation, person: personsWithPlacesObject[consultation.person] };
+    }
+    return consultationObject;
+  },
+});
+
+const arrayOfitemsGroupedByConsultationSelector = selector({
+  key: 'arrayOfitemsGroupedByConsultationSelector',
+  get: ({ get }) => {
+    const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
+    const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
+    return itemsGroupedByConsultationArray;
+  },
 });
 
 const consultationsByStatusSelector = selectorFamily({
