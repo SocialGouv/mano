@@ -44,7 +44,6 @@ const actionsByTeamAndStatusSelector = selectorFamily({
   get:
     ({ statuses, categories }) =>
     ({ get }) => {
-      console.time('ACTIONS BY TEAM AND STATUS');
       const currentTeam = get(currentTeamState);
       const actions = get(arrayOfitemsGroupedByActionSelector);
       const actionsByTeamAndStatus = actions.filter(
