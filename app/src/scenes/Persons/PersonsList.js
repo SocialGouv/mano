@@ -9,9 +9,81 @@ import { ListEmptyPersons, ListNoMorePersons } from '../../components/ListEmptyC
 import FloatAddButton from '../../components/FloatAddButton';
 import { FlashListStyled } from '../../components/Lists';
 import Search from '../../components/Search';
-import { personsFullSearchSelector } from '../../recoil/selectors';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil';
 import { loadingState, refreshTriggerState } from '../../components/Loader';
+import { formatBirthDate } from '../../services/dateDayjs';
+import { filterBySearch } from '../../utils/search';
+import { personsState } from '../../recoil/persons';
+
+const arrayOfitemsGroupedByPersonSelector = selector({
+  key: 'arrayOfitemsGroupedByPersonSelector',
+  get: ({ get }) => {
+    const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
+    return Object.values(itemsGroupedByPerson);
+  },
+});
+
+const personsPopulatedWithFormattedBirthDateSelector = selector({
+  key: 'personsPopulatedWithFormattedBirthDateSelector',
+  get: ({ get }) => {
+    const now = Date.now();
+    const persons = get(arrayOfitemsGroupedByPersonSelector);
+    const personsWithBirthdateFormatted = persons.map((person) => ({
+      ...person,
+      birthDate: formatBirthDate(person.birthDate),
+    }));
+    console.log('FINISH BIRTH DATE', Date.now() - now);
+    return personsWithBirthdateFormatted;
+  },
+});
+
+const personsFilteredSelector = selectorFamily({
+  key: 'personsFilteredSelector',
+  get:
+    ({ filterTeams, filterOutOfActiveList, filterAlertness }) =>
+    ({ get }) => {
+      const now = Date.now();
+      const personWithBirthDate = get(personsPopulatedWithFormattedBirthDateSelector);
+      let personsFiltered = personWithBirthDate;
+      if (filterOutOfActiveList) {
+        personsFiltered = personsFiltered.filter((p) => (filterOutOfActiveList === 'Oui' ? p.outOfActiveList : !p.outOfActiveList));
+      }
+      if (filterAlertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
+      if (filterTeams.length) {
+        personsFiltered = personsFiltered.filter((p) => {
+          const assignedTeams = p.assignedTeams || [];
+          for (let assignedTeam of assignedTeams) {
+            if (filterTeams.includes(assignedTeam)) return true;
+          }
+          return false;
+        });
+      }
+      console.log('FINISH FILTERS', Date.now() - now);
+      return personsFiltered;
+    },
+});
+
+const personsFilteredBySearchSelector = selectorFamily({
+  key: 'personsFilteredBySearchSelector',
+  get:
+    ({ filterTeams, filterOutOfActiveList, filterAlertness, search }) =>
+    ({ get }) => {
+      const now = Date.now();
+      if (!search?.length && !filterTeams.length && !filterOutOfActiveList && !filterAlertness) {
+        const persons = get(personsState);
+        console.log('FINISH NO SEARCH', Date.now() - now);
+        return persons;
+      }
+
+      const personsFiltered = get(personsFilteredSelector({ filterTeams, filterAlertness, filterOutOfActiveList }));
+
+      const personsfilteredBySearch = filterBySearch(search, personsFiltered);
+
+      console.log('FINISH SEARCH', Date.now() - now);
+      return personsfilteredBySearch;
+    },
+});
 
 const PersonsList = ({ navigation, route }) => {
   const [search, setSearch] = useState('');
@@ -25,7 +97,7 @@ const PersonsList = ({ navigation, route }) => {
   const numberOfFilters = Number(Boolean(filterAlertness)) + filterTeams.length + Number(['Oui', 'Non'].includes(filterOutOfActiveList));
 
   const filteredPersons = useRecoilValue(
-    personsFullSearchSelector({
+    personsFilteredBySearchSelector({
       search,
       filterTeams,
       filterAlertness,

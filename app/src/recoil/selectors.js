@@ -7,29 +7,11 @@ import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { territoriesState } from './territory';
 import { isComingInDays, isPassed, isToday, isTomorrow } from '../services/date';
-import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
-import { filterBySearch, filterData } from '../utils/search';
+import { filterBySearch } from '../utils/search';
 import { consultationsState } from './consultations';
-
-export const personsWithPlacesSelector = selector({
-  key: 'personsWithPlacesSelector',
-  get: ({ get }) => {
-    const persons = get(personsState);
-    const relsPersonPlace = get(relsPersonPlaceState);
-    const places = get(placesState);
-    return persons.map((p) => ({
-      ...p,
-      places: [
-        ...new Set(
-          relsPersonPlace
-            .filter((c) => c.person === p._id)
-            .map((rel) => places.find((place) => place._id === rel.place)?.name)
-            .filter(Boolean) // just to remove empty names in case it happens (it happened in dev)
-        ),
-      ],
-    }));
-  },
-});
+import { rencontresState } from './rencontres';
+import { treatmentsState } from './treatments';
+import { medicalFileState } from './medicalFiles';
 
 export const personsSearchSelector = selectorFamily({
   key: 'personsSearchSelector',
@@ -42,52 +24,150 @@ export const personsSearchSelector = selectorFamily({
     },
 });
 
-export const personsFullSearchSelector = selectorFamily({
-  key: 'personsFullSearchSelector',
-  get:
-    ({ search = '', filterTeams = [], filters = [], filterAlertness = false, filterOutOfActiveList = '' }) =>
-    ({ get }) => {
-      const persons = get(personsWithPlacesSelector);
-      let personsFiltered = persons;
-      if (filters?.filter((f) => Boolean(f?.value)).length) personsFiltered = filterData(personsFiltered, filters);
-      if (filterOutOfActiveList) {
-        personsFiltered = personsFiltered.filter((p) => (filterOutOfActiveList === 'Oui' ? p.outOfActiveList : !p.outOfActiveList));
-      }
-      if (filterAlertness) personsFiltered = personsFiltered.filter((p) => !!p.alertness);
-      if (filterTeams.length) {
-        personsFiltered = personsFiltered.filter((p) => {
-          const assignedTeams = p.assignedTeams || [];
-          for (let assignedTeam of assignedTeams) {
-            if (filterTeams.includes(assignedTeam)) return true;
-          }
-          return false;
-        });
-      }
-      if (search?.length) {
-        const personsFilteredIds = personsFiltered.map((p) => p._id);
-        const comments = get(commentsState);
-        const actions = get(actionsState);
-        const actionsOfFilteredPersons = actions.filter((a) => personsFilteredIds.includes(a.person));
-        const actionsOfFilteredPersonsIds = actionsOfFilteredPersons.map((a) => a._id);
-        const commentsOfFilteredPersons = comments.filter((c) => personsFilteredIds.includes(c.person));
-        const commentsOfFilteredActions = comments.filter((c) => actionsOfFilteredPersonsIds.includes(c.action));
-        const personsIdsFilteredByActionsSearch = filterBySearch(search, actionsOfFilteredPersons).map((a) => a.person);
-        const personsIdsFilteredByActionsCommentsSearch = filterBySearch(search, commentsOfFilteredPersons).map((c) => c.person);
-        const personsIdsFilteredByPersonsCommentsSearch = filterBySearch(search, commentsOfFilteredActions).map((c) => c.person);
-        const personsIdsFilteredByPersonsSearch = filterBySearch(search, personsFiltered).map((c) => c._id);
+const actionsWithCommentsSelector = selector({
+  key: 'actionsWithCommentsSelector',
+  get: ({ get }) => {
+    const actions = get(actionsState);
+    const comments = get(commentsState);
+    const actionsObject = {};
+    for (const action of actions) {
+      actionsObject[action._id] = { ...action, comments: [] };
+    }
+    for (const comment of comments) {
+      if (!actionsObject[comment.action]) continue;
+      actionsObject[comment.action].comments.push(comment);
+    }
+    return actionsObject;
+  },
+});
 
-        const personsIdsFilterBySearch = [
-          ...new Set([
-            ...personsIdsFilteredByActionsSearch,
-            ...personsIdsFilteredByActionsCommentsSearch,
-            ...personsIdsFilteredByPersonsCommentsSearch,
-            ...personsIdsFilteredByPersonsSearch,
-          ]),
-        ];
-        personsFiltered = personsFiltered.filter((p) => personsIdsFilterBySearch.includes(p._id));
-      }
-      return personsFiltered;
-    },
+const placesObjectSelector = selector({
+  key: 'placesObjectSelector',
+  get: ({ get }) => {
+    const places = get(placesState);
+    const placesObject = {};
+    for (const place of places) {
+      if (!place?.name) continue;
+      placesObject[place._id] = place;
+    }
+    return placesObject;
+  },
+});
+
+export const personsObjectSelector = selector({
+  key: 'personsObjectSelector',
+  get: ({ get }) => {
+    const persons = get(personsState);
+    const personsObject = {};
+    for (const person of persons) {
+      personsObject[person._id] = { ...person };
+    }
+    return personsObject;
+  },
+});
+
+export const itemsGroupedByPersonSelector = selector({
+  key: 'itemsGroupedByPersonSelector',
+  get: ({ get }) => {
+    const now = Date.now();
+    console.log('START PERSONS SELECTOR');
+    const persons = get(personsState);
+    const personsObject = {};
+    for (const person of persons) {
+      personsObject[person._id] = { ...person };
+    }
+    const actions = Object.values(get(actionsWithCommentsSelector));
+    const comments = get(commentsState);
+    const consultations = get(consultationsState);
+    const treatments = get(treatmentsState);
+    const medicalFiles = get(medicalFileState);
+    // const passages = get(passagesState);
+    const relsPersonPlace = get(relsPersonPlaceState);
+    const places = get(placesObjectSelector);
+    const rencontres = get(rencontresState);
+    for (const action of actions) {
+      if (!personsObject[action.person]) continue;
+      personsObject[action.person].actions = personsObject[action.person].actions || [];
+      personsObject[action.person].actions.push(action);
+    }
+    for (const comment of comments) {
+      if (!personsObject[comment.person]) continue;
+      personsObject[comment.person].comments = personsObject[comment.person].comments || [];
+      personsObject[comment.person].comments.push(comment);
+    }
+    for (const relPersonPlace of relsPersonPlace) {
+      if (!personsObject[relPersonPlace.person]) continue;
+      const place = places[relPersonPlace.place];
+      if (!place) continue;
+      personsObject[relPersonPlace.person].places = personsObject[relPersonPlace.person].places || {};
+      personsObject[relPersonPlace.person].places[place._id] = place.name;
+      personsObject[relPersonPlace.person].relsPersonPlace = personsObject[relPersonPlace.person].relsPersonPlace || [];
+      personsObject[relPersonPlace.person].relsPersonPlace.push(relPersonPlace);
+    }
+    for (const consultation of consultations) {
+      if (!personsObject[consultation.person]) continue;
+      personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
+      personsObject[consultation.person].consultations.push(consultation);
+    }
+    for (const treatment of treatments) {
+      if (!personsObject[treatment.person]) continue;
+      personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
+      personsObject[treatment.person].treatments.push(treatment);
+    }
+    for (const medicalFile of medicalFiles) {
+      if (!personsObject[medicalFile.person]) continue;
+      personsObject[medicalFile.person].medicalFile = medicalFile;
+    }
+    // for (const passage of passages) {
+    //   if (!personsObject[passage.person]) continue;
+    //   personsObject[passage.person].passages = personsObject[passage.person].passages || [];
+    //   personsObject[passage.person].passages.push(passage);
+    // }
+    for (const rencontre of rencontres) {
+      if (!personsObject[rencontre.person]) continue;
+      personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
+      personsObject[rencontre.person].rencontres.push(rencontre);
+    }
+    console.log('FINISH PERSONS SELECTOR', Date.now() - now);
+    return personsObject;
+  },
+});
+
+export const itemsGroupedByActionSelector = selector({
+  key: 'itemsGroupedByActionSelector',
+  get: ({ get }) => {
+    const actionsWithCommentsObject = get(actionsWithCommentsSelector);
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+
+    const actionsObject = {};
+    for (const actionId of Object.keys(actionsWithCommentsObject)) {
+      const action = actionsWithCommentsObject[actionId];
+      actionsObject[actionId] = { ...action, personPopulated: personsWithPlacesObject[action.person] };
+    }
+    return actionsObject;
+  },
+});
+
+export const personsWithPlacesSelector = selector({
+  key: 'personsWithPlacesSelector',
+  get: ({ get }) => {
+    const persons = get(personsState);
+    const personsObject = {};
+    for (const person of persons) {
+      personsObject[person._id] = { ...person };
+    }
+    const relsPersonPlace = get(relsPersonPlaceState);
+    const places = get(placesObjectSelector);
+
+    for (const relPersonPlace of relsPersonPlace) {
+      if (!personsObject[relPersonPlace.person]) continue;
+      const place = places[relPersonPlace.place];
+      if (!place) continue;
+      personsObject[relPersonPlace.person].places = personsObject[relPersonPlace.person].places || {};
+      personsObject[relPersonPlace.person].places[place._id] = place.name;
+    }
+    return personsObject;
+  },
 });
 
 export const actionsForCurrentTeamSelector = selector({
