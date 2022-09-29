@@ -99,8 +99,6 @@ const dataFilteredBySearchSelector = selectorFamily({
       const consultations = get(consultationsByStatusSelector({ statuses }));
       if (!search) {
         const dataFitered = [...actions, ...consultations].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt));
-        console.log('NOTHIG TO FILTER');
-        console.timeEnd('DATA FILTERED');
         return dataFitered;
       }
       const actionsFiltered = filterBySearch(search, actions);
