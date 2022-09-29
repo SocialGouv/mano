@@ -84,7 +84,6 @@ const consultationsByStatusSelector = selectorFamily({
   get:
     ({ statuses }) =>
     ({ get }) => {
-      console.time('CONSULTATIONS AND STATUS');
       const consultations = get(arrayOfitemsGroupedByConsultationSelector);
       const consultationsByStatus = consultations.filter((consult) => !statuses.length || statuses.includes(consult.status));
       console.timeEnd('CONSULTATIONS AND STATUS');
