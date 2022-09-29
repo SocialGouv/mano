@@ -29,12 +29,12 @@ const commentsByActionOrPersonSelector = selectorFamily({
       if (personId) {
         const persons = get(itemsGroupedByPersonSelector);
         const person = persons[personId];
-        return [...(person.comments || [])].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+        return [...(person?.comments || [])].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
       }
       if (actionId) {
         const actions = get(itemsGroupedByActionSelector);
         const action = actions[actionId];
-        return [...(action.comments || [])].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+        return [...(action?.comments || [])].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
       }
       return [];
     },

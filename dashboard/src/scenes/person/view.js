@@ -72,7 +72,7 @@ const personSelector = selectorFamily({
     ({ personId }) =>
     ({ get }) => {
       const persons = get(personsObjectSelector);
-      return persons[personId];
+      return persons[personId] || {};
     },
 });
 
@@ -82,7 +82,7 @@ const populatedPersonSelector = selectorFamily({
     ({ personId }) =>
     ({ get }) => {
       const persons = get(itemsGroupedByPersonSelector);
-      return persons[personId];
+      return persons[personId] || {};
     },
 });
 
