@@ -1,13 +1,13 @@
 import * as Sentry from '@sentry/react';
-import { Integrations } from '@sentry/tracing';
-const { ENV, VERSION } = require('../config');
+import { BrowserTracing } from '@sentry/tracing';
+import { ENV, VERSION } from '../config';
 
 if (ENV === 'production') {
   Sentry.init({
-    dsn: 'https://35e52183bab54c74914e6acc88097f18@sentry.incubateur.net/32',
+    dsn: 'https://e3eb487403dd4789b47cf6da857bb4bf@sentry.fabrique.social.gouv.fr/52',
     environment: 'dashboard',
     release: VERSION,
-    integrations: [new Integrations.BrowserTracing()],
+    integrations: [new BrowserTracing()],
 
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
