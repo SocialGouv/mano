@@ -19,7 +19,6 @@ import { organisationState, userState } from '../recoil/auth';
 
 import { clearCache, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
 import useApi from '../services/api';
-import { dayjsInstance } from '../services/date';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
@@ -246,21 +245,13 @@ export default function DataLoader() {
     } else if (current === 'passage') {
       setLoadingText('Chargement des passages');
       const res = await API.get({ path: '/passage', query });
-      setPassages(
-        res.hasMore
-          ? mergeItems(passages, res.decryptedData)
-          : mergeItems(passages, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
-      );
+      setPassages(mergeItems(passages, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'rencontre') {
       setLoadingText('Chargement des rencontres');
       const res = await API.get({ path: '/rencontre', query });
-      setRencontres(
-        res.hasMore
-          ? mergeItems(rencontres, res.decryptedData)
-          : mergeItems(rencontres, res.decryptedData).sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1))
-      );
+      setRencontres(mergeItems(rencontres, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'action') {

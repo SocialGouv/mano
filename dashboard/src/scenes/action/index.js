@@ -7,7 +7,7 @@ import View from './view';
 const Router = () => {
   return (
     <Switch>
-      <Route path="/action/:id" component={View} />
+      <Route path="/action/:actionId" component={View} />
       <Route path="/" component={List} />
     </Switch>
   );

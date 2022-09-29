@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Col, Label, Row, Button } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { selector, selectorFamily, useRecoilValue } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
@@ -15,10 +15,9 @@ import SelectCustom from '../../components/SelectCustom';
 import ActionName from '../../components/ActionName';
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
-import { actionsState, mappedIdsToLabels, TODO } from '../../recoil/actions';
-import { commentsState } from '../../recoil/comments';
+import { mappedIdsToLabels, TODO } from '../../recoil/actions';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
-import { personsWithPlacesSelector } from '../../recoil/selectors';
+import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
@@ -31,16 +30,92 @@ import { useDataLoader } from '../../components/DataLoader';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
+const arrayOfitemsGroupedByActionSelector = selector({
+  key: 'arrayOfitemsGroupedByActionSelector',
+  get: ({ get }) => {
+    const itemsGroupedByAction = get(itemsGroupedByActionSelector);
+    const itemsGroupedByActionArray = Object.values(itemsGroupedByAction);
+    return itemsGroupedByActionArray;
+  },
+});
+
+const actionsByTeamAndStatusSelector = selectorFamily({
+  key: 'actionsByTeamAndStatusSelector',
+  get:
+    ({ statuses, categories }) =>
+    ({ get }) => {
+      const currentTeam = get(currentTeamState);
+      const actions = get(arrayOfitemsGroupedByActionSelector);
+      const actionsByTeamAndStatus = actions.filter(
+        (action) =>
+          action.team === currentTeam._id &&
+          (!statuses.length || statuses.includes(action.status)) &&
+          (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
+      );
+      return actionsByTeamAndStatus;
+    },
+});
+
+const itemsGroupedByConsultationSelector = selector({
+  key: 'itemsGroupedByConsultationSelector',
+  get: ({ get }) => {
+    const consultations = get(consultationsState);
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+
+    const consultationObject = {};
+    for (const consultation of consultations) {
+      consultationObject[consultation._id] = { ...consultation, person: personsWithPlacesObject[consultation.person] };
+    }
+    return consultationObject;
+  },
+});
+
+const arrayOfitemsGroupedByConsultationSelector = selector({
+  key: 'arrayOfitemsGroupedByConsultationSelector',
+  get: ({ get }) => {
+    const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
+    const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
+    return itemsGroupedByConsultationArray;
+  },
+});
+
+const consultationsByStatusSelector = selectorFamily({
+  key: 'consultationsByStatusSelector',
+  get:
+    ({ statuses }) =>
+    ({ get }) => {
+      const consultations = get(arrayOfitemsGroupedByConsultationSelector);
+      const consultationsByStatus = consultations.filter((consult) => !statuses.length || statuses.includes(consult.status));
+      return consultationsByStatus;
+    },
+});
+
+const dataFilteredBySearchSelector = selectorFamily({
+  key: 'dataFilteredBySearchSelector',
+  get:
+    ({ search, statuses, categories }) =>
+    ({ get }) => {
+      const actions = get(actionsByTeamAndStatusSelector({ statuses, categories }));
+      const consultations = get(consultationsByStatusSelector({ statuses }));
+      if (!search) {
+        const dataFitered = [...actions, ...consultations].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt));
+        return dataFitered;
+      }
+      const actionsFiltered = filterBySearch(search, actions);
+      const consultationsFiltered = filterBySearch(search, consultations);
+      const dataFitered = [...actionsFiltered, ...consultationsFiltered].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt));
+      return dataFitered;
+    },
+});
+
+const limit = 20;
+
 const List = () => {
   const history = useHistory();
   useTitle('Agenda');
   const { isLoading, refresh } = useDataLoader();
   const [modalOpen, setModalOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
-  const actions = useRecoilValue(actionsState);
-  const consultations = useRecoilValue(consultationsState);
-  const comments = useRecoilValue(commentsState);
-  const persons = useRecoilValue(personsWithPlacesSelector);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
@@ -53,66 +128,16 @@ const List = () => {
   const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useState(window.localStorage.getItem('showAs') || showAsOptions[0]); // calendar, list
 
-  // List of actions filtered by current team and selected statuses.
-  const actionsByTeamAndStatus = useMemo(
-    () =>
-      actions.filter(
-        (action) =>
-          action.team === currentTeam._id &&
-          (!statuses.length || statuses.includes(action.status)) &&
-          (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
-      ),
-    [actions, currentTeam._id, statuses, categories]
-  );
-  // List of consultations filtered by current team and selected statuses.
-  const consultationsByStatusAndAuthorization = useMemo(() => {
-    return consultations.filter((consult) => !statuses.length || statuses.includes(consult.status));
-  }, [consultations, statuses]);
+  const dataConsolidated = useRecoilValue(dataFilteredBySearchSelector({ search, statuses, categories }));
+  const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
 
-  // The next memos are used to filter by search (empty array when search is empty).
-  const actionsIds = useMemo(() => (search?.length ? actionsByTeamAndStatus.map((action) => action._id) : []), [actionsByTeamAndStatus, search]);
-  const personsForActions = useMemo(
-    () => (actionsIds?.length ? persons.filter((person) => actionsIds.includes(person.action)) : []),
-    [actionsIds, persons]
-  );
-  const commentsForActions = useMemo(
-    () => (actionsIds?.length ? comments.filter((comment) => actionsIds.includes(comment.action)) : []),
-    [actionsIds, comments]
-  );
-  const actionsFiltered = useMemo(() => {
-    if (!search?.length) return actionsByTeamAndStatus;
-    const actionsIdsByActionsSearch = actionsByTeamAndStatus?.length ? filterBySearch(search, actionsByTeamAndStatus).map((a) => a._id) : [];
-    const actionsIdsByActionsCommentsSearch = commentsForActions?.length ? filterBySearch(search, commentsForActions).map((c) => c.action) : [];
-    const personIdsByPersonsSearch = personsForActions?.length ? filterBySearch(search, personsForActions).map((p) => p._id) : [];
-    const actionIdsByPersonsSearch = personIdsByPersonsSearch?.length
-      ? actionsByTeamAndStatus.filter((a) => personIdsByPersonsSearch.includes(a.person))
-      : [];
-    const actionsIdsFilterBySearch = [...new Set([...actionsIdsByActionsSearch, ...actionsIdsByActionsCommentsSearch, ...actionIdsByPersonsSearch])];
-    return actionsByTeamAndStatus.filter((a) => actionsIdsFilterBySearch.includes(a._id));
-  }, [actionsByTeamAndStatus, commentsForActions, personsForActions, search]);
 
-  const consultationsFiltered = useMemo(() => {
-    if (!search?.length) return consultationsByStatusAndAuthorization;
-    if (!consultationsByStatusAndAuthorization?.length) return [];
-    return filterBySearch(search, consultationsByStatusAndAuthorization);
-  }, [search, consultationsByStatusAndAuthorization]);
+  const total = dataConsolidated.length;
 
   useEffect(() => {
     window.localStorage.setItem('showAs', showAs);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [showAs]);
-  const limit = 20;
-
-  const dataConsolidated = useMemo(
-    () => [...actionsFiltered, ...consultationsFiltered].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt)),
-    [actionsFiltered, consultationsFiltered]
-  );
-
-  const dataConsolidatedPaginated = useMemo(
-    () => dataConsolidated.filter((_, index) => index < (page + 1) * limit && index >= page * limit),
-    [dataConsolidated, page]
-  );
-  const total = dataConsolidated.length;
 
   return (
     <>

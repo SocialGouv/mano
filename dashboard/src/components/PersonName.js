@@ -7,7 +7,7 @@ import { personsState } from '../recoil/persons';
 export default function PersonName({ item, redirectToTab = 'résumé' }) {
   const history = useHistory();
   const persons = useRecoilValue(personsState);
-  const personName = persons.find((p) => p._id === item.person)?.name;
+  const personName = item?.personPopulated?.name || persons.find((p) => p._id === item.person)?.name;
   return (
     <BoldOnHover
       onClick={(e) => {

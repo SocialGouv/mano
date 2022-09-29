@@ -6,7 +6,7 @@ import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import styled from 'styled-components';
 import DatePicker from 'react-datepicker';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { selectorFamily, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import TagTeam from '../../components/TagTeam';
 import { SmallHeaderWithBackButton } from '../../components/header';
@@ -60,16 +60,39 @@ import { treatmentsState } from '../../recoil/treatments';
 import MergeTwoPersons from './MergeTwoPersons';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import Rencontre from '../../components/Rencontre';
+import { itemsGroupedByPersonSelector, personsObjectSelector } from '../../recoil/selectors';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Rencontres', 'Lieux', 'Documents', 'Historique'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages', 'Rencontres'];
 
+// we take this selector to go faster when a change happens
+const personSelector = selectorFamily({
+  key: 'personSelector',
+  get:
+    ({ personId }) =>
+    ({ get }) => {
+      const persons = get(personsObjectSelector);
+      return persons[personId] || {};
+    },
+});
+
+const populatedPersonSelector = selectorFamily({
+  key: 'populatedPersonSelector',
+  get:
+    ({ personId }) =>
+    ({ get }) => {
+      const persons = get(itemsGroupedByPersonSelector);
+      return persons[personId] || {};
+    },
+});
+
 const View = () => {
-  const { id } = useParams();
+  const { personId } = useParams();
   const location = useLocation();
   const history = useHistory();
   const API = useApi();
-  const [persons, setPersons] = useRecoilState(personsState);
+  const setPersons = useSetRecoilState(personsState);
+  const person = useRecoilValue(personSelector({ personId }));
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
@@ -82,7 +105,6 @@ const View = () => {
 
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));
 
-  const person = persons.find((p) => p._id === id) || {};
   useTitle(`${person?.name} - Personne`);
 
   return (
@@ -155,7 +177,7 @@ const View = () => {
           </TabPane>
         )}
         <TabPane tabId={2}>
-          <Actions person={person} onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
+          <Actions onUpdateResults={(total) => updateTabContent(2, `Actions (${total})`)} />
         </TabPane>
         {!['restricted-access'].includes(user.role) && (
           <TabPane tabId={3}>
@@ -163,10 +185,10 @@ const View = () => {
           </TabPane>
         )}
         <TabPane tabId={4}>
-          <Passages personId={person?._id} onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
+          <Passages onUpdateResults={(total) => updateTabContent(4, `Passages (${total})`)} />
         </TabPane>
         <TabPane tabId={5}>
-          <Rencontres personId={person?._id} onUpdateResults={(total) => updateTabContent(5, `Rencontres (${total})`)} />
+          <Rencontres onUpdateResults={(total) => updateTabContent(5, `Rencontres (${total})`)} />
         </TabPane>
         {!['restricted-access'].includes(user.role) && (
           <>
@@ -265,16 +287,7 @@ const Summary = ({ person }) => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
   const setPersons = useSetRecoilState(personsState);
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [comments, setComments] = useRecoilState(commentsState);
-  const [passages, setPassages] = useRecoilState(passagesState);
-  const [rencontres, setRencontres] = useRecoilState(rencontresState);
-  const [consultations, setConsultations] = useRecoilState(consultationsState);
-  const [treatments, setTreatments] = useRecoilState(treatmentsState);
-  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
-  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const API = useApi();
-  const history = useHistory();
 
   return (
     <>
@@ -562,68 +575,7 @@ const Summary = ({ person }) => {
                   <>
                     <MergeTwoPersons person={person} />
                     <OutOfActiveList person={person} />
-                    <DeleteButtonAndConfirmModal
-                      title={`Voulez-vous vraiment supprimer la personne ${person.name}`}
-                      textToConfirm={person.name}
-                      onConfirm={async () => {
-                        const personRes = await API.delete({ path: `/person/${person._id}` });
-                        if (personRes.ok) {
-                          setPersons((persons) => persons.filter((p) => p._id !== person._id));
-                          for (const action of actions.filter((a) => a.person === person._id)) {
-                            const actionRes = await API.delete({ path: `/action/${action._id}` });
-                            if (actionRes.ok) {
-                              setActions((actions) => actions.filter((a) => a._id !== action._id));
-                              for (let comment of comments.filter((c) => c.action === action._id)) {
-                                const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-                                if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
-                              }
-                            }
-                          }
-                          for (let comment of comments.filter((c) => c.person === person._id)) {
-                            const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-                            if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
-                          }
-                          for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === person._id)) {
-                            const relRes = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-                            if (relRes.ok) {
-                              setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
-                            }
-                          }
-                          for (let passage of passages.filter((c) => c.person === person._id)) {
-                            const passageRes = await API.delete({ path: `/passage/${passage._id}` });
-                            if (passageRes.ok) setPassages((passages) => passages.filter((c) => c._id !== passage._id));
-                          }
-                          for (let rencontre of rencontres.filter((c) => c.person === person._id)) {
-                            const rencontreRes = await API.delete({ path: `/rencontre/${rencontre._id}` });
-                            if (rencontreRes.ok) setRencontres((rencontres) => rencontres.filter((c) => c._id !== rencontre._id));
-                          }
-
-                          for (let medicalFile of medicalFiles.filter((c) => c.person === person._id)) {
-                            const medicalFileRes = await API.delete({ path: `/medical-file/${medicalFile._id}` });
-                            if (medicalFileRes.ok) setMedicalFiles((medicalFiles) => medicalFiles.filter((c) => c._id !== medicalFile._id));
-                          }
-                          for (let treatment of treatments.filter((c) => c.person === person._id)) {
-                            const treatmentRes = await API.delete({ path: `/treatment/${treatment._id}` });
-                            if (treatmentRes.ok) setTreatments((treatments) => treatments.filter((c) => c._id !== treatment._id));
-                          }
-                          for (let consultation of consultations.filter((c) => c.person === person._id)) {
-                            const consultationRes = await API.delete({ path: `/consultation/${consultation._id}` });
-                            if (consultationRes.ok) setConsultations((consultations) => consultations.filter((c) => c._id !== consultation._id));
-                          }
-                        }
-                        if (personRes?.ok) {
-                          toast.success('Suppression réussie');
-                          history.goBack();
-                        }
-                      }}>
-                      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-                        Cette opération est irréversible
-                        <br />
-                        et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;:
-                        <br />
-                        actions, commentaires, lieux visités, passages, rencontres, documents...
-                      </span>
-                    </DeleteButtonAndConfirmModal>
+                    <DeletePersonButton person={person} />
                   </>
                 )}
                 <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
@@ -636,8 +588,112 @@ const Summary = ({ person }) => {
   );
 };
 
-const Actions = ({ person, onUpdateResults }) => {
-  const actions = useRecoilValue(actionsState);
+const DeletePersonButton = ({ person }) => {
+  const API = useApi();
+  const setPersons = useSetRecoilState(personsState);
+
+  const [actions, setActions] = useRecoilState(actionsState);
+  const [comments, setComments] = useRecoilState(commentsState);
+  const [passages, setPassages] = useRecoilState(passagesState);
+  const [rencontres, setRencontres] = useRecoilState(rencontresState);
+  const [consultations, setConsultations] = useRecoilState(consultationsState);
+  const [treatments, setTreatments] = useRecoilState(treatmentsState);
+  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const history = useHistory();
+
+  return (
+    <DeleteButtonAndConfirmModal
+      title={`Voulez-vous vraiment supprimer la personne ${person.name}`}
+      textToConfirm={person.name}
+      onConfirm={async () => {
+        const personRes = await API.delete({ path: `/person/${person._id}` });
+        if (personRes.ok) {
+          setPersons((persons) => persons.filter((p) => p._id !== person._id));
+          for (const action of actions.filter((a) => a.person === person._id)) {
+            const actionRes = await API.delete({ path: `/action/${action._id}` });
+            if (actionRes.ok) {
+              setActions((actions) => actions.filter((a) => a._id !== action._id));
+              for (let comment of comments.filter((c) => c.action === action._id)) {
+                const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+                if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
+              }
+            }
+          }
+          for (let comment of comments.filter((c) => c.person === person._id)) {
+            const commentRes = await API.delete({ path: `/comment/${comment._id}` });
+            if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
+          }
+          for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === person._id)) {
+            const relRes = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+            if (relRes.ok) {
+              setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
+            }
+          }
+          for (let passage of passages.filter((c) => c.person === person._id)) {
+            const passageRes = await API.delete({ path: `/passage/${passage._id}` });
+            if (passageRes.ok) setPassages((passages) => passages.filter((c) => c._id !== passage._id));
+          }
+          for (let rencontre of rencontres.filter((c) => c.person === person._id)) {
+            const rencontreRes = await API.delete({ path: `/rencontre/${rencontre._id}` });
+            if (rencontreRes.ok) setRencontres((rencontres) => rencontres.filter((c) => c._id !== rencontre._id));
+          }
+
+          for (let medicalFile of medicalFiles.filter((c) => c.person === person._id)) {
+            const medicalFileRes = await API.delete({ path: `/medical-file/${medicalFile._id}` });
+            if (medicalFileRes.ok) setMedicalFiles((medicalFiles) => medicalFiles.filter((c) => c._id !== medicalFile._id));
+          }
+          for (let treatment of treatments.filter((c) => c.person === person._id)) {
+            const treatmentRes = await API.delete({ path: `/treatment/${treatment._id}` });
+            if (treatmentRes.ok) setTreatments((treatments) => treatments.filter((c) => c._id !== treatment._id));
+          }
+          for (let consultation of consultations.filter((c) => c.person === person._id)) {
+            const consultationRes = await API.delete({ path: `/consultation/${consultation._id}` });
+            if (consultationRes.ok) setConsultations((consultations) => consultations.filter((c) => c._id !== consultation._id));
+          }
+        }
+        if (personRes?.ok) {
+          toast.success('Suppression réussie');
+          history.goBack();
+        }
+      }}>
+      <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+        Cette opération est irréversible
+        <br />
+        et entrainera la suppression définitive de toutes les données liées à la personne&nbsp;:
+        <br />
+        actions, commentaires, lieux visités, passages, rencontres, documents...
+      </span>
+    </DeleteButtonAndConfirmModal>
+  );
+};
+
+const filteredPersonActionsSelector = selectorFamily({
+  key: 'filteredPersonActionsSelector',
+  get:
+    ({ personId, filterCategories, filterStatus }) =>
+    ({ get }) => {
+      const person = get(populatedPersonSelector({ personId }));
+      let actionsToSet = person?.actions || [];
+      if (filterCategories.length) {
+        actionsToSet = actionsToSet.filter((a) =>
+          filterCategories.some((c) => (c === '-- Aucune --' ? a.categories?.length === 0 : a.categories?.includes(c)))
+        );
+      }
+      if (filterStatus.length) {
+        actionsToSet = actionsToSet.filter((a) => filterStatus.some((s) => a.status === s));
+      }
+      return [...actionsToSet]
+        .sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1))
+        .map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a));
+    },
+});
+
+const Actions = ({ onUpdateResults }) => {
+  const { personId } = useParams();
+
+  const person = useRecoilValue(populatedPersonSelector({ personId }));
+  const data = person?.actions || [];
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -648,23 +704,7 @@ const Actions = ({ person, onUpdateResults }) => {
 
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
-  const data = useMemo(() => {
-    if (!person) return [];
-    return actions.filter((a) => a.person === person._id);
-  }, [person, actions]);
-
-  const filteredData = useMemo(() => {
-    let actionsToSet = data;
-    if (filterCategories.length) {
-      actionsToSet = actionsToSet.filter((a) =>
-        filterCategories.some((c) => (c === '-- Aucune --' ? a.categories?.length === 0 : a.categories?.includes(c)))
-      );
-    }
-    if (filterStatus.length) {
-      actionsToSet = actionsToSet.filter((a) => filterStatus.some((s) => a.status === s));
-    }
-    return actionsToSet.sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)).map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a));
-  }, [data, filterCategories, filterStatus]);
+  const filteredData = useRecoilValue(filteredPersonActionsSelector({ personId, filterCategories, filterStatus }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -757,9 +797,13 @@ const Actions = ({ person, onUpdateResults }) => {
   );
 };
 
-const Passages = ({ personId, onUpdateResults }) => {
-  const passages = useRecoilValue(passagesState);
-  const personPassages = useMemo(() => passages.filter((passage) => passage.person === personId), [personId, passages]);
+const Passages = ({ onUpdateResults }) => {
+  const { personId } = useParams();
+  const person = useRecoilValue(populatedPersonSelector({ personId }));
+  const personPassages = useMemo(
+    () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    [person]
+  );
   const [passageToEdit, setPassageToEdit] = useState(null);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -820,9 +864,13 @@ const Passages = ({ personId, onUpdateResults }) => {
   );
 };
 
-const Rencontres = ({ personId, onUpdateResults }) => {
-  const rencontres = useRecoilValue(rencontresState);
-  const personRencontres = useMemo(() => rencontres.filter((rencontre) => rencontre.person === personId), [personId, rencontres]);
+const Rencontres = ({ onUpdateResults }) => {
+  const { personId } = useParams();
+  const person = useRecoilValue(populatedPersonSelector({ personId }));
+  const personRencontres = useMemo(
+    () => [...(person?.rencontres || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    [person]
+  );
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);

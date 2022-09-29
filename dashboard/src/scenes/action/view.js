@@ -21,29 +21,39 @@ import SelectTeam from '../../components/SelectTeam';
 
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker, now } from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
 import { useDataLoader } from '../../components/DataLoader';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
+import { itemsGroupedByActionSelector } from '../../recoil/selectors';
+
+const actionByIdSelector = selectorFamily({
+  key: 'actionByIdSelector',
+  get:
+    ({ actionId }) =>
+    ({ get }) => {
+      const actions = get(itemsGroupedByActionSelector);
+      return actions[actionId];
+    },
+});
 
 const View = () => {
-  const { id } = useParams();
+  const { actionId } = useParams();
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const [actions, setActions] = useRecoilState(actionsState);
-  const [comments, setComments] = useRecoilState(commentsState);
+  const action = useRecoilValue(actionByIdSelector({ actionId }));
+  const setActions = useSetRecoilState(actionsState);
+  const setComments = useSetRecoilState(commentsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const history = useHistory();
   const API = useApi();
   const { refresh } = useDataLoader();
-
-  const action = actions.find((a) => a._id === id);
 
   useTitle(`${action?.name} - Action`);
 
@@ -55,7 +65,7 @@ const View = () => {
       const actionRes = await API.delete({ path: `/action/${action._id}` });
       if (actionRes.ok) {
         setActions((actions) => actions.filter((a) => a._id !== action._id));
-        for (let comment of comments.filter((c) => c.action === action._id)) {
+        for (let comment of action.comments) {
           const commentRes = await API.delete({ path: `/comment/${comment._id}` });
           if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
         }
@@ -89,7 +99,7 @@ const View = () => {
       return;
     }
     setActions((actions) => [response.decryptedData, ...actions]);
-    for (let c of comments.filter((c) => c.action === action._id).filter((c) => !c.comment.includes('a changé le status'))) {
+    for (let c of action.comments.filter((c) => c.action === action._id).filter((c) => !c.comment.includes('a changé le status'))) {
       const body = {
         comment: c.comment,
         action: response.decryptedData._id,
@@ -297,7 +307,7 @@ const View = () => {
           );
         }}
       </Formik>
-      <Comments actionId={action._id} />
+      <Comments />
     </>
   );
 };

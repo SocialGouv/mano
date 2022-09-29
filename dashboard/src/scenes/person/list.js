@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { selector, selectorFamily, useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
@@ -18,32 +18,102 @@ import {
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
 import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
-import { personsWithPlacesSelector } from '../../recoil/selectors';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
 import { placesState } from '../../recoil/places';
-import { actionsState } from '../../recoil/actions';
-import { commentsState } from '../../recoil/comments';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
-import { consultationsState } from '../../recoil/consultations';
-import { medicalFileState } from '../../recoil/medicalFiles';
-import { treatmentsState } from '../../recoil/treatments';
 
 const limit = 20;
+
+const arrayOfitemsGroupedByPersonSelector = selector({
+  key: 'arrayOfitemsGroupedByPersonSelector',
+  get: ({ get }) => {
+    const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
+    return Object.values(itemsGroupedByPerson);
+  },
+});
+
+const personsPopulatedWithFormattedBirthDateSelector = selector({
+  key: 'personsPopulatedWithFormattedBirthDateSelector',
+  get: ({ get }) => {
+    const persons = get(arrayOfitemsGroupedByPersonSelector);
+    const personsWithBirthdateFormatted = persons.map((person) => ({
+      ...person,
+      birthDate: formatBirthDate(person.birthDate),
+    }));
+    return personsWithBirthdateFormatted;
+  },
+});
+
+const personsFilteredSelector = selectorFamily({
+  key: 'personsFilteredSelector',
+  get:
+    ({ filterTeams, filters, alertness }) =>
+    ({ get }) => {
+      const personWithBirthDate = get(personsPopulatedWithFormattedBirthDateSelector);
+      let pFiltered = personWithBirthDate;
+      if (!!filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);
+      if (!!alertness) pFiltered = pFiltered.filter((p) => !!p.alertness);
+      if (filterTeams.length) {
+        pFiltered = pFiltered.filter((p) => {
+          for (let assignedTeam of p.assignedTeams || []) {
+            if (filterTeams.includes(assignedTeam)) return true;
+          }
+          return false;
+        });
+      }
+      return pFiltered;
+    },
+});
+
+const personsFilteredBySearchSelector = selectorFamily({
+  key: 'personsFilteredBySearchSelector',
+  get:
+    ({ filterTeams, filters, alertness, search }) =>
+    ({ get }) => {
+      const personsFiltered = get(personsFilteredSelector({ filterTeams, filters, alertness }));
+
+      if (!search?.length) {
+        return personsFiltered;
+      }
+
+      const personsfilteredBySearch = filterBySearch(search, personsFiltered);
+
+      return personsfilteredBySearch;
+    },
+});
+
+const filterPersonsWithAllFieldsSelector = selector({
+  key: 'filterPersonsWithAllFieldsSelector',
+  get: ({ get }) => {
+    const places = get(placesState);
+    const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
+    const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
+    const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
+    return [
+      ...filterPersonsBase,
+      ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+      ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+      ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+      {
+        label: 'Lieux fréquentés',
+        field: 'places',
+        options: [...new Set(places.map((place) => place.name))],
+      },
+    ];
+  },
+});
 
 const List = () => {
   useTitle('Personnes');
   useDataLoader({ refreshOnMount: true });
-  const places = useRecoilValue(placesState);
-  const actions = useRecoilValue(actionsState);
-  const comments = useRecoilValue(commentsState);
-  const consultations = useRecoilValue(consultationsState);
-  const medicalFiles = useRecoilValue(medicalFileState);
-  const treatments = useRecoilValue(treatmentsState);
+  const filterPersonsWithAllFields = useRecoilValue(filterPersonsWithAllFieldsSelector);
+
   const [search, setSearch] = useSearchParamState('search', '');
   const [alertness, setFilterAlertness] = useSearchParamState('alertness', false);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrganisationData', []);
@@ -51,101 +121,8 @@ const List = () => {
   const [filters, setFilters] = useSearchParamState('filters', []);
   const [page, setPage] = useSearchParamState('page', 0);
   const currentTeam = useRecoilValue(currentTeamState);
-  const persons = useRecoilValue(personsWithPlacesSelector);
 
-  const personsFiltered = useMemo(() => {
-    let pFiltered = persons;
-    if (!!filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);
-    if (!!alertness) pFiltered = pFiltered.filter((p) => !!p.alertness);
-    if (filterTeams.length) {
-      pFiltered = pFiltered.filter((p) => {
-        for (let assignedTeam of p.assignedTeams || []) {
-          if (filterTeams.includes(assignedTeam)) return true;
-        }
-        return false;
-      });
-    }
-    return pFiltered.map((person) => {
-      return {
-        ...person,
-        formattedBirthDate: formatBirthDate(person.birthdate),
-      };
-    });
-  }, [persons, filterTeams, filters, alertness]);
-
-  // The next memos are used to filter by search (empty array when search is empty).
-  const personsFilteredIds = useMemo(() => personsFiltered.map((p) => p._id), [personsFiltered]);
-  const consultationsOfFilteredPersons = useMemo(
-    () => consultations.filter((a) => personsFilteredIds.includes(a.person)),
-    [consultations, personsFilteredIds]
-  );
-  const medicalFilesOfFilteredPersons = useMemo(
-    () => medicalFiles.filter((a) => personsFilteredIds.includes(a.person)),
-    [medicalFiles, personsFilteredIds]
-  );
-  const treatmentsOfFilteredPersons = useMemo(
-    () => treatments.filter((a) => personsFilteredIds.includes(a.person)),
-    [treatments, personsFilteredIds]
-  );
-  const actionsOfFilteredPersons = useMemo(() => actions.filter((a) => personsFilteredIds.includes(a.person)), [actions, personsFilteredIds]);
-  const actionsOfFilteredPersonsIds = useMemo(() => actionsOfFilteredPersons.map((a) => a._id), [actionsOfFilteredPersons]);
-  const commentsOfFilteredPersons = useMemo(() => comments.filter((c) => personsFilteredIds.includes(c.person)), [comments, personsFilteredIds]);
-  const commentsOfFilteredActions = useMemo(
-    () => comments.filter((c) => actionsOfFilteredPersonsIds.includes(c.action)),
-    [actionsOfFilteredPersonsIds, comments]
-  );
-  const personsIdsFilteredByConsultationSearch = useMemo(
-    () => filterBySearch(search, consultationsOfFilteredPersons).map((c) => c.person),
-    [consultationsOfFilteredPersons, search]
-  );
-  const personsIdsFilteredByMedicalFileSearch = useMemo(
-    () => filterBySearch(search, medicalFilesOfFilteredPersons).map((c) => c.person),
-    [medicalFilesOfFilteredPersons, search]
-  );
-  const personsIdsFilteredByTreatmentSearch = useMemo(
-    () => filterBySearch(search, treatmentsOfFilteredPersons).map((c) => c.person),
-    [treatmentsOfFilteredPersons, search]
-  );
-  const personsIdsFilteredByActionsSearch = useMemo(
-    () => filterBySearch(search, actionsOfFilteredPersons).map((a) => a.person),
-    [actionsOfFilteredPersons, search]
-  );
-  const personsIdsFilteredByActionsCommentsSearch = useMemo(
-    () => filterBySearch(search, commentsOfFilteredPersons).map((c) => c.person),
-    [commentsOfFilteredPersons, search]
-  );
-  const personsIdsFilteredByPersonsCommentsSearch = useMemo(
-    () => filterBySearch(search, commentsOfFilteredActions).map((c) => c.person),
-    [commentsOfFilteredActions, search]
-  );
-
-  const personsIdsFilteredByPersonsSearch = useMemo(() => filterBySearch(search, personsFiltered).map((c) => c._id), [personsFiltered, search]);
-
-  const personsFilteredBySearch = useMemo(() => {
-    if (!search?.length) return personsFiltered;
-    const personsIdsFilterBySearch = [
-      ...new Set([
-        ...personsIdsFilteredByConsultationSearch,
-        ...personsIdsFilteredByMedicalFileSearch,
-        ...personsIdsFilteredByTreatmentSearch,
-        ...personsIdsFilteredByActionsSearch,
-        ...personsIdsFilteredByActionsCommentsSearch,
-        ...personsIdsFilteredByPersonsCommentsSearch,
-        ...personsIdsFilteredByPersonsSearch,
-      ]),
-    ];
-    return personsFiltered.filter((p) => personsIdsFilterBySearch.includes(p._id));
-  }, [
-    search?.length,
-    personsFiltered,
-    personsIdsFilteredByConsultationSearch,
-    personsIdsFilteredByMedicalFileSearch,
-    personsIdsFilteredByTreatmentSearch,
-    personsIdsFilteredByActionsSearch,
-    personsIdsFilteredByActionsCommentsSearch,
-    personsIdsFilteredByPersonsCommentsSearch,
-    personsIdsFilteredByPersonsSearch,
-  ]);
+  const personsFilteredBySearch = useRecoilValue(personsFilteredBySearchSelector({ search, filterTeams, filters, alertness }));
 
   const data = useMemo(() => {
     return personsFilteredBySearch.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
@@ -153,9 +130,6 @@ const List = () => {
   const total = useMemo(() => personsFilteredBySearch.length, [personsFilteredBySearch]);
 
   const teams = useRecoilValue(teamsState);
-  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
 
@@ -171,19 +145,6 @@ const List = () => {
     isMounted.current = true;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [viewAllOrganisationData, currentTeam, teams]);
-
-  // Add places and enabled custom fields in filters.
-  const filterPersonsWithAllFields = [
-    ...filterPersonsBase,
-    ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-    {
-      label: 'Lieux fréquentés',
-      field: 'places',
-      options: [...new Set(places.map((place) => place.name))],
-    },
-  ];
 
   if (!personsFilteredBySearch) return <Loading />;
 
@@ -329,4 +290,5 @@ const PersonsActionsStyled = styled.div`
   justify-content: flex-end;
 `;
 
+// eslint-disable-next-line import/no-anonymous-default-export
 export default List;
