@@ -52,7 +52,7 @@
     "libphonenumber-js": "^1.9.13",
     "prop-types": "^15.7.2",
     "react": "^18.1.0",
-    "react-native": "^0.70.0",
+    "react-native": "^0.70.1",
     "react-native-base64": "^0.2.1",
     "react-native-blob-util": "^0.16.2",
     "react-native-bootsplash": "^4.3.2",
