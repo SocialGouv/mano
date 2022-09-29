@@ -27,7 +27,6 @@ const arrayOfitemsGroupedByPersonSelector = selector({
 const personsPopulatedWithFormattedBirthDateSelector = selector({
   key: 'personsPopulatedWithFormattedBirthDateSelector',
   get: ({ get }) => {
-    const now = Date.now();
     const persons = get(arrayOfitemsGroupedByPersonSelector);
     const personsWithBirthdateFormatted = persons.map((person) => ({
       ...person,
@@ -42,7 +41,6 @@ const personsFilteredSelector = selectorFamily({
   get:
     ({ filterTeams, filterOutOfActiveList, filterAlertness }) =>
     ({ get }) => {
-      const now = Date.now();
       const personWithBirthDate = get(personsPopulatedWithFormattedBirthDateSelector);
       let personsFiltered = personWithBirthDate;
       if (filterOutOfActiveList) {
@@ -67,7 +65,6 @@ const personsFilteredBySearchSelector = selectorFamily({
   get:
     ({ filterTeams, filterOutOfActiveList, filterAlertness, search }) =>
     ({ get }) => {
-      const now = Date.now();
       if (!search?.length && !filterTeams.length && !filterOutOfActiveList && !filterAlertness) {
         const persons = get(personsState);
         return persons;

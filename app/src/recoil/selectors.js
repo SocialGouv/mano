@@ -81,7 +81,6 @@ export const personsObjectSelector = selector({
 export const itemsGroupedByPersonSelector = selector({
   key: 'itemsGroupedByPersonSelector',
   get: ({ get }) => {
-    const now = Date.now();
     const persons = get(personsState);
     const personsObject = {};
     for (const person of persons) {
@@ -129,6 +128,10 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[medicalFile.person]) continue;
       personsObject[medicalFile.person].medicalFile = medicalFile;
     }
+
+    // we don't use passages in the app - no use, no load
+    // but we keep it here just to be aware of that app specificity
+
     // for (const passage of passages) {
     //   if (!personsObject[passage.person]) continue;
     //   personsObject[passage.person].passages = personsObject[passage.person].passages || [];
@@ -315,7 +318,6 @@ export const actionsByStatusSelector = selectorFamily({
   get:
     ({ status, limit }) =>
     ({ get }) => {
-      const now = Date.now();
       if (status === DONE) {
         const actions = get(actionsDoneSelectorSliced({ limit }));
         return actions;

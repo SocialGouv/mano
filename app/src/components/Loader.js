@@ -89,7 +89,6 @@ const Loader = () => {
   const initialLoadDone = useRef(null);
 
   const refresh = async () => {
-    const now = Date.now();
     const { showFullScreen, initialLoad } = refreshTrigger.options;
     setLoading('Chargement...');
     setFullScreen(showFullScreen);
