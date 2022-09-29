@@ -52,7 +52,6 @@ const actionsByTeamAndStatusSelector = selectorFamily({
           (!statuses.length || statuses.includes(action.status)) &&
           (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
       );
-      console.timeEnd('ACTIONS BY TEAM AND STATUS');
       return actionsByTeamAndStatus;
     },
 });
