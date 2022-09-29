@@ -4,17 +4,24 @@ const { VERSION, ENVIRONMENT } = require("./config");
 
 const sentryEnabled = ENVIRONMENT !== "development" && ENVIRONMENT !== "test" && process.env.MANO_API_IS_PRODUCTION === "true";
 
-if (sentryEnabled) {
+const SentryInit = (app) => {
+  if (!sentryEnabled) return;
   Sentry.init({
-    dsn: "https://d5bde308505f4860b199e7031dcd17d6@o348403.ingest.sentry.io/5384501",
+    dsn: "https://e3eb487403dd4789b47cf6da857bb4bf@sentry.fabrique.social.gouv.fr/52",
     environment: `api-${ENVIRONMENT}`,
+    integrations: [
+      // enable HTTP calls tracing
+      new Sentry.Integrations.Http({ tracing: true }),
+      // enable Express.js middleware tracing
+      new Tracing.Integrations.Express({ app }),
+    ],
     release: VERSION,
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
     tracesSampleRate: 1.0,
   });
-}
+};
 
 function capture(err, context = {}) {
   if (!sentryEnabled) {
@@ -53,4 +60,4 @@ function capture(err, context = {}) {
   }
 }
 
-module.exports = { capture };
+module.exports = { capture, SentryInit };

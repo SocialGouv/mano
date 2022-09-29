@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -7,7 +7,7 @@ import Spinner from '../../components/Spinner';
 import { ListEmptyActions, ListNoMoreActions } from '../../components/ListEmptyContainer';
 import FloatAddButton from '../../components/FloatAddButton';
 import { MyText } from '../../components/MyText';
-import { FlashListStyled, SectionListStyled } from '../../components/Lists';
+import { FlashListStyled } from '../../components/Lists';
 import { TODO } from '../../recoil/actions';
 import { actionsByStatusSelector, totalActionsByStatusSelector } from '../../recoil/selectors';
 import { useNavigation, useRoute } from '@react-navigation/native';

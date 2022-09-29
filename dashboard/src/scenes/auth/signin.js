@@ -13,7 +13,7 @@ import { DEFAULT_ORGANISATION_KEY, theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import useApi, { setOrgEncryptionKey } from '../../services/api';
-import { AppSentry, capture } from '../../services/sentry';
+import { AppSentry } from '../../services/sentry';
 import { useDataLoader } from '../../components/DataLoader';
 
 const SignIn = () => {
@@ -105,7 +105,6 @@ const SignIn = () => {
       <Formik
         initialValues={{ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' }}
         onSubmit={async (values, actions) => {
-          capture('test sentry');
           try {
             const body = {
               email: values.email,

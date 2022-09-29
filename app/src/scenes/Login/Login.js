@@ -100,7 +100,6 @@ const Login = ({ navigation }) => {
     setEmail(email);
     setIsValid(isValid);
     setExample(example);
-    throw new Error('try sentry');
   };
 
   const onResetCurrentUser = async () => {

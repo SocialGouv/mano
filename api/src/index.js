@@ -10,6 +10,8 @@ const { PORT, VERSION } = require("./config");
 const errors = require("./errors");
 
 const versionCheck = require("./middleware/versionCheck");
+const { SentryInit } = require("./sentry");
+const Sentry = require("@sentry/node");
 
 require("./db/sequelize");
 require("./db/relation");
@@ -19,6 +21,13 @@ const app = express();
 if (process.env.NODE_ENV === "development") {
   app.use(logger("dev"));
 }
+
+SentryInit(app);
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(Sentry.Handlers.requestHandler());
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler());
 
 if (process.env.NODE_ENV === "production") {
   app.use(cors({ credentials: true, origin: /fabrique\.social\.gouv\.fr$/ }));
@@ -85,6 +94,8 @@ app.use("/merge", require("./controllers/merge"));
 app.use("/consultation", require("./controllers/consultation"));
 app.use("/treatment", require("./controllers/treatment"));
 app.use("/medical-file", require("./controllers/medicalFile"));
+// The error handler must be before any other error middleware and after all controllers
+app.use(Sentry.Handlers.errorHandler());
 
 app.use(errors.sendError);
 
