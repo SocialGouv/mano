@@ -56,9 +56,9 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
       <CaptionsContainer>
         <CaptionsFirstLine>
           {Boolean(alertness) && (
-            <ExclamationMarkButtonDiv>
+            <ExclamationMarkButton>
               <ExclamationMark>!</ExclamationMark>
-            </ExclamationMarkButtonDiv>
+            </ExclamationMarkButton>
           )}
           <PersonName person={person} />
           {!isPersonsSearchRow && <ButtonTopPlus onPress={onMorePress} />}
@@ -73,6 +73,7 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
 
 const OutOfActiveListContainer = styled.View`
   flex-grow: 1;
+  flex-shrink: 1;
 `;
 
 const CaptionsContainer = styled.View`
@@ -111,7 +112,7 @@ const ActiveListReasonText = styled(MyText)`
   color: ${colors.app.colorGrey};
 `;
 
-const ExclamationMarkButtonDiv = styled.View`
+const ExclamationMarkButton = styled.View`
   width: 20px;
   height: 20px;
   border-radius: 20px;
@@ -127,7 +128,7 @@ const ExclamationMarkButtonDiv = styled.View`
 
 const ExclamationMark = styled(MyText)`
   font-size: 14px;
-  line-height: 26px;
+  line-height: 16px;
   font-weight: bold;
   color: #dc2626;
 `;

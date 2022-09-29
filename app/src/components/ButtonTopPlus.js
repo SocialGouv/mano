@@ -33,7 +33,7 @@ const ButtonContainer = styled.TouchableOpacity`
 const Plus = styled(MyText)`
   align-self: center;
   font-size: ${iconSize - 2}px;
-  line-height: ${(iconSize - 3) * 1.5}px;
+  line-height: ${(iconSize - 2) * 1.15}px;
   height: ${iconSize}px;
   width: ${iconSize}px;
   color: ${colors.app.color};
