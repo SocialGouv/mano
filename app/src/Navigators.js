@@ -221,7 +221,7 @@ const TabNavigator = () => (
       component={PersonsNavigator}
       options={{
         tabBarIcon: ({ size, color }) => <PersonIcon size={size} color={color} />,
-        tabBarLabel: 'USAGERS',
+        tabBarLabel: 'PERSONNES',
         tabBarTestID: 'tab-bar-persons',
       }}
     />
