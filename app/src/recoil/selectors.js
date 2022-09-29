@@ -31,48 +31,6 @@ export const personsWithPlacesSelector = selector({
   },
 });
 
-export const placesSearchSelector = selectorFamily({
-  key: 'placesSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const places = get(placesState);
-      if (!search?.length) return [];
-      return filterBySearch(search, places);
-    },
-});
-
-export const commentsFilteredSelector = selectorFamily({
-  key: 'commentsFilteredSelector',
-  get:
-    ({ personId, actionId, forPassages }) =>
-    ({ get }) => {
-      const comments = get(commentsState);
-      return comments
-        .filter((c) => {
-          if (personId) return c.person === personId;
-          if (actionId) return c.action === actionId;
-          return false;
-        })
-        .filter((c) => {
-          const commentIsPassage = c?.comment?.includes('Passage enregistré');
-          if (forPassages) return commentIsPassage;
-          return !commentIsPassage;
-        });
-    },
-});
-
-export const commentsSearchSelector = selectorFamily({
-  key: 'commentsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const comments = get(commentsState);
-      if (!search?.length) return [];
-      return filterBySearch(search, comments);
-    },
-});
-
 export const personsSearchSelector = selectorFamily({
   key: 'personsSearchSelector',
   get:
@@ -281,41 +239,6 @@ export const totalActionsByStatusSelector = selectorFamily({
 Observations
 
 */
-
-export const onlyFilledObservationsTerritories = selector({
-  key: 'onlyFilledObservationsTerritories',
-  get: ({ get }) => {
-    const customFieldsObs = get(customFieldsObsSelector);
-    const territoryObservations = get(territoryObservationsState);
-
-    const observationsKeyLabels = {};
-    for (const field of customFieldsObs) {
-      observationsKeyLabels[field.name] = field.label;
-    }
-
-    return territoryObservations.map((obs) => {
-      const obsWithOnlyFilledFields = {};
-      for (let key of Object.keys(obs)) {
-        if (obs[key]) obsWithOnlyFilledFields[observationsKeyLabels[key]] = obs[key];
-      }
-      return { territory: obs.territory, ...obsWithOnlyFilledFields };
-    });
-  },
-});
-
-export const territoriesObservationsSearchSelector = selectorFamily({
-  key: 'territoriesObservationsSearchSelector',
-  get:
-    ({ search = '' }) =>
-    ({ get }) => {
-      const onlyFilledObservations = get(onlyFilledObservationsTerritories);
-      const observations = get(territoryObservationsState);
-
-      if (!search?.length) return [];
-      const obsIds = filterBySearch(search, onlyFilledObservations).map((obs) => obs._id);
-      return observations.filter((obs) => obsIds.includes(obs._id));
-    },
-});
 
 export const territoriesSearchSelector = selectorFamily({
   key: 'territoriesSearchSelector',
