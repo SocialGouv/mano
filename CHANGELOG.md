@@ -1,3 +1,10 @@
+## [1.159.2](https://github.com/SocialGouv/mano/compare/v1.159.1...v1.159.2) (2022-09-29)
+
+
+### Bug Fixes
+
+* **dashboard:** persons list perf ([#903](https://github.com/SocialGouv/mano/issues/903)) ([3385b32](https://github.com/SocialGouv/mano/commit/3385b32caa70743e8cecc4135ad0f1f85df38223))
+
 ## [1.159.1](https://github.com/SocialGouv/mano/compare/v1.159.0...v1.159.1) (2022-09-27)
 
 
