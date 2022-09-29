@@ -111,7 +111,6 @@ const dataFilteredBySearchSelector = selectorFamily({
       const actionsFiltered = filterBySearch(search, actions);
       const consultationsFiltered = filterBySearch(search, consultations);
       const dataFitered = [...actionsFiltered, ...consultationsFiltered].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt));
-      console.timeEnd('DATA FILTERED');
       return dataFitered;
     },
 });
