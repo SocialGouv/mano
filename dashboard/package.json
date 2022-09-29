@@ -10,7 +10,7 @@
     "@sentry/browser": "^6.17.5",
     "@sentry/react": "^7.14.0",
     "@sentry/tracing": "^7.14.0",
-    "@wojtekmaj/react-daterange-picker": "^3.1.0",
+    "@wojtekmaj/react-daterange-picker": "^4.0.0",
     "base-64": "^1.0.0",
     "base64-js": "^1.5.1",
     "bootstrap": "^4.6.1",
