@@ -12,6 +12,7 @@ import { consultationsState } from './consultations';
 import { rencontresState } from './rencontres';
 import { treatmentsState } from './treatments';
 import { medicalFileState } from './medicalFiles';
+import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 
 export const personsSearchSelector = selectorFamily({
   key: 'personsSearchSelector',
@@ -24,6 +25,17 @@ export const personsSearchSelector = selectorFamily({
     },
 });
 
+export const actionsObjectSelector = selector({
+  key: 'actionsObjectSelector',
+  get: ({ get }) => {
+    const actions = get(actionsState);
+    const actionsObject = {};
+    for (const action of actions) {
+      actionsObject[action._id] = { ...action };
+    }
+    return actionsObject;
+  },
+});
 const actionsWithCommentsSelector = selector({
   key: 'actionsWithCommentsSelector',
   get: ({ get }) => {
@@ -239,12 +251,20 @@ Actions and Consultations
 
 */
 
+const consultationsSelector = selector({
+  key: 'consultationsSelector',
+  get: ({ get }) => {
+    const consultations = get(consultationsState);
+    return consultations.map((c) => ({ ...c, isConsultation: true }));
+  },
+});
+
 const actionsAndConsultationsSelector = selector({
   key: 'actionsAndConsultationsSelector',
   get: ({ get }) => {
     const actions = get(actionsForCurrentTeamSelector);
-    const consultations = get(consultationsState);
-    return [...actions, ...consultations.map((c) => ({ ...c, isConsultation: true }))];
+    const consultations = get(consultationsSelector);
+    return [...actions, ...consultations];
   },
 });
 
@@ -297,9 +317,22 @@ export const actionsByStatusSelector = selectorFamily({
   get:
     ({ status, limit }) =>
     ({ get }) => {
-      if (status === DONE) return get(actionsDoneSelectorSliced({ limit }));
-      if (status === TODO) return get(actionsTodoSelector);
-      if (status === CANCEL) return get(actionsCanceledSelectorSliced({ limit }));
+      const now = Date.now();
+      if (status === DONE) {
+        const actions = get(actionsDoneSelectorSliced({ limit }));
+        console.log('DONE ACTIONS DONE', Date.now() - now);
+        return actions;
+      }
+      if (status === TODO) {
+        const actions = get(actionsTodoSelector);
+        console.log('DONE ACTIONS TODO', Date.now() - now);
+        return actions;
+      }
+      if (status === CANCEL) {
+        const actions = get(actionsCanceledSelectorSliced({ limit }));
+        console.log('DONE ACTIONS CANCEL', Date.now() - now);
+        return actions;
+      }
     },
 });
 
@@ -319,6 +352,26 @@ export const totalActionsByStatusSelector = selectorFamily({
 Observations
 
 */
+export const onlyFilledObservationsTerritories = selector({
+  key: 'onlyFilledObservationsTerritories',
+  get: ({ get }) => {
+    const customFieldsObs = get(customFieldsObsSelector);
+    const territoryObservations = get(territoryObservationsState);
+
+    const observationsKeyLabels = {};
+    for (const field of customFieldsObs) {
+      observationsKeyLabels[field.name] = field.label;
+    }
+
+    return territoryObservations.map((obs) => {
+      const obsWithOnlyFilledFields = {};
+      for (let key of Object.keys(obs)) {
+        if (obs[key]) obsWithOnlyFilledFields[observationsKeyLabels[key]] = obs[key];
+      }
+      return { territory: obs.territory, ...obsWithOnlyFilledFields };
+    });
+  },
+});
 
 export const territoriesSearchSelector = selectorFamily({
   key: 'territoriesSearchSelector',

@@ -43,6 +43,7 @@ const PersonSummary = ({
   onDelete,
   onBack,
 }) => {
+  const now = Date.now();
   const onAddPlaceRequest = () => navigation.push('NewPersonPlaceForm', { person: personDB, fromRoute: 'Person' });
 
   const onCommentUpdate = (comment) => {
@@ -112,6 +113,8 @@ const PersonSummary = ({
     },
     [navigation]
   );
+
+  console.log('PERSON RENDER', Date.now() - now);
 
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
