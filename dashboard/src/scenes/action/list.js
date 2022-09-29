@@ -96,7 +96,6 @@ const dataFilteredBySearchSelector = selectorFamily({
   get:
     ({ search, statuses, categories }) =>
     ({ get }) => {
-      console.time('DATA FILTERED');
       const actions = get(actionsByTeamAndStatusSelector({ statuses, categories }));
       const consultations = get(consultationsByStatusSelector({ statuses }));
       if (!search) {
