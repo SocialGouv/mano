@@ -1,32 +1,30 @@
 import * as Sentry from '@sentry/react';
-import { Integrations } from '@sentry/tracing';
-const { ENV, VERSION } = require('../config');
+import { BrowserTracing } from '@sentry/tracing';
+const { VERSION } = require('../config');
 
-if (ENV === 'production') {
-  Sentry.init({
-    dsn: 'https://35e52183bab54c74914e6acc88097f18@sentry.incubateur.net/32',
-    environment: 'dashboard',
-    release: VERSION,
-    integrations: [new Integrations.BrowserTracing()],
+Sentry.init({
+  dsn: 'https://e3eb487403dd4789b47cf6da857bb4bf@sentry.fabrique.social.gouv.fr/52',
+  environment: 'dashboard',
+  release: VERSION,
+  integrations: [new BrowserTracing()],
 
-    // Set tracesSampleRate to 1.0 to capture 100%
-    // of transactions for performance monitoring.
-    // We recommend adjusting this value in production
-    tracesSampleRate: 1.0,
-    ignoreErrors: [
-      'Network request failed',
-      'Failed to fetch',
-      'NetworkError',
-      // ???
-      'withrealtime/messaging',
-      // This error seems to happen only in firefox and to be ignorable.
-      // The "fetch" failed because user has navigated.
-      // Since other browsers don't have this problem, we don't care about it,
-      // it may be a false positive.
-      'AbortError: The operation was aborted',
-    ],
-  });
-}
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+  ignoreErrors: [
+    'Network request failed',
+    'Failed to fetch',
+    'NetworkError',
+    // ???
+    'withrealtime/messaging',
+    // This error seems to happen only in firefox and to be ignorable.
+    // The "fetch" failed because user has navigated.
+    // Since other browsers don't have this problem, we don't care about it,
+    // it may be a false positive.
+    'AbortError: The operation was aborted',
+  ],
+});
 
 export const capture = (err, context = {}) => {
   console.log('capture', err, context);
