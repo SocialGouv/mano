@@ -114,8 +114,6 @@ const PersonSummary = ({
     [navigation]
   );
 
-  console.log('PERSON RENDER', Date.now() - now);
-
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
       {person.outOfActiveList && (

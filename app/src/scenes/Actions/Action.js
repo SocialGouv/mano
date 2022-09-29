@@ -250,9 +250,7 @@ const Action = ({ navigation, route }) => {
     const response = await updateAction(Object.assign({}, castToAction(action), { _id: actionDB?._id, team: currentTeam._id }));
     setUpdating(false);
     if (!response.ok) {
-      console.log('ON EST LA');
       if (response.error) {
-        console.log('ON EST ICI');
         Alert.alert(response.error);
       }
       return;

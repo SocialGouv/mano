@@ -90,7 +90,6 @@ const Loader = () => {
 
   const refresh = async () => {
     const now = Date.now();
-    console.log('START LOADING');
     const { showFullScreen, initialLoad } = refreshTrigger.options;
     setLoading('Chargement...');
     setFullScreen(showFullScreen);
@@ -386,7 +385,6 @@ const Loader = () => {
       status: false,
       options: { showFullScreen: false, initialLoad: false },
     });
-    console.log('END LOADING', Date.now() - now);
   };
 
   useEffect(() => {

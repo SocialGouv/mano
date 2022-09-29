@@ -33,7 +33,6 @@ const personsPopulatedWithFormattedBirthDateSelector = selector({
       ...person,
       birthDate: formatBirthDate(person.birthDate),
     }));
-    console.log('FINISH BIRTH DATE', Date.now() - now);
     return personsWithBirthdateFormatted;
   },
 });
@@ -59,7 +58,6 @@ const personsFilteredSelector = selectorFamily({
           return false;
         });
       }
-      console.log('FINISH FILTERS', Date.now() - now);
       return personsFiltered;
     },
 });
@@ -72,7 +70,6 @@ const personsFilteredBySearchSelector = selectorFamily({
       const now = Date.now();
       if (!search?.length && !filterTeams.length && !filterOutOfActiveList && !filterAlertness) {
         const persons = get(personsState);
-        console.log('FINISH NO SEARCH', Date.now() - now);
         return persons;
       }
 
@@ -80,7 +77,6 @@ const personsFilteredBySearchSelector = selectorFamily({
 
       const personsfilteredBySearch = filterBySearch(search, personsFiltered);
 
-      console.log('FINISH SEARCH', Date.now() - now);
       return personsfilteredBySearch;
     },
 });

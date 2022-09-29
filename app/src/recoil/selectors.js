@@ -82,7 +82,6 @@ export const itemsGroupedByPersonSelector = selector({
   key: 'itemsGroupedByPersonSelector',
   get: ({ get }) => {
     const now = Date.now();
-    console.log('START PERSONS SELECTOR');
     const persons = get(personsState);
     const personsObject = {};
     for (const person of persons) {
@@ -140,7 +139,6 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
       personsObject[rencontre.person].rencontres.push(rencontre);
     }
-    console.log('FINISH PERSONS SELECTOR', Date.now() - now);
     return personsObject;
   },
 });
@@ -320,17 +318,14 @@ export const actionsByStatusSelector = selectorFamily({
       const now = Date.now();
       if (status === DONE) {
         const actions = get(actionsDoneSelectorSliced({ limit }));
-        console.log('DONE ACTIONS DONE', Date.now() - now);
         return actions;
       }
       if (status === TODO) {
         const actions = get(actionsTodoSelector);
-        console.log('DONE ACTIONS TODO', Date.now() - now);
         return actions;
       }
       if (status === CANCEL) {
         const actions = get(actionsCanceledSelectorSliced({ limit }));
-        console.log('DONE ACTIONS CANCEL', Date.now() - now);
         return actions;
       }
     },
