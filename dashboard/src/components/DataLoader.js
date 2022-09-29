@@ -302,7 +302,6 @@ export default function DataLoader() {
   }
 
   function stopLoader() {
-    console.timeEnd('LOAD DATA');
     setIsLoading(false);
     setLastLoad(Date.now());
     setProgressBuffer(null);
