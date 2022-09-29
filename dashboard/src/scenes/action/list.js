@@ -137,7 +137,6 @@ const List = () => {
   const dataConsolidated = useRecoilValue(dataFilteredBySearchSelector({ search, statuses, categories }));
   const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
 
-  console.log({ dataConsolidatedPaginated });
 
   const total = dataConsolidated.length;
 
