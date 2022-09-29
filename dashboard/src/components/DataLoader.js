@@ -295,7 +295,6 @@ export default function DataLoader() {
   }
 
   function startLoader(list, itemsCount) {
-    console.time('LOAD DATA');
     setLoadList({ list, offset: 0 });
     setLoaderTrigger(false);
     setProgress(0);
