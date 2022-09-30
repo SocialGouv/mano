@@ -1,3 +1,10 @@
+## [1.159.3](https://github.com/SocialGouv/mano/compare/v1.159.2...v1.159.3) (2022-09-30)
+
+
+### Bug Fixes
+
+* **app:**  perfs app ([#908](https://github.com/SocialGouv/mano/issues/908)) ([dcfb704](https://github.com/SocialGouv/mano/commit/dcfb704c453856f4eca3b75437aa6d2486aeb361))
+
 ## [1.159.2](https://github.com/SocialGouv/mano/compare/v1.159.1...v1.159.2) (2022-09-29)
 
 
