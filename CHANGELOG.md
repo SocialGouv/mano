@@ -1,3 +1,10 @@
+# [1.160.0](https://github.com/SocialGouv/mano/compare/v1.159.3...v1.160.0) (2022-09-30)
+
+
+### Features
+
+* **dashboard:** show medical file in stats ([#910](https://github.com/SocialGouv/mano/issues/910)) ([ded75e5](https://github.com/SocialGouv/mano/commit/ded75e5433dc321828d71daddea3c436cbf2dedf))
+
 ## [1.159.3](https://github.com/SocialGouv/mano/compare/v1.159.2...v1.159.3) (2022-09-30)
 
 
