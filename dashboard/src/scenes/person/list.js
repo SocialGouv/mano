@@ -18,30 +18,23 @@ import {
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
 import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
-import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
+import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-import { currentTeamState, organisationState, teamsState } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { placesState } from '../../recoil/places';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 
 const limit = 20;
-
-const arrayOfitemsGroupedByPersonSelector = selector({
-  key: 'arrayOfitemsGroupedByPersonSelector',
-  get: ({ get }) => {
-    const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
-    return Object.values(itemsGroupedByPerson);
-  },
-});
 
 const personsPopulatedWithFormattedBirthDateSelector = selector({
   key: 'personsPopulatedWithFormattedBirthDateSelector',
   get: ({ get }) => {
-    const persons = get(arrayOfitemsGroupedByPersonSelector);
+    const persons = get(personsWithMedicalFileMergedSelector);
     const personsWithBirthdateFormatted = persons.map((person) => ({
       ...person,
       birthDate: formatBirthDate(person.birthDate),
@@ -92,14 +85,17 @@ const filterPersonsWithAllFieldsSelector = selector({
   key: 'filterPersonsWithAllFieldsSelector',
   get: ({ get }) => {
     const places = get(placesState);
+    const user = get(userState);
     const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
     const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
     const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
+    const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
     return [
       ...filterPersonsBase,
       ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
       ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
       ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+      ...(user.healthcareProfessional ? customFieldsMedicalFile.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })) : []),
       {
         label: 'Lieux fréquentés',
         field: 'places',

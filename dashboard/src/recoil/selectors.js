@@ -1,4 +1,4 @@
-import { currentTeamState } from './auth';
+import { currentTeamState, userState } from './auth';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
@@ -80,6 +80,7 @@ export const itemsGroupedByPersonSelector = selector({
   get: ({ get }) => {
     const persons = get(personsState);
     const personsObject = {};
+    const user = get(userState);
     for (const person of persons) {
       personsObject[person._id] = { ...person };
     }
@@ -111,19 +112,21 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[relPersonPlace.person].relsPersonPlace = personsObject[relPersonPlace.person].relsPersonPlace || [];
       personsObject[relPersonPlace.person].relsPersonPlace.push(relPersonPlace);
     }
-    for (const consultation of consultations) {
-      if (!personsObject[consultation.person]) continue;
-      personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
-      personsObject[consultation.person].consultations.push(consultation);
-    }
-    for (const treatment of treatments) {
-      if (!personsObject[treatment.person]) continue;
-      personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
-      personsObject[treatment.person].treatments.push(treatment);
-    }
-    for (const medicalFile of medicalFiles) {
-      if (!personsObject[medicalFile.person]) continue;
-      personsObject[medicalFile.person].medicalFile = medicalFile;
+    if (user.healthcareProfessional) {
+      for (const consultation of consultations) {
+        if (!personsObject[consultation.person]) continue;
+        personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
+        personsObject[consultation.person].consultations.push(consultation);
+      }
+      for (const treatment of treatments) {
+        if (!personsObject[treatment.person]) continue;
+        personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
+        personsObject[treatment.person].treatments.push(treatment);
+      }
+      for (const medicalFile of medicalFiles) {
+        if (!personsObject[medicalFile.person]) continue;
+        personsObject[medicalFile.person].medicalFile = medicalFile;
+      }
     }
     for (const passage of passages) {
       if (!personsObject[passage.person]) continue;
@@ -139,6 +142,26 @@ export const itemsGroupedByPersonSelector = selector({
   },
 });
 
+export const arrayOfitemsGroupedByPersonSelector = selector({
+  key: 'arrayOfitemsGroupedByPersonSelector',
+  get: ({ get }) => {
+    const itemsGroupedByPerson = get(itemsGroupedByPersonSelector);
+    return Object.values(itemsGroupedByPerson);
+  },
+});
+
+export const personsWithMedicalFileMergedSelector = selector({
+  key: 'personsWithMedicalFileMergedSelector',
+  get: ({ get }) => {
+    const user = get(userState);
+    const persons = get(arrayOfitemsGroupedByPersonSelector);
+    if (!user.healthcareProfessional) return persons;
+    return persons.map((p) => ({
+      ...(p.medicalFile || {}),
+      ...p,
+    }));
+  },
+});
 export const itemsGroupedByActionSelector = selector({
   key: 'itemsGroupedByActionSelector',
   get: ({ get }) => {

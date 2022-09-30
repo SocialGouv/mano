@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
-import { useRecoilValue } from 'recoil';
+import { selectorFamily, useRecoilValue } from 'recoil';
 import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
 import {
@@ -11,7 +11,6 @@ import {
   reasonsOptions,
   ressourcesOptions,
   filterPersonsBase,
-  personsState,
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
   genderOptions,
@@ -35,6 +34,8 @@ import { rencontresState } from '../../recoil/rencontres';
 import useTitle from '../../services/useTitle';
 import { consultationsState } from '../../recoil/consultations';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
+import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
+import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
 
 const getDataForPeriod = (data, { startDate, endDate }, selectedTeams, viewAllOrganisationData, { filters = [], field = 'createdAt' } = {}) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -48,6 +49,16 @@ const getDataForPeriod = (data, { startDate, endDate }, selectedTeams, viewAllOr
   );
 };
 
+const personsForStatsSelector = selectorFamily({
+  key: 'personsForStatsSelector',
+  get:
+    ({ filterPersons, persons }) =>
+    ({ get }) =>
+      filterPersons.find((f) => f.field === 'outOfActiveList' && f.value === 'Oui')
+        ? persons.filter((p) => p.outOfActiveList)
+        : persons.filter((p) => !p.outOfActiveList),
+});
+
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Rencontres', 'Observations', 'Comptes-rendus', 'Consultations'];
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
@@ -55,7 +66,7 @@ const Stats = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
 
-  const allPersons = useRecoilValue(personsState);
+  const allPersons = useRecoilValue(personsWithMedicalFileMergedSelector);
   const allConsultations = useRecoilValue(consultationsState);
   const allActions = useRecoilValue(actionsState);
   const allreports = useRecoilValue(reportsState);
@@ -66,6 +77,7 @@ const Stats = () => {
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const territories = useRecoilValue(territoriesState);
   const { isLoading } = useDataLoader({ refreshOnMount: true });
 
@@ -92,9 +104,7 @@ const Stats = () => {
     field: 'followedSince',
   });
 
-  const personsForStats = filterPersons.find((f) => f.field === 'outOfActiveList' && f.value === 'Oui')
-    ? persons.filter((p) => p.outOfActiveList)
-    : persons.filter((p) => !p.outOfActiveList);
+  const personsForStats = useRecoilValue(personsForStatsSelector({ filterPersons, persons }));
 
   const actions = getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData);
   const consultations = getDataForPeriod(allConsultations, period, selectedTeams, true);
@@ -190,6 +200,7 @@ const Stats = () => {
     ...filterPersonsBase,
     ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+    ...customFieldsMedicalFile.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
   ];
 
   if (isLoading) return <Loading />;
@@ -387,13 +398,9 @@ const Stats = () => {
               { options: fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReason').options }
             )}
           />
-          {
-            // In this particular case, we can use index as a key since order is always the same.
-            //
-            [customFieldsPersonsMedical, customFieldsPersonsSocial].map((customFields, key) => {
-              return <CustomFieldsStats key={key} data={persons} customFields={customFields} />;
-            })
-          }
+          <CustomFieldsStats data={persons} customFields={customFieldsPersonsMedical} />
+          <CustomFieldsStats data={persons} customFields={customFieldsPersonsSocial} />
+          <CustomFieldsStats data={persons} customFields={customFieldsMedicalFile} />
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des passages</Title>
