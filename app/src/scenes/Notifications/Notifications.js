@@ -4,7 +4,6 @@ import React, { useCallback, useMemo } from 'react';
 import { actionsState, TODO } from '../../recoil/actions';
 import { currentTeamState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
-import { personsState } from '../../recoil/persons';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import { refreshTriggerState } from '../../components/Loader';
@@ -14,13 +13,15 @@ import CommentRow from '../Comments/CommentRow';
 import styled from 'styled-components';
 import { MyText } from '../../components/MyText';
 import { ListEmptyUrgent, ListEmptyUrgentAction, ListEmptyUrgentComment } from '../../components/ListEmptyContainer';
+import { actionsObjectSelector, personsObjectSelector } from '../../recoil/selectors';
 
 export const urgentItemsSelector = selector({
   key: 'urgentItemsSelector',
   get: ({ get }) => {
     const currentTeam = get(currentTeamState);
-    const persons = get(personsState);
+    const persons = get(personsObjectSelector);
     const actions = get(actionsState);
+    const actionsObject = get(actionsObjectSelector);
     const comments = get(commentsState);
     const actionsFiltered = actions
       .filter((action) => action.team === currentTeam?._id && action.status === TODO && action.urgent)
@@ -34,15 +35,15 @@ export const urgentItemsSelector = selector({
       .map((comment) => {
         const commentPopulated = { ...comment };
         if (comment.person) {
-          const id = comment?.person;
-          commentPopulated.person = persons.find((p) => p._id === id);
+          const id = comment.person;
+          commentPopulated.person = persons[id];
           commentPopulated.type = 'person';
         }
         if (comment.action) {
-          const id = comment?.action;
-          const action = actions.find((p) => p._id === id);
+          const id = comment.action;
+          const action = actionsObject[id];
           commentPopulated.action = action;
-          commentPopulated.person = persons.find((p) => p._id === action?.person);
+          if (action.person) commentPopulated.person = persons[action.person];
           commentPopulated.type = 'action';
         }
         return commentPopulated;

@@ -103,13 +103,9 @@ class ApiService {
           }
         }
         if (!!res.data && Array.isArray(res.data)) {
-          const decryptedData = [];
-          for (const item of res.data) {
-            const decryptedItem = await this.decryptDBItem(item, { debug });
-            if (this.wrongKeyWarned) {
-              return { ok: false, data: [] };
-            }
-            decryptedData.push(decryptedItem);
+          const decryptedData = await Promise.all(res.data.map((item) => this.decryptDBItem(item, { debug })));
+          if (this.wrongKeyWarned) {
+            return { ok: false, data: [] };
           }
           res.decryptedData = decryptedData;
           return res;

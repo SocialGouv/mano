@@ -32,7 +32,7 @@ export async function getData({ collectionName, data = [], isInitialization = fa
 
   const response = await API.get({
     path: `/${collectionName}`,
-    batch: 1000,
+    batch: 2000,
     setProgress,
     query: { after: lastRefresh, withDeleted: Boolean(lastRefresh) },
     setBatchData,

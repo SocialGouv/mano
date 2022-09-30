@@ -2,9 +2,8 @@ import { selector, selectorFamily } from 'recoil';
 import { actionsState } from '../../recoil/actions';
 import { currentTeamState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
-import { personsState } from '../../recoil/persons';
 import { reportsState } from '../../recoil/reports';
-import { territoryObservationsState } from '../../recoil/territoryObservations';
+import { actionsObjectSelector, onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
 import { getIsDayWithinHoursOffsetOfDay } from '../../services/dateDayjs';
 
 export const currentTeamReportsSelector = selector({
@@ -49,8 +48,8 @@ export const commentsForReport = selectorFamily({
   get:
     ({ date }) =>
     ({ get }) => {
-      const actions = get(actionsState);
-      const persons = get(personsState);
+      const actions = get(actionsObjectSelector);
+      const persons = get(personsObjectSelector);
       const comments = get(commentsState);
       const currentTeam = get(currentTeamState);
       return comments
@@ -59,15 +58,15 @@ export const commentsForReport = selectorFamily({
         .map((comment) => {
           const commentPopulated = { ...comment };
           if (comment.person) {
-            const id = comment?.person;
-            commentPopulated.person = persons.find((p) => p._id === id);
+            const id = comment.person;
+            commentPopulated.person = persons[id];
             commentPopulated.type = 'person';
           }
           if (comment.action) {
-            const id = comment?.action;
-            const action = actions.find((p) => p._id === id);
+            const id = comment.action;
+            const action = actions[id];
             commentPopulated.action = action;
-            commentPopulated.person = persons.find((p) => p._id === action?.person);
+            commentPopulated.person = persons[action.person];
             commentPopulated.type = 'action';
           }
           return commentPopulated;
@@ -81,7 +80,7 @@ export const observationsForReport = selectorFamily({
   get:
     ({ date }) =>
     ({ get }) => {
-      const territoryObservations = get(territoryObservationsState);
+      const territoryObservations = get(onlyFilledObservationsTerritories);
       const currentTeam = get(currentTeamState);
       return territoryObservations
         .filter((o) => o.team === currentTeam._id)
