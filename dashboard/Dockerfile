@@ -14,6 +14,7 @@ RUN yarn --frozen-lockfile
 COPY dashboard/. .
 
 ENV NODE_ENV=production
+ARG SENTRY_AUTH_TOKEN
 
 RUN yarn build
 
