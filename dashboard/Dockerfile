@@ -16,6 +16,9 @@ COPY dashboard/. .
 ENV NODE_ENV=production
 ARG SENTRY_AUTH_TOKEN
 ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+ENV SENTRY_ORG=incubateur
+ENV SENTRY_URL=https://sentry.fabrique.social.gouv.fr/
+ENV SENTRY_PROJECT=mano
 
 RUN yarn build && export SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN && node scripts/sentry.js
 
