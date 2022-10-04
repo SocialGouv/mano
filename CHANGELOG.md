@@ -1,3 +1,10 @@
+## [1.161.1](https://github.com/SocialGouv/mano/compare/v1.161.0...v1.161.1) (2022-10-04)
+
+
+### Bug Fixes
+
+* **dashboard:** show name in consultation + search by place + show birth date ([#916](https://github.com/SocialGouv/mano/issues/916)) ([a715aa0](https://github.com/SocialGouv/mano/commit/a715aa02e7a5609dc45e724ad01bf4a7ee8cc21b))
+
 # [1.161.0](https://github.com/SocialGouv/mano/compare/v1.160.0...v1.161.0) (2022-09-30)
 
 
