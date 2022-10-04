@@ -64,7 +64,7 @@ const itemsGroupedByConsultationSelector = selector({
 
     const consultationObject = {};
     for (const consultation of consultations) {
-      consultationObject[consultation._id] = { ...consultation, person: personsWithPlacesObject[consultation.person] };
+      consultationObject[consultation._id] = { ...consultation, personPopulated: personsWithPlacesObject[consultation.person] };
     }
     return consultationObject;
   },
@@ -130,7 +130,6 @@ const List = () => {
 
   const dataConsolidated = useRecoilValue(dataFilteredBySearchSelector({ search, statuses, categories }));
   const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
-
 
   const total = dataConsolidated.length;
 
