@@ -647,7 +647,8 @@ const ConsultationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
     () =>
       consultations
         ?.filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } }))
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
     [consultations, currentTeam?.nightSession, date]
   );
 
@@ -738,7 +739,8 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
         .map((a) => {
           if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
           return a;
-        }),
+        })
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
     [comments, currentTeam._id, currentTeam?.nightSession, date, persons, actions]
   );
 
@@ -854,7 +856,8 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
             },
             currentTeam?.nightSession ? 12 : 0
           )
-        ),
+        )
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
     [allPassages, currentTeam._id, currentTeam?.nightSession, date]
   );
 
@@ -965,7 +968,8 @@ const RencontresCreatedAt = ({ date, onUpdateResults = () => null }) => {
             },
             currentTeam?.nightSession ? 12 : 0
           )
-        ),
+        )
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
     [allRencontres, currentTeam._id, currentTeam?.nightSession, date]
   );
 
@@ -1118,7 +1122,8 @@ const PersonCreatedAt = ({ date, onUpdateResults = () => null }) => {
     () =>
       persons
         .filter((o) => (o.assignedTeams || []).includes(currentTeam._id))
-        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0)),
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0))
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
     [currentTeam._id, currentTeam?.nightSession, date, persons]
   );
 
