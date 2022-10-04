@@ -55,7 +55,7 @@
   },
   "scripts": {
     "dev": "react-scripts start -FAST_REFRESH=true && node scripts/sentry.js",
-    "build": "react-scripts build && node scripts/sentry.js",
+    "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
