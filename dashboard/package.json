@@ -46,6 +46,7 @@
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
+    "@sentry/cli": "^2.6.0",
     "buffer": "^6.0.3",
     "crypto": "npm:crypto-browserify",
     "path": "npm:path-browserify",
@@ -53,8 +54,8 @@
     "stream": "npm:stream-browserify"
   },
   "scripts": {
-    "dev": "react-scripts start -FAST_REFRESH=true",
-    "build": "react-scripts build",
+    "dev": "react-scripts start -FAST_REFRESH=true && node scripts/sentry.js",
+    "build": "react-scripts build && node scripts/sentry.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

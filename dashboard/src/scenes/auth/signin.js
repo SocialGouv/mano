@@ -253,6 +253,12 @@ const SignIn = () => {
                   {!!showErrors && <p style={{ fontSize: 12, color: 'rgb(253, 49, 49)' }}>{errors.password}</p>}
                 </StyledFormGroup>
               )}
+              <button
+                onClick={() => {
+                  throw new Error('test sentry');
+                }}>
+                werreur
+              </button>
               <Submit loading={isSubmitting} type="submit" color="primary" title="Se connecter" />
               {!!authViaCookie && <ChangeUserButton color="link" title="Me connecter avec un autre utilisateur" onClick={onLogout} type="button" />}
               <p
