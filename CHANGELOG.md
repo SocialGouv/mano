@@ -1,3 +1,10 @@
+## [1.161.2](https://github.com/SocialGouv/mano/compare/v1.161.1...v1.161.2) (2022-10-04)
+
+
+### Bug Fixes
+
+* **dashboard:** sort items in dashboard ([#917](https://github.com/SocialGouv/mano/issues/917)) ([119d948](https://github.com/SocialGouv/mano/commit/119d948c6218fd5c890eb64471af30641d6b9efe))
+
 ## [1.161.1](https://github.com/SocialGouv/mano/compare/v1.161.0...v1.161.1) (2022-10-04)
 
 
