@@ -1,4 +1,3 @@
-ARG SENTRY_AUTH_TOKEN
 FROM node:14-alpine as builder
 
 RUN apk add --no-cache gcc autoconf automake build-base libpng-dev nasm
@@ -15,6 +14,7 @@ RUN yarn --frozen-lockfile
 COPY dashboard/. .
 
 ENV NODE_ENV=production
+ARG SENTRY_AUTH_TOKEN
 ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 ENV SENTRY_ORG=incubateur
 ENV SENTRY_URL=https://sentry.fabrique.social.gouv.fr/

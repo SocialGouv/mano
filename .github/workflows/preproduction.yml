@@ -42,6 +42,7 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           imageName: mano/dashboard
           dockerfile: dashboard/Dockerfile
+          dockerbuildargs: SENTRY_AUTH_TOKEN=${{ secrets.SENTRY_AUTH_TOKEN }}
           dockercontext: .
 
   ##############################################################################
