@@ -1,3 +1,10 @@
+## [1.161.3](https://github.com/SocialGouv/mano/compare/v1.161.2...v1.161.3) (2022-10-05)
+
+
+### Bug Fixes
+
+* **dashboard:**  sentry better integration + source map ([#918](https://github.com/SocialGouv/mano/issues/918)) ([016531e](https://github.com/SocialGouv/mano/commit/016531ecd04fdcecc922a01e59563b1fb1f70bca))
+
 ## [1.161.2](https://github.com/SocialGouv/mano/compare/v1.161.1...v1.161.2) (2022-10-04)
 
 
