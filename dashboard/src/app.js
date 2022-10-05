@@ -1,6 +1,9 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { RecoilRoot, useRecoilValue } from 'recoil';
-import { BrowserRouter as Router, Route, Switch, Redirect } from 'react-router-dom';
+import { Router, Switch, Redirect } from 'react-router-dom';
+import { createBrowserHistory } from 'history';
+import * as Sentry from '@sentry/react';
+import { BrowserTracing } from '@sentry/tracing';
 import { fr } from 'date-fns/esm/locale';
 import { registerLocale } from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -30,8 +33,42 @@ import ModalConfirm from './components/ModalConfirm';
 import DataLoader, { useDataLoader } from './components/DataLoader';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import SentryRoute from './components/Sentryroute';
+import { ENV, VERSION } from './config';
 
 registerLocale('fr', fr);
+
+const history = createBrowserHistory();
+
+if (ENV === 'production') {
+  Sentry.init({
+    dsn: 'https://e3eb487403dd4789b47cf6da857bb4bf@sentry.fabrique.social.gouv.fr/52',
+    environment: 'dashboard',
+    release: VERSION,
+    integrations: [
+      new BrowserTracing({
+        routingInstrumentation: Sentry.reactRouterV5Instrumentation(history),
+      }),
+    ],
+
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+    ignoreErrors: [
+      'Network request failed',
+      'Failed to fetch',
+      'NetworkError',
+      // ???
+      'withrealtime/messaging',
+      // This error seems to happen only in firefox and to be ignorable.
+      // The "fetch" failed because user has navigated.
+      // Since other browsers don't have this problem, we don't care about it,
+      // it may be a false positive.
+      'AbortError: The operation was aborted',
+    ],
+  });
+}
 
 const App = ({ resetRecoil }) => {
   const API = useApi();
@@ -58,10 +95,10 @@ const App = ({ resetRecoil }) => {
     <div className="main-container">
       <ToastContainer />
       <VersionOutdatedAlert />
-      <Router>
+      <Router history={history}>
         <ScrollToTop />
         <Switch>
-          <Route path="/auth" component={Auth} />
+          <SentryRoute path="/auth" component={Auth} />
           <RestrictedRoute path="/charte" component={Charte} />
           <RestrictedRoute path="/account" component={Account} />
           <RestrictedRoute path="/user" component={User} />
@@ -90,7 +127,7 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
   if (!!user && !user?.termsAccepted)
     return (
       <main className="main">
-        <Route {...rest} path="/auth" component={Charte} />
+        <SentryRoute {...rest} path="/auth" component={Charte} />
       </main>
     );
 
@@ -102,7 +139,7 @@ const RestrictedRoute = ({ component: Component, _isLoggedIn, ...rest }) => {
       <div className="main">
         {!!user && !['superadmin'].includes(user.role) && <Drawer />}
         <main className="main-content">
-          <Route {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
+          <SentryRoute {...rest} render={(props) => (user ? <Component {...props} /> : <Redirect to={{ pathname: '/auth' }} />)} />
         </main>
       </div>
     </>
