@@ -42,7 +42,7 @@ const Consultation = ({ navigation, route }) => {
       const consultationTypeCustomFields = consult?.type
         ? organisation.consultations.find((c) => c?.name === consult?.type)?.fields
         : organisation.consultations[0].fields;
-      const encryptedFieldsIncludingCustom = [...consultationTypeCustomFields.map((f) => f.name), ...encryptedFields];
+      const encryptedFieldsIncludingCustom = [...(consultationTypeCustomFields?.map((f) => f.name) || []), ...encryptedFields];
       for (const field of encryptedFieldsIncludingCustom) {
         toReturn[field] = cleanValue(consult[field]);
       }
@@ -52,14 +52,14 @@ const Consultation = ({ navigation, route }) => {
         type: consult.type || '',
         status: consult.status || TODO,
         dueAt: consult.dueAt || null,
-        person: consult.person || personDB._id,
+        person: consult.person || personDB?._id,
         completedAt: consult.completedAt || null,
         onlyVisibleBy: consult.onlyVisibleBy || [],
         user: consult.user || user._id,
         organisation: consult.organisation || organisation._id,
       };
     },
-    [organisation._id, organisation.consultations, personDB._id, user._id]
+    [organisation._id, organisation.consultations, personDB?._id, user._id]
   );
 
   const [posting, setPosting] = useState(false);
