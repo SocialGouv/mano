@@ -92,7 +92,8 @@ const View = () => {
             { referenceStartDay: report.date, referenceEndDay: report.date },
             currentTeam?.nightSession ? 12 : 0
           )
-        ),
+        )
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
     [allPassages, currentTeam._id, currentTeam?.nightSession, report.date]
   );
 
@@ -133,7 +134,8 @@ const View = () => {
     () =>
       allConsultations
         ?.filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } }))
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
     [allConsultations, currentTeam?.nightSession, report.date]
   );
 
@@ -162,7 +164,8 @@ const View = () => {
         .map((a) => {
           if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
           return a;
-        }),
+        })
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
     [allComments, currentTeam._id, currentTeam?.nightSession, allPersons, allActions, report.date]
   );
 
@@ -180,7 +183,8 @@ const View = () => {
             },
             currentTeam?.nightSession ? 12 : 0
           )
-        ),
+        )
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
     [allRencontres, currentTeam._id, currentTeam?.nightSession, report.date]
   );
 
@@ -197,7 +201,8 @@ const View = () => {
     () =>
       allPersons
         .filter((o) => (o.assignedTeams || []).includes(currentTeam._id))
-        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, report.date, currentTeam?.nightSession ? 12 : 0)),
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
     [currentTeam._id, currentTeam?.nightSession, report.date, allPersons]
   );
 
