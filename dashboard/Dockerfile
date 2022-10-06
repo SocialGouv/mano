@@ -14,8 +14,13 @@ RUN yarn --frozen-lockfile
 COPY dashboard/. .
 
 ENV NODE_ENV=production
+ARG SENTRY_AUTH_TOKEN
+ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
+ENV SENTRY_ORG=incubateur
+ENV SENTRY_URL=https://sentry.fabrique.social.gouv.fr/
+ENV SENTRY_PROJECT=mano
 
-RUN yarn build
+RUN yarn build && node scripts/sentry.js
 
 FROM ghcr.io/socialgouv/docker/nginx4spa:7.0.1
 

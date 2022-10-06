@@ -1,3 +1,24 @@
+## [1.161.3](https://github.com/SocialGouv/mano/compare/v1.161.2...v1.161.3) (2022-10-05)
+
+
+### Bug Fixes
+
+* **dashboard:**  sentry better integration + source map ([#918](https://github.com/SocialGouv/mano/issues/918)) ([016531e](https://github.com/SocialGouv/mano/commit/016531ecd04fdcecc922a01e59563b1fb1f70bca))
+
+## [1.161.2](https://github.com/SocialGouv/mano/compare/v1.161.1...v1.161.2) (2022-10-04)
+
+
+### Bug Fixes
+
+* **dashboard:** sort items in dashboard ([#917](https://github.com/SocialGouv/mano/issues/917)) ([119d948](https://github.com/SocialGouv/mano/commit/119d948c6218fd5c890eb64471af30641d6b9efe))
+
+## [1.161.1](https://github.com/SocialGouv/mano/compare/v1.161.0...v1.161.1) (2022-10-04)
+
+
+### Bug Fixes
+
+* **dashboard:** show name in consultation + search by place + show birth date ([#916](https://github.com/SocialGouv/mano/issues/916)) ([a715aa0](https://github.com/SocialGouv/mano/commit/a715aa02e7a5609dc45e724ad01bf4a7ee8cc21b))
+
 # [1.161.0](https://github.com/SocialGouv/mano/compare/v1.160.0...v1.161.0) (2022-09-30)
 
 

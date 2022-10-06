@@ -1,12 +1,13 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
+import SentryRoute from '../../components/Sentryroute';
 
 import View from './view';
 
 const Router = () => {
   return (
     <Switch>
-      <Route path="/reception" component={View} />
+      <SentryRoute path="/reception" component={View} />
     </Switch>
   );
 };

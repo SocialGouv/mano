@@ -37,7 +37,7 @@ const personsPopulatedWithFormattedBirthDateSelector = selector({
     const persons = get(personsWithMedicalFileMergedSelector);
     const personsWithBirthdateFormatted = persons.map((person) => ({
       ...person,
-      birthDate: formatBirthDate(person.birthDate),
+      formattedBirthDate: formatBirthDate(person.birthdate),
     }));
     return personsWithBirthdateFormatted;
   },

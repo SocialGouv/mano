@@ -1,5 +1,6 @@
 import React from 'react';
-import { Switch, Route } from 'react-router-dom';
+import { Switch } from 'react-router-dom';
+import SentryRoute from '../../components/Sentryroute';
 
 import List from './list';
 import View from './view';
@@ -7,8 +8,8 @@ import View from './view';
 const Router = () => {
   return (
     <Switch>
-      <Route path="/place/:id" component={View} />
-      <Route path="/" component={List} />
+      <SentryRoute path="/place/:id" component={View} />
+      <SentryRoute path="/" component={List} />
     </Switch>
   );
 };
