@@ -1,3 +1,10 @@
+# [1.162.0](https://github.com/SocialGouv/mano/compare/v1.161.3...v1.162.0) (2022-10-10)
+
+
+### Features
+
+* **app,dashboard:**  search show words starting by search first ([#915](https://github.com/SocialGouv/mano/issues/915)) ([4fb65de](https://github.com/SocialGouv/mano/commit/4fb65de1a7168ab907751882409a0460ead7ac7e))
+
 ## [1.161.3](https://github.com/SocialGouv/mano/compare/v1.161.2...v1.161.3) (2022-10-05)
 
 
