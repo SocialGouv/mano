@@ -1,3 +1,10 @@
+## [1.162.1](https://github.com/SocialGouv/mano/compare/v1.162.0...v1.162.1) (2022-10-10)
+
+
+### Bug Fixes
+
+* add created by for treeatments ([5e7bd76](https://github.com/SocialGouv/mano/commit/5e7bd76c6e6581c9791f8deac0210ec7ee50dddd))
+
 # [1.162.0](https://github.com/SocialGouv/mano/compare/v1.161.3...v1.162.0) (2022-10-10)
 
 
