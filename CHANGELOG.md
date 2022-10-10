@@ -1,3 +1,10 @@
+## [1.162.2](https://github.com/SocialGouv/mano/compare/v1.162.1...v1.162.2) (2022-10-10)
+
+
+### Bug Fixes
+
+* MANO-2R ([5ada896](https://github.com/SocialGouv/mano/commit/5ada89685646fe213d84c0bd2d903c8b0f3b6f00))
+
 ## [1.162.1](https://github.com/SocialGouv/mano/compare/v1.162.0...v1.162.1) (2022-10-10)
 
 
