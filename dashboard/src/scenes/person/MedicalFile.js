@@ -363,6 +363,11 @@ export function MedicalFile({ person }) {
             },
           },
           {
+            title: 'Créé par',
+            dataKey: 'user',
+            render: (e) => (e.user ? users.find((u) => u._id === e.user)?.name : ''),
+          },
+          {
             title: 'Dates',
             dataKey: 'endDate',
             render: (e) => {
