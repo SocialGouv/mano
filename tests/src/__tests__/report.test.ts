@@ -72,7 +72,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Dossier de Ma première personne");
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Actions (0)" });
+    await expect(page).toClick("a", { text: "Actions (0)" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Créer une nouvelle action" });
     await expect(page).toFill("input#create-action-name", "Mon action");
@@ -121,7 +121,7 @@ Accéder au dossier`
     expect(await getInnerText("h5#passages-title")).toBe("3 passages");
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
-    await expect(page).toClick("button", { text: "Passages (1)" });
+    await expect(page).toClick("a", { text: "Passages (1)" });
   });
 
   it("should be able go in the report", async () => {
@@ -177,7 +177,7 @@ Accéder au dossier`
   });
 
   it("should be able to see passages in the report", async () => {
-    await expect(page).toClick("button", { text: "Passages (3)" });
+    await expect(page).toClick("a", { text: "Passages (3)" });
     await page.waitForTimeout(1000);
     expect(await getInnerText("span#report-passages-anonymous-count")).toBe(
       "2"
@@ -216,7 +216,7 @@ Accéder au dossier`
     await page.waitForTimeout(2000);
     await expect(page).toMatch("Mise à jour !");
     await expect(page).toClick("button.Toastify__close-button");
-    await expect(page).toClick("button", { text: "Retour" });
+    await expect(page).toClick("a", { text: "Retour" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Actions annulées (0)" });
     await expect(page).toClick("button", { text: "Actions créées (0)" });
@@ -248,7 +248,7 @@ Accéder au dossier`
     await expect(page).toClick("button.Toastify__close-button");
     await page.waitForTimeout(1000);
     await page.evaluate(`window.confirm = window.originalConfirm;`); // to put back the original behavior
-    await expect(page).toClick("button", { text: "Retour" });
+    await expect(page).toClick("a", { text: "Retour" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Actions complétées (0)" });
     await expect(page).toClick("button", { text: "Actions créées (0)" });
