@@ -7,7 +7,7 @@ import {
   personsState,
   preparePersonForEncryption,
 } from '../../recoil/persons';
-import { useRecoilState, useRecoilValue } from 'recoil';
+import { selector, useRecoilState, useRecoilValue } from 'recoil';
 import AsyncSelect from 'react-select/async-creatable';
 import useApi from '../../services/api';
 import { formatBirthDate, formatCalendarDate } from '../../services/date';
@@ -38,6 +38,27 @@ function personsToOptions(persons, actions, passages, rencontres) {
   }));
 }
 
+const searchablePersonsSelector = selector({
+  key: 'searchablePersonsSelector',
+  get: ({ get }) => {
+    const persons = get(personsState);
+    return persons.map((person) => {
+      return {
+        ...person,
+        searchString: [removeDiatricsAndAccents(person.name), formatBirthDate(person.birthdate)].join(' ').toLowerCase(),
+      };
+    });
+  },
+});
+
+const filterEasySearch = (search, items = []) => {
+  search = removeDiatricsAndAccents(search.toLocaleLowerCase());
+  const firstItems = items.filter((item) => item.searchString.startsWith(search));
+  const firstItemsIds = new Set(firstItems.map((item) => item._id));
+  const secondItems = items.filter((item) => !firstItemsIds.has(item._id)).filter((item) => item.searchString.includes(search));
+  return [...firstItems, ...secondItems];
+};
+
 const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, classNamePrefix }) => {
   const [persons, setPersons] = useRecoilState(personsState);
   const actions = useRecoilValue(actionsState);
@@ -48,14 +69,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
   const API = useApi();
   const optionsExist = useRef(null);
 
-  const searchablePersons = useMemo(() => {
-    return persons.map((person) => {
-      return {
-        ...person,
-        searchString: [removeDiatricsAndAccents(person.name), formatBirthDate(person.birthdate)].join(' '),
-      };
-    });
-  }, [persons]);
+  const searchablePersons = useRecoilValue(searchablePersonsSelector);
 
   const lastActions = useMemo(() => {
     return Object.values(
@@ -107,13 +121,8 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
   return (
     <AsyncSelect
       loadOptions={(inputValue) => {
-        const formattedInputValue = removeDiatricsAndAccents(inputValue);
-        const options = personsToOptions(
-          searchablePersons.filter((person) => person.searchString.includes(formattedInputValue)),
-          lastActions,
-          lastPassages,
-          lastRencontres
-        );
+        const formattedInputValue = removeDiatricsAndAccents(inputValue).toLowerCase();
+        const options = personsToOptions(filterEasySearch(formattedInputValue, searchablePersons), lastActions, lastPassages, lastRencontres);
         optionsExist.current = options.length;
         return Promise.resolve(options);
       }}

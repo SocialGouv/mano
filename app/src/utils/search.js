@@ -28,15 +28,18 @@ const prepareItemForSearch = (item) => {
 };
 
 export const filterBySearch = (search, items = []) => {
-  search = search.toLocaleLowerCase().trim();
-  const firstItems = items.filter((item) => item?.name?.toLocaleLowerCase().includes(search));
-  const firstItemsIds = firstItems.map((item) => item._id);
+  search = search.toLocaleLowerCase();
+  const firstItems = items.filter((item) => item?.name?.toLocaleLowerCase().startsWith(search));
+  const firstItemsIds = new Set(firstItems.map((item) => item._id));
+  const secondItems = items.filter((item) => !firstItemsIds.has(item._id)).filter((item) => item?.name?.toLocaleLowerCase().includes(search));
+  const secondItemsIds = new Set(firstItems.map((item) => item._id));
   const lastItems = items
-    .filter((item) => !firstItemsIds.includes(item._id))
+    .filter((item) => !firstItemsIds.has(item._id))
+    .filter((item) => !secondItemsIds.has(item._id))
     .filter((item) => {
       const stringifiedItem = JSON.stringify(prepareItemForSearch(item));
       return stringifiedItem.toLocaleLowerCase().includes(search);
     });
 
-  return [...firstItems, ...lastItems];
+  return [...firstItems, ...secondItems, ...lastItems];
 };
