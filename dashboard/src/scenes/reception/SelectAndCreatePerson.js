@@ -143,7 +143,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
             body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name }),
           });
           if (personResponse.ok) {
-            setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => p1.name.localeCompare(p2.name)));
+            setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => (p1?.name || '').localeCompare(p2?.name || '')));
             toast.success('Nouvelle personne ajoutée !');
             onChange([...value, personResponse.decryptedData]);
           }
