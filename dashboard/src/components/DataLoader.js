@@ -381,7 +381,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
 }
 
 function mergeItems(oldItems, newItems) {
-  const newItemsIds = newItems.map((i) => i._id);
+  const newItemsIds = newItems?.map((i) => i._id) || [];
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
   return [...oldItemsPurged, ...newItems].filter((e) => !e.deletedAt);
 }
