@@ -161,7 +161,7 @@ Accéder au dossier`
   });
 
   it("should be able to modify services in the report", async () => {
-    await expect(page).toClick("button#report-button-Accueil");
+    await expect(page).toClick("button#report-button-reception");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("1");
     await page.waitForTimeout(1000);
