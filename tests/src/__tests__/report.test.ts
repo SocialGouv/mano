@@ -16,7 +16,7 @@ dayjs.extend(utc);
 dayjs.locale("fr");
 
 jest.setTimeout(120000);
-setDefaultOptions({ timeout: 100000 });
+setDefaultOptions({ timeout: 10000 });
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {
@@ -161,7 +161,7 @@ Accéder au dossier`
   });
 
   it("should be able to modify services in the report", async () => {
-    await expect(page).toClick("button#report-button-reception");
+    await expect(page).toClick("a#report-button-reception");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("1");
     await page.waitForTimeout(1000);
