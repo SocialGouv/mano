@@ -1,3 +1,10 @@
+## [1.163.2](https://github.com/SocialGouv/mano/compare/v1.163.1...v1.163.2) (2022-10-14)
+
+
+### Bug Fixes
+
+* zindex ([29fc0c0](https://github.com/SocialGouv/mano/commit/29fc0c0e323f9c24a47f906ae1dd6e176529e73a))
+
 ## [1.163.1](https://github.com/SocialGouv/mano/compare/v1.163.0...v1.163.1) (2022-10-14)
 
 
