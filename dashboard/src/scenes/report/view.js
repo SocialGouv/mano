@@ -1,7 +1,7 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Col, Row, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useHistory, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import {
@@ -55,23 +55,6 @@ import { useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 
-const tabs = [
-  'Résumé',
-  'Accueil',
-  'Actions complétées',
-  'Actions créées',
-  'Actions annulées',
-  'Commentaires',
-  'Passages',
-  'Rencontres',
-  'Observations',
-  'Personnes créées',
-];
-const healthcareTabs = ['Consultations faites', 'Consultations créées', 'Consultations annulées'];
-const tabsForRestrictedRole = ['Accueil', 'Passages', 'Rencontres'];
-const spaceAfterTab = [0, 1, 4, 5, 7, 8, 9];
-const tabsWithHealth = [...tabs, ...healthcareTabs];
-
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
   const nextDay = addOneDay(date);
@@ -83,22 +66,175 @@ const View = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const allComments = useRecoilValue(commentsState);
+  const allPersons = useRecoilValue(personsState);
   const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
   const setReports = useSetRecoilState(reportsState);
-  const location = useLocation();
   const history = useHistory();
-  const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(Number(searchParams.get('tab') || (['restricted-access'].includes(user.role) ? 1 : 0)));
-  const [tabsContents, setTabsContents] = useState(user.healthcareProfessional ? tabsWithHealth : tabs);
+  const [activeTab, setActiveTab] = useState(['restricted-access'].includes(user.role) ? 'reception' : 'resume');
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
-
   const reportDoesntExist = id.startsWith('new__');
   const report = useMemo(() => {
     if (reportDoesntExist) return { team: currentTeam._id, date: id.replace('new__', '') };
     return currentTeamReports.find((r) => r._id === id);
   }, [currentTeam._id, currentTeamReports, id, reportDoesntExist]);
+
+  const allPassages = useRecoilValue(passagesState);
+  const passages = useMemo(
+    () =>
+      allPassages
+        .filter((p) => p.team === currentTeam._id)
+        .filter((p) =>
+          getIsDayWithinHoursOffsetOfPeriod(
+            p.date,
+            { referenceStartDay: report.date, referenceEndDay: report.date },
+            currentTeam?.nightSession ? 12 : 0
+          )
+        )
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
+    [allPassages, currentTeam._id, currentTeam?.nightSession, report.date]
+  );
+
+  const allActions = useRecoilValue(actionsState);
+  const actionsCallback = useCallback(
+    (status) =>
+      allActions
+        ?.filter((a) => a.team === currentTeam._id)
+        .filter((a) => a.status === status)
+        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, report.date, currentTeam?.nightSession ? 12 : 0)),
+    [allActions, currentTeam._id, currentTeam?.nightSession, report.date]
+  );
+  const actionsDone = useMemo(() => actionsCallback(DONE), [actionsCallback]);
+  const actionsCancel = useMemo(() => actionsCallback(CANCEL), [actionsCallback]);
+
+  const actionsCreatedAt = useMemo(
+    () =>
+      allActions
+        ?.filter((a) => a.team === currentTeam._id)
+        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, report.date, currentTeam?.nightSession ? 12 : 0)),
+    [allActions, currentTeam?._id, currentTeam?.nightSession, report.date]
+  );
+
+  const allConsultations = useRecoilValue(consultationsState);
+  const consultations = useCallback(
+    (status) =>
+      allConsultations
+        ?.filter((c) => c.status === status)
+        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.completedAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
+    [allConsultations, currentTeam?.nightSession, report.date]
+  );
+  const consultationsDone = useMemo(() => consultations(DONE), [consultations]);
+  const consultationsCancel = useMemo(() => consultations(CANCEL), [consultations]);
+
+  const consultationsCreatedAt = useMemo(
+    () =>
+      allConsultations
+        ?.filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } }))
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
+    [allConsultations, currentTeam?.nightSession, report.date]
+  );
+
+  const comments = useMemo(
+    () =>
+      allComments
+        .filter((c) => c.team === currentTeam._id)
+        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        .map((comment) => {
+          const commentPopulated = { ...comment };
+          if (comment.person) {
+            const id = comment?.person;
+            commentPopulated.person = allPersons.find((p) => p._id === id);
+            commentPopulated.type = 'person';
+          }
+          if (comment.action) {
+            const id = comment?.action;
+            const action = allActions.find((p) => p._id === id);
+            commentPopulated.action = action;
+            commentPopulated.person = allPersons.find((p) => p._id === action?.person);
+            commentPopulated.type = 'action';
+          }
+          return commentPopulated;
+        })
+        .filter((c) => c.action || c.person)
+        .map((a) => {
+          if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+          return a;
+        })
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
+    [allComments, currentTeam._id, currentTeam?.nightSession, allPersons, allActions, report.date]
+  );
+
+  const allRencontres = useRecoilValue(rencontresState);
+  const rencontres = useMemo(
+    () =>
+      allRencontres
+        .filter((p) => p.team === currentTeam._id)
+        .filter((p) =>
+          getIsDayWithinHoursOffsetOfPeriod(
+            p.date,
+            {
+              referenceStartDay: report.date,
+              referenceEndDay: report.date,
+            },
+            currentTeam?.nightSession ? 12 : 0
+          )
+        )
+        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
+    [allRencontres, currentTeam._id, currentTeam?.nightSession, report.date]
+  );
+
+  const territoryObservations = useRecoilValue(territoryObservationsState);
+  const observations = useMemo(
+    () =>
+      territoryObservations
+        .filter((o) => o.team === currentTeam._id)
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, report.date, currentTeam?.nightSession ? 12 : 0)),
+    [currentTeam._id, currentTeam?.nightSession, report.date, territoryObservations]
+  );
+
+  const persons = useMemo(
+    () =>
+      allPersons
+        .filter((o) => (o.assignedTeams || []).includes(currentTeam._id))
+        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
+    [currentTeam._id, currentTeam?.nightSession, report.date, allPersons]
+  );
+
+  const total = useMemo(
+    () =>
+      passages.length +
+      actionsDone.length +
+      actionsCancel.length +
+      consultationsDone.length +
+      consultationsCancel.length +
+      comments.length +
+      rencontres.length +
+      observations.length +
+      persons.length,
+    [
+      passages.length,
+      actionsDone.length,
+      actionsCancel.length,
+      consultationsDone.length,
+      consultationsCancel.length,
+      comments.length,
+      rencontres.length,
+      observations.length,
+      persons.length,
+    ]
+  );
+
+  useEffect(() => {
+    if (total > 0 && !report?._id && report.date) {
+      createReportAtDateIfNotExist(report.date);
+    }
+  }, [total, report, createReportAtDateIfNotExist]);
 
   useTitle(report?.date ? `${dayjs(report.date).format('DD-MM-YYYY')} - Compte rendu` : 'Compte rendu');
 
@@ -126,11 +262,6 @@ const View = () => {
         history.goBack();
       }
     }
-  };
-
-  const updateTabContent = (tabIndex, total) => {
-    setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? `${tabsWithHealth[tabIndex]} (${total})` : c)));
-    if (total > 0 && !report?._id && report.date) createReportAtDateIfNotExist(report.date);
   };
 
   useEffect(() => {
@@ -168,20 +299,20 @@ const View = () => {
         <Reception report={report} />
         {!['restricted-access'].includes(user.role) && (
           <>
-            <ActionCompletedAt date={report.date} status={DONE} />
-            <ActionCreatedAt date={report.date} />
-            <ActionCompletedAt date={report.date} status={CANCEL} />
-            <CommentCreatedAt date={report.date} />
+            <ActionCompletedAt date={report.date} status={DONE} actions={actionsDone} />
+            <ActionCreatedAt date={report.date} actions={actionsCreatedAt} />
+            <ActionCompletedAt date={report.date} status={CANCEL} actions={actionsCancel} />
+            <CommentCreatedAt date={report.date} comments={comments} />
           </>
         )}
-        <PassagesCreatedAt date={report.date} report={report} />
-        <RencontresCreatedAt date={report.date} report={report} />
+        <PassagesCreatedAt date={report.date} report={report} passages={passages} />
+        <RencontresCreatedAt date={report.date} report={report} rencontres={rencontres} />
         {!['restricted-access'].includes(user.role) && (
           <>
-            <TerritoryObservationsCreatedAt date={report.date} />
-            {!!user.healthcareProfessional && <Consultations date={report.date} />}
-            {!!user.healthcareProfessional && <ConsultationsCreatedAt date={report.date} />}
-            {!!user.healthcareProfessional && <Consultations date={report.date} status={CANCEL} />}
+            <TerritoryObservationsCreatedAt date={report.date} observations={observations} />
+            {!!user.healthcareProfessional && <Consultations date={report.date} consultations={consultationsDone} />}
+            {!!user.healthcareProfessional && <ConsultationsCreatedAt date={report.date} consultations={consultationsCreatedAt} />}
+            {!!user.healthcareProfessional && <Consultations date={report.date} status={CANCEL} consultations={consultationsCancel} />}
           </>
         )}
       </div>
@@ -233,32 +364,98 @@ const View = () => {
         style={{ height: '100%', display: 'flex', overflow: 'hidden', flex: 1, marginTop: '1rem', borderTop: '1px solid #eee' }}>
         <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
           <Drawer title="Navigation dans les catégories du compte-rendu">
-            {tabsContents.map((tabCaption, index) => {
-              if (!organisation.receptionEnabled && index === 1) return null;
-              if (['restricted-access'].includes(user.role)) {
-                let showTab = false;
-                for (const authorizedTab of tabsForRestrictedRole) {
-                  if (tabCaption.includes(authorizedTab)) showTab = true;
-                }
-                if (!showTab) return null;
-              }
-              return (
-                <React.Fragment key={index + tabCaption}>
-                  <DrawerLink
-                    id={`report-button-${tabCaption}`}
-                    className={activeTab === index ? 'active' : ''}
-                    onClick={() => {
-                      const searchParams = new URLSearchParams(location.search);
-                      searchParams.set('tab', index);
-                      history.replace({ pathname: location.pathname, search: searchParams.toString() });
-                      setActiveTab(index);
-                    }}>
-                    {tabCaption}
-                  </DrawerLink>
-                  {spaceAfterTab.includes(index) && <hr />}
-                </React.Fragment>
-              );
-            })}
+            {!['restricted-access'].includes(user.role) && (
+              <>
+                <DrawerLink id="report-button-resume" className={activeTab === 'resume' ? 'active' : ''} onClick={() => setActiveTab('resume')}>
+                  Résumé
+                </DrawerLink>
+                <hr />
+              </>
+            )}
+            <DrawerLink id="report-button-reception" className={activeTab === 'reception' ? 'active' : ''} onClick={() => setActiveTab('reception')}>
+              Accueil
+            </DrawerLink>
+            {!['restricted-access'].includes(user.role) && (
+              <>
+                <hr />
+                <DrawerLink
+                  id="report-button-action-completed"
+                  className={activeTab === 'action-completed' ? 'active' : ''}
+                  onClick={() => setActiveTab('action-completed')}>
+                  Actions complétées ({actionsDone.length})
+                </DrawerLink>
+                <DrawerLink
+                  id="report-button-action-created"
+                  className={activeTab === 'action-created' ? 'active' : ''}
+                  onClick={() => setActiveTab('action-created')}>
+                  Actions créées ({actionsCreatedAt.length})
+                </DrawerLink>
+                <DrawerLink
+                  id="report-button-action-cancelled"
+                  className={activeTab === 'action-cancelled' ? 'active' : ''}
+                  onClick={() => setActiveTab('action-cancelled')}>
+                  Actions annulées ({actionsCancel.length})
+                </DrawerLink>
+                <hr />
+                <DrawerLink
+                  id="report-button-comment-created"
+                  className={activeTab === 'comment-created' ? 'active' : ''}
+                  onClick={() => setActiveTab('comment-created')}>
+                  Commentaires ({comments.length})
+                </DrawerLink>
+                <hr />
+              </>
+            )}
+            <DrawerLink id="report-button-passages" className={activeTab === 'passages' ? 'active' : ''} onClick={() => setActiveTab('passages')}>
+              Passages ({passages.length})
+            </DrawerLink>
+            <DrawerLink
+              id="report-button-rencontres"
+              className={activeTab === 'rencontres' ? 'active' : ''}
+              onClick={() => setActiveTab('rencontres')}>
+              Rencontres ({rencontres.length})
+            </DrawerLink>
+            {!['restricted-access'].includes(user.role) && (
+              <>
+                <hr />
+                <DrawerLink
+                  id="report-button-territory-observations"
+                  className={activeTab === 'territory-observations' ? 'active' : ''}
+                  onClick={() => setActiveTab('territory-observations')}>
+                  Observations ({observations.length})
+                </DrawerLink>
+                <hr />
+                <DrawerLink
+                  id="report-button-persons-created"
+                  className={activeTab === 'persons-created' ? 'active' : ''}
+                  onClick={() => setActiveTab('persons-created')}>
+                  Personnes créées ({persons.length})
+                </DrawerLink>
+              </>
+            )}
+            {!!user.healthcareProfessional && (
+              <>
+                <hr />
+                <DrawerLink
+                  id="report-button-consultations"
+                  className={activeTab === 'consultations' ? 'active' : ''}
+                  onClick={() => setActiveTab('consultations')}>
+                  Consultations faites ({consultationsCreatedAt.length})
+                </DrawerLink>
+                <DrawerLink
+                  id="report-button-consultations-created"
+                  className={activeTab === 'consultations-created' ? 'active' : ''}
+                  onClick={() => setActiveTab('consultations-created')}>
+                  Consultations créées ({consultationsDone.length})
+                </DrawerLink>
+                <DrawerLink
+                  id="report-button-consultations-cancelled"
+                  className={activeTab === 'consultations-cancelled' ? 'active' : ''}
+                  onClick={() => setActiveTab('consultations-cancelled')}>
+                  Consultations annulées ({consultationsCancel.length})
+                </DrawerLink>
+              </>
+            )}
           </Drawer>
           <div
             ref={scrollContainer}
@@ -271,58 +468,70 @@ const View = () => {
               padding: '15px 25px 0px',
               backgroundColor: '#fff',
             }}>
-            {!['restricted-access'].includes(user.role) && (
-              <div style={activeTab !== 0 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <DescriptionAndCollaborations report={report} key={report._id} />
+            {activeTab === 'resume' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <DescriptionAndCollaborations report={report} />
               </div>
             )}
-            <div style={activeTab !== 1 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <Reception report={report} />
-            </div>
-            {!['restricted-access'].includes(user.role) && (
-              <>
-                <div style={activeTab !== 2 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCompletedAt date={report.date} status={DONE} onUpdateResults={(total) => updateTabContent(2, total)} />
-                </div>
-                <div style={activeTab !== 3 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(3, total)} />
-                </div>
-                <div style={activeTab !== 4 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <ActionCompletedAt date={report.date} status={CANCEL} onUpdateResults={(total) => updateTabContent(4, total)} />
-                </div>
-                <div style={activeTab !== 5 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <CommentCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(5, total)} />
-                </div>
-              </>
+            {activeTab === 'reception' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <Reception report={report} />
+              </div>
             )}
-            <div style={activeTab !== 6 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <PassagesCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(6, total)} />
-            </div>
-            <div style={activeTab !== 7 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-              <RencontresCreatedAt date={report.date} report={report} onUpdateResults={(total) => updateTabContent(7, `Rencontres (${total})`)} />
-            </div>
-            {!['restricted-access'].includes(user.role) && (
-              <>
-                <div style={activeTab !== 8 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <TerritoryObservationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(8, total)} />
-                </div>
-                <div style={activeTab !== 9 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                  <PersonCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(9, total)} />
-                </div>
-                {!!user.healthcareProfessional && (
-                  <>
-                    <div style={activeTab !== 10 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(10, total)} status={DONE} />
-                    </div>
-                    <div style={activeTab !== 11 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <ConsultationsCreatedAt date={report.date} onUpdateResults={(total) => updateTabContent(11, total)} />
-                    </div>
-                    <div style={activeTab !== 12 ? { display: 'none' } : { overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                      <Consultations date={report.date} onUpdateResults={(total) => updateTabContent(12, total)} status={CANCEL} />
-                    </div>
-                  </>
-                )}
-              </>
+            {activeTab === 'action-completed' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <ActionCompletedAt date={report.date} status={DONE} actions={actionsDone} />
+              </div>
+            )}
+            {activeTab === 'action-created' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <ActionCreatedAt date={report.date} actions={actionsCreatedAt} />
+              </div>
+            )}
+            {activeTab === 'action-cancelled' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <ActionCompletedAt date={report.date} status={CANCEL} actions={actionsCancel} />
+              </div>
+            )}
+            {activeTab === 'comment-created' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <CommentCreatedAt date={report.date} comments={comments} />
+              </div>
+            )}
+            {activeTab === 'passages' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <PassagesCreatedAt date={report.date} report={report} passages={passages} />
+              </div>
+            )}
+            {activeTab === 'rencontres' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <RencontresCreatedAt date={report.date} report={report} rencontres={rencontres} />
+              </div>
+            )}
+            {activeTab === 'territory-observations' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <TerritoryObservationsCreatedAt date={report.date} report={report} observations={observations} />
+              </div>
+            )}
+            {activeTab === 'persons-created' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <PersonCreatedAt date={report.date} report={report} persons={persons} />
+              </div>
+            )}
+            {activeTab === 'consultations' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <Consultations date={report.date} status={DONE} consultations={consultationsDone} />
+              </div>
+            )}
+            {activeTab === 'consultations-created' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <ConsultationsCreatedAt date={report.date} consultations={consultationsCreatedAt} />
+              </div>
+            )}
+            {activeTab === 'consultations-cancelled' && (
+              <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
+                <Consultations date={report.date} status={CANCEL} consultations={consultationsCancel} />
+              </div>
             )}
           </div>
         </div>
@@ -340,10 +549,8 @@ const View = () => {
 
 const Reception = ({ report }) => {
   const organisation = useRecoilValue(organisationState);
-
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
-
   const services = report?.services?.length ? JSON.parse(report?.services) : {};
 
   const onServiceUpdate = async (service, newCount) => {
@@ -413,25 +620,10 @@ const ServicesWrapper = styled.div`
   }
 `;
 
-const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
+const ActionCompletedAt = ({ date, status, actions }) => {
+  const data = actions;
   const history = useHistory();
-  const currentTeam = useRecoilValue(currentTeamState);
-  const allActions = useRecoilValue(actionsState);
-
   const [modalOpen, setModalOpen] = useState(false);
-  const data = useMemo(
-    () =>
-      allActions
-        ?.filter((a) => a.team === currentTeam._id)
-        .filter((a) => a.status === status)
-        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0)),
-    [allActions, currentTeam._id, currentTeam?.nightSession, status, date]
-  );
-
-  useEffect(() => {
-    onUpdateResults(data.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.length]);
 
   if (!data) return <div />;
 
@@ -498,25 +690,9 @@ const ActionCompletedAt = ({ date, status, onUpdateResults = () => null }) => {
   );
 };
 
-const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
+const ActionCreatedAt = ({ date, actions }) => {
+  const data = actions;
   const history = useHistory();
-
-  const currentTeam = useRecoilValue(currentTeamState);
-  const actions = useRecoilValue(actionsState);
-
-  const data = useMemo(
-    () =>
-      actions
-        ?.filter((a) => a.team === currentTeam._id)
-        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-        .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, date, currentTeam?.nightSession ? 12 : 0)),
-    [date, actions, currentTeam?._id, currentTeam?.nightSession]
-  );
-
-  useEffect(() => {
-    onUpdateResults(data.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -564,26 +740,10 @@ const ActionCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const Consultations = ({ date, onUpdateResults = () => null, status }) => {
-  const history = useHistory();
-
-  const currentTeam = useRecoilValue(currentTeamState);
-  const consultations = useRecoilValue(consultationsState);
+const Consultations = ({ date, status, consultations }) => {
+  const data = consultations;
   const user = useRecoilValue(userState);
-
-  const data = useMemo(
-    () =>
-      consultations
-        ?.filter((c) => c.status === status)
-        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.completedAt, date, currentTeam?.nightSession ? 12 : 0))
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
-    [consultations, currentTeam?.nightSession, date, status]
-  );
-
-  useEffect(() => {
-    onUpdateResults(data.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.length]);
+  const history = useHistory();
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -636,26 +796,10 @@ const Consultations = ({ date, onUpdateResults = () => null, status }) => {
   );
 };
 
-const ConsultationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
+const ConsultationsCreatedAt = ({ date, consultations }) => {
+  const data = consultations;
   const history = useHistory();
-
-  const currentTeam = useRecoilValue(currentTeamState);
-  const consultations = useRecoilValue(consultationsState);
   const user = useRecoilValue(userState);
-
-  const data = useMemo(
-    () =>
-      consultations
-        ?.filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } }))
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [consultations, currentTeam?.nightSession, date]
-  );
-
-  useEffect(() => {
-    onUpdateResults(data.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -706,48 +850,9 @@ const ConsultationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
+const CommentCreatedAt = ({ date, comments }) => {
   const history = useHistory();
-
-  const comments = useRecoilValue(commentsState);
-  const persons = useRecoilValue(personsState);
-  const actions = useRecoilValue(actionsState);
-  const currentTeam = useRecoilValue(currentTeamState);
-
-  const data = useMemo(
-    () =>
-      comments
-        .filter((c) => c.team === currentTeam._id)
-        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-        .map((comment) => {
-          const commentPopulated = { ...comment };
-          if (comment.person) {
-            const id = comment?.person;
-            commentPopulated.person = persons.find((p) => p._id === id);
-            commentPopulated.type = 'person';
-          }
-          if (comment.action) {
-            const id = comment?.action;
-            const action = actions.find((p) => p._id === id);
-            commentPopulated.action = action;
-            commentPopulated.person = persons.find((p) => p._id === action?.person);
-            commentPopulated.type = 'action';
-          }
-          return commentPopulated;
-        })
-        .filter((c) => c.action || c.person)
-        .map((a) => {
-          if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
-          return a;
-        })
-        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [comments, currentTeam._id, currentTeam?.nightSession, date, persons, actions]
-  );
-
-  useEffect(() => {
-    onUpdateResults(data.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.length]);
+  const data = comments;
 
   if (!data) return <div />;
 
@@ -837,34 +942,10 @@ const CommentCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
-  const allPassages = useRecoilValue(passagesState);
+const PassagesCreatedAt = ({ date, passages }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const [passageToEdit, setPassageToEdit] = useState(null);
-
-  const passages = useMemo(
-    () =>
-      allPassages
-        .filter((p) => p.team === currentTeam._id)
-        .filter((p) =>
-          getIsDayWithinHoursOffsetOfPeriod(
-            p.date,
-            {
-              referenceStartDay: date,
-              referenceEndDay: date,
-            },
-            currentTeam?.nightSession ? 12 : 0
-          )
-        )
-        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allPassages, currentTeam._id, currentTeam?.nightSession, date]
-  );
-
-  useEffect(() => {
-    onUpdateResults(passages.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [passages.length]);
 
   const numberOfAnonymousPassages = useMemo(() => passages.filter((p) => !p.person)?.length, [passages]);
   const numberOfNonAnonymousPassages = useMemo(() => passages.filter((p) => !!p.person)?.length, [passages]);
@@ -949,34 +1030,10 @@ const PassagesCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const RencontresCreatedAt = ({ date, onUpdateResults = () => null }) => {
-  const allRencontres = useRecoilValue(rencontresState);
+const RencontresCreatedAt = ({ date, rencontres }) => {
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
-
-  const rencontres = useMemo(
-    () =>
-      allRencontres
-        .filter((p) => p.team === currentTeam._id)
-        .filter((p) =>
-          getIsDayWithinHoursOffsetOfPeriod(
-            p.date,
-            {
-              referenceStartDay: date,
-              referenceEndDay: date,
-            },
-            currentTeam?.nightSession ? 12 : 0
-          )
-        )
-        .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allRencontres, currentTeam._id, currentTeam?.nightSession, date]
-  );
-
-  useEffect(() => {
-    onUpdateResults(rencontres.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [rencontres.length]);
 
   const numberOfNonAnonymousRencontres = useMemo(() => rencontres.filter((p) => !!p.person)?.length, [rencontres]);
 
@@ -1052,26 +1109,11 @@ const RencontresCreatedAt = ({ date, onUpdateResults = () => null }) => {
   );
 };
 
-const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) => {
+const TerritoryObservationsCreatedAt = ({ date, observations }) => {
+  const data = observations;
+  const territories = useRecoilValue(territoriesState);
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
-
-  const currentTeam = useRecoilValue(currentTeamState);
-  const territories = useRecoilValue(territoriesState);
-  const territoryObservations = useRecoilValue(territoryObservationsState);
-
-  const data = useMemo(
-    () =>
-      territoryObservations
-        .filter((o) => o.team === currentTeam._id)
-        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, date, currentTeam?.nightSession ? 12 : 0)),
-    [currentTeam._id, currentTeam?.nightSession, date, territoryObservations]
-  );
-
-  useEffect(() => {
-    onUpdateResults(data.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -1113,24 +1155,9 @@ const TerritoryObservationsCreatedAt = ({ date, onUpdateResults = () => null }) 
   );
 };
 
-const PersonCreatedAt = ({ date, onUpdateResults = () => null }) => {
+const PersonCreatedAt = ({ date, persons }) => {
+  const data = persons;
   const history = useHistory();
-  const currentTeam = useRecoilValue(currentTeamState);
-  const persons = useRecoilValue(personsState);
-
-  const data = useMemo(
-    () =>
-      persons
-        .filter((o) => (o.assignedTeams || []).includes(currentTeam._id))
-        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, date, currentTeam?.nightSession ? 12 : 0))
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [currentTeam._id, currentTeam?.nightSession, date, persons]
-  );
-
-  useEffect(() => {
-    onUpdateResults(data.length);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.length]);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;

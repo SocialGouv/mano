@@ -80,7 +80,7 @@ describe("Organisation CRUD", () => {
       `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
     );
     await page.waitForTimeout(500);
-    await expect(page).toClick("a#report-button-Accueil");
+    await expect(page).toClick("a#report-button-reception");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("0");
     await page.waitForTimeout(500);
@@ -130,7 +130,7 @@ describe("Organisation CRUD", () => {
       `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
     );
     await page.waitForTimeout(500);
-    await expect(page).toClick("a#report-button-Accueil");
+    await expect(page).toClick("a#report-button-reception");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("0");
     expect(await getInputValue("input#Bain-count")).toBe("2");
@@ -145,7 +145,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);
-    await scrollDown();
+    await expect(page).toClick("a#report-button-reception");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("1");
     expect(await getInputValue("input#Bain-count")).toBe("3");
