@@ -145,7 +145,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(500);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);
-    await scrollDown();
+    await expect(page).toClick("a#report-button-reception");
     await page.waitForTimeout(1000);
     expect(await getInputValue("input#Café-count")).toBe("1");
     expect(await getInputValue("input#Bain-count")).toBe("3");
