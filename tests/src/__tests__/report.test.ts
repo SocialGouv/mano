@@ -190,14 +190,14 @@ Accéder au dossier`
   });
 
   it("should be able to see actions in the report", async () => {
-    await expect(page).toClick("button", { text: "Actions complétées (0)" });
-    await expect(page).toClick("button", { text: "Actions annulées (0)" });
-    await expect(page).toClick("button", { text: "Actions créées (1)" });
+    await expect(page).toClick("a", { text: "Actions complétées (0)" });
+    await expect(page).toClick("a", { text: "Actions annulées (0)" });
+    await expect(page).toClick("a", { text: "Actions créées (1)" });
   });
 
   it("should be able to see actions updated to DONE in the report", async () => {
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Actions créées (1)" });
+    await expect(page).toClick("a", { text: "Actions créées (1)" });
     await page.waitForTimeout(1000);
     await scrollDown();
     await page.waitForTimeout(1000);
@@ -218,15 +218,15 @@ Accéder au dossier`
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toClick("a", { text: "Retour" });
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Actions annulées (0)" });
-    await expect(page).toClick("button", { text: "Actions créées (0)" });
+    await expect(page).toClick("a", { text: "Actions annulées (0)" });
+    await expect(page).toClick("a", { text: "Actions créées (0)" });
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Actions complétées (1)" });
+    await expect(page).toClick("a", { text: "Actions complétées (1)" });
   });
 
   it("should be able to see actions updated to CANCELED in the report", async () => {
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Actions complétées (1)" });
+    await expect(page).toClick("a", { text: "Actions complétées (1)" });
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Mon action");
     await expect(page).toClick("td", { text: "Mon action" });
@@ -250,13 +250,13 @@ Accéder au dossier`
     await page.evaluate(`window.confirm = window.originalConfirm;`); // to put back the original behavior
     await expect(page).toClick("a", { text: "Retour" });
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Actions complétées (0)" });
-    await expect(page).toClick("button", { text: "Actions créées (0)" });
-    await expect(page).toClick("button", { text: "Actions annulées (1)" });
+    await expect(page).toClick("a", { text: "Actions complétées (0)" });
+    await expect(page).toClick("a", { text: "Actions créées (0)" });
+    await expect(page).toClick("a", { text: "Actions annulées (1)" });
   });
 
   it("should be able to see actions comments in the report", async () => {
-    await expect(page).toClick("button", { text: "Commentaires (2)" });
+    await expect(page).toClick("a", { text: "Commentaires (2)" });
     await page.waitForTimeout(1000);
     await expect(page).toMatch("Mon action");
     await expect(page).toMatch(
@@ -272,7 +272,7 @@ Accéder au dossier`
     await page.waitForTimeout(1000);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Résumé" });
+    await expect(page).toClick("a", { text: "Résumé" });
     await page.waitForTimeout(1000);
     await expect(page).toFill(
       "input#report-select-collaboration",
@@ -301,7 +301,7 @@ Accéder au dossier`
       `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
     );
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Résumé" });
+    await expect(page).toClick("a", { text: "Résumé" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("input#report-select-collaboration");
     await expect(page).toClick("div.report-select-collaboration__option");
@@ -327,7 +327,7 @@ Accéder au dossier`
       `Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`
     );
     await page.waitForTimeout(1000);
-    await expect(page).toClick("button", { text: "Résumé" });
+    await expect(page).toClick("a", { text: "Résumé" });
     await page.waitForTimeout(1000);
     await expect(page).toClick("button", { text: "Ajouter une description" });
     await expect(page).toMatch("Description", { timeout: 10000 });
