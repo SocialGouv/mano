@@ -310,6 +310,7 @@ const StyledComment = styled.div`
     font-style: italic;
     display: flex;
     align-items: center;
+    overflow-x: auto;
     p {
       margin-left: 16px;
       margin-top: 0;
