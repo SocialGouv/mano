@@ -1,3 +1,10 @@
+## [1.163.1](https://github.com/SocialGouv/mano/compare/v1.163.0...v1.163.1) (2022-10-14)
+
+
+### Bug Fixes
+
+* fix search ([30c17b5](https://github.com/SocialGouv/mano/commit/30c17b54822c943d67c0ee720e518794ca43d840))
+
 # [1.163.0](https://github.com/SocialGouv/mano/compare/v1.162.3...v1.163.0) (2022-10-14)
 
 
