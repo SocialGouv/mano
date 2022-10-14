@@ -29,6 +29,8 @@ const SelectCustom = ({ creatable, ...props }) => {
 const filterStyles = {
   // control: (styles) => ({ ...styles, borderWidth: 0 }),
   indicatorSeparator: (styles) => ({ ...styles, borderWidth: 0, backgroundColor: 'transparent' }),
+  menuPortal: (provided) => ({ ...provided, zIndex: 10000 }),
+  menu: (provided) => ({ ...provided, zIndex: 10000 }),
 };
 
 export default SelectCustom;
