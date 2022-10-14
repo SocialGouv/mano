@@ -32,7 +32,7 @@ export const filterBySearch = (search, items = []) => {
   const firstItems = items.filter((item) => item?.name?.toLocaleLowerCase().startsWith(search));
   const firstItemsIds = new Set(firstItems.map((item) => item._id));
   const secondItems = items.filter((item) => !firstItemsIds.has(item._id)).filter((item) => item?.name?.toLocaleLowerCase().includes(search));
-  const secondItemsIds = new Set(firstItems.map((item) => item._id));
+  const secondItemsIds = new Set(secondItems.map((item) => item._id));
   const lastItems = items
     .filter((item) => !firstItemsIds.has(item._id))
     .filter((item) => !secondItemsIds.has(item._id))
