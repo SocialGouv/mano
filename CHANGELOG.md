@@ -1,3 +1,10 @@
+# [1.163.0](https://github.com/SocialGouv/mano/compare/v1.162.3...v1.163.0) (2022-10-14)
+
+
+### Features
+
+* add person updated for stats ([#913](https://github.com/SocialGouv/mano/issues/913)) ([6fe9370](https://github.com/SocialGouv/mano/commit/6fe9370fb95e4ec6d462d937a5ac85fbbbfac91d))
+
 ## [1.162.3](https://github.com/SocialGouv/mano/compare/v1.162.2...v1.162.3) (2022-10-10)
 
 
