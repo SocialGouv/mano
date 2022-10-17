@@ -199,7 +199,10 @@ router.put(
           await Consultation.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
 
-        organisation.set({ consulations: organisationsConsultations });
+        // Note by Rap2h: I don't understand why `organisation.set({ consultations: organisationsConsultations })`
+        // doesn't work here. Maybe JSONB is not handled correctly by Sequelize?
+        organisation.consultations = organisationsConsultations;
+        organisation.changed("consulations", true);
         await organisation.save({ transaction: tx });
       });
     } catch (e) {
