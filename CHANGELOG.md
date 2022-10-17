@@ -1,3 +1,10 @@
+## [1.163.4](https://github.com/SocialGouv/mano/compare/v1.163.3...v1.163.4) (2022-10-17)
+
+
+### Bug Fixes
+
+* **api:** fix save custom field for consultations ([be43bf9](https://github.com/SocialGouv/mano/commit/be43bf9505a424298a6267949adfa9e1c385ccf5))
+
 ## [1.163.3](https://github.com/SocialGouv/mano/compare/v1.163.2...v1.163.3) (2022-10-14)
 
 
