@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
-import { organisationState } from '../recoil/auth';
+import { organisationState, teamsState } from '../recoil/auth';
 import { typeOptions } from '../utils';
 import useApi from '../services/api';
 import ButtonCustom from './ButtonCustom';
@@ -37,6 +37,7 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
   const [isNewField, setIsNewField] = useState(null);
+  const [teams, setTeams] = useRecoilState(teamsState);
   const [tableKey, setTableKey] = useState(0);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const API = useApi();
@@ -155,10 +156,31 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
             show: true,
           },
           {
-            title: 'Activé',
+            title: "Activé pour l'équipe",
             show: true,
             dataKey: 'enabled',
-            render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} />,
+            render: (f) => {
+              return (
+                <div className="text-left">
+                  <div>
+                    <label>
+                      <input type="checkbox" checked={f.enabled === true || f.enabled === '__ALL__'} onChange={onEnabledChange(f, '__ALL__')} />
+                      <b>Toute l'organisation</b>
+                    </label>
+                  </div>
+                  {teams.map((e) => {
+                    return (
+                      <div>
+                        <label>
+                          <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f, e.id)} />
+                          {e.name}
+                        </label>
+                      </div>
+                    );
+                  })}
+                </div>
+              );
+            },
           },
           {
             title: (
