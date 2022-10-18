@@ -40,6 +40,7 @@ const customFieldSchema = z
     type: z.string().min(1),
     label: z.optional(z.string().min(1)),
     enabled: z.optional(z.boolean()),
+    enabledTeams: z.optional(z.array(z.string().min(1))),
     deletable: z.optional(z.boolean()),
     required: z.optional(z.boolean()),
     showInStats: z.optional(z.boolean()),
