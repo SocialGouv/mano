@@ -86,15 +86,16 @@ const filterPersonsWithAllFieldsSelector = selector({
   get: ({ get }) => {
     const places = get(placesState);
     const user = get(userState);
+    const team = get(currentTeamState);
     const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
     const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
     const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
     const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
     return [
       ...filterPersonsBase,
-      ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-      ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-      ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+      ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
+      ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
+      ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...(user.healthcareProfessional ? customFieldsMedicalFile.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })) : []),
       {
         label: 'Lieux fréquentés',

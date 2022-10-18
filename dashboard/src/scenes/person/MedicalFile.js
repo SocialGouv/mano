@@ -15,7 +15,7 @@ import {
   genderOptions,
   healthInsuranceOptions,
 } from '../../recoil/persons';
-import { organisationState, usersState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -42,6 +42,7 @@ export function MedicalFile({ person }) {
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
+  const team = useRecoilValue(currentTeamState);
 
   const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null, { resetOnValueChange: true });
   const [currentConsultation, setCurrentConsultation] = useState(
@@ -224,7 +225,7 @@ export function MedicalFile({ person }) {
           );
         }}
       </Formik>
-      {!!medicalFile && !!customFieldsMedicalFile.filter((f) => f.enabled).length && (
+      {!!medicalFile && !!customFieldsMedicalFile.filter((f) => f.enabled || f.enabledTeams?.includes(team._id)).length && (
         <>
           <TitleWithButtonsContainer>
             <Title>Dossier médical</Title>

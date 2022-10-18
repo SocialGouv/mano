@@ -286,6 +286,7 @@ const Summary = ({ person }) => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
+  const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
   const API = useApi();
 
@@ -534,7 +535,7 @@ const Summary = ({ person }) => {
                       <Reasons value={values.reasons} onChange={handleChange} />
                     </Col>
                     {customFieldsPersonsSocial
-                      .filter((f) => f.enabled)
+                      .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                       .map((field) => (
                         <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                       ))}
@@ -561,7 +562,7 @@ const Summary = ({ person }) => {
                       </FormGroup>
                     </Col>
                     {customFieldsPersonsMedical
-                      .filter((f) => f.enabled)
+                      .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                       .map((field) => (
                         <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                       ))}
