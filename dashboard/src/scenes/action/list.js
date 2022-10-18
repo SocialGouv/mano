@@ -96,7 +96,8 @@ const dataFilteredBySearchSelector = selectorFamily({
     ({ search, statuses, categories }) =>
     ({ get }) => {
       const actions = get(actionsByTeamAndStatusSelector({ statuses, categories }));
-      const consultations = get(consultationsByStatusSelector({ statuses }));
+      // When we filter by category, we don't want to see all consultations.
+      const consultations = categories?.length ? [] : get(consultationsByStatusSelector({ statuses }));
       if (!search) {
         const dataFitered = [...actions, ...consultations].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt));
         return dataFitered;
