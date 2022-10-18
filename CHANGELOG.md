@@ -1,3 +1,10 @@
+## [1.163.5](https://github.com/SocialGouv/mano/compare/v1.163.4...v1.163.5) (2022-10-18)
+
+
+### Bug Fixes
+
+* **dashboard:** consultation were always shown when category selected ([2285d05](https://github.com/SocialGouv/mano/commit/2285d0500eaf5a58a0f6854da8e691d025c3c9c4))
+
 ## [1.163.4](https://github.com/SocialGouv/mano/compare/v1.163.3...v1.163.4) (2022-10-17)
 
 
