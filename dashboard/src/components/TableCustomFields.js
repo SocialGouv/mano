@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
-import { organisationState, teamsState } from '../recoil/auth';
+import { organisationState } from '../recoil/auth';
 import { typeOptions } from '../utils';
 import useApi from '../services/api';
 import ButtonCustom from './ButtonCustom';
