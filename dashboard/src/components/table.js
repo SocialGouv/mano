@@ -71,6 +71,7 @@ const Table = ({
               <td
                 onClick={!!onSortBy ? onNameClick : null}
                 className={`column-header ${column.left && 'align-left'} ${!!onSortBy && 'clickable'}`}
+                style={column.style || {}}
                 key={String(dataKey) + String(column.title)}>
                 <span>{column.title}</span>
                 {(sortBy === sortableKey || sortBy === dataKey) && (
