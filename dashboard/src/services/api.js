@@ -93,7 +93,6 @@ const decryptDBItem = async (item, { logout, path, debug = false, encryptedVerif
           message: 'ERROR DECRYPTING ITEM',
           item,
           path,
-          hashedOrgEncryptionKey,
         },
       });
       sendCaptureError++;

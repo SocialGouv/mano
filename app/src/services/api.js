@@ -230,8 +230,6 @@ class ApiService {
           extra: {
             message: 'ERROR DECRYPTING ITEM',
             item,
-            orgEncryptionKey: this.orgEncryptionKey,
-            hashedOrgEncryptionKey: this.hashedOrgEncryptionKey,
           },
         });
         this.sendCaptureError++;
