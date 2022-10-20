@@ -69,17 +69,41 @@ const View = () => {
   const allComments = useRecoilValue(commentsState);
   const allPersons = useRecoilValue(personsState);
   const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
+  const allReports = useRecoilValue(reportsState);
   const setReports = useSetRecoilState(reportsState);
   const history = useHistory();
   const [activeTab, setActiveTab] = useState(['restricted-access'].includes(user.role) ? 'reception' : 'resume');
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
-  const reportDoesntExist = id.startsWith('new__');
+
+  // When we switch team, we need to refresh the report.
+  // Since there is ["new__" or ID] in URL and team can be switch, we have to handle many edge cases.
+  useEffect(
+    function redirectOnTeamChange() {
+      const maybeNewReport = id.startsWith('new__'); // URL says it's new, but it can be false when URL changes.
+      if (maybeNewReport) {
+        const currentReportByDateAndTeam = allReports.find((r) => r.date === id.replace('new__', '') && r.team === currentTeam._id);
+        if (currentReportByDateAndTeam) return history.push(`/report/${currentReportByDateAndTeam._id}`);
+        return;
+      }
+      const currentTeamReportById = currentTeamReports.find((r) => r._id === id);
+      if (currentTeamReportById) return;
+
+      const initialReport = allReports.find((r) => r._id === id);
+      if (initialReport) {
+        const currentTeamReportByDate = currentTeamReports.find((r) => r.date === initialReport.date);
+        if (currentTeamReportByDate) return history.push(`/report/${currentTeamReportByDate._id}`);
+        else return history.push(`/report/new__${initialReport.date}`);
+      }
+    },
+    [allReports, currentTeam._id, currentTeamReports, history, id]
+  );
+
   const report = useMemo(() => {
-    if (reportDoesntExist) return { team: currentTeam._id, date: id.replace('new__', '') };
-    return currentTeamReports.find((r) => r._id === id);
-  }, [currentTeam._id, currentTeamReports, id, reportDoesntExist]);
+    if (id.startsWith('new__')) return { team: currentTeam._id, date: id.replace('new__', '') };
+    return currentTeamReports.find((r) => r._id === id) || allReports.find((r) => r._id === id);
+  }, [allReports, currentTeam._id, currentTeamReports, id]);
 
   const allPassages = useRecoilValue(passagesState);
   const passages = useMemo(
