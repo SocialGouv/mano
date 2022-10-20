@@ -122,7 +122,7 @@ const List = () => {
   const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
   const [search, setSearch] = useSearchParamState('search', '');
-  const [page, setPage] = useSearchParamState('page', 0, { resetOnValueChange: currentTeam._id });
+  const [page, setPage] = useSearchParamState('page', 0, { resetOnValueChange: currentTeam?._id });
   const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
   const [categories, setCategories] = useSearchParamState('categories', []);
 
