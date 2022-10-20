@@ -13,7 +13,6 @@ import { DEFAULT_ORGANISATION_KEY, theme } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import useApi, { setOrgEncryptionKey } from '../../services/api';
-import { AppSentry } from '../../services/sentry';
 import { useDataLoader } from '../../components/DataLoader';
 
 const SignIn = () => {
@@ -145,7 +144,6 @@ const SignIn = () => {
               if (!encryptionIsValid) return;
             }
             setUser(user);
-            AppSentry.setUser(user);
             // now login !
             // superadmin
             if (['superadmin'].includes(user.role)) {

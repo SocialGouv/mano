@@ -13,7 +13,6 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectRole from '../../components/SelectRole';
 import { organisationState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
-import { AppSentry } from '../../services/sentry';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
@@ -59,7 +58,6 @@ const View = () => {
             if (user._id === id) {
               const { data } = await API.get({ path: `/user/${id}` });
               setUser(data);
-              AppSentry.setUser(data);
             }
             actions.setSubmitting(false);
             toast.success('Mis à jour !');

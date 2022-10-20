@@ -10,7 +10,6 @@ import ButtonCustom from '../components/ButtonCustom';
 import ChangePassword from '../components/ChangePassword';
 import { userState } from '../recoil/auth';
 import useApi from '../services/api';
-import { AppSentry } from '../services/sentry';
 
 const Account = () => {
   const [user, setUser] = useRecoilState(userState);
@@ -30,7 +29,6 @@ const Account = () => {
               toast.success('Mis à jour !');
               const { user } = await API.get({ path: '/user/me' });
               setUser(user);
-              AppSentry.setUser(user);
             }
           } catch (userUpdateError) {
             console.log('error in user update', userUpdateError);

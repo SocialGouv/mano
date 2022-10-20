@@ -146,7 +146,7 @@ const useApi = () => {
     blockEncrypt = false;
     setRecoilResetKey((k) => k + 1);
     AppSentry.setUser({});
-    AppSentry.setContext('currentTeam', {});
+    AppSentry.setTag('organisationId', '');
   };
 
   const logout = async (status) => {

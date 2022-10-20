@@ -12,7 +12,6 @@ import Table from '../../components/table';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import useApi from '../../services/api';
-import { AppSentry } from '../../services/sentry';
 import OnboardingEndModal from '../../components/OnboardingEndModal';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
@@ -91,7 +90,6 @@ const Create = () => {
                 if (!userPutRes.ok) return actions.setSubmitting(false);
                 const meResponse = await API.get({ path: '/user/me' });
                 setUser(meResponse.user);
-                AppSentry.setUser(meResponse.user);
                 setCurrentTeam(meResponse.user.teams[0]);
                 toast.success(`Création réussie ! Vous êtes dans l'équipe ${newTeamRes.data.name}`);
                 setOnboardingEndModalOpen(true);

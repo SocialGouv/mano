@@ -4,7 +4,6 @@ import { useRecoilState } from 'recoil';
 import ButtonCustom from '../../components/ButtonCustom';
 import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
-import { AppSentry } from '../../services/sentry';
 import { theme } from '../../config';
 import openNewWindow from '../../assets/icons/open-in-new-window.svg';
 import charte from '../../assets/charte.pdf';
@@ -20,7 +19,6 @@ const Charte = () => {
     const response = await API.put({ path: '/user', body: { termsAccepted } });
     if (!response.ok) return;
     setUser({ ...user, termsAccepted });
-    AppSentry.setUser({ ...user, termsAccepted });
   };
 
   return (
