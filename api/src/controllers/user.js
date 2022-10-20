@@ -398,11 +398,16 @@ https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}
 Vous pourrez ensuite commencer à utiliser Mano en suivant ce lien:
 https://dashboard-mano.fabrique.social.gouv.fr/
 
+Et vous pourrez télécharger l'application sur votre téléphone Android en suivant cet autre lien:
+https://mano-app.fabrique.social.gouv.fr/download
+
 Toute l'équipe Mano vous souhaite la bienvenue !
 
 Si vous avez des questions n'hésitez pas à nous contacter:
 
 Nathan Fradin, chargé de déploiement: nathan.fradin.mano@gmail.com - +33 6 29 54 94 26
+Melissa SAITER chargée de déploiement Mano m.saiter.mano@gmail.com
+Yoann KITTERY chargé de déploiement Mano ykittery.mano@gmail.com
 Guillaume Demirhan, porteur du projet: g.demirhan@aurore.asso.fr - +33 7 66 56 19 96
 `;
     await mailservice.sendEmail(data.email, subject, body);
