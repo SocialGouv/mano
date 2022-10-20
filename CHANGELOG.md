@@ -1,3 +1,11 @@
+## [1.163.7](https://github.com/SocialGouv/mano/compare/v1.163.6...v1.163.7) (2022-10-20)
+
+
+### Bug Fixes
+
+* clean sentry data captures ([000be3f](https://github.com/SocialGouv/mano/commit/000be3f95264ed06aba0df248953f16c6b9c8f31))
+* MANO-2Q ([52bd6a7](https://github.com/SocialGouv/mano/commit/52bd6a7dc8fefceab304d0a84f438fc09aa94b49))
+
 ## [1.163.6](https://github.com/SocialGouv/mano/compare/v1.163.5...v1.163.6) (2022-10-20)
 
 
