@@ -71,7 +71,9 @@ const View = () => {
       path: '/user/signin-token',
       skipEncryption: '/user/signin-token',
     });
-    setOrganisation(user.organisation);
+    if (user) {
+      setOrganisation(user.organisation);
+    }
   };
 
   useEffect(() => {
