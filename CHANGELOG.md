@@ -1,3 +1,10 @@
+## [1.163.8](https://github.com/SocialGouv/mano/compare/v1.163.7...v1.163.8) (2022-10-20)
+
+
+### Bug Fixes
+
+* update welcome email in api ([42c6776](https://github.com/SocialGouv/mano/commit/42c6776a15cbde9ea32527c0a7f06d2b75a25991))
+
 ## [1.163.7](https://github.com/SocialGouv/mano/compare/v1.163.6...v1.163.7) (2022-10-20)
 
 
