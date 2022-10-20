@@ -292,7 +292,7 @@ const useApi = () => {
           return res;
         }
       } catch (errorFromJson) {
-        capture(errorFromJson, { extra: { message: 'error parsing response', response } });
+        capture(errorFromJson, { extra: { message: 'error parsing response', response, path, query } });
         return { ok: false, error: "Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !" };
       }
     } catch (errorExecuteApi) {
