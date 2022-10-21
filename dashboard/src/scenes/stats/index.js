@@ -52,7 +52,7 @@ const getDataForPeriod = (
   const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
 
   if (callback) {
-    return callback(data, startDate, endDate, offsetHours);
+    return callback(data, offsetHours);
   }
   return data.filter((item) =>
     getIsDayWithinHoursOffsetOfPeriod(item[field] || item.createdAt, { referenceStartDay: startDate, referenceEndDay: endDate }, offsetHours)
@@ -121,9 +121,9 @@ const Stats = () => {
           filters: filterPersons,
           field: 'followedSince',
         },
-        (data, startDate, endDate, offsetHours) => {
+        (data, offsetHours) => {
           const res = data.filter((item) => {
-            const params = [{ referenceStartDay: startDate, referenceEndDay: endDate }, offsetHours];
+            const params = [{ referenceStartDay: period.startDate, referenceEndDay: period.endDate }, offsetHours];
             if (!item) return false;
             return (
               getIsDayWithinHoursOffsetOfPeriod(item.createdAt, ...params) ||
@@ -160,10 +160,34 @@ const Stats = () => {
       : personsUpdated.filter((p) => !p.outOfActiveList);
   }, [filterPersons, personsUpdated]);
 
+  const personsWithActions = useMemo(() => {
+    const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
+    const params = [{ referenceStartDay: period.startDate, referenceEndDay: period.endDate }, offsetHours];
+    return personsUpdatedForStats.filter((person) => {
+      if (!person) return false;
+      if (!period.startDate || !period.endDate) return !!person.actions?.length;
+      const hasActions = person.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params));
+      return hasActions;
+    });
+  }, [period.endDate, period.startDate, personsUpdatedForStats, selectedTeams, viewAllOrganisationData]);
+
   const actions = useMemo(
     () => getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData),
     [allActions, filterByTeam, period, selectedTeams, viewAllOrganisationData]
   );
+
+  const numberOfActionsPerPerson = useMemo(() => {
+    if (!personsUpdatedForStats.length) return 0;
+    if (!actions.length) return 0;
+    return Math.round((actions.length / personsUpdatedForStats.length) * 10) / 10;
+  }, [actions.length, personsUpdatedForStats.length]);
+
+  const numberOfActionsPerPersonConcernedByActions = useMemo(() => {
+    if (!personsWithActions.length) return 0;
+    if (!actions.length) return 0;
+    return Math.round((actions.length / personsWithActions.length) * 10) / 10;
+  }, [actions.length, personsWithActions.length]);
+
   const consultations = useMemo(() => getDataForPeriod(allConsultations, period, selectedTeams, true), [allConsultations, period, selectedTeams]);
   const observations = useMemo(
     () =>
@@ -277,6 +301,8 @@ const Stats = () => {
 
   if (isLoading) return <Loading />;
 
+  console.log({ actions, personsUpdatedForStats, personsWithActions });
+
   return (
     <>
       <HeaderStyled style={{ padding: '16px 0' }}>
@@ -339,6 +365,8 @@ const Stats = () => {
             <Block data={personsForStats} title="Nombre de personnes créées" />
             <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
             <Block data={actions} title="Nombre d'actions" />
+            <Block data={numberOfActionsPerPerson} title="Nombre d'actions par personne" />
+            <Block data={numberOfActionsPerPersonConcernedByActions} title="Nombre d'actions par personne concernée par au moins une action" />
             <Block data={rencontres.length} title="Nombre de rencontres" />
           </Row>
         </TabPane>
@@ -472,9 +500,9 @@ const Stats = () => {
               { options: fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReason').options }
             )}
           />
-          <CustomFieldsStats data={persons} customFields={customFieldsPersonsMedical} />
-          <CustomFieldsStats data={persons} customFields={customFieldsPersonsSocial} />
-          <CustomFieldsStats data={persons} customFields={customFieldsMedicalFile} />
+          <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsMedical} />
+          <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsSocial} />
+          <CustomFieldsStats data={personsForStats} customFields={customFieldsMedicalFile} />
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des passages</Title>
