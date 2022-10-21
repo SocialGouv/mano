@@ -1,3 +1,10 @@
+# [1.164.0](https://github.com/SocialGouv/mano/compare/v1.163.8...v1.164.0) (2022-10-21)
+
+
+### Features
+
+* **dashboard:** stats for actions per perso ([#927](https://github.com/SocialGouv/mano/issues/927)) ([420c22c](https://github.com/SocialGouv/mano/commit/420c22cc6e538f83b64bb026cccfbce3c2684db8))
+
 ## [1.163.8](https://github.com/SocialGouv/mano/compare/v1.163.7...v1.163.8) (2022-10-20)
 
 
