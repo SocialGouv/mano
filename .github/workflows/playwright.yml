@@ -25,7 +25,6 @@ jobs:
           --health-timeout 5s
           --health-retries 5
         ports:
-          # Maps tcp port 5432 on service container to the host
           - 5432:5432
 
     steps:
@@ -38,17 +37,17 @@ jobs:
       - name: Install Playwright Browsers
         run: npx playwright install --with-deps
 
-      # - name: Install dashboard dependencies and build
-      #   run: |
-      #     yarn --cwd ./dashboard
-      #     yarn --cwd ./dashboard build
-      #   env:
-      #     REACT_APP_HOST: 127.0.0.1:8091
-      #     REACT_APP_SCHEME: http
-      #     REACT_APP_TEST: "true"
+      - name: Install dashboard dependencies and build
+        run: |
+          yarn --cwd ./dashboard
+          yarn --cwd ./dashboard build
+        env:
+          REACT_APP_HOST: 127.0.0.1:8091
+          REACT_APP_SCHEME: http
+          REACT_APP_TEST: "true"
 
-      # - name: Install api dependencies
-      #   run: yarn --cwd ./api
+      - name: Install api dependencies
+        run: yarn --cwd ./api
 
       - name: Install tests dependencies and initdb
         run: |
@@ -58,18 +57,18 @@ jobs:
           PGDATABASE: manotest
           PGBASEURL: postgres://postgres:postgres@localhost:5432
 
-      # - name: Start the server
-      #   run: |
-      #     yarn --cwd ./api start:test &
-      #     sleep 10
-      #   env:
-      #     PGBASEURL: postgres://postgres:postgres@postgres:5432
-      #     PGHOST: postgres
-      #     PGDATABASE: manotest
-      #     PGPORT: 5432
-      #     PGUSER: postgres
-      #     PGPASSWORD: postgres
-      #     PORT: 8091
+      - name: Start the server
+        run: |
+          yarn --cwd ./api start:test &
+          sleep 10
+        env:
+          PGBASEURL: postgres://postgres:postgres@localhost:5432
+          PGHOST: localhost
+          PGDATABASE: manotest
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+          PORT: 8091
 
       # - name: Start the frontend
       #   run: |
