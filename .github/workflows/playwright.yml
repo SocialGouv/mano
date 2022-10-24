@@ -11,7 +11,7 @@ on:
       - v*
 jobs:
   test:
-    timeout-minutes: 10
+    timeout-minutes: 15
     runs-on: ubuntu-latest
 
     services:
@@ -55,28 +55,29 @@ jobs:
           PGDATABASE: manotest
           PGBASEURL: postgres://postgres:postgres@postgres:5432
 
-      - name: Start the server
-        run: |
-          yarn --cwd ./api start:test &
-          sleep 10
-        env:
-          PGDATABASE: manotest
-          PORT: 8091
-          PGHOST: postgres
-          PGUSER: postgres
-          PGPASSWORD: postgres
-          PGPORT: 5432
+      # - name: Start the server
+      #   run: |
+      #     yarn --cwd ./api start:test &
+      #     sleep 10
+      #   env:
+      #     PGBASEURL: postgres://postgres:postgres@postgres:5432
+      #     PGHOST: postgres
+      #     PGDATABASE: manotest
+      #     PGPORT: 5432
+      #     PGUSER: postgres
+      #     PGPASSWORD: postgres
+      #     PORT: 8091
 
-      - name: Start the frontend
-        run: |
-          npx serve --single -l 8083 ../dashboard/build &
-          sleep 10
+      # - name: Start the frontend
+      #   run: |
+      #     npx serve --single -l 8083 ../dashboard/build &
+      #     sleep 10
 
-      - name: Run Playwright tests
-        run: yarn playwright test
-      - uses: actions/upload-artifact@v3
-        if: always()
-        with:
-          name: playwright-report
-          path: playwright-report/
-          retention-days: 30
+      # - name: Run Playwright tests
+      #   run: yarn playwright test
+      # - uses: actions/upload-artifact@v3
+      #   if: always()
+      #   with:
+      #     name: playwright-report
+      #     path: playwright-report/
+      #     retention-days: 30
