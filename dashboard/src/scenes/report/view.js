@@ -464,13 +464,13 @@ const View = () => {
                   id="report-button-consultations"
                   className={activeTab === 'consultations' ? 'active' : ''}
                   onClick={() => setActiveTab('consultations')}>
-                  Consultations faites ({consultationsCreatedAt.length})
+                  Consultations faites ({consultationsDone.length})
                 </DrawerLink>
                 <DrawerLink
                   id="report-button-consultations-created"
                   className={activeTab === 'consultations-created' ? 'active' : ''}
                   onClick={() => setActiveTab('consultations-created')}>
-                  Consultations créées ({consultationsDone.length})
+                  Consultations créées ({consultationsCreatedAt.length})
                 </DrawerLink>
                 <DrawerLink
                   id="report-button-consultations-cancelled"
