@@ -1,9 +1,9 @@
 name: Playwright Tests
 on:
-#  push:
-#    branches: [main, master]
-#  pull_request:
-#    branches: [main, master]
+  #  push:
+  #    branches: [main, master]
+  #  pull_request:
+  #    branches: [main, master]
   push:
     branches-ignore:
       - ignoreme
@@ -13,6 +13,7 @@ jobs:
   test:
     timeout-minutes: 10
     runs-on: ubuntu-latest
+
     services:
       postgres:
         image: postgres
@@ -23,6 +24,7 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
+
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -52,8 +54,8 @@ jobs:
         env:
           PGDATABASE: manotest
           PGBASEURL: postgres://postgres:postgres@postgres:5432
-      
-      -name: Start the server
+
+      - name: Start the server
         run: |
           yarn --cwd ../api start:test &
           sleep 10
@@ -64,7 +66,7 @@ jobs:
           PGUSER: postgres
           PGPASSWORD: postgres
           PGPORT: 5432
-      
+
       - name: Start the frontend
         run: |
           npx serve --single -l 8090 ../dashboard/build &
