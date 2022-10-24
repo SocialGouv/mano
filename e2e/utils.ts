@@ -1,126 +1,28 @@
 import pg from "pg";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
+import { ElementHandle, Page } from "@playwright/test";
 
-const postgresqlUrl = `${process.env.PGBASEURL}/${process.env.PGDATABASE}`;
-
-export async function useEncryptedOrga() {
-  const client = new pg.Client(postgresqlUrl);
-  await client.connect();
-
-  const orgId = uuidv4();
-  const userId = uuidv4();
-  const teamId = uuidv4();
-  const relUserTeamId = uuidv4();
-
-  const date = "2021-01-01";
-
-  await client.query(
-    `delete from mano."Organisation" where name='Encrypted orga'`
-  );
-  await client.query(
-    `INSERT INTO mano."Organisation" (
-      _id,
-      name,
-      "createdAt",
-      "updatedAt",
-      categories,
-      "encryptionEnabled",
-      "encryptionLastUpdateAt",
-      "encryptedVerificationKey",
-      services,
-      "receptionEnabled",
-      collaborations
-    ) VALUES (
-      $1,
-      'Encrypted orga',
-      $2,
-      $2,
-      null,
-      true,
-      $2,
-      'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0=',
-      '{Café,Douche,Repas,Kit,"Don chaussures","Distribution seringue"}',
-      true,
-      '{"Ma première collab"}'
-    );`,
-    [orgId, date]
+export default async function reactSelect(
+  page: Page,
+  instanceId: string,
+  optionText: string
+) {
+  const innerDetailWithKnownId = await page.waitForSelector(
+    `#react-select-${instanceId}-live-region`
   );
 
-  await client.query(
-    `delete from mano."User" where name='Encrypted Orga Admin'`
+  const select = await parentElement(innerDetailWithKnownId);
+  await select!.click();
+  const option = await page.waitForSelector(
+    `#react-select-${instanceId}-listbox div:text('${optionText}')`
   );
-  await client.query(
-    `INSERT INTO mano."User" (
-      _id,
-      name,
-      email,
-      password,
-      organisation,
-      "lastLoginAt",
-      "createdAt",
-      "updatedAt",
-      role,
-      "lastChangePasswordAt",
-      "forgotPasswordResetExpires",
-      "forgotPasswordResetToken",
-      "termsAccepted",
-      "healthcareProfessional"
-    ) VALUES (
-      $1,
-      'Encrypted Orga Admin',
-      'adminencrypted@example.org',
-      $2,
-      $3,
-      $4,
-      $4,
-      $4,
-      'admin',
-      $5::date,
-      null,
-      null,
-      $4,
-      true
-    );`,
-    [userId, bcrypt.hashSync("secret", 10), orgId, date, date]
-  );
-
-  await client.query(
-    `delete from mano."Team" where name='Encrypted Orga Team'`
-  );
-  await client.query(
-    `INSERT INTO mano."Team" (
-      _id,
-      name,
-      organisation,
-      "createdAt",
-      "updatedAt"
-    ) VALUES (
-      $1,
-      'Encrypted Orga Team',
-      $2,
-      $3,
-      $3
-    );`,
-    [teamId, orgId, date]
-  );
-
-  await client.query(
-    `INSERT INTO mano."RelUserTeam" (
-      _id,
-      "user",
-      "team",
-      "createdAt",
-      "updatedAt"
-    ) VALUES (
-      $1,
-      $2,
-      $3,
-      $4,
-      $4
-    );`,
-    [relUserTeamId, userId, teamId, date]
-  );
-
-  await client.end();
+  await option.scrollIntoViewIfNeeded();
+  await option.click();
 }
+
+function parentElement(element: ElementHandle<any>) {
+  return element.$("xpath=..");
+}
+
+// <div class="person-select-personalSituation__menu css-1hueuxh-menu"><div class="person-select-personalSituation__menu-list css-1kpp62a-MenuList"><div class="person-select-personalSituation__option css-9mqv0d-option" id="react-select-9-option-0" tabindex="-1">Aucune</div><div class="person-select-personalSituation__option person-select-personalSituation__option--is-selected css-kd1e6q-option" id="react-select-9-option-1" tabindex="-1">Homme isolé</div><div class="person-select-personalSituation__option css-9mqv0d-option" id="react-select-9-option-2" tabindex="-1">Femme isolée</div><div class="person-select-personalSituation__option css-9mqv0d-option" id="react-select-9-option-3" tabindex="-1">En couple</div><div class="person-select-personalSituation__option css-9mqv0d-option" id="react-select-9-option-4" tabindex="-1">Famille</div><div class="person-select-personalSituation__option css-9mqv0d-option" id="react-select-9-option-5" tabindex="-1">Famille monoparentale</div><div class="person-select-personalSituation__option person-select-personalSituation__option--is-focused css-ycxnge-option" id="react-select-9-option-6" tabindex="-1">Autre</div></div></div>

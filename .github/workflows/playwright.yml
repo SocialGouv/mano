@@ -45,8 +45,8 @@ jobs:
 
       - name: Install tests dependencies and initdb
         run: |
-          yarn --cwd ./tests
-          yarn --cwd ./tests test:init-db
+          yarn --cwd
+          yarn test:init-db
         env:
           PGDATABASE: manotest
           PGBASEURL: postgres://postgres:postgres@localhost:5432
