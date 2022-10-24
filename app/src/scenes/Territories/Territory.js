@@ -10,11 +10,10 @@ import ButtonsContainer from '../../components/ButtonsContainer';
 import TerritoryMultiCheckBoxes from '../../components/MultiCheckBoxes/TerritoryMultiCheckBoxes';
 import SubList from '../../components/SubList';
 import TerritoryObservationRow from './TerritoryObservationRow';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { prepareTerritoryForEncryption, territoriesState } from '../../recoil/territory';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 
 const castToTerritory = (territory = {}) => ({
   name: territory.name?.trim() || '',
@@ -28,13 +27,12 @@ const Territory = ({ route, navigation }) => {
   const [territoryDB, setTerritoryDB] = useState(() => territories.find((territory) => territory._id === route.params?.territory?._id));
 
   const [territory, setTerritory] = useState(castToTerritory(route?.params?.territory));
-  const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
-  const allTerritoryOservations = useRecoilValue(onlyFilledObservationsTerritories);
+  const [allTerritoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territoryObservations = useMemo(() => {
-    return allTerritoryOservations
+    return allTerritoryObservations
       .filter((obs) => obs.territory === territoryDB?._id)
       .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
-  }, [territoryDB, allTerritoryOservations]);
+  }, [territoryDB, allTerritoryObservations]);
 
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);

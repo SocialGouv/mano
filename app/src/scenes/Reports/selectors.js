@@ -3,7 +3,8 @@ import { actionsState } from '../../recoil/actions';
 import { currentTeamState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
 import { reportsState } from '../../recoil/reports';
-import { actionsObjectSelector, onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
+import { actionsObjectSelector, personsObjectSelector } from '../../recoil/selectors';
+import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { getIsDayWithinHoursOffsetOfDay } from '../../services/dateDayjs';
 
 export const currentTeamReportsSelector = selector({
@@ -80,7 +81,7 @@ export const observationsForReport = selectorFamily({
   get:
     ({ date }) =>
     ({ get }) => {
-      const territoryObservations = get(onlyFilledObservationsTerritories);
+      const territoryObservations = get(territoryObservationsState);
       const currentTeam = get(currentTeamState);
       return territoryObservations
         .filter((o) => o.team === currentTeam._id)
