@@ -1,3 +1,10 @@
+# [1.167.0](https://github.com/SocialGouv/mano/compare/v1.166.0...v1.167.0) (2022-10-24)
+
+
+### Features
+
+* **dashboard:** reverse history of person to show newest change first ([b2b2039](https://github.com/SocialGouv/mano/commit/b2b20390c404d0dac88f5247fa57cbf7c4297e2e))
+
 # [1.166.0](https://github.com/SocialGouv/mano/compare/v1.165.0...v1.166.0) (2022-10-24)
 
 
