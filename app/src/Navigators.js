@@ -21,6 +21,7 @@ import PersonsFilter from './scenes/Persons/PersonsFilter';
 import StructuresList from './scenes/Structures/StructuresList';
 import NewStructureForm from './scenes/Structures/NewStructureForm';
 import Structure from './scenes/Structures/Structure';
+import Soliguide from './scenes/Soliguide/Soliguide';
 import Comment from './scenes/Comments/Comment';
 import Place from './scenes/Places/Place';
 import NewPlaceForm from './scenes/Places/NewPlaceForm';
@@ -175,6 +176,7 @@ const MenuNavigator = () => {
       <MenuStack.Screen name="Menu" component={Menu} />
       <MenuStack.Screen name="Reports" component={ReportsNavigator} />
       <MenuStack.Screen name="Structures" component={StructuresNavigator} />
+      <MenuStack.Screen name="Soliguide" component={Soliguide} />
       <MenuStack.Screen name="ChangePassword" component={ChangePassword} />
       <MenuStack.Screen name="ChangeTeam" component={ChangeTeam} />
       <MenuStack.Screen name="Legal" component={Legal} />
