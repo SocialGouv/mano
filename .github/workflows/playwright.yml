@@ -53,6 +53,14 @@ jobs:
 
       - name: Run Playwright tests
         run: yarn playwright test
+        env:
+          PGBASEURL: postgres://postgres:postgres@localhost:5432
+          PGHOST: localhost
+          PGDATABASE: manotest
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+
       - uses: actions/upload-artifact@v3
         if: always()
         with:
