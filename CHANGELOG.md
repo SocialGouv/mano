@@ -1,3 +1,10 @@
+## [1.164.1](https://github.com/SocialGouv/mano/compare/v1.164.0...v1.164.1) (2022-10-24)
+
+
+### Bug Fixes
+
+* **app:** observations selector ([#932](https://github.com/SocialGouv/mano/issues/932)) ([a6f0764](https://github.com/SocialGouv/mano/commit/a6f07645ab25bb875e4909c5261ca1aa1e5a0d3e))
+
 # [1.164.0](https://github.com/SocialGouv/mano/compare/v1.163.8...v1.164.0) (2022-10-21)
 
 
