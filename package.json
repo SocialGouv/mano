@@ -8,5 +8,14 @@
   "devDependencies": {
     "@playwright/test": "^1.27.1"
   },
-  "scripts": {}
+  "scripts": {
+    "start-dashboard-for-record": "REACT_APP_HOST=127.0.0.1:8091 REACT_APP_SCHEME=http REACT_APP_TEST=true PORT=8090 yarn --cwd ./dashboard dev",
+    "start-api-for-record": "PORT=8091 NODE_ENV=test PGDATABASE=manotest node ./api/src/index.js dev"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "nanoid": "^4.0.0",
+    "pg": "^8.8.0",
+    "uuid": "^9.0.0"
+  }
 }
