@@ -301,8 +301,6 @@ const Stats = () => {
 
   if (isLoading) return <Loading />;
 
-  console.log({ actions, personsUpdatedForStats, personsWithActions });
-
   return (
     <>
       <HeaderStyled style={{ padding: '16px 0' }}>
@@ -943,12 +941,13 @@ function CustomFieldsStats({ customFields, data, additionalCols = [] }) {
   const totalCols = customFieldsNumber.length + customFieldsDate.length + additionalCols.length;
 
   const colSize = getColsSize(totalCols);
+
   return (
     <>
       {totalCols > 0 && (
         <Row>
           {additionalCols.map((col) => (
-            <Col md={colSize} style={{ marginBottom: 20 }}>
+            <Col md={colSize} style={{ marginBottom: 20 }} key={col.title}>
               {/* TODO: fix alignment. */}
               <Card title={col.title} count={col.value} children={<div></div>} />
             </Col>
