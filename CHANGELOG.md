@@ -1,3 +1,15 @@
+# [1.166.0](https://github.com/SocialGouv/mano/compare/v1.165.0...v1.166.0) (2022-10-24)
+
+
+### Bug Fixes
+
+* bugs from 24 octobre 2022 ([#931](https://github.com/SocialGouv/mano/issues/931)) ([d225f71](https://github.com/SocialGouv/mano/commit/d225f7134a758f3299ba2a3b1b0c6fb55a2b9d46))
+
+
+### Features
+
+* new app version 2.24.1 ([ab48af5](https://github.com/SocialGouv/mano/commit/ab48af5a916b684f889ed384797d0cde9545c799))
+
 # [1.165.0](https://github.com/SocialGouv/mano/compare/v1.164.1...v1.165.0) (2022-10-24)
 
 
