@@ -57,7 +57,7 @@ jobs:
 
       - name: Start the server
         run: |
-          yarn --cwd ../api start:test &
+          yarn --cwd ./api start:test &
           sleep 10
         env:
           PGDATABASE: manotest
