@@ -1,3 +1,10 @@
+## [1.167.1](https://github.com/SocialGouv/mano/compare/v1.167.0...v1.167.1) (2022-10-24)
+
+
+### Bug Fixes
+
+* **api:** phone numbers to contacts ([42652c2](https://github.com/SocialGouv/mano/commit/42652c203b0a0112bf5be9e46430c46235a019d2))
+
 # [1.167.0](https://github.com/SocialGouv/mano/compare/v1.166.0...v1.167.0) (2022-10-24)
 
 
