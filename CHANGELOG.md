@@ -1,3 +1,10 @@
+# [1.165.0](https://github.com/SocialGouv/mano/compare/v1.164.1...v1.165.0) (2022-10-24)
+
+
+### Features
+
+* add soliguide in mano ([#921](https://github.com/SocialGouv/mano/issues/921)) ([fa3d4f2](https://github.com/SocialGouv/mano/commit/fa3d4f2a2f41aef2337f04cd2094c98c248e63b3))
+
 ## [1.164.1](https://github.com/SocialGouv/mano/compare/v1.164.0...v1.164.1) (2022-10-24)
 
 
