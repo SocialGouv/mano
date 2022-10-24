@@ -1,9 +1,14 @@
 name: Playwright Tests
 on:
+#  push:
+#    branches: [main, master]
+#  pull_request:
+#    branches: [main, master]
   push:
-    branches: [main, master]
-  pull_request:
-    branches: [main, master]
+    branches-ignore:
+      - ignoreme
+    tags-ignore:
+      - v*
 jobs:
   test:
     timeout-minutes: 10
