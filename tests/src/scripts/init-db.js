@@ -3,10 +3,13 @@ const fs = require("fs");
 const path = require("path");
 require("dotenv").config({ path: path.resolve(__dirname, "../../.env") });
 
-console.log(process.env.PGBASEURL, process.env.PGDATABASE);
-
 if (!process.env.PGBASEURL || !process.env.PGDATABASE) {
   console.log("PGBASEURL and PGDATABASE env variables not set");
+  process.exit(1);
+}
+
+if (process.env.PGDATABASE !== "manotest") {
+  console.log("PGDATABASE must be set to manotest");
   process.exit(1);
 }
 

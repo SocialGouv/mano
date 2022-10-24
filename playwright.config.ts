@@ -104,6 +104,32 @@ const config: PlaywrightTestConfig = {
   //  timeout: 120 * 1000,
   //  reuseExistingServer: !process.env.CI,
   // },
+
+  webServer: [
+    {
+      command: "yarn --cwd ./dashboard dev",
+      port: 8090,
+      timeout: 120 * 1000,
+      reuseExistingServer: !process.env.CI,
+      env: {
+        PORT: "8090",
+        REACT_APP_HOST: "127.0.0.1:8091",
+        REACT_APP_SCHEME: "http",
+        REACT_APP_TEST: "true",
+      },
+    },
+    {
+      command: "node ./api/src/index.js",
+      port: 8091,
+      timeout: 120 * 1000,
+      reuseExistingServer: false,
+      env: {
+        PORT: "8091",
+        NODE_ENV: "test",
+        PGDATABASE: "manotest",
+      },
+    },
+  ],
 };
 
 export default config;
