@@ -43,10 +43,8 @@ jobs:
       - name: Install api dependencies
         run: yarn --cwd ./api
 
-      - name: Install tests dependencies and initdb
-        run: |
-          yarn --cwd
-          yarn test:init-db
+      - name: Init DB
+        run: yarn test:init-db
         env:
           PGDATABASE: manotest
           PGBASEURL: postgres://postgres:postgres@localhost:5432
