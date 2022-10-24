@@ -69,7 +69,7 @@ jobs:
 
       - name: Start the frontend
         run: |
-          npx serve --single -l 8090 ../dashboard/build &
+          npx serve --single -l 8083 ../dashboard/build &
           sleep 10
 
       - name: Run Playwright tests
