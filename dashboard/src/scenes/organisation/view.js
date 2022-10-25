@@ -127,6 +127,7 @@ const View = () => {
         <div ref={scrollContainer} style={{ overflow: 'auto', flexBasis: '100%', padding: '15px 25px 20px' }}>
           <Formik
             initialValues={{ ...organisation, receptionEnabled: organisation.receptionEnabled || false }}
+            enableReinitialize
             onSubmit={async (body) => {
               try {
                 const response = await API.put({ path: `/organisation/${organisation._id}`, body });

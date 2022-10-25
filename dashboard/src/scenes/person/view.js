@@ -225,7 +225,7 @@ const View = () => {
 const PersonHistory = ({ person }) => {
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const teams = useRecoilValue(teamsState);
-  const history = person.history || [];
+  const history = useMemo(() => [...(person.history || [])].reverse(), [person.history]);
   return (
     <div>
       <Row style={{ marginTop: '30px', marginBottom: '5px' }}>

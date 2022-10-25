@@ -56,7 +56,7 @@ const Menu = ({ navigation }) => {
           }}
         />
         <Row withNextButton caption="Structures" onPress={() => navigation.navigate('Structures')} />
-        <Row withNextButton caption="Soliguide" onPress={() => Linking.openURL('https://soliguide.fr')} />
+        <Row withNextButton caption="Soliguide" onPress={() => navigation.navigate('Soliguide')} />
         <Spacer height={30} />
         <Row withNextButton caption={`Changer d'équipe (actuellement ${currentTeam?.name})`} onPress={() => navigation.navigate('ChangeTeam')} />
         <Row withNextButton caption="Changer le mot de passe" onPress={() => navigation.navigate('ChangePassword')} />

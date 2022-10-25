@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Col, Row } from 'reactstrap';
 import { toast } from 'react-toastify';
@@ -16,9 +16,7 @@ const List = ({ territory = {} }) => {
   const [openObservationModale, setOpenObservationModale] = useState(null);
   const API = useApi();
 
-  const observations = territoryObservations
-    .filter((obs) => obs.territory === territory._id)
-    .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
+  const observations = useMemo(() => territoryObservations.filter((obs) => obs.territory === territory._id), [territory._id, territoryObservations]);
 
   if (!observations) return null;
 

@@ -1,3 +1,50 @@
+## [1.167.2](https://github.com/SocialGouv/mano/compare/v1.167.1...v1.167.2) (2022-10-25)
+
+
+### Bug Fixes
+
+* new tipi key ([#934](https://github.com/SocialGouv/mano/issues/934)) ([9ba7aa1](https://github.com/SocialGouv/mano/commit/9ba7aa17b1df8515a959a2da40d343e669127d28))
+
+## [1.167.1](https://github.com/SocialGouv/mano/compare/v1.167.0...v1.167.1) (2022-10-24)
+
+
+### Bug Fixes
+
+* **api:** phone numbers to contacts ([42652c2](https://github.com/SocialGouv/mano/commit/42652c203b0a0112bf5be9e46430c46235a019d2))
+
+# [1.167.0](https://github.com/SocialGouv/mano/compare/v1.166.0...v1.167.0) (2022-10-24)
+
+
+### Features
+
+* **dashboard:** reverse history of person to show newest change first ([b2b2039](https://github.com/SocialGouv/mano/commit/b2b20390c404d0dac88f5247fa57cbf7c4297e2e))
+
+# [1.166.0](https://github.com/SocialGouv/mano/compare/v1.165.0...v1.166.0) (2022-10-24)
+
+
+### Bug Fixes
+
+* bugs from 24 octobre 2022 ([#931](https://github.com/SocialGouv/mano/issues/931)) ([d225f71](https://github.com/SocialGouv/mano/commit/d225f7134a758f3299ba2a3b1b0c6fb55a2b9d46))
+
+
+### Features
+
+* new app version 2.24.1 ([ab48af5](https://github.com/SocialGouv/mano/commit/ab48af5a916b684f889ed384797d0cde9545c799))
+
+# [1.165.0](https://github.com/SocialGouv/mano/compare/v1.164.1...v1.165.0) (2022-10-24)
+
+
+### Features
+
+* add soliguide in mano ([#921](https://github.com/SocialGouv/mano/issues/921)) ([fa3d4f2](https://github.com/SocialGouv/mano/commit/fa3d4f2a2f41aef2337f04cd2094c98c248e63b3))
+
+## [1.164.1](https://github.com/SocialGouv/mano/compare/v1.164.0...v1.164.1) (2022-10-24)
+
+
+### Bug Fixes
+
+* **app:** observations selector ([#932](https://github.com/SocialGouv/mano/issues/932)) ([a6f0764](https://github.com/SocialGouv/mano/commit/a6f07645ab25bb875e4909c5261ca1aa1e5a0d3e))
+
 # [1.164.0](https://github.com/SocialGouv/mano/compare/v1.163.8...v1.164.0) (2022-10-21)
 
 

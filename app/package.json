@@ -1,6 +1,6 @@
 {
   "name": "mano",
-  "version": "2.24.0",
+  "version": "2.24.1",
   "private": true,
   "scripts": {
     "get-ip": "./get-ip.sh",
@@ -75,6 +75,7 @@
     "react-native-sodium": "^0.4.0",
     "react-native-svg": "^13.0.0",
     "react-native-tab-view": "^3.1.1",
+    "react-native-webview": "^11.23.1",
     "recoil": "^0.7.0",
     "recompose": "^0.30.0",
     "styled-components": "^5.2.1",

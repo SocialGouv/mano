@@ -245,13 +245,27 @@ export default function DataLoader() {
     } else if (current === 'passage') {
       setLoadingText('Chargement des passages');
       const res = await API.get({ path: '/passage', query });
-      setPassages(mergeItems(passages, res.decryptedData));
+      setPassages(() => {
+        const mergedItems = mergeItems(passages, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > rencontres.length) {
+          return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+        }
+        return mergedItems;
+      });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'rencontre') {
       setLoadingText('Chargement des rencontres');
       const res = await API.get({ path: '/rencontre', query });
-      setRencontres(mergeItems(rencontres, res.decryptedData));
+      setRencontres(() => {
+        const mergedItems = mergeItems(rencontres, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > rencontres.length) {
+          return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+        }
+        return mergedItems;
+      });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'action') {
@@ -264,31 +278,60 @@ export default function DataLoader() {
     } else if (current === 'territory') {
       setLoadingText('Chargement des territoires');
       const res = await API.get({ path: '/territory', query });
-      setTerritories(mergeItems(territories, res.decryptedData));
+      setTerritories(() => {
+        const mergedItems = mergeItems(territories, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > territories.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return mergedItems;
+      });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'place') {
       setLoadingText('Chargement des lieux');
       const res = await API.get({ path: '/place', query });
-      setPlaces(mergeItems(places, res.decryptedData));
+      setPlaces(() => {
+        const mergedItems = mergeItems(places, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > places.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return mergedItems;
+      });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'relsPersonPlace') {
       setLoadingText('Chargement des relations personne-lieu');
       const res = await API.get({ path: '/relPersonPlace', query });
-      setRelsPersonPlace(mergeItems(relsPersonPlace, res.decryptedData));
+      setRelsPersonPlace(() => {
+        const mergedItems = mergeItems(relsPersonPlace, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > relsPersonPlace.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        return mergedItems;
+      });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'territoryObservation') {
       setLoadingText('Chargement des observations de territoire');
       const res = await API.get({ path: '/territory-observation', query });
-      setTerritoryObservations(mergeItems(territoryObservations, res.decryptedData));
+      setTerritoryObservations(() => {
+        const mergedItems = mergeItems(territoryObservations, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > territoryObservations.length) {
+          return mergedItems.sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
+        }
+        return mergedItems;
+      });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'comment') {
       setLoadingText('Chargement des commentaires');
       const res = await API.get({ path: '/comment', query });
-      setComments(mergeItems(comments, res.decryptedData));
+      setComments(() => {
+        const mergedItems = mergeItems(comments, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > comments.length) {
+          return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+        }
+        return mergedItems;
+      });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     }
@@ -380,7 +423,7 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   };
 }
 
-function mergeItems(oldItems, newItems) {
+function mergeItems(oldItems, newItems = []) {
   const newItemsIds = newItems?.map((i) => i._id) || [];
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
   return [...oldItemsPurged, ...newItems].filter((e) => !e.deletedAt);

@@ -344,32 +344,6 @@ export const totalActionsByStatusSelector = selectorFamily({
     },
 });
 
-/*
-
-Observations
-
-*/
-export const onlyFilledObservationsTerritories = selector({
-  key: 'onlyFilledObservationsTerritories',
-  get: ({ get }) => {
-    const customFieldsObs = get(customFieldsObsSelector);
-    const territoryObservations = get(territoryObservationsState);
-
-    const observationsKeyLabels = {};
-    for (const field of customFieldsObs) {
-      observationsKeyLabels[field.name] = field.label;
-    }
-
-    return territoryObservations.map((obs) => {
-      const obsWithOnlyFilledFields = {};
-      for (let key of Object.keys(obs)) {
-        if (obs[key]) obsWithOnlyFilledFields[observationsKeyLabels[key]] = obs[key];
-      }
-      return { territory: obs.territory, ...obsWithOnlyFilledFields };
-    });
-  },
-});
-
 export const territoriesSearchSelector = selectorFamily({
   key: 'territoriesSearchSelector',
   get:
