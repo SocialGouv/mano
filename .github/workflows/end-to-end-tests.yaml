@@ -1,7 +1,10 @@
 name: End to End tests
 on:
   push:
-    branches: [none]
+    branches-ignore:
+      - ignoreme
+    tags-ignore:
+      - v*
 
 jobs:
   end-to-end-tests:
