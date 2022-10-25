@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "repository": "https://github.com/SocialGouv/mano.git",
-  "author": "Raphaël Huchet <raphael.huchet@beta.gouv.fr>",
+  "author": "Raphaël Huchet <raphael.huchet@beta.gouv.fr>, Arnaud Ambroselli <arnaud@ambroselli.io>",
   "license": "MIT",
   "devDependencies": {
     "@playwright/test": "^1.27.1"
