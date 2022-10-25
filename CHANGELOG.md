@@ -1,3 +1,10 @@
+## [1.167.2](https://github.com/SocialGouv/mano/compare/v1.167.1...v1.167.2) (2022-10-25)
+
+
+### Bug Fixes
+
+* new tipi key ([#934](https://github.com/SocialGouv/mano/issues/934)) ([9ba7aa1](https://github.com/SocialGouv/mano/commit/9ba7aa17b1df8515a959a2da40d343e669127d28))
+
 ## [1.167.1](https://github.com/SocialGouv/mano/compare/v1.167.0...v1.167.1) (2022-10-24)
 
 
