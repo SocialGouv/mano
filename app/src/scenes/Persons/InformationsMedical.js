@@ -11,11 +11,12 @@ import InputLabelled from '../../components/InputLabelled';
 import colors from '../../utils/colors';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { customFieldsPersonsMedicalSelector } from '../../recoil/persons';
-import { userState } from '../../recoil/auth';
+import { currentTeamState, userState } from '../../recoil/auth';
 
 const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, onEdit, isUpdateDisabled, updating, backgroundColor, person }) => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const user = useRecoilValue(userState);
+  const team = useRecoilValue(currentTeamState);
   const scrollViewRef = useRef(null);
   const refs = useRef({});
   const _scrollToInput = (ref) => {
@@ -48,7 +49,7 @@ const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, o
           {!editable && <Spacer />}
           {(customFieldsPersonsMedical || [])
             .filter((f) => f)
-            .filter((f) => f.enabled)
+            .filter((f) => f.enabled || f.enabledTeams.includes(team._id))
             .filter((f) => !f.onlyHealthcareProfessional || user?.healthcareProfessional)
             .map((field) => {
               const { label, name } = field;

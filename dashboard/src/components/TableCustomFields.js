@@ -11,6 +11,7 @@ import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import Table from './table';
 import DeleteButtonAndConfirmModal from './DeleteButtonAndConfirmModal';
+import TableCustomFieldteamSelector from './TableCustomFieldTeamSelector';
 
 const newField = () => ({
   // Todo: I guess could use crypto here.
@@ -37,14 +38,14 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
   const [mutableData, setMutableData] = useState(data);
   const [editingField, setEditingField] = useState(null);
   const [isNewField, setIsNewField] = useState(null);
+
   const [tableKey, setTableKey] = useState(0);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const API = useApi();
 
-  const onEnabledChange = (fieldToUpdate) => (event) => {
-    const enabled = event.target.checked;
-    setMutableData(mutableData.map((field) => (field.name !== fieldToUpdate.name ? field : { ...fieldToUpdate, enabled })));
-  };
+  function onUpdate(fieldToUpdate, data) {
+    setMutableData(mutableData.map((f) => (f.name === fieldToUpdate.name ? { ...f, ...data } : f)));
+  }
 
   const onShowStatsChange = (fieldToUpdate) => (event) => {
     const showInStats = event.target.checked;
@@ -155,10 +156,11 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
             show: true,
           },
           {
-            title: 'Activé',
+            title: "Activé pour l'équipe",
             show: true,
+            style: { width: '180px' },
             dataKey: 'enabled',
-            render: (f) => <input type="checkbox" checked={f.enabled} onChange={onEnabledChange(f)} />,
+            render: (f) => <TableCustomFieldteamSelector field={f} onUpdate={(data) => onUpdate(f, data)} />,
           },
           {
             title: (

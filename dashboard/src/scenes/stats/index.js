@@ -294,9 +294,9 @@ const Stats = () => {
   // Add enabled custom fields in filters.
   const filterPersonsWithAllFields = [
     ...filterPersonsBase,
-    ...customFieldsPersonsSocial.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsPersonsMedical.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsMedicalFile.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })),
+    ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
+    ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
+    ...customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
   ];
 
   if (isLoading) return <Loading />;
@@ -916,27 +916,22 @@ const BlockTotal = ({ title, unit, data, field }) => {
 };
 
 function CustomFieldsStats({ customFields, data, additionalCols = [] }) {
+  const team = useRecoilValue(currentTeamState);
   function getColsSize(totalCols) {
     if (totalCols === 1) return 12;
     if (totalCols === 2) return 6;
     if (totalCols % 4 === 0) return 3;
     return 4;
   }
-  const customFieldsNumber = customFields
+
+  const customFieldsInStats = customFields
     .filter((f) => f)
-    .filter((f) => f.enabled)
-    .filter((f) => f.showInStats)
-    .filter((field) => ['number'].includes(field.type));
-  const customFieldsDate = customFields
-    .filter((f) => f)
-    .filter((f) => f.enabled)
-    .filter((f) => f.showInStats)
-    .filter((field) => ['date', 'date-with-time'].includes(field.type));
-  const customFieldsResponsivePie = customFields
-    .filter((f) => f)
-    .filter((f) => f.enabled)
-    .filter((f) => f.showInStats)
-    .filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
+    .filter((f) => f.enabled || f.enabledTeams.includes(team._id))
+    .filter((f) => f.showInStats);
+
+  const customFieldsNumber = customFieldsInStats.filter((field) => ['number'].includes(field.type));
+  const customFieldsDate = customFieldsInStats.filter((field) => ['date', 'date-with-time'].includes(field.type));
+  const customFieldsResponsivePie = customFieldsInStats.filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
 
   const totalCols = customFieldsNumber.length + customFieldsDate.length + additionalCols.length;
 
