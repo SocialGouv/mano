@@ -115,7 +115,7 @@ const decryptDBItem = async (item, { logout, path, debug = false, encryptedVerif
   return item;
 };
 
-const handleApiError = (res) => {
+const handleApiError = (res, path, query) => {
   if (res?.error?.message) {
     toast?.error(res?.error?.message);
   } else if (res?.error) {
@@ -123,7 +123,7 @@ const handleApiError = (res) => {
   } else if (res?.code) {
     toast?.error(res?.code);
   } else {
-    capture('api error unhandled', { extra: { res } });
+    capture('api error unhandled', { extra: { res, path, query } });
   }
 };
 
@@ -276,7 +276,7 @@ const useApi = () => {
 
       try {
         const res = await response.json();
-        if (!response.ok) handleApiError(res);
+        if (!response.ok) handleApiError(res, path, query);
         if (!!res.data && Array.isArray(res.data)) {
           const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, debug, logout, encryptedVerificationKey })));
           if (wrongKeyWarned) {
