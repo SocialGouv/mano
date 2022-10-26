@@ -1,3 +1,10 @@
+## [1.168.2](https://github.com/SocialGouv/mano/compare/v1.168.1...v1.168.2) (2022-10-26)
+
+
+### Bug Fixes
+
+* **dashboard:** more logs on api error ([1059267](https://github.com/SocialGouv/mano/commit/10592672e267b56e1455256b445adcad644d0c85))
+
 ## [1.168.1](https://github.com/SocialGouv/mano/compare/v1.168.0...v1.168.1) (2022-10-26)
 
 
