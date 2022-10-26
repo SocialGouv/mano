@@ -1,3 +1,10 @@
+## [1.168.1](https://github.com/SocialGouv/mano/compare/v1.168.0...v1.168.1) (2022-10-26)
+
+
+### Bug Fixes
+
+* **dashboard:** f.enabledTeams?.includes ([c63ad66](https://github.com/SocialGouv/mano/commit/c63ad665f02d6c4ea4d7552562f068d8b626cbf0))
+
 # [1.168.0](https://github.com/SocialGouv/mano/compare/v1.167.2...v1.168.0) (2022-10-26)
 
 
