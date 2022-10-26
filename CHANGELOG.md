@@ -1,3 +1,10 @@
+# [1.168.0](https://github.com/SocialGouv/mano/compare/v1.167.2...v1.168.0) (2022-10-26)
+
+
+### Features
+
+* configuration multi-team ([#926](https://github.com/SocialGouv/mano/issues/926)) ([bdf8349](https://github.com/SocialGouv/mano/commit/bdf8349a3cd4ddeaa0e05dbe3197a76585de1d0a))
+
 ## [1.167.2](https://github.com/SocialGouv/mano/compare/v1.167.1...v1.167.2) (2022-10-25)
 
 
