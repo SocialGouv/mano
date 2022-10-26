@@ -926,7 +926,7 @@ function CustomFieldsStats({ customFields, data, additionalCols = [] }) {
 
   const customFieldsInStats = customFields
     .filter((f) => f)
-    .filter((f) => f.enabled || f.enabledTeams.includes(team._id))
+    .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
     .filter((f) => f.showInStats);
 
   const customFieldsNumber = customFieldsInStats.filter((field) => ['number'].includes(field.type));
