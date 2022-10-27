@@ -1,0 +1,63 @@
+name: Playwright Tests
+on:
+  push:
+    branches: [main]
+    tags-ignore: [v*]
+  pull_request:
+    branches: [main]
+jobs:
+  test:
+    timeout-minutes: 15
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_PASSWORD: postgres
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16
+      - name: Install dependencies
+        run: yarn
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+
+      - name: Install dashboard dependencies
+        run: yarn --cwd ./dashboard
+
+      - name: Install api dependencies
+        run: yarn --cwd ./api
+
+      - name: Init DB
+        run: yarn test:init-db
+        env:
+          PGDATABASE: manotest
+          PGBASEURL: postgres://postgres:postgres@localhost:5432
+
+      - name: Run Playwright tests
+        run: yarn playwright test
+        env:
+          PGBASEURL: postgres://postgres:postgres@localhost:5432
+          PGHOST: localhost
+          PGDATABASE: manotest
+          PGPORT: 5432
+          PGUSER: postgres
+          PGPASSWORD: postgres
+
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30

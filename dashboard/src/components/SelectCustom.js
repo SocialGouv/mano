@@ -22,6 +22,7 @@ const SelectCustom = ({ creatable, ...props }) => {
           primary75: theme.main75,
         },
       })}
+      instanceId={props.name}
       {...props}
     />
   );

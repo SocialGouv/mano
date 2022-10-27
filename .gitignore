@@ -5,3 +5,6 @@ node_modules
 .env
 .cache_ggshield
 test-local.js
+/test-results/
+/playwright-report/
+/playwright/.cache/

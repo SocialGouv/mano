@@ -1,0 +1,23 @@
+{
+  "name": "mano",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/SocialGouv/mano.git",
+  "author": "Raphaël Huchet <raphael.huchet@beta.gouv.fr>, Arnaud Ambroselli <arnaud@ambroselli.io>",
+  "license": "MIT",
+  "devDependencies": {
+    "@playwright/test": "^1.27.1"
+  },
+  "scripts": {
+    "test:start-dashboard-for-record": "REACT_APP_HOST=127.0.0.1:8091 REACT_APP_SCHEME=http REACT_APP_TEST=true PORT=8090 yarn --cwd ./dashboard dev",
+    "test:start-api-for-record": "PORT=8091 NODE_ENV=test PGDATABASE=manotest node ./api/src/index.js dev",
+    "test:init-db": "PGDATABASE=manotest node ./e2e/scripts/init-db.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "dotenv": "^16.0.3",
+    "nanoid": "3.3.4",
+    "pg": "^8.8.0",
+    "uuid": "^9.0.0"
+  }
+}

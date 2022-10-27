@@ -8,6 +8,11 @@ if (!process.env.PGBASEURL || !process.env.PGDATABASE) {
   process.exit(1);
 }
 
+if (process.env.PGDATABASE !== "manotest") {
+  console.log("PGDATABASE must be set to manotest");
+  process.exit(1);
+}
+
 async function createDb() {
   const client = new pg.Client({
     connectionString: `${process.env.PGBASEURL}/postgres`,
