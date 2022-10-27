@@ -1,3 +1,10 @@
+# [1.169.0](https://github.com/SocialGouv/mano/compare/v1.168.2...v1.169.0) (2022-10-27)
+
+
+### Features
+
+* **ci:** add playwright tests ([#930](https://github.com/SocialGouv/mano/issues/930)) ([138a220](https://github.com/SocialGouv/mano/commit/138a220a6a07e990076004bcf32a2f61039b2adf))
+
 ## [1.168.2](https://github.com/SocialGouv/mano/compare/v1.168.1...v1.168.2) (2022-10-26)
 
 
