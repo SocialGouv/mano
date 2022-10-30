@@ -1,3 +1,10 @@
+## [1.169.2](https://github.com/SocialGouv/mano/compare/v1.169.1...v1.169.2) (2022-10-30)
+
+
+### Bug Fixes
+
+* nextjw waring ([f819027](https://github.com/SocialGouv/mano/commit/f8190275e4ef9ec4a6835408edf28ec562463d6e))
+
 ## [1.169.1](https://github.com/SocialGouv/mano/compare/v1.169.0...v1.169.1) (2022-10-30)
 
 
