@@ -1,3 +1,10 @@
+## [1.169.1](https://github.com/SocialGouv/mano/compare/v1.169.0...v1.169.1) (2022-10-30)
+
+
+### Bug Fixes
+
+* **deps:** update react monorepo to v18 ([#731](https://github.com/SocialGouv/mano/issues/731)) ([bf2c64e](https://github.com/SocialGouv/mano/commit/bf2c64e8d76d0caca855af9f399fe0076cdbccd4))
+
 # [1.169.0](https://github.com/SocialGouv/mano/compare/v1.168.2...v1.169.0) (2022-10-27)
 
 
