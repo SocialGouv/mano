@@ -22,76 +22,76 @@ export default function Footer({ skipFirstParagraph }) {
   }, []);
   return (
     <>
-      <section className="bg-shamrock-400 flex justify-center" id="contact">
-        <div className="px-5 py-12 lg:py-24 lg:mx-24 md:container md:grid md:grid-cols-12">
-          <div className="mb-8 text-center lg:col-span-5 col-span-full flex flex-col justify-center">
-            <h3 className="mb-2 text-xl font-semibold text-white">Nous contacter</h3>
+      <section className='bg-shamrock-400 flex justify-center' id='contact'>
+        <div className='px-5 py-12 lg:py-24 lg:mx-24 md:container md:grid md:grid-cols-12'>
+          <div className='mb-8 text-center lg:col-span-5 col-span-full flex flex-col justify-center'>
+            <h3 className='mb-2 text-xl font-semibold text-white'>Nous contacter</h3>
             {!skipFirstParagraph && (
-              <p className="mb-8 text-sm text-white">
+              <p className='mb-8 text-sm text-white'>
                 Que vous ayez besoin d’un renseignement complémentaire ou d’une présentation
                 complète ou que vous soyez déjà convaincus, nous serons ravis d’échanger avec vous
               </p>
             )}
           </div>
-          <div className="grid grid-cols-1 gap-10 lg:col-span-8 lg:col-start-7 col-span-full">
+          <div className='grid grid-cols-1 gap-10 lg:col-span-8 lg:col-start-7 col-span-full'>
             <div>
-              <p className="mb-3  text-sm text-white text-center">
+              <p className='mb-3  text-sm text-white text-center'>
                 Pour toutes questions sur les fonctionnalités de MANO, pour une présentation
                 complète en présentiel ou commencer à utiliser l'outil{`\u00A0`}:<br />
-                <span className=" block text-base  mt-3 font-medium ">
+                <span className=' block text-base  mt-3 font-medium '>
                   Nathan, Mélissa et Yoann
                   <br />
                   chargés de déploiement
                 </span>
               </p>
               <button
-                className="mx-auto p-4 px-6 md:px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
+                className='mx-auto p-4 px-6 md:px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30'
                 onClick={() => {
                   window.location.href = "mailto:" + window && window.atob(nathan);
                 }}>
-                <HiOutlineMail className="text-lg" />
-                <span suppressHydrationWarning className="text-base font-medium">
+                <HiOutlineMail className='text-lg' />
+                <span suppressHydrationWarning className='text-base font-medium'>
                   {emailNathan}
                 </span>
               </button>
               <button
-                className="mx-auto p-4 px-6 md:px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
+                className='mx-auto p-4 px-6 md:px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30'
                 onClick={() => {
                   window.location.href = "mailto:" + window && window.atob(melissa);
                 }}>
-                <HiOutlineMail className="text-lg" />
-                <span suppressHydrationWarning className="text-base font-medium">
+                <HiOutlineMail className='text-lg' />
+                <span suppressHydrationWarning className='text-base font-medium'>
                   {emailMelissa}
                 </span>
               </button>
               <button
-                className="mx-auto p-4 px-6 md:px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
+                className='mx-auto p-4 px-6 md:px-12 mt-2 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30'
                 onClick={() => {
                   window.location.href = "mailto:" + window && window.atob(yoann);
                 }}>
-                <HiOutlineMail className="text-lg" />
-                <span suppressHydrationWarning className="text-base font-medium">
+                <HiOutlineMail className='text-lg' />
+                <span suppressHydrationWarning className='text-base font-medium'>
                   {emailYoann}
                 </span>
               </button>
             </div>
             <div>
-              <p className="mb-2 text-sm text-center text-white">
+              <p className='mb-2 text-sm text-center text-white'>
                 Pour toute question plus générale sur le projet ou pour établir un partenariat avec
                 un autre service :
-                <span className=" block text-base  mt-3 font-medium ">
+                <span className=' block text-base  mt-3 font-medium '>
                   Guillaume Demirhan,
                   <br />
                   porteur du projet
                 </span>
               </p>
               <button
-                className="mx-auto p-4 px-6 md:px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30"
+                className='mx-auto p-4 px-6 md:px-12 space-x-2 text-white transition-all bg-white flex-center rounded-xl bg-opacity-10 hover:bg-opacity-30'
                 onClick={() => {
                   window.location.href = "mailto:" + window && window.atob(guillaume);
                 }}>
-                <HiOutlineMail className="text-lg" />
-                <span suppressHydrationWarning className="text-base font-medium">
+                <HiOutlineMail className='text-lg' />
+                <span suppressHydrationWarning className='text-base font-medium'>
                   {emailGuillaume}
                 </span>
               </button>
@@ -100,32 +100,24 @@ export default function Footer({ skipFirstParagraph }) {
         </div>
       </section>
 
-      <section className="bg-shamrock-500">
-        <div className="flex flex-col items-center justify-center p-8 md:container md:flex-row md:justify-between">
-          <a className="w-20 mb-10 md:mb-0" href="/">
-            <img className="object-contain w-full h-full" src="/logo-white.png" alt="" />
+      <section className='bg-shamrock-500'>
+        <div className='flex flex-col items-center justify-center p-8 md:container md:flex-row md:justify-between'>
+          <a className='w-20 mb-10 md:mb-0' href='/'>
+            <img className='object-contain w-full h-full' src='/logo-white.png' alt='' />
           </a>
-          <p className="text-xs text-white">
-            <Link href="/legal">
-              <a>Accessibilité : non conforme</a>
-            </Link>
+          <p className='text-xs text-white'>
+            <Link href='/legal'>Accessibilité : non conforme</Link>
           </p>
-          <p className="text-xs text-white opacity-40">
-            <Link href="/legal">
-              <a>Mentions légales</a>
-            </Link>
+          <p className='text-xs text-white opacity-40'>
+            <Link href='/legal'>Mentions légales</Link>
           </p>
-          <p className="text-xs text-white opacity-40">
-            <Link href="/stats">
-              <a>Statistiques</a>
-            </Link>
+          <p className='text-xs text-white opacity-40'>
+            <Link href='/stats'>Statistiques</Link>
           </p>
-          <p className="text-xs text-white opacity-40">
-            <Link href="/privacy.pdf">
-              <a>Politique de confidentialité</a>
-            </Link>
+          <p className='text-xs text-white opacity-40'>
+            <Link href='/privacy.pdf'>Politique de confidentialité</Link>
           </p>
-          <p className="text-xs text-white opacity-40">
+          <p className='text-xs text-white opacity-40'>
             &copy; 2021-{year} Mano - Tous droits réservés
           </p>
         </div>
