@@ -1,3 +1,10 @@
+# [1.170.0](https://github.com/SocialGouv/mano/compare/v1.169.2...v1.170.0) (2022-10-30)
+
+
+### Features
+
+* **website:** update nextjs ([#943](https://github.com/SocialGouv/mano/issues/943)) ([420bcb1](https://github.com/SocialGouv/mano/commit/420bcb1756edd965831e757cfe8f9c593bec25e0))
+
 ## [1.169.2](https://github.com/SocialGouv/mano/compare/v1.169.1...v1.169.2) (2022-10-30)
 
 
