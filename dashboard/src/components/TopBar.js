@@ -38,6 +38,7 @@ const TopBar = () => {
             onChange={setCurrentTeam}
             teamId={currentTeam?._id}
             teams={user.role === 'admin' ? teams : user.teams}
+            inputId="team-selector-topBar"
           />
         )}
       </TopBarOrganistionTeamBox>

@@ -723,6 +723,7 @@ export function MedicalFile({ person }) {
           {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
             <React.Fragment>
               <ModalHeader
+                closeAriaLabel="Fermer la fenêtre de modification de la consultation"
                 toggle={async () => {
                   if (JSON.stringify(values) === JSON.stringify(currentConsultation)) return resetCurrentConsultation();
                   setModalConfirmState({
@@ -761,13 +762,15 @@ export function MedicalFile({ person }) {
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="type">Type</Label>
-                      <SelectCustom
+                      <SelectAsInput
                         id="type"
-                        value={{ label: values.type, value: values.type }}
-                        onChange={(t) => {
-                          handleChange({ currentTarget: { value: t.value, name: 'type' } });
-                        }}
-                        options={organisation.consultations.map((e) => ({ label: e.name, value: e.name }))}
+                        name="type"
+                        inputId="consultation-modal-type"
+                        classNamePrefix="consultation-modal-type"
+                        value={values.type || ''}
+                        onChange={handleChange}
+                        placeholder="Choisissez le type de consultation"
+                        options={organisation.consultations.map((e) => e.name)}
                       />
                       {touched.type && errors.type && <Error>{errors.type}</Error>}
                     </FormGroup>

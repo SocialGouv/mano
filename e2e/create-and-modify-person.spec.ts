@@ -1,6 +1,6 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
-import reactSelect from "./utils";
+import { clickOnEmptyReactSelect } from "./utils";
 
 // This test uses admin1@example.org
 // It creates a random person and then modifies it.
@@ -30,9 +30,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page
-    .getByRole("button", { name: "Créer une nouvelle personne" })
-    .click();
+  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
 
   await page.getByLabel("Nom").click();
 
@@ -54,9 +52,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("En rue depuis le").fill("10/10/2022");
 
   await page
-    .getByLabel(
-      "Personne très vulnérable, ou ayant besoin d'une attention particulière"
-    )
+    .getByLabel("Personne très vulnérable, ou ayant besoin d'une attention particulière")
     .check();
 
   await page.getByLabel("Téléphone").click();
@@ -65,7 +61,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("Test de description");
 
-  await reactSelect(page, "personalSituation", "Famille");
+  await clickOnEmptyReactSelect(page, "person-select-personalSituation", "Famille");
 
   await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("aucune");
@@ -74,17 +70,12 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByText("Oui", { exact: true }).click();
 
   await page.locator(".person-select-address__placeholder").click();
-  await page
-    .locator(".person-select-address__menu")
-    .getByText("Oui", { exact: true })
-    .click();
+  await page.locator(".person-select-address__menu").getByText("Oui", { exact: true }).click();
 
   await page.locator(".person-select-addressDetail__value-container").click();
   await page.getByText("Logement", { exact: true }).click();
 
-  await page
-    .locator(".person-select-nationalitySituation__value-container")
-    .click();
+  await page.locator(".person-select-nationalitySituation__value-container").click();
   await page.getByText("UE", { exact: true }).click();
 
   await page.locator(".person-select-employment__value-container").click();
@@ -99,9 +90,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Structure de suivi médical").click();
   await page.getByLabel("Structure de suivi médical").fill("fdfdfs");
 
-  await page
-    .locator(".person-custom-select-consumptions__value-container")
-    .click();
+  await page.locator(".person-custom-select-consumptions__value-container").click();
   await page.getByText("Alcool", { exact: true }).click();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
@@ -109,9 +98,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByText("Mis à jour !").click();
 
   await page.locator('a:has-text("Dossier Médical")').click();
-  await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/.*\?tab=dossier\+m%C3%A9dical/
-  );
+  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?tab=dossier\+m%C3%A9dical/);
 
   await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
 
