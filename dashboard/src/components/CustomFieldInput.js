@@ -20,7 +20,11 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
   return (
     <Col md={colWidth} key={field.name}>
       <FormGroup>
-        {!hideLabel && <Label htmlFor={id}>{field.type !== 'boolean' ? field.label : ''}</Label>}
+        {!hideLabel && (
+          <Label data-test-id={field.label} htmlFor={id}>
+            {field.type !== 'boolean' ? field.label : ''}
+          </Label>
+        )}
         {!!['text', 'number'].includes(field.type) && (
           <Input
             disabled={disabled}

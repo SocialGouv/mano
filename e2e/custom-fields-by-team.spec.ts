@@ -1,8 +1,19 @@
 import { test, expect } from "@playwright/test";
+import { nanoid } from "nanoid";
 import { changeReactSelectValue, clickOnEmptyReactSelect } from "./utils";
 
 test("Create custom fields filtered by team", async ({ page }) => {
-  test.setTimeout(60000);
+  // Always use a new items
+  const personName = nanoid();
+  const territoryName = nanoid();
+  const teamExcludeCustomFieldName = nanoid();
+  const testPersonSocialField = nanoid();
+  const testPersonMedicalField = nanoid();
+  const testMedicalFileField = nanoid();
+  const testConsultationField = nanoid();
+  const testObsTerritoryField = nanoid();
+
+  test.setTimeout(120000);
 
   await page.goto("http://localhost:8090/");
 
@@ -23,6 +34,28 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   /*
 
+  Add a new team
+
+
+
+  */
+
+  await page.getByRole("link", { name: "Équipes" }).click();
+  await expect(page).toHaveURL("http://localhost:8090/team");
+
+  await page.getByRole("button", { name: "Créer une nouvelle équipe" }).click();
+
+  await page.getByLabel("Nom").click();
+
+  await page.getByLabel("Nom").fill(teamExcludeCustomFieldName);
+
+  await page.getByLabel("Non").check();
+
+  await page.getByRole("button", { name: "Créer" }).click();
+  await page.locator(".Toastify__close-button").click();
+
+  /*
+
   Add the custom fields
 
 
@@ -37,7 +70,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Nom").click();
 
-  await page.getByLabel("Nom").fill("Test champ perso infos sociales");
+  await page.getByLabel("Nom").fill(testPersonSocialField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").click();
@@ -46,7 +79,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Nom").click();
 
-  await page.getByLabel("Nom").fill("Test champ perso info médicales");
+  await page.getByLabel("Nom").fill(testPersonMedicalField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").click();
@@ -57,7 +90,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Nom").click();
 
-  await page.getByLabel("Nom").fill("Test champ perso dossier médical");
+  await page.getByLabel("Nom").fill(testMedicalFileField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").click();
@@ -68,7 +101,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Nom").click();
 
-  await page.getByLabel("Nom").fill("Test champ perso consultation");
+  await page.getByLabel("Nom").fill(testConsultationField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").click();
@@ -79,7 +112,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Nom").click();
 
-  await page.getByLabel("Nom").fill("Test champ perso observation");
+  await page.getByLabel("Nom").fill(testObsTerritoryField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").click();
@@ -99,20 +132,20 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Nom").click();
 
-  await page.getByLabel("Nom").fill("Test personne");
+  await page.getByLabel("Nom").fill(personName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
   await changeReactSelectValue(page, "team-selector-topBar", "Team Test - 1");
 
-  await page.getByLabel("Test champ perso infos sociales").click();
+  await page.getByLabel(testPersonSocialField).click();
 
-  await page.getByLabel("Test champ perso info médicales").click();
+  await page.getByLabel(testPersonMedicalField).click();
 
   await page.locator('a:has-text("Dossier Médical")').click();
 
-  await page.getByLabel("Test champ perso dossier médical").click();
+  await page.getByLabel(testMedicalFileField).click();
 
   await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
 
@@ -120,9 +153,9 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
 
-  await page.getByLabel("Test champ perso consultation").click();
+  await page.getByLabel(testConsultationField).click();
 
-  await page.getByLabel("Test champ perso consultation").fill("Super");
+  await page.getByLabel(testConsultationField).fill("Super");
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
 
@@ -133,40 +166,20 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Nom").click();
 
-  await page.getByLabel("Nom").fill("Test territoire");
+  await page.getByLabel("Nom").fill(territoryName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".Toastify__close-button").click();
 
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
 
-  await page.getByLabel("Test champ perso observation").click();
+  await page.getByLabel(testObsTerritoryField).click();
 
-  await page.getByLabel("Test champ perso observation").fill("Magique");
+  await page.getByLabel(testObsTerritoryField).fill("Magique");
+
+  await clickOnEmptyReactSelect(page, "observation-select-team", teamExcludeCustomFieldName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator(".Toastify__close-button").click();
-
-  /*
-
-  Add a new team
-
-
-
-  */
-
-  await page.getByRole("link", { name: "Équipes" }).click();
-  await expect(page).toHaveURL("http://localhost:8090/team");
-
-  await page.getByRole("button", { name: "Créer une nouvelle équipe" }).click();
-
-  await page.getByLabel("Nom").click();
-
-  await page.getByLabel("Nom").fill("Team exclue champs persos");
-
-  await page.getByLabel("Non").check();
-
-  await page.getByRole("button", { name: "Créer" }).click();
   await page.locator(".Toastify__close-button").click();
 
   /*
@@ -182,29 +195,26 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Personnes suivies" }).click();
 
   await page
-    .getByRole("row", {
-      name: "✎ Test champ perso infos sociales Texte Toute l'organisation Supprimer",
-    })
-    .getByLabel("Toute l'organisation")
-    .uncheck();
+    .locator(`data-test-id=${testPersonSocialField}`)
+    .getByText("Toute l'organisation")
+    .click();
 
-  await page.getByLabel("Team exclue champs persos").uncheck();
+  await page
+    .locator(`data-test-id=${testPersonSocialField}`)
+    .getByLabel(teamExcludeCustomFieldName)
+    .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
   await page.locator(".Toastify__close-button").click();
 
   await page
-    .getByRole("row", {
-      name: "✎ Test champ perso info médicales Texte Toute l'organisation Supprimer",
-    })
-    .getByLabel("Toute l'organisation")
-    .uncheck();
+    .locator(`data-test-id=${testPersonMedicalField}`)
+    .getByText("Toute l'organisation")
+    .click();
 
   await page
-    .getByRole("row", {
-      name: "✎ Test champ perso info médicales Texte Toute l'organisation Team Test - 1 Team exclue champs persos Supprimer",
-    })
-    .getByLabel("Team exclue champs persos")
+    .locator(`data-test-id=${testPersonMedicalField}`)
+    .getByLabel(teamExcludeCustomFieldName)
     .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).nth(2).click();
@@ -213,13 +223,14 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
 
   await page
-    .getByRole("row", {
-      name: "✎ Test champ perso dossier médical Texte Toute l'organisation Supprimer",
-    })
-    .getByLabel("Toute l'organisation")
-    .uncheck();
+    .locator(`data-test-id=${testMedicalFileField}`)
+    .getByText("Toute l'organisation")
+    .click();
 
-  await page.getByText("Team exclue champs persos").click();
+  await page
+    .locator(`data-test-id=${testMedicalFileField}`)
+    .getByLabel(teamExcludeCustomFieldName)
+    .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
   await page.locator(".Toastify__close-button").click();
@@ -227,13 +238,14 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
 
   await page
-    .getByRole("row", {
-      name: "✎ Test champ perso consultation Texte Toute l'organisation Supprimer",
-    })
+    .locator(`data-test-id=${testConsultationField}`)
     .getByLabel("Toute l'organisation")
     .uncheck();
 
-  await page.getByLabel("Team exclue champs persos").uncheck();
+  await page
+    .locator(`data-test-id=${testConsultationField}`)
+    .getByLabel(teamExcludeCustomFieldName)
+    .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
   await page.locator(".Toastify__close-button").click();
@@ -241,13 +253,14 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Territoires" }).click();
 
   await page
-    .getByRole("row", {
-      name: "✎ Test champ perso observation Texte Toute l'organisation Supprimer",
-    })
+    .locator(`data-test-id=${testObsTerritoryField}`)
     .getByText("Toute l'organisation")
     .click();
 
-  await page.getByText("Team exclue champs persos").click();
+  await page
+    .locator(`data-test-id=${testObsTerritoryField}`)
+    .getByLabel(teamExcludeCustomFieldName)
+    .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
   await page.locator(".Toastify__close-button").click();
@@ -264,23 +277,18 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page
-    .getByRole("row", { name: "Test personne Team Test - 1 30 octobre 2022" })
-    .getByRole("cell")
-    .nth(1)
-    .click();
+  await page.getByRole("cell", { name: personName }).click();
 
-  await page.locator('label:has-text("Test champ perso infos sociales")').click();
-
-  await page.locator('label:has-text("Test champ perso info médicales")').click();
+  await page.locator(`data-test-id=${testPersonSocialField}`).click();
+  await page.locator(`data-test-id=${testPersonMedicalField}`).click();
 
   await page.locator('a:has-text("Dossier Médical")').click();
 
-  await page.getByText("Test champ perso dossier médical").click();
+  await page.locator(`data-test-id=${testMedicalFileField}`).click();
 
   await page.locator("tbody > tr > td:nth-child(5)").click();
 
-  await page.locator('label:has-text("Test champ perso consultation")').click();
+  await page.locator(`data-test-id=${testConsultationField}`).click();
 
   await page
     .getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" })
@@ -289,11 +297,11 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Territoires" }).click();
   await expect(page).toHaveURL("http://localhost:8090/territory");
 
-  await page.getByRole("cell", { name: "Test territoire" }).click();
+  await page.getByRole("cell", { name: territoryName }).click();
 
-  await page.getByText("Test champ perso observation: Magique").click();
+  await page.getByText(`${testObsTerritoryField}: Magique`).click();
 
-  await page.locator('label:has-text("Test champ perso observation")').click();
+  await page.locator(`data-test-id=${testObsTerritoryField}`).click();
 
   await page
     .locator(
@@ -305,34 +313,29 @@ test("Create custom fields filtered by team", async ({ page }) => {
   /*
 
   Test the restrictions on the fields
-  Test with the allowed team
+  Test with the unallowed team
 
 
 
   */
 
-  await changeReactSelectValue(page, "team-selector-topBar", "Team exclue champs persos");
+  await changeReactSelectValue(page, "team-selector-topBar", teamExcludeCustomFieldName);
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page
-    .getByRole("row", { name: "Test personne Team Test - 1 30 octobre 2022" })
-    .getByRole("cell")
-    .nth(1)
-    .click();
+  await page.getByRole("cell", { name: personName }).click();
 
-  await expect(page.locator('label:has-text("Test champ perso infos sociales")')).toBeHidden();
-
-  await expect(page.locator('label:has-text("Test champ perso info médicales")')).toBeHidden();
+  await expect(page.locator(`data-test-id=${testPersonSocialField}`)).toBeHidden();
+  await expect(page.locator(`data-test-id=${testPersonMedicalField}`)).toBeHidden();
 
   await page.locator('a:has-text("Dossier Médical")').click();
 
-  await expect(page.locator('label:has-text("Test champ perso dossier médical")')).toBeHidden();
+  await expect(page.locator(`data-test-id=${testMedicalFileField}`)).toBeHidden();
 
   await page.locator("tbody > tr > td:nth-child(5)").click();
 
-  await expect(page.locator('label:has-text("Test champ perso consultation")')).toBeHidden();
+  await expect(page.locator(`data-test-id=${testConsultationField}`)).toBeHidden();
 
   await page
     .getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" })
@@ -341,12 +344,12 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("link", { name: "Territoires" }).click();
   await expect(page).toHaveURL("http://localhost:8090/territory");
 
-  await page.getByRole("cell", { name: "Test territoire" }).click();
+  await page.getByRole("cell", { name: territoryName }).click();
 
   await expect(page.getByText("Test champ perso observation: Magique")).toBeHidden();
   await page.getByText("Nombre de personnes non connues hommes rencontrées:").click();
 
-  await expect(page.locator('label:has-text("Test champ perso observation")')).toBeHidden();
+  await expect(page.locator(`data-test-id=${testObsTerritoryField}`)).toBeHidden();
 
   await page
     .locator(

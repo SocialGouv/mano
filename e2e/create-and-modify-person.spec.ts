@@ -37,13 +37,15 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Nom").fill(personName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.locator(".Toastify__close-button").click();
+
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
 
   await page.getByLabel("Autres pseudos").click();
   await page.getByLabel("Autres pseudos").fill("deuxième pseudo");
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
-  await page.getByText("Mis à jour !").click();
+  await page.locator(".Toastify__close-button").click();
 
   await page.getByLabel("Autres pseudos").click();
   await page.getByLabel("Nom prénom ou Pseudonyme").click();
@@ -94,8 +96,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByText("Alcool", { exact: true }).click();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
-
-  await page.getByText("Mis à jour !").click();
+  await page.locator(".Toastify__close-button").click();
 
   await page.locator('a:has-text("Dossier Médical")').click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?tab=dossier\+m%C3%A9dical/);
@@ -115,5 +116,5 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByPlaceholder("Angine").fill("dsqdsqdqs");
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Traitement créé !").click();
+  await page.locator(".Toastify__close-button").click();
 });

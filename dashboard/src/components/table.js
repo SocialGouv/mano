@@ -94,6 +94,7 @@ const Table = ({
                 onClick={() => (!rowDisabled(item) && onRowClick ? onRowClick(item) : null)}
                 key={item[rowKey] || item._id}
                 data-key={item[rowKey] || item._id}
+                data-test-id={item[rowKey] || item._id}
                 style={{
                   ...(item.style || {}),
                   cursor: rowDisabled(item) ? 'not-allowed' : 'pointer',
