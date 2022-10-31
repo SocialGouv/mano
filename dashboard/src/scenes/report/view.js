@@ -54,6 +54,7 @@ import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
+import { flushSync } from 'react-dom';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -396,9 +397,14 @@ const View = () => {
                 <hr />
               </>
             )}
-            <DrawerLink id="report-button-reception" className={activeTab === 'reception' ? 'active' : ''} onClick={() => setActiveTab('reception')}>
-              Accueil
-            </DrawerLink>
+            {!!organisation.services && !!organisation.receptionEnabled && (
+              <DrawerLink
+                id="report-button-reception"
+                className={activeTab === 'reception' ? 'active' : ''}
+                onClick={() => setActiveTab('reception')}>
+                Accueil
+              </DrawerLink>
+            )}
             {!['restricted-access'].includes(user.role) && (
               <>
                 <hr />
@@ -497,7 +503,7 @@ const View = () => {
                 <DescriptionAndCollaborations report={report} />
               </div>
             )}
-            {activeTab === 'reception' && (
+            {activeTab === 'reception' && !!organisation.services && !!organisation.receptionEnabled && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
                 <Reception report={report} />
               </div>
@@ -575,39 +581,45 @@ const Reception = ({ report }) => {
   const organisation = useRecoilValue(organisationState);
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
-  const services = report?.services?.length ? JSON.parse(report?.services) : {};
+  const [services, setServices] = useState(() => (report?.services?.length ? JSON.parse(report?.services) : {}));
 
+  const changeTimeout = useRef(null);
   const onServiceUpdate = async (service, newCount) => {
+    const newServices = {
+      ...services,
+      [service]: newCount,
+    };
+    flushSync(() => setServices(newServices));
     const reportUpdate = {
       ...report,
-      services: JSON.stringify({
-        ...services,
-        [service]: newCount,
-      }),
+      services: JSON.stringify(newServices),
     };
-    const isNew = !report._id;
-    const res = isNew
-      ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-      : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
-    if (res.ok) {
-      setReports((reports) =>
-        isNew
-          ? [res.decryptedData, ...reports]
-          : reports.map((a) => {
-              if (a._id === report._id) return res.decryptedData;
-              return a;
-            })
-      );
-    }
+    clearTimeout(changeTimeout.current);
+    changeTimeout.current = setTimeout(async () => {
+      const isNew = !report._id;
+      const res = isNew
+        ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+        : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+      if (res.ok) {
+        setReports((reports) =>
+          isNew
+            ? [res.decryptedData, ...reports]
+            : reports.map((a) => {
+                if (a._id === report._id) return res.decryptedData;
+                return a;
+              })
+        );
+      }
+    }, 1000);
   };
 
   if (!organisation.receptionEnabled) return null;
+  if (!organisation?.services) return null;
 
-  const renderServices = () => {
-    if (!organisation.services) return null;
-    const services = JSON.parse(report.services || '{}') || {};
-    return (
-      <>
+  return (
+    <StyledBox>
+      <TabTitle>Services effectués ce jour</TabTitle>
+      <ServicesWrapper>
         {organisation?.services?.map((service) => (
           <IncrementorSmall
             key={service}
@@ -616,14 +628,7 @@ const Reception = ({ report }) => {
             onChange={(newCount) => onServiceUpdate(service, newCount)}
           />
         ))}
-      </>
-    );
-  };
-
-  return (
-    <StyledBox>
-      <TabTitle>Services effectués ce jour</TabTitle>
-      <ServicesWrapper>{renderServices()}</ServicesWrapper>
+      </ServicesWrapper>
     </StyledBox>
   );
 };
