@@ -252,7 +252,7 @@ export function MedicalFile({ person }) {
                 <React.Fragment>
                   <Row>
                     {customFieldsMedicalFile
-                      .filter((f) => f.enabled)
+                      .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                       .map((field) => (
                         <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                       ))}
@@ -511,7 +511,7 @@ export function MedicalFile({ person }) {
                 .map(([key, value]) => {
                   let field = organisation.consultations
                     .find((e) => e.name === (c.type || ''))
-                    ?.fields.filter((f) => f.enabled)
+                    ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                     .find((e) => e.name === key);
                   if (!field) {
                     field = { type: 'text', label: key };
@@ -723,6 +723,7 @@ export function MedicalFile({ person }) {
           {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
             <React.Fragment>
               <ModalHeader
+                closeAriaLabel="Fermer la fenêtre de modification de la consultation"
                 toggle={async () => {
                   if (JSON.stringify(values) === JSON.stringify(currentConsultation)) return resetCurrentConsultation();
                   setModalConfirmState({
@@ -761,20 +762,22 @@ export function MedicalFile({ person }) {
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="type">Type</Label>
-                      <SelectCustom
+                      <SelectAsInput
                         id="type"
-                        value={{ label: values.type, value: values.type }}
-                        onChange={(t) => {
-                          handleChange({ currentTarget: { value: t.value, name: 'type' } });
-                        }}
-                        options={organisation.consultations.map((e) => ({ label: e.name, value: e.name }))}
+                        name="type"
+                        inputId="consultation-modal-type"
+                        classNamePrefix="consultation-modal-type"
+                        value={values.type || ''}
+                        onChange={handleChange}
+                        placeholder="Choisissez le type de consultation"
+                        options={organisation.consultations.map((e) => e.name)}
                       />
                       {touched.type && errors.type && <Error>{errors.type}</Error>}
                     </FormGroup>
                   </Col>
                   {organisation.consultations
                     .find((e) => e.name === values.type)
-                    ?.fields.filter((f) => f.enabled)
+                    ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                     .map((field) => {
                       return (
                         <CustomFieldInput colWidth={6} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />

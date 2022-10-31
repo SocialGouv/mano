@@ -93,7 +93,7 @@ const App = ({ resetRecoil }) => {
 
   return (
     <div className="main-container">
-      <ToastContainer />
+      <ToastContainer limit={process.env.REACT_APP_TEST === 'true' ? 1 : 10} />
       <VersionOutdatedAlert />
       <Router history={history}>
         <ScrollToTop />

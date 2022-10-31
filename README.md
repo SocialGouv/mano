@@ -1,4 +1,5 @@
 # Mano
+
 ![Mobile version](https://img.shields.io/badge/mobile%20app%20version-2.24.1-blue)
 [![Maintainability](https://api.codeclimate.com/v1/badges/223e4185a3e13f1ef5d0/maintainability)](https://codeclimate.com/github/SocialGouv/mano/maintainability)
 
@@ -38,7 +39,7 @@ yarn && yarn test:init-db
 
 ### Lancer les tests en local
 
-Lancer les tests directement depuis l'interface de VSCode, qui se charge de lancer les serveurs nécessaires. On peut lancer l'ensemble ou seulement un test.
+Lancer les tests directement depuis l'interface de VSCode (lancer la commande `Testing: Focus on Playwright View`), qui se charge de lancer les serveurs nécessaires. On peut lancer l'ensemble ou seulement un test.
 
 ### Créer des nouveaux tests
 

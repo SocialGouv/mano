@@ -96,7 +96,9 @@ const filterPersonsWithAllFieldsSelector = selector({
       ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
-      ...(user.healthcareProfessional ? customFieldsMedicalFile.filter((a) => a.enabled).map((a) => ({ field: a.name, ...a })) : []),
+      ...(user.healthcareProfessional
+        ? customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a }))
+        : []),
       {
         label: 'Lieux fréquentés',
         field: 'places',

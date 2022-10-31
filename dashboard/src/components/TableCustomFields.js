@@ -118,7 +118,7 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
         data={mutableData}
         // use this key prop to reset table and reset sortablejs on each element added/removed
         key={(keyPrefix || customFields) + tableKey + organisation}
-        rowKey="name"
+        rowKey="label"
         isSortable
         onSort={handleSort}
         noData="Pas de champs personnalisés"
