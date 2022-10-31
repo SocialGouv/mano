@@ -2,13 +2,13 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-const IncrementorSmall = ({ service, count, onChange }) => {
+const IncrementorSmall = ({ service, count, onChange, disabled = false }) => {
   return (
-    <IncrementorSmallWrapper>
-      <div id={`${service}-title`} className="service-name">
+    <IncrementorSmallWrapper className="incrementor-small">
+      <p id={`${service}-title`} className="service-name">
         {service}
-      </div>
-      <ButtonRemoveAdd aria-label="moins" disabled={count === 0} onClick={() => onChange(count - 1)} id={`${service}-remove`}>
+      </p>
+      <ButtonRemoveAdd aria-label="moins" disabled={disabled || count === 0} onClick={() => onChange(count - 1)} id={`${service}-remove`}>
         -
       </ButtonRemoveAdd>
       <LocalCount
@@ -16,9 +16,10 @@ const IncrementorSmall = ({ service, count, onChange }) => {
         id={`${service}-count`}
         type="number"
         value={count}
+        disabled={disabled}
         onChange={(e) => onChange(Number(e.currentTarget.value))}
       />
-      <ButtonRemoveAdd aria-label="plus" onClick={() => onChange(count + 1)} id={`${service}-add`}>
+      <ButtonRemoveAdd aria-label="plus" onClick={() => onChange(count + 1)} id={`${service}-add`} disabled={disabled}>
         +
       </ButtonRemoveAdd>
     </IncrementorSmallWrapper>
@@ -32,6 +33,7 @@ const IncrementorSmallWrapper = styled.div`
   .service-name {
     flex-grow: 1;
     color: ${theme.black75};
+    margin: 0;
   }
 `;
 const LocalCount = styled.input`

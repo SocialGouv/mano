@@ -1,20 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Col, Row, FormGroup, Label } from 'reactstrap';
 import styled from 'styled-components';
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import {
   addOneDay,
   formatDateWithFullMonth,
+  formatDateWithNameOfDay,
   formatTime,
-  getIsDayWithinHoursOffsetOfDay,
   getIsDayWithinHoursOffsetOfPeriod,
   startOfToday,
 } from '../../services/date';
 import DateBloc from '../../components/DateBloc';
-import { SmallHeader } from '../../components/header';
-import Loading from '../../components/loading';
+import { HeaderStyled, Title as HeaderTitle } from '../../components/header';
 import BackButton, { BackButtonWrapper } from '../../components/backButton';
 import Box from '../../components/Box';
 import ActionStatus from '../../components/ActionStatus';
@@ -32,14 +31,13 @@ import CreateObservation from '../../components/CreateObservation';
 import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
 import ActionName from '../../components/ActionName';
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
 import { personsState } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { currentTeamReportsSelector } from '../../recoil/selectors';
 import IncrementorSmall from '../../components/IncrementorSmall';
 import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
@@ -53,8 +51,9 @@ import { consultationsState, disableConsultationRow } from '../../recoil/consult
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
-import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import { flushSync } from 'react-dom';
+import useSearchParamState from '../../services/useSearchParamState';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -63,73 +62,87 @@ const getPeriodTitle = (date, nightSession) => {
 };
 
 const View = () => {
-  const { id } = useParams();
+  const { dateString } = useParams();
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const allComments = useRecoilValue(commentsState);
   const allPersons = useRecoilValue(personsState);
-  const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
+  const teams = useRecoilValue(teamsState);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
+  const [selectedTeamIds, setSelectedTeamIds] = useSearchParamState('reportsTeams', [currentTeam._id], {
+    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
+  });
+  const selectedTeams = useMemo(
+    () => (viewAllOrganisationData ? teams : teams.filter((team) => selectedTeamIds.includes(team._id))),
+    [selectedTeamIds, teams, viewAllOrganisationData]
+  );
+  const selectedTeamsObject = useMemo(() => {
+    const teamsObject = {};
+    for (const team of selectedTeams) {
+      teamsObject[team._id] = team;
+    }
+    return teamsObject;
+  }, [selectedTeams]);
+  const isReadOnly = selectedTeams.length > 1;
+
+  const isSingleTeam = selectedTeams.length === 1;
+
   const allReports = useRecoilValue(reportsState);
+  const reportsFromDay = useMemo(() => allReports.filter((report) => report.date === dateString), [dateString, allReports]);
   const setReports = useSetRecoilState(reportsState);
   const history = useHistory();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useState(['restricted-access'].includes(user.role) ? 'reception' : 'resume');
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
-  // When we switch team, we need to refresh the report.
-  // Since there is ["new__" or ID] in URL and team can be switch, we have to handle many edge cases.
-  useEffect(
-    function redirectOnTeamChange() {
-      const maybeNewReport = id.startsWith('new__'); // URL says it's new, but it can be false when URL changes.
-      if (maybeNewReport) {
-        const currentReportByDateAndTeam = allReports.find((r) => r.date === id.replace('new__', '') && r.team === currentTeam._id);
-        if (currentReportByDateAndTeam) return history.push(`/report/${currentReportByDateAndTeam._id}`);
-        return;
-      }
-      const currentTeamReportById = currentTeamReports.find((r) => r._id === id);
-      if (currentTeamReportById) return;
+  const selectedTeamsReports = useMemo(() => {
+    return selectedTeams.map((team) => {
+      const report = reportsFromDay.find((rep) => rep.team === team._id);
+      if (!!report) return report;
+      return { team: team._id, date: dateString };
+    });
+  }, [selectedTeams, reportsFromDay, dateString]);
 
-      const initialReport = allReports.find((r) => r._id === id);
-      if (initialReport) {
-        const currentTeamReportByDate = currentTeamReports.find((r) => r.date === initialReport.date);
-        if (currentTeamReportByDate) return history.push(`/report/${currentTeamReportByDate._id}`);
-        else return history.push(`/report/new__${initialReport.date}`);
-      }
-    },
-    [allReports, currentTeam._id, currentTeamReports, history, id]
-  );
-
-  const report = useMemo(() => {
-    if (id.startsWith('new__')) return { team: currentTeam._id, date: id.replace('new__', '') };
-    return currentTeamReports.find((r) => r._id === id) || allReports.find((r) => r._id === id);
-  }, [allReports, currentTeam._id, currentTeamReports, id]);
+  const singleReport = useMemo(() => {
+    if (!isSingleTeam) return null;
+    return selectedTeamsReports[0];
+  }, [isSingleTeam, selectedTeamsReports]);
 
   const allPassages = useRecoilValue(passagesState);
   const passages = useMemo(
     () =>
       allPassages
-        .filter((p) => p.team === currentTeam._id)
-        .filter((p) =>
-          getIsDayWithinHoursOffsetOfPeriod(
+        .filter((p) => !!selectedTeamsObject[p.team])
+        .filter((p) => {
+          const currentTeam = selectedTeamsObject[p.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
             p.date,
-            { referenceStartDay: report.date, referenceEndDay: report.date },
+            { referenceStartDay: dateString, referenceEndDay: dateString },
             currentTeam?.nightSession ? 12 : 0
-          )
-        )
+          );
+        })
         .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allPassages, currentTeam._id, currentTeam?.nightSession, report.date]
+    [allPassages, dateString, selectedTeamsObject]
   );
 
   const allActions = useRecoilValue(actionsState);
   const actionsCallback = useCallback(
     (status) =>
       allActions
-        ?.filter((a) => a.team === currentTeam._id)
+        .filter((a) => !!selectedTeamsObject[a.team])
         .filter((a) => a.status === status)
-        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.completedAt, report.date, currentTeam?.nightSession ? 12 : 0)),
-    [allActions, currentTeam._id, currentTeam?.nightSession, report.date]
+        .filter((a) => {
+          const currentTeam = selectedTeamsObject[a.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
+            a.completedAt,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        }),
+    [allActions, selectedTeamsObject, dateString]
   );
   const actionsDone = useMemo(() => actionsCallback(DONE), [actionsCallback]);
   const actionsCancel = useMemo(() => actionsCallback(CANCEL), [actionsCallback]);
@@ -137,20 +150,42 @@ const View = () => {
   const actionsCreatedAt = useMemo(
     () =>
       allActions
-        ?.filter((a) => a.team === currentTeam._id)
-        .filter((a) => getIsDayWithinHoursOffsetOfDay(a.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
-        .filter((a) => !getIsDayWithinHoursOffsetOfDay(a.completedAt, report.date, currentTeam?.nightSession ? 12 : 0)),
-    [allActions, currentTeam?._id, currentTeam?.nightSession, report.date]
+        .filter((a) => !!selectedTeamsObject[a.team])
+        .filter((a) => {
+          const currentTeam = selectedTeamsObject[a.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
+            a.createdAt,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        })
+        .filter((a) => {
+          const currentTeam = selectedTeamsObject[a.team];
+          return !getIsDayWithinHoursOffsetOfPeriod(
+            a.completedAt,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        }),
+    [allActions, dateString, selectedTeamsObject]
   );
 
   const allConsultations = useRecoilValue(consultationsState);
   const consultations = useCallback(
     (status) =>
       allConsultations
-        ?.filter((c) => c.status === status)
-        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.completedAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        ?.filter((a) => !!selectedTeamsObject[a.team])
+        .filter((c) => c.status === status)
+        .filter((a) => {
+          const currentTeam = selectedTeamsObject[a.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
+            a.completedAt,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        })
         .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
-    [allConsultations, currentTeam?.nightSession, report.date]
+    [allConsultations, dateString, selectedTeamsObject]
   );
   const consultationsDone = useMemo(() => consultations(DONE), [consultations]);
   const consultationsCancel = useMemo(() => consultations(CANCEL), [consultations]);
@@ -158,27 +193,42 @@ const View = () => {
   const consultationsCreatedAt = useMemo(
     () =>
       allConsultations
-        ?.filter((c) => getIsDayWithinHoursOffsetOfDay(c.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        ?.filter((a) => !!selectedTeamsObject[a.team])
+        .filter((a) => {
+          const currentTeam = selectedTeamsObject[a.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
+            a.createdAt,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        })
         .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } }))
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [allConsultations, currentTeam?.nightSession, report.date]
+    [allConsultations, dateString, selectedTeamsObject]
   );
 
   const comments = useMemo(
     () =>
       allComments
-        .filter((c) => c.team === currentTeam._id)
-        .filter((c) => getIsDayWithinHoursOffsetOfDay(c.date || c.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        ?.filter((c) => !!selectedTeamsObject[c.team])
+        .filter((c) => {
+          const currentTeam = selectedTeamsObject[c.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
+            c.date || c.createdAt,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        })
         .map((comment) => {
           const commentPopulated = { ...comment };
           if (comment.person) {
-            const id = comment?.person;
-            commentPopulated.person = allPersons.find((p) => p._id === id);
+            const personId = comment?.person;
+            commentPopulated.person = allPersons.find((p) => p._id === personId);
             commentPopulated.type = 'person';
           }
           if (comment.action) {
-            const id = comment?.action;
-            const action = allActions.find((p) => p._id === id);
+            const actionId = comment?.action;
+            const action = allActions.find((p) => p._id === actionId);
             commentPopulated.action = action;
             commentPopulated.person = allPersons.find((p) => p._id === action?.person);
             commentPopulated.type = 'action';
@@ -191,98 +241,78 @@ const View = () => {
           return a;
         })
         .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allComments, currentTeam._id, currentTeam?.nightSession, allPersons, allActions, report.date]
+    [allComments, selectedTeamsObject, dateString, allPersons, allActions]
   );
 
   const allRencontres = useRecoilValue(rencontresState);
   const rencontres = useMemo(
     () =>
       allRencontres
-        .filter((p) => p.team === currentTeam._id)
-        .filter((p) =>
-          getIsDayWithinHoursOffsetOfPeriod(
+        .filter((p) => !!selectedTeamsObject[p.team])
+        .filter((p) => {
+          const currentTeam = selectedTeamsObject[p.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
             p.date,
-            {
-              referenceStartDay: report.date,
-              referenceEndDay: report.date,
-            },
+            { referenceStartDay: dateString, referenceEndDay: dateString },
             currentTeam?.nightSession ? 12 : 0
-          )
-        )
+          );
+        })
         .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
-    [allRencontres, currentTeam._id, currentTeam?.nightSession, report.date]
+    [allRencontres, dateString, selectedTeamsObject]
   );
 
   const territoryObservations = useRecoilValue(territoryObservationsState);
   const observations = useMemo(
     () =>
       territoryObservations
-        .filter((o) => o.team === currentTeam._id)
-        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.observedAt || o.createdAt, report.date, currentTeam?.nightSession ? 12 : 0)),
-    [currentTeam._id, currentTeam?.nightSession, report.date, territoryObservations]
+        .filter((o) => !!selectedTeamsObject[o.team])
+        .filter((o) => {
+          const currentTeam = selectedTeamsObject[o.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
+            o.observedAt || o.createdAt,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        })
+        .filter((o) => o.team === currentTeam._id),
+    [currentTeam._id, dateString, selectedTeamsObject, territoryObservations]
   );
 
   const persons = useMemo(
     () =>
       allPersons
-        .filter((o) => (o.assignedTeams || []).includes(currentTeam._id))
-        .filter((o) => getIsDayWithinHoursOffsetOfDay(o.createdAt, report.date, currentTeam?.nightSession ? 12 : 0))
+        .filter((o) => (o.assignedTeams || []).some((teamId) => selectedTeamsObject[teamId]))
+        .filter((p) => {
+          const currentTeam = selectedTeamsObject[p.team];
+          return getIsDayWithinHoursOffsetOfPeriod(
+            p.createdAt,
+            { referenceStartDay: dateString, referenceEndDay: dateString },
+            currentTeam?.nightSession ? 12 : 0
+          );
+        })
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [currentTeam._id, currentTeam?.nightSession, report.date, allPersons]
+    [allPersons, selectedTeamsObject, dateString]
   );
 
-  const total = useMemo(
-    () =>
-      passages.length +
-      actionsDone.length +
-      actionsCancel.length +
-      consultationsDone.length +
-      consultationsCancel.length +
-      comments.length +
-      rencontres.length +
-      observations.length +
-      persons.length,
-    [
-      passages.length,
-      actionsDone.length,
-      actionsCancel.length,
-      consultationsDone.length,
-      consultationsCancel.length,
-      comments.length,
-      rencontres.length,
-      observations.length,
-      persons.length,
-    ]
-  );
-
-  useEffect(() => {
-    if (total > 0 && !report?._id && report.date) {
-      createReportAtDateIfNotExist(report.date);
-    }
-  }, [total, report, createReportAtDateIfNotExist]);
-
-  useTitle(report?.date ? `${dayjs(report.date).format('DD-MM-YYYY')} - Compte rendu` : 'Compte rendu');
+  useTitle(`${dayjs(dateString).format('DD-MM-YYYY')} - Compte rendu`);
 
   const onPreviousReportRequest = () => {
-    const prevDate = dayjs(report.date).subtract(1, 'day').format('YYYY-MM-DD');
-    const prevReport = currentTeamReports.find((r) => r.date === prevDate);
-    if (!!prevReport) return history.push(`/report/${prevReport._id}`);
-    history.push(`/report/new__${prevDate}`);
+    const prevDate = dayjs(dateString).subtract(1, 'day').format('YYYY-MM-DD');
+    history.push(`/report/${prevDate}?${searchParams.toString()}`);
   };
 
   const onNextReportRequest = () => {
-    const nextDate = dayjs(report.date).add(1, 'day').format('YYYY-MM-DD');
-    const nextReport = currentTeamReports.find((r) => r.date === nextDate);
-    if (!!nextReport) return history.push(`/report/${nextReport._id}`);
-    history.push(`/report/new__${nextDate}`);
+    const nextDate = dayjs(dateString).add(1, 'day').format('YYYY-MM-DD');
+    history.push(`/report/${nextDate}?${searchParams.toString()}`);
   };
 
   const deleteData = async () => {
+    if (!singleReport) return;
     const confirm = window.confirm('Êtes-vous sûr ?');
     if (confirm) {
-      const res = await API.delete({ path: `/report/${id}` });
+      const res = await API.delete({ path: `/report/${singleReport._id}` });
       if (res.ok) {
-        setReports((reports) => reports.filter((p) => p._id !== id));
+        setReports((reports) => reports.filter((p) => p._id !== singleReport._id));
         toast.success('Suppression réussie');
         history.goBack();
       }
@@ -290,15 +320,8 @@ const View = () => {
   };
 
   useEffect(() => {
-    if (!!currentTeam?._id && (!report || report.team !== currentTeam._id)) history.goBack();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentTeam?._id]);
-
-  useEffect(() => {
     // for print use only
-    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${report && dayjs(report.date).format('DD-MM-YYYY')} - imprimé par ${
-      user.name
-    }`;
+    document.title = `Compte rendu Mano - Organisation ${organisation.name} - ${dayjs(dateString).format('DD-MM-YYYY')} - imprimé par ${user.name}`;
     return () => {
       document.title = 'Mano - Admin';
     };
@@ -309,35 +332,36 @@ const View = () => {
     scrollContainer.current.scrollTo({ top: 0 });
   }, [activeTab]);
 
-  if (!report) return <Loading />;
-
   const renderPrintOnly = () => {
     if (process.env.REACT_APP_TEST === 'true') return null;
     return (
       <div className="printonly">
         <div style={{ fontSize: 24, lineHeight: '32px', fontWeight: 'bold', padding: '16px 32px' }}>
-          {`Compte rendu de l'équipe ${currentTeam?.name || ''}`}
+          {selectedTeams.length === 1 ? getPeriodTitle(dateString, selectedTeams[0]?.nightSession) : formatDateWithNameOfDay(dateString).capitalize()}
           <br />
-          {getPeriodTitle(report.date, currentTeam?.nightSession)}
+          Compte rendu {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes ' : "de l'équipe "}</>}
+          {selectedTeams.map((t) => t.name).join(', ')}
         </div>
-        {!['restricted-access'].includes(user.role) && <DescriptionAndCollaborations report={report} key={report._id} />}
-        <Reception report={report} />
+        {!['restricted-access'].includes(user.role) && (
+          <DescriptionAndCollaborations reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
+        )}
+        <Reception reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
         {!['restricted-access'].includes(user.role) && (
           <>
-            <ActionCompletedAt date={report.date} status={DONE} actions={actionsDone} />
-            <ActionCreatedAt date={report.date} actions={actionsCreatedAt} />
-            <ActionCompletedAt date={report.date} status={CANCEL} actions={actionsCancel} />
-            <CommentCreatedAt date={report.date} comments={comments} />
+            <ActionCompletedAt date={dateString} status={DONE} actions={actionsDone} />
+            <ActionCreatedAt date={dateString} actions={actionsCreatedAt} />
+            <ActionCompletedAt date={dateString} status={CANCEL} actions={actionsCancel} />
+            <CommentCreatedAt date={dateString} comments={comments} />
           </>
         )}
-        <PassagesCreatedAt date={report.date} report={report} passages={passages} />
-        <RencontresCreatedAt date={report.date} report={report} rencontres={rencontres} />
+        <PassagesCreatedAt date={dateString} passages={passages} />
+        <RencontresCreatedAt date={dateString} rencontres={rencontres} />
         {!['restricted-access'].includes(user.role) && (
           <>
-            <TerritoryObservationsCreatedAt date={report.date} observations={observations} />
-            {!!user.healthcareProfessional && <Consultations date={report.date} consultations={consultationsDone} />}
-            {!!user.healthcareProfessional && <ConsultationsCreatedAt date={report.date} consultations={consultationsCreatedAt} />}
-            {!!user.healthcareProfessional && <Consultations date={report.date} status={CANCEL} consultations={consultationsCancel} />}
+            <TerritoryObservationsCreatedAt date={dateString} observations={observations} />
+            {!!user.healthcareProfessional && <Consultations date={dateString} consultations={consultationsDone} />}
+            {!!user.healthcareProfessional && <ConsultationsCreatedAt date={dateString} consultations={consultationsCreatedAt} />}
+            {!!user.healthcareProfessional && <Consultations date={dateString} status={CANCEL} consultations={consultationsCancel} />}
           </>
         )}
       </div>
@@ -354,36 +378,74 @@ const View = () => {
         height: 'calc(100% + 4rem)',
         overflow: 'hidden',
       }}>
-      <SmallHeader
-        style={{ width: '100%', padding: 0 }}
-        titleStyle={{ width: '100%' }}
-        title={
-          <div style={{ minWidth: '100%', width: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-              <div style={{ display: 'flex' }}>
-                <BackButton />
-                <BackButtonWrapper caption="Imprimer" onClick={window.print} />
-                {!['restricted-access'].includes(user.role) && <BackButtonWrapper caption="Supprimer" onClick={deleteData} />}
-              </div>
-              <div style={{ display: 'flex' }}>
-                <ButtonCustom color="link" className="noprint" title="Rafraichir" onClick={() => refresh()} disabled={isLoading} />
-                <ButtonCustom color="link" className="noprint" title="Précédent" onClick={onPreviousReportRequest} />
-                <ButtonCustom
-                  color="link"
-                  className="noprint"
-                  title="Suivant"
-                  disabled={report.date === dayjs().format('YYYY-MM-DD')}
-                  onClick={onNextReportRequest}
-                />
-              </div>
+      <HeaderStyled style={{ padding: 0 }}>
+        <div style={{ minWidth: '100%', width: '100%' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
+            <div style={{ display: 'flex' }}>
+              <BackButton />
+              <BackButtonWrapper caption="Imprimer" onClick={window.print} />
+              {!['restricted-access'].includes(user.role) && <BackButtonWrapper disabled={isReadOnly} caption="Supprimer" onClick={deleteData} />}
             </div>
-            <div style={{ padding: '0 2rem', fontWeight: '400' }}>
-              {`Compte rendu de l'équipe `}
-              <b>{currentTeam?.name || ''}</b> - {getPeriodTitle(report.date, currentTeam?.nightSession)}
+            <p style={{ margin: 0 }}>
+              {selectedTeams.length === 1
+                ? getPeriodTitle(dateString, selectedTeams[0]?.nightSession)
+                : formatDateWithNameOfDay(dateString).capitalize()}
+            </p>
+            <div style={{ display: 'flex' }}>
+              <ButtonCustom color="link" className="noprint" title="Rafraichir" onClick={() => refresh()} disabled={isLoading} />
+              <ButtonCustom color="link" className="noprint" title="Précédent" onClick={onPreviousReportRequest} />
+              <ButtonCustom
+                color="link"
+                className="noprint"
+                title="Suivant"
+                disabled={dateString === dayjs().format('YYYY-MM-DD')}
+                onClick={onNextReportRequest}
+              />
             </div>
           </div>
-        }
-      />
+          {/* <div style={{ padding: '0 2rem', fontWeight: '400' }}>
+            {`Compte rendu de l'équipe `}
+            <b>{currentTeam?.name || ''}</b> - {getPeriodTitle(report.date, currentTeam?.nightSession)}
+          </div> */}
+          <div style={{ display: 'flex', flexGrow: '1', padding: '0 2rem', fontWeight: '400' }}>
+            <HeaderTitle style={{ fontWeight: '400', flexShrink: 0 }}>
+              <span>
+                Compte rendu{' '}
+                {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes' : "de l'équipe"}</>}
+              </span>
+            </HeaderTitle>
+            <div style={{ marginLeft: '1rem' }}>
+              <SelectTeamMultiple onChange={setSelectedTeamIds} value={selectedTeamIds} colored isDisabled={viewAllOrganisationData} />
+              {teams.length > 1 && (
+                <label htmlFor="viewAllOrganisationData" style={{ fontSize: '14px' }}>
+                  <input
+                    id="viewAllOrganisationData"
+                    type="checkbox"
+                    style={{ marginRight: '0.5rem' }}
+                    onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                  />
+                  Comptes rendus de toutes les équipes
+                </label>
+              )}
+            </div>
+          </div>
+          {selectedTeams.length > 1 && selectedTeams.filter((t) => t.nightSession).length > 0 && (
+            <details style={{ padding: '0 2rem', fontWeight: '400' }}>
+              <summary style={{ fontSize: 12 }}>
+                Certaines équipes travaillent de nuit 🌒, <u>cliquez ici</u> pour savoir la période concernée par chacune
+              </summary>
+              {selectedTeams.map((team) => (
+                <p key={team._id} style={{ fontSize: 12, marginLeft: 20, margin: 0 }}>
+                  <b>
+                    {team.nightSession ? '🌒' : '☀️'} {team?.name || ''}
+                  </b>{' '}
+                  - {getPeriodTitle(dateString, team?.nightSession)}
+                </p>
+              ))}
+            </details>
+          )}
+        </div>
+      </HeaderStyled>
       <div
         className="noprint"
         style={{ height: '100%', display: 'flex', overflow: 'hidden', flex: 1, marginTop: '1rem', borderTop: '1px solid #eee' }}>
@@ -500,67 +562,67 @@ const View = () => {
             }}>
             {activeTab === 'resume' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <DescriptionAndCollaborations report={report} />
+                <DescriptionAndCollaborations reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
               </div>
             )}
             {activeTab === 'reception' && !!organisation.services && !!organisation.receptionEnabled && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <Reception report={report} />
+                <Reception reports={selectedTeamsReports} dateString={dateString} selectedTeamsObject={selectedTeamsObject} />
               </div>
             )}
             {activeTab === 'action-completed' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <ActionCompletedAt date={report.date} status={DONE} actions={actionsDone} />
+                <ActionCompletedAt date={dateString} status={DONE} actions={actionsDone} />
               </div>
             )}
             {activeTab === 'action-created' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <ActionCreatedAt date={report.date} actions={actionsCreatedAt} />
+                <ActionCreatedAt date={dateString} actions={actionsCreatedAt} />
               </div>
             )}
             {activeTab === 'action-cancelled' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <ActionCompletedAt date={report.date} status={CANCEL} actions={actionsCancel} />
+                <ActionCompletedAt date={dateString} status={CANCEL} actions={actionsCancel} />
               </div>
             )}
             {activeTab === 'comment-created' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <CommentCreatedAt date={report.date} comments={comments} />
+                <CommentCreatedAt date={dateString} comments={comments} />
               </div>
             )}
             {activeTab === 'passages' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <PassagesCreatedAt date={report.date} report={report} passages={passages} />
+                <PassagesCreatedAt date={dateString} passages={passages} />
               </div>
             )}
             {activeTab === 'rencontres' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <RencontresCreatedAt date={report.date} report={report} rencontres={rencontres} />
+                <RencontresCreatedAt date={dateString} rencontres={rencontres} />
               </div>
             )}
             {activeTab === 'territory-observations' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <TerritoryObservationsCreatedAt date={report.date} report={report} observations={observations} />
+                <TerritoryObservationsCreatedAt date={dateString} reports={selectedTeamsReports} observations={observations} />
               </div>
             )}
             {activeTab === 'persons-created' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <PersonCreatedAt date={report.date} report={report} persons={persons} />
+                <PersonCreatedAt date={dateString} reports={selectedTeamsReports} persons={persons} />
               </div>
             )}
             {activeTab === 'consultations' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <Consultations date={report.date} status={DONE} consultations={consultationsDone} />
+                <Consultations date={dateString} status={DONE} consultations={consultationsDone} />
               </div>
             )}
             {activeTab === 'consultations-created' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <ConsultationsCreatedAt date={report.date} consultations={consultationsCreatedAt} />
+                <ConsultationsCreatedAt date={dateString} consultations={consultationsCreatedAt} />
               </div>
             )}
             {activeTab === 'consultations-cancelled' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <Consultations date={report.date} status={CANCEL} consultations={consultationsCancel} />
+                <Consultations date={dateString} status={CANCEL} consultations={consultationsCancel} />
               </div>
             )}
           </div>
@@ -577,11 +639,63 @@ const View = () => {
   );
 };
 
-const Reception = ({ report }) => {
+const Reception = ({ reports, selectedTeamsObject, dateString }) => {
+  const organisation = useRecoilValue(organisationState);
+  const services = useMemo(() => {
+    const reportsServices = reports.map((report) => (report?.services?.length ? JSON.parse(report?.services) : {}));
+
+    const services = {};
+    for (const service of organisation.services) {
+      services[service] = reportsServices.reduce((total, teamServices) => total + (teamServices?.[service] || 0), 0);
+    }
+    return services;
+  }, [reports, organisation.services]);
+  const [show, toggleShow] = useState(true);
+
+  useEffect(() => {
+    window.sessionStorage.setItem(`services-general-${dateString}`, show);
+  }, [show, dateString]);
+
+  if (!organisation.receptionEnabled) return null;
+  if (!organisation?.services) return null;
+
+  return (
+    <StyledBox>
+      <TabTitle>Services effectués ce jour</TabTitle>
+      {reports.length > 1 && (
+        <ServicesWrapper show={show} showForPrint={window.sessionStorage.getItem(`services-general-${dateString}`) === 'true'}>
+          <div className="team-name">
+            <p>
+              Services effectués par toutes les équipes sélectionnées
+              <br />
+              <small style={{ opacity: 0.5 }}>
+                Ces données sont en lecture seule. Pour les modifier, vous devez le faire équipe par équipe (ci-dessous)
+              </small>
+            </p>
+            <button className="toggle-show" type="button" onClick={() => toggleShow((s) => !s)}>
+              {show ? 'Masquer' : 'Afficher'}
+            </button>
+          </div>
+          <div className="services-list">
+            {organisation?.services?.map((service) => (
+              <IncrementorSmall key={service} service={service} count={services[service] || 0} disabled />
+            ))}
+          </div>
+        </ServicesWrapper>
+      )}
+      {reports.map((report) => (
+        <Service report={report} key={report.team} withMultipleTeams={reports.length > 1} team={selectedTeamsObject[report.team]} />
+      ))}
+    </StyledBox>
+  );
+};
+
+const Service = ({ report, team, withMultipleTeams, dateString }) => {
   const organisation = useRecoilValue(organisationState);
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
   const [services, setServices] = useState(() => (report?.services?.length ? JSON.parse(report?.services) : {}));
+  const [show, toggleShow] = useState(!withMultipleTeams);
 
   const changeTimeout = useRef(null);
   const onServiceUpdate = async (service, newCount) => {
@@ -617,9 +731,21 @@ const Reception = ({ report }) => {
   if (!organisation?.services) return null;
 
   return (
-    <StyledBox>
-      <TabTitle>Services effectués ce jour</TabTitle>
-      <ServicesWrapper>
+    <ServicesWrapper show={show}>
+      {!!withMultipleTeams && (
+        <div className="team-name">
+          <p>
+            <b>
+              {team.nightSession ? '🌒' : '☀️ '} {team?.name || ''}
+            </b>{' '}
+            - {getPeriodTitle(dateString, team?.nightSession)}
+          </p>
+          <button className="toggle-show" type="button" onClick={() => toggleShow((s) => !s)}>
+            {show ? 'Masquer' : 'Afficher'}
+          </button>
+        </div>
+      )}
+      <div className="services-list">
         {organisation?.services?.map((service) => (
           <IncrementorSmall
             key={service}
@@ -628,24 +754,61 @@ const Reception = ({ report }) => {
             onChange={(newCount) => onServiceUpdate(service, newCount)}
           />
         ))}
-      </ServicesWrapper>
-    </StyledBox>
+      </div>
+    </ServicesWrapper>
   );
 };
 
 const ServicesWrapper = styled.div`
   background-color: #f8f8f8;
-  border-radius: 5px;
-  max-width: 500px;
+  border-radius: 15px;
   padding: 1rem;
   margin-bottom: 1rem;
-  gap: 1rem;
-  .services-title {
+  .services-list {
+    display: ${(p) => (p.show ? 'flex' : 'none')};
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    @media print {
+      display: flex;
+    }
+  }
+  .incrementor-small {
+    max-width: 400px;
     color: #555;
+    width: 100%;
+  }
+  .service-name {
+    width: 100%;
+    margin-right: auto;
+    width: 100%;
   }
   .services-incrementators {
     text-align: left;
     margin-top: 1rem;
+  }
+  .team-name {
+    font-weight: 600;
+    ${(p) => p.show && 'border-bottom: 1px solid #ddd;'}
+    ${(p) => p.show && 'margin-bottom: 1.5rem;'}
+    ${(p) => p.show && 'padding-bottom: 0.5rem;'}
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    p {
+      margin: 0;
+    }
+  }
+  button.toggle-show {
+    background: none;
+    color: ${theme.main};
+    display: inline-block;
+    font-size: 14px;
+    font-weight: 600;
+    margin-left: auto;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
   }
 `;
 
@@ -1222,104 +1385,127 @@ const PersonCreatedAt = ({ date, persons }) => {
   );
 };
 
-const DescriptionAndCollaborations = ({ report }) => {
+const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString }) => {
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
 
   return (
-    <>
-      <DescriptionBox className="noprint" report={report}>
-        <Formik
-          className="noprint"
-          initialValues={report}
-          enableReinitialize
-          onSubmit={async (body) => {
-            const reportUpdate = {
-              ...report,
-              ...body,
-            };
-            const isNew = !report._id;
-            const res = isNew
-              ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-              : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
-            if (res.ok) {
-              setReports((reports) =>
-                isNew
-                  ? [res.decryptedData, ...reports]
-                  : reports.map((a) => {
-                      if (a._id === report._id) return res.decryptedData;
-                      return a;
-                    })
-              );
-              toast.success('Mis à jour !');
-            }
-          }}>
-          {({ values, handleChange, handleSubmit, isSubmitting }) => (
-            <Row>
-              <Col md={12}>
-                <FormGroup>
-                  <Label htmlFor="report-select-collaboration">Collaboration</Label>
-                  <SelectAndCreateCollaboration values={values.collaborations} onChange={handleChange} />
-                </FormGroup>
-              </Col>
-              <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                <ButtonCustom
-                  title={'Mettre à jour'}
-                  loading={isSubmitting}
-                  disabled={JSON.stringify(report.collaborations) === JSON.stringify(values.collaborations)}
-                  onClick={handleSubmit}
-                />
-              </Col>
-              <Col md={12}>
-                <FormGroup>
-                  <div
-                    style={{
-                      display: 'flex',
-                      flexDirection: report?.description?.length ? 'row' : 'column',
-                      alignItems: report?.description?.length ? 'center' : 'flex-start',
-                      justifyContent: 'flex-start',
-                    }}>
-                    <Label htmlFor="description">Description</Label>
-                    <ReportDescriptionModale report={report} />
-                  </div>
-                  {report?.description && (
-                    <p style={{ border: '1px solid #ccc', borderRadius: 5, padding: '0.5rem' }}>
-                      {report?.description?.split('\n').map((sentence, index) => (
+    <StyledBox>
+      {reports.map((report) => {
+        const team = selectedTeamsObject[report.team];
+        return (
+          <React.Fragment key={report.team}>
+            <DescriptionBox className="noprint" report={report}>
+              {reports.length > 1 && (
+                <p style={{ fontWeight: 600, marginBottom: 20 }}>
+                  <b>
+                    {team.nightSession ? '🌒' : '☀️'} {team?.name || ''}
+                  </b>{' '}
+                  - {getPeriodTitle(dateString, team?.nightSession)}
+                </p>
+              )}
+              <Formik
+                className="noprint"
+                initialValues={report}
+                enableReinitialize
+                onSubmit={async (body) => {
+                  const reportUpdate = {
+                    ...report,
+                    ...body,
+                  };
+                  const isNew = !report._id;
+                  const res = isNew
+                    ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+                    : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+                  if (res.ok) {
+                    setReports((reports) =>
+                      isNew
+                        ? [res.decryptedData, ...reports]
+                        : reports.map((a) => {
+                            if (a._id === report._id) return res.decryptedData;
+                            return a;
+                          })
+                    );
+                    toast.success('Mis à jour !');
+                  }
+                }}>
+                {({ values, handleChange, handleSubmit, isSubmitting }) => (
+                  <Row>
+                    <Col md={12}>
+                      <FormGroup>
+                        <Label htmlFor="report-select-collaboration">Collaboration</Label>
+                        <SelectAndCreateCollaboration values={values.collaborations} onChange={handleChange} />
+                      </FormGroup>
+                    </Col>
+                    <Col md={12} style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
+                      <ButtonCustom
+                        title={'Mettre à jour'}
+                        loading={isSubmitting}
+                        disabled={JSON.stringify(report.collaborations) === JSON.stringify(values.collaborations)}
+                        onClick={handleSubmit}
+                      />
+                    </Col>
+                    <Col md={12}>
+                      <FormGroup>
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexDirection: report?.description?.length ? 'row' : 'column',
+                            alignItems: report?.description?.length ? 'center' : 'flex-start',
+                            justifyContent: 'flex-start',
+                          }}>
+                          <Label htmlFor="description">Description</Label>
+                          <ReportDescriptionModale report={report} />
+                        </div>
+                        {report?.description && (
+                          <p style={{ border: '1px solid #ccc', borderRadius: 5, padding: '0.5rem', background: '#fff' }}>
+                            {report?.description?.split('\n').map((sentence, index) => (
+                              <React.Fragment key={index}>
+                                {sentence}
+                                <br />
+                              </React.Fragment>
+                            ))}
+                          </p>
+                        )}
+                      </FormGroup>
+                    </Col>
+                  </Row>
+                )}
+              </Formik>
+            </DescriptionBox>
+            {process.env.REACT_APP_TEST !== 'true' && (
+              <DescriptionBox className="printonly" report={report}>
+                {reports.length > 1 && (
+                  <p style={{ fontWeight: 600, marginBottom: 20 }}>
+                    <b>
+                      {team.nightSession ? '🌒' : '☀️'} {team?.name || ''}
+                    </b>{' '}
+                    - {getPeriodTitle(dateString, team?.nightSession)}
+                  </p>
+                )}
+                {!!report?.collaborations?.length && (
+                  <>
+                    <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
+                    <p>{report?.collaborations.join(', ')}</p>
+                  </>
+                )}
+                <Title>Description</Title>
+                <p>
+                  {!report?.description
+                    ? 'Pas de description'
+                    : report?.description?.split('\n').map((sentence, index) => (
                         <React.Fragment key={index}>
                           {sentence}
                           <br />
                         </React.Fragment>
                       ))}
-                    </p>
-                  )}
-                </FormGroup>
-              </Col>
-            </Row>
-          )}
-        </Formik>
-      </DescriptionBox>
-      {process.env.REACT_APP_TEST !== 'true' && (
-        <DescriptionBox className="printonly" report={report}>
-          {!!report?.collaborations?.length && (
-            <>
-              <Title>Collaboration{report.collaborations.length > 1 ? 's' : ''}</Title>
-              <p>{report?.collaborations.join(', ')}</p>
-            </>
-          )}
-          <Title>Description</Title>
-          <p>
-            {!report?.description
-              ? 'Pas de description'
-              : report?.description?.split('\n').map((sentence, index) => (
-                  <React.Fragment key={index}>
-                    {sentence}
-                    <br />
-                  </React.Fragment>
-                ))}
-          </p>
-        </DescriptionBox>
-      )}
-    </>
+                </p>
+              </DescriptionBox>
+            )}
+          </React.Fragment>
+        );
+      })}
+    </StyledBox>
   );
 };
 
@@ -1363,10 +1549,11 @@ const StyledBox = styled(Box)`
 `;
 
 const DescriptionBox = styled(StyledBox)`
+  background-color: #f8f8f8;
+  border-radius: 15px;
+  padding: 1rem;
   @media screen {
-    padding: 10px 4rem 10px;
-    border-radius: 0px;
-    height: 100%;
+    margin-bottom: 1rem;
     width: 100%;
   }
   @media print {
