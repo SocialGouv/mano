@@ -1,3 +1,10 @@
+## [1.170.1](https://github.com/SocialGouv/mano/compare/v1.170.0...v1.170.1) (2022-10-31)
+
+
+### Bug Fixes
+
+* **dashboard:** enabled by team for medical file and territories ([#941](https://github.com/SocialGouv/mano/issues/941)) ([861f37f](https://github.com/SocialGouv/mano/commit/861f37fc1389bb5a5f60ae4bf69ddfd7ca7d4a59))
+
 # [1.170.0](https://github.com/SocialGouv/mano/compare/v1.169.2...v1.170.0) (2022-10-30)
 
 
