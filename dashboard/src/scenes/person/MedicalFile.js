@@ -44,7 +44,7 @@ export function MedicalFile({ person }) {
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const team = useRecoilValue(currentTeamState);
 
-  const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null, { resetOnValueChange: true });
+  const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null);
   const [currentConsultation, setCurrentConsultation] = useState(
     !currentConsultationId ? null : allConsultations?.find((c) => c._id === currentConsultationId)
   );

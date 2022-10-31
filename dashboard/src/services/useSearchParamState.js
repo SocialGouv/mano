@@ -24,7 +24,7 @@ const getDataAsSearchParam = (data, defaultValue) => {
 
 // NOTE: its not possible to update two different URLSearchParams very quickly, the second one cancels the first one
 
-const useSearchParamState = (param, defaultAndInitialValue, { resetOnValueChange = null } = {}) => {
+const useSearchParamState = (param, defaultAndInitialValue, { resetToDefaultIfTheFollowingValueChange = null } = {}) => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -44,15 +44,16 @@ const useSearchParamState = (param, defaultAndInitialValue, { resetOnValueChange
     setState(newState);
   };
 
-  const resetKeyRef = useRef(resetOnValueChange);
+  const resetKey = resetToDefaultIfTheFollowingValueChange;
+  const resetKeyRef = useRef(resetToDefaultIfTheFollowingValueChange);
   useEffect(() => {
     // effect not triggered on mount
-    if (resetOnValueChange !== resetKeyRef.current) {
+    if (resetKey !== resetKeyRef.current) {
       setStateRequest(defaultAndInitialValue);
-      resetKeyRef.current = resetOnValueChange;
+      resetKeyRef.current = resetKey;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetOnValueChange]);
+  }, [resetKey]);
 
   return [state, setStateRequest];
 };
