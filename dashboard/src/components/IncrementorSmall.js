@@ -1,38 +1,24 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../config';
 
 const IncrementorSmall = ({ service, count, onChange }) => {
-  const [localcount, setLocalcount] = useState(count);
-
-  const changeTimeout = useRef(null);
-
-  useEffect(() => {
-    setLocalcount(count);
-  }, [count]);
-
-  const onChangeRequest = async (newCount) => {
-    newCount = Number(parseInt(newCount, 10).toString());
-    setLocalcount(newCount);
-    clearTimeout(changeTimeout.current);
-    changeTimeout.current = setTimeout(() => onChange(newCount), 1000);
-  };
   return (
     <IncrementorSmallWrapper>
       <div id={`${service}-title`} className="service-name">
         {service}
       </div>
-      <ButtonRemoveAdd aria-label="moins" disabled={localcount === 0} onClick={() => onChangeRequest(localcount - 1)} id={`${service}-remove`}>
+      <ButtonRemoveAdd aria-label="moins" disabled={count === 0} onClick={() => onChange(count - 1)} id={`${service}-remove`}>
         -
       </ButtonRemoveAdd>
       <LocalCount
         aria-label={`Nombre de ${service}`}
         id={`${service}-count`}
         type="number"
-        value={localcount}
-        onChange={(e) => onChangeRequest(Number(e.currentTarget.value))}
+        value={count}
+        onChange={(e) => onChange(Number(e.currentTarget.value))}
       />
-      <ButtonRemoveAdd aria-label="plus" onClick={() => onChangeRequest(localcount + 1)} id={`${service}-add`}>
+      <ButtonRemoveAdd aria-label="plus" onClick={() => onChange(count + 1)} id={`${service}-add`}>
         +
       </ButtonRemoveAdd>
     </IncrementorSmallWrapper>

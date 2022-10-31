@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -30,6 +30,7 @@ import Table from '../../components/table';
 import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
+import { flushSync } from 'react-dom';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -137,7 +138,7 @@ const Reception = () => {
     return params.map((id) => persons.find((p) => p._id === id)).filter(Boolean);
   });
 
-  const services = todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {};
+  const [services, setServices] = useState(() => (todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {}));
 
   const onSelectPerson = (persons) => {
     persons = persons?.filter(Boolean) || [];
@@ -153,24 +154,30 @@ const Reception = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
+  const changeTimeout = useRef(null);
   const onServiceUpdate = async (service, newCount) => {
     const reportToUpdate = todaysReport || (await createReportAtDateIfNotExist(startOfToday().format('YYYY-MM-DD')));
+    const newServices = {
+      ...services,
+      [service]: newCount,
+    };
+    flushSync(() => setServices(newServices));
     const reportUpdate = {
       ...reportToUpdate,
-      services: JSON.stringify({
-        ...services,
-        [service]: newCount,
-      }),
+      services: JSON.stringify(newServices),
     };
-    const res = await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
-    if (res.ok) {
-      setReports((reports) =>
-        reports.map((a) => {
-          if (a._id === reportUpdate._id) return res.decryptedData;
-          return a;
-        })
-      );
-    }
+    clearTimeout(changeTimeout.current);
+    changeTimeout.current = setTimeout(async () => {
+      const res = await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
+      if (res.ok) {
+        setReports((reports) =>
+          reports.map((a) => {
+            if (a._id === reportUpdate._id) return res.decryptedData;
+            return a;
+          })
+        );
+      }
+    }, 1000);
   };
 
   const onAddAnonymousPassage = async () => {
