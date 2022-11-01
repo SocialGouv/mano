@@ -26,6 +26,7 @@ const SelectPerson = ({
         options={persons}
         name={name}
         inputId={inputId}
+        classNamePrefix={inputId}
         isMulti={isMulti}
         isClearable={isClearable}
         isSearchable

@@ -415,7 +415,14 @@ const View = () => {
               </span>
             </HeaderTitle>
             <div style={{ marginLeft: '1rem' }}>
-              <SelectTeamMultiple onChange={setSelectedTeamIds} value={selectedTeamIds} colored isDisabled={viewAllOrganisationData} />
+              <SelectTeamMultiple
+                inputId="report-select-teams"
+                classNamePrefix="report-select-teams"
+                onChange={setSelectedTeamIds}
+                value={selectedTeamIds}
+                colored
+                isDisabled={viewAllOrganisationData}
+              />
               {teams.length > 1 && (
                 <label htmlFor="viewAllOrganisationData" style={{ fontSize: '14px' }}>
                   <input
@@ -678,7 +685,13 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
           </div>
           <div className="services-list">
             {organisation?.services?.map((service) => (
-              <IncrementorSmall key={service} service={service} count={services[service] || 0} disabled />
+              <IncrementorSmall
+                dataTestId={`general-${service}-${services[service] || 0}`}
+                key={service}
+                service={service}
+                count={services[service] || 0}
+                disabled
+              />
             ))}
           </div>
         </ServicesWrapper>
@@ -709,22 +722,25 @@ const Service = ({ report, team, withMultipleTeams, dateString }) => {
       services: JSON.stringify(newServices),
     };
     clearTimeout(changeTimeout.current);
-    changeTimeout.current = setTimeout(async () => {
-      const isNew = !report._id;
-      const res = isNew
-        ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-        : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
-      if (res.ok) {
-        setReports((reports) =>
-          isNew
-            ? [res.decryptedData, ...reports]
-            : reports.map((a) => {
-                if (a._id === report._id) return res.decryptedData;
-                return a;
-              })
-        );
-      }
-    }, 1000);
+    changeTimeout.current = setTimeout(
+      async () => {
+        const isNew = !report._id;
+        const res = isNew
+          ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+          : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+        if (res.ok) {
+          setReports((reports) =>
+            isNew
+              ? [res.decryptedData, ...reports]
+              : reports.map((a) => {
+                  if (a._id === report._id) return res.decryptedData;
+                  return a;
+                })
+          );
+        }
+      },
+      process.env.REACT_APP_TEST === 'true' ? 0 : 1100
+    );
   };
 
   if (!organisation.receptionEnabled) return null;
@@ -749,6 +765,7 @@ const Service = ({ report, team, withMultipleTeams, dateString }) => {
         {organisation?.services?.map((service) => (
           <IncrementorSmall
             key={service}
+            dataTestId={`${team?.name}-${service}-${services[service] || 0}`}
             service={service}
             count={services[service] || 0}
             onChange={(newCount) => onServiceUpdate(service, newCount)}
@@ -849,6 +866,7 @@ const ActionCompletedAt = ({ date, status, actions }) => {
           data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
+          dataTestId="name"
           columns={[
             {
               title: '',
@@ -899,6 +917,7 @@ const ActionCreatedAt = ({ date, actions }) => {
           data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
+          dataTestId="name"
           columns={[
             {
               title: '',
@@ -955,6 +974,7 @@ const Consultations = ({ date, status, consultations }) => {
           }
           rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
           rowKey="_id"
+          dataTestId="name"
           columns={[
             {
               title: '',
@@ -1009,6 +1029,7 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
           }
           rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
           rowKey="_id"
+          dataTestId="name"
           columns={[
             {
               title: '',
@@ -1064,6 +1085,7 @@ const CommentCreatedAt = ({ date, comments }) => {
             }
           }}
           rowKey="_id"
+          dataTestId="comment"
           columns={[
             {
               title: '',
@@ -1366,6 +1388,7 @@ const PersonCreatedAt = ({ date, persons }) => {
             if (person) history.push(`/person/${person._id}`);
           }}
           rowKey="_id"
+          dataTestId="name"
           columns={[
             {
               title: 'Heure',

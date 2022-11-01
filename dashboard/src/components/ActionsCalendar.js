@@ -67,6 +67,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
       }}
       rowDisabled={(actionOrConsultation) => ['restricted-access'].includes(user.role) || disableConsultationRow(actionOrConsultation, user)}
       rowKey="_id"
+      dataTestId="name"
       columns={[
         {
           title: '',

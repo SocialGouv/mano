@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-const IncrementorSmall = ({ service, count, onChange, disabled = false }) => {
+const IncrementorSmall = ({ service, count, onChange, dataTestId = null, disabled = false }) => {
   return (
     <IncrementorSmallWrapper className="incrementor-small">
       <p id={`${service}-title`} className="service-name">
@@ -14,6 +14,7 @@ const IncrementorSmall = ({ service, count, onChange, disabled = false }) => {
       <LocalCount
         aria-label={`Nombre de ${service}`}
         id={`${service}-count`}
+        data-test-id={dataTestId || `${service}-count`}
         type="number"
         value={count}
         disabled={disabled}
