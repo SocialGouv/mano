@@ -117,7 +117,7 @@ const List = () => {
               return (
                 <DayButton aria-label={dateString} key={dateString} isOutOfMonth={isOutOfMonth} onClick={() => onReportClick(dateString)}>
                   <DayContent isToday={isToday}>{isOutOfMonth && process.env.REACT_APP_TEST === 'true' ? '' : day.format('D')}</DayContent>
-                  {!!report && <Dot />}
+                  {!!report && <Dot data-test-id={`report-dot-${dateString}`} />}
                 </DayButton>
               );
             })}
