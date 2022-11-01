@@ -335,6 +335,7 @@ const Reception = () => {
             <div className="services-incrementators">
               {organisation?.services?.map((service) => (
                 <IncrementorSmall
+                  dataTestId={`${currentTeam?.name}-reception-${service}-${services[service] || 0}`}
                   key={service}
                   service={service}
                   count={services[service] || 0}

@@ -50,13 +50,11 @@ async function createUsersAndOrgas() {
     connectionString: `${process.env.PGBASEURL}/${process.env.PGDATABASE}`,
   });
   await client.connect();
-  await client.query(
-    `delete from mano."Organisation" where name like 'Orga Test - %'`
-  );
+  await client.query(`delete from mano."Organisation" where name like 'Orga Test - %'`);
   await client.query(`delete from mano."User" where name like 'User Test - %'`);
   await client.query(`delete from mano."Team" where name like 'Team Test - %'`);
 
-  for (let i = 1; i < 50; i++) {
+  for (let i = 1; i < 5; i++) {
     console.log("create user", i);
 
     const orgId = uuidv4();

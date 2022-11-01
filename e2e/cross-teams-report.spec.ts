@@ -172,16 +172,17 @@ test("Cross teams report", async ({ page }) => {
   await page.getByRole("button", { name: "Passage anonyme" }).click();
   expect(page.locator('[id="passages-title"]')).toContainText("2 passages");
 
-  expect(page.locator('[id="Café-count"]')).toContainText("0");
+  // await expect(page.locator(`data-test-id=${team1Name}-reception-Douche-0`)).toBeVisible();
+  expect(page.locator('[id="Café-count"]')).toHaveValue("0");
   await page.locator('[id="Café-add"]').click();
   await page.locator('[id="Café-add"]').click();
-  expect(page.locator('[id="Café-count"]')).toContainText("2");
+  expect(page.locator('[id="Café-count"]')).toHaveValue("2");
 
-  expect(page.locator('[id="Douche-add"]')).toContainText("0");
+  expect(page.locator('[id="Douche-count"]')).toHaveValue("0");
   await page.locator('[id="Douche-add"]').click();
   await page.locator('[id="Douche-add"]').click();
   await page.locator('[id="Douche-add"]').click();
-  expect(page.locator('[id="Douche-add"]')).toContainText("3");
+  expect(page.locator('[id="Douche-count"]')).toHaveValue("3");
 
   await changeReactSelectValue(page, "team-selector-topBar", team2Name);
 
@@ -197,18 +198,18 @@ test("Cross teams report", async ({ page }) => {
   await page.getByRole("button", { name: "Passage anonyme" }).click();
   await page.getByRole("button", { name: "Passage anonyme" }).click();
   expect(page.locator('[id="passages-title"]')).toContainText("3 passages");
-  expect(page.locator('[id="Café-count"]')).toContainText("0");
+  expect(page.locator('[id="Café-count"]')).toHaveValue("0");
   await page.locator('[id="Café-add"]').click();
   await page.locator('[id="Café-add"]').click();
-  expect(page.locator('[id="Café-count"]')).toContainText("2");
+  expect(page.locator('[id="Café-count"]')).toHaveValue("2");
 
-  expect(page.locator('[id="Douche-count"]')).toContainText("0");
+  expect(page.locator('[id="Douche-count"]')).toHaveValue("0");
 
-  expect(page.locator('[id="Repas-add"]')).toContainText("0");
+  expect(page.locator('[id="Repas-count"]')).toHaveValue("0");
   await page.locator('[id="Repas-add"]').click();
   await page.locator('[id="Repas-add"]').click();
   await page.locator('[id="Repas-add"]').click();
-  expect(page.locator('[id="Repas-add"]')).toContainText("3");
+  expect(page.locator('[id="Repas-count"]')).toHaveValue("3");
   await changeReactSelectValue(page, "team-selector-topBar", team1Name);
 
   /*
@@ -239,7 +240,6 @@ test("Cross teams report", async ({ page }) => {
   await expect(page.locator(`data-test-id=general-Café-4`)).toBeVisible();
   await expect(page.locator(`data-test-id=general-Douche-3`)).toBeVisible();
   await expect(page.locator(`data-test-id=general-Repas-3`)).toBeVisible();
-  /*
   await page
     .getByText(
       "Certaines équipes travaillent de nuit 🌒, cliquez ici pour savoir la période concernée par chacune"
@@ -290,5 +290,5 @@ test("Cross teams report", async ({ page }) => {
   await expect(page.locator(`data-test-id=${person2action}`)).toBeVisible();
   await page.getByText("Personnes créées (1)").click();
   await expect(page.locator(`data-test-id=${person1Name}`)).toBeHidden();
-  await expect(page.locator(`data-test-id=${person2Name}`)).toBeVisible(); */
+  await expect(page.locator(`data-test-id=${person2Name}`)).toBeVisible();
 });
