@@ -208,6 +208,7 @@ const Reception = () => {
   };
 
   const onAddAnonymousPassage = async () => {
+    console.log('ADD FUCKING PASSAGE');
     const optimisticId = Date.now();
     const newPassage = {
       user: user._id,
@@ -215,14 +216,19 @@ const Reception = () => {
       date: new Date(),
       optimisticId,
     };
+    console.log('ADD FUCKING PASSAGE', JSON.stringify(newPassage));
     // optimistic UI
     setPassages((passages) => [newPassage, ...passages]);
     const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
+    console.log('BOOM', JSON.stringify(response));
     if (response.ok) {
+      console.log('DECRYTED', JSON.stringify(response.decryptedData));
       setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
       createReportAtDateIfNotExist(response.decryptedData.date);
     }
   };
+
+  console.log('passages', JSON.stringify(passages));
 
   const onAddPassageForPersons = async () => {
     try {
