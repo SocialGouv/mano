@@ -32,6 +32,8 @@ test("Cross teams report", async ({ page }) => {
   // const team1Collab = "team1Collab";
   // const team2Collab = "team2Collab";
 
+  test.setTimeout(120000);
+
   await test.step("Log in", async () => {
     await page.goto("http://localhost:8090/");
 
