@@ -54,7 +54,7 @@ describe("Organisation CRUD", () => {
     // await expect(page).toMatch("Comptes rendus de l'équipe");
     await expect(page).toClick("button", { text: dayjs().format("D") });
     await page.waitForTimeout(1000);
-    await expect(page).toMatch(`Compte rendu de l'équipe Encrypted Orga Team`);
+    // await expect(page).toMatch(`Compte rendu de l'équipe Encrypted Orga Team`);
     await expect(page).toMatch(`Journée du ${dayjs().format("D MMMM YYYY")}`);
     await page.waitForTimeout(500);
     await scrollDown();
