@@ -1,3 +1,10 @@
+## [1.170.2](https://github.com/SocialGouv/mano/compare/v1.170.1...v1.170.2) (2022-11-02)
+
+
+### Bug Fixes
+
+* **dashboard, api:** deploy ([4e81b2c](https://github.com/SocialGouv/mano/commit/4e81b2c9480ae286ee2622006404ea7a2330eebd))
+
 ## [1.170.1](https://github.com/SocialGouv/mano/compare/v1.170.0...v1.170.1) (2022-10-31)
 
 
