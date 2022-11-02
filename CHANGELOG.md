@@ -1,3 +1,10 @@
+## [1.170.3](https://github.com/SocialGouv/mano/compare/v1.170.2...v1.170.3) (2022-11-02)
+
+
+### Bug Fixes
+
+* disable playwright on main branch temp ([717b188](https://github.com/SocialGouv/mano/commit/717b1880072cb7a6cee4cccf651390faff074250))
+
 ## [1.170.2](https://github.com/SocialGouv/mano/compare/v1.170.1...v1.170.2) (2022-11-02)
 
 
