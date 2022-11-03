@@ -1,8 +1,8 @@
 fileignoreconfig:
-- filename: .github/workflows/release.yml
-  checksum: 9de8b8b08e706e957ee60cf9b4eb5524c4120a32d6b9d97e3ee930ca24ebb378
-- filename: app/ios/Podfile.lock
-  checksum: c47f6bc22846aa5918fb1746356eb8c2c21e08628b48a73e6167b90dd05c5c0d
+  - filename: .github/workflows/release.yml
+    checksum: 9de8b8b08e706e957ee60cf9b4eb5524c4120a32d6b9d97e3ee930ca24ebb378
+  - filename: app/ios/Podfile.lock
+    checksum: c47f6bc22846aa5918fb1746356eb8c2c21e08628b48a73e6167b90dd05c5c0d
 scopeconfig:
-- scope: node
+  - scope: node
 version: "1.0"
