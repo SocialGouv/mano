@@ -1,3 +1,4 @@
+const { capture } = require("../../sentry");
 const sequelize = require("../sequelize");
 
 module.exports = async () => {
