@@ -20,11 +20,10 @@ const Table = ({
   const sortableJsRef = useRef(null);
 
   const onListChange = useCallback(() => {
-    onSort(
-      [...gridRef.current.children].map((i) => i.dataset.key),
-      data
-    );
-  }, [onSort, data]);
+    if (!isSortable) return;
+    const newOrder = [...gridRef.current.children].map((i) => i.dataset.key);
+    onSort(newOrder, data);
+  }, [onSort, data, isSortable]);
 
   useEffect(() => {
     if (!!isSortable && !!data.length) {

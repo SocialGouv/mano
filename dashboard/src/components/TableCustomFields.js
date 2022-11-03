@@ -91,10 +91,10 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
     setIsSubmitting(false);
   };
 
-  const handleSort = async (keys) => {
+  const handleSort = async (keys, oldData) => {
     setIsSubmitting(true);
     try {
-      const dataForApi = keys.map((key) => mutableData.find((field) => field.name === key));
+      const dataForApi = keys.map((key) => mutableData.find((field) => field.label === key));
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
         body: { [customFields]: mergeData ? mergeData(dataForApi) : dataForApi },
