@@ -54,6 +54,7 @@ import Rencontre from '../../components/Rencontre';
 import { flushSync } from 'react-dom';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
+import TagTeam from '../../components/TagTeam';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -69,10 +70,13 @@ const View = () => {
   const allComments = useRecoilValue(commentsState);
   const allPersons = useRecoilValue(personsState);
   const teams = useRecoilValue(teamsState);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrgData', teams.length === 1, {
+    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
+  });
   const [selectedTeamIds, setSelectedTeamIds] = useSearchParamState('reportsTeams', [currentTeam._id], {
     resetToDefaultIfTheFollowingValueChange: currentTeam._id,
   });
+
   const selectedTeams = useMemo(
     () => (viewAllOrganisationData ? teams : teams.filter((team) => selectedTeamIds.includes(team._id))),
     [selectedTeamIds, teams, viewAllOrganisationData]
@@ -273,9 +277,8 @@ const View = () => {
             { referenceStartDay: dateString, referenceEndDay: dateString },
             currentTeam?.nightSession ? 12 : 0
           );
-        })
-        .filter((o) => o.team === currentTeam._id),
-    [currentTeam._id, dateString, selectedTeamsObject, territoryObservations]
+        }),
+    [dateString, selectedTeamsObject, territoryObservations]
   );
 
   const persons = useMemo(
@@ -420,6 +423,7 @@ const View = () => {
                 classNamePrefix="report-select-teams"
                 onChange={setSelectedTeamIds}
                 value={selectedTeamIds}
+                key={selectedTeamIds}
                 colored
                 isDisabled={viewAllOrganisationData}
               />
@@ -430,6 +434,7 @@ const View = () => {
                     type="checkbox"
                     style={{ marginRight: '0.5rem' }}
                     onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                    checked={viewAllOrganisationData}
                   />
                   Comptes rendus de toutes les équipes
                 </label>
@@ -892,6 +897,11 @@ const ActionCompletedAt = ({ date, status, actions }) => {
               render: (action) => <PersonName item={action} />,
             },
             { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            {
+              title: 'Équipe en charge',
+              dataKey: 'team',
+              render: (action) => <TagTeam teamId={action?.team} />,
+            },
           ]}
         />
       </StyledBox>
@@ -943,6 +953,11 @@ const ActionCreatedAt = ({ date, actions }) => {
               render: (action) => <PersonName item={action} />,
             },
             { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            {
+              title: 'Équipe en charge',
+              dataKey: 'team',
+              render: (action) => <TagTeam teamId={action?.team} />,
+            },
           ]}
         />
       </StyledBox>
@@ -1148,6 +1163,11 @@ const CommentCreatedAt = ({ date, comments }) => {
                 );
               },
             },
+            {
+              title: 'Équipe en charge',
+              dataKey: 'team',
+              render: (comment) => <TagTeam teamId={comment?.team} />,
+            },
           ]}
         />
       </StyledBox>
@@ -1236,6 +1256,11 @@ const PassagesCreatedAt = ({ date, passages }) => {
                 render: (passage) => (passage.user ? <UserName id={passage.user} /> : null),
               },
               { title: 'Commentaire', dataKey: 'comment' },
+              {
+                title: 'Équipe en charge',
+                dataKey: 'team',
+                render: (passage) => <TagTeam teamId={passage?.team} />,
+              },
             ]}
           />
         )}
@@ -1315,6 +1340,11 @@ const RencontresCreatedAt = ({ date, rencontres }) => {
                 render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
               },
               { title: 'Commentaire', dataKey: 'comment' },
+              {
+                title: 'Équipe en charge',
+                dataKey: 'team',
+                render: (rencontre) => <TagTeam teamId={rencontre?.team} />,
+              },
             ]}
           />
         )}
@@ -1359,7 +1389,12 @@ const TerritoryObservationsCreatedAt = ({ date, observations }) => {
               render: (obs) => <UserName id={obs.user} />,
             },
             { title: 'Territoire', dataKey: 'territory', render: (obs) => territories.find((t) => t._id === obs.territory)?.name },
-            { title: 'Observation', dataKey: 'entityKey', render: (obs) => <Observation noBorder obs={obs} />, left: true },
+            { title: 'Observation', dataKey: 'entityKey', render: (obs) => <Observation noTeams noBorder obs={obs} />, left: true },
+            {
+              title: 'Équipe en charge',
+              dataKey: 'team',
+              render: (obs) => <TagTeam teamId={obs?.team} />,
+            },
           ]}
         />
       </StyledBox>
@@ -1400,6 +1435,17 @@ const PersonCreatedAt = ({ date, persons }) => {
               title: 'Utilisateur (créateur)',
               dataKey: 'user',
               render: (obs) => <UserName id={obs.user} />,
+            },
+            {
+              title: 'Équipe en charge',
+              dataKey: 'assignedTeams',
+              render: (person) => (
+                <React.Fragment>
+                  {person.assignedTeams?.map((teamId) => (
+                    <TagTeam key={teamId} teamId={teamId} />
+                  ))}
+                </React.Fragment>
+              ),
             },
           ]}
         />

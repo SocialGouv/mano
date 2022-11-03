@@ -18,11 +18,14 @@ const List = () => {
 
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
+  const allTeamIds = useMemo(() => teams.map((t) => t._id), [teams]);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrgData', teams.length === 1, {
+    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
+  });
   const [selectedTeamIds, setSelectedTeamIds] = useSearchParamState('reportsTeams', [currentTeam._id], {
     resetToDefaultIfTheFollowingValueChange: currentTeam._id,
   });
-  const reports = useRecoilValue(selectedTeamsReportsSelector({ teamIds: selectedTeamIds }));
+  const reports = useRecoilValue(selectedTeamsReportsSelector({ teamIds: viewAllOrganisationData ? allTeamIds : selectedTeamIds }));
 
   const history = useHistory();
   const location = useLocation();
@@ -63,7 +66,13 @@ const List = () => {
             </span>
           </HeaderTitle>
           <div style={{ marginLeft: '1rem' }}>
-            <SelectTeamMultiple onChange={setSelectedTeamIds} value={selectedTeamIds} colored isDisabled={viewAllOrganisationData} />
+            <SelectTeamMultiple
+              onChange={setSelectedTeamIds}
+              value={selectedTeamIds}
+              key={selectedTeamIds}
+              colored
+              isDisabled={viewAllOrganisationData}
+            />
             {teams.length > 1 && (
               <label htmlFor="viewAllOrganisationData" style={{ fontSize: '14px' }}>
                 <input
@@ -71,6 +80,7 @@ const List = () => {
                   type="checkbox"
                   style={{ marginRight: '0.5rem' }}
                   onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                  checked={viewAllOrganisationData}
                 />
                 Comptes rendus de toutes les équipes
               </label>
