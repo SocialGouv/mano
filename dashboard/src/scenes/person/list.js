@@ -231,7 +231,7 @@ const List = () => {
                 return (
                   <div style={{ color: theme.black50 }}>
                     <div>{p.name}</div>
-                    <div>Sortie de file active : {p.outOfActiveListReason}</div>
+                    <div>Sortie de file active : {p.outOfActiveListReasons.join(', ')}</div>
                   </div>
                 );
               return p.name;

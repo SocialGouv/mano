@@ -1,5 +1,6 @@
-import { useRecoilState, useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { organisationState } from '../recoil/auth';
+import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, preparePersonForEncryption } from '../recoil/persons';
 import { prepareReportForEncryption } from '../recoil/reports';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { dayjsInstance } from '../services/date';
@@ -13,6 +14,9 @@ export default function useDataMigrator() {
   const API = useApi();
 
   const organisationId = organisation?._id;
+
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
 
   return {
     // One "if" for each migration.
@@ -111,6 +115,31 @@ export default function useDataMigrator() {
         const response = await API.put({
           path: `/migration/clean-duplicated-reports`,
           body: { consolidatedReports: encryptedConsolidatedReports, reportIdsToDelete },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
+      if (!organisation.migrations?.includes('update-outOfActiveListReason-to-multi-choice')) {
+        setLoadingText(LOADING_TEXT);
+        const res = await API.get({
+          path: '/person',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const personsToUpdate = (res.decryptedData || []).map((p) => ({
+          ...p,
+          outOfActiveListReasons: p.outOfActiveListReason ? [p.outOfActiveListReason] : [],
+        }));
+        const encryptedPersonsToMigrate = await Promise.all(
+          personsToUpdate
+            .map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial))
+            .map(encryptItem(hashedOrgEncryptionKey))
+        );
+        const response = await API.put({
+          path: `/migration/update-outOfActiveListReason-to-multi-choice`,
+          body: { personsToUpdate: encryptedPersonsToMigrate },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {

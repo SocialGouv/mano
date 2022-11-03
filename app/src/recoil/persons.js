@@ -211,9 +211,9 @@ export const outOfActiveListReasonOptions = [
 
 const fieldsPersonsCustomizableOptions = [
   {
-    name: 'outOfActiveListReason',
-    type: 'enum',
-    label: 'Motif de sortie de file active',
+    name: 'outOfActiveListReasons',
+    type: 'multi-choice',
+    label: 'Motifs de sortie de file active',
     options: outOfActiveListReasonOptions,
     showInStats: true,
     enabled: true,

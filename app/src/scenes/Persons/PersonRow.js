@@ -10,12 +10,12 @@ import colors from '../../utils/colors';
 import { useNavigation } from '@react-navigation/native';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReason } }) => {
+const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } }) => {
   if (outOfActiveList) {
     return (
       <OutOfActiveListContainer>
         <NameMuted>{name}</NameMuted>
-        <ActiveListReasonText>Sortie de file active : {outOfActiveListReason}</ActiveListReasonText>
+        <ActiveListReasonText>Sortie de file active : {outOfActiveListReasons.join(', ')}</ActiveListReasonText>
       </OutOfActiveListContainer>
     );
   }

@@ -16,6 +16,7 @@ import SelectAsInput from '../../components/SelectAsInput';
 import useApi from '../../services/api';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../../services/date';
+import SelectCustom from '../../components/SelectCustom';
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
@@ -27,14 +28,14 @@ const OutOfActiveList = ({ person }) => {
 
   const setPersons = useSetRecoilState(personsState);
 
-  const handleSetOutOfActiveList = async (outOfActiveListReason = '', outOfActiveListDate = Date.now()) => {
+  const handleSetOutOfActiveList = async (outOfActiveListReasons = [], outOfActiveListDate = Date.now()) => {
     const outOfActiveList = !person.outOfActiveList;
     const response = await API.put({
       path: `/person/${person._id}`,
       body: preparePersonForEncryption(
         customFieldsPersonsMedical,
         customFieldsPersonsSocial
-      )({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReason, outOfActiveListDate }),
+      )({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReasons, outOfActiveListDate }),
     });
     if (response.ok) {
       const newPerson = response.decryptedData;
@@ -62,7 +63,7 @@ const OutOfActiveList = ({ person }) => {
           <Formik
             initialValues={person}
             onSubmit={async (body) => {
-              await handleSetOutOfActiveList(body.outOfActiveListReason, body.outOfActiveListDate);
+              await handleSetOutOfActiveList(body.outOfActiveListReasons, body.outOfActiveListDate);
               setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -70,17 +71,22 @@ const OutOfActiveList = ({ person }) => {
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <label htmlFor="person-select-outOfActiveListReason">
-                        Veuillez préciser le motif de sortie
-                        <SelectAsInput
+                      <label htmlFor="person-select-outOfActiveListReasons">
+                        Veuillez préciser le(s) motif(s) de sortie
+                        <SelectCustom
+                          options={fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReasons').options}
+                          name="outOfActiveListReasons"
+                          onChange={(v) => handleChange({ currentTarget: { value: v, name: 'outOfActiveListReasons' } })}
+                          isClearable={false}
+                          isMulti
+                          inputId="person-select-outOfActiveListReasons"
+                          classNamePrefix="person-select-outOfActiveListReasons"
+                          value={values.outOfActiveListReasons || []}
+                          placeholder={' -- Choisir -- '}
+                          getOptionValue={(i) => i}
+                          getOptionLabel={(i) => i}
                           styles={{ width: '800px' }}
                           style={{ width: '800px' }}
-                          options={fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReason').options}
-                          name="outOfActiveListReason"
-                          value={values.outOfActiveListReason || ''}
-                          onChange={handleChange}
-                          inputId="person-select-outOfActiveListReason"
-                          classNamePrefix="person-select-outOfActiveListReason"
                         />
                       </label>
                     </FormGroup>

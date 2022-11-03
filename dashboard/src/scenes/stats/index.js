@@ -491,11 +491,11 @@ const Stats = () => {
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Raison de sortie de file active"
-            field="outOfActiveListReason"
+            field="outOfActiveListReasons"
             data={getPieData(
               persons.filter((p) => !!p.outOfActiveList),
-              'outOfActiveListReason',
-              { options: fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReason').options }
+              'outOfActiveListReasons',
+              { options: fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReasons').options }
             )}
           />
           <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsMedical} />
@@ -613,7 +613,7 @@ const Stats = () => {
   );
 };
 
-const getPieData = (source, key, { options = null, isBoolean = false } = {}) => {
+const getPieData = (source, key, { options = null, isBoolean = false, debug = false } = {}) => {
   const data = source.reduce(
     (newData, item) => {
       if (isBoolean) {

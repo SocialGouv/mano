@@ -218,7 +218,7 @@ const Person = ({ person }) => {
             label="Date de sortie de file active"
             value={person.outOfActiveListDate ? formatCalendarDate(person.outOfActiveListDate) : 'Non renseignée'}
           />
-          <AdditionalInfo label="Motif" value={person.outOfActiveListReason} />
+          <AdditionalInfo label="Motif" value={person.outOfActiveListReasons.join(', ')} />
         </AdditionalInfoWrapper>
       )}
       <AdditionalInfoWrapper>

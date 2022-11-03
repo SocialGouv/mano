@@ -78,7 +78,7 @@ const Person = ({ route, navigation }) => {
         hasAnimal: person.hasAnimal?.trim() || '',
         entityKey: person.entityKey || '',
         outOfActiveList: person.outOfActiveList || false,
-        outOfActiveListReason: person.outOfActiveListReason || '',
+        outOfActiveListReasons: person.outOfActiveListReasons || [],
         documents: person.documents || [],
       };
     },
