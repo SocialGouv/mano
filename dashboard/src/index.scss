@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('./assets/Lato/font-face.css');
 
 @font-face {
@@ -13,7 +17,6 @@
 
 body {
   font-family: Lato, serif;
-  background-color: #f7f9fa;
   color: #1d2021;
 }
 
@@ -33,7 +36,6 @@ li {
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  // border: 10px solid black;
 }
 
 .main {
@@ -41,7 +43,6 @@ li {
   flex-basis: 100%;
   display: flex;
   overflow: hidden;
-  // border: 10px solid orange;
   width: 100%;
 }
 
@@ -52,7 +53,6 @@ li {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  // border: 10px solid red;
   align-items: center;
   justify-content: center;
 }
@@ -64,18 +64,7 @@ li {
   flex-direction: column;
   overflow: auto;
   padding: 1rem 3rem 3rem;
-  // border: 10px solid black;
 }
-
-// .container {
-//   width: 100%;
-//   padding-left: 0 !important;
-//   padding-right: 0 !important;
-//   padding-bottom: 40px;
-//   position: relative;
-//   display: flex;
-//   flex-direction: column;
-// }
 
 input:focus,
 textarea:focus,
@@ -209,6 +198,7 @@ input:-webkit-autofill:focus,
 input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px rgba(222, 243, 237, 1) inset !important;
 }
+
 $theme-colors: (
   'primary': #49c3a6,
 );
