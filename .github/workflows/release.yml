@@ -32,3 +32,5 @@ jobs:
               {name: 'beta', prerelease: true},
               {name: 'alpha', prerelease: true}
             ]
+        env:
+          GITHUB_TOKEN: ${{ secrets.DEPLOY_KEY }}
