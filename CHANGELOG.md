@@ -1,3 +1,10 @@
+# [1.172.0](https://github.com/SocialGouv/mano/compare/v1.171.6...v1.172.0) (2022-11-03)
+
+
+### Features
+
+* show consultation type ([d73ec57](https://github.com/SocialGouv/mano/commit/d73ec57c7e7eb6727b9acdd15816b939598cc528))
+
 ## [1.171.6](https://github.com/SocialGouv/mano/compare/v1.171.5...v1.171.6) (2022-11-03)
 
 
