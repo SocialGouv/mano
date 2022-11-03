@@ -1,3 +1,10 @@
+## [1.171.6](https://github.com/SocialGouv/mano/compare/v1.171.5...v1.171.6) (2022-11-03)
+
+
+### Bug Fixes
+
+* activate playwright ([650c7c4](https://github.com/SocialGouv/mano/commit/650c7c4a143b5f7f6eafaf075cfd7be8ac71c652))
+
 ## [1.171.5](https://github.com/SocialGouv/mano/compare/v1.171.4...v1.171.5) (2022-11-03)
 
 
