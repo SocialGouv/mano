@@ -1,2 +1,6 @@
+fileignoreconfig:
+- filename: .github/workflows/release.yml
+  checksum: 9de8b8b08e706e957ee60cf9b4eb5524c4120a32d6b9d97e3ee930ca24ebb378
 scopeconfig:
-  - scope: node
+- scope: node
+version: "1.0"
