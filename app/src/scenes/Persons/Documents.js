@@ -15,6 +15,11 @@ const Documents = ({ personDB, navigation, onUpdatePerson, backgroundColor }) =>
               documents: [...(personDB.documents || []), document],
             })
           }
+          onDelete={(doc) =>
+            onUpdatePerson(true, {
+              documents: personDB.documents.filter((d) => d.file.filename !== doc.file.filename),
+            })
+          }
           personDB={personDB}
           documents={personDB?.documents}
           backgroundColor={backgroundColor || colors.app.color}

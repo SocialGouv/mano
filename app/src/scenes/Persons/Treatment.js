@@ -167,7 +167,12 @@ const Treatment = ({ navigation, route }) => {
           />
           <InputLabelled label="Indication" value={indication} onChangeText={setIndication} placeholder="Angine" testID="new-treatment-indication" />
           <Label label="Document(s)" />
-          <DocumentsManager personDB={personDB} onAddDocument={(doc) => setDocuments((docs) => [...docs, doc])} documents={documents} />
+          <DocumentsManager
+            personDB={personDB}
+            onAddDocument={(doc) => setDocuments((docs) => [...docs, doc])}
+            onDelete={(doc) => setDocuments((docs) => docs.filter((d) => d.file.filename !== doc.file.filename))}
+            documents={documents}
+          />
           <Spacer />
           <DateAndTimeInput label="Date de début" date={startDate} setDate={setStartDate} editable showYear />
           <DateAndTimeInput label="Date de fin" date={endDate} setDate={setEndDate} editable showYear />

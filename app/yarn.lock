@@ -841,10 +841,10 @@
     minimatch "^3.1.2"
     strip-json-comments "^3.1.1"
 
-"@expo/react-native-action-sheet@^3.9.0":
-  version "3.13.0"
-  resolved "https://registry.yarnpkg.com/@expo/react-native-action-sheet/-/react-native-action-sheet-3.13.0.tgz#b4cb08440c54b5ec0b3e429cac396422da1d9442"
-  integrity sha512-EFLK35TBsM28W43SY54lISAIvjEm9584LIRWXsYaf5sgmfF65oWAOQP4UyKxMPLYGoaKjnCAJVFNtZUK80ss9A==
+"@expo/react-native-action-sheet@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@expo/react-native-action-sheet/-/react-native-action-sheet-4.0.0.tgz#d51475ebe6ea29b78aeecd699519c9ae0e1fcc9d"
+  integrity sha512-y+w5BpkEN7SZ/+cZN5lOJlOsatO9TIfwlJRB1iq33ateAU5uVrN4yRGPPDDrX3q8hpGky5hXplJ5I+GFM4DqlQ==
   dependencies:
     "@types/hoist-non-react-statics" "^3.3.1"
     hoist-non-react-statics "^3.3.0"
