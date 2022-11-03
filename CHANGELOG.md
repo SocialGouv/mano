@@ -1,3 +1,10 @@
+## [1.171.1](https://github.com/SocialGouv/mano/compare/v1.171.0...v1.171.1) (2022-11-03)
+
+
+### Bug Fixes
+
+* reorder custom fields ([#951](https://github.com/SocialGouv/mano/issues/951)) ([a1151fa](https://github.com/SocialGouv/mano/commit/a1151fadcafd2dca8faacc68aee6b5dfb76619d2))
+
 # [1.171.0](https://github.com/SocialGouv/mano/compare/v1.170.3...v1.171.0) (2022-11-03)
 
 
