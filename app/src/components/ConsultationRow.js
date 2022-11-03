@@ -20,11 +20,20 @@ const isVisibleByMe = (consultation, me) => {
   return consultation.onlyVisibleBy.includes(me._id);
 };
 
-const ConsultationRow = ({ onConsultationPress, consultation, testID = 'consultation', withBadge = false, showStatus, onPseudoPress }) => {
+const ConsultationRow = ({
+  onConsultationPress,
+  consultation,
+  testID = 'consultation',
+  withBadge = false,
+  showStatus,
+  showPseudo,
+  onPseudoPress,
+}) => {
   const persons = useRecoilValue(personsState);
   const me = useRecoilValue(userState);
 
   const name = consultation?.name;
+  const type = consultation?.type;
   const status = consultation?.status;
   const user = consultation?.user;
   const person = useMemo(() => (consultation?.person ? persons?.find((p) => p._id === consultation.person) : null), [persons, consultation.person]);
@@ -55,14 +64,15 @@ const ConsultationRow = ({ onConsultationPress, consultation, testID = 'consulta
       )}
       <DateAndTimeCalendarDisplay date={dueAt} withTime />
       <CaptionsContainer>
-        <Name bold>{name}</Name>
+        <Name>{name}</Name>
+        <Type>{type}</Type>
         {showStatus ? (
           <>
             <StatusContainer>
               <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>
             </StatusContainer>
           </>
-        ) : pseudo ? (
+        ) : showPseudo && pseudo ? (
           <PseudoContainer onPress={onPseudoContainerPress} testID={`${testID}-row-person-${pseudo?.split(' ').join('-').toLowerCase()}-button`}>
             <Pseudo>Pour {pseudo}</Pseudo>
           </PseudoContainer>
@@ -92,6 +102,11 @@ const CaptionsContainer = styled.View`
 const Name = styled(MyText)`
   font-weight: bold;
   font-size: 17px;
+`;
+
+const Type = styled(MyText)`
+  font-size: 12px;
+  opacity: 0.5;
 `;
 
 const StatusContainer = styled.View`

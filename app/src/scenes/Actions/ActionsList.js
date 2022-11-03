@@ -76,7 +76,7 @@ const ActionsList = () => {
   const renderItem = ({ item }) => {
     if (item.type === 'title') return <SectionHeaderStyled heavy>{item.title}</SectionHeaderStyled>;
     if (item.isConsultation) {
-      return <ConsultationRow consultation={item} onConsultationPress={onConsultationPress} onPseudoPress={onPseudoPress} withBadge />;
+      return <ConsultationRow consultation={item} onConsultationPress={onConsultationPress} onPseudoPress={onPseudoPress} withBadge showPseudo />;
     }
     return <ActionRow action={item} onPseudoPress={onPseudoPress} onActionPress={onActionPress} />;
   };

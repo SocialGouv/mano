@@ -11,6 +11,7 @@ export default function ActionName({ action }) {
             {category}
           </Badge>
         ))}
+        {action.isConsultation && <small className="text-muted">{action.type}</small>}
       </div>
     </>
   );
