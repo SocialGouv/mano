@@ -189,7 +189,7 @@ export const healthInsuranceOptions = ['Aucune', 'Régime Général', 'PUMa', 'A
 
 export const employmentOptions = ['DPH', 'CDD', 'CDDI', 'CDI', 'Interim', 'Bénévolat', 'Sans activité', 'Étudiant', 'Non déclaré', 'Autre'];
 
-export const personalSituationOptions = ['Aucune', 'Homme isolé', 'Femme isolée', 'En couple', 'Famille', 'Famille monoparentale', 'Autre'];
+export const personalSituationOptions = ['Aucune', 'Homme isolé', 'Femme isolée', 'En couple', 'Famille', 'Famille monoparentale', 'Mineur', 'Autre'];
 
 export const genderOptions = ['Aucun', 'Homme', 'Femme', 'Homme transgenre', 'Femme transgenre', 'Non binaire', 'Autre'];
 

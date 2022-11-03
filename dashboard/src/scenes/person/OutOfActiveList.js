@@ -12,7 +12,6 @@ import {
   personsState,
   preparePersonForEncryption,
 } from '../../recoil/persons';
-import SelectAsInput from '../../components/SelectAsInput';
 import useApi from '../../services/api';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../../services/date';
