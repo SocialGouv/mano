@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import UserName from '../../components/UserName';
 import { customFieldsObsSelector } from '../../recoil/territoryObservations';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
-import { currentTeamState, teamsState } from '../../recoil/auth';
+import { currentTeamState } from '../../recoil/auth';
 import { formatDateTimeWithNameOfDay } from '../../services/date';
 import TagTeam from '../../components/TagTeam';
 
@@ -18,7 +18,6 @@ const fieldIsEmpty = (value) => {
 };
 
 const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
-  const teams = useRecoilValue(teamsState);
   const team = useRecoilValue(currentTeamState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
