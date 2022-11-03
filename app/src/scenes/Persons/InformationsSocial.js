@@ -17,9 +17,11 @@ import AddressDetailSelect, { isFreeFieldAddressDetail } from '../../components/
 import colors from '../../utils/colors';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { customFieldsPersonsSocialSelector } from '../../recoil/persons';
+import { currentTeamState } from '../../recoil/auth';
 
 const InformationsSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, onEdit, isUpdateDisabled, backgroundColor, person }) => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const currentTeam = useRecoilValue(currentTeamState);
 
   const scrollViewRef = useRef(null);
   const refs = useRef({});
@@ -79,7 +81,7 @@ const InformationsSocial = ({ navigation, editable, updating, onChange, onUpdate
         {!editable && <Spacer />}
         {(customFieldsPersonsSocial || [])
           .filter((f) => f)
-          .filter((f) => f.enabled)
+          .filter((f) => f.enabled || f.enabledTeams.includes(currentTeam._id))
           .map((field) => {
             const { label, name } = field;
             return (

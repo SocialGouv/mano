@@ -9,7 +9,7 @@ import SubList from '../../components/SubList';
 import DateAndTimeInput, { displayBirthDate } from '../../components/DateAndTimeInput';
 import GenderSelect from '../../components/Selects/GenderSelect';
 import colors from '../../utils/colors';
-import { organisationState } from '../../recoil/auth';
+import { currentTeamState, organisationState } from '../../recoil/auth';
 import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
@@ -20,11 +20,11 @@ import ConsultationRow from '../../components/ConsultationRow';
 import TreatmentRow from '../../components/TreatmentRow';
 import Document from '../../components/Document';
 import DocumentsManager from '../../components/DocumentsManager';
-import { TouchableOpacity } from 'react-native-gesture-handler';
 import { MyText } from '../../components/MyText';
 
 const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, editable, onEdit, isUpdateDisabled, backgroundColor, onChange }) => {
   const organisation = useRecoilValue(organisationState);
+  const currentTeam = useRecoilValue(currentTeamState);
 
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
@@ -161,7 +161,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
       />
       {customFieldsMedicalFile
         .filter((f) => f)
-        .filter((f) => f.enabled)
+        .filter((f) => f.enabled || f.enabledTeams.includes(currentTeam._id))
         .map((field) => {
           const { label, name } = field;
           return (
