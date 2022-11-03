@@ -8,6 +8,7 @@ import colors from '../../utils/colors';
 import UserName from '../../components/UserName';
 import API from '../../services/api';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
+import { currentTeamState } from '../../recoil/auth';
 
 const hitSlop = {
   top: 20,
@@ -48,6 +49,8 @@ const computeCustomFieldDisplay = (field, value) => {
 };
 
 const TerritoryObservationRow = ({ onUpdate, observation, territoryToShow, onTerritoryPress, showActionSheetWithOptions }) => {
+  const currentTeam = useRecoilValue(currentTeamState);
+
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const setTerritoryObservations = useSetRecoilState(territoryObservationsState);
 
@@ -103,7 +106,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, territoryToShow, onTer
         ) : null}
         {customFieldsObs
           .filter((f) => f)
-          .filter((f) => f.enabled)
+          .filter((f) => f.enabled || f.enabledTeams.includes(currentTeam._id))
           .map((field) => {
             const { name, label } = field;
             return (

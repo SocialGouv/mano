@@ -15,7 +15,7 @@ import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
 import { consultationsState, encryptedFields, prepareConsultationForEncryption } from '../../recoil/consultations';
 import ConsultationTypeSelect from '../../components/Selects/ConsultationTypeSelect';
 import CustomFieldInput from '../../components/CustomFieldInput';
-import { organisationState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, TODO } from '../../recoil/actions';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
@@ -31,6 +31,7 @@ const Consultation = ({ navigation, route }) => {
   const setAllConsultations = useSetRecoilState(consultationsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
+  const currentTeam = useRecoilValue(currentTeamState);
   const personDB = route?.params?.personDB;
   const consultationDB = route?.params?.consultationDB;
   const isNew = !consultationDB?._id;
@@ -197,7 +198,7 @@ const Consultation = ({ navigation, route }) => {
           {organisation.consultations
             .find((e) => e.name === consultation.type)
             ?.fields.filter((f) => f)
-            .filter((f) => f.enabled)
+            .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
             .map((field) => {
               const { label, name } = field;
               return (
