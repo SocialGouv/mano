@@ -546,14 +546,21 @@ const Summary = ({ person }) => {
                   <Title>Informations médicales</Title>
                   <Row>
                     <Col md={4}>
-                      <Label htmlFor="person-select-healthInsurance">Couverture médicale</Label>
-                      <SelectAsInput
+                      <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
+                      <SelectCustom
                         options={healthInsuranceOptions}
-                        name="healthInsurance"
-                        value={values.healthInsurance || ''}
-                        onChange={handleChange}
-                        inputId="person-select-healthInsurance"
-                        classNamePrefix="person-select-healthInsurance"
+                        name="healthInsurances"
+                        onChange={(v) => handleChange({ currentTarget: { value: v, name: 'healthInsurances' } })}
+                        isClearable={false}
+                        isMulti
+                        inputId="person-select-healthInsurances"
+                        classNamePrefix="person-select-healthInsurances"
+                        value={values.healthInsurances || []}
+                        placeholder={' -- Choisir -- '}
+                        getOptionValue={(i) => i}
+                        getOptionLabel={(i) => i}
+                        styles={{ width: '800px' }}
+                        style={{ width: '800px' }}
                       />
                     </Col>
                     <Col md={4}>

@@ -122,7 +122,7 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
-      if (!organisation.migrations?.includes('update-outOfActiveListReason-to-multi-choice')) {
+      if (!organisation.migrations?.includes('update-outOfActiveListReason-and-healthInsurances-to-multi-choice')) {
         setLoadingText(LOADING_TEXT);
         const res = await API.get({
           path: '/person',
@@ -131,6 +131,7 @@ export default function useDataMigrator() {
         const personsToUpdate = (res.decryptedData || []).map((p) => ({
           ...p,
           outOfActiveListReasons: p.outOfActiveListReason ? [p.outOfActiveListReason] : [],
+          healthInsurances: p.healthInsurance ? [p.healthInsurance] : [],
         }));
         const encryptedPersonsToMigrate = await Promise.all(
           personsToUpdate
@@ -138,7 +139,7 @@ export default function useDataMigrator() {
             .map(encryptItem(hashedOrgEncryptionKey))
         );
         const response = await API.put({
-          path: `/migration/update-outOfActiveListReason-to-multi-choice`,
+          path: `/migration/update-outOfActiveListReason-and-healthInsurances-to-multi-choice`,
           body: { personsToUpdate: encryptedPersonsToMigrate },
           query: { migrationLastUpdateAt },
         });

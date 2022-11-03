@@ -106,7 +106,7 @@ router.put(
             await Report.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
           }
         }
-        if (req.params.migrationName === "update-outOfActiveListReason-to-multi-choice") {
+        if (req.params.migrationName === "update-outOfActiveListReason-and-healthInsurances-to-multi-choice") {
           try {
             z.array(
               z.object({

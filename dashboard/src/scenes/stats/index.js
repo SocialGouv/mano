@@ -472,8 +472,8 @@ const Stats = () => {
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Couverture médicale des personnes"
-            field="healthInsurance"
-            data={getPieData(personsForStats, 'healthInsurance', { options: healthInsuranceOptions })}
+            field="healthInsurances"
+            data={getPieData(personsForStats, 'healthInsurances', { options: healthInsuranceOptions })}
           />
           <CustomResponsivePie onAddFilter={addFilter} title="Avec animaux" data={getPieData(personsForStats, 'hasAnimal')} />
           <CustomResponsivePie

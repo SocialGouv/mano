@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { View } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SubHeader from '../../components/SubHeader';
-import HealthInsuranceSelect from '../../components/Selects/HealthInsuranceSelect';
+import HealthInsuranceMultiCheckBox from '../../components/Selects/HealthInsuranceMultiCheckBox';
 import Spacer from '../../components/Spacer';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import Button from '../../components/Button';
@@ -38,7 +38,11 @@ const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, o
       <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Informations médicales" />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
         <View>
-          <HealthInsuranceSelect value={person.healthInsurance} onSelect={(healthInsurance) => onChange({ healthInsurance })} editable={editable} />
+          <HealthInsuranceMultiCheckBox
+            values={person.healthInsurances}
+            onChange={(healthInsurances) => onChange({ healthInsurances })}
+            editable={editable}
+          />
           <InputLabelled
             label="Structure de suivi médical"
             onChangeText={(structureMedical) => onChange({ structureMedical })}

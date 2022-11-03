@@ -278,9 +278,9 @@ export const personFields = [
     filterable: true,
   },
   {
-    name: 'healthInsurance',
-    type: 'enum',
-    label: 'Couverture médicale',
+    name: 'healthInsurances',
+    type: 'multi-choice',
+    label: 'Couverture(s) médicale(s)',
     encrypted: true,
     importable: true,
     options: healthInsuranceOptions,
