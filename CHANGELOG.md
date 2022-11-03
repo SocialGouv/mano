@@ -1,3 +1,10 @@
+## [1.171.4](https://github.com/SocialGouv/mano/compare/v1.171.3...v1.171.4) (2022-11-03)
+
+
+### Bug Fixes
+
+* trigger release ([eb2bafe](https://github.com/SocialGouv/mano/commit/eb2bafea66f359864a8ed934bf5634f77ad197de))
+
 ## [1.171.3](https://github.com/SocialGouv/mano/compare/v1.171.2...v1.171.3) (2022-11-03)
 
 
