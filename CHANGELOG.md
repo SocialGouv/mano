@@ -1,3 +1,10 @@
+## [1.171.5](https://github.com/SocialGouv/mano/compare/v1.171.4...v1.171.5) (2022-11-03)
+
+
+### Bug Fixes
+
+* revert "release without bot token [#899](https://github.com/SocialGouv/mano/issues/899)" ([d9e0653](https://github.com/SocialGouv/mano/commit/d9e0653f6a2404734d416e7e90063206ad720474))
+
 ## [1.171.4](https://github.com/SocialGouv/mano/compare/v1.171.3...v1.171.4) (2022-11-03)
 
 
