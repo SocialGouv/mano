@@ -43,6 +43,7 @@ create table if not exists "mano"."Organisation"
     "customFieldsObs"          jsonb,
     "customFieldsPersonsSocial"          jsonb,
     "customFieldsPersonsMedical"          jsonb,
+    "fieldsPersonsCustomizableOptions"    jsonb,
     "encryptedVerificationKey" text,
     migrations                 text[],
     "migrationLastUpdateAt"    timestamp with time zone,

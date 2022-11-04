@@ -127,8 +127,12 @@ router.put(
               await person.save();
             }
           }
+
           organisation.set({
-            fieldsPersonsCustomizableOptions: (organisation.fieldsPersonsCustomizableOptions || []).map((field) => {
+            fieldsPersonsCustomizableOptions: (Array.isArray(organisation?.fieldsPersonsCustomizableOptions)
+              ? organisation?.fieldsPersonsCustomizableOptions
+              : []
+            ).map((field) => {
               if (field.name !== "outOfActiveListReason") return field;
               return {
                 name: "outOfActiveListReasons",

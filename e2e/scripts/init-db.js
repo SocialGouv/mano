@@ -78,7 +78,8 @@ async function createUsersAndOrgas() {
         "encryptedVerificationKey",
         services,
         "receptionEnabled",
-        collaborations
+        collaborations,
+        "fieldsPersonsCustomizableOptions"
       ) VALUES (
         $1,
         $3,
@@ -90,7 +91,8 @@ async function createUsersAndOrgas() {
         'Q5DgJJ7xjdctMfRYKCQYxvaOlDlgMcx6D2GB9cJqEvHuUw+TRKtRVeXFnDj5i8QhhfJAEOTBbx0=',
         '{Café,Douche,Repas,Kit,"Don chaussures","Distribution seringue"}',
         true,
-        '{"Ma première collab"}'
+        '{"Ma première collab"}',
+        '[{"name": "outOfActiveListReasons", "type": "multi-choice", "label": "Motif(s) de sortie de file active", "enabled": true, "options": ["Relai vers autre structure", "Hébergée", "Décès", "Incarcération", "Départ vers autre région", "Perdu de vue", "Hospitalisation", "Reconduite à la frontière"], "showInStats": true}]'
       );`,
       [orgId, date, `Orga Test - ${i}`]
     );
