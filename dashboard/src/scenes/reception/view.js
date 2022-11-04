@@ -140,7 +140,7 @@ const Reception = () => {
 
   const [services, setServices] = useState(() => (todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {}));
   useEffect(() => {
-    console.log({ todaysReport });
+    // when we change the team, we change the report and we reset the services
     setServices(todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todaysReport?._id]);
