@@ -1,3 +1,11 @@
+## [1.173.4](https://github.com/SocialGouv/mano/compare/v1.173.3...v1.173.4) (2022-11-04)
+
+
+### Bug Fixes
+
+* **app:** release version ([4cbe794](https://github.com/SocialGouv/mano/commit/4cbe794fc701480ca02b2fd65147893975989c91))
+* **app:** update cache key ([577a028](https://github.com/SocialGouv/mano/commit/577a028361beb1ff798e78d1c7f46c92abe5c491))
+
 ## [1.173.3](https://github.com/SocialGouv/mano/compare/v1.173.2...v1.173.3) (2022-11-04)
 
 
