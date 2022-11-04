@@ -81,7 +81,7 @@ const InformationsSocial = ({ navigation, editable, updating, onChange, onUpdate
         {!editable && <Spacer />}
         {(customFieldsPersonsSocial || [])
           .filter((f) => f)
-          .filter((f) => f.enabled || f.enabledTeams.includes(currentTeam._id))
+          .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
           .map((field) => {
             const { label, name } = field;
             return (

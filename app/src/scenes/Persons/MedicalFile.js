@@ -161,7 +161,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
       />
       {customFieldsMedicalFile
         .filter((f) => f)
-        .filter((f) => f.enabled || f.enabledTeams.includes(currentTeam._id))
+        .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
         .map((field) => {
           const { label, name } = field;
           return (

@@ -106,7 +106,7 @@ const TerritoryObservationRow = ({ onUpdate, observation, territoryToShow, onTer
         ) : null}
         {customFieldsObs
           .filter((f) => f)
-          .filter((f) => f.enabled || f.enabledTeams.includes(currentTeam._id))
+          .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
           .map((field) => {
             const { name, label } = field;
             return (

@@ -228,7 +228,7 @@ const TerritoryObservation = ({ route, navigation }) => {
           <CreatedAt>{new Date(obs?.observedAt || obs?.createdAt || Date.now()).getLocaleDateAndTime('fr')}</CreatedAt>
           {customFieldsObs
             .filter((f) => f)
-            .filter((f) => f.enabled || f.enabledTeams.includes(currentTeam._id))
+            .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))
             .map((field) => {
               const { label, name } = field;
               return (
