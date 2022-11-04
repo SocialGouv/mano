@@ -11,6 +11,7 @@ import Comments from './Comments';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import { populatedPersonSelector } from '../selectors/selectors';
+import Passages from './Passages';
 
 export default function Summary({ person }) {
   return (
@@ -39,7 +40,7 @@ export default function Summary({ person }) {
           <InfosMedicales person={person} />
         </div>
         <div className="span-3 col-alt border shadow rounded p-3">
-          <div>aaa</div>
+          <Passages passages={person.passages} />
         </div>
       </ContainerRow>
     </>

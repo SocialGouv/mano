@@ -4,25 +4,25 @@ import TagTeam from '../../../components/TagTeam';
 import { usersState } from '../../../recoil/auth';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 
-export default function Comments({ comments }) {
+export default function Passages({ passages }) {
   const users = useRecoilValue(usersState);
   return (
     <Container>
-      <h4 className="mt-2 mb-4">Commentaires</h4>
+      <h4 className="mt-2 mb-4">passageaires</h4>
       <table className="table table-striped">
         <tbody className="small">
-          {(comments || []).map((comment) => {
+          {(passages || []).map((passage) => {
             return (
               <tr>
                 <td>
-                  <div>{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
+                  <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
                   <div className="content">
-                    {(comment.comment || '').split('\n').map((e) => (
+                    {(passage.comment || '').split('\n').map((e) => (
                       <p>{e}</p>
                     ))}
                   </div>
-                  <div className="small">Créé par {users.find((e) => e._id === comment.user)?.name}</div>
-                  <TagTeam teamId={comment.team} />
+                  <div className="small">Créé par {users.find((e) => e._id === passage.user)?.name}</div>
+                  <TagTeam teamId={passage.team} />
                 </td>
               </tr>
             );
