@@ -1,16 +1,51 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Text } from 'react-native';
+import { Text, Alert } from 'react-native';
 import API from '../services/api';
 import FileViewer from 'react-native-file-viewer';
+import { connectActionSheet } from '@expo/react-native-action-sheet';
 
-const Document = ({ personId, document }) => {
-  const [isLoading, setIsLoading] = useState(false);
+const Document = ({ showActionSheetWithOptions, personId, document, onDelete }) => {
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const onMorePress = async () => {
+    const options = ['Supprimer', 'Annuler'];
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex: options.findIndex((option) => option === 'Annuler'),
+        destructiveButtonIndex: options.findIndex((option) => option === 'Supprimer'),
+      },
+      async (buttonIndex) => {
+        if (options[buttonIndex] === 'Supprimer') {
+          Alert.alert('Voulez-vous vraiment supprimer ce document ?', null, [
+            {
+              text: 'Annuler',
+              style: 'cancel',
+            },
+            {
+              text: 'Supprimer',
+              style: 'destructive',
+              onPress: async () => {
+                setIsDeleting(true);
+                await API.delete({ path: `/person/${personId}/document/${document.file.filename}` });
+                onDelete(document);
+                setIsDeleting(false);
+              },
+            },
+          ]);
+        }
+      }
+    );
+  };
+
   return (
     <DocumentContainer
+      onLongPress={onMorePress}
       onPress={() => {
-        if (isLoading) return;
-        setIsLoading(true);
+        if (isDownloading) return;
+        setIsDownloading(true);
         API.download({
           path: `/person/${personId}/document/${document.file.filename}`,
           encryptedEntityKey: document.encryptedEntityKey,
@@ -18,15 +53,17 @@ const Document = ({ personId, document }) => {
         }).then(({ path }) => {
           FileViewer.open(path)
             .then((f) => {
-              setIsLoading(false);
+              setIsDownloading(false);
             })
             .catch((error) => {
-              setIsLoading(false);
+              setIsDownloading(false);
             });
         });
       }}
-      key={document.name}>
-      {isLoading ? <Text>Chargement du document chiffré, veuillez patienter</Text> : <DocumentTitle>{document.name}</DocumentTitle>}
+      key={document.name + document.createdAt}>
+      {!!isDownloading && <Text>Chargement du document chiffré, veuillez patienter</Text>}
+      {!!isDeleting && <Text>Suppression du document, veuillez patienter</Text>}
+      {!isDeleting && !isDownloading && <DocumentTitle>{document.name}</DocumentTitle>}
     </DocumentContainer>
   );
 };
@@ -47,4 +84,4 @@ const DocumentContainer = styled.TouchableOpacity`
 const DocumentTitle = styled.Text`
   text-align: left;
 `;
-export default Document;
+export default connectActionSheet(Document);

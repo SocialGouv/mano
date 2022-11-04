@@ -218,6 +218,7 @@ const Consultation = ({ navigation, route }) => {
           <DocumentsManager
             personDB={personDB}
             onAddDocument={(doc) => onChange({ documents: [...(consultation.documents || []), doc] })}
+            onDelete={(doc) => onChange({ documents: consultation.documents.filter((d) => d.file.filename !== doc.file.filename) })}
             documents={consultation.documents}
           />
           <Spacer />

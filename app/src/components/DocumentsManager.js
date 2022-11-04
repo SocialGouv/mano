@@ -16,7 +16,7 @@ import InputLabelled from './InputLabelled';
 import ButtonsContainer from './ButtonsContainer';
 import Document from './Document';
 
-const DocumentsManager = ({ personDB, documents = [], onAddDocument }) => {
+const DocumentsManager = ({ personDB, documents = [], onAddDocument, onDelete }) => {
   const user = useRecoilValue(userState);
   const [asset, setAsset] = useState(null);
   const [name, setName] = useState('');
@@ -65,9 +65,8 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument }) => {
     <>
       {documents.length > 0 && <Hint>Cliquez sur un document pour le consulter</Hint>}
       {documents.map((doc) => (
-        <Document key={doc.name} document={doc} personId={personDB._id} />
+        <Document key={doc.name} document={doc} personId={personDB._id} onDelete={onDelete} />
       ))}
-      <Hint>👉 Vous ne pouvez pas supprimer un document depuis l'application mobile (seulement depuis le dashboard)</Hint>
       <Button
         caption="Ajouter une photo"
         disabled={!!loading}

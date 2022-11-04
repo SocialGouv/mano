@@ -127,6 +127,24 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
     }
   };
 
+  const onDelete = async (doc) => {
+    const body = prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+      ...medicalFile,
+      documents: medicalFile.documents.filter((d) => d.file.filename !== doc.file.filename),
+    });
+    const medicalFileResponse = await API.put({ path: `/medical-file/${medicalFile._id}`, body });
+
+    if (medicalFileResponse.ok) {
+      setAllMedicalFiles((medicalFiles) =>
+        medicalFiles.map((m) => {
+          if (m._id === medicalFileDB._id) return medicalFileResponse.decryptedData;
+          return m;
+        })
+      );
+      setMedicalFile(medicalFileResponse.decryptedData);
+    }
+  };
+
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
       <BackButton onPress={navigation.goBack}>
@@ -210,7 +228,7 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
           </DocumentRow>
         )}
         ifEmpty="Pas encore de document médical">
-        <DocumentsManager personDB={personDB} onAddDocument={onAddDocument} />
+        <DocumentsManager personDB={personDB} onAddDocument={onAddDocument} onDelete={onDelete} />
       </SubList>
     </ScrollContainer>
   );
