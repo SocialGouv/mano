@@ -1,3 +1,10 @@
+## [1.172.2](https://github.com/SocialGouv/mano/compare/v1.172.1...v1.172.2) (2022-11-04)
+
+
+### Bug Fixes
+
+* **app:** enabledteams can be empty ([2f370f5](https://github.com/SocialGouv/mano/commit/2f370f5d22397abdab864d42c05231337862cc47))
+
 ## [1.172.1](https://github.com/SocialGouv/mano/compare/v1.172.0...v1.172.1) (2022-11-04)
 
 
