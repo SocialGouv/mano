@@ -178,16 +178,21 @@ const Reception = () => {
         services: JSON.stringify(services),
       };
       const isNew = !todaysReport?._id;
-      const res = isNew
-        ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-        : await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
-      if (res.ok) {
-        setReports((reports) =>
-          reports.map((a) => {
-            if (a._id === reportUpdate._id) return res.decryptedData;
-            return a;
-          })
-        );
+      if (isNew) {
+        const res = await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) });
+        if (res.ok) {
+          setReports((reports) => [...reports, res.decryptedData]);
+        }
+      } else {
+        const res = await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
+        if (res.ok) {
+          setReports((reports) =>
+            reports.map((a) => {
+              if (a._id === reportUpdate._id) return res.decryptedData;
+              return a;
+            })
+          );
+        }
       }
     },
     process.env.REACT_APP_TEST === 'true' ? 0 : 900,
