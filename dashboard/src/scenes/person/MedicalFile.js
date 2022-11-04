@@ -215,8 +215,6 @@ export function MedicalFile({ person }) {
                     placeholder={' -- Choisir -- '}
                     getOptionValue={(i) => i}
                     getOptionLabel={(i) => i}
-                    styles={{ width: '800px' }}
-                    style={{ width: '800px' }}
                   />
                 </Col>
               </Row>
