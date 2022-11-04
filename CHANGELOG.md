@@ -1,3 +1,10 @@
+## [1.172.1](https://github.com/SocialGouv/mano/compare/v1.172.0...v1.172.1) (2022-11-04)
+
+
+### Bug Fixes
+
+* **dashboard:** report creation bug ([#956](https://github.com/SocialGouv/mano/issues/956)) ([4763ef0](https://github.com/SocialGouv/mano/commit/4763ef042d9d24fdf13a5873517ea06ea66d1ef4))
+
 # [1.172.0](https://github.com/SocialGouv/mano/compare/v1.171.6...v1.172.0) (2022-11-03)
 
 
