@@ -1,3 +1,10 @@
+## [1.173.3](https://github.com/SocialGouv/mano/compare/v1.173.2...v1.173.3) (2022-11-04)
+
+
+### Bug Fixes
+
+* **dashboard:** last refresh ([e47a724](https://github.com/SocialGouv/mano/commit/e47a724cd955e12b99d04a9fc8f439914bc44928))
+
 ## [1.173.2](https://github.com/SocialGouv/mano/compare/v1.173.1...v1.173.2) (2022-11-04)
 
 
