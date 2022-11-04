@@ -77,6 +77,35 @@ router.put(
           }
         }
 
+        if (req.params.migrationName === "clean-duplicated-reports") {
+          try {
+            z.object({
+              reportIdsToDelete: z.array(z.string().regex(looseUuidRegex)),
+              consolidatedReports: z.array(
+                z.object({
+                  _id: z.string().regex(looseUuidRegex),
+                  encrypted: z.string(),
+                  encryptedEntityKey: z.string(),
+                })
+              ),
+            }).parse(req.body);
+          } catch (e) {
+            const error = new Error(`Invalid request in clean-duplicated-reports: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.consolidatedReports) {
+            const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (report) {
+              report.set({ encrypted, encryptedEntityKey });
+              await report.save();
+            }
+          }
+          for (const _id of req.body.reportIdsToDelete) {
+            await Report.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+          }
+        }
+
         organisation.set({
           migrations: [...(organisation.migrations || []), req.params.migrationName],
           migrating: false,

@@ -64,6 +64,60 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
+      if (!organisation.migrations?.includes('clean-duplicated-reports')) {
+        setLoadingText(LOADING_TEXT);
+        const res = await API.get({
+          path: '/report',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const reportsObjByTeamAndDate = (res.decryptedData || [])
+          // sorting the oldest first so that
+          // when we loop over the reports to create a consolidates unique report
+          // the first to be looped is the oldest one, the last is the newest one
+          // so that we keep the newest report's data
+          .sort((a, b) => new Date(b.updatedAt) - new Date(a.updatedAt))
+          .reduce((reportsObj, report) => {
+            if (!reportsObj[`${report.team}-${report.date}`]) reportsObj[`${report.team}-${report.date}`] = [];
+            reportsObj[`${report.team}-${report.date}`].push(report);
+            return reportsObj;
+          }, {});
+        const reportIdsToDelete = [];
+        const consolidatedReports = Object.values(reportsObjByTeamAndDate).map((reports) => {
+          if (reports.length === 1) return reports[0];
+          // console.log('DOUBLE REPORTS', reports.date, reports.length, reports);
+          const consolidatedReport = {
+            _id: reports[0]._id,
+            createdAt: reports[0].createdAt,
+            updatedAt: reports[0].updatedAt,
+            organisation: reports[0].organisation,
+            team: reports[0].team,
+            date: reports[0].date,
+            // services
+            // description
+            // collaborations
+          };
+          for (const [index, report] of Object.entries(reports)) {
+            if (report.services) consolidatedReport.services = report.services;
+            if (report.description) consolidatedReport.description = report.description;
+            if (report.collaborations) consolidatedReport.collaborations = report.collaborations;
+            if (index !== 0) reportIdsToDelete.push(report._id);
+          }
+          return consolidatedReport;
+        });
+        const encryptedConsolidatedReports = await Promise.all(
+          consolidatedReports.map(prepareReportForEncryption).map(encryptItem(hashedOrgEncryptionKey))
+        );
+
+        const response = await API.put({
+          path: `/migration/clean-duplicated-reports`,
+          body: { consolidatedReports: encryptedConsolidatedReports, reportIdsToDelete },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
     },
   };
 }
