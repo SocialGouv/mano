@@ -18,7 +18,7 @@ const Menu = ({ navigation }) => {
   const resetUser = useResetRecoilState(userState);
   const resetTeams = useResetRecoilState(teamsState);
   const resetCurrentTeam = useResetRecoilState(currentTeamState);
-  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-05-27');
+  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-11-04');
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 

@@ -35,7 +35,7 @@ const Login = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const setUser = useSetRecoilState(userState);
   // eslint-disable-next-line no-unused-vars
-  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-05-27');
+  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-11-04');
   const setOrganisation = useSetRecoilState(organisationState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
