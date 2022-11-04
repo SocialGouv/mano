@@ -1,6 +1,7 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
+import { useDebounce } from 'react-use';
 import { useHistory, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { SmallHeader } from '../../components/header';
@@ -30,7 +31,6 @@ import Table from '../../components/table';
 import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
-import { flushSync } from 'react-dom';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -139,6 +139,11 @@ const Reception = () => {
   });
 
   const [services, setServices] = useState(() => (todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {}));
+  useEffect(() => {
+    console.log({ todaysReport });
+    setServices(todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [todaysReport?._id]);
 
   const onSelectPerson = (persons) => {
     persons = persons?.filter(Boolean) || [];
@@ -154,21 +159,28 @@ const Reception = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
-  const changeTimeout = useRef(null);
-  const onServiceUpdate = async (service, newCount) => {
-    const reportToUpdate = todaysReport || (await createReportAtDateIfNotExist(startOfToday().format('YYYY-MM-DD')));
-    const newServices = {
-      ...services,
-      [service]: newCount,
-    };
-    flushSync(() => setServices(newServices));
-    const reportUpdate = {
-      ...reportToUpdate,
-      services: JSON.stringify(newServices),
-    };
-    clearTimeout(changeTimeout.current);
-    changeTimeout.current = setTimeout(async () => {
-      const res = await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
+  useDebounce(
+    async () => {
+      /*
+      The target of this complicated process is to not create empty reports automatically
+      like we used to do before, so that the page /report is not cluttered with empty reports.
+      The solution is to create a report only if there is at least one thing going one, including a service.
+      */
+
+      // we need to prevent create report on first mount with empty services
+      if (!Object.keys(services).length) return;
+      // we need to prevent update on first mount for nothing
+      if (JSON.stringify(services) === todaysReport?.services) return;
+      const reportUpdate = {
+        team: currentTeam._id,
+        date: startOfToday().format('YYYY-MM-DD'),
+        ...(todaysReport || {}),
+        services: JSON.stringify(services),
+      };
+      const isNew = !todaysReport?._id;
+      const res = isNew
+        ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+        : await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
       if (res.ok) {
         setReports((reports) =>
           reports.map((a) => {
@@ -177,7 +189,17 @@ const Reception = () => {
           })
         );
       }
-    }, 1000);
+    },
+    process.env.REACT_APP_TEST === 'true' ? 0 : 900,
+    [services]
+  );
+
+  const onServiceUpdate = async (service, newCount) => {
+    const newServices = {
+      ...services,
+      [service]: newCount,
+    };
+    setServices(newServices);
   };
 
   const onAddAnonymousPassage = async () => {
