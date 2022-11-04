@@ -224,7 +224,9 @@ describe("Organisation CRUD", () => {
       await getInnerText("div.person-select-reasons__multi-value__label")
     ).toBe("Sortie d'hébergement");
     expect(
-      await getInnerText("div.person-select-healthInsurances__single-value")
+      await getInnerText(
+        "div.person-select-healthInsurances__multi-value__label"
+      )
     ).toBe("Aucune");
     expect(
       await getInnerText(
@@ -432,7 +434,7 @@ describe("Organisation CRUD", () => {
   it("should be able to put out of active list", async () => {
     await expect(page).toClick("a", { text: "Résumé" });
     await expect(page).toClick("button", { text: "Sortie de file active" });
-    await expect(page).toMatch("Veuillez préciser le motif de sortie");
+    await expect(page).toMatch("Veuillez préciser le(s) motif(s) de sortie");
     await expect(page).toClick("input#person-select-outOfActiveListReasons");
     await expect(page).toClick(
       "div.person-select-outOfActiveListReasons__option"
