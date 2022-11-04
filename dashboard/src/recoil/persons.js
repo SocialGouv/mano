@@ -184,7 +184,7 @@ export const healthInsuranceOptions = ['Aucune', 'Régime Général', 'PUMa', 'A
 
 export const employmentOptions = ['DPH', 'CDD', 'CDDI', 'CDI', 'Interim', 'Bénévolat', 'Sans activité', 'Étudiant', 'Non déclaré', 'Autre'];
 
-export const personalSituationOptions = ['Aucune', 'Homme isolé', 'Femme isolée', 'En couple', 'Famille', 'Famille monoparentale', 'Autre'];
+export const personalSituationOptions = ['Aucune', 'Homme isolé', 'Femme isolée', 'En couple', 'Famille', 'Famille monoparentale', 'Mineur', 'Autre'];
 
 export const genderOptions = ['Aucun', 'Homme', 'Femme', 'Homme transgenre', 'Femme transgenre', 'Non binaire', 'Autre'];
 
@@ -206,9 +206,9 @@ export const outOfActiveListReasonOptions = [
 
 const fieldsPersonsCustomizableOptions = [
   {
-    name: 'outOfActiveListReason',
-    type: 'enum',
-    label: 'Motif de sortie de file active',
+    name: 'outOfActiveListReasons',
+    type: 'multi-choice',
+    label: 'Motifs de sortie de file active',
     options: outOfActiveListReasonOptions,
     showInStats: true,
     enabled: true,
@@ -273,9 +273,9 @@ export const personFields = [
     filterable: true,
   },
   {
-    name: 'healthInsurance',
-    type: 'enum',
-    label: 'Couverture médicale',
+    name: 'healthInsurances',
+    type: 'multi-choice',
+    label: 'Couverture(s) médicale(s)',
     encrypted: true,
     importable: true,
     options: healthInsuranceOptions,

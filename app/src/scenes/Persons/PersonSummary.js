@@ -78,7 +78,7 @@ const PersonSummary = ({
   const onAddRencontre = async () => navigation.push('AddRencontre', { person: personDB, fromRoute: 'Person' });
 
   const onGetBackToActiveList = async () => {
-    await onUpdatePerson(false, { outOfActiveListReason: '', outOfActiveList: false });
+    await onUpdatePerson(false, { outOfActiveListReasons: [], outOfActiveList: false });
   };
 
   const allActions = useRecoilValue(actionsState);
@@ -118,7 +118,8 @@ const PersonSummary = ({
       {person.outOfActiveList && (
         <AlterOutOfActiveList>
           <Text style={{ color: colors.app.colorWhite }}>
-            {person?.name} est en dehors de la file active, pour le motif suivant : {person.outOfActiveListReason}
+            {person?.name} est en dehors de la file active, pour{' '}
+            {person?.outOfActiveListReasons?.length > 1 ? 'les motifs suivants' : 'le motif suivant'} : {person.outOfActiveListReasons.join(', ')}
             {person?.outOfActiveListDate && `le ${formatDateWithFullMonth(person.outOfActiveListDate)}`}
           </Text>
         </AlterOutOfActiveList>
@@ -254,7 +255,6 @@ const PersonSummary = ({
           caption={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
           onPress={() => (person.outOfActiveList ? onGetBackToActiveList() : onRemoveFromActiveList())}
           color={colors.warning.color}
-          disabled={editable ? isUpdateDisabled : false}
         />
       </ButtonsContainer>
 

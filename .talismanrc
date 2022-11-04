@@ -3,6 +3,10 @@ fileignoreconfig:
   checksum: 9de8b8b08e706e957ee60cf9b4eb5524c4120a32d6b9d97e3ee930ca24ebb378
 - filename: app/ios/Podfile.lock
   checksum: c47f6bc22846aa5918fb1746356eb8c2c21e08628b48a73e6167b90dd05c5c0d
+- filename: e2e/scripts/db.sql
+  checksum: d4326f920efa1cd22289485ed2a9499b9f6e2a9581d4f5c4015525d43ed95aa3
+- filename: tests/src/scripts/db.sql
+  checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
 scopeconfig:
 - scope: node
 version: "1.0"

@@ -16,8 +16,8 @@ import {
 dayjs.extend(utc);
 dayjs.locale("fr");
 
-jest.setTimeout(60000);
-setDefaultOptions({ timeout: 60000 });
+jest.setTimeout(30000);
+setDefaultOptions({ timeout: 30000 });
 
 describe("Organisation CRUD", () => {
   beforeAll(async () => {
@@ -144,8 +144,8 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("div.person-select-resources__option");
     await expect(page).toClick("input#person-select-reasons");
     await expect(page).toClick("div.person-select-reasons__option");
-    await expect(page).toClick("input#person-select-healthInsurance");
-    await expect(page).toClick("div.person-select-healthInsurance__option");
+    await expect(page).toClick("input#person-select-healthInsurances");
+    await expect(page).toClick("div.person-select-healthInsurances__option");
     await expect(page).toClick("input#person-custom-select-consumptions");
     await expect(page).toClick("div.person-custom-select-consumptions__option");
     await expect(page).toFill(
@@ -224,7 +224,9 @@ describe("Organisation CRUD", () => {
       await getInnerText("div.person-select-reasons__multi-value__label")
     ).toBe("Sortie d'hébergement");
     expect(
-      await getInnerText("div.person-select-healthInsurance__single-value")
+      await getInnerText(
+        "div.person-select-healthInsurances__multi-value__label"
+      )
     ).toBe("Aucune");
     expect(
       await getInnerText(
@@ -256,7 +258,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Mise à l'abri");
     await expect(page).toMatch("Ressources");
     await expect(page).toMatch("SANS");
-    await expect(page).toMatch("Couverture médicale");
+    await expect(page).toMatch("Couverture(s) médicale(s)");
     await expect(page).toMatch("Aucune");
   });
 
@@ -395,7 +397,9 @@ describe("Organisation CRUD", () => {
       await getInnerText("div.person-select-reasons__multi-value__label")
     ).toBe("Sortie d'hébergement");
     expect(
-      await getInnerText("div.person-select-healthInsurance__single-value")
+      await getInnerText(
+        "div.person-select-healthInsurances__multi-value__label"
+      )
     ).toBe("Aucune");
     expect(
       await getInnerText(
@@ -430,10 +434,10 @@ describe("Organisation CRUD", () => {
   it("should be able to put out of active list", async () => {
     await expect(page).toClick("a", { text: "Résumé" });
     await expect(page).toClick("button", { text: "Sortie de file active" });
-    await expect(page).toMatch("Veuillez préciser le motif de sortie");
-    await expect(page).toClick("input#person-select-outOfActiveListReason");
+    await expect(page).toMatch("Veuillez préciser le(s) motif(s) de sortie");
+    await expect(page).toClick("input#person-select-outOfActiveListReasons");
     await expect(page).toClick(
-      "div.person-select-outOfActiveListReason__option"
+      "div.person-select-outOfActiveListReasons__option"
     );
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);

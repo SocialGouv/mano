@@ -14,7 +14,7 @@ import { consultationsState } from '../../recoil/consultations';
 import { treatmentsState } from '../../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
 import API from '../../services/api';
-import HealthInsuranceSelect from '../../components/Selects/HealthInsuranceSelect';
+import HealthInsuranceMultiCheckBox from '../../components/Selects/HealthInsuranceMultiCheckBox';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import ConsultationRow from '../../components/ConsultationRow';
 import TreatmentRow from '../../components/TreatmentRow';
@@ -169,7 +169,11 @@ const MedicalFile = ({ navigation, person, personDB, onUpdatePerson, updating, e
       ) : (
         <InputLabelled label="Âge" value={displayBirthDate(person.birthdate, { reverse: true })} placeholder="JJ-MM-AAAA" editable={false} />
       )}
-      <HealthInsuranceSelect value={person.healthInsurance} onSelect={(healthInsurance) => onChange({ healthInsurance })} editable={editable} />
+      <HealthInsuranceMultiCheckBox
+        values={person.healthInsurances}
+        onChange={(healthInsurances) => onChange({ healthInsurances })}
+        editable={editable}
+      />
       <InputLabelled
         label="Structure de suivi médical"
         onChangeText={(structureMedical) => onChange({ structureMedical })}
