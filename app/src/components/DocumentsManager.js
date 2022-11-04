@@ -67,7 +67,6 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument, onDelete })
       {documents.map((doc) => (
         <Document key={doc.name} document={doc} personId={personDB._id} onDelete={onDelete} />
       ))}
-      <Hint>👉 Vous ne pouvez pas supprimer un document depuis l'application mobile (seulement depuis le dashboard)</Hint>
       <Button
         caption="Ajouter une photo"
         disabled={!!loading}
