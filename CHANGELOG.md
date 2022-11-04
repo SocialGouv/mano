@@ -1,3 +1,10 @@
+## [1.173.1](https://github.com/SocialGouv/mano/compare/v1.173.0...v1.173.1) (2022-11-04)
+
+
+### Bug Fixes
+
+* out of active list multi-choice ([#952](https://github.com/SocialGouv/mano/issues/952)) ([14def52](https://github.com/SocialGouv/mano/commit/14def52fd1e6b55ec59974bff330bc775c33133c))
+
 # [1.173.0](https://github.com/SocialGouv/mano/compare/v1.172.2...v1.173.0) (2022-11-04)
 
 
