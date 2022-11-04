@@ -1,3 +1,10 @@
+# [1.173.0](https://github.com/SocialGouv/mano/compare/v1.172.2...v1.173.0) (2022-11-04)
+
+
+### Features
+
+* **app:** can delete document ([#953](https://github.com/SocialGouv/mano/issues/953)) ([e8e70c9](https://github.com/SocialGouv/mano/commit/e8e70c999915731189b2facf28bd4e68cc4a2679))
+
 ## [1.172.2](https://github.com/SocialGouv/mano/compare/v1.172.1...v1.172.2) (2022-11-04)
 
 
