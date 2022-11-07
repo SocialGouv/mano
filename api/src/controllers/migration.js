@@ -128,22 +128,21 @@ router.put(
             }
           }
 
-          organisation.set({
-            fieldsPersonsCustomizableOptions: (Array.isArray(organisation?.fieldsPersonsCustomizableOptions)
-              ? organisation?.fieldsPersonsCustomizableOptions
-              : []
-            ).map((field) => {
-              if (field.name !== "outOfActiveListReason") return field;
-              return {
-                name: "outOfActiveListReasons",
-                type: "multi-choice",
-                label: "Motif(s) de sortie de file active",
-                options: field.options,
-                showInStats: true,
-                enabled: true,
-              };
-            }),
-          });
+          if (Array.isArray(organisation?.fieldsPersonsCustomizableOptions)) {
+            organisation.set({
+              fieldsPersonsCustomizableOptions: organisation?.fieldsPersonsCustomizableOptions.map((field) => {
+                if (field.name !== "outOfActiveListReason") return field;
+                return {
+                  name: "outOfActiveListReasons",
+                  type: "multi-choice",
+                  label: "Motif(s) de sortie de file active",
+                  options: field.options,
+                  showInStats: true,
+                  enabled: true,
+                };
+              }),
+            });
+          }
           await organisation.save({ transaction: tx });
         }
 
