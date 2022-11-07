@@ -197,7 +197,7 @@ const MergeTwoPersons = ({ person }) => {
               initialValues={initMergedPerson}
               enableReinitialize
               onSubmit={async (body, { setSubmitting }) => {
-                if (process.env.REACT_APP_TEST !== 'true' && !window.confirm('Cette opération est irréversible, êtes-vous sûr ?')) return;
+                if (!window.confirm('Cette opération est irréversible, êtes-vous sûr ?')) return;
                 if (!body.followedSince) body.followedSince = originPerson.createdAt;
                 body.entityKey = originPerson.entityKey;
 

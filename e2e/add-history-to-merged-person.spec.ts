@@ -16,7 +16,7 @@ test("test", async ({ page }) => {
 
   await page.getByLabel("Email").click();
 
-  await page.getByLabel("Email").fill("admin1@example.org");
+  await page.getByLabel("Email").fill("admin4@example.org");
 
   await page.getByLabel("Mot de passe").fill("secret");
 
@@ -30,15 +30,14 @@ test("test", async ({ page }) => {
   /*
 
   Add a new team
-
-
-
   */
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page
+    .getByRole("button", { name: "Créer une nouvelle personne" })
+    .click();
 
   await page.getByLabel("Nom").click();
 
@@ -57,7 +56,9 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+  await page
+    .getByRole("button", { name: "Créer une nouvelle personne" })
+    .click();
 
   await page.getByLabel("Nom").click();
 
@@ -78,12 +79,24 @@ test("test", async ({ page }) => {
 
   await page.getByRole("cell", { name: originPersonName }).click();
 
-  await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
+  await page
+    .getByRole("button", { name: "Fusionner avec un autre dossier" })
+    .click();
 
-  await clickOnEmptyReactSelect(page, "person-to-merge-with-select", mergePersonName);
+  await clickOnEmptyReactSelect(
+    page,
+    "person-to-merge-with-select",
+    mergePersonName
+  );
 
-  await page.locator('[data-test-id="name"]').getByRole("cell", { name: originPersonName }).click();
-  await page.locator('[data-test-id="name"]').getByRole("cell", { name: mergePersonName }).click();
+  await page
+    .locator('[data-test-id="name"]')
+    .getByRole("cell", { name: originPersonName })
+    .click();
+  await page
+    .locator('[data-test-id="name"]')
+    .getByRole("cell", { name: mergePersonName })
+    .click();
   await page
     .locator('[data-test-id="otherNames"]')
     .getByRole("cell", { name: originPersonOtherName })
@@ -97,14 +110,9 @@ test("test", async ({ page }) => {
     .locator('[data-test-id="otherNames"] input[name="otherNames"]')
     .fill(mergedPersonOtherName);
 
-  await page.getByRole("button", { name: "Fusionner" }).click();
+  page.once("dialog", (dialog) => dialog.accept());
 
-  // // window.confirm not working on my tests
-  // page.once("dialog", (dialog) => {
-  //   if (dialog.message() === "Cette opération est irréversible, êtes-vous sûr ?") {
-  //     dialog.accept().catch(() => {});
-  //   }
-  // });
+  await page.getByRole("button", { name: "Fusionner" }).click();
 
   await page.locator(".Toastify__close-button").click();
   await page.locator('a:has-text("Historique")').click();
@@ -116,6 +124,8 @@ test("test", async ({ page }) => {
     .click();
 
   await page
-    .locator(`[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"${originPersonOtherName}\\""]`)
+    .locator(
+      `[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"${originPersonOtherName}\\""]`
+    )
     .click();
 });
