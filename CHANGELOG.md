@@ -1,3 +1,10 @@
+## [1.173.5](https://github.com/SocialGouv/mano/compare/v1.173.4...v1.173.5) (2022-11-07)
+
+
+### Bug Fixes
+
+* api fieldsPersonsCustomizableOptions migration ([ebf5901](https://github.com/SocialGouv/mano/commit/ebf5901e7cea32a1647072e3ff7e8e976e3da5d4))
+
 ## [1.173.4](https://github.com/SocialGouv/mano/compare/v1.173.3...v1.173.4) (2022-11-04)
 
 
