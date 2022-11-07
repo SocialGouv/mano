@@ -21,16 +21,6 @@ test("Cross teams report", async ({ page }) => {
   const team2Description = nanoid();
   const team1Collab = nanoid();
   const team2Collab = nanoid();
-  // const team1Name = "team1Name";
-  // const team2Name = "team2Name";
-  // const person1Name = "person1Name";
-  // const person2Name = "person2Name";
-  // const person1action = "person1action";
-  // const person2action = "person2action";
-  // const team1Description = "team1Description";
-  // const team2Description = "team2Description";
-  // const team1Collab = "team1Collab";
-  // const team2Collab = "team2Collab";
 
   test.setTimeout(120000);
 
@@ -301,30 +291,6 @@ test("Cross teams report", async ({ page }) => {
     await expect(page.locator(`data-test-id=general-Café-4`)).toBeVisible();
     await expect(page.locator(`data-test-id=general-Douche-3`)).toBeVisible();
     await expect(page.locator(`data-test-id=general-Repas-3`)).toBeVisible();
-    // await page
-    //   .getByText(
-    //     "Certaines équipes travaillent de nuit 🌒, cliquez ici pour savoir la période concernée par chacune"
-    //   )
-    //   .click();
-
-    // await page
-    //   .getByRole("group")
-    //   .getByText(`☀️ ${team1Name} - Journée du ${dayjs().format("D MMMM YYYY")}`)
-    //   .click();
-
-    // await page
-    //   .getByRole("group")
-    //   .getByText(`☀️ ${team2Name} - Journée du ${dayjs().format("D MMMM YYYY")}`)
-    //   .click();
-
-    // await page
-    //   .getByRole("group")
-    //   .getByText(
-    //     `🌒 ${team2Name} - Nuit du ${dayjs().format("D MMMM YYYY")} au ${dayjs()
-    //       .add(1, "day")
-    //       .format("D MMMM YYYY")}`
-    //   )
-    //   .click();
 
     await page.getByRole("button", { name: "Afficher" }).first().click();
     await page.getByRole("button", { name: "Afficher" }).first().click();
