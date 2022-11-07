@@ -1,3 +1,10 @@
+# [1.174.0](https://github.com/SocialGouv/mano/compare/v1.173.6...v1.174.0) (2022-11-07)
+
+
+### Features
+
+* **dashboard:**  reports cross team ([#948](https://github.com/SocialGouv/mano/issues/948)) ([8509142](https://github.com/SocialGouv/mano/commit/8509142a481d266ab2ac3a2904b5e7d4d8ea36ff))
+
 ## [1.173.6](https://github.com/SocialGouv/mano/compare/v1.173.5...v1.173.6) (2022-11-07)
 
 
