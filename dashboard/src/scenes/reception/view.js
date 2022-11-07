@@ -144,7 +144,6 @@ const Reception = () => {
     setServices(todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {});
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [todaysReport?._id]);
-  console.log({ todaysReport });
 
   const onSelectPerson = (persons) => {
     persons = persons?.filter(Boolean) || [];
