@@ -1,11 +1,21 @@
 import { setCacheItem } from '../services/dataManagement';
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
+import { organisationState } from './auth';
 
 const collectionName = 'action';
 export const actionsState = atom({
   key: collectionName,
   default: [],
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
+});
+
+export const actionsCategoriesSelector = selector({
+  key: 'actionsCategoriesSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (organisation.actionsGroupedCategories) return organisation.actionsGroupedCategories;
+    return [{ groupTitle: 'Toutes', categories: organisation.categories }];
+  },
 });
 
 const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];

@@ -7,7 +7,13 @@ Organisation.init(
   {
     _id: { type: DataTypes.UUID, allowNull: false, defaultValue: Sequelize.UUIDV4, primaryKey: true },
     name: DataTypes.TEXT,
+
     categories: DataTypes.ARRAY(DataTypes.TEXT),
+    actionsGroupedCategories: {
+      type: DataTypes.JSONB,
+      // example: [{"groupTitle": "médical", categories: ["seringue", "pansement"]}, { "groupTitle": "local", "categories": ["entretien", "lavage"]}]
+    },
+
     collaborations: { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] },
     consultations: DataTypes.JSONB,
     encryptionEnabled: { type: DataTypes.BOOLEAN },
@@ -16,6 +22,7 @@ Organisation.init(
     encrypting: { type: DataTypes.BOOLEAN, default: false },
     receptionEnabled: { type: DataTypes.BOOLEAN },
     services: DataTypes.ARRAY(DataTypes.TEXT),
+
     customFieldsObs: DataTypes.JSONB,
     fieldsPersonsCustomizableOptions: DataTypes.JSONB,
     customFieldsPersonsSocial: DataTypes.JSONB,

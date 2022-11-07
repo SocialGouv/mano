@@ -7,6 +7,7 @@ const ButtonCustom = ({
   color = 'primary',
   onClick = Function.prototype,
   style,
+  className = '',
   loading,
   title = 'ButtonCustom',
   type = 'submit',
@@ -18,7 +19,7 @@ const ButtonCustom = ({
 }) => {
   return (
     <ButtonWrapper
-      className="noprint"
+      className={['noprint', className].join(' ')}
       onClick={onClick}
       color={color}
       style={style}

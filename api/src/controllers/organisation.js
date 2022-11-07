@@ -230,6 +230,7 @@ router.put(
       const bodyToParse = {
         name: z.optional(z.string().min(1)),
         categories: z.optional(z.array(z.string().min(1))),
+        actionsGroupedCategories: z.optional(z.array(z.object({ actionsGroupedCategories: z.string(), categories: z.array(z.string().min(1)) }))),
         collaborations: z.optional(z.array(z.string().min(1))),
         customFieldsObs: z.optional(z.array(customFieldSchema)),
         fieldsPersonsCustomizableOptions: z.optional(z.array(customFieldSchema)),
@@ -279,6 +280,7 @@ router.put(
     const updateOrg = {};
     if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
     if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
+    if (req.body.hasOwnProperty("actionsGroupedCategories")) updateOrg.actionsGroupedCategories = req.body.actionsGroupedCategories;
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
     if (req.body.hasOwnProperty("customFieldsObs"))
       updateOrg.customFieldsObs = typeof req.body.customFieldsObs === "string" ? JSON.parse(req.body.customFieldsObs) : req.body.customFieldsObs;

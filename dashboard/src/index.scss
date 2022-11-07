@@ -12,6 +12,9 @@
 .Toastify__hack-force-fast {
   animation-duration: 1ms !important;
 }
+.debug {
+  @apply tw-border-8 tw-border-red-500;
+}
 
 * {
   padding: 0;
