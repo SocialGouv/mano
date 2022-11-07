@@ -456,7 +456,14 @@ const View = () => {
       </HeaderStyled>
       <div
         className="noprint"
-        style={{ height: '100%', display: 'flex', overflow: 'hidden', flex: 1, marginTop: '1rem', borderTop: '1px solid #eee' }}>
+        style={{
+          height: '100%',
+          display: selectedTeamIds.length ? 'flex' : 'none',
+          overflow: 'hidden',
+          flex: 1,
+          marginTop: '1rem',
+          borderTop: '1px solid #eee',
+        }}>
         <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
           <Drawer title="Navigation dans les catégories du compte-rendu">
             {!['restricted-access'].includes(user.role) && (
