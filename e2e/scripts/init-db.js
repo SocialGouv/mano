@@ -50,9 +50,7 @@ async function createUsersAndOrgas() {
     connectionString: `${process.env.PGBASEURL}/${process.env.PGDATABASE}`,
   });
   await client.connect();
-  await client.query(
-    `delete from mano."Organisation" where name like 'Orga Test - %'`
-  );
+  await client.query(`delete from mano."Organisation" where name like 'Orga Test - %'`);
   await client.query(`delete from mano."User" where name like 'User Test - %'`);
   await client.query(`delete from mano."Team" where name like 'Team Test - %'`);
 

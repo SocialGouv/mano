@@ -258,7 +258,7 @@ const Reception = () => {
     <>
       <SmallHeader
         title={
-          <span>
+          <span data-test-id="reception-title">
             Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
             <b>{currentTeam?.name || ''}</b>
           </span>
@@ -321,7 +321,7 @@ const Reception = () => {
             {!!todaysReport?._id && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <ButtonCustom
-                  onClick={() => history.push(`/report/${todaysReport?._id}?tab=6`)}
+                  onClick={() => history.push(`/report/${todaysReport?.date}?tab=6`)}
                   color="link"
                   title="Modifier les passages"
                   padding="0px"
@@ -335,6 +335,7 @@ const Reception = () => {
             <div className="services-incrementators">
               {organisation?.services?.map((service) => (
                 <IncrementorSmall
+                  dataTestId={`${currentTeam?.name}-reception-${service}-${services[service] || 0}`}
                   key={service}
                   service={service}
                   count={services[service] || 0}

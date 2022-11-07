@@ -18,6 +18,7 @@ const BackButtonWrapperStyled = styled.a`
   border-radius: 8px;
   cursor: pointer;
   border: 0;
+  ${(props) => props.disabled && `opacity: 0.5; pointer-events: none; cursor: default;`}
 `;
 
 const BackButton = () => {
@@ -25,8 +26,8 @@ const BackButton = () => {
   return <BackButtonWrapper withArrow onClick={() => history.goBack()} caption="Retour" />;
 };
 
-export const BackButtonWrapper = ({ onClick, caption, withArrow }) => (
-  <BackButtonWrapperStyled className="noprint" onClick={onClick} withArrow={withArrow}>
+export const BackButtonWrapper = ({ onClick, caption, withArrow, disabled = false, title = '' }) => (
+  <BackButtonWrapperStyled className="noprint" onClick={onClick} withArrow={withArrow} disabled={disabled} title={title}>
     {caption}
   </BackButtonWrapperStyled>
 );

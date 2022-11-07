@@ -6,6 +6,8 @@ import { clickOnEmptyReactSelect } from "./utils";
 // It creates a random person and then modifies it.
 // It could be used as an example for writing new tests.
 test("Create and modify a person", async ({ page }) => {
+  test.setTimeout(120000);
+
   // Always use a new person name
   const personName = nanoid();
 
@@ -37,7 +39,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Nom").fill(personName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator(".Toastify__close-button").click();
+  // await page.locator(".Toastify__close-button").click();
 
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
 
@@ -45,7 +47,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Autres pseudos").fill("deuxième pseudo");
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
-  await page.locator(".Toastify__close-button").click();
+  // await page.locator(".Toastify__close-button").click();
 
   await page.getByLabel("Autres pseudos").click();
   await page.getByLabel("Nom prénom ou Pseudonyme").click();
@@ -96,7 +98,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByText("Alcool", { exact: true }).click();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
-  await page.locator(".Toastify__close-button").click();
+  // await page.locator(".Toastify__close-button").click();
 
   await page.locator('a:has-text("Dossier Médical")').click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*\?tab=dossier\+m%C3%A9dical/);
@@ -116,5 +118,5 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByPlaceholder("Angine").fill("dsqdsqdqs");
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator(".Toastify__close-button").click();
+  // await page.locator(".Toastify__close-button").click();
 });

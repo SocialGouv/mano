@@ -12,13 +12,14 @@
     "node-talisman": "^1.29.3"
   },
   "scripts": {
-    "test:start-dashboard-for-record": "REACT_APP_HOST=127.0.0.1:8091 REACT_APP_SCHEME=http REACT_APP_TEST=true PORT=8090 yarn --cwd ./dashboard dev",
+    "test:start-dashboard-for-record": "REACT_APP_HOST=127.0.0.1:8091 REACT_APP_SCHEME=http REACT_APP_TEST=true REACT_APP_TEST_PLAYWRIGHT=true PORT=8090 yarn --cwd ./dashboard dev",
     "test:start-api-for-record": "PORT=8091 NODE_ENV=test PGDATABASE=manotest node ./api/src/index.js dev",
     "test:init-db": "PGDATABASE=manotest node ./e2e/scripts/init-db.js",
     "postinstall": "is-ci || husky install"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "dayjs": "^1.11.6",
     "dotenv": "^16.0.3",
     "nanoid": "3.3.4",
     "pg": "^8.8.0",

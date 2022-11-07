@@ -7,6 +7,7 @@ const Table = ({
   columns = [],
   data = [],
   rowKey,
+  dataTestId = null,
   onRowClick,
   rowDisabled = () => false,
   nullDisplay = '',
@@ -93,7 +94,7 @@ const Table = ({
                 onClick={() => (!rowDisabled(item) && onRowClick ? onRowClick(item) : null)}
                 key={item[rowKey] || item._id}
                 data-key={item[rowKey] || item._id}
-                data-test-id={item[rowKey] || item._id}
+                data-test-id={item[dataTestId] || item[rowKey] || item._id}
                 style={{
                   ...(item.style || {}),
                   cursor: rowDisabled(item) ? 'not-allowed' : 'pointer',

@@ -116,6 +116,7 @@ const config: PlaywrightTestConfig = {
         REACT_APP_HOST: "127.0.0.1:8091",
         REACT_APP_SCHEME: "http",
         REACT_APP_TEST: "true",
+        REACT_APP_TEST_PLAYWRIGHT: "true",
       },
     },
     {

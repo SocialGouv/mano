@@ -24,11 +24,13 @@ const getDataAsSearchParam = (data, defaultValue) => {
 
 // NOTE: its not possible to update two different URLSearchParams very quickly, the second one cancels the first one
 
-const useSearchParamState = (param, defaultAndInitialValue, { resetToDefaultIfTheFollowingValueChange = null } = {}) => {
+const useSearchParamState = (param, defaultAndInitialValue, { resetToDefaultIfTheFollowingValueChange = null, debug = false } = {}) => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const [state, setState] = useState(() => getDataAsSearchParam(searchParams.get(param), defaultAndInitialValue) || defaultAndInitialValue);
+  const [state, setState] = useState(() => {
+    return getDataAsSearchParam(searchParams.get(param), defaultAndInitialValue) || defaultAndInitialValue;
+  });
 
   const setStateRequest = (newState, { sideEffect = null } = {}) => {
     if (!!window) {

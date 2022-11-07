@@ -257,7 +257,7 @@ const List = () => {
               return p.alertness ? <ExclamationMarkButton /> : null;
             },
           },
-          { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
+          { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams person={person} /> },
           {
             title: 'Suivi(e) depuis le',
             dataKey: 'followedSince',

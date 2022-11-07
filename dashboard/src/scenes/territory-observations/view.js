@@ -5,8 +5,9 @@ import { useRecoilValue } from 'recoil';
 import UserName from '../../components/UserName';
 import { customFieldsObsSelector } from '../../recoil/territoryObservations';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
-import { currentTeamState, teamsState } from '../../recoil/auth';
+import { currentTeamState } from '../../recoil/auth';
 import { formatDateTimeWithNameOfDay } from '../../services/date';
+import TagTeam from '../../components/TagTeam';
 
 const fieldIsEmpty = (value) => {
   if (value === null) return true;
@@ -16,17 +17,20 @@ const fieldIsEmpty = (value) => {
   return false;
 };
 
-const View = ({ obs, onDelete, onClick, noBorder }) => {
-  const teams = useRecoilValue(teamsState);
+const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
   const team = useRecoilValue(currentTeamState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
 
   return (
     <StyledObservation noBorder={noBorder}>
       {!!onDelete && <CloseButton close onClick={() => onDelete(obs._id)} />}
-      <div style={{ display: 'flex' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <UserName id={obs.user} wrapper={(name) => <span className="author">{name}</span>} />
-        <i style={{ marginLeft: 10 }}>(équipe {teams.find((t) => obs.team === t._id)?.name})</i>
+        {!noTeams && (
+          <div style={{ marginLeft: 150 }}>
+            <TagTeam teamId={obs?.team} />
+          </div>
+        )}
       </div>
       <div className="time">{formatDateTimeWithNameOfDay(obs.observedAt || obs.createdAt)}</div>
       <div onClick={onClick ? () => onClick(obs) : null} className="content">
