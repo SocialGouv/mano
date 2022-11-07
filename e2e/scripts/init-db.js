@@ -54,7 +54,7 @@ async function createUsersAndOrgas() {
   await client.query(`delete from mano."User" where name like 'User Test - %'`);
   await client.query(`delete from mano."Team" where name like 'Team Test - %'`);
 
-  for (let i = 1; i < 5; i++) {
+  for (let i = 1; i < 50; i++) {
     console.log("create user", i);
 
     const orgId = uuidv4();
