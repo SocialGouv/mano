@@ -57,6 +57,11 @@ const initMergeValue = (field, originPerson = {}, personToMergeAndDelete = {}) =
   return originPerson[field.name] || personToMergeAndDelete[field.name];
 };
 
+const fieldIsEmpty = (value) => {
+  if (Array.isArray(value)) return !value.length;
+  return !value;
+};
+
 const MergeTwoPersons = ({ person }) => {
   const API = useApi();
   const [open, setOpen] = useState(false);
@@ -194,7 +199,21 @@ const MergeTwoPersons = ({ person }) => {
                 if (!body.followedSince) body.followedSince = originPerson.createdAt;
                 body.entityKey = originPerson.entityKey;
 
+                const historyEntry = {
+                  date: new Date(),
+                  user: user._id,
+                  data: {},
+                };
+                for (const key in body) {
+                  if (fieldIsEmpty(body[key]) && fieldIsEmpty(originPerson[key])) continue;
+                  if (JSON.stringify(body[key]) !== JSON.stringify(initMergedPerson[key])) {
+                    historyEntry.data[key] = { oldValue: initMergedPerson[key], newValue: body[key] };
+                  }
+                }
+                body.history = [...(initMergedPerson.history || []), historyEntry];
+
                 const mergedPerson = preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body);
+
                 const mergedActions = actions
                   .filter((a) => a.person === personToMergeAndDelete._id)
                   .map((comment) => prepareActionForEncryption({ ...comment, person: originPerson._id }))
