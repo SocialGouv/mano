@@ -227,6 +227,7 @@ const PersonHistory = ({ person }) => {
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const teams = useRecoilValue(teamsState);
   const history = useMemo(() => [...(person.history || [])].reverse(), [person.history]);
+
   return (
     <div>
       <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
@@ -256,7 +257,7 @@ const PersonHistory = ({ person }) => {
                       const personField = personFieldsIncludingCustomFields.find((f) => f.name === key);
                       if (key === 'assignedTeams') {
                         return (
-                          <div>
+                          <div key={key}>
                             {personField?.label} : <br />
                             {(value.oldValue || []).map((teamId) => {
                               const team = teams.find((t) => t._id === teamId);
@@ -266,7 +267,9 @@ const PersonHistory = ({ person }) => {
                         );
                       }
                       return (
-                        <div>
+                        <div
+                          key={key}
+                          data-test-id={`${personField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
                           {personField?.label} : <br />
                           <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
                         </div>
