@@ -44,14 +44,14 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom").fill(originPersonName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator(".Toastify__close-button").click();
+  //  await page.locator(".Toastify__close-button").click();
 
   await page.getByLabel("Autres pseudos").click();
 
   await page.getByLabel("Autres pseudos").fill(originPersonOtherName);
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
-  await page.locator(".Toastify__close-button").click();
+  //  await page.locator(".Toastify__close-button").click();
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
@@ -65,14 +65,14 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom").fill(mergePersonName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator(".Toastify__close-button").click();
+  //  await page.locator(".Toastify__close-button").click();
 
   await page.getByLabel("Autres pseudos").click();
 
   await page.getByLabel("Autres pseudos").fill(mergePersonOtherName);
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
-  await page.locator(".Toastify__close-button").click();
+  //  await page.locator(".Toastify__close-button").click();
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
@@ -114,7 +114,7 @@ test("test", async ({ page }) => {
 
   await page.getByRole("button", { name: "Fusionner" }).click();
 
-  await page.locator(".Toastify__close-button").click();
+  //  await page.locator(".Toastify__close-button").click();
   await page.locator('a:has-text("Historique")').click();
 
   await page
