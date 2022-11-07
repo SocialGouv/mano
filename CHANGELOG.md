@@ -1,3 +1,10 @@
+# [1.175.0](https://github.com/SocialGouv/mano/compare/v1.174.0...v1.175.0) (2022-11-07)
+
+
+### Features
+
+* save merged fields in history ([#959](https://github.com/SocialGouv/mano/issues/959)) ([51b791b](https://github.com/SocialGouv/mano/commit/51b791b7294a8a9a50303579563ae36b9f2d8bdd))
+
 # [1.174.0](https://github.com/SocialGouv/mano/compare/v1.173.6...v1.174.0) (2022-11-07)
 
 
