@@ -152,6 +152,7 @@ const MergeTwoPersons = ({ person }) => {
               <SelectCustom
                 options={personsToMergeWith}
                 inputId="origin-person-with-select"
+                classNamePrefix="origin-person-with-select"
                 isClearable
                 isSearchable
                 onChange={setOriginPerson}
@@ -170,6 +171,7 @@ const MergeTwoPersons = ({ person }) => {
               <SelectCustom
                 options={personsToMergeWith}
                 inputId="person-to-merge-with-select"
+                classNamePrefix="person-to-merge-with-select"
                 isClearable
                 isSearchable
                 onChange={setPersonToMergeAndDelete}
@@ -195,7 +197,7 @@ const MergeTwoPersons = ({ person }) => {
               initialValues={initMergedPerson}
               enableReinitialize
               onSubmit={async (body, { setSubmitting }) => {
-                if (!window.confirm('Cette opération est irréversible, êtes-vous sûr ?')) return;
+                if (process.env.REACT_APP_TEST !== 'true' && !window.confirm('Cette opération est irréversible, êtes-vous sûr ?')) return;
                 if (!body.followedSince) body.followedSince = originPerson.createdAt;
                 body.entityKey = originPerson.entityKey;
 
