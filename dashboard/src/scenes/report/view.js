@@ -649,7 +649,6 @@ const View = () => {
 
 const Reception = ({ reports, selectedTeamsObject, dateString }) => {
   const organisation = useRecoilValue(organisationState);
-  console.log({ reports });
   const services = useMemo(() => {
     const reportsServices = reports.map((report) => (report?.services?.length ? JSON.parse(report?.services) : {}));
 
