@@ -406,10 +406,6 @@ const View = () => {
               />
             </div>
           </div>
-          {/* <div style={{ padding: '0 2rem', fontWeight: '400' }}>
-            {`Compte rendu de l'équipe `}
-            <b>{currentTeam?.name || ''}</b> - {getPeriodTitle(report.date, currentTeam?.nightSession)}
-          </div> */}
           <div style={{ display: 'flex', flexGrow: '1', padding: '0 2rem', fontWeight: '400' }}>
             <HeaderTitle style={{ fontWeight: '400', flexShrink: 0 }}>
               <span>
