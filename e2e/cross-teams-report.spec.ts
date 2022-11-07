@@ -41,7 +41,7 @@ test("Cross teams report", async ({ page }) => {
 
     await page.getByLabel("Email").click();
 
-    await page.getByLabel("Email").fill("admin1@example.org");
+    await page.getByLabel("Email").fill("admin2@example.org");
 
     await page.getByLabel("Mot de passe").click();
 
