@@ -208,7 +208,7 @@ export default function DataLoader() {
               .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
       );
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -221,7 +221,7 @@ export default function DataLoader() {
           : mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user))
       );
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -230,7 +230,7 @@ export default function DataLoader() {
       const res = await API.get({ path: '/treatment', query: { ...query, after: initialLoad ? 0 : lastLoad } });
       setTreatments(mergeItems(treatments, res.decryptedData));
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -239,7 +239,7 @@ export default function DataLoader() {
       const res = await API.get({ path: '/medical-file', query: { ...query, after: initialLoad ? 0 : lastLoad } });
       setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -254,7 +254,7 @@ export default function DataLoader() {
               .filter((r) => !!r.team && !!r.date)
       );
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -270,7 +270,7 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -286,7 +286,7 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -296,7 +296,7 @@ export default function DataLoader() {
       const res = await API.get({ path: '/action', query });
       setActions(mergeItems(actions, res.decryptedData));
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -310,7 +310,7 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -324,7 +324,7 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -338,7 +338,7 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -354,7 +354,7 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
@@ -370,7 +370,7 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
-      if (!res.data?.length) {
+      if (!res.data) {
         capture('Debug: No data in loader', { extra: { res, organisation }, user });
       }
       setProgressBuffer(res.data.length);
