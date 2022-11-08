@@ -1,3 +1,10 @@
+## [1.175.5](https://github.com/SocialGouv/mano/compare/v1.175.4...v1.175.5) (2022-11-08)
+
+
+### Bug Fixes
+
+* outOfActiveListReasons small bug ([e9c980b](https://github.com/SocialGouv/mano/commit/e9c980bf1fe958592f0499ccc98a094b0a6f7f31))
+
 ## [1.175.4](https://github.com/SocialGouv/mano/compare/v1.175.3...v1.175.4) (2022-11-08)
 
 
