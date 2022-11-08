@@ -1,3 +1,10 @@
+## [1.175.2](https://github.com/SocialGouv/mano/compare/v1.175.1...v1.175.2) (2022-11-08)
+
+
+### Bug Fixes
+
+* **dashboard:** report when no service ([fbef23d](https://github.com/SocialGouv/mano/commit/fbef23d8c1b6d0b5a9ee334192a99ac6594c4819))
+
 ## [1.175.1](https://github.com/SocialGouv/mano/compare/v1.175.0...v1.175.1) (2022-11-08)
 
 
