@@ -42,7 +42,9 @@ test("Cross teams report", async ({ page }) => {
     await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
 
     await page.getByRole("button", { name: "Se connecter" }).click();
-    await expect(page).toHaveURL("http://localhost:8090/reception?calendarTab=2");
+    await expect(page).toHaveURL(
+      "http://localhost:8090/reception?calendarTab=2"
+    );
   });
 
   /*
@@ -54,15 +56,19 @@ test("Cross teams report", async ({ page }) => {
     await page.getByRole("link", { name: "Équipes" }).click();
     await expect(page).toHaveURL("http://localhost:8090/team");
 
-    await page.getByRole("button", { name: "Créer une nouvelle équipe" }).click();
+    await page
+      .getByRole("button", { name: "Créer une nouvelle équipe" })
+      .click();
 
     await page.getByLabel("Nom").click();
     await page.getByLabel("Nom").fill(team1Name);
 
     await page.getByRole("button", { name: "Créer" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
 
-    await page.getByRole("button", { name: "Créer une nouvelle équipe" }).click();
+    await page
+      .getByRole("button", { name: "Créer une nouvelle équipe" })
+      .click();
 
     await page.getByLabel("Nom").click();
     await page.getByLabel("Nom").fill(team2Name);
@@ -73,7 +79,7 @@ test("Cross teams report", async ({ page }) => {
     // await page.getByLabel("Oui").check(); // night shift
 
     await page.getByRole("button", { name: "Créer" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
   });
 
   await test.step("should create persons", async () => {
@@ -82,28 +88,32 @@ test("Cross teams report", async ({ page }) => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
 
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page
+      .getByRole("button", { name: "Créer une nouvelle personne" })
+      .click();
 
     await page.getByLabel("Nom").click();
 
     await page.getByLabel("Nom").fill(person1Name);
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
 
     await changeReactSelectValue(page, "team-selector-topBar", team2Name);
 
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page
+      .getByRole("button", { name: "Créer une nouvelle personne" })
+      .click();
 
     await page.getByLabel("Nom").click();
 
     await page.getByLabel("Nom").fill(person2Name);
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
   });
 
   await test.step("should create actions", async () => {
@@ -111,7 +121,9 @@ test("Cross teams report", async ({ page }) => {
 
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
+    await page
+      .getByRole("button", { name: "Créer une nouvelle action" })
+      .click();
 
     await page.getByLabel("Nom de l'action").click();
 
@@ -119,16 +131,22 @@ test("Cross teams report", async ({ page }) => {
 
     await clickOnEmptyReactSelect(page, "create-action-team-select", team1Name);
 
-    await clickOnEmptyReactSelect(page, "create-action-person-select", person1Name);
+    await clickOnEmptyReactSelect(
+      page,
+      "create-action-person-select",
+      person1Name
+    );
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
 
     await page.getByRole("link", { name: "Agenda" }).click();
 
     await changeReactSelectValue(page, "team-selector-topBar", team2Name);
 
-    await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
+    await page
+      .getByRole("button", { name: "Créer une nouvelle action" })
+      .click();
 
     await page.getByLabel("Nom de l'action").click();
 
@@ -136,10 +154,14 @@ test("Cross teams report", async ({ page }) => {
 
     await clickOnEmptyReactSelect(page, "create-action-team-select", team2Name);
 
-    await clickOnEmptyReactSelect(page, "create-action-person-select", person2Name);
+    await clickOnEmptyReactSelect(
+      page,
+      "create-action-person-select",
+      person2Name
+    );
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
   });
 
   /*
@@ -152,7 +174,9 @@ test("Cross teams report", async ({ page }) => {
     await page.getByRole("link", { name: "Accueil" }).click();
 
     await expect(page.locator("data-test-id=reception-title")).toContainText(
-      `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe ${team1Name}`
+      `Accueil du ${dayjs().format(
+        "dddd D MMMM YYYY"
+      )} de l'équipe ${team1Name}`
     );
 
     await expect(page.locator(`data-test-id=${person1action}`)).toBeVisible();
@@ -181,7 +205,9 @@ test("Cross teams report", async ({ page }) => {
     //   `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe de nuit ${team2Name}`
     // );
     await expect(page.locator("data-test-id=reception-title")).toContainText(
-      `Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe ${team2Name}`
+      `Accueil du ${dayjs().format(
+        "dddd D MMMM YYYY"
+      )} de l'équipe ${team2Name}`
     );
 
     await expect(page.locator(`data-test-id=${person2action}`)).toBeVisible();
@@ -222,8 +248,12 @@ test("Cross teams report", async ({ page }) => {
 
     await page.locator('[id="report-button-reception"]').click();
 
-    await expect(page.locator(`data-test-id=${team1Name}-Café-2`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team1Name}-Douche-3`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${team1Name}-Café-2`)
+    ).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${team1Name}-Douche-3`)
+    ).toBeVisible();
   });
 
   await test.step("should be able to add a collab and a description in team 1", async () => {
@@ -231,9 +261,9 @@ test("Cross teams report", async ({ page }) => {
     await page.getByText("-- Choisir une collaboration --").click();
     await page.getByLabel("Collaboration").fill(team1Collab);
     await page.getByText(`Créer "${team1Collab}"`).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
     await page.getByRole("button", { name: "Mettre à jour" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
 
     await page.getByRole("button", { name: "Ajouter une description" }).click();
     await page.getByLabel("Description").click();
@@ -259,9 +289,9 @@ test("Cross teams report", async ({ page }) => {
     await page.getByText("-- Choisir une collaboration --").click();
     await page.getByLabel("Collaboration").fill(team2Collab);
     await page.getByText(`Créer "${team2Collab}"`).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
     await page.getByRole("button", { name: "Mettre à jour" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").click();
 
     await page.getByRole("button", { name: "Ajouter une description" }).click();
     await page.getByLabel("Description").click();
@@ -274,7 +304,9 @@ test("Cross teams report", async ({ page }) => {
     await changeReactSelectValue(page, "report-select-teams", team1Name);
 
     await page
-      .getByRole("navigation", { name: "Navigation dans les catégories du compte-rendu" })
+      .getByRole("navigation", {
+        name: "Navigation dans les catégories du compte-rendu",
+      })
       .getByText("Résumé")
       .click();
 
@@ -284,7 +316,9 @@ test("Cross teams report", async ({ page }) => {
     await expect(page.getByText(team2Description)).toBeVisible();
 
     await page
-      .getByRole("navigation", { name: "Navigation dans les catégories du compte-rendu" })
+      .getByRole("navigation", {
+        name: "Navigation dans les catégories du compte-rendu",
+      })
       .getByText("Accueil")
       .click();
 
@@ -295,13 +329,25 @@ test("Cross teams report", async ({ page }) => {
     await page.getByRole("button", { name: "Afficher" }).first().click();
     await page.getByRole("button", { name: "Afficher" }).first().click();
 
-    await expect(page.locator(`data-test-id=${team1Name}-Café-2`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team1Name}-Douche-3`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team1Name}-Repas-0`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${team1Name}-Café-2`)
+    ).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${team1Name}-Douche-3`)
+    ).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${team1Name}-Repas-0`)
+    ).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${team2Name}-Café-2`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team2Name}-Douche-0`)).toBeVisible();
-    await expect(page.locator(`data-test-id=${team2Name}-Repas-3`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${team2Name}-Café-2`)
+    ).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${team2Name}-Douche-0`)
+    ).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${team2Name}-Repas-3`)
+    ).toBeVisible();
 
     await page.getByText("Passages (6)").click();
     await page.getByText("Actions créées (2)").click();
@@ -316,13 +362,17 @@ test("Cross teams report", async ({ page }) => {
     await page.getByRole("link", { name: "Comptes rendus" }).click();
     await expect(page).toHaveURL("http://localhost:8090/report");
 
-    await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
+    await page
+      .getByRole("button", { name: dayjs().format("YYYY-MM-DD") })
+      .click();
 
     await page.getByText(`Journée du ${dayjs().format("D MMMM YYYY")}`).click();
 
     await page.getByRole("button", { name: "Précédent" }).click();
 
-    await page.getByText(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`).click();
+    await page
+      .getByText(`Journée du ${dayjs().add(-1, "day").format("D MMMM YYYY")}`)
+      .click();
 
     await page.getByRole("button", { name: "Suivant" }).click();
 

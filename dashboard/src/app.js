@@ -31,10 +31,18 @@ import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
 import ModalConfirm from './components/ModalConfirm';
 import DataLoader, { useDataLoader } from './components/DataLoader';
-import { ToastContainer } from 'react-toastify';
+import { Bounce, cssTransition, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SentryRoute from './components/Sentryroute';
 import { ENV, VERSION } from './config';
+
+const ToastifyFastTransition = cssTransition({
+  enter: 'Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter',
+  exit: 'Toastify--animate Toastify__hack-force-fast Toastify__bounce-exit',
+  appendPosition: true,
+  collapseDuration: 0,
+  collapse: true,
+});
 
 registerLocale('fr', fr);
 
@@ -93,7 +101,7 @@ const App = ({ resetRecoil }) => {
 
   return (
     <div className="main-container">
-      {process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' && <ToastContainer />}
+      <ToastContainer transition={process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' ? Bounce : ToastifyFastTransition} />
       <VersionOutdatedAlert />
       <Router history={history}>
         <ScrollToTop />

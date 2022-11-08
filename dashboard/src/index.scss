@@ -9,6 +9,10 @@
   src: url('./assets/password.woff');
 }
 
+.Toastify__hack-force-fast {
+  animation-duration: 1ms !important;
+}
+
 * {
   padding: 0;
   margin: 0;
