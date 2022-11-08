@@ -50,7 +50,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByLabel("Non").check();
 
   await page.getByRole("button", { name: "Créer" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   /*
   Add the custom fields
@@ -67,7 +67,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByLabel("Nom").fill(testPersonSocialField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Ajouter un champ" }).nth(1).click();
 
@@ -76,7 +76,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByLabel("Nom").fill(testPersonMedicalField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
 
@@ -87,7 +87,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByLabel("Nom").fill(testMedicalFileField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
 
@@ -98,7 +98,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByLabel("Nom").fill(testConsultationField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Territoires" }).click();
 
@@ -109,7 +109,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByLabel("Nom").fill(testObsTerritoryField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   /*
 
@@ -131,9 +131,9 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByLabel("Nom").fill(personName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
-  await changeReactSelectValue(page, "team-selector-topBar", "Team Test - 1");
+  await changeReactSelectValue(page, "team-selector-topBar", "Team Test - 4");
 
   await page.getByLabel(testPersonSocialField).click();
 
@@ -169,7 +169,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByLabel("Nom").fill(territoryName);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Nouvelle observation" }).click();
 
@@ -184,7 +184,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   );
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   /*
 
@@ -209,7 +209,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
     .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page
     .locator(`data-test-id=${testPersonMedicalField}`)
@@ -222,7 +222,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
     .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).nth(2).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();
 
@@ -237,7 +237,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
     .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Consultations 🧑‍⚕️" }).click();
 
@@ -252,7 +252,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
     .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Territoires" }).click();
 
@@ -267,7 +267,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
     .uncheck();
 
   await page.getByRole("button", { name: "Mettre à jour" }).click();
-  await page.locator(".Toastify__close-button").click();
+  await page.locator(".Toastify__close-button").last().click();
 
   /*
 
