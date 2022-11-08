@@ -22,6 +22,7 @@ import useApi from '../services/api';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
+import { capture } from '../services/sentry';
 
 // Update to flush cache.
 const currentCacheKey = 'mano-last-refresh-2022-11-04';
@@ -207,6 +208,9 @@ export default function DataLoader() {
               .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
       );
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'consultation') {
       setLoadingText('Chargement des consultations');
@@ -217,18 +221,27 @@ export default function DataLoader() {
           : mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user))
       );
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'treatment') {
       setLoadingText('Chargement des traitements');
       const res = await API.get({ path: '/treatment', query: { ...query, after: initialLoad ? 0 : lastLoad } });
       setTreatments(mergeItems(treatments, res.decryptedData));
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'medicalFile') {
       setLoadingText('Chargement des fichiers médicaux');
       const res = await API.get({ path: '/medical-file', query: { ...query, after: initialLoad ? 0 : lastLoad } });
       setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'report') {
       setLoadingText('Chargement des rapports');
@@ -241,6 +254,9 @@ export default function DataLoader() {
               .filter((r) => !!r.team && !!r.date)
       );
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'passage') {
       setLoadingText('Chargement des passages');
@@ -254,6 +270,9 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'rencontre') {
       setLoadingText('Chargement des rencontres');
@@ -267,6 +286,9 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'action') {
       setFullScreen(false);
@@ -274,6 +296,9 @@ export default function DataLoader() {
       const res = await API.get({ path: '/action', query });
       setActions(mergeItems(actions, res.decryptedData));
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'territory') {
       setLoadingText('Chargement des territoires');
@@ -285,6 +310,9 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'place') {
       setLoadingText('Chargement des lieux');
@@ -296,6 +324,9 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'relsPersonPlace') {
       setLoadingText('Chargement des relations personne-lieu');
@@ -307,6 +338,9 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'territoryObservation') {
       setLoadingText('Chargement des observations de territoire');
@@ -320,6 +354,9 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     } else if (current === 'comment') {
       setLoadingText('Chargement des commentaires');
@@ -333,6 +370,9 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
+      if (!res.data?.length) {
+        capture('Debug: No data in loader', { extra: { res, organisation }, user });
+      }
       setProgressBuffer(res.data.length);
     }
   }
