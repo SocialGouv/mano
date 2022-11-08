@@ -14,6 +14,7 @@ export default function InfosSociales({ person }) {
   return (
     <div>
       <h4>Information sociales</h4>
+      <div className="my-4">{person.description}</div>
       <Row>
         <Col md={4}>
           <InfoSocialeLine label="Situation personnelle" value={person.personalSituation} />
