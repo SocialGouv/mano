@@ -1,3 +1,10 @@
+## [1.175.4](https://github.com/SocialGouv/mano/compare/v1.175.3...v1.175.4) (2022-11-08)
+
+
+### Bug Fixes
+
+* **dashboard:** try to debug MANO-3J Cannot read properties of undefined (reading length) call(components/DataLoader) bis ([56d92e9](https://github.com/SocialGouv/mano/commit/56d92e9188dadffa4877862800e42e1acddcd782))
+
 ## [1.175.3](https://github.com/SocialGouv/mano/compare/v1.175.2...v1.175.3) (2022-11-08)
 
 
