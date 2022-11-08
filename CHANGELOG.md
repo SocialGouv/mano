@@ -1,3 +1,10 @@
+## [1.175.1](https://github.com/SocialGouv/mano/compare/v1.175.0...v1.175.1) (2022-11-08)
+
+
+### Bug Fixes
+
+* **dashboard:** average calculation ([9a66d4f](https://github.com/SocialGouv/mano/commit/9a66d4f1d07d0fec15d779d5a382eaa0cd8bda4b))
+
 # [1.175.0](https://github.com/SocialGouv/mano/compare/v1.174.0...v1.175.0) (2022-11-07)
 
 
