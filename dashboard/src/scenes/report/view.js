@@ -348,7 +348,9 @@ const View = () => {
         {!['restricted-access'].includes(user.role) && (
           <DescriptionAndCollaborations reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
         )}
-        <Reception reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
+        {!!organisation.services && !!organisation.receptionEnabled && (
+          <Reception reports={selectedTeamsReports} selectedTeamsObject={selectedTeamsObject} dateString={dateString} />
+        )}
         {!['restricted-access'].includes(user.role) && (
           <>
             <ActionCompletedAt date={dateString} status={DONE} actions={actionsDone} />
@@ -475,16 +477,18 @@ const View = () => {
               </>
             )}
             {!!organisation.services && !!organisation.receptionEnabled && (
-              <DrawerLink
-                id="report-button-reception"
-                className={activeTab === 'reception' ? 'active' : ''}
-                onClick={() => setActiveTab('reception')}>
-                Accueil
-              </DrawerLink>
+              <>
+                <DrawerLink
+                  id="report-button-reception"
+                  className={activeTab === 'reception' ? 'active' : ''}
+                  onClick={() => setActiveTab('reception')}>
+                  Accueil
+                </DrawerLink>
+                <hr />
+              </>
             )}
             {!['restricted-access'].includes(user.role) && (
               <>
-                <hr />
                 <DrawerLink
                   id="report-button-action-completed"
                   className={activeTab === 'action-completed' ? 'active' : ''}
