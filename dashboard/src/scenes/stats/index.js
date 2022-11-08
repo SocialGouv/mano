@@ -890,13 +890,12 @@ const BlockWanderingAt = ({ persons }) => {
 
 const BlockTotal = ({ title, unit, data, field }) => {
   try {
-    data = data.filter((item) => Boolean(item[field]));
     if (!data.length) {
       return <Card title={title} unit={unit} count={0} />;
     }
-    const dataWithOnlyNumbers = data.filter((e) => !isNaN(Number(e[field])));
+    const dataWithOnlyNumbers = data.filter((item) => Boolean(item[field])).filter((e) => !isNaN(Number(e[field])));
     const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);
-    const avg = Math.round((total / dataWithOnlyNumbers.length) * 100) / 100;
+    const avg = Math.round((total / data.length) * 100) / 100;
     return (
       <Card
         title={title}
