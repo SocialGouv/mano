@@ -124,6 +124,8 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
   const [isEditingGroupTitle, setIsEditingGroupTitle] = useState(false);
   const groupTitles = useRecoilValue(groupTitlesSelector);
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
+  const actions = useRecoilValue(actionsState);
+
   const API = useApi();
   const { refresh } = useDataLoader();
   const setOrganisation = useSetRecoilState(organisationState);
@@ -170,6 +172,43 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
     }
   };
 
+  const onDeleteGroup = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce groupe et toutes ses catégories ? Cette opération est irréversible')) return;
+    const newActionsGroupedCategories = actionsGroupedCategories.filter((group) => group.groupTitle !== groupTitle);
+    const categoriesToDelete = actionsGroupedCategories.find((group) => group.groupTitle === groupTitle).categories;
+    const encryptedActions = await Promise.all(
+      actions
+        .map((a) => {
+          for (const category of a.categories || []) {
+            if (categoriesToDelete.includes(category)) {
+              return a;
+            }
+          }
+          return null;
+        })
+        .filter(Boolean)
+        .map((action) => ({
+          ...action,
+          categories: (action.categories || []).map((category) => (categoriesToDelete.includes(category) ? null : category)).filter(Boolean),
+        }))
+        .map(prepareActionForEncryption)
+        .map(encryptItem(hashedOrgEncryptionKey))
+    );
+    const response = await API.put({
+      path: `/category`,
+      body: {
+        actionsGroupedCategories: newActionsGroupedCategories,
+        actions: encryptedActions,
+      },
+    });
+    if (response.ok) {
+      refresh();
+      setIsEditingGroupTitle(false);
+      setOrganisation(response.data);
+      toast.success("Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+    }
+  };
+
   return (
     <>
       <div className="tw-basis-1/3 tw-p-1">
@@ -202,6 +241,11 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
             text: 'Enregistrer',
             type: 'submit',
             form: 'edit-category-group-form',
+          },
+          {
+            text: 'Supprimer',
+            type: 'destructive',
+            onClick: onDeleteGroup,
           },
           {
             text: 'Annuler',
@@ -269,8 +313,42 @@ const Category = ({ category, groupTitle }) => {
       setOrganisation(response.data);
       setIsEditingCategory(false);
       toast.success("Catégorie mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
-    } else {
-      toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+    }
+  };
+
+  const onDeleteCategory = async () => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette opération est irréversible')) return;
+    const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
+      if (group.groupTitle === groupTitle) {
+        return {
+          ...group,
+          categories: group.categories.filter((cat) => cat !== category),
+        };
+      }
+      return group;
+    });
+    const encryptedActions = await Promise.all(
+      actions
+        .filter((a) => a.categories.includes(category))
+        .map((action) => ({
+          ...action,
+          categories: action.categories.filter((cat) => cat !== category),
+        }))
+        .map(prepareActionForEncryption)
+        .map(encryptItem(hashedOrgEncryptionKey))
+    );
+    const response = await API.put({
+      path: `/category`,
+      body: {
+        actionsGroupedCategories: newActionsGroupedCategories,
+        actions: encryptedActions,
+      },
+    });
+    if (response.ok) {
+      refresh();
+      setIsEditingCategory(false);
+      setOrganisation(response.data);
+      toast.success("Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     }
   };
 
@@ -299,6 +377,11 @@ const Category = ({ category, groupTitle }) => {
             text: 'Enregistrer',
             type: 'submit',
             form: 'edit-category-group-form',
+          },
+          {
+            text: 'Supprimer',
+            type: 'destructive',
+            onClick: onDeleteCategory,
           },
           {
             text: 'Annuler',
