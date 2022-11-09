@@ -7,7 +7,7 @@ import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
-import { organisationState, teamsState, userState } from '../recoil/auth';
+import { teamsState, userState } from '../recoil/auth';
 import { dateForDatePicker } from '../services/date';
 import useApi from '../services/api';
 
@@ -15,13 +15,12 @@ import SelectTeam from './SelectTeam';
 import SelectPerson from './SelectPerson';
 import ButtonCustom from './ButtonCustom';
 import SelectStatus from './SelectStatus';
-import SelectCustom from './SelectCustom';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
+import ActionsCategorySelect from './tailwind/ActionsCategorySelect';
 
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
-  const organisation = useRecoilValue(organisationState);
   const setActions = useSetRecoilState(actionsState);
   const history = useHistory();
   const API = useApi();
@@ -34,8 +33,6 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
     createReportAtDateIfNotExist(response.decryptedData.date);
     return response;
   };
-
-  const catsSelect = [...(organisation.categories || [])];
 
   if (['restricted-access'].includes(user.role)) return null;
 
@@ -164,17 +161,10 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label htmlFor="categories">Catégories</Label>
-                    <SelectCustom
-                      inputId="categories"
-                      options={catsSelect}
-                      name="categories"
+                    <ActionsCategorySelect
+                      id="categories"
+                      label="Catégories"
                       onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
-                      isClearable={false}
-                      isMulti
-                      value={values.categories || []}
-                      getOptionValue={(i) => i}
-                      getOptionLabel={(i) => i}
                     />
                   </FormGroup>
                 </Col>

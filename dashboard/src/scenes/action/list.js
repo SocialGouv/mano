@@ -16,7 +16,7 @@ import ActionName from '../../components/ActionName';
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
 import { mappedIdsToLabels, TODO } from '../../recoil/actions';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { currentTeamState, userState } from '../../recoil/auth';
 import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
@@ -27,6 +27,7 @@ import { consultationsState, disableConsultationRow } from '../../recoil/consult
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
+import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
@@ -117,9 +118,7 @@ const List = () => {
   const { isLoading, refresh } = useDataLoader();
   const [modalOpen, setModalOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
-  const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
-  const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [page, setPage] = useSearchParamState('page', 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
@@ -198,17 +197,7 @@ const List = () => {
             Filtrer par catégorie&nbsp;:
           </Label>
           <div style={{ width: '100%' }}>
-            <SelectCustom
-              options={catsSelect}
-              value={categories}
-              inputId="action-select-categories-filter"
-              name="categories"
-              onChange={(c) => setCategories(c)}
-              isClearable
-              isMulti
-              getOptionValue={(c) => c}
-              getOptionLabel={(c) => c}
-            />
+            <ActionsCategorySelect id="action-select-categories-filter" onChange={(c) => setCategories(c)} values={categories} />
           </div>
         </Col>
         <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>

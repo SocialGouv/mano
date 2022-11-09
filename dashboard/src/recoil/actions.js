@@ -18,6 +18,14 @@ export const actionsCategoriesSelector = selector({
   },
 });
 
+export const flattenedCategoriesSelector = selector({
+  key: 'flattenedCategoriesSelector',
+  get: ({ get }) => {
+    const actionsGroupedCategories = get(actionsCategoriesSelector);
+    return actionsGroupedCategories.reduce((allCategories, { categories }) => [...allCategories, ...categories], []);
+  },
+});
+
 const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];
 
 export const prepareActionForEncryption = (action) => {

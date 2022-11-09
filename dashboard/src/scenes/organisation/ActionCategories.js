@@ -3,20 +3,12 @@ import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'rec
 import SortableJS from 'sortablejs';
 import { useDataLoader } from '../../components/DataLoader';
 import ButtonCustom from '../../components/ButtonCustom';
-import { actionsCategoriesSelector, actionsState, prepareActionForEncryption } from '../../recoil/actions';
+import { actionsCategoriesSelector, flattenedCategoriesSelector, actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import { organisationState } from '../../recoil/auth';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
-import Modal from '../../components/tailwind/Modal';
+import ModalWithForm from '../../components/tailwind/ModalWithForm';
 import Input from '../../components/tailwind/Input';
 import { toast } from 'react-toastify';
-
-const flattenedCategoriesSelector = selector({
-  key: 'flattenedCategoriesSelector',
-  get: ({ get }) => {
-    const actionsGroupedCategories = get(actionsCategoriesSelector);
-    return actionsGroupedCategories.reduce((allCategories, { categories }) => [...allCategories, ...categories], []);
-  },
-});
 
 const groupTitlesSelector = selector({
   key: 'groupTitlesSelector',
@@ -26,7 +18,7 @@ const groupTitlesSelector = selector({
   },
 });
 
-const ActionCategories = ({ handleChange, isSubmitting, handleSubmit }) => {
+const ActionCategories = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
@@ -92,7 +84,7 @@ const ActionCategories = ({ handleChange, isSubmitting, handleSubmit }) => {
           ))}
         </div>
       </div>
-      <Modal
+      <ModalWithForm
         open={addGroupModalVisible}
         setOpen={setAddGroupModalVisible}
         title="Ajouter un groupe de catégories"
@@ -113,7 +105,7 @@ const ActionCategories = ({ handleChange, isSubmitting, handleSubmit }) => {
         <form id="add-action-categories-group-form" className="tw-flex tw-flex-col tw-gap-4" onSubmit={onAddGroup}>
           <Input label="Titre du groupe" id="groupTitle" name="groupTitle" type="text" placeholder="Démarches administratives" />
         </form>
-      </Modal>
+      </ModalWithForm>
     </>
   );
 };
@@ -232,7 +224,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
           </div>
         </details>
       </div>
-      <Modal
+      <ModalWithForm
         open={isEditingGroupTitle}
         setOpen={setIsEditingGroupTitle}
         title={`Éditer le groupe: ${groupTitle}`}
@@ -255,7 +247,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
         <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onEditGroupTitle}>
           <Input label="Nouveau nom du groupe" id="newGroupTitle" name="newGroupTitle" type="text" placeholder={groupTitle} />
         </form>
-      </Modal>
+      </ModalWithForm>
     </>
   );
 };
@@ -368,7 +360,7 @@ const Category = ({ category, groupTitle }) => {
           ✏️
         </button>
       </div>
-      <Modal
+      <ModalWithForm
         open={isEditingCategory}
         setOpen={setIsEditingCategory}
         title={`Éditer la catégorie: ${category}`}
@@ -391,7 +383,7 @@ const Category = ({ category, groupTitle }) => {
         <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onEditCategory}>
           <Input label="Nouveau nom de la catégorie" id="newCategory" name="newCategory" type="text" placeholder={category} />
         </form>
-      </Modal>
+      </ModalWithForm>
     </>
   );
 };

@@ -17,7 +17,7 @@ const Input = ({ id, name, label, placeholder, type, defaultValue, ...props }) =
   return (
     <div>
       {!!label && (
-        <label htmlFor={id} className="tw-block tw-text-sm tw-font-medium tw-text-gray-700">
+        <label htmlFor={id} className="tw-block tw-text-gray-700">
           {label}
         </label>
       )}

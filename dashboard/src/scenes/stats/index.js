@@ -22,7 +22,7 @@ import { CustomResponsiveBar, CustomResponsivePie } from '../../components/chart
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsState, DONE, mappedIdsToLabels } from '../../recoil/actions';
+import { actionsState, DONE, flattenedCategoriesSelector, mappedIdsToLabels } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
@@ -78,6 +78,7 @@ const Stats = () => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const territories = useRecoilValue(territoriesState);
+  const allCategories = useRecoilValue(flattenedCategoriesSelector);
   const { isLoading } = useDataLoader({ refreshOnMount: true });
 
   const [selectedTerritories, setSelectedTerritories] = useState([]);
@@ -422,7 +423,7 @@ const Stats = () => {
                   return actionsSplitsByCategories;
                 }, []),
               'category',
-              { options: organisation.categories }
+              { options: allCategories }
             )}
           />
         </TabPane>
