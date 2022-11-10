@@ -16,7 +16,7 @@ import { MyText } from '../../components/MyText';
 import { actionsState, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { currentTeamState, userState } from '../../recoil/auth';
 import API from '../../services/api';
-import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
+import ActionCategoriesModalSelect from '../../components/ActionCategoriesModalSelect';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 
@@ -188,7 +188,7 @@ const NewActionForm = ({ route, navigation }) => {
             setWithTime={setWithTime}
             testID="new-action-dueAt"
           />
-          <ActionCategoriesMultiCheckboxes onChange={setCategories} values={categories} editable />
+          <ActionCategoriesModalSelect onChange={setCategories} values={categories} editable />
           <CheckboxLabelled
             label="Action prioritaire (cette action sera mise en avant par rapport aux autres)"
             alone

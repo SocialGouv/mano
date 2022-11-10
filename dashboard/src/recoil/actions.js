@@ -14,7 +14,7 @@ export const actionsCategoriesSelector = selector({
   get: ({ get }) => {
     const organisation = get(organisationState);
     if (organisation.actionsGroupedCategories) return organisation.actionsGroupedCategories;
-    return [{ groupTitle: 'Toutes', categories: organisation.categories }];
+    return [{ groupTitle: 'Toutes mes catégories', categories: organisation.categories }];
   },
 });
 

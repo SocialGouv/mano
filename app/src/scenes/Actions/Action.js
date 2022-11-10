@@ -17,7 +17,7 @@ import ActionStatusSelect from '../../components/Selects/ActionStatusSelect';
 import UserName from '../../components/UserName';
 import Spacer from '../../components/Spacer';
 import NewCommentInput from '../../scenes/Comments/NewCommentInput';
-import ActionCategoriesMultiCheckboxes from '../../components/MultiCheckBoxes/ActionCategoriesMultiCheckboxes';
+import ActionCategoriesModalSelect from '../../components/ActionCategoriesModalSelect';
 import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
@@ -451,11 +451,7 @@ const Action = ({ navigation, route }) => {
           ref={descriptionRef}
           onFocus={() => _scrollToInput(descriptionRef)}
         />
-        <ActionCategoriesMultiCheckboxes
-          onChange={(categories) => setAction((a) => ({ ...a, categories }))}
-          values={categories}
-          editable={editable}
-        />
+        <ActionCategoriesModalSelect onChange={(categories) => setAction((a) => ({ ...a, categories }))} values={categories} editable={editable} />
         {editable ? (
           <CheckboxLabelled
             label="Action prioritaire (cette action sera mise en avant par rapport aux autres)"
