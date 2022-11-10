@@ -7,7 +7,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import ButtonCustom from '../../components/ButtonCustom';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
-import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -29,7 +28,7 @@ import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirm
 import { capture } from '../../services/sentry';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { useDataLoader } from '../../components/DataLoader';
-import ActionCategories from './ActionCategories';
+import ActionCategoriesSettings from './ActionCategoriesSettings';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -48,7 +47,6 @@ const getSettingTitle = (tabId) => {
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const user = useRecoilValue(userState);
-  const actions = useRecoilValue(actionsState);
   const reports = useRecoilValue(reportsState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
@@ -249,7 +247,7 @@ const View = () => {
                     </>
                   );
                 case 'actions':
-                  return <ActionCategories />;
+                  return <ActionCategoriesSettings />;
                 case 'reception':
                   return (
                     <>

@@ -41,6 +41,7 @@ router.put(
       return next(error);
     }
 
+    await new Promise((res) => setTimeout(res, 500));
     const organisation = await Organisation.findOne({ where: { _id: req.user.organisation } });
     if (!organisation) return res.status(404).send({ ok: false, error: "Not Found" });
 

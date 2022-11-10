@@ -94,7 +94,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id }) => {
             placeholder="Recherchez..."
           />
         </div>
-        <div className="tw-mt-8 tw-flex tw-w-full tw-border-y tw-border-gray-300">
+        <div className="tw-mx-4 tw-mt-8 tw-flex tw-basis-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300">
           <div className="tw-flex tw-basis-1/3 tw-flex-col tw-justify-start tw-border-gray-300">
             <span className="tw-border-b tw-border-gray-300 tw-py-2 tw-px-4 tw-text-left tw-font-semibold">Groupes</span>
             <div className="tw-flex tw-flex-col tw-overflow-y-auto">

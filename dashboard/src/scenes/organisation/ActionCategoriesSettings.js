@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { selector, useRecoilState, useRecoilValue } from 'recoil';
 import SortableJS from 'sortablejs';
 import { useDataLoader } from '../../components/DataLoader';
 import ButtonCustom from '../../components/ButtonCustom';
@@ -18,7 +18,7 @@ const groupTitlesSelector = selector({
   },
 });
 
-const ActionCategories = () => {
+const ActionCategoriesSettings = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
@@ -93,9 +93,6 @@ const ActionCategories = () => {
             text: 'Ajouter',
             type: 'submit',
             form: 'add-action-categories-group-form',
-            onClick: () => {
-              setAddGroupModalVisible(false);
-            },
           },
           {
             text: 'Annuler',
@@ -117,10 +114,11 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
   const groupTitles = useRecoilValue(groupTitlesSelector);
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
   const actions = useRecoilValue(actionsState);
+  const flattenedCategories = useRecoilValue(flattenedCategoriesSelector);
 
   const API = useApi();
   const { refresh } = useDataLoader();
-  const setOrganisation = useSetRecoilState(organisationState);
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   useEffect(() => {
     sortableRef.current = SortableJS.create(listRef.current, {
@@ -139,14 +137,15 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
     if (groupTitles.find((title) => title === newGroupTitle)) return toast.error('Ce groupe existe déjà');
 
     const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
-      if (group.groupTitle === groupTitle) {
-        return {
-          ...group,
-          groupTitle: newGroupTitle,
-        };
-      }
-      return group;
+      if (group.groupTitle !== groupTitle) return group;
+      return {
+        ...group,
+        groupTitle: newGroupTitle,
+      };
     });
+
+    const oldOrganisation = organisation;
+    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
 
     const response = await API.put({
       path: `/category`,
@@ -160,7 +159,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
       setIsEditingGroupTitle(false);
       toast.success("Groupe mis à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
     } else {
-      toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
+      setOrganisation(oldOrganisation);
     }
   };
 
@@ -186,6 +185,10 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
         .map(prepareActionForEncryption)
         .map(encryptItem(hashedOrgEncryptionKey))
     );
+
+    const oldOrganisation = organisation;
+    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
+
     const response = await API.put({
       path: `/category`,
       body: {
@@ -198,6 +201,46 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
       setIsEditingGroupTitle(false);
       setOrganisation(response.data);
       toast.success("Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+    } else {
+      setOrganisation(oldOrganisation);
+    }
+  };
+
+  const toastTimeout = useRef(null);
+  const onAddCategory = async (e) => {
+    e.preventDefault();
+    clearTimeout(toastTimeout.current);
+    const { newCategory } = Object.fromEntries(new FormData(e.target));
+    if (!newCategory) return toast.error('Vous devez saisir un nom pour la catégorie');
+    if (flattenedCategories.includes(newCategory)) {
+      const existingGroupTitle = actionsGroupedCategories.find(({ categories }) => categories.includes(newCategory)).groupTitle;
+      return toast.error(`Cette catégorie existe déjà: ${existingGroupTitle} > ${newCategory}`);
+    }
+    const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
+      if (group.groupTitle !== groupTitle) return group;
+      return {
+        ...group,
+        categories: [...new Set([...(group.categories || []), newCategory])],
+      };
+    });
+
+    const oldOrganisation = organisation;
+    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
+    const response = await API.put({
+      path: `/category`,
+      body: {
+        actionsGroupedCategories: newActionsGroupedCategories,
+      },
+    });
+    if (response.ok) {
+      setOrganisation(response.data);
+      toastTimeout.current = setTimeout(() => {
+        // if we add category after category quickly, we dont want to be annoyed by successful toast
+        // only when we fnished adding our categories
+        toast.success("Catégorie(s) ajoutée(s). Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+      }, 5000);
+    } else {
+      setOrganisation(oldOrganisation);
     }
   };
 
@@ -221,6 +264,18 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
             ) : (
               categories.map((category) => <Category category={category} key={category} groupTitle={groupTitle} />)
             )}
+            <form className="tw-flex" onSubmit={onAddCategory}>
+              <input
+                type="text"
+                id="newCategory"
+                name="newCategory"
+                className="tw-my-1 tw-rounded tw-bg-transparent tw-px-1.5 tw-py-1 placeholder:tw-opacity-60"
+                placeholder="Ajouter une catégorie"
+              />
+              <button type="submit" className="tw-ml-auto tw-rounded tw-bg-transparent">
+                Ajouter
+              </button>
+            </form>
           </div>
         </details>
       </div>
@@ -256,7 +311,7 @@ const Category = ({ category, groupTitle }) => {
   const [isSelected, setIsSelected] = useState(false);
   const [isEditingCategory, setIsEditingCategory] = useState(false);
   const actions = useRecoilValue(actionsState);
-  const setOrganisation = useSetRecoilState(organisationState);
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const API = useApi();
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
@@ -284,14 +339,14 @@ const Category = ({ category, groupTitle }) => {
         .map(encryptItem(hashedOrgEncryptionKey))
     );
     const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
-      if (group.groupTitle === groupTitle) {
-        return {
-          ...group,
-          categories: [...new Set((group.categories || []).map((cat) => (cat === oldCategory ? newCategory.trim() : cat)))],
-        };
-      }
-      return group;
+      if (group.groupTitle !== groupTitle) return group;
+      return {
+        ...group,
+        categories: [...new Set((group.categories || []).map((cat) => (cat === oldCategory ? newCategory.trim() : cat)))],
+      };
     });
+    const oldOrganisation = organisation;
+    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
 
     const response = await API.put({
       path: `/category`,
@@ -305,19 +360,19 @@ const Category = ({ category, groupTitle }) => {
       setOrganisation(response.data);
       setIsEditingCategory(false);
       toast.success("Catégorie mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+    } else {
+      setOrganisation(oldOrganisation);
     }
   };
 
   const onDeleteCategory = async () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette opération est irréversible')) return;
     const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
-      if (group.groupTitle === groupTitle) {
-        return {
-          ...group,
-          categories: group.categories.filter((cat) => cat !== category),
-        };
-      }
-      return group;
+      if (group.groupTitle !== groupTitle) return group;
+      return {
+        ...group,
+        categories: group.categories.filter((cat) => cat !== category),
+      };
     });
     const encryptedActions = await Promise.all(
       actions
@@ -329,6 +384,9 @@ const Category = ({ category, groupTitle }) => {
         .map(prepareActionForEncryption)
         .map(encryptItem(hashedOrgEncryptionKey))
     );
+    const oldOrganisation = organisation;
+    setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI
+
     const response = await API.put({
       path: `/category`,
       body: {
@@ -341,6 +399,8 @@ const Category = ({ category, groupTitle }) => {
       setIsEditingCategory(false);
       setOrganisation(response.data);
       toast.success("Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
+    } else {
+      setOrganisation(oldOrganisation);
     }
   };
 
@@ -388,4 +448,4 @@ const Category = ({ category, groupTitle }) => {
   );
 };
 
-export default ActionCategories;
+export default ActionCategoriesSettings;
