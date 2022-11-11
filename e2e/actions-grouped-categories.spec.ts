@@ -18,7 +18,6 @@ test("Actions", async ({ page }) => {
   const action1Name = nanoid();
   const action2Name = nanoid();
   const action3Name = nanoid();
-
   const createGroup = async (groupName: string) => {
     await page.getByRole("button", { name: "Ajouter un groupe" }).click();
 
