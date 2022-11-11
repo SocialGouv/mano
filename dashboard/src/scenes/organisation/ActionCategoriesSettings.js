@@ -206,10 +206,8 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
     }
   };
 
-  const toastTimeout = useRef(null);
   const onAddCategory = async (e) => {
     e.preventDefault();
-    clearTimeout(toastTimeout.current);
     const { newCategory } = Object.fromEntries(new FormData(e.target));
     if (!newCategory) return toast.error('Vous devez saisir un nom pour la catégorie');
     if (flattenedCategories.includes(newCategory)) {
@@ -234,11 +232,6 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
     });
     if (response.ok) {
       setOrganisation(response.data);
-      toastTimeout.current = setTimeout(() => {
-        // if we add category after category quickly, we dont want to be annoyed by successful toast
-        // only when we fnished adding our categories
-        toast.success("Catégorie(s) ajoutée(s). Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard");
-      }, 5000);
     } else {
       setOrganisation(oldOrganisation);
     }
