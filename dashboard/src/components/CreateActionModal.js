@@ -164,6 +164,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                     <ActionsCategorySelect
                       id="categories"
                       label="Catégories"
+                      withMostUsed
                       onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
                     />
                   </FormGroup>
