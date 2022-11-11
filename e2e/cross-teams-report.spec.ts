@@ -60,7 +60,7 @@ test("Cross teams report", async ({ page }) => {
     await page.getByLabel("Nom").fill(team1Name);
 
     await page.getByRole("button", { name: "Créer" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
 
     await page.getByRole("button", { name: "Créer une nouvelle équipe" }).click();
 
@@ -73,7 +73,7 @@ test("Cross teams report", async ({ page }) => {
     // await page.getByLabel("Oui").check(); // night shift
 
     await page.getByRole("button", { name: "Créer" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
   });
 
   await test.step("should create persons", async () => {
@@ -89,7 +89,7 @@ test("Cross teams report", async ({ page }) => {
     await page.getByLabel("Nom").fill(person1Name);
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
@@ -103,7 +103,7 @@ test("Cross teams report", async ({ page }) => {
     await page.getByLabel("Nom").fill(person2Name);
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
   });
 
   await test.step("should create actions", async () => {
@@ -122,7 +122,7 @@ test("Cross teams report", async ({ page }) => {
     await clickOnEmptyReactSelect(page, "create-action-person-select", person1Name);
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
 
     await page.getByRole("link", { name: "Agenda" }).click();
 
@@ -139,7 +139,7 @@ test("Cross teams report", async ({ page }) => {
     await clickOnEmptyReactSelect(page, "create-action-person-select", person2Name);
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
   });
 
   /*
@@ -231,9 +231,9 @@ test("Cross teams report", async ({ page }) => {
     await page.getByText("-- Choisir une collaboration --").click();
     await page.getByLabel("Collaboration").fill(team1Collab);
     await page.getByText(`Créer "${team1Collab}"`).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
     await page.getByRole("button", { name: "Mettre à jour" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
 
     await page.getByRole("button", { name: "Ajouter une description" }).click();
     await page.getByLabel("Description").click();
@@ -259,9 +259,9 @@ test("Cross teams report", async ({ page }) => {
     await page.getByText("-- Choisir une collaboration --").click();
     await page.getByLabel("Collaboration").fill(team2Collab);
     await page.getByText(`Créer "${team2Collab}"`).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
     await page.getByRole("button", { name: "Mettre à jour" }).click();
-    // await page.locator(".Toastify__close-button").click();
+    await page.locator(".Toastify__close-button").last().click();
 
     await page.getByRole("button", { name: "Ajouter une description" }).click();
     await page.getByLabel("Description").click();
@@ -274,7 +274,9 @@ test("Cross teams report", async ({ page }) => {
     await changeReactSelectValue(page, "report-select-teams", team1Name);
 
     await page
-      .getByRole("navigation", { name: "Navigation dans les catégories du compte-rendu" })
+      .getByRole("navigation", {
+        name: "Navigation dans les catégories du compte-rendu",
+      })
       .getByText("Résumé")
       .click();
 
@@ -284,7 +286,9 @@ test("Cross teams report", async ({ page }) => {
     await expect(page.getByText(team2Description)).toBeVisible();
 
     await page
-      .getByRole("navigation", { name: "Navigation dans les catégories du compte-rendu" })
+      .getByRole("navigation", {
+        name: "Navigation dans les catégories du compte-rendu",
+      })
       .getByText("Accueil")
       .click();
 
