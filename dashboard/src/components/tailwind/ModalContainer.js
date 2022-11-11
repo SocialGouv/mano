@@ -3,7 +3,18 @@ import { Dialog, Transition } from '@headlessui/react';
 
 // https://tailwindui.com/components/application-ui/overlays/modals#component-47a5888a08838ad98779d50878d359b3
 
-const ModalContainer = ({ Footer, Header, children, title, open, setOpen, className = '', cancelButtonRef = null }) => {
+const ModalContainer = ({
+  Footer,
+  Header,
+  children,
+  title,
+  open,
+  setOpen,
+  className = '',
+  cancelButtonRef = null,
+  onAfterEnter = () => null,
+  onBeforeLeave = () => null,
+}) => {
   return (
     <>
       <Transition.Root show={open} as={Fragment}>
@@ -28,7 +39,9 @@ const ModalContainer = ({ Footer, Header, children, title, open, setOpen, classN
                 enterTo="tw-opacity-100 tw-translate-y-0 sm:tw-scale-100"
                 leave="tw-ease-in tw-duration-200"
                 leaveFrom="tw-opacity-100 tw-translate-y-0 sm:tw-scale-100"
-                leaveTo="tw-opacity-0 tw-translate-y-4 sm:tw-translate-y-0 sm:tw-scale-95">
+                leaveTo="tw-opacity-0 tw-translate-y-4 sm:tw-translate-y-0 sm:tw-scale-95"
+                afterEnter={onAfterEnter}
+                beforeLeave={onBeforeLeave}>
                 <Dialog.Panel className="tw-relative tw-transform tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg">
                   <div className="tw-bg-white tw-pt-5 tw-pb-4">
                     <div className="sm:tw-flex sm:tw-items-start">
