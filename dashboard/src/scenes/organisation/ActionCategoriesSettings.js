@@ -36,6 +36,7 @@ const ActionCategoriesSettings = () => {
       body: { actionsGroupedCategories: [...actionsGroupedCategories, { groupTitle, categories: [] }] },
     });
     if (res.ok) {
+      toast.success('Groupe ajouté', { autoclose: 2000 });
       setOrganisation(res.data);
       setAddGroupModalVisible(false);
       refresh();
@@ -78,7 +79,7 @@ const ActionCategoriesSettings = () => {
       </div>
       <hr />
       <div key={JSON.stringify(actionsGroupedCategories)}>
-        <div className="tw--m-1 tw-inline-flex tw-w-full tw-flex-wrap" ref={gridRef}>
+        <div id="category-groups" className="tw--m-1 tw-inline-flex tw-w-full tw-flex-wrap" ref={gridRef}>
           {actionsGroupedCategories.map(({ groupTitle, categories }) => (
             <ActionCategoriesGroup key={groupTitle} groupTitle={groupTitle} categories={categories} onDragAndDrop={onDragAndDrop} />
           ))}
@@ -232,6 +233,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
     });
     if (response.ok) {
       setOrganisation(response.data);
+      toast.success("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard", { autoClose: 2000 });
     } else {
       setOrganisation(oldOrganisation);
     }
@@ -240,13 +242,22 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
   return (
     <>
       <div className="tw-basis-1/3 tw-p-1">
-        <details open key={groupTitle} data-group={groupTitle} className="tw-flex tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
+        <details
+          open
+          key={groupTitle}
+          id={groupTitle}
+          data-group={groupTitle}
+          className="category-group tw-flex tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
           <summary className="tw-basis-full tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">
             <div className="tw-group tw-inline-flex tw-w-11/12 tw-shrink tw-justify-between">
-              <span className="tw-pl-2">
+              <span className="category-group-title tw-pl-2">
                 {groupTitle} ({categories.length})
               </span>
-              <button type="button" className="tw-ml-auto tw-hidden group-hover:tw-inline-flex" onClick={() => setIsEditingGroupTitle(true)}>
+              <button
+                type="button"
+                aria-label={`Modifier le groupe ${groupTitle}`}
+                className="tw-ml-auto tw-hidden group-hover:tw-inline-flex"
+                onClick={() => setIsEditingGroupTitle(true)}>
                 ✏️
               </button>
             </div>
@@ -408,8 +419,14 @@ const Category = ({ category, groupTitle }) => {
           'tw-group tw-flex tw-cursor-move tw-items-center tw-border-2 tw-border-transparent tw-pl-1',
           isSelected ? 'tw-rounded tw-border-main' : '',
         ].join(' ')}>
-        <p className="tw-m-0">{category}</p>
-        <button type="button" className="tw-ml-auto tw-hidden group-hover:tw-inline-flex" onClick={() => setIsEditingCategory(true)}>
+        <p className="tw-m-0" id={category}>
+          {category}
+        </p>
+        <button
+          type="button"
+          aria-label={`Modifier la catégorie ${category}`}
+          className="tw-ml-auto tw-hidden group-hover:tw-inline-flex"
+          onClick={() => setIsEditingCategory(true)}>
           ✏️
         </button>
       </div>

@@ -3,8 +3,6 @@ import { useRecoilValue } from 'recoil';
 import { actionsCategoriesSelector } from '../../recoil/actions';
 import ModalContainer from './ModalContainer';
 
-// https://tailwindui.com/components/application-ui/overlays/modals#component-47a5888a08838ad98779d50878d359b3
-
 const ActionsCategorySelect = ({ label, values, onChange, id }) => {
   const [open, setOpen] = useState(false);
   const allGroups = useRecoilValue(actionsCategoriesSelector);
@@ -42,7 +40,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id }) => {
         className="tw-flex tw-max-h-16 tw-flex-wrap tw-items-center tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300 tw-px-2.5 tw-py-1"
         onClick={() => setOpen(true)}>
         {selected.map((category) => (
-          <div className="selected-action-category tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
+          <div key={category} className="selected-action-category tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
             {category}
             <button
               className="selected-action-category-close-button tw-ml-2 tw-font-bold"
@@ -77,7 +75,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id }) => {
         )}>
         <div className="tw-mx-4 tw-flex tw-max-h-16 tw-flex-wrap tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300  tw-px-2.5 tw-py-1">
           {selected.map((category) => (
-            <div className="selected-action-category-modal tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
+            <div key={category} className="selected-action-category-modal tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
               {category}{' '}
               <button
                 className="selected-action-category-close-button-modal tw-ml-1 tw-font-bold"
@@ -100,6 +98,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id }) => {
             <div className="tw-flex tw-flex-col tw-overflow-y-auto">
               {groups.map(({ groupTitle, categories }) => (
                 <button
+                  key={groupTitle}
                   type="button"
                   className={[
                     'action-category-group py-2 tw-border-b tw-border-gray-300 tw-px-4 tw-text-left',
