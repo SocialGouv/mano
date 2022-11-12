@@ -58,6 +58,8 @@ test("Actions", async ({ page }) => {
     await page.getByText("Création réussie !").click();
   };
 
+  test.setTimeout(60000);
+
   await test.step("Log in", async () => {
     await page.goto("http://localhost:8090/");
 
