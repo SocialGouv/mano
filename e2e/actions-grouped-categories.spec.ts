@@ -32,7 +32,7 @@ test("Actions", async ({ page }) => {
       .getByRole("button", { name: "Ajouter" })
       .click();
 
-    await page.getByText("Groupe ajouté").click();
+    await page.getByText("Groupe ajouté").last().click();
   };
 
   const createAction = async (
