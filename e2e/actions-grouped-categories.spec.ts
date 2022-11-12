@@ -4,13 +4,10 @@ import { changeReactSelectValue, clickOnEmptyReactSelect } from "./utils";
 
 test("Actions", async ({ page }) => {
   // Always use a new items
-  // const group1Name = nanoid();
-  const group1Name = "groupe 11";
-  // const group1Renamed = nanoid();
+  const group1Name = nanoid();
   const groupe1cat1 = nanoid();
   const groupe1cat2 = nanoid();
-  // const group2Name = nanoid();
-  const group2Name = "groupe 22";
+  const group2Name = nanoid();
   const groupe2cat1 = nanoid();
   const groupe2cat2 = nanoid();
   const groupe2cat2Renamed = nanoid();
@@ -32,7 +29,7 @@ test("Actions", async ({ page }) => {
       .getByRole("button", { name: "Ajouter" })
       .click();
 
-    await page.getByText("Groupe ajouté").last().click();
+    await page.getByText("Groupe ajouté").click();
   };
 
   const createAction = async (
