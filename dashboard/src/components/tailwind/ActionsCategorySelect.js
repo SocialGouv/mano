@@ -96,7 +96,10 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
         onClick={() => setOpen(true)}
         ref={categories1Ref}>
         {selected.map((category) => (
-          <div key={category} data-category={category} className="selected-action-category tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
+          <div
+            key={category}
+            data-category={category}
+            className="selected-action-category tw-cursor-pointer tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
             {category}
             <button
               className="selected-action-category-close-button tw-ml-2 tw-font-bold"
