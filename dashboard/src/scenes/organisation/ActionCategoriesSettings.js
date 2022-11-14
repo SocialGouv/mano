@@ -7,7 +7,6 @@ import { actionsCategoriesSelector, flattenedCategoriesSelector, actionsState, p
 import { organisationState } from '../../recoil/auth';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
 import ModalWithForm from '../../components/tailwind/ModalWithForm';
-import Input from '../../components/tailwind/Input';
 import { toast } from 'react-toastify';
 
 const groupTitlesSelector = selector({
@@ -100,8 +99,13 @@ const ActionCategoriesSettings = () => {
             type: 'cancel',
           },
         ]}>
-        <form id="add-action-categories-group-form" className="tw-flex tw-flex-col tw-gap-4" onSubmit={onAddGroup}>
-          <Input label="Titre du groupe" id="groupTitle" name="groupTitle" type="text" placeholder="Démarches administratives" />
+        <form id="add-action-categories-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onAddGroup}>
+          <div>
+            <label htmlFor="groupTitle" className="form-text tailwindui">
+              Titre du groupe
+            </label>
+            <input type="text" id="groupTitle" name="groupTitle" placeholder="Démarches administratives" className="form-text tailwindui" />
+          </div>
         </form>
       </ModalWithForm>
     </>
@@ -273,7 +277,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
                 type="text"
                 id="newCategory"
                 name="newCategory"
-                className="tw-my-1 tw-rounded tw-bg-transparent tw-px-1.5 tw-py-1 placeholder:tw-opacity-60"
+                className="form-text tw-my-1 tw-rounded tw-bg-transparent tw-px-1.5 tw-py-1 placeholder:tw-opacity-60"
                 placeholder="Ajouter une catégorie"
               />
               <button type="submit" className="tw-ml-auto tw-rounded tw-bg-transparent">
@@ -304,7 +308,12 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
           },
         ]}>
         <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onEditGroupTitle}>
-          <Input label="Nouveau nom du groupe" id="newGroupTitle" name="newGroupTitle" type="text" placeholder={groupTitle} />
+          <div>
+            <label htmlFor="newGroupTitle" className="form-text tailwindui">
+              Nouveau nom du groupe
+            </label>
+            <input type="text" id="newGroupTitle" name="newGroupTitle" placeholder={groupTitle} className="form-text tailwindui" />
+          </div>
         </form>
       </ModalWithForm>
     </>
@@ -451,7 +460,12 @@ const Category = ({ category, groupTitle }) => {
           },
         ]}>
         <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onEditCategory}>
-          <Input label="Nouveau nom de la catégorie" id="newCategory" name="newCategory" type="text" placeholder={category} />
+          <div>
+            <label htmlFor="newCategory" className="form-text tailwindui">
+              Nouveau nom de la catégorie
+            </label>
+            <input className="form-text tailwindui" id="newCategory" name="newCategory" type="text" placeholder={category} />
+          </div>
         </form>
       </ModalWithForm>
     </>

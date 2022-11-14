@@ -88,7 +88,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id }) => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             type="search"
-            className="tw-border-none tw-p-0 tw-px-2  tw-py-1 tw-text-sm placeholder:tw-italic"
+            className="form-text !tw-mt-0 tw-border-none tw-p-0 tw-px-2  tw-py-1 tw-text-sm placeholder:tw-italic"
             placeholder="Recherchez..."
           />
         </div>

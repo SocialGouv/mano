@@ -11,6 +11,8 @@ fileignoreconfig:
   checksum: f07dd01934ecf1e9344f55187bb0742c199eef51ff763256795a424699c5779d
 - filename: dashboard/src/components/tailwind/ActionsCategorySelect.js
   checksum: 979717723e4c40f05e696dfce46943e318c6aed98bd15979d1547e055c08ef71
+- filename: dashboard/src/index.scss
+  checksum: b0c164892558dd35b2260af1311433d88ee0322526b9172646042fd6d9839c42
 - filename: dashboard/src/scenes/organisation/ActionCategoriesSettings.js
   checksum: 285d945a640542c3265e54d311d7458395d386c99b1b2dcbeba8b74be32dcf8f
 - filename: e2e/scripts/db.sql

@@ -27,6 +27,13 @@ module.exports = {
       }),
     },
   },
-  // plugins: [require('@tailwindcss/forms')],
+  plugins: [
+    require('@tailwindcss/forms')({
+      // strategy: 'base', // only generate global styles
+      /* When using the class strategy, form elements are not styled globally,
+       and instead must be styled using the generated form-{name} classes. */
+      strategy: 'class', // only generate classes
+    }),
+  ],
   prefix: 'tw-',
 };
