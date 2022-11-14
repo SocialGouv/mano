@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
+import { populate } from "./scripts/populate-db";
 import { changeReactSelectValue, clickOnEmptyReactSelect } from "./utils";
+
+test.beforeAll(async () => {
+  await populate();
+});
 
 test("Actions", async ({ page }) => {
   // Always use a new items
@@ -38,11 +43,17 @@ test("Actions", async ({ page }) => {
   ) => {
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
+    await page
+      .getByRole("button", { name: "Créer une nouvelle action" })
+      .click();
 
     await page.getByLabel("Nom de l'action").fill(actionName);
 
-    await clickOnEmptyReactSelect(page, "create-action-person-select", personName);
+    await clickOnEmptyReactSelect(
+      page,
+      "create-action-person-select",
+      personName
+    );
 
     await page.locator("#categories").getByText("-- Choisir --").click();
 
@@ -57,8 +68,6 @@ test("Actions", async ({ page }) => {
 
     await page.getByText("Création réussie !").click();
   };
-
-  test.setTimeout(60000);
 
   await test.step("Log in", async () => {
     await page.goto("http://localhost:8090/");
@@ -78,7 +87,9 @@ test("Actions", async ({ page }) => {
     await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
 
     await page.getByRole("button", { name: "Se connecter" }).click();
-    await expect(page).toHaveURL("http://localhost:8090/reception?calendarTab=2");
+    await expect(page).toHaveURL(
+      "http://localhost:8090/reception?calendarTab=2"
+    );
   });
 
   await test.step("Create first group to be renamed", async () => {
@@ -118,7 +129,9 @@ test("Actions", async ({ page }) => {
       .getByRole("button", { name: "Ajouter" })
       .click();
 
-    await page.getByText(`Cette catégorie existe déjà: ${group1Name} > ${groupe1cat1}`).click();
+    await page
+      .getByText(`Cette catégorie existe déjà: ${group1Name} > ${groupe1cat1}`)
+      .click();
   });
 
   await test.step("Create second category in first group", async () => {
@@ -253,7 +266,9 @@ test("Actions", async ({ page }) => {
   await test.step("Create one person to assign actions", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
-    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    await page
+      .getByRole("button", { name: "Créer une nouvelle personne" })
+      .click();
     await page.getByLabel("Nom").click();
     await page.getByLabel("Nom").fill(personName);
     await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -271,10 +286,15 @@ test("Actions", async ({ page }) => {
       { group: group2Name, category: groupe2cat2 },
     ]);
 
-    await createAction(action3Name, [{ group: groupe3Name, category: groupe3cat1ToBeDeleted }]);
+    await createAction(action3Name, [
+      { group: groupe3Name, category: groupe3cat1ToBeDeleted },
+    ]);
   });
 
   await test.step("Search for category", async () => {
+    await page.getByRole("link", { name: "Agenda" }).click();
+    await page.getByText(action3Name).click();
+
     await page.locator("#categories").getByRole("button").last().click();
 
     await page.getByPlaceholder("Recherchez...").fill(groupe2cat2);
@@ -293,19 +313,29 @@ test("Actions", async ({ page }) => {
   await test.step("Check for proper categories on actions", async () => {
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await expect(page.locator(`data-test-id=${action1Name}${groupe1cat1}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action1Name}${groupe1cat1}`)
+    ).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action1Name}${groupe2cat1}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action1Name}${groupe2cat1}`)
+    ).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action2Name}${groupe1cat2}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action2Name}${groupe1cat2}`)
+    ).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action2Name}${groupe2cat2}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action2Name}${groupe2cat2}`)
+    ).toBeVisible();
 
     await expect(
       page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)
     ).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action3Name}${groupe2cat2}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action3Name}${groupe2cat2}`)
+    ).toBeVisible();
   });
 
   await test.step("Update category name", async () => {
@@ -314,7 +344,9 @@ test("Actions", async ({ page }) => {
     await page.getByRole("button", { name: "Actions" }).click();
 
     await page.hover(`id=${groupe2cat2}`);
-    await page.getByRole("button", { name: `Modifier la catégorie ${groupe2cat2}` }).click();
+    await page
+      .getByRole("button", { name: `Modifier la catégorie ${groupe2cat2}` })
+      .click();
 
     await page.getByPlaceholder(groupe2cat2).fill(groupe2cat2Renamed);
 
@@ -333,7 +365,9 @@ test("Actions", async ({ page }) => {
   await test.step("Delete category", async () => {
     await page.hover(`id=${groupe3cat1ToBeDeleted}`);
     await page
-      .getByRole("button", { name: `Modifier la catégorie ${groupe3cat1ToBeDeleted}` })
+      .getByRole("button", {
+        name: `Modifier la catégorie ${groupe3cat1ToBeDeleted}`,
+      })
       .click();
 
     page.on("dialog", async (dialog) => {
@@ -341,7 +375,9 @@ test("Actions", async ({ page }) => {
     });
 
     await page
-      .getByRole("dialog", { name: `Éditer la catégorie: ${groupe3cat1ToBeDeleted}` })
+      .getByRole("dialog", {
+        name: `Éditer la catégorie: ${groupe3cat1ToBeDeleted}`,
+      })
       .getByRole("button", { name: "Supprimer" })
       .click();
 
@@ -355,18 +391,28 @@ test("Actions", async ({ page }) => {
   await test.step("Check for proper categories on actions", async () => {
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await expect(page.locator(`data-test-id=${action1Name}${groupe1cat1}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action1Name}${groupe1cat1}`)
+    ).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action1Name}${groupe2cat1}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action1Name}${groupe2cat1}`)
+    ).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action2Name}${groupe1cat2}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action2Name}${groupe1cat2}`)
+    ).toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action2Name}${groupe2cat2Renamed}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action2Name}${groupe2cat2Renamed}`)
+    ).toBeVisible();
 
     await expect(
       page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)
     ).not.toBeVisible();
 
-    await expect(page.locator(`data-test-id=${action3Name}${groupe2cat2Renamed}`)).toBeVisible();
+    await expect(
+      page.locator(`data-test-id=${action3Name}${groupe2cat2Renamed}`)
+    ).toBeVisible();
   });
 });

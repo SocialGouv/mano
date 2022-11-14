@@ -1,276 +1,425 @@
-drop table if exists "mano"."Comment";
+CREATE SCHEMA IF NOT EXISTS mano;
 
-drop table if exists "mano"."Action";
 
-drop table if exists "mano"."RelPersonPlace";
+CREATE TABLE IF NOT EXISTS mano."Action" (
+    _id uuid NOT NULL,
+    status text,
+    "dueAt" timestamp with time zone,
+    "completedAt" timestamp with time zone,
+    organisation uuid,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    encrypted text,
+    "encryptedEntityKey" text,
+    "deletedAt" timestamp with time zone
+);
 
-drop table if exists "mano"."Place";
 
-drop table if exists "mano"."Person";
 
-drop table if exists "mano"."RelUserTeam";
+CREATE TABLE IF NOT EXISTS mano."Comment" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    organisation uuid,
+    encrypted text,
+    "encryptedEntityKey" text,
+    "deletedAt" timestamp with time zone
+);
 
-drop table if exists "mano"."Report";
 
-drop table if exists "mano"."Structure";
 
-drop table if exists "mano"."TerritoryObservation";
+CREATE TABLE IF NOT EXISTS mano."Consultation" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "dueAt" timestamp with time zone NOT NULL,
+    "completedAt" timestamp with time zone,
+    "deletedAt" timestamp with time zone,
+    status text,
+    organisation uuid,
+    "onlyVisibleBy" uuid[],
+    encrypted text,
+    "encryptedEntityKey" text
+);
 
-drop table if exists "mano"."Team";
 
-drop table if exists "mano"."Territory";
 
-drop table if exists "mano"."User";
+CREATE TABLE IF NOT EXISTS mano."MedicalFile" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "deletedAt" timestamp with time zone,
+    organisation uuid,
+    encrypted text,
+    "encryptedEntityKey" text
+);
 
-drop table if exists "mano"."Organisation";
 
-create table if not exists "mano"."Organisation"
-(
-    _id                        uuid                     not null
-        constraint "Organisation_pkey"
-            primary key,
-    name                       text,
-    "createdAt"                timestamp with time zone not null,
-    "updatedAt"                timestamp with time zone not null,
-    categories                 text[],
-    "consultations"            jsonb default '[{ "name": "Médicale", "fields": [{ "name": "description", "type": "textarea", "label": "Description", "enabled": true, "showInStats": false }] }]'::jsonb,
-    "encryptionEnabled"        boolean default false,
-    "encryptionLastUpdateAt"   timestamp with time zone,
-    encrypting                 boolean default false,
-    "receptionEnabled"         boolean default false,
-    services                   text[],
-    collaborations             text[],
-    "customFieldsObs"          jsonb,
-    "customFieldsPersonsSocial"          jsonb,
-    "customFieldsPersonsMedical"          jsonb,
-    "fieldsPersonsCustomizableOptions"    jsonb,
+
+CREATE TABLE IF NOT EXISTS mano."Organisation" (
+    _id uuid NOT NULL,
+    name text,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    categories text[],
+    "actionsGroupedCategories" jsonb,
+    consultations jsonb DEFAULT '[{"name": "Médicale", "fields": [{"name": "description", "type": "textarea", "label": "Description", "enabled": true, "showInStats": false}]}]'::jsonb,
+    "encryptionEnabled" boolean DEFAULT false,
+    "encryptionLastUpdateAt" timestamp with time zone,
+    encrypting boolean DEFAULT false,
+    "receptionEnabled" boolean DEFAULT false,
+    services text[],
+    collaborations text[],
+    "customFieldsObs" jsonb,
+    "fieldsPersonsCustomizableOptions" jsonb,
+    "customFieldsPersonsSocial" jsonb,
+    "customFieldsPersonsMedical" jsonb,
     "encryptedVerificationKey" text,
-    migrations                 text[],
-    "migrationLastUpdateAt"    timestamp with time zone,
-    migrating                 boolean default false,
+    migrations text[],
+    "migrationLastUpdateAt" timestamp with time zone,
+    migrating boolean DEFAULT false,
     "customFieldsMedicalFile" jsonb
 );
 
-create table if not exists "mano"."Structure"
-(
-    _id          uuid                     not null
-        constraint "Structure_pkey"
-            primary key,
-    name         text,
-    description  text,
-    city         text,
-    postcode     text,
-    adresse      text,
-    phone        text,
-    organisation uuid
-        constraint "Structure_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade
-            deferrable,
-    categories   text[],
-    "createdAt"  timestamp with time zone not null,
-    "updatedAt"  timestamp with time zone not null
-);
 
-create table if not exists "mano"."Team"
-(
-    _id            uuid                     not null
-        constraint "Team_pkey"
-            primary key,
-    name           text,
-    organisation   uuid
-        constraint "Team_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade
-            deferrable,
-    "createdAt"    timestamp with time zone not null,
-    "updatedAt"    timestamp with time zone not null,
-    "nightSession" boolean default false
-);
 
-create table if not exists "mano"."Report"
-(
-    _id                  uuid                     not null
-        constraint "Report_pkey"
-            primary key,
-    "createdAt"          timestamp with time zone not null,
-    "updatedAt"          timestamp with time zone not null,
-    encrypted            text,
+CREATE TABLE IF NOT EXISTS mano."Passage" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    organisation uuid,
+    encrypted text,
     "encryptedEntityKey" text,
-    organisation         uuid
-        constraint "Report_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade
+    "deletedAt" timestamp with time zone
 );
 
-create table if not exists "mano"."User"
-(
-    _id                          uuid                     not null
-        constraint "User_pkey"
-            primary key,
-    name                         text,
-    email                        text                     not null
-        constraint "User_email_key"
-            unique,
-    password                     text                     not null,
-    organisation                 uuid
-        constraint "User_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade
-            deferrable,
-    "lastLoginAt"                timestamp with time zone,
-    "createdAt"                  timestamp with time zone not null,
-    "updatedAt"                  timestamp with time zone not null,
-    role                         text,
-    "lastChangePasswordAt"       date,
+
+
+CREATE TABLE IF NOT EXISTS mano."Person" (
+    _id uuid NOT NULL,
+    organisation uuid,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    encrypted text,
+    "encryptedEntityKey" text,
+    "deletedAt" timestamp with time zone
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."Place" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    organisation uuid,
+    encrypted text,
+    "encryptedEntityKey" text,
+    "deletedAt" timestamp with time zone
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."RelPersonPlace" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    organisation uuid,
+    encrypted text,
+    "encryptedEntityKey" text,
+    "deletedAt" timestamp with time zone
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."RelUserTeam" (
+    _id uuid NOT NULL,
+    "user" uuid,
+    team uuid,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."Report" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    encrypted text,
+    "encryptedEntityKey" text,
+    organisation uuid,
+    "deletedAt" timestamp with time zone
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."Structure" (
+    _id uuid NOT NULL,
+    name text,
+    description text,
+    city text,
+    postcode text,
+    adresse text,
+    phone text,
+    organisation uuid,
+    categories text[],
+    "actionsGroupedCategories" jsonb,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."Team" (
+    _id uuid NOT NULL,
+    name text,
+    organisation uuid,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "nightSession" boolean DEFAULT false
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."Territory" (
+    _id uuid NOT NULL,
+    organisation uuid,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    encrypted text,
+    "encryptedEntityKey" text,
+    "deletedAt" timestamp with time zone
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."TerritoryObservation" (
+    _id uuid NOT NULL,
+    organisation uuid,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    encrypted text,
+    "encryptedEntityKey" text,
+    "deletedAt" timestamp with time zone
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."Treatment" (
+    _id uuid NOT NULL,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    "deletedAt" timestamp with time zone,
+    organisation uuid,
+    encrypted text,
+    "encryptedEntityKey" text
+);
+
+
+
+CREATE TABLE IF NOT EXISTS mano."User" (
+    _id uuid NOT NULL,
+    name text,
+    email text NOT NULL,
+    password text NOT NULL,
+    organisation uuid,
+    "lastLoginAt" timestamp with time zone,
+    "createdAt" timestamp with time zone NOT NULL,
+    "updatedAt" timestamp with time zone NOT NULL,
+    role text,
+    "lastChangePasswordAt" date,
     "forgotPasswordResetExpires" date,
-    "forgotPasswordResetToken"   text,
-    "termsAccepted"              timestamp with time zone,
+    "forgotPasswordResetToken" text,
+    "termsAccepted" timestamp with time zone,
     "healthcareProfessional" boolean DEFAULT false,
     "debugApp" jsonb,
     "debugDashboard" jsonb
 );
 
-create table if not exists "mano"."Person"
-(
-    _id                     uuid                     not null
-        constraint "Person_pkey"
-            primary key,
-    organisation            uuid
-        constraint "Person_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade
-            deferrable,
-    "createdAt"             timestamp with time zone not null,
-    "updatedAt"             timestamp with time zone not null,
-    encrypted               text,
-    "encryptedEntityKey"    text
-);
 
-create table if not exists "mano"."Action"
-(
-    _id                  uuid                     not null
-        constraint "Action_pkey"
-            primary key,
-    status               text,
-    "dueAt"              timestamp with time zone,
-    "completedAt"        timestamp with time zone,
-    organisation         uuid
-        constraint "Action_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade
-            deferrable,
-    "createdAt"          timestamp with time zone not null,
-    "updatedAt"          timestamp with time zone not null,
-    encrypted            text,
-    "encryptedEntityKey" text
-);
 
-create table if not exists "mano"."Comment"
-(
-    _id                  uuid                     not null
-        constraint "Comment_pkey"
-            primary key,
-    "createdAt"          timestamp with time zone not null,
-    "updatedAt"          timestamp with time zone not null,
-    organisation         uuid
-        constraint "Comment_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade,
-    encrypted            text,
-    "encryptedEntityKey" text
-);
 
-create table if not exists "mano"."Passage"
-(
-    _id                  uuid                     not null
-        constraint "Passage_pkey"
-            primary key,
-    "createdAt"          timestamp with time zone not null,
-    "updatedAt"          timestamp with time zone not null,
-    organisation         uuid
-        constraint "Passage_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade,
-    encrypted            text,
-    "encryptedEntityKey" text
-);
+ALTER TABLE ONLY mano."Action"
+    ADD CONSTRAINT "Action_pkey" PRIMARY KEY (_id);
 
-create table if not exists "mano"."Place"
-(
-    _id                  uuid                     not null
-        constraint "Place_pkey"
-            primary key,
-    "createdAt"          timestamp with time zone not null,
-    "updatedAt"          timestamp with time zone not null,
-    organisation         uuid
-        constraint "Place_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade,
-    encrypted            text,
-    "encryptedEntityKey" text
-);
 
-create table if not exists "mano"."RelPersonPlace"
-(
-    _id                  uuid                     not null
-        constraint "RelPersonPlace_pkey"
-            primary key,
-    "createdAt"          timestamp with time zone not null,
-    "updatedAt"          timestamp with time zone not null,
-    organisation         uuid
-        constraint "RelPersonPlace_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade,
-    encrypted            text,
-    "encryptedEntityKey" text
-);
 
-create table if not exists "mano"."RelUserTeam"
-(
-    _id         uuid                     not null
-        constraint "RelUserTeam_pkey"
-            primary key,
-    "user"      uuid
-        constraint "RelUserTeam_user_fkey"
-            references "mano"."User"
-            on update cascade on delete cascade,
-    team        uuid
-        constraint "RelUserTeam_team_fkey"
-            references "mano"."Team"
-            on update cascade on delete cascade,
-    "createdAt" timestamp with time zone not null,
-    "updatedAt" timestamp with time zone not null,
-    constraint "RelUserTeam_user_team_key"
-        unique ("user", team)
-);
+ALTER TABLE ONLY mano."Comment"
+    ADD CONSTRAINT "Comment_pkey" PRIMARY KEY (_id);
 
-create table if not exists "mano"."Territory"
-(
-    _id                  uuid                     not null
-        constraint "Territory_pkey"
-            primary key,
-    organisation         uuid
-        constraint "Territory_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade,
-    "createdAt"          timestamp with time zone not null,
-    "updatedAt"          timestamp with time zone not null,
-    encrypted            text,
-    "encryptedEntityKey" text
-);
 
-create table if not exists "mano"."TerritoryObservation"
-(
-    _id                  uuid                     not null
-        constraint "TerritoryObservation_pkey"
-            primary key,
-    organisation         uuid
-        constraint "TerritoryObservation_organisation_fkey"
-            references "mano"."Organisation"
-            on update cascade on delete cascade,
-    "createdAt"          timestamp with time zone not null,
-    "updatedAt"          timestamp with time zone not null,
-    encrypted            text,
-    "encryptedEntityKey" text
-);
+
+ALTER TABLE ONLY mano."Consultation"
+    ADD CONSTRAINT "Consultation_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."MedicalFile"
+    ADD CONSTRAINT "MedicalFile_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Organisation"
+    ADD CONSTRAINT "Organisation_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Passage"
+    ADD CONSTRAINT "Passage_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Person"
+    ADD CONSTRAINT "Person_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Place"
+    ADD CONSTRAINT "Place_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."RelPersonPlace"
+    ADD CONSTRAINT "RelPersonPlace_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."RelUserTeam"
+    ADD CONSTRAINT "RelUserTeam_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."RelUserTeam"
+    ADD CONSTRAINT "RelUserTeam_user_team_key" UNIQUE ("user", team);
+
+
+
+ALTER TABLE ONLY mano."Report"
+    ADD CONSTRAINT "Report_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Structure"
+    ADD CONSTRAINT "Structure_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Team"
+    ADD CONSTRAINT "Team_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."TerritoryObservation"
+    ADD CONSTRAINT "TerritoryObservation_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Territory"
+    ADD CONSTRAINT "Territory_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Treatment"
+    ADD CONSTRAINT "Treatment_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."User"
+    ADD CONSTRAINT "User_email_key" UNIQUE (email);
+
+
+
+ALTER TABLE ONLY mano."User"
+    ADD CONSTRAINT "User_pkey" PRIMARY KEY (_id);
+
+
+
+ALTER TABLE ONLY mano."Action"
+    ADD CONSTRAINT "Action_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+
+
+
+ALTER TABLE ONLY mano."Comment"
+    ADD CONSTRAINT "Comment_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."Consultation"
+    ADD CONSTRAINT "Consultation_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."MedicalFile"
+    ADD CONSTRAINT "MedicalFile_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."Passage"
+    ADD CONSTRAINT "Passage_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."Person"
+    ADD CONSTRAINT "Person_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+
+
+
+ALTER TABLE ONLY mano."Place"
+    ADD CONSTRAINT "Place_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."RelPersonPlace"
+    ADD CONSTRAINT "RelPersonPlace_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."RelUserTeam"
+    ADD CONSTRAINT "RelUserTeam_team_fkey" FOREIGN KEY (team) REFERENCES mano."Team"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."RelUserTeam"
+    ADD CONSTRAINT "RelUserTeam_user_fkey" FOREIGN KEY ("user") REFERENCES mano."User"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."Report"
+    ADD CONSTRAINT "Report_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."Structure"
+    ADD CONSTRAINT "Structure_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+
+
+
+ALTER TABLE ONLY mano."Team"
+    ADD CONSTRAINT "Team_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+
+
+
+ALTER TABLE ONLY mano."TerritoryObservation"
+    ADD CONSTRAINT "TerritoryObservation_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."Territory"
+    ADD CONSTRAINT "Territory_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."Treatment"
+    ADD CONSTRAINT "Treatment_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+
+ALTER TABLE ONLY mano."User"
+    ADD CONSTRAINT "User_organisation_fkey" FOREIGN KEY (organisation) REFERENCES mano."Organisation"(_id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE;
+
+
+--
+-- PostgreSQL database dump complete
+--
+
+
