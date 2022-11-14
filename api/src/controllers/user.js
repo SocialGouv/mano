@@ -300,8 +300,8 @@ router.post(
 
     const subject = "Réinitialiser votre mot de passe";
     const body = `Une requête pour réinitialiser votre mot de passe a été effectuée.
-    Si elle ne vient pas de vous, veuillez avertir l'administrateur.
-    Si vous en êtes à l'origine, vous pouvez cliquer sur ce lien: ${link}`;
+Si elle ne vient pas de vous, veuillez avertir l'administrateur.
+Si vous en êtes à l'origine, vous pouvez cliquer sur ce lien: ${link}`;
     await mailservice.sendEmail(user.email, subject, body);
 
     return res.status(200).send({ ok: true });
