@@ -7,7 +7,6 @@ const sendEmail = async (address, subject, text) => {
   if (process.env.NODE_ENV === "development") {
     address = process.env.EMAIL_DEV || "arnaud@ambroselli.io";
   }
-  console.log("ON EST LA");
   const emailSentResponse = await fetch("https://api.tipimail.com/v1/messages/send", {
     method: "POST",
     headers: {
