@@ -72,7 +72,7 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
     categories text[],
-    actionsGroupedCategories jsonb DEFAULT '[{"groupTitle": "médical", categories: ["seringue", "pansement"]}, { "groupTitle": "local", "categories": ["entretien", "lavage"]}]'::jsonb,
+    actionsGroupedCategories jsonb,
     consultations jsonb DEFAULT '[{"name": "Médicale", "fields": [{"name": "description", "type": "textarea", "label": "Description", "enabled": true, "showInStats": false}]}]'::jsonb,
     "encryptionEnabled" boolean DEFAULT false,
     "encryptionLastUpdateAt" timestamp with time zone,

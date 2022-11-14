@@ -4,7 +4,7 @@ fileignoreconfig:
 - filename: CHANGELOG.md
   checksum: 56a538010c6c74166b1f41a6269494a4a7a4364e5e4f9e913ff6fc8e7cda038f
 - filename: api/mocked-db.sql
-  checksum: 12fcb945822122b58701c646d7ea2828142567007b8e5c5f67d2d95b0a039723
+  checksum: d932c3f5ce8ccb2cb2dc3ed5a8b19915b24a2165008639de2acc5fc7d0d9b43a
 - filename: app/ios/Podfile.lock
   checksum: c47f6bc22846aa5918fb1746356eb8c2c21e08628b48a73e6167b90dd05c5c0d
 - filename: app/src/components/ActionCategoriesModalSelect.js
