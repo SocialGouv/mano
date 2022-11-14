@@ -86,7 +86,6 @@ const ChangePasswordBody = ({ onOK, children }) => {
     const response = await API.post({
       path: '/user/reset_password',
       body: { newPassword: newPassword.trim(), verifyPassword: verifyPassword.trim(), password: password.trim() },
-      skipEncryption: true,
     });
     if (response.error) {
       Alert.alert(response.error);

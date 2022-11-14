@@ -291,11 +291,8 @@ const App = () => {
       API.token = null;
       AsyncStorage.removeItem('persistent_token');
       API.enableEncrypt = null;
-      API.wrongKeyWarned = null;
       API.hashedOrgEncryptionKey = null;
       API.orgEncryptionKey = null;
-      API.sendCaptureError = null;
-      API.blockEncrypt = null;
       API.organisation = null;
       setIsLoggedIn(false);
     };

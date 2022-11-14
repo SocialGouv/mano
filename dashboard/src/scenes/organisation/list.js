@@ -174,7 +174,7 @@ const Create = ({ onChange }) => {
             }}
             onSubmit={async (body, actions) => {
               try {
-                const orgRes = await API.post({ path: '/organisation', skipEncryption: '/organisation', body });
+                const orgRes = await API.post({ path: '/organisation', body });
                 actions.setSubmitting(false);
                 if (!orgRes.ok) return;
                 toast.success('Création réussie !');

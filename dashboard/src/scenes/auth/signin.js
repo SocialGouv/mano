@@ -55,10 +55,7 @@ const SignIn = () => {
 
   useEffect(() => {
     (async () => {
-      const { token, ok, user } = await API.get({
-        path: '/user/signin-token',
-        skipEncryption: '/user/signin-token',
-      });
+      const { token, ok, user } = await API.get({ path: '/user/signin-token' });
       if (ok && token && user) {
         setAuthViaCookie(true);
         const { organisation } = user;
@@ -118,15 +115,8 @@ const SignIn = () => {
             }
 
             const { user, token, ok } = authViaCookie
-              ? await API.get({
-                  path: '/user/signin-token',
-                  skipEncryption: '/user/signin-token',
-                })
-              : await API.post({
-                  path: '/user/signin',
-                  skipEncryption: '/user/signin',
-                  body,
-                });
+              ? await API.get({ path: '/user/signin-token' })
+              : await API.post({ path: '/user/signin', body });
             if (!ok) return actions.setSubmitting(false);
             const { organisation } = user;
             if (!!organisation.encryptionEnabled && !showEncryption && !['superadmin'].includes(user.role)) {

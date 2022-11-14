@@ -52,7 +52,7 @@ class ApiService {
     tablet: isTablet(), // false
   });
 
-  execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
+  execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, batch = null } = {}) => {
     try {
       if (this.token) headers.Authorization = `JWT ${this.token}`;
       const options = {
@@ -60,11 +60,7 @@ class ApiService {
         headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: this.platform, version: VERSION },
       };
       if (body) {
-        if (!skipEncryption) {
-          options.body = JSON.stringify(await this.encryptItem(body));
-        } else {
-          options.body = JSON.stringify(body);
-        }
+        options.body = JSON.stringify(await this.encryptItem(body));
       }
 
       if (['PUT', 'POST', 'DELETE'].includes(method) && this.enableEncrypt) {

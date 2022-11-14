@@ -130,10 +130,7 @@ const useApi = () => {
   };
 
   const logout = async (status) => {
-    await post({
-      path: '/user/logout',
-      skipEncryption: '/user/logout',
-    });
+    await post({ path: '/user/logout' });
     reset();
     if (window.location.pathname !== '/auth') {
       if (history) {
@@ -192,16 +189,7 @@ const useApi = () => {
     return response.json();
   };
 
-  const execute = async ({
-    method,
-    path = '',
-    body = null,
-    query = {},
-    headers = {},
-    debug = false,
-    skipEncryption = false,
-    forceMigrationLastUpdate = null,
-  } = {}) => {
+  const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null } = {}) => {
     try {
       // Force logout when one user has been logged in multiple tabs to different organisations.
       if (

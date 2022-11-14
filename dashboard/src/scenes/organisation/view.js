@@ -64,10 +64,7 @@ const View = () => {
     // we update the organisation on each tab change to mitigate
     // to mitigate the sync problem between all the users of an organisation
 
-    const { user } = await API.get({
-      path: '/user/signin-token',
-      skipEncryption: '/user/signin-token',
-    });
+    const { user } = await API.get({ path: '/user/signin-token' });
     if (user) {
       setOrganisation(user.organisation);
     }
@@ -477,7 +474,7 @@ const View = () => {
                             <li>
                               les colonnes qui seront importées peuvent être parmi la liste suivante - toute colonne qui ne s'appelle pas ainsi ne
                               sera pas prise en compte - certaines colonnes ont des valeurs imposées :
-                              <table className="table table-sm" style={{ fontSize: '14px', marginTop: '2rem' }}>
+                              <table className="table-sm table" style={{ fontSize: '14px', marginTop: '2rem' }}>
                                 <thead>
                                   <tr>
                                     <th>Colonne</th>
