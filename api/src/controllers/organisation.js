@@ -12,6 +12,7 @@ const Consultation = require("../models/consultation");
 const Treatment = require("../models/treatment");
 const MedicalFile = require("../models/medicalFile");
 const Person = require("../models/person");
+const Group = require("../models/group");
 const Territory = require("../models/territory");
 const Report = require("../models/report");
 const Comment = require("../models/comment");
@@ -58,6 +59,7 @@ router.get(
     const relsPersonPlace = await RelPersonPlace.count(query);
     const actions = await Action.count(query);
     const persons = await Person.count(query);
+    const groups = await Group.count(query);
     const comments = await Comment.count(query);
     const passages = await Passage.count(query);
     const rencontres = await Rencontre.count(query);
@@ -84,6 +86,7 @@ router.get(
         rencontres,
         medicalFiles,
         persons,
+        groups,
         places,
         relsPersonPlace,
         territories,
@@ -183,6 +186,7 @@ router.get(
     };
     const actions = (await Action.findAll(countQuery)).map((item) => item.toJSON());
     const persons = (await Person.findAll(countQuery)).map((item) => item.toJSON());
+    const groups = (await Group.findAll(countQuery)).map((item) => item.toJSON());
     const territories = (await Territory.findAll(countQuery)).map((item) => item.toJSON());
     const reports = (await Report.findAll(countQuery)).map((item) => item.toJSON());
     const comments = (await Comment.findAll(countQuery)).map((item) => item.toJSON());
@@ -197,6 +201,7 @@ router.get(
           const counters = {
             actions: actions.find((a) => a.organisation === org._id) ? Number(actions.find((a) => a.organisation === org._id).countByOrg) : 0,
             persons: persons.find((p) => p.organisation === org._id) ? Number(persons.find((p) => p.organisation === org._id).countByOrg) : 0,
+            groups: groups.find((p) => p.organisation === org._id) ? Number(groups.find((p) => p.organisation === org._id).countByOrg) : 0,
             territories: territories.find((t) => t.organisation === org._id)
               ? Number(territories.find((t) => t.organisation === org._id).countByOrg)
               : 0,

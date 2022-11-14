@@ -89,6 +89,7 @@ app.use("/migration", require("./controllers/migration"));
 app.use("/merge", require("./controllers/merge"));
 app.use("/consultation", require("./controllers/consultation"));
 app.use("/treatment", require("./controllers/treatment"));
+app.use("/group", require("./controllers/group"));
 app.use("/medical-file", require("./controllers/medicalFile"));
 // The error handler must be before any other error middleware and after all controllers
 app.use(Sentry.Handlers.errorHandler());
