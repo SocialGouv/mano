@@ -3,10 +3,8 @@ const { capture } = require("../sentry");
 const { X_TIPIMAIL_APIUSER, X_TIPIMAIL_APIKEY } = require("../config");
 
 const sendEmail = async (address, subject, text) => {
-  console.log("Sending email to", address, process.env.NODE_ENV);
   if (process.env.NODE_ENV === "test") return;
   if (process.env.NODE_ENV === "development") {
-    console.log(address);
     address = process.env.EMAIL_DEV || "arnaud@ambroselli.io";
   }
   console.log("ON EST LA");
