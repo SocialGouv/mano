@@ -1,14 +1,38 @@
 import { useState, useMemo, useEffect } from 'react';
-import { useRecoilValue } from 'recoil';
-import { actionsCategoriesSelector } from '../../recoil/actions';
+import { selector, useRecoilValue } from 'recoil';
+import { actionsCategoriesSelector, actionsState } from '../../recoil/actions';
 import ModalContainer from './ModalContainer';
 
-const ActionsCategorySelect = ({ label, values, onChange, id }) => {
+const categoriesSortedByMostUsedSelector = selector({
+  key: 'categoriesSortedByMostUsedSelector',
+  get: ({ get }) => {
+    const actions = get(actionsState);
+    const categories = {};
+    for (const action of actions) {
+      for (const category of action.categories) {
+        if (!categories[category]) categories[category] = 0;
+        categories[category]++;
+      }
+    }
+
+    return Object.entries(categories) // [[{category}, {count}], [{category}, {count}]]
+      .sort(([_, countCat1], [__, countCat2]) => countCat2 - countCat1)
+      .map(([category]) => category);
+  },
+});
+
+const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) => {
   const [open, setOpen] = useState(false);
   const allGroups = useRecoilValue(actionsCategoriesSelector);
+  const categoriesSortedByMostUsed = useRecoilValue(categoriesSortedByMostUsedSelector);
   const [selected, setSelected] = useState(() => values || []);
   const [search, setSearch] = useState('');
   const [groupSelected, setGroupSelected] = useState(allGroups[0].groupTitle);
+
+  const mostUsedCategoriesToShow = useMemo(
+    () => categoriesSortedByMostUsed.filter((category) => !selected.some((_category) => _category === category)).slice(0, 5),
+    [categoriesSortedByMostUsed, selected]
+  );
 
   const groups = useMemo(() => {
     if (!search && !selected.length) return allGroups;
@@ -61,6 +85,16 @@ const ActionsCategorySelect = ({ label, values, onChange, id }) => {
           <div className="tw-absolute tw-inset-0 tw-m-auto tw-h-3/6 tw-w-0.5 tw-rotate-90 tw-bg-main" />
         </button>
       </div>
+      {!!withMostUsed && (
+        <div className="mt-1 tw-flex tw-flex-wrap tw-items-center tw-gap-1 tw-text-xs tw-text-gray-500">
+          <p className="tw-m-0">Catégories les plus utilisées :</p>
+          {mostUsedCategoriesToShow.map((cat) => (
+            <button className="tw-rounded-full tw-border tw-border-gray-300 tw-p-1" key={cat} onClick={() => setSelected((s) => [...s, cat])}>
+              {cat}
+            </button>
+          ))}
+        </div>
+      )}
       <ModalContainer
         open={open}
         setOpen={setOpen}

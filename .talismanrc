@@ -1,24 +1,26 @@
 fileignoreconfig:
-- filename: .github/workflows/release.yml
-  checksum: 9de8b8b08e706e957ee60cf9b4eb5524c4120a32d6b9d97e3ee930ca24ebb378
-- filename: CHANGELOG.md
-  checksum: 56a538010c6c74166b1f41a6269494a4a7a4364e5e4f9e913ff6fc8e7cda038f
-- filename: app/ios/Podfile.lock
-  checksum: c47f6bc22846aa5918fb1746356eb8c2c21e08628b48a73e6167b90dd05c5c0d
-- filename: dashboard/src/components/ActionName.js
-  checksum: 85c84d11d7d840c01a671650b1665c0ad2e0dd01fb5d85ee946128ad0fc7a84f
-- filename: dashboard/src/components/DataLoader.js
-  checksum: f07dd01934ecf1e9344f55187bb0742c199eef51ff763256795a424699c5779d
-- filename: dashboard/src/components/tailwind/ActionsCategorySelect.js
-  checksum: 979717723e4c40f05e696dfce46943e318c6aed98bd15979d1547e055c08ef71
-- filename: dashboard/src/index.scss
-  checksum: b0c164892558dd35b2260af1311433d88ee0322526b9172646042fd6d9839c42
-- filename: dashboard/src/scenes/organisation/ActionCategoriesSettings.js
-  checksum: 285d945a640542c3265e54d311d7458395d386c99b1b2dcbeba8b74be32dcf8f
-- filename: e2e/scripts/db.sql
-  checksum: d4326f920efa1cd22289485ed2a9499b9f6e2a9581d4f5c4015525d43ed95aa3
-- filename: tests/src/scripts/db.sql
-  checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
+  - filename: .github/workflows/release.yml
+    checksum: 9de8b8b08e706e957ee60cf9b4eb5524c4120a32d6b9d97e3ee930ca24ebb378
+  - filename: CHANGELOG.md
+    checksum: 56a538010c6c74166b1f41a6269494a4a7a4364e5e4f9e913ff6fc8e7cda038f
+  - filename: app/ios/Podfile.lock
+    checksum: c47f6bc22846aa5918fb1746356eb8c2c21e08628b48a73e6167b90dd05c5c0d
+  - filename: app/src/components/ActionCategoriesModalSelect.js
+    checksum: 7b03aa1b13e211fd0d8bdb188a9dcaaae3b4ce2f822cc849483fcd5fab19f284
+  - filename: dashboard/src/components/ActionName.js
+    checksum: 85c84d11d7d840c01a671650b1665c0ad2e0dd01fb5d85ee946128ad0fc7a84f
+  - filename: dashboard/src/components/DataLoader.js
+    checksum: f07dd01934ecf1e9344f55187bb0742c199eef51ff763256795a424699c5779d
+  - filename: dashboard/src/components/tailwind/ActionsCategorySelect.js
+    checksum: 2132b3811b9d23c0639ad9c51cafc18ca053d1e03f695d7245ccb9a5b982989a
+  - filename: dashboard/src/index.scss
+    checksum: b0c164892558dd35b2260af1311433d88ee0322526b9172646042fd6d9839c42
+  - filename: dashboard/src/scenes/organisation/ActionCategoriesSettings.js
+    checksum: 285d945a640542c3265e54d311d7458395d386c99b1b2dcbeba8b74be32dcf8f
+  - filename: e2e/scripts/db.sql
+    checksum: d4326f920efa1cd22289485ed2a9499b9f6e2a9581d4f5c4015525d43ed95aa3
+  - filename: tests/src/scripts/db.sql
+    checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
 scopeconfig:
-- scope: node
+  - scope: node
 version: "1.0"

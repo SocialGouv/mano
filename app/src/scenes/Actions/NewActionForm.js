@@ -188,7 +188,7 @@ const NewActionForm = ({ route, navigation }) => {
             setWithTime={setWithTime}
             testID="new-action-dueAt"
           />
-          <ActionCategoriesModalSelect onChange={setCategories} values={categories} editable />
+          <ActionCategoriesModalSelect withMostUsed onChange={setCategories} values={categories} editable />
           <CheckboxLabelled
             label="Action prioritaire (cette action sera mise en avant par rapport aux autres)"
             alone
