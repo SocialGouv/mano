@@ -1,3 +1,10 @@
+# [1.176.0](https://github.com/SocialGouv/mano/compare/v1.175.7...v1.176.0) (2022-11-14)
+
+
+### Features
+
+* add actionsGroupedCategories ([#961](https://github.com/SocialGouv/mano/issues/961)) ([b3e9f8e](https://github.com/SocialGouv/mano/commit/b3e9f8e01c6b71d41b7aada2fd2540ba60bd5282)), closes [#968](https://github.com/SocialGouv/mano/issues/968) [#969](https://github.com/SocialGouv/mano/issues/969) [#970](https://github.com/SocialGouv/mano/issues/970) [#974](https://github.com/SocialGouv/mano/issues/974)
+
 ## [1.175.7](https://github.com/SocialGouv/mano/compare/v1.175.6...v1.175.7) (2022-11-14)
 
 
