@@ -120,7 +120,7 @@ const config: PlaywrightTestConfig = {
       },
     },
     {
-      command: "node ./api/src/index.js",
+      command: "node ./e2e/scripts/init-db.js && node ./api/src/index.js",
       port: 8091,
       timeout: 120 * 1000,
       reuseExistingServer: !process.env.CI,
