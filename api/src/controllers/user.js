@@ -282,28 +282,36 @@ router.post(
       error.status = 400;
       return next(error);
     }
-
+    console.log("1");
     if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
+    console.log("2");
 
     const user = await User.findOne({ where: { email } });
     if (!user) return res.status(200).send({ ok: true });
+    console.log("3");
 
     const { password } = await User.scope("withPassword").findOne({ where: { email }, attributes: ["password"] });
     if (!password) return res.status(200).send({ ok: true });
+    console.log("4");
 
     const token = crypto.randomBytes(20).toString("hex");
     user.forgotPasswordResetToken = token;
     user.forgotPasswordResetExpires = new Date(Date.now() + JWT_MAX_AGE * 1000);
+    console.log("5");
 
     const link = `https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}`;
+    console.log("6");
 
     await user.save();
+    console.log("7");
 
     const subject = "Réinitialiser votre mot de passe";
     const body = `Une requête pour réinitialiser votre mot de passe a été effectuée.
-Si elle ne vient pas de vous, veuillez avertir l'administrateur.
-Si vous en êtes à l'origine, vous pouvez cliquer sur ce lien: ${link}`;
+    Si elle ne vient pas de vous, veuillez avertir l'administrateur.
+    Si vous en êtes à l'origine, vous pouvez cliquer sur ce lien: ${link}`;
+    console.log("8");
     await mailservice.sendEmail(user.email, subject, body);
+    console.log("9");
 
     return res.status(200).send({ ok: true });
   })

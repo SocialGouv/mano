@@ -3,12 +3,14 @@ const { capture } = require("../sentry");
 const { X_TIPIMAIL_APIUSER, X_TIPIMAIL_APIKEY } = require("../config");
 
 const sendEmail = async (address, subject, text) => {
+  console.log("Sending email to", address, process.env.NODE_ENV);
   if (process.env.NODE_ENV === "test") return;
   if (process.env.NODE_ENV === "development") {
     console.log(address);
     address = process.env.EMAIL_DEV || "arnaud@ambroselli.io";
   }
-  return fetch("https://api.tipimail.com/v1/messages/send", {
+  console.log("ON EST LA");
+  const emailSentResponse = await fetch("https://api.tipimail.com/v1/messages/send", {
     method: "POST",
     headers: {
       "X-Tipimail-ApiUser": X_TIPIMAIL_APIUSER,
@@ -31,9 +33,11 @@ const sendEmail = async (address, subject, text) => {
         text,
       },
     }),
-  })
-    .then((res) => res.json())
-    .catch((err) => capture(err, { extra: { message: "error sending address", address, subject, text } }));
+  });
+  if (!emailSentResponse.ok) {
+    capture(new Error("Email not sent"), { address, subject, text, response: emailSentResponse });
+  }
+  return emailSentResponse;
 };
 
 module.exports = {
