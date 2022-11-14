@@ -1,3 +1,10 @@
+## [1.175.6](https://github.com/SocialGouv/mano/compare/v1.175.5...v1.175.6) (2022-11-14)
+
+
+### Bug Fixes
+
+* emails not sent ([#976](https://github.com/SocialGouv/mano/issues/976)) ([daec3bf](https://github.com/SocialGouv/mano/commit/daec3bf3d49f219443ba8fd678dc7ae464488a45))
+
 ## [1.175.5](https://github.com/SocialGouv/mano/compare/v1.175.4...v1.175.5) (2022-11-08)
 
 
