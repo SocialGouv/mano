@@ -143,7 +143,10 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
       name: organisation.name,
       createdAt: organisation.createdAt,
       updatedAt: organisation.updatedAt,
-      categories: organisation.categories,
+      categories: !!organisation.actionsGroupedCategories
+        ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
+        : organisation.categories,
+      actionsGroupedCategories: organisation.actionsGroupedCategories,
       consultations: organisation.consultations,
       encryptionEnabled: organisation.encryptionEnabled,
       encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
@@ -282,7 +285,6 @@ router.post(
       error.status = 400;
       return next(error);
     }
-
     if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
 
     const user = await User.findOne({ where: { email } });

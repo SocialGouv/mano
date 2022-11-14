@@ -1,3 +1,24 @@
+# [1.176.0](https://github.com/SocialGouv/mano/compare/v1.175.7...v1.176.0) (2022-11-14)
+
+
+### Features
+
+* add actionsGroupedCategories ([#961](https://github.com/SocialGouv/mano/issues/961)) ([b3e9f8e](https://github.com/SocialGouv/mano/commit/b3e9f8e01c6b71d41b7aada2fd2540ba60bd5282)), closes [#968](https://github.com/SocialGouv/mano/issues/968) [#969](https://github.com/SocialGouv/mano/issues/969) [#970](https://github.com/SocialGouv/mano/issues/970) [#974](https://github.com/SocialGouv/mano/issues/974)
+
+## [1.175.7](https://github.com/SocialGouv/mano/compare/v1.175.6...v1.175.7) (2022-11-14)
+
+
+### Bug Fixes
+
+* **api:** sealed secret ([975d1f0](https://github.com/SocialGouv/mano/commit/975d1f08909de12b0a47b237edce7becf1e0eea7))
+
+## [1.175.6](https://github.com/SocialGouv/mano/compare/v1.175.5...v1.175.6) (2022-11-14)
+
+
+### Bug Fixes
+
+* emails not sent ([#976](https://github.com/SocialGouv/mano/issues/976)) ([daec3bf](https://github.com/SocialGouv/mano/commit/daec3bf3d49f219443ba8fd678dc7ae464488a45))
+
 ## [1.175.5](https://github.com/SocialGouv/mano/compare/v1.175.4...v1.175.5) (2022-11-08)
 
 
