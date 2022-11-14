@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
-import { teamsState, userState } from '../recoil/auth';
+import { organisationState, teamsState, userState } from '../recoil/auth';
 import { dateForDatePicker } from '../services/date';
 import useApi from '../services/api';
 
@@ -21,6 +21,7 @@ import ActionsCategorySelect from './tailwind/ActionsCategorySelect';
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
   const setActions = useSetRecoilState(actionsState);
   const setComments = useSetRecoilState(commentsState);
   const API = useApi();
