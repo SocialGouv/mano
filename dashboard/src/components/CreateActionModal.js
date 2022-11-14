@@ -1,6 +1,5 @@
 import React from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
-import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
