@@ -310,7 +310,33 @@ router.put(
 
     await organisation.update(updateOrg);
 
-    return res.status(200).send({ ok: true, data: organisation });
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: organisation._id,
+        name: organisation.name,
+        createdAt: organisation.createdAt,
+        updatedAt: organisation.updatedAt,
+        categories: !!organisation.actionsGroupedCategories
+          ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
+          : organisation.categories,
+        actionsGroupedCategories: organisation.actionsGroupedCategories,
+        encryptionEnabled: organisation.encryptionEnabled,
+        encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
+        receptionEnabled: organisation.receptionEnabled,
+        services: organisation.services,
+        consultations: organisation.consultations,
+        collaborations: organisation.collaborations,
+        customFieldsObs: organisation.customFieldsObs,
+        encryptedVerificationKey: organisation.encryptedVerificationKey,
+        fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions,
+        customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
+        customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
+        customFieldsMedicalFile: organisation.customFieldsMedicalFile,
+        migrations: organisation.migrations,
+        migrationLastUpdateAt: organisation.migrationLastUpdateAt,
+      },
+    });
   })
 );
 
