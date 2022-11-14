@@ -1,3 +1,10 @@
+## [1.176.2](https://github.com/SocialGouv/mano/compare/v1.176.1...v1.176.2) (2022-11-14)
+
+
+### Bug Fixes
+
+* **dashboard:** do not redirect when action is created to action modification ([#973](https://github.com/SocialGouv/mano/issues/973)) ([dac9173](https://github.com/SocialGouv/mano/commit/dac9173d90231e4d94060cbb4ead48b46fd510ad))
+
 ## [1.176.1](https://github.com/SocialGouv/mano/compare/v1.176.0...v1.176.1) (2022-11-14)
 
 
