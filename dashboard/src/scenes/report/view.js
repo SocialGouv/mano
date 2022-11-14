@@ -284,7 +284,10 @@ const View = () => {
   const persons = useMemo(
     () =>
       allPersons
-        .filter((o) => (o.assignedTeams || []).some((teamId) => selectedTeamsObject[teamId]))
+        .filter((p) => {
+          if (viewAllOrganisationData) return true;
+          return (p.assignedTeams || []).some((teamId) => selectedTeamsObject[teamId]);
+        })
         .filter((p) => {
           const currentTeam = selectedTeamsObject[p.team];
           return getIsDayWithinHoursOffsetOfPeriod(
@@ -294,7 +297,7 @@ const View = () => {
           );
         })
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [allPersons, selectedTeamsObject, dateString]
+    [allPersons, selectedTeamsObject, dateString, viewAllOrganisationData]
   );
 
   useTitle(`${dayjs(dateString).format('DD-MM-YYYY')} - Compte rendu`);

@@ -17,6 +17,8 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import useApi from '../../services/api';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { useDataLoader } from '../../components/DataLoader';
+import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
+import dayjs from 'dayjs';
 
 const CreatePerson = ({ refreshable }) => {
   const [open, setOpen] = useState(false);
@@ -28,6 +30,7 @@ const CreatePerson = ({ refreshable }) => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   return (
     <>
@@ -53,7 +56,7 @@ const CreatePerson = ({ refreshable }) => {
               if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
               const existingPerson = persons.find((p) => p.name === body.name);
               if (existingPerson) return toast.error('Une personne existe déjà à ce nom');
-              body.followedSince = new Date();
+              body.followedSince = dayjs();
               body.user = user._id;
               const response = await API.post({
                 path: '/person',
@@ -65,6 +68,7 @@ const CreatePerson = ({ refreshable }) => {
                 setOpen(false);
                 actions.setSubmitting(false);
                 history.push(`/person/${response.decryptedData._id}`);
+                createReportAtDateIfNotExist(dayjs());
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (

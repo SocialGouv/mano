@@ -1,4 +1,4 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import {
@@ -16,9 +16,11 @@ import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
 import { useHistory } from 'react-router-dom';
 import ButtonCustom from '../../components/ButtonCustom';
-import { userState } from '../../recoil/auth';
+import { currentTeamState, userState } from '../../recoil/auth';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
 import { theme } from '../../config';
+import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
+import dayjs from 'dayjs';
 
 function removeDiatricsAndAccents(str) {
   return (str || '')
@@ -59,15 +61,19 @@ const filterEasySearch = (search, items = []) => {
   return [...firstItems, ...secondItems];
 };
 
-const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, classNamePrefix }) => {
+const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) => {
   const [persons, setPersons] = useRecoilState(personsState);
+  const [isDisabled, setIsDisabled] = useState(false);
   const actions = useRecoilValue(actionsState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
   const passages = useRecoilValue(passagesState);
   const rencontres = useRecoilValue(rencontresState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
   const optionsExist = useRef(null);
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const searchablePersons = useRecoilValue(searchablePersonsSelector);
 
@@ -118,6 +124,8 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
     );
   }, [rencontres]);
 
+  console.log({ value });
+
   return (
     <AsyncSelect
       loadOptions={(inputValue) => {
@@ -129,24 +137,27 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
       defaultOptions={personsToOptions(searchablePersons, lastActions, lastPassages, lastRencontres)}
       name="persons"
       isMulti
+      isDisabled={isDisabled}
       isSearchable
       onChange={onChange}
       placeholder={'Entrez un nom, une date de naissance…'}
       onCreateOption={async (name) => {
-        if (!autoCreate) {
-          onChange([...value, { value: `temporary-id-${Date.now()}`, label: `${name} (en cours de création)`, name }]);
-        } else {
-          const existingPerson = persons.find((p) => p.name === name);
-          if (existingPerson) return toast.error('Un utilisateur existe déjà à ce nom');
-          const personResponse = await API.post({
-            path: '/person',
-            body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name }),
-          });
-          if (personResponse.ok) {
-            setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => (p1?.name || '').localeCompare(p2?.name || '')));
-            toast.success('Nouvelle personne ajoutée !');
-            onChange([...value, personResponse.decryptedData]);
-          }
+        const existingPerson = persons.find((p) => p.name === name);
+        if (existingPerson) return toast.error('Un utilisateur existe déjà à ce nom');
+        setIsDisabled(true);
+        const newPerson = { name, assignedTeams: [currentTeam._id], followedSince: dayjs(), user: user._id };
+        const currentValue = value || [];
+        onChange([...currentValue, { ...newPerson, __isNew__: true }]);
+        const personResponse = await API.post({
+          path: '/person',
+          body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(newPerson),
+        });
+        setIsDisabled(false);
+        if (personResponse.ok) {
+          setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => (p1?.name || '').localeCompare(p2?.name || '')));
+          toast.success('Nouvelle personne ajoutée !');
+          onChange([...currentValue, personResponse.decryptedData]);
+          createReportAtDateIfNotExist(dayjs());
         }
       }}
       value={value}
@@ -155,6 +166,7 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
           if (person.__isNew__) return <span>Créer "{person.value}"</span>;
           return <Person person={person} />;
         }
+        if (person.__isNew__) return <span>Création de {person.name}...</span>;
         return <PersonSelected person={person} />;
       }}
       format

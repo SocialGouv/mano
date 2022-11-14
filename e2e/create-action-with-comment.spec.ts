@@ -14,7 +14,7 @@ test("Create action with comments", async ({ page }) => {
   await page.goto("http://localhost:8090/");
   await page.goto("http://localhost:8090/auth");
   await page.getByLabel("Email").click();
-  await page.getByLabel("Email").fill("admin6@example.org");
+  await page.getByLabel("Email").fill("admin7@example.org");
   await page.getByLabel("Mot de passe").fill("secret");
   await page.getByLabel("Mot de passe").press("Enter");
   await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
@@ -24,9 +24,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page
-    .getByRole("button", { name: "Créer une nouvelle personne" })
-    .click();
+  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(person1Name);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -34,9 +32,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
   await page.getByText("Création réussie !").click();
-  await page
-    .getByRole("button", { name: "Créer une nouvelle personne" })
-    .click();
+  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(person2Name);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -48,11 +44,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
   await page.getByLabel("Nom de l'action").click();
   await page.getByLabel("Nom de l'action").fill("action avec commentaire");
-  await changeReactSelectValue(
-    page,
-    "create-action-person-select",
-    person1Name
-  );
+  await changeReactSelectValue(page, "create-action-person-select", person1Name);
   await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("Une seule personne");
   await page.getByLabel("Commentaire (optionnel)").click();
@@ -60,9 +52,7 @@ test("Create action with comments", async ({ page }) => {
     .getByLabel("Commentaire (optionnel)")
     .fill("Une personne avec un commentaire prioritaire");
   await page
-    .getByText(
-      "Commentaire prioritaire Ce commentaire sera mise en avant par rapport aux autres"
-    )
+    .getByText("Commentaire prioritaire Ce commentaire sera mise en avant par rapport aux autres")
     .click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
@@ -82,19 +72,9 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
   await page.getByLabel("Nom de l'action").click();
   await page.getByLabel("Nom de l'action").fill("Action sur deux personnes");
-  await changeReactSelectValue(
-    page,
-    "create-action-person-select",
-    person1Name
-  );
-  await changeReactSelectValue(
-    page,
-    "create-action-person-select",
-    person2Name
-  );
-  await page
-    .getByLabel("Commentaire (optionnel)")
-    .fill("Un commentaire pour tout le monde");
+  await changeReactSelectValue(page, "create-action-person-select", person1Name);
+  await changeReactSelectValue(page, "create-action-person-select", person2Name);
+  await page.getByLabel("Commentaire (optionnel)").fill("Un commentaire pour tout le monde");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
