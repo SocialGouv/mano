@@ -5,7 +5,7 @@ import PlusIcon from '../icons/PlusIcon';
 import { MyText, MyTextInput } from './MyText';
 import Button from './Button';
 
-const Tags = ({ data = [], onAddRequest, renderTag, onChange, editable, listEmptyText = '' }) => {
+const Tags = ({ data = [], onAddRequest, disableAdd, renderTag, onChange, editable, listEmptyText = '', style }) => {
   const addItem = (item) => [...data, item];
   const [text, setText] = useState('');
   const inputRef = useRef(null);
@@ -17,6 +17,7 @@ const Tags = ({ data = [], onAddRequest, renderTag, onChange, editable, listEmpt
 
   const renderAddTag = () => {
     if (!editable) return null;
+    if (disableAdd) return null;
     if (onAddRequest) return <Button caption="Ajouter" onPress={onAddRequest} />;
     return (
       <TagItemAdd>
@@ -39,7 +40,7 @@ const Tags = ({ data = [], onAddRequest, renderTag, onChange, editable, listEmpt
   };
 
   return (
-    <TagWrapper>
+    <TagWrapper style={style}>
       {data.map((tag, i) => (
         <TagItem key={`${tag}${i}`}>
           {renderTag(tag)}

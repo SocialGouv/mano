@@ -22,7 +22,7 @@ import { CustomResponsiveBar, CustomResponsivePie } from '../../components/chart
 import Filters, { filterData } from '../../components/Filters';
 import Card from '../../components/Card';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsState, DONE, mappedIdsToLabels } from '../../recoil/actions';
+import { actionsCategoriesSelector, actionsState, DONE, flattenedCategoriesSelector, mappedIdsToLabels } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
@@ -78,6 +78,8 @@ const Stats = () => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const territories = useRecoilValue(territoriesState);
+  const allCategories = useRecoilValue(flattenedCategoriesSelector);
+  const groupsCategories = useRecoilValue(actionsCategoriesSelector);
   const { isLoading } = useDataLoader({ refreshOnMount: true });
 
   const [selectedTerritories, setSelectedTerritories] = useState([]);
@@ -86,6 +88,7 @@ const Stats = () => {
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
   const [actionsStatuses, setActionsStatuses] = useState(DONE);
+  const [actionsCategories, setActionsCategories] = useState([]);
   const [selectedTeams, setSelectedTeams] = useState([currentTeam]);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
@@ -174,6 +177,32 @@ const Stats = () => {
   const actions = useMemo(
     () => getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData),
     [allActions, filterByTeam, period, selectedTeams, viewAllOrganisationData]
+  );
+
+  const actionsFilteredByStatus = useMemo(
+    () => actions.filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status)),
+    [actions, actionsStatuses]
+  );
+
+  const actionsWithDetailedGroupAndCategories = useMemo(
+    () =>
+      actionsFilteredByStatus
+        .reduce((actionsDetailed, action) => {
+          if (!!action.categories?.length) {
+            for (const category of action.categories) {
+              actionsDetailed.push({
+                ...action,
+                category,
+                group: groupsCategories.find((g) => g.categories.includes(category))?.groupTitle ?? 'Autres',
+              });
+            }
+          } else {
+            actionsDetailed.push(action);
+          }
+          return actionsDetailed;
+        }, [])
+        .filter((a) => !actionsCategories.length || actionsCategories.includes(a.group)),
+    [actionsFilteredByStatus, groupsCategories, actionsCategories]
   );
 
   const numberOfActionsPerPerson = useMemo(() => {
@@ -301,6 +330,11 @@ const Stats = () => {
 
   if (isLoading) return <Loading />;
 
+  console.log(
+    { actionsWithDetailedGroupAndCategories },
+    groupsCategories.map((group) => group.groupTitle)
+  );
+
   return (
     <>
       <HeaderStyled style={{ padding: '16px 0' }}>
@@ -392,7 +426,7 @@ const Stats = () => {
             <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
               Filtrer par statut :
             </label>
-            <div style={{ width: 300 }}>
+            <div style={{ width: 500 }}>
               <SelectCustom
                 inputId="action-select-status-filter"
                 options={mappedIdsToLabels}
@@ -406,24 +440,31 @@ const Stats = () => {
               />
             </div>
           </Col>
+          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+              Filtrer par catégorie:
+            </label>
+            <div style={{ basis: 500, flexGrow: 1 }}>
+              <SelectCustom
+                inputId="action-select-group-category-filter"
+                options={groupsCategories.map((group) => group.groupTitle)}
+                getOptionValue={(s) => s}
+                getOptionLabel={(s) => s}
+                name="status"
+                onChange={setActionsCategories}
+                isClearable
+                isMulti
+                value={actionsCategories}
+              />
+            </div>
+          </Col>
+          <CustomResponsivePie
+            title="Répartition des actions par groupe"
+            data={getPieData(actionsWithDetailedGroupAndCategories, 'group', { options: groupsCategories.map((group) => group.groupTitle) })}
+          />
           <CustomResponsivePie
             title="Répartition des actions par catégorie"
-            data={getPieData(
-              actions
-                .filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status))
-                .reduce((actionsSplitsByCategories, action) => {
-                  if (!!action.categories?.length) {
-                    for (const category of action.categories) {
-                      actionsSplitsByCategories.push({ ...action, category });
-                    }
-                  } else {
-                    actionsSplitsByCategories.push(action);
-                  }
-                  return actionsSplitsByCategories;
-                }, []),
-              'category',
-              { options: organisation.categories }
-            )}
+            data={getPieData(actionsWithDetailedGroupAndCategories, 'category', { options: allCategories })}
           />
         </TabPane>
         <TabPane tabId={3}>

@@ -2,13 +2,11 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
 import { useRecoilState, useRecoilValue } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import EncryptionKey from '../../components/EncryptionKey';
 import SelectCustom from '../../components/SelectCustom';
-import { actionsCategories, actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -22,7 +20,6 @@ import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api'
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
-import { theme } from '../../config';
 import SortableGrid from '../../components/SortableGrid';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import useTitle from '../../services/useTitle';
@@ -31,6 +28,7 @@ import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirm
 import { capture } from '../../services/sentry';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { useDataLoader } from '../../components/DataLoader';
+import ActionCategoriesSettings from './ActionCategoriesSettings';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -49,7 +47,6 @@ const getSettingTitle = (tabId) => {
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const user = useRecoilValue(userState);
-  const actions = useRecoilValue(actionsState);
   const reports = useRecoilValue(reportsState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
@@ -83,48 +80,71 @@ const View = () => {
   }, [tab]);
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', margin: '-1rem -3rem -3rem', height: 'calc(100% + 4rem)' }}>
-      <Title>Configuration de l'organisation {organisation.name}</Title>
-      <div style={{ display: 'flex', overflow: 'hidden', flex: 1 }}>
-        <Drawer title="Navigation dans la configuration de l'organisation">
-          <DrawerButton className={tab === 'infos' ? 'active' : ''} onClick={() => setTab('infos')}>
+    <div className="tw--m-12 tw--mt-4 tw-flex tw-h-[calc(100%+4rem)] tw-flex-col">
+      <h2 className="tw-m-0 tw-border-b tw-border-b-gray-300 tw-bg-main tw-bg-opacity-10 tw-p-4 tw-text-2xl">
+        Configuration de l'organisation {organisation.name}
+      </h2>
+      <div className="tw-flex tw-flex-1 tw-overflow-hidden">
+        <nav
+          className="tw-flex tw-h-full tw-w-52 tw-shrink-0 tw-flex-col tw-items-start tw-bg-main  tw-bg-opacity-10 tw-pt-5 tw-pl-2.5"
+          title="Navigation dans la configuration de l'organisation">
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'infos' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('infos')}>
             Infos
-          </DrawerButton>
-          <DrawerButton className={tab === 'encryption' ? 'active' : ''} onClick={() => setTab('encryption')}>
+          </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'encryption' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('encryption')}>
             Chiffrement
-          </DrawerButton>
+          </button>
           <hr />
-          <DrawerButton className={tab === 'reception' ? 'active' : ''} onClick={() => setTab('reception')}>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'reception' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('reception')}>
             Accueil de jour
-          </DrawerButton>
-          <DrawerButton className={tab === 'persons' ? 'active' : ''} onClick={() => setTab('persons')} disabled={!organisation.encryptionEnabled}>
+          </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'persons' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('persons')}
+            disabled={!organisation.encryptionEnabled}>
             Personnes suivies
-          </DrawerButton>
-          <DrawerButton className={tab === 'medicalFile' ? 'active' : ''} onClick={() => setTab('medicalFile')}>
+          </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'medicalFile' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('medicalFile')}>
             Dossier Médical 🧑‍⚕️
-          </DrawerButton>
-          <DrawerButton className={tab === 'consultations' ? 'active' : ''} onClick={() => setTab('consultations')}>
+          </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'consultations' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('consultations')}>
             Consultations 🧑‍⚕️
-          </DrawerButton>
+          </button>
 
-          <DrawerButton className={tab === 'actions' ? 'active' : ''} onClick={() => setTab('actions')}>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'actions' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('actions')}>
             Actions
-          </DrawerButton>
-          <DrawerButton
-            className={tab === 'territories' ? 'active' : ''}
+          </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'territories' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
             onClick={() => setTab('territories')}
             disabled={!organisation.encryptionEnabled}>
             Territoires
-          </DrawerButton>
+          </button>
           <hr />
-          <DrawerButton className={tab === 'export' ? 'active' : ''} onClick={() => setTab('export')}>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'export' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('export')}>
             Export
-          </DrawerButton>
-          <DrawerButton className={tab === 'import' ? 'active' : ''} onClick={() => setTab('import')}>
+          </button>
+          <button
+            className={['tw-my-0.5 tw-p-0 tw-text-sm tw-font-semibold', tab === 'import' ? 'tw-text-main' : 'tw-text-zinc-600'].join(' ')}
+            onClick={() => setTab('import')}>
             Import
-          </DrawerButton>
-        </Drawer>
-        <div ref={scrollContainer} style={{ overflow: 'auto', flexBasis: '100%', padding: '15px 25px 20px' }}>
+          </button>
+        </nav>
+        <div ref={scrollContainer} className="tw-basis-full tw-overflow-auto tw-py-4 tw-px-6">
           <Formik
             initialValues={{ ...organisation, receptionEnabled: organisation.receptionEnabled || false }}
             enableReinitialize
@@ -146,7 +166,7 @@ const View = () => {
                 case 'infos':
                   return (
                     <>
-                      <SubTitle>Informations générales</SubTitle>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations générales</h3>
                       <Row>
                         <Col md={6}>
                           <FormGroup>
@@ -155,7 +175,7 @@ const View = () => {
                           </FormGroup>
                         </Col>
                       </Row>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <DeleteButtonAndConfirmModal
                           title={`Voulez-vous vraiment supprimer l'organisation ${organisation.name}`}
                           textToConfirm={organisation.name}
@@ -171,7 +191,7 @@ const View = () => {
                               toast.error(organisationDeleteError.message);
                             }
                           }}>
-                          <span style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
+                          <span className="tw-mb-7 tw-block tw-w-full tw-text-center">
                             Cette opération est irréversible
                             <br />
                             et entrainera la suppression définitive de toutes les données liées à l'organisation&nbsp;:
@@ -186,8 +206,8 @@ const View = () => {
                 case 'encryption':
                   return (
                     <>
-                      <SubTitle>Chiffrement</SubTitle>
-                      <div style={{ display: 'flex', justifyContent: 'space-around', marginBottom: 40 }}>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Chiffrement</h3>
+                      <div className="tw-mb-10 tw-flex tw-justify-around">
                         <EncryptionKey isMain />
                       </div>
                     </>
@@ -197,7 +217,7 @@ const View = () => {
                 case 'medicalFile':
                   return (
                     <>
-                      <SubTitle>Dossier Médical</SubTitle>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Dossier Médical</h3>
                       {organisation.encryptionEnabled ? (
                         <>
                           <p>
@@ -219,7 +239,7 @@ const View = () => {
                               </p>
                             </Col>
                           </Row>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                          <div className="tw-mb-10 tw-flex tw-justify-end">
                             <EncryptionKey />
                           </div>
                         </>
@@ -227,100 +247,16 @@ const View = () => {
                     </>
                   );
                 case 'actions':
-                  return (
-                    <>
-                      <SubTitle>Actions</SubTitle>
-                      <Row>
-                        <Col md={12}>
-                          <FormGroup>
-                            <Label htmlFor="categories">Categories des actions</Label>
-                            <SortableGrid
-                              list={values.categories || []}
-                              editItemTitle="Changer le nom de la catégorie d'action"
-                              onUpdateList={(cats) => handleChange({ target: { value: cats, name: 'categories' } })}
-                              onRemoveItem={(content) =>
-                                handleChange({ target: { value: (values.categories || []).filter((cat) => cat !== content), name: 'categories' } })
-                              }
-                              onEditItem={async ({ content, newContent }) => {
-                                if (!newContent) {
-                                  toast.error('Vous devez saisir un nom pour la catégorie');
-                                  return;
-                                }
-                                const encryptedActions = await Promise.all(
-                                  actions
-                                    .filter((a) => a.categories.includes(content))
-                                    .map((action) => ({
-                                      ...action,
-                                      categories: [...new Set(action.categories.map((cat) => (cat === content ? newContent : cat)))],
-                                    }))
-                                    .map(prepareActionForEncryption)
-                                    .map(encryptItem(hashedOrgEncryptionKey))
-                                );
-                                const newCategories = [...new Set((values.categories || []).map((cat) => (cat === content ? newContent : cat)))];
-                                const response = await API.put({
-                                  path: `/category`,
-                                  body: {
-                                    categories: newCategories,
-                                    actions: encryptedActions,
-                                  },
-                                });
-                                if (response.ok) {
-                                  refresh();
-                                  handleChange({ target: { value: newCategories, name: 'categories' } });
-                                  setOrganisation({ ...organisation, categories: newCategories });
-                                  toast.success(
-                                    "Catégorie mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-                                  );
-                                } else {
-                                  toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
-                                }
-                              }}
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <Label htmlFor="organisation-select-categories">Ajouter une catégorie</Label>
-                            <SelectCustom
-                              key={JSON.stringify(values.categories || [])}
-                              creatable
-                              options={[...(actionsCategories || [])]
-                                .filter((cat) => !(values.categories || []).includes(cat))
-                                .sort((c1, c2) => c1.localeCompare(c2))
-                                .map((cat) => ({ value: cat, label: cat }))}
-                              value={null}
-                              onChange={(cat) => {
-                                if (cat && cat.value) {
-                                  handleChange({ target: { value: [...(values.categories || []), cat.value], name: 'categories' } });
-                                }
-                              }}
-                              onCreateOption={async (name) => {
-                                handleChange({ target: { value: [...(values.categories || []), name], name: 'categories' } });
-                              }}
-                              isClearable
-                              inputId="organisation-select-categories"
-                              classNamePrefix="organisation-select-categories"
-                            />
-                          </FormGroup>
-                        </Col>
-                      </Row>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
-                        <ButtonCustom
-                          title={'Mettre à jour'}
-                          disabled={JSON.stringify(organisation.categories) === JSON.stringify(values.categories || [])}
-                          loading={isSubmitting}
-                          onClick={handleSubmit}
-                        />
-                      </div>
-                    </>
-                  );
+                  return <ActionCategoriesSettings />;
                 case 'reception':
                   return (
                     <>
-                      <SubTitle>Accueil de jour</SubTitle>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Accueil de jour</h3>
                       <Row>
                         <Col md={12}>
                           <FormGroup>
                             <Label />
-                            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
+                            <div className="tw-ml-5 tw-flex tw-w-4/5 tw-flex-col">
                               <label htmlFor="receptionEnabled">Accueil de jour activé</label>
                               <Input
                                 type="checkbox"
@@ -420,7 +356,7 @@ const View = () => {
                           </FormGroup>
                         </Col>
                       </Row>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem', marginBottom: 40 }}>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <ButtonCustom
                           title={'Mettre à jour'}
                           disabled={
@@ -436,7 +372,7 @@ const View = () => {
                 case 'territories':
                   return (
                     <>
-                      <SubTitle>Territoires</SubTitle>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Territoires</h3>
                       {organisation.encryptionEnabled ? (
                         <>
                           <Label>Champs personnalisés</Label>
@@ -459,7 +395,7 @@ const View = () => {
                               </p>
                             </Col>
                           </Row>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                          <div className="tw-mb-10 tw-flex tw-justify-end">
                             <EncryptionKey />
                           </div>
                         </>
@@ -469,7 +405,7 @@ const View = () => {
                 case 'persons':
                   return (
                     <>
-                      <SubTitle>Personnes suivies</SubTitle>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Personnes suivies</h3>
                       {organisation.encryptionEnabled ? (
                         <>
                           <Label>Champs permanents - options modulables</Label>
@@ -502,7 +438,7 @@ const View = () => {
                               </p>
                             </Col>
                           </Row>
-                          <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                          <div className="tw-mb-10 tw-flex tw-justify-end">
                             <EncryptionKey />
                           </div>
                         </>
@@ -512,13 +448,13 @@ const View = () => {
                 case 'export':
                   return (
                     <>
-                      <SubTitle>Exporter des données</SubTitle>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Exporter des données</h3>
                       <Row>
                         <Col md={10}>
                           <p>Vous pouvez exporter l'ensemble de vos données dans un fichier Excel.</p>
                         </Col>
                       </Row>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                      <div className="tw-mb-10 tw-flex tw-justify-end">
                         <ExportData />
                       </div>
                     </>
@@ -526,7 +462,7 @@ const View = () => {
                 case 'import':
                   return (
                     <>
-                      <SubTitle>Importer des personnes suivies</SubTitle>
+                      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Importer des personnes suivies</h3>
                       <Row>
                         <Col md={10}>
                           <p>
@@ -567,7 +503,7 @@ const View = () => {
                           </ul>
                         </Col>
                       </Row>
-                      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40, gap: '1rem' }}>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
                         <DownloadExample />
                         <ImportData />
                       </div>
@@ -596,13 +532,13 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
 
   return (
     <>
-      <SubTitle>Consultations</SubTitle>
+      <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Consultations</h3>
       <p>
         Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
       </p>
       <hr />
 
-      <SubTitleLevel2>Configuration du type de consultation</SubTitleLevel2>
+      <h4 className="tw-my-8">Configuration du type de consultation</h4>
 
       <FormGroup>
         <Label htmlFor="consultations">Types de consultations</Label>
@@ -677,7 +613,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
           isClearable
         />
       </FormGroup>
-      <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '2rem', marginTop: '1rem', gap: '1rem' }}>
+      <div className="tw-mb-8 tw-mt-4 tw-flex tw-justify-end tw-gap-4">
         <ButtonCustom
           title="Mettre à jour"
           loading={isSubmitting}
@@ -689,11 +625,11 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
         />
       </div>
       <hr />
-      <SubTitleLevel2>Champs personnalisés des consultations</SubTitleLevel2>
+      <h4 className="tw-my-8">Champs personnalisés des consultations</h4>
       {organisation.consultations.map((consultation) => {
         return (
           <div key={consultation.name}>
-            <h5 style={{ marginTop: '2rem' }}>{consultation.name}</h5>
+            <h5 className="tw-mt-8">{consultation.name}</h5>
 
             <small>
               Vous pouvez personnaliser les champs disponibles pour les consultations de type <strong>{consultation.name}</strong>.
@@ -741,68 +677,5 @@ const ImportFieldDetails = ({ field }) => {
   }
   return <i style={{ color: '#666' }}>Un texte</i>;
 };
-
-const Title = styled.h2`
-  color: ${theme.black};
-  font-size: 1.5rem;
-  line-height: 2rem;
-  /* border-bottom: 1px solid rgba(0, 0, 0, 0.1); */
-  padding: 1rem;
-  margin: 0;
-  background-color: ${theme.main}22;
-`;
-
-const SubTitle = styled.h3`
-  font-size: 1.25rem;
-  font-weight: 800;
-  display: flex;
-  justify-content: space-between;
-  margin: 40px 0;
-  span {
-    margin-bottom: 20px;
-    font-size: 16px;
-    font-weight: 400;
-    font-style: italic;
-    display: block;
-  }
-`;
-
-const SubTitleLevel2 = styled.h4`
-  margin: 2rem 0;
-`;
-
-const Drawer = styled.nav`
-  padding-top: 20px;
-  padding-left: 10px;
-  width: 200px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  flex-shrink: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.1);
-  height: 100%;
-  background-color: ${theme.main}22;
-  button {
-    text-align: left;
-  }
-`;
-
-const DrawerButton = styled.button`
-  text-decoration: none;
-  padding: 0px;
-  display: block;
-  border-radius: 8px;
-  color: #565a5b;
-  font-style: normal;
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 24px;
-  margin: 2px 0;
-  border: none;
-  background: none;
-  &.active {
-    color: ${theme.main};
-  }
-`;
 
 export default View;

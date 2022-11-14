@@ -16,7 +16,6 @@ import Comments from '../../components/Comments';
 import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
-import SelectCustom from '../../components/SelectCustom';
 import SelectTeam from '../../components/SelectTeam';
 
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
@@ -29,6 +28,7 @@ import useTitle from '../../services/useTitle';
 import { useDataLoader } from '../../components/DataLoader';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import { itemsGroupedByActionSelector } from '../../recoil/selectors';
+import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 
 const actionByIdSelector = selectorFamily({
   key: 'actionByIdSelector',
@@ -75,8 +75,6 @@ const View = () => {
       history.goBack();
     }
   };
-
-  const catsSelect = [...(organisation.categories || [])];
 
   const onDuplicate = async () => {
     const { name, person, dueAt, withTime, description, categories, urgent } = action;
@@ -260,17 +258,11 @@ const View = () => {
                 </Col>
                 <Col md={6}>
                   <FormGroup>
-                    <Label htmlFor="categories">Catégories</Label>
-                    <SelectCustom
-                      options={catsSelect}
-                      inputId="categories"
-                      name="categories"
+                    <ActionsCategorySelect
+                      values={values.categories}
+                      id="categories"
+                      label="Catégories"
                       onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
-                      isClearable={false}
-                      isMulti
-                      value={values.categories || []}
-                      getOptionValue={(i) => i}
-                      getOptionLabel={(i) => i}
                     />
                   </FormGroup>
                 </Col>

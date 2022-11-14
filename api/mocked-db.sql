@@ -72,6 +72,7 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL,
     categories text[],
+    "actionsGroupedCategories" jsonb,
     consultations jsonb DEFAULT '[{"name": "Médicale", "fields": [{"name": "description", "type": "textarea", "label": "Description", "enabled": true, "showInStats": false}]}]'::jsonb,
     "encryptionEnabled" boolean DEFAULT false,
     "encryptionLastUpdateAt" timestamp with time zone,
@@ -186,6 +187,7 @@ CREATE TABLE IF NOT EXISTS mano."Structure" (
     phone text,
     organisation uuid,
     categories text[],
+    "actionsGroupedCategories" jsonb,
     "createdAt" timestamp with time zone NOT NULL,
     "updatedAt" timestamp with time zone NOT NULL
 );

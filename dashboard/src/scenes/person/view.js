@@ -61,6 +61,7 @@ import MergeTwoPersons from './MergeTwoPersons';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import Rencontre from '../../components/Rencontre';
 import { itemsGroupedByPersonSelector, personsObjectSelector } from '../../recoil/selectors';
+import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Rencontres', 'Lieux', 'Documents', 'Historique'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages', 'Rencontres'];
@@ -705,14 +706,11 @@ const Actions = ({ onUpdateResults }) => {
   const person = useRecoilValue(populatedPersonSelector({ personId }));
   const data = person?.actions || [];
   const history = useHistory();
-  const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
-
-  const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
 
   const filteredData = useRecoilValue(filteredPersonActionsSelector({ personId, filterCategories, filterStatus }));
 
@@ -739,19 +737,7 @@ const Actions = ({ onUpdateResults }) => {
       {data.length ? (
         <Row>
           <Col md={6}>
-            <Label htmlFor="action-select-categories-filter">Filtrer par catégorie</Label>
-            <SelectCustom
-              options={catsSelect}
-              inputId="action-select-categories-filter"
-              name="categories"
-              onChange={(c) => {
-                setFilterCategories(c);
-              }}
-              isClearable
-              isMulti
-              getOptionValue={(c) => c}
-              getOptionLabel={(c) => c}
-            />
+            <ActionsCategorySelect onChange={(c) => setFilterCategories(c)} id="action-select-categories-filter" label="Filtrer par catégorie" />
           </Col>
           <Col md={6}>
             <Label htmlFor="action-select-status-filter">Filtrer par statut</Label>

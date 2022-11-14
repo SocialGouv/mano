@@ -1,10 +1,28 @@
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
 import { storage } from '../services/dataManagement';
+import { organisationState } from './auth';
 
 export const actionsState = atom({
   key: 'actionsState',
   default: [],
   effects: [({ onSet }) => onSet(async (newValue) => storage.set('action', JSON.stringify(newValue)))],
+});
+
+export const actionsCategoriesSelector = selector({
+  key: 'actionsCategoriesSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (organisation.actionsGroupedCategories) return organisation.actionsGroupedCategories;
+    return [{ groupTitle: 'Toutes mes catégories', categories: organisation.categories ?? [] }];
+  },
+});
+
+export const flattenedCategoriesSelector = selector({
+  key: 'flattenedCategoriesSelector',
+  get: ({ get }) => {
+    const actionsGroupedCategories = get(actionsCategoriesSelector);
+    return actionsGroupedCategories.reduce((allCategories, { categories }) => [...allCategories, ...categories], []);
+  },
 });
 
 const encryptedFields = ['category', 'categories', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];
