@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
+import { populate } from "./scripts/populate-db";
 import { changeReactSelectValue, clickOnEmptyReactSelect } from "./utils";
+
+test.beforeAll(async () => {
+  await populate();
+});
 
 test("test", async ({ page }) => {
   // Always use a new items

@@ -1,4 +1,9 @@
 import { test, expect } from "@playwright/test";
+import { populate } from "./scripts/populate-db";
+
+test.beforeAll(async () => {
+  await populate();
+});
 
 test("Try to login and fail", async ({ page }) => {
   await page.goto("http://localhost:8090/");
