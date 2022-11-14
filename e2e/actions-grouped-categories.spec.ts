@@ -228,8 +228,8 @@ test("Actions", async ({ page }) => {
       .click();
   });
 
-  /*  FIXME: tests are run in 3 browser in a row, with the same DB.
-   thos tests work on the first browser but not on the second one
+  /*  FIXME: tests are run in 3 browser one after the other, with the same DB.
+   those tests work on the first browser but not on the second one
   await test.step("Drag and drop category works", async () => {
     await expect(page.getByText(`${group2Name} (2)`)).toBeVisible();
     await expect(page.getByText(`${group1Name} (2)`)).toBeVisible();
