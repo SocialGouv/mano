@@ -1,6 +1,7 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { selector, useRecoilValue } from 'recoil';
 import { actionsCategoriesSelector, actionsState } from '../../recoil/actions';
+import SortableJS from 'sortablejs';
 import ModalContainer from './ModalContainer';
 
 const categoriesSortedByMostUsedSelector = selector({
@@ -23,6 +24,7 @@ const categoriesSortedByMostUsedSelector = selector({
 
 const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) => {
   const [open, setOpen] = useState(false);
+  const [modalIsOpened, setModalIsOpened] = useState(false);
   const allGroups = useRecoilValue(actionsCategoriesSelector);
   const categoriesSortedByMostUsed = useRecoilValue(categoriesSortedByMostUsedSelector);
   const [selected, setSelected] = useState(() => values || []);
@@ -52,6 +54,35 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selected]);
 
+  const categories1Ref = useRef(null);
+  const categories2Ref = useRef(null);
+  const sortable1Ref = useRef(null);
+  const sortable2Ref = useRef(null);
+  const onDragAndDrop = (ref, from) => () => {
+    if (!ref.current) return;
+    const categoriesElement = ref.current.querySelectorAll('[data-category]');
+    setSelected([...categoriesElement].map((el) => el.dataset.category));
+  };
+  useEffect(() => {
+    sortable1Ref.current = SortableJS.create(categories1Ref.current, {
+      animation: 150,
+      group: 'categories-in-view',
+      filter: '.not-draggable', // 'not-draggable' class is not draggable
+      onEnd: onDragAndDrop(categories1Ref, '1'),
+    });
+  }, []);
+  useEffect(() => {
+    if (modalIsOpened) {
+      sortable2Ref.current = SortableJS.create(categories2Ref.current, {
+        animation: 150,
+        group: 'categories-in-modal',
+        onEnd: onDragAndDrop(categories2Ref, '2'),
+      });
+    } else {
+      sortable2Ref.current?.destroy();
+    }
+  }, [modalIsOpened]);
+
   return (
     <>
       {!!label && (
@@ -62,9 +93,13 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
       <div
         id={id}
         className="tw-flex tw-max-h-16 tw-flex-wrap tw-items-center tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300 tw-px-2.5 tw-py-1"
-        onClick={() => setOpen(true)}>
+        onClick={() => setOpen(true)}
+        ref={categories1Ref}>
         {selected.map((category) => (
-          <div key={category} className="selected-action-category tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
+          <div
+            key={category}
+            data-category={category}
+            className="selected-action-category tw-cursor-pointer tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
             {category}
             <button
               className="selected-action-category-close-button tw-ml-2 tw-font-bold"
@@ -76,11 +111,11 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
             </button>
           </div>
         ))}
-        {!selected.length && <div className="tw-py-0.5 tw-opacity-60">-- Choisir --</div>}
+        {!selected.length && <div className="not-draggable tw-py-0.5 tw-opacity-60">-- Choisir --</div>}
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="add-action-category-button tw-relative tw-ml-auto tw-h-6 tw-w-6 tw-rounded-full tw-border tw-border-main">
+          className="not-draggable add-action-category-button tw-relative tw-ml-auto tw-h-6 tw-w-6 tw-rounded-full tw-border tw-border-main">
           <div className="tw-absolute tw-inset-0 tw-m-auto tw-h-3/6 tw-w-0.5 tw-bg-main" />
           <div className="tw-absolute tw-inset-0 tw-m-auto tw-h-3/6 tw-w-0.5 tw-rotate-90 tw-bg-main" />
         </button>
@@ -98,6 +133,8 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
       <ModalContainer
         open={open}
         setOpen={setOpen}
+        onAfterEnter={() => setModalIsOpened(true)}
+        onBeforeLeave={() => setModalIsOpened(false)}
         title="Sélectionner des catégories"
         Footer={() => (
           <button
@@ -107,10 +144,15 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
             Fermer
           </button>
         )}>
-        <div className="tw-mx-4 tw-flex tw-max-h-16 tw-flex-wrap tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300  tw-px-2.5 tw-py-1">
+        <div
+          className="tw-mx-4 tw-flex tw-max-h-16 tw-flex-wrap tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300  tw-px-2.5 tw-py-1"
+          ref={categories2Ref}>
           {selected.map((category) => (
-            <div key={category} className="selected-action-category-modal tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
-              {category}{' '}
+            <div
+              key={category}
+              data-category={category}
+              className="selected-action-category-modal tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
+              {category}
               <button
                 className="selected-action-category-close-button-modal tw-ml-1 tw-font-bold"
                 onClick={() => setSelected((s) => s.filter((_cat) => _cat !== category))}>
@@ -122,7 +164,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             type="search"
-            className="form-text !tw-mt-0 tw-border-none tw-p-0 tw-px-2  tw-py-1 tw-text-sm placeholder:tw-italic"
+            className="not-draggable form-text !tw-mt-0 tw-border-none tw-p-0 tw-px-2  tw-py-1 tw-text-sm placeholder:tw-italic"
             placeholder="Recherchez..."
           />
         </div>
