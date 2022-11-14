@@ -1,3 +1,10 @@
+## [1.175.7](https://github.com/SocialGouv/mano/compare/v1.175.6...v1.175.7) (2022-11-14)
+
+
+### Bug Fixes
+
+* **api:** sealed secret ([975d1f0](https://github.com/SocialGouv/mano/commit/975d1f08909de12b0a47b237edce7becf1e0eea7))
+
 ## [1.175.6](https://github.com/SocialGouv/mano/compare/v1.175.5...v1.175.6) (2022-11-14)
 
 
