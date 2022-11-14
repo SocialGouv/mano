@@ -4,7 +4,7 @@ import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { organisationState, teamsState, userState } from '../recoil/auth';
@@ -25,7 +25,6 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
   const organisation = useRecoilValue(organisationState);
   const setActions = useSetRecoilState(actionsState);
   const setComments = useSetRecoilState(commentsState);
-  const history = useHistory();
   const API = useApi();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
