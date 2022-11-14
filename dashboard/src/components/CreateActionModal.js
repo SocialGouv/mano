@@ -1,13 +1,12 @@
 import React from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
-import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
-import { teamsState, userState } from '../recoil/auth';
+import { organisationState, teamsState, userState } from '../recoil/auth';
 import { dateForDatePicker } from '../services/date';
 import useApi from '../services/api';
 
@@ -16,13 +15,15 @@ import SelectPerson from './SelectPerson';
 import ButtonCustom from './ButtonCustom';
 import SelectStatus from './SelectStatus';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
+import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import ActionsCategorySelect from './tailwind/ActionsCategorySelect';
 
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
   const setActions = useSetRecoilState(actionsState);
-  const history = useHistory();
+  const setComments = useSetRecoilState(commentsState);
   const API = useApi();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
@@ -51,6 +52,8 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
             categories: [],
             description: '',
             urgent: false,
+            comment: '',
+            commentUrgent: false,
           }}
           onSubmit={async (values, actions) => {
             if (!values.name) return toast.error('Le nom est obligatoire');
@@ -69,33 +72,57 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
               urgent: values.urgent,
               user: user._id,
             };
+            let actionsId = [];
+            // What is this strange case?
             if (typeof values.person === 'string') {
               body.person = values.person;
               const res = await onAddAction(body);
               actions.setSubmitting(false);
               if (res.ok) {
                 toast.success('Création réussie !');
-                history.push(`/action/${res.data._id}`);
                 setOpen(false);
+                actionsId.push(res.decryptedData._id);
               }
-              return;
-            }
-            if (values.person.length === 1) {
+            } else if (values.person.length === 1) {
               body.person = values.person[0];
               const res = await onAddAction(body);
               actions.setSubmitting(false);
               if (res.ok) {
                 toast.success('Création réussie !');
-                history.push(`/action/${res.data._id}`);
+                setOpen(false);
+                actionsId.push(res.decryptedData._id);
               }
             } else {
               for (const person of values.person) {
                 const res = await onAddAction({ ...body, person });
                 if (!res.ok) break;
+                actionsId.push(res.decryptedData._id);
               }
               actions.setSubmitting(false);
               toast.success('Création réussie !');
               setOpen(false);
+            }
+            // Then, save the comment if present.
+            if (values.comment.trim()) {
+              const commentBody = {
+                comment: values.comment,
+                urgent: values.commentUrgent,
+                user: user._id,
+                date: new Date(),
+                team: values.team,
+                organisation: organisation._id,
+              };
+              // There can be multiple actions, so we need to save the comment for each action.
+              const commentsToAdd = [];
+              for (const actionId of actionsId) {
+                const response = await API.post({
+                  path: '/comment',
+                  body: prepareCommentForEncryption({ ...commentBody, action: actionId }),
+                });
+                if (response.ok) commentsToAdd.push(response.decryptedData);
+                else toast.error('Erreur lors de la création du commentaire');
+              }
+              setComments((comments) => [...commentsToAdd, ...comments]);
             }
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -169,13 +196,11 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                     />
                   </FormGroup>
                 </Col>
-                <Col lg={12} md={6}>
+                <Col lg={6} md={6}>
                   <FormGroup>
                     <Label htmlFor="create-action-description">Description</Label>
                     <Input id="create-action-description" type="textarea" name="description" value={values.description} onChange={handleChange} />
                   </FormGroup>
-                </Col>
-                <Col md={12}>
                   <FormGroup>
                     <Label htmlFor="create-action-urgent">
                       <input
@@ -188,6 +213,26 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                       />
                       Action prioritaire <br />
                       <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
+                    </Label>
+                  </FormGroup>
+                </Col>
+                <Col lg={6} md={6}>
+                  <FormGroup>
+                    <Label htmlFor="create-comment-description">Commentaire (optionnel)</Label>
+                    <Input id="create-comment-description" type="textarea" name="comment" value={values.comment} onChange={handleChange} />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="create-comment-urgent">
+                      <input
+                        type="checkbox"
+                        id="create-comment-urgent"
+                        style={{ marginRight: '0.5rem' }}
+                        name="commentUrgent"
+                        checked={values.commentUrgent}
+                        onChange={handleChange}
+                      />
+                      Commentaire prioritaire <br />
+                      <small className="text-muted">Ce commentaire sera mise en avant par rapport aux autres</small>
                     </Label>
                   </FormGroup>
                 </Col>

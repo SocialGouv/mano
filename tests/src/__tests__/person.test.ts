@@ -79,11 +79,14 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(2000);
     await expect(page).toMatch("Création réussie !");
     await expect(page).toClick("button.Toastify__close-button");
+    await expect(page).toClick("td", { text: "Mon action" });
     await expect(page).toMatch("Mon action");
     await expect(page).toMatch("À FAIRE");
     await expect(page).toMatch("(créée par Encrypted Orga Admin)");
     await expect(page).toMatch("Une petite description pour la route");
+    await page.waitForTimeout(2000);
     await expect(page).toClick("a", { text: "Retour" });
+    await page.waitForTimeout(2000);
     await expect(page).toMatch("Dossier de Ma première personne");
     await expect(page).toClick("a", { text: "Commentaires (0)" });
     await expect(page).toClick("a", { text: "Actions (1)" });
