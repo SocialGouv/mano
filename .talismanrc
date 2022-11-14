@@ -1,6 +1,8 @@
 fileignoreconfig:
 - filename: .github/workflows/release.yml
   checksum: 9de8b8b08e706e957ee60cf9b4eb5524c4120a32d6b9d97e3ee930ca24ebb378
+- filename: .kube-workflow/prod/templates/api.sealed-secret.yaml
+  checksum: b970e343d3f2b5d1dfdf3a17c008b9c439668cb2c66789b8904a83debe777af1
 - filename: CHANGELOG.md
   checksum: 56a538010c6c74166b1f41a6269494a4a7a4364e5e4f9e913ff6fc8e7cda038f
 - filename: app/ios/Podfile.lock

@@ -282,7 +282,6 @@ router.post(
       error.status = 400;
       return next(error);
     }
-
     if (!email) return res.status(403).send({ ok: false, error: "Veuillez fournir un email", code: EMAIL_OR_PASSWORD_INVALID });
 
     const user = await User.findOne({ where: { email } });
