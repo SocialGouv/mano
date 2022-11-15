@@ -269,7 +269,6 @@ const Reception = () => {
           <SelectAndCreatePerson
             value={selectedPersons}
             onChange={onSelectPerson}
-            autoCreate
             inputId="person-select-and-create-reception"
             classNamePrefix="person-select-and-create-reception"
           />
