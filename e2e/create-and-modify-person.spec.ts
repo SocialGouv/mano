@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
+import { populate } from "./scripts/populate-db";
 import { clickOnEmptyReactSelect } from "./utils";
+
+test.beforeAll(async () => {
+  await populate();
+});
 
 // This test uses admin1@example.org
 // It creates a random person and then modifies it.

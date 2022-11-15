@@ -1,6 +1,11 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
+import { populate } from "./scripts/populate-db";
 import { changeReactSelectValue } from "./utils";
+
+test.beforeAll(async () => {
+  await populate();
+});
 
 test("Create action with comments", async ({ page }) => {
   const person1Name = nanoid();
