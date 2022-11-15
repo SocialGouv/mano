@@ -1,3 +1,10 @@
+## [1.176.3](https://github.com/SocialGouv/mano/compare/v1.176.2...v1.176.3) (2022-11-15)
+
+
+### Bug Fixes
+
+* can press on item inside react-select on tablet ([6285fb2](https://github.com/SocialGouv/mano/commit/6285fb2c26ecbf97ce4bbc6daf9027f5751f7afe))
+
 ## [1.176.2](https://github.com/SocialGouv/mano/compare/v1.176.1...v1.176.2) (2022-11-14)
 
 
