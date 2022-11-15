@@ -215,7 +215,6 @@ class ApiService {
           message: 'ERROR DECRYPTING ITEM',
           item,
           path,
-          hashedOrgEncryptionKey: this.hashedOrgEncryptionKey,
         },
       });
       if (this.handleError) {

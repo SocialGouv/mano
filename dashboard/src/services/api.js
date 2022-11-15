@@ -85,7 +85,6 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
         message: 'ERROR DECRYPTING ITEM',
         item,
         path,
-        hashedOrgEncryptionKey, // temporary to detect the decryption unsolved and critical bug
       },
     });
     if (!!encryptedVerificationKey) {
