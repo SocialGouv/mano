@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { Alert, Keyboard, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilState, useRecoilValue } from 'recoil';
+import dayjs from 'dayjs';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
@@ -15,12 +16,13 @@ import {
 } from '../../recoil/persons';
 import API from '../../services/api';
 import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
-import { currentTeamState, teamsState } from '../../recoil/auth';
+import { currentTeamState, teamsState, userState } from '../../recoil/auth';
 import { sortByName } from '../../utils/sortByName';
 
 const NewPersonForm = ({ navigation, route }) => {
   const [persons, setPersons] = useRecoilState(personsState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const user = useRecoilValue(userState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const teams = useRecoilValue(teamsState);
@@ -69,7 +71,10 @@ const NewPersonForm = ({ navigation, route }) => {
     }
     const response = await API.post({
       path: '/person',
-      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ name, followedSince: new Date(), assignedTeams }),
+      body: preparePersonForEncryption(
+        customFieldsPersonsMedical,
+        customFieldsPersonsSocial
+      )({ name, followedSince: dayjs(), assignedTeams, user: user._id }),
     });
     if (response.ok) {
       setPersons((persons) =>
