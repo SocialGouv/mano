@@ -1,3 +1,10 @@
+## [1.176.6](https://github.com/SocialGouv/mano/compare/v1.176.5...v1.176.6) (2022-11-15)
+
+
+### Bug Fixes
+
+* refactor modal ([#982](https://github.com/SocialGouv/mano/issues/982)) ([5965894](https://github.com/SocialGouv/mano/commit/59658947f409e8966d0bc6a5257f00b9d8f2151f))
+
 ## [1.176.5](https://github.com/SocialGouv/mano/compare/v1.176.4...v1.176.5) (2022-11-15)
 
 
