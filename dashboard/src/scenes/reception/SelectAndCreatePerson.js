@@ -171,22 +171,22 @@ const SelectAndCreatePerson = ({ value, onChange, autoCreate, inputId, className
 
 const PersonSelected = ({ person }) => {
   const history = useHistory();
+  const onClick = (e) => {
+    e.stopPropagation();
+    history.push(`/person/${person._id}`);
+  };
   return (
-    <div>
-      <div style={{ display: 'flex', alignItems: 'center' }}>
-        <span style={{ color: theme.black50 }}>{person.name}</span>
-        {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
-        <ButtonCustom
-          onClick={(e) => {
-            e.stopPropagation();
-            history.push(`/person/${person._id}`);
-          }}
-          color="link"
-          title="Accéder au dossier"
-          padding="0"
-          style={{ marginLeft: '0.5rem' }}
-        />
-      </div>
+    <div className="tw-flex tw-items-center">
+      <span className="tw-text-black50">{person.name}</span>
+      {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
+      <button
+        onMouseUp={onClick}
+        // onTouchEnd required to work on tablet
+        // see https://github.com/JedWatson/react-select/issues/3117#issuecomment-1286232693 for similar issue
+        onTouchEnd={onClick}
+        className="noprint tw-ml-2 tw-p-0 tw-text-sm tw-font-semibold tw-text-main hover:tw-underline">
+        Accéder au dossier
+      </button>
     </div>
   );
 };
