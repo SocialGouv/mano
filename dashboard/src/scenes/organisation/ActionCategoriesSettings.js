@@ -22,6 +22,7 @@ const ActionCategoriesSettings = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
   const [addGroupModalVisible, setAddGroupModalVisible] = useState(false);
+  const [isDisabled, setIsDisabled] = useState(false);
 
   const { refresh } = useDataLoader();
   const API = useApi();
@@ -65,10 +66,12 @@ const ActionCategoriesSettings = () => {
       capture('Drag and drop categories error', { extra: { groups, actionsGroupedCategories } });
       return toast.error('Désolé, une erreur est survenue lors du glisser/déposer', "L'équipe technique a été prévenue. Vous pouvez réessayer");
     }
+    setIsDisabled(true);
     const res = await API.put({
       path: `/organisation/${organisation._id}`,
       body: { actionsGroupedCategories: groups },
     });
+    setIsDisabled(false);
     if (res.ok) {
       setOrganisation(res.data);
       refresh();
@@ -87,13 +90,16 @@ const ActionCategoriesSettings = () => {
 
   return (
     <>
-      <div className="tw-my-10 tw-flex tw-items-center tw-gap-2">
+      <div className={['tw-my-10 tw-flex tw-items-center tw-gap-2', isDisabled ? 'disable-everything' : ''].join(' ')}>
         <h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Catégories d'action</h3>
         <ButtonCustom title="Ajouter un groupe" className="tw-ml-auto" onClick={() => setAddGroupModalVisible(true)} />
       </div>
       <hr />
-      <div key={JSON.stringify(actionsGroupedCategories)}>
-        <div id="category-groups" className="tw--m-1 tw-inline-flex tw-w-full tw-flex-wrap" ref={gridRef}>
+      <div key={JSON.stringify(actionsGroupedCategories)} className={isDisabled ? 'tw-cursor-wait' : ''}>
+        <div
+          id="category-groups"
+          className={['tw--m-1 tw-inline-flex tw-w-full tw-flex-wrap', isDisabled ? 'disable-everything' : ''].join(' ')}
+          ref={gridRef}>
           {actionsGroupedCategories.map(({ groupTitle, categories }) => (
             <ActionCategoriesGroup key={groupTitle} groupTitle={groupTitle} categories={categories} onDragAndDrop={onDragAndDrop} />
           ))}
