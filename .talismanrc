@@ -22,7 +22,7 @@ fileignoreconfig:
 - filename: dashboard/src/index.scss
   checksum: b0c164892558dd35b2260af1311433d88ee0322526b9172646042fd6d9839c42
 - filename: dashboard/src/scenes/organisation/ActionCategoriesSettings.js
-  checksum: 285d945a640542c3265e54d311d7458395d386c99b1b2dcbeba8b74be32dcf8f
+  checksum: 161e785b6d6e9c55563bcc218bbffad2e8895849d0578e4176eb660ec75634a4
 - filename: e2e/scripts/db.sql
   checksum: 760314340593e904bcf21e2997a8bfeb0afcfd4b488be13a18905c113e981169
 - filename: e2e/scripts/populate-db.ts
