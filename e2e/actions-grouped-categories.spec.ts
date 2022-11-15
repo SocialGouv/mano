@@ -100,6 +100,8 @@ test("Actions", async ({ page }) => {
     await page.locator(`details[data-group='${group1Name}']`).getByRole("button", { name: "Ajouter" }).click();
 
     await page.getByText(`Cette catégorie existe déjà: ${group1Name} > ${groupe1cat1}`).click();
+
+    await page.locator(`details[data-group='${group1Name}']`).getByRole("button", { name: "Annuler" }).click();
   });
 
   await test.step("Create second category in first group", async () => {
@@ -118,6 +120,8 @@ test("Actions", async ({ page }) => {
     await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Ajouter" }).click();
 
     await page.getByText("Ce groupe existe déjà").click();
+
+    await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Annuler" }).click();
   });
 
   await test.step("Create second group", async () => {
