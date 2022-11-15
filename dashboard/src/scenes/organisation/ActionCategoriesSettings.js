@@ -6,7 +6,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { actionsCategoriesSelector, flattenedCategoriesSelector, actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import { organisationState } from '../../recoil/auth';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
-import ModalWithForm from '../../components/tailwind/ModalWithForm';
+import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import { toast } from 'react-toastify';
 import { capture } from '../../services/sentry';
 
@@ -105,30 +105,27 @@ const ActionCategoriesSettings = () => {
           ))}
         </div>
       </div>
-      <ModalWithForm
-        open={addGroupModalVisible}
-        setOpen={setAddGroupModalVisible}
-        title="Ajouter un groupe de catégories"
-        buttons={[
-          {
-            text: 'Ajouter',
-            type: 'submit',
-            form: 'add-action-categories-group-form',
-          },
-          {
-            text: 'Annuler',
-            type: 'cancel',
-          },
-        ]}>
-        <form id="add-action-categories-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onAddGroup}>
-          <div>
-            <label htmlFor="groupTitle" className="form-text tailwindui">
-              Titre du groupe
-            </label>
-            <input type="text" id="groupTitle" name="groupTitle" placeholder="Démarches administratives" className="form-text tailwindui" />
-          </div>
-        </form>
-      </ModalWithForm>
+      <ModalContainer open={addGroupModalVisible}>
+        <ModalHeader title="Ajouter un groupe de catégories" />
+        <ModalBody>
+          <form id="add-action-categories-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onAddGroup}>
+            <div>
+              <label htmlFor="groupTitle" className="form-text tailwindui">
+                Titre du groupe
+              </label>
+              <input type="text" id="groupTitle" name="groupTitle" placeholder="Démarches administratives" className="form-text tailwindui" />
+            </div>
+          </form>
+        </ModalBody>
+        <ModalFooter>
+          <button type="submit" className="button-submit" form="add-action-categories-group-form">
+            Ajouter
+          </button>
+          <button name="cancel" type="button" className="button-cancel" onClick={() => setAddGroupModalVisible(false)}>
+            Annuler
+          </button>
+        </ModalFooter>
+      </ModalContainer>
     </>
   );
 };
@@ -308,35 +305,30 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
           </div>
         </details>
       </div>
-      <ModalWithForm
-        open={isEditingGroupTitle}
-        setOpen={setIsEditingGroupTitle}
-        title={`Éditer le groupe: ${groupTitle}`}
-        buttons={[
-          {
-            text: 'Enregistrer',
-            type: 'submit',
-            form: 'edit-category-group-form',
-          },
-          {
-            text: 'Supprimer',
-            type: 'destructive',
-            onClick: onDeleteGroup,
-          },
-          {
-            text: 'Annuler',
-            type: 'cancel',
-          },
-        ]}>
-        <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onEditGroupTitle}>
-          <div>
-            <label htmlFor="newGroupTitle" className="form-text tailwindui">
-              Nouveau nom du groupe
-            </label>
-            <input type="text" id="newGroupTitle" name="newGroupTitle" placeholder={groupTitle} className="form-text tailwindui" />
-          </div>
-        </form>
-      </ModalWithForm>
+      <ModalContainer open={isEditingGroupTitle}>
+        <ModalHeader title={`Éditer le groupe: ${groupTitle}`} />
+        <ModalBody>
+          <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditGroupTitle}>
+            <div>
+              <label htmlFor="newGroupTitle" className="form-text tailwindui">
+                Nouveau nom du groupe
+              </label>
+              <input type="text" id="newGroupTitle" name="newGroupTitle" placeholder={groupTitle} className="form-text tailwindui" />
+            </div>
+          </form>
+        </ModalBody>
+        <ModalFooter>
+          <button type="submit" className="button-submit" form="edit-category-group-form">
+            Enregistrer
+          </button>
+          <button type="button" className="button-destructive" onClick={onDeleteGroup}>
+            Supprimer
+          </button>
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingGroupTitle(false)}>
+            Annuler
+          </button>
+        </ModalFooter>
+      </ModalContainer>
     </>
   );
 };
@@ -460,35 +452,30 @@ const Category = ({ category, groupTitle }) => {
           ✏️
         </button>
       </div>
-      <ModalWithForm
-        open={isEditingCategory}
-        setOpen={setIsEditingCategory}
-        title={`Éditer la catégorie: ${category}`}
-        buttons={[
-          {
-            text: 'Enregistrer',
-            type: 'submit',
-            form: 'edit-category-group-form',
-          },
-          {
-            text: 'Supprimer',
-            type: 'destructive',
-            onClick: onDeleteCategory,
-          },
-          {
-            text: 'Annuler',
-            type: 'cancel',
-          },
-        ]}>
-        <form id="edit-category-group-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onEditCategory}>
-          <div>
-            <label htmlFor="newCategory" className="form-text tailwindui">
-              Nouveau nom de la catégorie
-            </label>
-            <input className="form-text tailwindui" id="newCategory" name="newCategory" type="text" placeholder={category} />
-          </div>
-        </form>
-      </ModalWithForm>
+      <ModalContainer open={isEditingCategory}>
+        <ModalHeader title={`Éditer la catégorie: ${category}`} />
+        <ModalBody>
+          <form id="edit-category-form" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditCategory}>
+            <div>
+              <label htmlFor="newCategory" className="form-text tailwindui">
+                Nouveau nom de la catégorie
+              </label>
+              <input className="form-text tailwindui" id="newCategory" name="newCategory" type="text" placeholder={category} />
+            </div>
+          </form>
+        </ModalBody>
+        <ModalFooter>
+          <button type="submit" className="button-submit" form="edit-category-form">
+            Enregistrer
+          </button>
+          <button type="button" className="button-destructive" onClick={onDeleteCategory}>
+            Supprimer
+          </button>
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingCategory(false)}>
+            Annuler
+          </button>
+        </ModalFooter>
+      </ModalContainer>
     </>
   );
 };
