@@ -190,7 +190,12 @@ const PersonSelected = ({ person }) => {
   return (
     <div className="tw-flex tw-items-center">
       <span className="tw-text-black50">{person.name}</span>
-      {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
+      {person.birthdate ? (
+        <small className="text-muted">
+          &nbsp;-&nbsp;
+          {formatBirthDate(person.birthdate)}
+        </small>
+      ) : null}
       <button
         onMouseUp={onClick}
         // onTouchEnd required to work on tablet

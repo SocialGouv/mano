@@ -3,15 +3,7 @@ import utc from "dayjs/plugin/utc";
 import "dayjs/locale/fr";
 import "expect-puppeteer";
 import { setDefaultOptions } from "expect-puppeteer";
-import {
-  connectWith,
-  navigateWithReactRouter,
-  useEncryptedOrga,
-  scrollDown,
-  scrollTop,
-  getInputValue,
-  getInnerText,
-} from "../utils";
+import { connectWith, navigateWithReactRouter, useEncryptedOrga, scrollDown, scrollTop, getInputValue, getInnerText } from "../utils";
 
 dayjs.extend(utc);
 dayjs.locale("fr");
@@ -71,10 +63,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("À FAIRE");
     const dueAt = await getInputValue("input#create-action-dueat");
     expect(dueAt).toBe(dayjs().format("DD/MM/YYYY"));
-    await expect(page).toFill(
-      "textarea#create-action-description",
-      "Une petite description pour la route"
-    );
+    await expect(page).toFill("textarea#create-action-description", "Une petite description pour la route");
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);
     await expect(page).toMatch("Création réussie !");
@@ -105,9 +94,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Résumé" });
     await expect(page).toFill('input[name="otherNames"]', "autre nom");
     await expect(page).toClick("input#person-select-gender");
-    await expect(page).toClick(
-      "div.person-select-gender__option:nth-of-type(2)"
-    );
+    await expect(page).toClick("div.person-select-gender__option:nth-of-type(2)");
     await expect(page).toFill("input#person-birthdate", "26/05/1981");
     await page.keyboard.press("Escape");
     await expect(page).toFill("input#person-wanderingAt", "26/04/2005");
@@ -117,30 +104,18 @@ describe("Organisation CRUD", () => {
     await page.keyboard.press("Escape");
     await expect(page).toClick("input#person-alertness-checkbox");
     await expect(page).toFill('input[name="phone"]', "0123456789");
-    await expect(page).toFill(
-      'textarea[name="description"]',
-      "Une chic personne"
-    );
+    await expect(page).toFill('textarea[name="description"]', "Une chic personne");
     await expect(page).toClick("input#person-select-personalSituation");
-    await expect(page).toClick(
-      "div.person-select-personalSituation__option:nth-of-type(2)"
-    );
-    await expect(page).toFill(
-      'input[name="structureSocial"]',
-      "Une structure sociale"
-    );
+    await expect(page).toClick("div.person-select-personalSituation__option:nth-of-type(2)");
+    await expect(page).toFill('input[name="structureSocial"]', "Une structure sociale");
     await expect(page).toClick("input#person-select-animals");
     await expect(page).toClick("div.person-select-animals__option");
     await expect(page).toClick("input#person-select-address");
     await expect(page).toClick("div.person-select-address__option");
     await expect(page).toClick("input#person-select-addressDetail");
-    await expect(page).toClick(
-      "div.person-select-addressDetail__option:nth-of-type(4)"
-    );
+    await expect(page).toClick("div.person-select-addressDetail__option:nth-of-type(4)");
     await expect(page).toClick("input#person-select-nationalitySituation");
-    await expect(page).toClick(
-      "div.person-select-nationalitySituation__option"
-    );
+    await expect(page).toClick("div.person-select-nationalitySituation__option");
     await expect(page).toClick("input#person-select-employment");
     await expect(page).toClick("div.person-select-employment__option");
     await expect(page).toClick("input#person-select-resources");
@@ -151,14 +126,8 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("div.person-select-healthInsurances__option");
     await expect(page).toClick("input#person-custom-select-consumptions");
     await expect(page).toClick("div.person-custom-select-consumptions__option");
-    await expect(page).toFill(
-      'input[name="structureMedical"]',
-      "Une structure médicale"
-    );
-    await expect(page).toFill(
-      'textarea[name="caseHistoryDescription"]',
-      "Mon historique médical"
-    );
+    await expect(page).toFill('input[name="structureMedical"]', "Une structure médicale");
+    await expect(page).toFill('textarea[name="caseHistoryDescription"]', "Mon historique médical");
     await expect(page).toClick("button", { text: "Mettre à jour" });
     await page.waitForTimeout(2000);
     await expect(page).toMatch("Mis à jour !");
@@ -174,21 +143,13 @@ describe("Organisation CRUD", () => {
   it("should see created person all fields", async () => {
     await navigateWithReactRouter("/person");
     await expect(page).toClick("td", { text: "Ma première personne" });
-    expect(await getInputValue('input[name="name"]')).toBe(
-      "Ma première personne"
-    );
+    expect(await getInputValue('input[name="name"]')).toBe("Ma première personne");
     expect(await getInputValue('input[name="otherNames"]')).toBe("autre nom");
-    expect(await getInnerText("div.person-select-gender__single-value")).toBe(
-      "Homme"
-    );
+    expect(await getInnerText("div.person-select-gender__single-value")).toBe("Homme");
     expect(await getInputValue("input#person-birthdate")).toBe("26/05/1981");
     expect(await getInputValue("input#person-wanderingAt")).toBe("26/04/2005");
-    expect(await getInputValue("input#person-followedSince")).toBe(
-      "20/04/2019"
-    );
-    expect(
-      await getInnerText("div.person-select-assigned-team__multi-value__label")
-    ).toBe("Encrypted Orga Team");
+    expect(await getInputValue("input#person-followedSince")).toBe("20/04/2019");
+    expect(await getInnerText("div.person-select-assigned-team__multi-value__label")).toBe("Encrypted Orga Team");
     expect(
       await page
         .$('input[name="alertness"]')
@@ -196,52 +157,20 @@ describe("Organisation CRUD", () => {
         .then((value) => value?.jsonValue())
     ).toBe(true);
     expect(await getInputValue('input[name="phone"]')).toBe("0123456789");
-    expect(await getInputValue('textarea[name="description"]')).toBe(
-      "Une chic personne"
-    );
-    expect(
-      await getInnerText("div.person-select-personalSituation__single-value")
-    ).toBe("Homme isolé");
-    expect(await getInputValue('input[name="structureSocial"]')).toBe(
-      "Une structure sociale"
-    );
-    expect(await getInnerText("div.person-select-animals__single-value")).toBe(
-      "Oui"
-    );
-    expect(await getInnerText("div.person-select-address__single-value")).toBe(
-      "Oui"
-    );
-    expect(
-      await getInnerText("div.person-select-addressDetail__single-value")
-    ).toBe("Mise à l'abri");
-    expect(
-      await getInnerText("div.person-select-nationalitySituation__single-value")
-    ).toBe("Hors UE");
-    expect(
-      await getInnerText("div.person-select-employment__single-value")
-    ).toBe("DPH");
-    expect(
-      await getInnerText("div.person-select-resources__multi-value__label")
-    ).toBe("SANS");
-    expect(
-      await getInnerText("div.person-select-reasons__multi-value__label")
-    ).toBe("Sortie d'hébergement");
-    expect(
-      await getInnerText(
-        "div.person-select-healthInsurances__multi-value__label"
-      )
-    ).toBe("Aucune");
-    expect(
-      await getInnerText(
-        "div.person-custom-select-consumptions__multi-value__label"
-      )
-    ).toBe("Alcool");
-    expect(await getInputValue('input[name="structureMedical"]')).toBe(
-      "Une structure médicale"
-    );
-    expect(await getInputValue('textarea[name="caseHistoryDescription"]')).toBe(
-      "Mon historique médical"
-    );
+    expect(await getInputValue('textarea[name="description"]')).toBe("Une chic personne");
+    expect(await getInnerText("div.person-select-personalSituation__single-value")).toBe("Homme isolé");
+    expect(await getInputValue('input[name="structureSocial"]')).toBe("Une structure sociale");
+    expect(await getInnerText("div.person-select-animals__single-value")).toBe("Oui");
+    expect(await getInnerText("div.person-select-address__single-value")).toBe("Oui");
+    expect(await getInnerText("div.person-select-addressDetail__single-value")).toBe("Mise à l'abri");
+    expect(await getInnerText("div.person-select-nationalitySituation__single-value")).toBe("Hors UE");
+    expect(await getInnerText("div.person-select-employment__single-value")).toBe("DPH");
+    expect(await getInnerText("div.person-select-resources__multi-value__label")).toBe("SANS");
+    expect(await getInnerText("div.person-select-reasons__multi-value__label")).toBe("Sortie d'hébergement");
+    expect(await getInnerText("div.person-select-healthInsurances__multi-value__label")).toBe("Aucune");
+    expect(await getInnerText("div.person-custom-select-consumptions__multi-value__label")).toBe("Alcool");
+    expect(await getInputValue('input[name="structureMedical"]')).toBe("Une structure médicale");
+    expect(await getInputValue('textarea[name="caseHistoryDescription"]')).toBe("Mon historique médical");
   });
 
   it("should be able to see the history for an updated person", async () => {
@@ -273,10 +202,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("a", { text: "Commentaires (0)" });
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
     await expect(page).toMatch("Créer un commentaire", { timeout: 10000 });
-    await expect(page).toFill(
-      'textarea[name="comment"]',
-      "Ceci est un commentaire"
-    );
+    await expect(page).toFill('textarea[name="comment"]', "Ceci est un commentaire");
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);
     await expect(page).toClick("button.Toastify__close-button");
@@ -289,10 +215,7 @@ describe("Organisation CRUD", () => {
     await page.waitForTimeout(2000);
     await expect(page).toClick("button", { text: "Ajouter un commentaire" });
     await expect(page).toMatch("Créer un commentaire", { timeout: 10000 });
-    await expect(page).toFill(
-      'textarea[name="comment"]',
-      "Ceci est un autre commentaire"
-    );
+    await expect(page).toFill('textarea[name="comment"]', "Ceci est un autre commentaire");
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);
     await expect(page).toClick("button.Toastify__close-button");
@@ -347,21 +270,13 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("td", { text: "Ma première personne" });
     // await scrollTop();
     /* Summary */
-    expect(await getInputValue('input[name="name"]')).toBe(
-      "Ma première personne"
-    );
+    expect(await getInputValue('input[name="name"]')).toBe("Ma première personne");
     expect(await getInputValue('input[name="otherNames"]')).toBe("autre nom");
-    expect(await getInnerText("div.person-select-gender__single-value")).toBe(
-      "Homme"
-    );
+    expect(await getInnerText("div.person-select-gender__single-value")).toBe("Homme");
     expect(await getInputValue("input#person-birthdate")).toBe("26/05/1981");
     expect(await getInputValue("input#person-wanderingAt")).toBe("26/04/2005");
-    expect(await getInputValue("input#person-followedSince")).toBe(
-      "20/04/2019"
-    );
-    expect(
-      await getInnerText("div.person-select-assigned-team__multi-value__label")
-    ).toBe("Encrypted Orga Team");
+    expect(await getInputValue("input#person-followedSince")).toBe("20/04/2019");
+    expect(await getInnerText("div.person-select-assigned-team__multi-value__label")).toBe("Encrypted Orga Team");
     expect(
       await page
         .$('input[name="alertness"]')
@@ -369,52 +284,20 @@ describe("Organisation CRUD", () => {
         .then((value) => value?.jsonValue())
     ).toBe(true);
     expect(await getInputValue('input[name="phone"]')).toBe("0123456789");
-    expect(await getInputValue('textarea[name="description"]')).toBe(
-      "Une chic personne"
-    );
-    expect(
-      await getInnerText("div.person-select-personalSituation__single-value")
-    ).toBe("Homme isolé");
-    expect(await getInputValue('input[name="structureSocial"]')).toBe(
-      "Une structure sociale"
-    );
-    expect(await getInnerText("div.person-select-animals__single-value")).toBe(
-      "Oui"
-    );
-    expect(await getInnerText("div.person-select-address__single-value")).toBe(
-      "Oui"
-    );
-    expect(
-      await getInnerText("div.person-select-addressDetail__single-value")
-    ).toBe("Mise à l'abri");
-    expect(
-      await getInnerText("div.person-select-nationalitySituation__single-value")
-    ).toBe("Hors UE");
-    expect(
-      await getInnerText("div.person-select-employment__single-value")
-    ).toBe("DPH");
-    expect(
-      await getInnerText("div.person-select-resources__multi-value__label")
-    ).toBe("SANS");
-    expect(
-      await getInnerText("div.person-select-reasons__multi-value__label")
-    ).toBe("Sortie d'hébergement");
-    expect(
-      await getInnerText(
-        "div.person-select-healthInsurances__multi-value__label"
-      )
-    ).toBe("Aucune");
-    expect(
-      await getInnerText(
-        "div.person-custom-select-consumptions__multi-value__label"
-      )
-    ).toBe("Alcool");
-    expect(await getInputValue('input[name="structureMedical"]')).toBe(
-      "Une structure médicale"
-    );
-    expect(await getInputValue('textarea[name="caseHistoryDescription"]')).toBe(
-      "Mon historique médical"
-    );
+    expect(await getInputValue('textarea[name="description"]')).toBe("Une chic personne");
+    expect(await getInnerText("div.person-select-personalSituation__single-value")).toBe("Homme isolé");
+    expect(await getInputValue('input[name="structureSocial"]')).toBe("Une structure sociale");
+    expect(await getInnerText("div.person-select-animals__single-value")).toBe("Oui");
+    expect(await getInnerText("div.person-select-address__single-value")).toBe("Oui");
+    expect(await getInnerText("div.person-select-addressDetail__single-value")).toBe("Mise à l'abri");
+    expect(await getInnerText("div.person-select-nationalitySituation__single-value")).toBe("Hors UE");
+    expect(await getInnerText("div.person-select-employment__single-value")).toBe("DPH");
+    expect(await getInnerText("div.person-select-resources__multi-value__label")).toBe("SANS");
+    expect(await getInnerText("div.person-select-reasons__multi-value__label")).toBe("Sortie d'hébergement");
+    expect(await getInnerText("div.person-select-healthInsurances__multi-value__label")).toBe("Aucune");
+    expect(await getInnerText("div.person-custom-select-consumptions__multi-value__label")).toBe("Alcool");
+    expect(await getInputValue('input[name="structureMedical"]')).toBe("Une structure médicale");
+    expect(await getInputValue('textarea[name="caseHistoryDescription"]')).toBe("Mon historique médical");
     /* Actions */
     await expect(page).toClick("a", { text: "Actions (1)" });
     await expect(page).toMatch("Mon action");
@@ -439,25 +322,17 @@ describe("Organisation CRUD", () => {
     await expect(page).toClick("button", { text: "Sortie de file active" });
     await expect(page).toMatch("Veuillez préciser le(s) motif(s) de sortie");
     await expect(page).toClick("input#person-select-outOfActiveListReasons");
-    await expect(page).toClick(
-      "div.person-select-outOfActiveListReasons__option"
-    );
+    await expect(page).toClick("div.person-select-outOfActiveListReasons__option");
     await expect(page).toClick("button", { text: "Sauvegarder" });
     await page.waitForTimeout(2000);
-    await expect(page).toMatch(
-      "Ma première personne est hors de la file active."
-    );
+    await expect(page).toMatch("Ma première personne est hors de la file active.");
     await expect(page).toClick("button.Toastify__close-button");
     await expect(page).toMatch("Réintégrer dans la file active");
     await scrollTop();
-    await expect(page).toMatch(
-      "Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure"
-    );
+    await expect(page).toMatch("Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure");
     await expect(page).toClick("a", { text: "Retour" });
     await expect(page).toMatch("Ma première personne");
-    await expect(page).toMatch(
-      "Sortie de file active : Relai vers autre structure"
-    );
+    await expect(page).toMatch("Sortie de file active : Relai vers autre structure");
   });
 
   it("should be able to put back in active list", async () => {
@@ -470,9 +345,7 @@ describe("Organisation CRUD", () => {
     await expect(page).toMatch("Ma première personne");
     await expect(page).toClick("td", { text: "Ma première personne" });
     // await scrollTop();
-    await expect(page).toMatch(
-      "Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure"
-    );
+    await expect(page).toMatch("Ma première personne est en dehors de la file active, pour le motif suivant : Relai vers autre structure");
     await expect(page).toClick("button", {
       text: "Réintégrer dans la file active",
     });
@@ -506,35 +379,19 @@ describe("Organisation CRUD", () => {
 
   it("should be able to see the action in reception", async () => {
     await navigateWithReactRouter("/reception");
-    await expect(page).toMatch(
-      `Accueil du ${dayjs().format(
-        "dddd D MMMM YYYY"
-      )} de l'équipe Encrypted Orga Team`
-    );
+    await expect(page).toMatch(`Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`);
     await expect(page).toMatch("Mon action");
   });
 
   it("should be able to add a passage", async () => {
     await navigateWithReactRouter("/reception");
-    await expect(page).toMatch(
-      `Accueil du ${dayjs().format(
-        "dddd D MMMM YYYY"
-      )} de l'équipe Encrypted Orga Team`
-    );
+    await expect(page).toMatch(`Accueil du ${dayjs().format("dddd D MMMM YYYY")} de l'équipe Encrypted Orga Team`);
     await expect(page).toClick("input#person-select-and-create-reception");
-    await expect(page).toClick(
-      "div.person-select-and-create-reception__option"
-    );
-    expect(
-      await getInnerText(
-        "div.person-select-and-create-reception__multi-value__label"
-      )
-    ).toBe(
-      `Ma première personne
-- 26/05/1981 (41 ans)
-
-Accéder au dossier`
-    );
+    await expect(page).toClick("div.person-select-and-create-reception__option");
+    await page.waitForTimeout(2000);
+    // there is a strange behavior with f***g spaces
+    const textOnly: any = await getInnerText("div.person-select-and-create-reception__multi-value__label");
+    expect(textOnly.replace(/\s/g, "")).toBe(`Mapremièrepersonne-26/05/1981(41ans)Accéderaudossier`);
     await expect(page).toClick("button", { text: "Passage" });
     await page.waitForTimeout(2000);
     expect(await getInnerText("h5#passages-title")).toBe("1 passage");
