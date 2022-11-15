@@ -1,3 +1,10 @@
+## [1.176.4](https://github.com/SocialGouv/mano/compare/v1.176.3...v1.176.4) (2022-11-15)
+
+
+### Bug Fixes
+
+* fix playwright tests ([#977](https://github.com/SocialGouv/mano/issues/977)) ([fd1affc](https://github.com/SocialGouv/mano/commit/fd1affc0cae353f025513f06e7d2a3d4b5b308c8))
+
 ## [1.176.3](https://github.com/SocialGouv/mano/compare/v1.176.2...v1.176.3) (2022-11-15)
 
 
