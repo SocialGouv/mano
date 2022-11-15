@@ -1,3 +1,11 @@
+## [1.176.5](https://github.com/SocialGouv/mano/compare/v1.176.4...v1.176.5) (2022-11-15)
+
+
+### Bug Fixes
+
+* **dashboard:**  drag and drop on category settings ([#981](https://github.com/SocialGouv/mano/issues/981)) ([a60a252](https://github.com/SocialGouv/mano/commit/a60a2522bb359511d93f1923ddcca0ba07fc6a0b))
+* **dashboard:** person created though select to have user/team and to… ([#979](https://github.com/SocialGouv/mano/issues/979)) ([61a05fb](https://github.com/SocialGouv/mano/commit/61a05fbf54f29902520aebbfb58ca173b59d4bfc))
+
 ## [1.176.4](https://github.com/SocialGouv/mano/compare/v1.176.3...v1.176.4) (2022-11-15)
 
 
