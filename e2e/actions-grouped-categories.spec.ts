@@ -29,31 +29,19 @@ test("Actions", async ({ page }) => {
 
     await page.getByLabel("Titre du groupe").fill(groupName);
 
-    await page
-      .getByRole("dialog", { name: "Ajouter un groupe de catégories" })
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Ajouter" }).click();
 
     await page.getByText("Groupe ajouté").click();
   };
 
-  const createAction = async (
-    actionName: string,
-    categories: Array<{ group: string; category: string }>
-  ) => {
+  const createAction = async (actionName: string, categories: Array<{ group: string; category: string }>) => {
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await page
-      .getByRole("button", { name: "Créer une nouvelle action" })
-      .click();
+    await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
 
     await page.getByLabel("Nom de l'action").fill(actionName);
 
-    await clickOnEmptyReactSelect(
-      page,
-      "create-action-person-select",
-      personName
-    );
+    await clickOnEmptyReactSelect(page, "create-action-person-select", personName);
 
     await page.locator("#categories").getByText("-- Choisir --").click();
 
@@ -87,9 +75,7 @@ test("Actions", async ({ page }) => {
     await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
 
     await page.getByRole("button", { name: "Se connecter" }).click();
-    await expect(page).toHaveURL(
-      "http://localhost:8090/reception?calendarTab=2"
-    );
+    await expect(page).toHaveURL("http://localhost:8090/reception?calendarTab=2");
   });
 
   await test.step("Create first group to be renamed", async () => {
@@ -101,55 +87,27 @@ test("Actions", async ({ page }) => {
   });
 
   await test.step("Create first category in first group", async () => {
-    await page
-      .locator(`details[data-group='${group1Name}']`)
-      .getByPlaceholder("Ajouter une catégorie")
-      .fill(groupe1cat1);
+    await page.locator(`details[data-group='${group1Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe1cat1);
 
-    await page
-      .locator(`details[data-group='${group1Name}']`)
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.locator(`details[data-group='${group1Name}']`).getByRole("button", { name: "Ajouter" }).click();
 
-    await page
-      .getByText(
-        "Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-      )
-      .click();
+    await page.getByText("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
   });
 
   await test.step("Create same category should throw an error", async () => {
-    await page
-      .locator(`details[data-group='${group1Name}']`)
-      .getByPlaceholder("Ajouter une catégorie")
-      .fill(groupe1cat1);
+    await page.locator(`details[data-group='${group1Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe1cat1);
 
-    await page
-      .locator(`details[data-group='${group1Name}']`)
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.locator(`details[data-group='${group1Name}']`).getByRole("button", { name: "Ajouter" }).click();
 
-    await page
-      .getByText(`Cette catégorie existe déjà: ${group1Name} > ${groupe1cat1}`)
-      .click();
+    await page.getByText(`Cette catégorie existe déjà: ${group1Name} > ${groupe1cat1}`).click();
   });
 
   await test.step("Create second category in first group", async () => {
-    await page
-      .locator(`details[data-group='${group1Name}']`)
-      .getByPlaceholder("Ajouter une catégorie")
-      .fill(groupe1cat2);
+    await page.locator(`details[data-group='${group1Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe1cat2);
 
-    await page
-      .locator(`details[data-group='${group1Name}']`)
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.locator(`details[data-group='${group1Name}']`).getByRole("button", { name: "Ajouter" }).click();
 
-    await page
-      .getByText(
-        "Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-      )
-      .click();
+    await page.getByText("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
   });
 
   await test.step("Create same group should throw an error", async () => {
@@ -157,10 +115,7 @@ test("Actions", async ({ page }) => {
 
     await page.getByLabel("Titre du groupe").fill(group1Name);
 
-    await page
-      .getByRole("dialog", { name: "Ajouter un groupe de catégories" })
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Ajouter" }).click();
 
     await page.getByText("Ce groupe existe déjà").click();
   });
@@ -170,79 +125,37 @@ test("Actions", async ({ page }) => {
   });
 
   await test.step("Create first category in second group", async () => {
-    await page
-      .locator(`details[data-group='${group2Name}']`)
-      .getByPlaceholder("Ajouter une catégorie")
-      .fill(groupe2cat1);
+    await page.locator(`details[data-group='${group2Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe2cat1);
 
-    await page
-      .locator(`details[data-group='${group2Name}']`)
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.locator(`details[data-group='${group2Name}']`).getByRole("button", { name: "Ajouter" }).click();
 
-    await page
-      .getByText(
-        "Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-      )
-      .click();
+    await page.getByText("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
   });
 
   await test.step("Create second category in second group, to be renamed", async () => {
-    await page
-      .locator(`details[data-group='${group2Name}']`)
-      .getByPlaceholder("Ajouter une catégorie")
-      .fill(groupe2cat2);
+    await page.locator(`details[data-group='${group2Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe2cat2);
 
-    await page
-      .locator(`details[data-group='${group2Name}']`)
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.locator(`details[data-group='${group2Name}']`).getByRole("button", { name: "Ajouter" }).click();
 
-    await page
-      .getByText(
-        "Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-      )
-      .click();
+    await page.getByText("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
   });
 
   await test.step("Create third group and category to be deleted", async () => {
     await createGroup(groupe3Name);
 
-    await page
-      .locator(`details[data-group='${groupe3Name}']`)
-      .getByPlaceholder("Ajouter une catégorie")
-      .fill(groupe3cat1ToBeDeleted);
+    await page.locator(`details[data-group='${groupe3Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe3cat1ToBeDeleted);
 
-    await page
-      .locator(`details[data-group='${groupe3Name}']`)
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.locator(`details[data-group='${groupe3Name}']`).getByRole("button", { name: "Ajouter" }).click();
 
-    await page
-      .getByText(
-        "Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-      )
-      .click();
+    await page.getByText("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
 
-    await page
-      .locator(`details[data-group='${groupe3Name}']`)
-      .getByPlaceholder("Ajouter une catégorie")
-      .fill(groupe3cat2);
+    await page.locator(`details[data-group='${groupe3Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe3cat2);
 
-    await page
-      .locator(`details[data-group='${groupe3Name}']`)
-      .getByRole("button", { name: "Ajouter" })
-      .click();
+    await page.locator(`details[data-group='${groupe3Name}']`).getByRole("button", { name: "Ajouter" }).click();
 
-    await page
-      .getByText(
-        "Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-      )
-      .click();
+    await page.getByText("Catégorie ajoutée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
   });
 
-  /*  FIXME: tests are run in 3 browsers, one after the other, with the same DB.
-   those tests work on the first browser but not on the second one
   await test.step("Drag and drop category works", async () => {
     await expect(page.getByText(`${group2Name} (2)`)).toBeVisible();
     await expect(page.getByText(`${group1Name} (2)`)).toBeVisible();
@@ -262,13 +175,11 @@ test("Actions", async ({ page }) => {
     });
     await expect(page.locator(".category-group-title").first()).toHaveText(`${group1Name} (2)`);
   });
- */
+
   await test.step("Create one person to assign actions", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
-    await page
-      .getByRole("button", { name: "Créer une nouvelle personne" })
-      .click();
+    await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
     await page.getByLabel("Nom").click();
     await page.getByLabel("Nom").fill(personName);
     await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -286,9 +197,7 @@ test("Actions", async ({ page }) => {
       { group: group2Name, category: groupe2cat2 },
     ]);
 
-    await createAction(action3Name, [
-      { group: groupe3Name, category: groupe3cat1ToBeDeleted },
-    ]);
+    await createAction(action3Name, [{ group: groupe3Name, category: groupe3cat1ToBeDeleted }]);
   });
 
   await test.step("Search for category", async () => {
@@ -313,29 +222,17 @@ test("Actions", async ({ page }) => {
   await test.step("Check for proper categories on actions", async () => {
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await expect(
-      page.locator(`data-test-id=${action1Name}${groupe1cat1}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action1Name}${groupe1cat1}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action1Name}${groupe2cat1}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action1Name}${groupe2cat1}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action2Name}${groupe1cat2}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action2Name}${groupe1cat2}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action2Name}${groupe2cat2}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action2Name}${groupe2cat2}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action3Name}${groupe2cat2}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action3Name}${groupe2cat2}`)).toBeVisible();
   });
 
   await test.step("Update category name", async () => {
@@ -344,9 +241,7 @@ test("Actions", async ({ page }) => {
     await page.getByRole("button", { name: "Actions" }).click();
 
     await page.hover(`id=${groupe2cat2}`);
-    await page
-      .getByRole("button", { name: `Modifier la catégorie ${groupe2cat2}` })
-      .click();
+    await page.getByRole("button", { name: `Modifier la catégorie ${groupe2cat2}` }).click();
 
     await page.getByPlaceholder(groupe2cat2).fill(groupe2cat2Renamed);
 
@@ -355,11 +250,7 @@ test("Actions", async ({ page }) => {
       .getByRole("button", { name: "Enregistrer" })
       .click();
 
-    await page
-      .getByText(
-        "Catégorie mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-      )
-      .click();
+    await page.getByText("Catégorie mise à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
   });
 
   await test.step("Delete category", async () => {
@@ -381,38 +272,22 @@ test("Actions", async ({ page }) => {
       .getByRole("button", { name: "Supprimer" })
       .click();
 
-    await page
-      .getByText(
-        "Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-      )
-      .click();
+    await page.getByText("Catégorie supprimée. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard").click();
   });
 
   await test.step("Check for proper categories on actions", async () => {
     await page.getByRole("link", { name: "Agenda" }).click();
 
-    await expect(
-      page.locator(`data-test-id=${action1Name}${groupe1cat1}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action1Name}${groupe1cat1}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action1Name}${groupe2cat1}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action1Name}${groupe2cat1}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action2Name}${groupe1cat2}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action2Name}${groupe1cat2}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action2Name}${groupe2cat2Renamed}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action2Name}${groupe2cat2Renamed}`)).toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)
-    ).not.toBeVisible();
+    await expect(page.locator(`data-test-id=${action3Name}${groupe3cat1ToBeDeleted}`)).not.toBeVisible();
 
-    await expect(
-      page.locator(`data-test-id=${action3Name}${groupe2cat2Renamed}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${action3Name}${groupe2cat2Renamed}`)).toBeVisible();
   });
 });
