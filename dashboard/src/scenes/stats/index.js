@@ -330,11 +330,6 @@ const Stats = () => {
 
   if (isLoading) return <Loading />;
 
-  console.log(
-    { actionsWithDetailedGroupAndCategories },
-    groupsCategories.map((group) => group.groupTitle)
-  );
-
   return (
     <>
       <HeaderStyled style={{ padding: '16px 0' }}>

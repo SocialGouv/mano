@@ -68,7 +68,7 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
-      if (!organisation.migrations?.includes('clean-duplicated-reports')) {
+      if (!organisation.migrations?.includes('clean-duplicated-reports-2')) {
         setLoadingText(LOADING_TEXT);
         const res = await API.get({
           path: '/report',
@@ -88,7 +88,6 @@ export default function useDataMigrator() {
         const reportIdsToDelete = [];
         const consolidatedReports = Object.values(reportsObjByTeamAndDate).map((reports) => {
           if (reports.length === 1) return reports[0];
-          // console.log('DOUBLE REPORTS', reports.date, reports.length, reports);
           const consolidatedReport = {
             _id: reports[0]._id,
             createdAt: reports[0].createdAt,
@@ -104,7 +103,7 @@ export default function useDataMigrator() {
             if (report.services) consolidatedReport.services = report.services;
             if (report.description) consolidatedReport.description = report.description;
             if (report.collaborations) consolidatedReport.collaborations = report.collaborations;
-            if (index !== 0) reportIdsToDelete.push(report._id);
+            if (Number(index) !== 0) reportIdsToDelete.push(report._id);
           }
           return consolidatedReport;
         });
@@ -113,7 +112,7 @@ export default function useDataMigrator() {
         );
 
         const response = await API.put({
-          path: `/migration/clean-duplicated-reports`,
+          path: `/migration/clean-duplicated-reports-2`,
           body: { consolidatedReports: encryptedConsolidatedReports, reportIdsToDelete },
           query: { migrationLastUpdateAt },
         });

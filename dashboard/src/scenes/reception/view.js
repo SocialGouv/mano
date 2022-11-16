@@ -86,7 +86,7 @@ const todaysPassagesSelector = selector({
     const passages = get(passagesState);
     const currentTeam = get(currentTeamState);
     return passages
-      .filter((p) => p.team === currentTeam._id)
+      .filter((p) => p.team === currentTeam?._id)
       .filter((p) =>
         getIsDayWithinHoursOffsetOfPeriod(
           p.date,
@@ -220,7 +220,7 @@ const Reception = () => {
     const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
     if (response.ok) {
       setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
-      createReportAtDateIfNotExist(response.decryptedData.date);
+      await createReportAtDateIfNotExist(response.decryptedData.date);
     }
   };
 
@@ -244,7 +244,7 @@ const Reception = () => {
         const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
         if (response.ok) {
           setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
-          createReportAtDateIfNotExist(response.decryptedData.date);
+          await createReportAtDateIfNotExist(response.decryptedData.date);
         }
       }
       setAddingPassage(false);

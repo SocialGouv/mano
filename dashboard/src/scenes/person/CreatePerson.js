@@ -68,7 +68,7 @@ const CreatePerson = ({ refreshable }) => {
                 setOpen(false);
                 actions.setSubmitting(false);
                 history.push(`/person/${response.decryptedData._id}`);
-                createReportAtDateIfNotExist(dayjs());
+                await createReportAtDateIfNotExist(dayjs());
               }
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (

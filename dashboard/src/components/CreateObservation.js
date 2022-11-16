@@ -39,7 +39,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
     const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
       setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
-      createReportAtDateIfNotExist(res.decryptedData.observedAt);
+      await createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
     return res;
   };
@@ -53,7 +53,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
           return a;
         })
       );
-      createReportAtDateIfNotExist(res.decryptedData.observedAt);
+      await createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
     return res;
   };

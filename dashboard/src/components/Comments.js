@@ -85,7 +85,7 @@ const Comments = ({ onUpdateResults }) => {
     if (!response.ok) return;
     setComments((comments) => [response.decryptedData, ...comments]);
     toast.success('Commentaire ajouté !');
-    createReportAtDateIfNotExist(response.decryptedData.date);
+    await createReportAtDateIfNotExist(response.decryptedData.date);
     setClearNewCommentKey((k) => k + 1);
   };
 
@@ -101,7 +101,7 @@ const Comments = ({ onUpdateResults }) => {
           return c;
         })
       );
-      createReportAtDateIfNotExist(response.decryptedData.date || response.decryptedData.createdAt);
+      await createReportAtDateIfNotExist(response.decryptedData.date || response.decryptedData.createdAt);
     }
     if (!response.ok) return;
     toast.success('Commentaire mis à jour');
