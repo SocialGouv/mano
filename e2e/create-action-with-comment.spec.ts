@@ -10,6 +10,7 @@ test.beforeAll(async () => {
 test("Create action with comments", async ({ page }) => {
   const person1Name = nanoid();
   const person2Name = nanoid();
+  // const person2Name = "person 2";
 
   await page.goto("http://localhost:8090/");
   await page.goto("http://localhost:8090/auth");
@@ -48,12 +49,8 @@ test("Create action with comments", async ({ page }) => {
   await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("Une seule personne");
   await page.getByLabel("Commentaire (optionnel)").click();
-  await page
-    .getByLabel("Commentaire (optionnel)")
-    .fill("Une personne avec un commentaire prioritaire");
-  await page
-    .getByText("Commentaire prioritaire Ce commentaire sera mise en avant par rapport aux autres")
-    .click();
+  await page.getByLabel("Commentaire (optionnel)").fill("Une personne avec un commentaire prioritaire");
+  await page.getByText("Commentaire prioritaire Ce commentaire sera mise en avant par rapport aux autres").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
@@ -78,7 +75,7 @@ test("Create action with comments", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
-  await page.getByText(person2Name).last().click();
+  await page.getByText(person2Name).first().click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText("Actions (1)").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
