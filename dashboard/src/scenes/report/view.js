@@ -852,7 +852,16 @@ const ActionCompletedAt = ({ date, status, actions }) => {
               dataKey: 'urgent',
               small: true,
               render: (action) => {
-                return action.urgent ? <ExclamationMarkButton /> : null;
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!action.urgent && <ExclamationMarkButton />}
+                    {!!action.group && (
+                      <span className="tw-text-3xl" aria-label="Action familiale">
+                        👪
+                      </span>
+                    )}
+                  </div>
+                );
               },
             },
             { title: 'À faire le ', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
@@ -908,7 +917,16 @@ const ActionCreatedAt = ({ date, actions }) => {
               dataKey: 'urgent',
               small: true,
               render: (action) => {
-                return action.urgent ? <ExclamationMarkButton /> : null;
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!action.urgent && <ExclamationMarkButton />}
+                    {!!action.group && (
+                      <span className="tw-text-3xl" aria-label="Action familiale">
+                        👪
+                      </span>
+                    )}
+                  </div>
+                );
               },
             },
             { title: 'À faire le ', dataKey: 'dueAt', render: (d) => <DateBloc date={d.dueAt} /> },
@@ -1081,8 +1099,16 @@ const CommentCreatedAt = ({ date, comments }) => {
               dataKey: 'urgent',
               small: true,
               render: (comment) => {
-                if (comment.urgent) return <ExclamationMarkButton />;
-                return null;
+                return (
+                  <>
+                    {!!comment.urgent && <ExclamationMarkButton />}
+                    {!!comment.group && (
+                      <span className="tw-text-3xl" aria-label="Action familiale">
+                        👪
+                      </span>
+                    )}
+                  </>
+                );
               },
             },
             {

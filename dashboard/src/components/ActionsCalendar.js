@@ -71,12 +71,20 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
       columns={[
         {
           title: '',
-          dataKey: 'urgent',
+          dataKey: 'urgentOrGroupOrConsultation',
           small: true,
           render: (actionOrConsult) => {
-            if (actionOrConsult.urgent) return <ExclamationMarkButton />;
-            if (actionOrConsult.isConsultation) return <ConsultationButton />;
-            return null;
+            return (
+              <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                {!!actionOrConsult.group && (
+                  <span className="tw-text-3xl" aria-label="Action familiale">
+                    👪
+                  </span>
+                )}
+                {!!actionOrConsult.isConsultation && <ConsultationButton />}
+              </div>
+            );
           },
         },
         {
@@ -99,7 +107,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           render: (action) => <PersonName item={action} />,
         },
         { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
-      ].filter((column) => columns.includes(column.title) || column.dataKey === 'urgent')}
+      ].filter((column) => columns.includes(column.title) || column.dataKey === 'urgentOrGroupOrConsultation')}
     />
   );
 

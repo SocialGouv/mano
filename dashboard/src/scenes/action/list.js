@@ -257,12 +257,20 @@ const List = () => {
             columns={[
               {
                 title: '',
-                dataKey: 'urgentOrConsultation',
+                dataKey: 'urgentOrGroupOrConsultation',
                 small: true,
-                render: (action) => {
-                  if (action.urgent) return <ExclamationMarkButton />;
-                  if (action.isConsultation) return <ConsultationButton />;
-                  return null;
+                render: (actionOrConsult) => {
+                  return (
+                    <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                      {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                      {!!actionOrConsult.group && (
+                        <span className="tw-text-3xl" aria-label="Action familiale">
+                          👪
+                        </span>
+                      )}
+                      {!!actionOrConsult.isConsultation && <ConsultationButton />}
+                    </div>
+                  );
                 },
               },
               {

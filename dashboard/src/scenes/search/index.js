@@ -29,6 +29,7 @@ import { commentsState } from '../../recoil/comments';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ConsultationButton from '../../components/ConsultationButton';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -126,6 +127,20 @@ const Actions = ({ search, onUpdateResults }) => {
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
           columns={[
+            {
+              title: '',
+              dataKey: 'urgentOrGroupOrConsultation',
+              small: true,
+              render: (actionOrConsult) => {
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                    {!!actionOrConsult.group && <ExclamationMarkButton />}
+                    {!!actionOrConsult.isConsultation && <ConsultationButton />}
+                  </div>
+                );
+              },
+            },
             { title: 'À faire le ', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
             {
               title: 'Heure',

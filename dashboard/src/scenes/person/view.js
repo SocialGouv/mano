@@ -891,7 +891,16 @@ const Actions = ({ onUpdateResults }) => {
             dataKey: 'urgent',
             small: true,
             render: (action) => {
-              return action.urgent ? <ExclamationMarkButton /> : null;
+              return (
+                <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                  {!!action.urgent && <ExclamationMarkButton />}
+                  {!!action.group && (
+                    <span className="tw-text-3xl" aria-label="Action familiale">
+                      👪
+                    </span>
+                  )}
+                </div>
+              );
             },
           },
           { title: 'À faire le', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },

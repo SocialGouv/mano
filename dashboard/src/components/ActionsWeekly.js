@@ -144,6 +144,7 @@ function ActionsOfDay({ actions }) {
           <div>
             🧑 <PersonName item={action} />
           </div>
+          {Boolean(action.group) && <div>👪 Action familiale</div>}
           <ActionStatus status={action.status} />
         </div>
       ))}

@@ -135,6 +135,11 @@ const Comments = ({ onUpdateResults }) => {
                 <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                 <div className="content">
                   {!!comment.urgent && <ExclamationMarkButton />}
+                  {!!comment.group && (
+                    <span className="tw-text-3xl" aria-label="Action familiale">
+                      👪
+                    </span>
+                  )}
                   <p>
                     {comment.comment
                       ? comment.comment.split('\n').map((c, i, a) => {
