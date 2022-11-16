@@ -16,7 +16,7 @@ fileignoreconfig:
 - filename: dashboard/src/components/ActionName.js
   checksum: 85c84d11d7d840c01a671650b1665c0ad2e0dd01fb5d85ee946128ad0fc7a84f
 - filename: dashboard/src/components/DataLoader.js
-  checksum: f07dd01934ecf1e9344f55187bb0742c199eef51ff763256795a424699c5779d
+  checksum: e2fd738febd0f55007db268737697c71b1477d537769360e9fbaba45bf3886f5
 - filename: dashboard/src/components/tailwind/ActionsCategorySelect.js
   checksum: d9a9708f12d448b92fffbb8c2268c7f527b354e191349c3814b7a84daf4d7001
 - filename: dashboard/src/components/tailwind/Modal.js

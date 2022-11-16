@@ -25,7 +25,7 @@ import useDataMigrator from './DataMigrator';
 import { capture } from '../services/sentry';
 
 // Update to flush cache.
-const currentCacheKey = 'mano-last-refresh-2022-11-04';
+const currentCacheKey = 'mano-last-refresh-2022-11-17';
 
 const cacheEffect = ({ onSet }) => {
   onSet(async (newValue) => {
