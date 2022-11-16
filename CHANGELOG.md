@@ -1,3 +1,10 @@
+## [1.176.7](https://github.com/SocialGouv/mano/compare/v1.176.6...v1.176.7) (2022-11-16)
+
+
+### Bug Fixes
+
+* await create report if not exist + fix report migration ([#985](https://github.com/SocialGouv/mano/issues/985)) ([00d8ab9](https://github.com/SocialGouv/mano/commit/00d8ab945fe1b049b399801ca85cb881bcde8864))
+
 ## [1.176.6](https://github.com/SocialGouv/mano/compare/v1.176.5...v1.176.6) (2022-11-15)
 
 
