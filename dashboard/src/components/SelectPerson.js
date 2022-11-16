@@ -8,6 +8,7 @@ import SelectCustom from './SelectCustom';
 
 const SelectPerson = ({
   value = '',
+  defaultValue = null,
   onChange,
   isMulti = false,
   noLabel = false,
@@ -33,6 +34,9 @@ const SelectPerson = ({
         isSearchable
         onChange={(person) => onChange?.({ currentTarget: { value: isMulti ? person.map((p) => p._id) : person?._id, name } })}
         value={value != null && isMulti ? persons.filter((i) => value?.includes(i._id)) : persons.find((i) => i._id === value)}
+        defaultValue={
+          defaultValue != null && isMulti ? persons.filter((i) => defaultValue?.includes(i._id)) : persons.find((i) => i._id === defaultValue)
+        }
         getOptionValue={(i) => i._id}
         getOptionLabel={(i) => i?.name || ''}
         formatOptionLabel={(i, options) => {

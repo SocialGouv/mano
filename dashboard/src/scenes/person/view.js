@@ -62,12 +62,7 @@ import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import Rencontre from '../../components/Rencontre';
 import { itemsGroupedByPersonSelector, personsObjectSelector } from '../../recoil/selectors';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
-import { groupSelector, groupsState, prepareGroupForEncryption } from '../../recoil/group';
-import SelectPerson from '../../components/SelectPerson';
-import { useDataLoader } from '../../components/DataLoader';
-import dayjs from 'dayjs';
-import PersonName from '../../components/PersonName';
-import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from '../../components/tailwind/Modal';
+import PersonFamily from './PersonFamily';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Rencontres', 'Lieux', 'Documents', 'Historique', 'Famille'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages', 'Rencontres'];
@@ -293,120 +288,6 @@ const PersonHistory = ({ person }) => {
         </tbody>
       </table>
     </div>
-  );
-};
-
-const PersonFamily = ({ person }) => {
-  const [groups, setGroups] = useRecoilState(groupsState);
-  const user = useRecoilValue(userState);
-  const personGroup = useRecoilValue(groupSelector({ personId: person?._id }));
-  const [newRelationModalOpen, setNewRelationModalOpen] = useState(false);
-  const { refresh } = useDataLoader();
-  const API = useApi();
-
-  const onAddFamilyLink = async (e) => {
-    e.preventDefault();
-    const { personId, relation } = Object.fromEntries(new FormData(e.target));
-    if (person._id === personId) {
-      return toast.error("Le lien avec cette personne est vite vu : c'est elle !");
-    }
-    if (personGroup.persons.find((_personId) => _personId === personId)) {
-      return toast.error('Cette personne fait déjà partie de votre groupe');
-    }
-    if (groups.find((group) => group.persons.find((_personId) => _personId === personId))) {
-      return toast.error(
-        "Cette personne fait déjà partie d'un autre groupe",
-        "Vous ne pouvez pour l'instant pas ajouter une personne à plusieurs groupes. N'hésitez pas à nous contacter si vous souhaitez faire évoluer cette fonctionnalité."
-      );
-    }
-    const nextGroup = {
-      ...personGroup,
-      persons: [...new Set([...personGroup.persons, person._id, personId])],
-      relations: [...personGroup.relations, { persons: [person._id, personId], relation, createdAt: dayjs(), updatedAt: dayjs(), user: user._id }],
-    };
-    const isNew = !personGroup?._id;
-    const response = isNew
-      ? await API.post({ path: '/group', body: prepareGroupForEncryption(nextGroup) })
-      : await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
-    if (response.ok) {
-      setGroups((groups) =>
-        isNew ? [...groups, response.decryptedData] : groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group))
-      );
-      setNewRelationModalOpen(false);
-      toast.success('Le lien familial a été ajouté');
-    }
-  };
-
-  return (
-    <>
-      <div className="tw-my-10 tw-flex tw-items-center tw-gap-2">
-        <h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Liens familiaux</h3>
-        <ButtonCustom
-          title="Ajouter un lien"
-          className="tw-ml-auto"
-          onClick={() => {
-            refresh(); // just refresh to make sure we have the latest data
-            setNewRelationModalOpen(true);
-          }}
-        />
-      </div>
-      <ModalContainer open={newRelationModalOpen}>
-        <ModalHeader title="Nouveau lien familial" />
-        <ModalBody>
-          <form id="new-family-relation" className="tw-flex tw-w-full tw-flex-col tw-gap-4" onSubmit={onAddFamilyLink}>
-            <div>
-              <label htmlFor="personId" className="form-text tailwindui">
-                Nouveau lien avec...
-              </label>
-              <SelectPerson name="personId" noLabel disableAccessToPerson />
-            </div>
-            <div>
-              <label htmlFor="relation" className="form-text tailwindui">
-                Relation/commentaire
-              </label>
-              <input className="form-text tailwindui" id="relation" name="relation" type="text" placeholder="Père/fille, mère/fils..." />
-            </div>
-          </form>
-        </ModalBody>
-        <ModalFooter>
-          <button type="submit" className="button-submit" form="new-family-relation">
-            Enregistrer
-          </button>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setNewRelationModalOpen(false)}>
-            Annuler
-          </button>
-        </ModalFooter>
-      </ModalContainer>
-
-      <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Lien entre</th>
-            <th>Relation</th>
-            <th>Enregistré par</th>
-            <th>Date</th>
-          </tr>
-        </thead>
-        <tbody className="small">
-          {personGroup.relations.map(({ relation, persons, createdAt, user }) => {
-            return (
-              <tr key={JSON.stringify(persons)}>
-                <td>
-                  <PersonName item={{ person: persons[0] }} redirectToTab="famille" />
-                  {' et '}
-                  <PersonName item={{ person: persons[1] }} redirectToTab="famille" />
-                </td>
-                <td>{relation}</td>
-                <td>
-                  <UserName id={user} />
-                </td>
-                <td>{dayjsInstance(createdAt).format('DD/MM/YYYY HH:mm')}</td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </>
   );
 };
 

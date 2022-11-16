@@ -135,7 +135,11 @@ const Actions = ({ search, onUpdateResults }) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                    {!!actionOrConsult.group && <ExclamationMarkButton />}
+                    {!!actionOrConsult.group && (
+                      <span className="tw-text-3xl" aria-label="Action familiale">
+                        👪
+                      </span>
+                    )}
                     {!!actionOrConsult.isConsultation && <ConsultationButton />}
                   </div>
                 );

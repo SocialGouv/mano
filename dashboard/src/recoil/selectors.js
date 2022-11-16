@@ -13,6 +13,7 @@ import { passagesState } from './passages';
 import { medicalFileState } from './medicalFiles';
 import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
+import { groupsState } from './group';
 
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
@@ -103,10 +104,26 @@ export const itemsGroupedByPersonSelector = selector({
     const relsPersonPlace = get(relsPersonPlaceState);
     const places = get(placesObjectSelector);
     const rencontres = get(rencontresState);
+    const groups = get(groupsState);
+    for (const group of groups) {
+      for (const person of group.persons) {
+        if (!personsObject[person]) continue;
+        personsObject[person].group = group;
+      }
+    }
     for (const action of actions) {
       if (!personsObject[action.person]) continue;
       personsObject[action.person].actions = personsObject[action.person].actions || [];
       personsObject[action.person].actions.push(action);
+      if (!!action.group) {
+        const group = personsObject[action.person].group;
+        for (const person of group.persons) {
+          if (!personsObject[person]) continue;
+          if (person === action.person) continue;
+          personsObject[person].actions = personsObject[person].actions || [];
+          personsObject[person].actions.push(action);
+        }
+      }
     }
     for (const comment of comments) {
       if (!personsObject[comment.person]) continue;
