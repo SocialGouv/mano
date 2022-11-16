@@ -124,8 +124,6 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
     );
   }, [rencontres]);
 
-  console.log({ value });
-
   return (
     <AsyncSelect
       loadOptions={(inputValue) => {
@@ -157,7 +155,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
           setPersons((persons) => [personResponse.decryptedData, ...persons].sort((p1, p2) => (p1?.name || '').localeCompare(p2?.name || '')));
           toast.success('Nouvelle personne ajoutée !');
           onChange([...currentValue, personResponse.decryptedData]);
-          createReportAtDateIfNotExist(dayjs());
+          await createReportAtDateIfNotExist(dayjs());
         }
       }}
       value={value}

@@ -80,7 +80,7 @@ const Passage = ({ passage, onFinished }) => {
                     });
                     if (response.ok) {
                       setPassages((passages) => [response.decryptedData, ...passages]);
-                      createReportAtDateIfNotExist(response.decryptedData.date);
+                      await createReportAtDateIfNotExist(response.decryptedData.date);
                     }
                   }
                 } else if (showMultiSelect) {
@@ -91,7 +91,7 @@ const Passage = ({ passage, onFinished }) => {
                     });
                     if (response.ok) {
                       setPassages((passages) => [response.decryptedData, ...passages]);
-                      createReportAtDateIfNotExist(response.decryptedData.date);
+                      await createReportAtDateIfNotExist(response.decryptedData.date);
                     }
                   }
                 } else {
@@ -101,7 +101,7 @@ const Passage = ({ passage, onFinished }) => {
                   });
                   if (response.ok) {
                     setPassages((passages) => [response.decryptedData, ...passages]);
-                    createReportAtDateIfNotExist(response.decryptedData.date);
+                    await createReportAtDateIfNotExist(response.decryptedData.date);
                   }
                 }
 
@@ -122,7 +122,7 @@ const Passage = ({ passage, onFinished }) => {
                     return p;
                   })
                 );
-                createReportAtDateIfNotExist(response.decryptedData.date);
+                await createReportAtDateIfNotExist(response.decryptedData.date);
               }
               if (!response.ok) return;
               setOpen(false);

@@ -31,7 +31,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
     if (body.status !== TODO) body.completedAt = completedAt || Date.now();
     const response = await API.post({ path: '/action', body: prepareActionForEncryption(body) });
     if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
-    createReportAtDateIfNotExist(response.decryptedData.date);
+    await createReportAtDateIfNotExist(response.decryptedData.date);
     return response;
   };
 
