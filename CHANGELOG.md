@@ -1,3 +1,10 @@
+## [1.176.12](https://github.com/SocialGouv/mano/compare/v1.176.11...v1.176.12) (2022-11-17)
+
+
+### Bug Fixes
+
+* **api:** persons query ([43da87d](https://github.com/SocialGouv/mano/commit/43da87d6cd0f7a8bbbfef1391e8efe2ea2db7409))
+
 ## [1.176.11](https://github.com/SocialGouv/mano/compare/v1.176.10...v1.176.11) (2022-11-17)
 
 
