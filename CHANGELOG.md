@@ -1,3 +1,10 @@
+## [1.176.13](https://github.com/SocialGouv/mano/compare/v1.176.12...v1.176.13) (2022-11-17)
+
+
+### Bug Fixes
+
+* **api:** reports query ([546ea42](https://github.com/SocialGouv/mano/commit/546ea424e2df9a463806a465cc183d4ef43d3a77))
+
 ## [1.176.12](https://github.com/SocialGouv/mano/compare/v1.176.11...v1.176.12) (2022-11-17)
 
 
