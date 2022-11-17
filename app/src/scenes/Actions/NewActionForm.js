@@ -90,8 +90,8 @@ const NewActionForm = ({ route, navigation }) => {
       setActions((actions) => [response.decryptedData, ...actions]);
       actions.push(response.decryptedData);
     }
-    createReportAtDateIfNotExist(newAction.createdAt);
-    if (newAction.completedAt) createReportAtDateIfNotExist(newAction.completedAt);
+    await createReportAtDateIfNotExist(newAction.createdAt);
+    if (newAction.completedAt) await createReportAtDateIfNotExist(newAction.completedAt);
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
     backRequestHandledRef.current = true;
     Sentry.setContext('action', { _id: newAction._id });
