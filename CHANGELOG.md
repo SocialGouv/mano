@@ -1,3 +1,10 @@
+## [1.176.10](https://github.com/SocialGouv/mano/compare/v1.176.9...v1.176.10) (2022-11-17)
+
+
+### Bug Fixes
+
+* MANO-4J ([73c3f08](https://github.com/SocialGouv/mano/commit/73c3f08dabb6dd4f0d7899fe66a77045b1b76dbd))
+
 ## [1.176.9](https://github.com/SocialGouv/mano/compare/v1.176.8...v1.176.9) (2022-11-16)
 
 
