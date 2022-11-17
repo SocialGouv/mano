@@ -226,6 +226,7 @@ router.get(
 
     const query = {
       where: { organisation: req.user.organisation },
+      order: [["createdAt", "DESC"]],
     };
 
     const total = await Person.count(query);
@@ -237,6 +238,8 @@ router.get(
     } else if (after && !isNaN(Number(after))) {
       query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
     }
+
+    console.log(query);
 
     const data = await Person.findAll({
       ...query,
