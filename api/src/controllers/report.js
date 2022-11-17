@@ -28,7 +28,10 @@ router.get(
     }
     const { limit, page, after, withDeleted } = req.query;
 
-    const query = { where: { organisation: req.user.organisation } };
+    const query = {
+      where: { organisation: req.user.organisation },
+      order: [["createdAt", "DESC"]],
+    };
 
     const total = await Report.count(query);
     if (limit) query.limit = Number(limit);
