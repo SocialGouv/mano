@@ -239,8 +239,6 @@ router.get(
       query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
     }
 
-    console.log(query);
-
     const data = await Person.findAll({
       ...query,
       attributes: ["_id", "encrypted", "encryptedEntityKey", "organisation", "createdAt", "updatedAt", "deletedAt"],
