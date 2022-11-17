@@ -3,15 +3,21 @@ import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 
-import ButtonCustom from '../components/ButtonCustom';
-import SelectUser from './SelectUser';
+import ButtonCustom from '../../../components/ButtonCustom';
+import SelectUser from '../../../components/SelectUser';
 import { Formik } from 'formik';
-import { userState } from '../recoil/auth';
-import { useRecoilValue } from 'recoil';
-import { dateForDatePicker } from '../services/date';
+import { currentTeamState, organisationState, userState } from '../../../recoil/auth';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { dateForDatePicker } from '../../../services/date';
+import { commentsState, prepareCommentForEncryption } from '../../../recoil/comments';
+import useApi from '../../../services/api';
 
-const CommentModal = ({ comment = {}, isNewComment, onClose }) => {
+const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
+  const currentTeam = useRecoilValue(currentTeamState);
+  const setComments = useSetRecoilState(commentsState);
+  const API = useApi();
 
   return (
     <>
@@ -24,8 +30,40 @@ const CommentModal = ({ comment = {}, isNewComment, onClose }) => {
               if (!body.user && !isNewComment) return toast.error("L'utilisateur est obligatoire");
               if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
               if (!body.comment) return toast.error('Le commentaire est obligatoire');
-              // await onSubmit({ ...comment, ...body });
-              // TODO......
+
+              const commentBody = {
+                comment: body.comment,
+                urgent: body.urgent || false,
+                user: body.user || user._id,
+                date: body.date || new Date(),
+                team: body.team || currentTeam._id,
+                organisation: organisation._id,
+              };
+
+              if (isNewComment) {
+                const response = await API.post({
+                  path: '/comment',
+                  body: prepareCommentForEncryption({ ...commentBody, person: person._id }),
+                });
+                if (response.ok) {
+                  toast.success('Commentaire enregistré');
+                  setComments((comments) => [response.decryptedData, ...comments]);
+                } else {
+                  toast.error(response.error);
+                }
+              } else {
+                const response = await API.put({
+                  path: `/comment/${comment._id}`,
+                  body: prepareCommentForEncryption({ ...commentBody, person: person._id }),
+                });
+                if (response.ok) {
+                  toast.success('Commentaire enregistré');
+                  setComments((comments) => comments.map((c) => (c._id === comment._id ? response.decryptedData : c)));
+                } else {
+                  toast.error(response.error);
+                }
+              }
+
               actions.setSubmitting(false);
               window.sessionStorage.removeItem('currentComment');
               onClose();

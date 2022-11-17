@@ -4,7 +4,6 @@ import { Alert } from 'reactstrap';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import Places from '../../components/Places';
-import { SmallHeader, SmallHeaderWithBackButton } from '../../components/header';
 import { itemsGroupedByPersonSelector, personsObjectSelector } from '../../recoil/selectors';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';

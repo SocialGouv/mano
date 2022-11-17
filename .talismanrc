@@ -48,5 +48,5 @@ b65c2b5037be9d00f54e4f9ec8e453d37936b28a3fce9456
 - filename: tests/src/scripts/db.sql
   checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
 scopeconfig:
-  - scope: node
+- scope: node
 version: "1.0"

@@ -11,7 +11,7 @@ import Comments from './Comments';
 import styled from 'styled-components';
 import { useRecoilValue } from 'recoil';
 import { populatedPersonSelector } from '../selectors/selectors';
-import Passages from './Passages';
+import PassagesRencontres from './PassagesRencontres';
 
 export default function Summary({ person }) {
   return (
@@ -24,7 +24,7 @@ export default function Summary({ person }) {
           <Actions person={person} />
         </div>
         <div className="span-3 col-alt border shadow rounded p-3">
-          <Comments comments={person.comments} />
+          <Comments comments={person.comments} person={person} />
         </div>
       </ContainerRow>
       <ContainerRow>
@@ -40,7 +40,7 @@ export default function Summary({ person }) {
           <InfosMedicales person={person} />
         </div>
         <div className="span-3 col-alt border shadow rounded p-3">
-          <Passages passages={person.passages} />
+          <PassagesRencontres person={person} />
         </div>
       </ContainerRow>
     </>

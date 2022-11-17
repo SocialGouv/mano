@@ -75,7 +75,11 @@ export const Actions = ({ person }) => {
           {filteredData.map((action, i) => (
             <tr>
               <td>
-                <div style={{ padding: '0.5rem 0' }}>
+                <div
+                  style={{ padding: '0.5rem 0' }}
+                  onClick={() => {
+                    history.push(`/action/${action._id}`);
+                  }}>
                   <div style={{ display: 'flex' }}>
                     <div style={{ flexGrow: 1 }}>{action.urgent ? <ExclamationMarkButton /> : null} Vendredi 29 Septembre 22:30</div>
                     <div>
