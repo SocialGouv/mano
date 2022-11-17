@@ -1,3 +1,10 @@
+## [1.176.11](https://github.com/SocialGouv/mano/compare/v1.176.10...v1.176.11) (2022-11-17)
+
+
+### Bug Fixes
+
+* tests ([#984](https://github.com/SocialGouv/mano/issues/984)) ([8b6d1c5](https://github.com/SocialGouv/mano/commit/8b6d1c5f670ad8a649e2ac334e06e5ab0670cedf))
+
 ## [1.176.10](https://github.com/SocialGouv/mano/compare/v1.176.9...v1.176.10) (2022-11-17)
 
 
