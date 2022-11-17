@@ -1,13 +1,13 @@
 import { Col, Row } from 'reactstrap';
-import { Actions } from './Actions';
-import Comments from '../../../components/Comments';
 import { theme } from '../../../config';
 import { useRecoilValue } from 'recoil';
-import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector } from '../../../recoil/persons';
+import { customFieldsPersonsMedicalSelector } from '../../../recoil/persons';
 import { currentTeamState } from '../../../recoil/auth';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import EditModal from './EditModal';
 
 export default function InfosMedicales({ person }) {
+  const [editModal, setEditModal] = useState(false);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const team = useRecoilValue(currentTeamState);
   const customFields = useMemo(() => {
@@ -15,7 +15,15 @@ export default function InfosMedicales({ person }) {
   }, [customFieldsPersonsMedical, team]);
   return (
     <div>
-      <h4>Information Medicales</h4>
+      {Boolean(editModal) && <EditModal person={person} selectedPanel={editModal} onClose={() => setEditModal(false)} />}
+      <div className="tw-flex">
+        <h4 className="tw-flex-1">Informations Médicales</h4>
+        <div>
+          <button className="rounded px-2 py-1 tw-bg-main tw-text-sm tw-text-white" onClick={() => setEditModal('medical')}>
+            Modifier
+          </button>
+        </div>
+      </div>
       <Row>
         <Col md={4}>
           <InfoMedicaleLine label="Couverture médicale" value={person.healthInsurance} />
@@ -25,7 +33,7 @@ export default function InfosMedicales({ person }) {
         </Col>
         {customFields.map((field) => (
           <Col md={4}>
-            <InfoMedicaleLine label={field.label} value={Array.isArray(field.value) ? field.value.join(', ') : field.value} />
+            <InfoMedicaleLine label={field.label} value={person[field.name]} />
           </Col>
         ))}
       </Row>
@@ -38,7 +46,17 @@ function InfoMedicaleLine({ label, value }) {
     <div className="my-2">
       <div>{label} :</div>
       <div>
-        <b style={{ color: theme.main }}>{value || '-'}</b>
+        {Array.isArray(value) ? (
+          <ul className="tw-list-disc">
+            {value.map((v) => (
+              <li key={v}>
+                <b style={{ color: theme.main }}>{v || '-'}</b>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <b style={{ color: theme.main }}>{value || '-'}</b>
+        )}
       </div>
     </div>
   );

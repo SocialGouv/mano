@@ -19,7 +19,11 @@ export default function Comments({ comments, person }) {
       {modalEditOpen && <CommentModal comment={commentToEdit} person={person} isNewComment={false} onClose={() => setModalEditOpen(false)} />}
       <div>
         <h4>Commentaires</h4>
-        <ButtonCustom className="tw-mb-4" onClick={() => setModalCreateOpen(true)} title="Ajouter" />
+        <div>
+          <button className="rounded px-2 py-1 tw-mb-4 tw-bg-main tw-text-sm tw-text-white" onClick={() => setModalCreateOpen(true)}>
+            Ajouter un commentaire
+          </button>
+        </div>
       </div>
 
       <table className="table table-striped">

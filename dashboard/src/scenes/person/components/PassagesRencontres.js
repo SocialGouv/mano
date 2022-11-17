@@ -49,21 +49,24 @@ function Passages({ passages, personId }) {
   const [passageToEdit, setPassageToEdit] = useState(null);
   return (
     <>
-      <ButtonCustom
-        className="tw-mb-4"
-        title="Ajouter un passage"
+      <button
+        className="rounded px-2 py-1 tw-mb-4 tw-bg-main tw-text-sm tw-text-white"
         onClick={() =>
           setPassageToEdit({
             user: user._id,
             team: currentTeam._id,
             person: personId,
           })
-        }
-      />
+        }>
+        Ajouter un passage
+      </button>
       <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
       {(passages || []).map((passage) => {
         return (
-          <tr onClick={(passage) => setPassageToEdit(passage)}>
+          <tr
+            onClick={() => {
+              setPassageToEdit(passage);
+            }}>
             <td>
               <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
               <div className="content">
@@ -88,21 +91,21 @@ function Rencontres({ rencontres, personId }) {
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
   return (
     <>
-      <ButtonCustom
-        className="tw-mb-4"
-        title="Ajouter une rencontre"
+      <button
+        className="rounded px-2 py-1 tw-mb-4 tw-bg-main tw-text-sm tw-text-white"
         onClick={() =>
           setRencontreToEdit({
             user: user._id,
             team: currentTeam._id,
             person: personId,
           })
-        }
-      />
+        }>
+        Ajouter une rencontre
+      </button>
       <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
       {(rencontres || []).map((rencontre) => {
         return (
-          <tr onClick={(passage) => setRencontreToEdit(passage)}>
+          <tr onClick={() => setRencontreToEdit(rencontre)}>
             <td>
               <div>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
               <div className="content">

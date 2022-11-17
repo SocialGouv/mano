@@ -9,8 +9,7 @@ import PersonDocuments from './PersonDocuments';
 import InfosMedicales from './InfosMedicales';
 import Comments from './Comments';
 import styled from 'styled-components';
-import { useRecoilValue } from 'recoil';
-import { populatedPersonSelector } from '../selectors/selectors';
+
 import PassagesRencontres from './PassagesRencontres';
 
 export default function Summary({ person }) {
@@ -39,7 +38,7 @@ export default function Summary({ person }) {
         <div className="span-9 col-main pt-4 border shadow rounded p-3">
           <InfosMedicales person={person} />
         </div>
-        <div className="span-3 col-alt border shadow rounded p-3">
+        <div className="span-3 col-alt border shadow rounded p-3" style={{ minHeight: '360px' }}>
           <PassagesRencontres person={person} />
         </div>
       </ContainerRow>

@@ -1,10 +1,15 @@
 import { theme } from '../../../config';
 import { dayjsInstance } from '../../../services/date';
 import styled from 'styled-components';
+import ButtonCustom from '../../../components/ButtonCustom';
+import { useState } from 'react';
+import EditModal from './EditModal';
 
 export function InfosMain({ person }) {
+  const [editModal, setEditModal] = useState(false);
   return (
     <Container>
+      {Boolean(editModal) && <EditModal person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
       <div className="card">
         <div className="card-body">
           <div className="person-name">
@@ -24,13 +29,22 @@ export function InfosMain({ person }) {
             </div>
             <div>
               <b>Suivi·e depuis le : </b>
-              {dayjsInstance(person.wanderingAt || person.createdAt).format('DD/MM/YYYY')}
+              {dayjsInstance(person.followedSince || person.createdAt).format('DD/MM/YYYY')}
             </div>
+            {person.wanderingAt ? (
+              <div>
+                <b>En rue depuis le : </b>
+                {dayjsInstance(person.wanderingAt).format('DD/MM/YYYY')}
+              </div>
+            ) : null}
             <div>
               <b>Téléphone : </b>
               {person.phone}
             </div>
           </div>
+          <button className="rounded px-2 py-1 tw-mt-4 tw-bg-white tw-text-sm tw-text-main" onClick={() => setEditModal(true)}>
+            Modifier
+          </button>
         </div>
       </div>
     </Container>
@@ -40,7 +54,7 @@ export function InfosMain({ person }) {
 const Container = styled.div`
   .card {
     background-color: ${theme.main};
-    height: 350px;
+    min-height: 350px;
     display: flex;
     align-items: center;
     flex-direction: row;

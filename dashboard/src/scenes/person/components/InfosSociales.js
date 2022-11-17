@@ -3,9 +3,11 @@ import { theme } from '../../../config';
 import { useRecoilValue } from 'recoil';
 import { customFieldsPersonsSocialSelector } from '../../../recoil/persons';
 import { currentTeamState } from '../../../recoil/auth';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
+import EditModal from './EditModal';
 
 export default function InfosSociales({ person }) {
+  const [editModal, setEditModal] = useState(false);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const team = useRecoilValue(currentTeamState);
   const customFields = useMemo(() => {
@@ -13,7 +15,15 @@ export default function InfosSociales({ person }) {
   }, [customFieldsPersonsSocial, team]);
   return (
     <div>
-      <h4>Information sociales</h4>
+      {Boolean(editModal) && <EditModal person={person} selectedPanel={editModal} onClose={() => setEditModal(false)} />}
+      <div className="tw-flex">
+        <h4 className="tw-flex-1">Informations sociales</h4>
+        <div>
+          <button className="rounded px-2 py-1 tw-bg-main tw-text-sm tw-text-white" onClick={() => setEditModal('social')}>
+            Modifier
+          </button>
+        </div>
+      </div>
       <div className="my-4">{person.description}</div>
       <Row>
         <Col md={4}>
@@ -46,7 +56,7 @@ export default function InfosSociales({ person }) {
         </Col>
         {customFields.map((field) => (
           <Col md={4}>
-            <InfoSocialeLine label={field.label} value={Array.isArray(field.value) ? field.value.join(', ') : field.value} />
+            <InfoSocialeLine label={field.label} value={person[field.name]} />
           </Col>
         ))}
       </Row>
@@ -59,7 +69,17 @@ function InfoSocialeLine({ label, value }) {
     <div className="my-2">
       <div>{label} :</div>
       <div>
-        <b style={{ color: theme.main }}>{value || '-'}</b>
+        {Array.isArray(value) ? (
+          <ul className="tw-list-disc">
+            {value.map((v) => (
+              <li key={v}>
+                <b style={{ color: theme.main }}>{v || '-'}</b>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <b style={{ color: theme.main }}>{value || '-'}</b>
+        )}
       </div>
     </div>
   );

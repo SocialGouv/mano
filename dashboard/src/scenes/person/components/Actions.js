@@ -33,7 +33,11 @@ export const Actions = ({ person }) => {
     <div>
       <div style={{ display: 'flex' }}>
         <h4 style={{ flex: '1' }}>Actions</h4>
-        <ButtonCustom onClick={() => setModalOpen(true)} title="Créer une action" />
+        <div>
+          <button className="rounded px-2 py-1 tw-bg-main tw-text-sm tw-text-white" onClick={() => setModalOpen(true)}>
+            Créer une action
+          </button>
+        </div>
         <CreateActionModal person={person._id} open={modalOpen} setOpen={(value) => setModalOpen(value)} />
       </div>
       {data.length ? (
