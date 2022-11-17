@@ -18,6 +18,7 @@ const categoriesSortedByMostUsedSelector = selector({
     const actions = get(actionsState);
     const categories = {};
     for (const action of actions) {
+      if (!action.categories) continue;
       for (const category of action.categories) {
         if (!categories[category]) categories[category] = 0;
         categories[category]++;
