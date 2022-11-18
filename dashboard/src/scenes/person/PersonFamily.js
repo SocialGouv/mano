@@ -13,11 +13,13 @@ import SelectPerson from '../../components/SelectPerson';
 import { useDataLoader } from '../../components/DataLoader';
 import PersonName from '../../components/PersonName';
 import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from '../../components/tailwind/Modal';
+import { personsState } from '../../recoil/persons';
 
 const PersonFamily = ({ person }) => {
   const [groups, setGroups] = useRecoilState(groupsState);
   const user = useRecoilValue(userState);
   const personGroup = useRecoilValue(groupSelector({ personId: person?._id }));
+  const persons = useRecoilValue(personsState);
   const [newRelationModalOpen, setNewRelationModalOpen] = useState(false);
   const [relationToEdit, setRelationToEdit] = useState(null);
   const { refresh } = useDataLoader();
@@ -25,7 +27,7 @@ const PersonFamily = ({ person }) => {
 
   const onAddFamilyLink = async (e) => {
     e.preventDefault();
-    const { personId, relation } = Object.fromEntries(new FormData(e.target));
+    const { personId, description } = Object.fromEntries(new FormData(e.target));
     if (person._id === personId) {
       return toast.error("Le lien avec cette personne est vite vu : c'est elle !");
     }
@@ -46,7 +48,7 @@ const PersonFamily = ({ person }) => {
         {
           _id: uuidv4(),
           persons: [person._id, personId],
-          relation,
+          description,
           createdAt: dayjs(),
           updatedAt: dayjs(),
           user: user._id,
@@ -66,39 +68,47 @@ const PersonFamily = ({ person }) => {
     }
   };
 
-  const onEditFamilyLink = async (e) => {
+  const onEditRelation = async (e) => {
     e.preventDefault();
-    const { personId, relation } = Object.fromEntries(new FormData(e.target));
-    if (person._id === personId) {
-      return toast.error("Le lien avec cette personne est vite vu : c'est elle !");
-    }
-    if (personGroup.persons.find((_personId) => _personId === personId)) {
-      return toast.error('Il y a déjà un lien entre ces deux personnes');
-    }
-    if (groups.find((group) => group.persons.find((_personId) => _personId === personId))) {
-      return toast.error(
-        "Cette personne fait déjà partie d'une autre famille",
-        "Vous ne pouvez pour l'instant pas ajouter une personne à plusieurs familles. N'hésitez pas à nous contacter si vous souhaitez faire évoluer cette fonctionnalité."
-      );
-    }
+    const { _id, description } = Object.fromEntries(new FormData(e.target));
     const nextGroup = {
       ...personGroup,
-      persons: [...new Set([...personGroup.persons, person._id, personId])],
-      relations: [...personGroup.relations, { persons: [person._id, personId], relation, createdAt: dayjs(), updatedAt: dayjs(), user: user._id }],
+      relations: personGroup.relations.map((relation) =>
+        relation._id === _id ? { ...relation, description, updatedAt: dayjs(), user: user._id } : relation
+      ),
     };
-    const isNew = !personGroup?._id;
-    const response = isNew
-      ? await API.post({ path: '/group', body: prepareGroupForEncryption(nextGroup) })
-      : await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
+    const response = await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
     if (response.ok) {
-      setGroups((groups) =>
-        isNew ? [...groups, response.decryptedData] : groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group))
-      );
-      setNewRelationModalOpen(false);
-      toast.success('Le lien familial a été ajouté');
+      setGroups((groups) => groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group)));
+      setRelationToEdit(null);
+      toast.success('Le lien familial a été modifié');
     }
   };
 
+  const onDeleteRelation = async (relation) => {
+    const personId1 = relation?.persons[0];
+    const personId1Name = persons.find((p) => p._id === personId1)?.name;
+    const personId2 = relation?.persons[1];
+    const personId2Name = persons.find((p) => p._id === personId2)?.name;
+    if (
+      !window.confirm(
+        `Voulez-vous vraiment supprimer le lien familial entre ${personId1Name} et ${personId2Name} ? Cette opération erst irréversible.`
+      )
+    ) {
+      return;
+    }
+    const nextRelations = personGroup.relations.filter((_relation) => _relation._id !== relation._id);
+    const nextGroup = {
+      persons: [...new Set(nextRelations.reduce((_personIds, relation) => [..._personIds, ...relation.persons], []))],
+      relations: nextRelations,
+    };
+    const response = await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
+    if (response.ok) {
+      setGroups((groups) => groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group)));
+      setRelationToEdit(null);
+      toast.success('Le lien familial a été supprimé');
+    }
+  };
   return (
     <>
       <div className="tw-my-10 tw-flex tw-items-center tw-gap-2">
@@ -124,8 +134,8 @@ const PersonFamily = ({ person }) => {
           </tr>
         </thead>
         <tbody className="small">
-          {personGroup.relations.map((rel) => {
-            const { relation, persons, createdAt, user } = rel;
+          {personGroup.relations.map((_relation) => {
+            const { description, persons, createdAt, user } = _relation;
             return (
               <tr key={JSON.stringify(persons)}>
                 <td>
@@ -133,17 +143,17 @@ const PersonFamily = ({ person }) => {
                   {' et '}
                   <PersonName item={{ person: persons[1] }} redirectToTab="famille" />
                 </td>
-                <td>{relation}</td>
+                <td>{description}</td>
                 <td width="15%">
                   <UserName id={user} />
                 </td>
                 <td width="15%">{dayjsInstance(createdAt).format('DD/MM/YYYY HH:mm')}</td>
                 <td width="15%">
                   <div className="tw-flex tw-flex-col tw-items-center tw-gap-2">
-                    <button type="button" className="button-classic" onClick={() => setRelationToEdit(rel)}>
+                    <button type="button" className="button-classic" onClick={() => setRelationToEdit(_relation)}>
                       Modifier
                     </button>
-                    <button type="button" className="button-destructive">
+                    <button type="button" className="button-destructive" onClick={() => onDeleteRelation(_relation)}>
                       Supprimer
                     </button>
                   </div>
@@ -155,7 +165,8 @@ const PersonFamily = ({ person }) => {
         <EditRelation
           open={!!relationToEdit}
           setOpen={setRelationToEdit}
-          onEditFamilyLink={onEditFamilyLink}
+          onEditRelation={onEditRelation}
+          onDeleteRelation={onDeleteRelation}
           person={person}
           relationToEdit={relationToEdit}
         />
@@ -164,12 +175,12 @@ const PersonFamily = ({ person }) => {
   );
 };
 
-const NewRelation = ({ open, setOpen, onEditFamilyLink, person }) => {
+const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
   return (
     <ModalContainer open={open}>
       <ModalHeader title="Nouveau lien familial" />
       <ModalBody>
-        <form id="new-family-relation" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onEditFamilyLink}>
+        <form id="new-family-relation" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8" onSubmit={onAddFamilyLink}>
           <div>
             <label htmlFor="personId" className="form-text tailwindui">
               Nouvelle relation entre {person.name} et...
@@ -177,10 +188,10 @@ const NewRelation = ({ open, setOpen, onEditFamilyLink, person }) => {
             <SelectPerson name="personId" noLabel disableAccessToPerson />
           </div>
           <div>
-            <label htmlFor="relation" className="form-text tailwindui">
+            <label htmlFor="description" className="form-text tailwindui">
               Relation/commentaire
             </label>
-            <input className="form-text tailwindui" id="relation" name="relation" type="text" placeholder="Père/fille, mère/fils..." />
+            <input className="form-text tailwindui" id="description" name="description" type="text" placeholder="Père/fille, mère/fils..." />
           </div>
         </form>
       </ModalBody>
@@ -196,46 +207,46 @@ const NewRelation = ({ open, setOpen, onEditFamilyLink, person }) => {
   );
 };
 
-const EditRelation = ({ open, setOpen, onEditFamilyLink, relationToEdit }) => {
+const EditRelation = ({ open, setOpen, onEditRelation, onDeleteRelation, relationToEdit }) => {
+  const persons = useRecoilValue(personsState);
+  const personId1 = relationToEdit?.persons[0];
+  const personId2 = relationToEdit?.persons[1];
+
   return (
     <ModalContainer open={open}>
-      <ModalHeader title="Éditer le lien familial" />
+      <ModalHeader
+        title={`Éditer le lien familial entre ${persons.find((p) => p._id === personId1)?.name} et ${persons.find((p) => p._id === personId2)?.name}`}
+      />
       <ModalBody>
         <form
           key={JSON.stringify(relationToEdit)}
           id="edit-family-relation"
           className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8"
-          onSubmit={onEditFamilyLink}>
+          onSubmit={onEditRelation}>
+          <input type="hidden" name="_id" defaultValue={relationToEdit?._id} />
+          <input type="hidden" name="personId1" defaultValue={relationToEdit?.persons[0]} />
+          <input type="hidden" name="personId2" defaultValue={relationToEdit?.persons[1]} />
           <div>
-            <label htmlFor="personId1" className="form-text tailwindui">
-              Relation entre...
-            </label>
-            <SelectPerson name="personId1" noLabel disableAccessToPerson defaultValue={relationToEdit?.persons[0]} />
-          </div>
-          <div>
-            <label htmlFor="personId2" className="form-text tailwindui">
-              et...
-            </label>
-            <SelectPerson name="personId2" noLabel disableAccessToPerson defaultValue={relationToEdit?.persons[1]} />
-          </div>
-          <div>
-            <label htmlFor="relation" className="form-text tailwindui">
+            <label htmlFor="description" className="form-text tailwindui">
               Relation/commentaire
             </label>
             <input
               className="form-text tailwindui"
-              id="relation"
-              name="relation"
+              id="description"
+              name="description"
               type="text"
               placeholder="Père/fille, mère/fils..."
-              defaultValue={relationToEdit?.relation}
+              defaultValue={relationToEdit?.description}
             />
           </div>
         </form>
       </ModalBody>
       <ModalFooter>
-        <button type="submit" className="button-submit" form="new-family-relation">
+        <button type="submit" className="button-submit" form="edit-family-relation">
           Enregistrer
+        </button>
+        <button type="button" className="button-destructive" onClick={() => onDeleteRelation(relationToEdit)}>
+          Supprimer
         </button>
         <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(null)}>
           Annuler
