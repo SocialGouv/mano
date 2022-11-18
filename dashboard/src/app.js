@@ -124,6 +124,8 @@ const App = ({ resetRecoil }) => {
 
           <RestrictedRoute path="*" component={() => <Redirect to={'stats'} />} />
         </Switch>
+        <DataLoader />
+        <ModalConfirm />
       </Router>
     </div>
   );
@@ -160,8 +162,6 @@ export default function ContextedApp() {
   return (
     <RecoilRoot key={recoilKey}>
       <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
-      <DataLoader />
-      <ModalConfirm />
     </RecoilRoot>
   );
 }
