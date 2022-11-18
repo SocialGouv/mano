@@ -29,59 +29,61 @@ const PersonDocuments = ({ person }) => {
   return (
     <div>
       {openModal && <DocumentModal document={openModal} person={person} onClose={() => setOpenModal(false)} />}
-      <h4 className="mt-2">Documents</h4>
-      <label className="rounded px-2 py-1 tw-bg-main tw-text-sm tw-text-white">
-        Ajouter un document
-        <input
-          type="file"
-          key={resetFileInputKey}
-          name="file"
-          className="tw-hidden"
-          onChange={async (e) => {
-            const docResponse = await API.upload({
-              path: `/person/${person._id}/document`,
-              file: e.target.files[0],
-            });
-            if (!docResponse.ok || !docResponse.data) {
-              capture('Error uploading document', { extra: { docResponse } });
-              toast.error("Une erreur est survenue lors de l'envoi du document");
-              return;
-            }
-            setResetFileInputKey((k) => k + 1);
-            const { data: file, encryptedEntityKey } = docResponse;
-            const personResponse = await API.put({
-              path: `/person/${person._id}`,
-              body: preparePersonForEncryption(
-                customFieldsPersonsMedical,
-                customFieldsPersonsSocial
-              )({
-                ...person,
-                documents: [
-                  ...(person.documents || []),
-                  {
-                    _id: file.filename,
-                    name: file.originalname,
-                    encryptedEntityKey,
-                    createdAt: new Date(),
-                    createdBy: user._id,
-                    file,
-                  },
-                ],
-              }),
-            });
-            if (personResponse.ok) {
-              const newPerson = personResponse.decryptedData;
-              setPersons((persons) =>
-                persons.map((p) => {
-                  if (p._id === person._id) return newPerson;
-                  return p;
-                })
-              );
-              toast.success('Document ajouté !');
-            }
-          }}
-        />
-      </label>
+      <div className="tw-flex">
+        <h4 className="tw-flex-1">Documents</h4>
+        <label className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
+          ＋
+          <input
+            type="file"
+            key={resetFileInputKey}
+            name="file"
+            className="tw-hidden"
+            onChange={async (e) => {
+              const docResponse = await API.upload({
+                path: `/person/${person._id}/document`,
+                file: e.target.files[0],
+              });
+              if (!docResponse.ok || !docResponse.data) {
+                capture('Error uploading document', { extra: { docResponse } });
+                toast.error("Une erreur est survenue lors de l'envoi du document");
+                return;
+              }
+              setResetFileInputKey((k) => k + 1);
+              const { data: file, encryptedEntityKey } = docResponse;
+              const personResponse = await API.put({
+                path: `/person/${person._id}`,
+                body: preparePersonForEncryption(
+                  customFieldsPersonsMedical,
+                  customFieldsPersonsSocial
+                )({
+                  ...person,
+                  documents: [
+                    ...(person.documents || []),
+                    {
+                      _id: file.filename,
+                      name: file.originalname,
+                      encryptedEntityKey,
+                      createdAt: new Date(),
+                      createdBy: user._id,
+                      file,
+                    },
+                  ],
+                }),
+              });
+              if (personResponse.ok) {
+                const newPerson = personResponse.decryptedData;
+                setPersons((persons) =>
+                  persons.map((p) => {
+                    if (p._id === person._id) return newPerson;
+                    return p;
+                  })
+                );
+                toast.success('Document ajouté !');
+              }
+            }}
+          />
+        </label>
+      </div>
       <table className="table table-striped">
         <tbody className="small">
           {(person.documents || []).map((doc) => (
@@ -101,6 +103,7 @@ const PersonDocuments = ({ person }) => {
           ))}
         </tbody>
       </table>
+      {!person.documents?.length && <div className="text-center  tw-italic">Aucun document</div>}
     </div>
   );
 };

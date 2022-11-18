@@ -56,11 +56,11 @@ export function InfosMain({ person }) {
 }
 
 const Teams = ({ person: { _id, assignedTeams } }) => (
-  <React.Fragment key={_id}>
+  <div key={_id} className="tw-mt-2 tw-grid tw-gap-1">
     {assignedTeams?.map((teamId) => (
-      <TagTeam key={teamId} teamId={teamId} />
+      <TagTeam key={teamId} teamId={teamId} className="tw-text-xs" />
     ))}
-  </React.Fragment>
+  </div>
 );
 
 const Container = styled.div`
@@ -76,7 +76,7 @@ const Container = styled.div`
   }
   .person-name {
     border-bottom: solid white 1px;
-    padding-bottom: 1rem;
+    padding-bottom: 0.5rem;
   }
   .person-description {
     padding-top: 1rem;

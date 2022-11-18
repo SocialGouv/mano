@@ -19,8 +19,8 @@ export default function InfosSociales({ person }) {
       <div className="tw-flex">
         <h4 className="tw-flex-1">Informations sociales</h4>
         <div>
-          <button className="rounded px-2 py-1 tw-bg-main tw-text-sm tw-text-white" onClick={() => setEditModal('social')}>
-            Modifier
+          <button className="tw-transition hover:tw-scale-125" onClick={() => setEditModal('social')}>
+            ✏️
           </button>
         </div>
       </div>

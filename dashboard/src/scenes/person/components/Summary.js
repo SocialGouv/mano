@@ -25,10 +25,10 @@ export default function Summary({ person }) {
         <div className="span-3 col-main">
           <InfosMain person={person} />
         </div>
-        <div className="span-6 col-alt pt-4 border shadow rounded p-3">
+        <div className="span-6 border shadow rounded col-alt tw-relative">
           <Actions person={person} />
         </div>
-        <div className="span-3 col-alt border shadow rounded p-3">
+        <div className="span-3 col-alt border shadow rounded">
           <Comments comments={person.comments} person={person} />
         </div>
       </ContainerRow>

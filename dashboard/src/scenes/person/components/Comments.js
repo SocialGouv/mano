@@ -17,11 +17,13 @@ export default function Comments({ comments, person }) {
     <Container>
       {modalCreateOpen && <CommentModal isNewComment={true} person={person} onClose={() => setModalCreateOpen(false)} />}
       {modalEditOpen && <CommentModal comment={commentToEdit} person={person} isNewComment={false} onClose={() => setModalEditOpen(false)} />}
-      <div>
-        <h4>Commentaires</h4>
+      <div className="p-3 tw-flex">
+        <h4 className="tw-flex-1">Commentaires</h4>
         <div>
-          <button className="rounded px-2 py-1 tw-mb-4 tw-bg-main tw-text-sm tw-text-white" onClick={() => setModalCreateOpen(true)}>
-            Ajouter un commentaire
+          <button
+            className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
+            onClick={() => setModalCreateOpen(true)}>
+            ＋
           </button>
         </div>
       </div>

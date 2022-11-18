@@ -31,18 +31,20 @@ export const Actions = ({ person }) => {
 
   return (
     <div>
-      <div style={{ display: 'flex' }}>
-        <h4 style={{ flex: '1' }}>Actions</h4>
+      <div className="p-3 tw-flex tw-bg-white">
+        <h4 className="tw-flex-1">Actions</h4>
         <div>
-          <button className="rounded px-2 py-1 tw-bg-main tw-text-sm tw-text-white" onClick={() => setModalOpen(true)}>
-            Créer une action
+          <button
+            className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
+            onClick={() => setModalOpen(true)}>
+            ＋
           </button>
         </div>
         <CreateActionModal person={person._id} open={modalOpen} setOpen={(value) => setModalOpen(value)} />
       </div>
       {data.length ? (
-        <Row>
-          <Col md={6}>
+        <div className="tw-mb-4 tw-grid tw-grid-cols-2 tw-gap-2 tw-px-3">
+          <div>
             <Label htmlFor="action-select-categories-filter">Filtrer par catégorie</Label>
             <SelectCustom
               options={catsSelect}
@@ -56,8 +58,8 @@ export const Actions = ({ person }) => {
               getOptionValue={(c) => c}
               getOptionLabel={(c) => c}
             />
-          </Col>
-          <Col md={6}>
+          </div>
+          <div>
             <Label htmlFor="action-select-status-filter">Filtrer par statut</Label>
             <SelectCustom
               inputId="action-select-status-filter"
@@ -70,8 +72,8 @@ export const Actions = ({ person }) => {
               isMulti
               value={mappedIdsToLabels.filter((s) => filterStatus.includes(s._id))}
             />
-          </Col>
-        </Row>
+          </div>
+        </div>
       ) : null}
 
       <table className="table table-striped">
@@ -107,23 +109,3 @@ export const Actions = ({ person }) => {
     </div>
   );
 };
-
-const StyledTable = styled(Table)`
-  table tr {
-    height: 40px;
-  }
-`;
-
-const Title = styled.h2`
-  font-size: 20px;
-  font-weight: 800;
-  display: flex;
-  justify-content: space-between;
-  span {
-    margin-bottom: 20px;
-    font-size: 16px;
-    font-weight: 400;
-    font-style: italic;
-    display: block;
-  }
-`;
