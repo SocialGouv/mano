@@ -369,7 +369,6 @@ export default function DataLoader() {
   async function resetLoaderOnError() {
     // an error was thrown, the data was not downloaded,
     // this can result in data corruption, we need to reset the loader
-    console.log('resetting loader');
     await clearCache();
     setLastLoad(0);
     toast.error('Désolé, une erreur est survenue lors du chargement de vos données, veuillez réessayer', {
