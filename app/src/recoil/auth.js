@@ -26,4 +26,5 @@ export const usersState = atom({
 export const currentTeamState = atom({
   key: 'currentTeamState',
   default: null,
+  effects: [({ onSet }) => onSet((currentTeam) => Sentry.setContext('currentTeam', currentTeam))],
 });
