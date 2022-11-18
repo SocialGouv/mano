@@ -19,6 +19,8 @@ fileignoreconfig:
   checksum: e2fd738febd0f55007db268737697c71b1477d537769360e9fbaba45bf3886f5
 - filename: dashboard/src/components/DateRangePickerWithPresets.js
   checksum: 9351169dd8564856c9f6375bd4c72a4b42d256294e3468c002e3298adc9b901c
+- filename: dashboard/src/components/Documents.js
+  checksum: 79d5aebca22723be6546c3804476901a6f579cdf996aac687d88f5d1dd3bc1a6
 - filename: dashboard/src/components/tailwind/ActionsCategorySelect.js
   checksum: d9a9708f12d448b92fffbb8c2268c7f527b354e191349c3814b7a84daf4d7001
 - filename: dashboard/src/components/tailwind/Modal.js

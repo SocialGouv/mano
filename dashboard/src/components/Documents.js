@@ -11,6 +11,8 @@ import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
 import useApi from '../services/api';
 import { Col, Row } from 'reactstrap';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../recoil/auth';
 
 const Documents = ({
   person,
@@ -24,6 +26,7 @@ const Documents = ({
   onRowClick = null,
 }) => {
   const API = useApi();
+  const user = useRecoilValue(userState);
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
 
   return (
@@ -82,11 +85,23 @@ const Documents = ({
                     title="Télécharger"
                     style={{ margin: '0 auto' }}
                     onClick={async () => {
-                      const file = await API.download({
-                        path: `/person/${person._id}/document/${document.file.filename}`,
-                        encryptedEntityKey: document.encryptedEntityKey,
-                      });
-                      download(file, document.name);
+                      try {
+                        const file = await API.download({
+                          path: `/person/${person._id}/document/${document.file.filename}`,
+                          encryptedEntityKey: document.encryptedEntityKey,
+                        });
+                        download(file, document.name);
+                      } catch (error) {
+                        capture('Error downloading document', { extra: { error, document }, user });
+                        if (error.message === 'wrong secret key for the given ciphertext') {
+                          toast.error(
+                            'Le fichier est malheureusement corrompu',
+                            "Il ne peut plus être téléchargé, mais vous pouvez le supprimer et le réuploader s'il vous le faut"
+                          );
+                        } else {
+                          toast.error('Une erreur est survenue lors du téléchargement du document', "L'équipe technique a été prévenue");
+                        }
+                      }
                     }}
                   />
                   {!!canDelete && (

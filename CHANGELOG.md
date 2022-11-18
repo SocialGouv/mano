@@ -1,3 +1,31 @@
+## [1.176.14](https://github.com/SocialGouv/mano/compare/v1.176.13...v1.176.14) (2022-11-18)
+
+
+### Bug Fixes
+
+* **dashboard:** MANO-35 document decryption error ([a013f67](https://github.com/SocialGouv/mano/commit/a013f67dce665abc7c5aa13845013d3de5c3b9d2))
+
+## [1.176.13](https://github.com/SocialGouv/mano/compare/v1.176.12...v1.176.13) (2022-11-17)
+
+
+### Bug Fixes
+
+* **api:** reports query ([546ea42](https://github.com/SocialGouv/mano/commit/546ea424e2df9a463806a465cc183d4ef43d3a77))
+
+## [1.176.12](https://github.com/SocialGouv/mano/compare/v1.176.11...v1.176.12) (2022-11-17)
+
+
+### Bug Fixes
+
+* **api:** persons query ([43da87d](https://github.com/SocialGouv/mano/commit/43da87d6cd0f7a8bbbfef1391e8efe2ea2db7409))
+
+## [1.176.11](https://github.com/SocialGouv/mano/compare/v1.176.10...v1.176.11) (2022-11-17)
+
+
+### Bug Fixes
+
+* tests ([#984](https://github.com/SocialGouv/mano/issues/984)) ([8b6d1c5](https://github.com/SocialGouv/mano/commit/8b6d1c5f670ad8a649e2ac334e06e5ab0670cedf))
+
 ## [1.176.10](https://github.com/SocialGouv/mano/compare/v1.176.9...v1.176.10) (2022-11-17)
 
 

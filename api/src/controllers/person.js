@@ -226,6 +226,7 @@ router.get(
 
     const query = {
       where: { organisation: req.user.organisation },
+      order: [["createdAt", "DESC"]],
     };
 
     const total = await Person.count(query);
