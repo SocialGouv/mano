@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { atom, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
-import { useHistory } from 'react-router-dom';
 
 import { personsState } from '../recoil/persons';
 import { treatmentsState } from '../recoil/treatments';
@@ -67,8 +66,6 @@ export default function DataLoader() {
   const [loadingText, setLoadingText] = useRecoilState(loadingTextState);
   const initialLoad = useRecoilValue(initialLoadState);
   const organisation = useRecoilValue(organisationState);
-
-  const history = useHistory();
 
   const [loadList, setLoadList] = useState({ list: [], offset: 0 });
   const [progressBuffer, setProgressBuffer] = useState(null);
@@ -203,6 +200,7 @@ export default function DataLoader() {
     if (current === 'person') {
       setLoadingText('Chargement des personnes');
       const res = await API.get({ path: '/person', query });
+      if (!res.data) return resetLoaderOnError();
       setPersons(
         res.hasMore
           ? mergeItems(persons, res.decryptedData)
@@ -210,37 +208,37 @@ export default function DataLoader() {
               .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
               .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
       );
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'consultation') {
       setLoadingText('Chargement des consultations');
       const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastLoad } });
+      if (!res.data) return resetLoaderOnError();
       setConsultations(
         res.hasMore
           ? mergeItems(consultations, res.decryptedData)
           : mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user))
       );
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'treatment') {
       setLoadingText('Chargement des traitements');
       const res = await API.get({ path: '/treatment', query: { ...query, after: initialLoad ? 0 : lastLoad } });
-      setTreatments(mergeItems(treatments, res.decryptedData));
       if (!res.data) return resetLoaderOnError();
+      setTreatments(mergeItems(treatments, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'medicalFile') {
       setLoadingText('Chargement des fichiers médicaux');
       const res = await API.get({ path: '/medical-file', query: { ...query, after: initialLoad ? 0 : lastLoad } });
-      setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
       if (!res.data) return resetLoaderOnError();
+      setMedicalFiles(mergeItems(medicalFiles, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'report') {
       setLoadingText('Chargement des rapports');
       const res = await API.get({ path: '/report', query });
+      if (!res.data) return resetLoaderOnError();
       setReports(
         res.hasMore
           ? mergeItems(reports, res.decryptedData)
@@ -248,12 +246,12 @@ export default function DataLoader() {
               // This line should be removed when `clean-reports-with-no-team-nor-date` migration has run on all organisations.
               .filter((r) => !!r.team && !!r.date)
       );
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'passage') {
       setLoadingText('Chargement des passages');
       const res = await API.get({ path: '/passage', query });
+      if (!res.data) return resetLoaderOnError();
       setPassages(() => {
         const mergedItems = mergeItems(passages, res.decryptedData);
         if (res.hasMore) return mergedItems;
@@ -262,12 +260,12 @@ export default function DataLoader() {
         }
         return mergedItems;
       });
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'rencontre') {
       setLoadingText('Chargement des rencontres');
       const res = await API.get({ path: '/rencontre', query });
+      if (!res.data) return resetLoaderOnError();
       setRencontres(() => {
         const mergedItems = mergeItems(rencontres, res.decryptedData);
         if (res.hasMore) return mergedItems;
@@ -276,56 +274,56 @@ export default function DataLoader() {
         }
         return mergedItems;
       });
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'action') {
       setFullScreen(false);
       setLoadingText('Chargement des actions');
       const res = await API.get({ path: '/action', query });
-      setActions(mergeItems(actions, res.decryptedData));
       if (!res.data) return resetLoaderOnError();
+      setActions(mergeItems(actions, res.decryptedData));
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'territory') {
       setLoadingText('Chargement des territoires');
       const res = await API.get({ path: '/territory', query });
+      if (!res.data) return resetLoaderOnError();
       setTerritories(() => {
         const mergedItems = mergeItems(territories, res.decryptedData);
         if (res.hasMore) return mergedItems;
         if (mergedItems.length > territories.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         return mergedItems;
       });
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'place') {
       setLoadingText('Chargement des lieux');
       const res = await API.get({ path: '/place', query });
+      if (!res.data) return resetLoaderOnError();
       setPlaces(() => {
         const mergedItems = mergeItems(places, res.decryptedData);
         if (res.hasMore) return mergedItems;
         if (mergedItems.length > places.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         return mergedItems;
       });
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'relsPersonPlace') {
       setLoadingText('Chargement des relations personne-lieu');
       const res = await API.get({ path: '/relPersonPlace', query });
+      if (!res.data) return resetLoaderOnError();
       setRelsPersonPlace(() => {
         const mergedItems = mergeItems(relsPersonPlace, res.decryptedData);
         if (res.hasMore) return mergedItems;
         if (mergedItems.length > relsPersonPlace.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         return mergedItems;
       });
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'territoryObservation') {
       setLoadingText('Chargement des observations de territoire');
       const res = await API.get({ path: '/territory-observation', query });
+      if (!res.data) return resetLoaderOnError();
       setTerritoryObservations(() => {
         const mergedItems = mergeItems(territoryObservations, res.decryptedData);
         if (res.hasMore) return mergedItems;
@@ -334,12 +332,12 @@ export default function DataLoader() {
         }
         return mergedItems;
       });
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'comment') {
       setLoadingText('Chargement des commentaires');
       const res = await API.get({ path: '/comment', query });
+      if (!res.data) return resetLoaderOnError();
       setComments(() => {
         const mergedItems = mergeItems(comments, res.decryptedData);
         if (res.hasMore) return mergedItems;
@@ -348,7 +346,6 @@ export default function DataLoader() {
         }
         return mergedItems;
       });
-      if (!res.data) return resetLoaderOnError();
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     }
