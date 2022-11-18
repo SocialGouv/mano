@@ -11,8 +11,14 @@ import Comments from './Comments';
 import styled from 'styled-components';
 
 import PassagesRencontres from './PassagesRencontres';
+import OutOfActiveList from '../OutOfActiveList';
+import { DeletePersonButton } from '../view';
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../../recoil/auth';
+import MergeTwoPersons from '../MergeTwoPersons';
 
 export default function Summary({ person }) {
+  const user = useRecoilValue(userState);
   return (
     <>
       <ContainerRow>
@@ -31,17 +37,24 @@ export default function Summary({ person }) {
           <InfosSociales person={person} />
         </div>
         <div className="span-3 col-alt border shadow rounded p-3">
-          <PersonDocuments person={person} onUpdateResults={() => {}} onGoToMedicalFiles={() => {}} />
+          <PassagesRencontres person={person} />
         </div>
       </ContainerRow>
       <ContainerRow>
         <div className="span-9 col-main pt-4 border shadow rounded p-3">
           <InfosMedicales person={person} />
         </div>
-        <div className="span-3 col-alt border shadow rounded p-3" style={{ minHeight: '360px' }}>
-          <PassagesRencontres person={person} />
+        <div className="span-3 col-alt border shadow rounded p-3">
+          <PersonDocuments person={person} onUpdateResults={() => {}} onGoToMedicalFiles={() => {}} />
         </div>
       </ContainerRow>
+      {!['restricted-access'].includes(user.role) && (
+        <div className="tw-mt-4 tw-flex tw-justify-end tw-gap-2">
+          <MergeTwoPersons person={person} />
+          <OutOfActiveList person={person} />
+          <DeletePersonButton person={person} />
+        </div>
+      )}
     </>
   );
 }

@@ -49,7 +49,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
           enableReinitialize
           initialValues={person}
           onSubmit={async (body) => {
-            console.log(body);
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
             body.entityKey = person.entityKey;
@@ -379,14 +378,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                   )}
                 </div>
                 <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
-                  {!['restricted-access'].includes(user.role) && <MergeTwoPersons person={person} />}
                   <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
-                  {!['restricted-access'].includes(user.role) && (
-                    <>
-                      <OutOfActiveList person={person} />
-                      <DeletePersonButton person={person} />
-                    </>
-                  )}
                   <ButtonCustom disabled={isSubmitting} color="primary" type="submit" onClick={handleSubmit} title="Enregistrer" />
                 </div>
               </>

@@ -29,8 +29,8 @@ const PersonDocuments = ({ person }) => {
   return (
     <div>
       {openModal && <DocumentModal document={openModal} person={person} onClose={() => setOpenModal(false)} />}
-      <h4 className="mt-2 mb-4">Documents</h4>
-      <label>
+      <h4 className="mt-2">Documents</h4>
+      <label className="rounded px-2 py-1 tw-bg-main tw-text-sm tw-text-white">
         Ajouter un document
         <input
           type="file"
