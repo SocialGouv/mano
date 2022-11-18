@@ -13,7 +13,7 @@ import { currentTeamState } from '../../recoil/auth';
 const keyExtractor = (item) => item._id;
 
 const Comments = ({ navigation, route }) => {
-  const { date } = route.params;
+  const date = route?.params?.date;
   const comments = useRecoilValue(commentsForReport({ date }));
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
   const currentTeam = useRecoilValue(currentTeamState);
