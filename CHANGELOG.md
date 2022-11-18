@@ -1,3 +1,10 @@
+## [1.176.14](https://github.com/SocialGouv/mano/compare/v1.176.13...v1.176.14) (2022-11-18)
+
+
+### Bug Fixes
+
+* **dashboard:** MANO-35 document decryption error ([a013f67](https://github.com/SocialGouv/mano/commit/a013f67dce665abc7c5aa13845013d3de5c3b9d2))
+
 ## [1.176.13](https://github.com/SocialGouv/mano/compare/v1.176.12...v1.176.13) (2022-11-17)
 
 
