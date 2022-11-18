@@ -49,6 +49,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
           enableReinitialize
           initialValues={person}
           onSubmit={async (body) => {
+            console.log(body);
             if (!body.name?.trim()?.length) return toast.error('Une personne doit avoir un nom');
             if (!body.followedSince) body.followedSince = person.createdAt;
             body.entityKey = person.entityKey;

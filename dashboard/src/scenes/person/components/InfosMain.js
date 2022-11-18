@@ -5,15 +5,17 @@ import ButtonCustom from '../../../components/ButtonCustom';
 import React, { useState } from 'react';
 import EditModal from './EditModal';
 import TagTeam from '../../../components/TagTeam';
+import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 
 export function InfosMain({ person }) {
   const [editModal, setEditModal] = useState(false);
   return (
     <Container>
       {Boolean(editModal) && <EditModal person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
-      <div className="card">
+      <div className="card !tw-bg-main">
         <div className="card-body">
           <div className="person-name">
+            {person.alertness && <ExclamationMarkButton className="tw-mr-2" />}
             <b>{person.name}</b>
             {person.otherNames && <span> ({person.otherNames})</span>}
             <Teams person={person} />
@@ -63,7 +65,6 @@ const Teams = ({ person: { _id, assignedTeams } }) => (
 
 const Container = styled.div`
   .card {
-    background-color: ${theme.main};
     min-height: 350px;
     display: flex;
     align-items: center;
