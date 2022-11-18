@@ -12,7 +12,7 @@ import { getPeriodTitle } from './utils';
 import { currentTeamState } from '../../recoil/auth';
 const keyExtractor = (item) => item._id;
 
-const Comments = ({ navigation, route }) => {
+const CommentsForReport = ({ navigation, route }) => {
   const date = route?.params?.date;
   const comments = useRecoilValue(commentsForReport({ date }));
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
@@ -25,7 +25,7 @@ const Comments = ({ navigation, route }) => {
   const onPseudoPress = useCallback(
     (person) => {
       Sentry.setContext('person', { _id: person._id });
-      navigation.navigate('Person', { person, fromRoute: 'Comments' });
+      navigation.navigate('Person', { person, fromRoute: 'CommentsForReport' });
     },
     [navigation]
   );
@@ -35,7 +35,7 @@ const Comments = ({ navigation, route }) => {
       Sentry.setContext('action', { _id: action._id });
       navigation.navigate('Action', {
         action,
-        fromRoute: 'Comments',
+        fromRoute: 'CommentsForReport',
       });
     },
     [navigation]
@@ -56,7 +56,7 @@ const Comments = ({ navigation, route }) => {
                 navigation.push(comment.type === 'action' ? 'ActionComment' : 'PersonComment', {
                   ...comment,
                   commentTitle: commentedItem?.name,
-                  fromRoute: 'Comments',
+                  fromRoute: 'CommentsForReport',
                 })
             : null
         }
@@ -82,4 +82,4 @@ const Comments = ({ navigation, route }) => {
   );
 };
 
-export default Comments;
+export default CommentsForReport;

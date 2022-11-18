@@ -254,7 +254,7 @@ const Report = ({ navigation, route }) => {
         <Row
           withNextButton
           caption={`Commentaires (${comments.length})`}
-          onPress={() => navigation.navigate('Comments', { date: reportDB?.date })}
+          onPress={() => navigation.navigate('CommentsForReport', { date: reportDB?.date })}
           disabled={!comments.length}
         />
         <Spacer height={30} />

@@ -49,7 +49,7 @@ import Notifications from './scenes/Notifications/Notifications';
 import ReportsCalendar from './scenes/Reports/ReportsCalendar';
 import Report from './scenes/Reports/Report';
 import Actions from './scenes/Reports/Actions';
-import Comments from './scenes/Reports/Comments';
+import CommentsForReport from './scenes/Reports/CommentsForReport';
 import Observations from './scenes/Reports/Observations';
 import Collaborations from './scenes/Reports/Collaborations';
 import Treatment from './scenes/Persons/Treatment';
@@ -162,7 +162,7 @@ const ReportsNavigator = () => {
       <ReportsStack.Screen name="Territory" component={Territory} />
       <ReportsStack.Screen name="TerritoryObservation" component={TerritoryObservation} />
 
-      <ReportsStack.Screen name="Comments" component={Comments} />
+      <ReportsStack.Screen name="CommentsForReport" component={CommentsForReport} />
       <ReportsStack.Screen name="Actions" component={Actions} />
       <ReportsStack.Screen name="Observations" component={Observations} />
     </ReportsStack.Navigator>
