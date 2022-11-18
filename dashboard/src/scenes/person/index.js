@@ -10,7 +10,8 @@ import { ENV } from '../../config';
 const Router = () => {
   return (
     <Switch>
-      <SentryRoute path="/person/:personId" component={ENV !== 'production' ? NewView : View} />
+      {/* <SentryRoute path="/person/:personId" component={ENV !== 'production' ? NewView : View} /> */}
+      <SentryRoute path="/person/:personId" component={NewView} />
       <SentryRoute path="/" component={List} />
     </Switch>
   );
