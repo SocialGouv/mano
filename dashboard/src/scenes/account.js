@@ -84,7 +84,7 @@ const LinkToChangePassword = () => {
         <ModalHeader>Modifier son mot de passe</ModalHeader>
         <ModalBody>
           <ChangePassword
-            onSubmit={(body) => API.post({ path: `/user/reset_password`, skipEncryption: '/user/reset_password', body })}
+            onSubmit={(body) => API.post({ path: `/user/reset_password`, body })}
             onFinished={() => setOpen(false)}
             withCurrentPassword
           />

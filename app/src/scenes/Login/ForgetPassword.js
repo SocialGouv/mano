@@ -27,7 +27,7 @@ const ForgetPassword = ({ navigation }) => {
       return;
     }
     setLoading(true);
-    const response = await API.post({ path: '/user/forgot_password', body: { email }, skipEncryption: true });
+    const response = await API.post({ path: '/user/forgot_password', body: { email } });
     if (response.error) {
       Alert.alert(response.error);
       setLoading(false);

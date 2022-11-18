@@ -28,7 +28,16 @@ fileignoreconfig:
 - filename: dashboard/src/index.scss
   checksum: b0c164892558dd35b2260af1311433d88ee0322526b9172646042fd6d9839c42
 - filename: dashboard/src/scenes/organisation/ActionCategoriesSettings.js
-  checksum: 161e785b6d6e9c55563bcc218bbffad2e8895849d0578e4176eb660ec75634a4
+  checksum: 285d945a640542c3265e54d311d7458395d386c99b1b2dcbeba8b74be32dcf8f
+  checksum: c47f6bc22846aa5918fb1746356eb8c2c21e08628b48a73e6167b90dd05c5c0d
+- filename: app/src/services/api.js
+  checksum: 80f4e31299ceebffe355fe0c3666fef45364f867a9b4877ff67bef89eb9d9b2d
+- filename: dashboard/src/components/DataLoader.js
+  checksum: f07dd01934ecf1e9344f55187bb0742c199eef51ff763256795a424699c5779d
+- filename: dashboard/src/services/api.js
+  checksum: 2e6404fe5ba55e87a6cab3287e39c3e77d5c3807efc5d47906567e2373bc224b
+- filename: dashboard/src/services/encryption.js
+  checksum: fdffb58b9e0c37eaf6f1c54397a488715e2ecaef0f5be04ec1e5d375e6745651
 - filename: e2e/scripts/db.sql
   checksum: 760314340593e904bcf21e2997a8bfeb0afcfd4b488be13a18905c113e981169
 - filename: e2e/scripts/populate-db.ts
@@ -36,5 +45,5 @@ fileignoreconfig:
 - filename: tests/src/scripts/db.sql
   checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
 scopeconfig:
-- scope: node
+  - scope: node
 version: "1.0"

@@ -80,7 +80,6 @@ const EncryptionKey = ({ isMain }) => {
   const totalDurationOnServer = totalToEncrypt * 0.032; // average 32 ms in server
 
   if (!['admin'].includes(user.role)) return null;
-  if (API.blockEncrypt) return null;
 
   const onEncrypt = async (values) => {
     try {

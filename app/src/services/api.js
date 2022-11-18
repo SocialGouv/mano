@@ -52,7 +52,7 @@ class ApiService {
     tablet: isTablet(), // false
   });
 
-  execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, skipEncryption = false, batch = null } = {}) => {
+  execute = async ({ method, path = '', body = null, query = {}, headers = {}, debug = false, batch = null } = {}) => {
     try {
       if (this.token) headers.Authorization = `JWT ${this.token}`;
       const options = {
@@ -60,18 +60,10 @@ class ApiService {
         headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: this.platform, version: VERSION },
       };
       if (body) {
-        if (!skipEncryption) {
-          options.body = JSON.stringify(await this.encryptItem(body));
-        } else {
-          options.body = JSON.stringify(body);
-        }
+        options.body = JSON.stringify(await this.encryptItem(body));
       }
 
       if (['PUT', 'POST', 'DELETE'].includes(method) && this.enableEncrypt) {
-        if (this.blockEncrypt && !skipEncryption) {
-          if (this.handleBlockEncrypt) this.handleBlockEncrypt();
-          return { ok: false, error: "Vous ne pouvez pas modifier le contenu. La clé de chiffrement n'est pas la bonne" };
-        }
         query = {
           encryptionLastUpdateAt: this.organisation?.encryptionLastUpdateAt,
           encryptionEnabled: this.organisation?.encryptionEnabled,
@@ -103,15 +95,12 @@ class ApiService {
           }
         }
         if (!!res.data && Array.isArray(res.data)) {
-          const decryptedData = await Promise.all(res.data.map((item) => this.decryptDBItem(item, { debug })));
-          if (this.wrongKeyWarned) {
-            return { ok: false, data: [] };
-          }
+          const decryptedData = await Promise.all(res.data.map((item) => this.decryptDBItem(item, { debug, path })));
           res.decryptedData = decryptedData;
           return res;
         }
         if (res.data) {
-          res.decryptedData = await this.decryptDBItem(res.data, { debug });
+          res.decryptedData = await this.decryptDBItem(res.data, { debug, path });
           return res;
         }
         return res;
@@ -180,9 +169,6 @@ class ApiService {
     }
     this.enableEncrypt = true;
     this.orgEncryptionKey = orgEncryptionKey;
-    this.sendCaptureError = 0;
-    this.wrongKeyWarned = false;
-    this.blockEncrypt = false;
     return true;
   };
 
@@ -200,8 +186,7 @@ class ApiService {
     return item;
   };
 
-  decryptDBItem = async (item, { debug = false } = {}) => {
-    if (this.wrongKeyWarned) return item;
+  decryptDBItem = async (item, { path } = {}) => {
     if (!this.enableEncrypt) return item;
     if (!item.encrypted) return item;
     if (!!item.deletedAt) return item;
@@ -215,7 +200,7 @@ class ApiService {
         JSON.parse(content);
       } catch (errorDecryptParsing) {
         if (this.handleError) this.handleError(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
-        console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
+        capture('ERROR PARSING CONTENT', { extra: { errorDecryptParsing, content } });
       }
 
       const decryptedItem = {
@@ -225,31 +210,19 @@ class ApiService {
       };
       return decryptedItem;
     } catch (errorDecrypt) {
-      if (this.sendCaptureError < 5) {
-        capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
-          extra: {
-            message: 'ERROR DECRYPTING ITEM',
-            item,
-          },
-        });
-        this.sendCaptureError++;
+      capture(errorDecrypt, {
+        extra: {
+          message: 'ERROR DECRYPTING ITEM',
+          item,
+          path,
+        },
+      });
+      if (this.handleError) {
+        this.handleError(
+          "Désolé, un élément n'a pas pu être déchiffré",
+          "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
+        );
       }
-      if (this.organisation.encryptedVerificationKey) {
-        if (this.handleError) {
-          this.handleError(
-            "Désolé, un élément n'a pas pu être déchiffré",
-            "L'équipe technique a été prévenue, nous reviendrons vers vous dans les meilleurs délais."
-          );
-        }
-        return item;
-      }
-      if (!this.wrongKeyWarned && this.handleWrongKey) {
-        this.wrongKeyWarned = true;
-        this.handleWrongKey();
-      }
-      if (this.handleError && debug) this.handleError(errorDecrypt, 'ERROR DECRYPTING ITEM');
-      // prevent false admin with bad key to be able to change the key
-      this.blockEncrypt = this.enableEncrypt && errorDecrypt.message.includes('FAILURE');
     }
     return item;
   };

@@ -42,7 +42,6 @@ const View = () => {
           try {
             const response = await API.post({
               path: '/user/forgot_password',
-              skipEncryption: '/user/forgot_password',
               body,
             });
             actions.setSubmitting(false);

@@ -18,9 +18,6 @@ const getUrl = (path, query = {}) => {
 /* encryption */
 export let hashedOrgEncryptionKey = null;
 let enableEncrypt = false;
-let blockEncrypt = false;
-let sendCaptureError = 0; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryptionVerificationKey`
-let wrongKeyWarned = false; // TO BE REMOVED WHEN ALL ORGANISATIONS HAVE `encryptionVerificationKey`
 
 /* auth */
 export let tokenCached = null;
@@ -37,9 +34,6 @@ export const setOrgEncryptionKey = async (orgEncryptionKey, { encryptedVerificat
   }
   hashedOrgEncryptionKey = newHashedOrgEncryptionKey;
   enableEncrypt = true;
-  sendCaptureError = 0;
-  wrongKeyWarned = false;
-  blockEncrypt = false;
   return newHashedOrgEncryptionKey;
 };
 
@@ -62,8 +56,7 @@ export const encryptItem =
     return item;
   };
 
-const decryptDBItem = async (item, { logout, path, debug = false, encryptedVerificationKey = null } = {}) => {
-  if (wrongKeyWarned) return item;
+const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {}) => {
   if (!enableEncrypt) return item;
   if (!item.encrypted) return item;
   if (!!item.deletedAt) return item;
@@ -77,7 +70,7 @@ const decryptDBItem = async (item, { logout, path, debug = false, encryptedVerif
       JSON.parse(content);
     } catch (errorDecryptParsing) {
       toast.error(errorDecryptParsing, 'Désolé une erreur est survenue lors du déchiffrement');
-      console.log('ERROR PARSING CONTENT', errorDecryptParsing, content);
+      capture('ERROR PARSING CONTENT', { extra: { errorDecryptParsing, content } });
     }
 
     const decryptedItem = {
@@ -87,16 +80,13 @@ const decryptDBItem = async (item, { logout, path, debug = false, encryptedVerif
     };
     return decryptedItem;
   } catch (errorDecrypt) {
-    if (sendCaptureError < 5) {
-      capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
-        extra: {
-          message: 'ERROR DECRYPTING ITEM',
-          item,
-          path,
-        },
-      });
-      sendCaptureError++;
-    }
+    capture(`ERROR DECRYPTING ITEM : ${errorDecrypt}`, {
+      extra: {
+        message: 'ERROR DECRYPTING ITEM',
+        item,
+        path,
+      },
+    });
     if (!!encryptedVerificationKey) {
       toast.error(
         "Désolé, un élément n'a pas pu être déchiffré",
@@ -104,13 +94,6 @@ const decryptDBItem = async (item, { logout, path, debug = false, encryptedVerif
       );
       return item;
     }
-    if (!wrongKeyWarned) {
-      wrongKeyWarned = true;
-      toast.error('La clé de chiffrement ne semble pas être correcte, veuillez réessayer.');
-      logout();
-    }
-    // prevent false admin with bad key to be able to change the key
-    blockEncrypt = enableEncrypt && errorDecrypt.message.includes('FAILURE');
   }
   return item;
 };
@@ -140,19 +123,13 @@ const useApi = () => {
     hashedOrgEncryptionKey = null;
     enableEncrypt = false;
     tokenCached = null;
-    sendCaptureError = 0;
-    wrongKeyWarned = false;
-    blockEncrypt = false;
     setRecoilResetKey((k) => k + 1);
     AppSentry.setUser({});
     AppSentry.setTag('organisationId', '');
   };
 
   const logout = async (status) => {
-    await post({
-      path: '/user/logout',
-      skipEncryption: '/user/logout',
-    });
+    await post({ path: '/user/logout' });
     reset();
     if (window.location.pathname !== '/auth') {
       if (history) {
@@ -211,16 +188,7 @@ const useApi = () => {
     return response.json();
   };
 
-  const execute = async ({
-    method,
-    path = '',
-    body = null,
-    query = {},
-    headers = {},
-    debug = false,
-    skipEncryption = false,
-    forceMigrationLastUpdate = null,
-  } = {}) => {
+  const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null } = {}) => {
     try {
       // Force logout when one user has been logged in multiple tabs to different organisations.
       if (
@@ -249,9 +217,6 @@ const useApi = () => {
       }
 
       if (['PUT', 'POST', 'DELETE'].includes(method) && enableEncrypt) {
-        if (blockEncrypt && !skipEncryption) {
-          return { ok: false, error: "Vous ne pouvez pas modifier le contenu. La clé de chiffrement n'est pas la bonne" };
-        }
         query = {
           encryptionLastUpdateAt,
           encryptionEnabled,
@@ -278,14 +243,11 @@ const useApi = () => {
         const res = await response.json();
         if (!response.ok) handleApiError(res, path, query);
         if (!!res.data && Array.isArray(res.data)) {
-          const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, debug, logout, encryptedVerificationKey })));
-          if (wrongKeyWarned) {
-            return { ok: false, data: [] };
-          }
+          const decryptedData = await Promise.all(res.data.map((item) => decryptDBItem(item, { path, encryptedVerificationKey })));
           res.decryptedData = decryptedData;
           return res;
         } else if (res.data) {
-          res.decryptedData = await decryptDBItem(res.data, { path, debug, logout, encryptedVerificationKey });
+          res.decryptedData = await decryptDBItem(res.data, { path, encryptedVerificationKey });
           return res;
         } else {
           return res;

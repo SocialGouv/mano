@@ -67,19 +67,14 @@ const _decrypt_after_extracting_nonce_uint8array = async (nonce_and_cypher_uint8
 };
 
 const decrypt = async (encryptedContent, encryptedEntityKey, masterKey) => {
-  try {
-    const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
-    const content_uint8array = await _decrypt_after_extracting_nonce(encryptedContent, entityKey_bytes_array);
-    const content = window.atob(new TextDecoder().decode(content_uint8array));
+  const entityKey_bytes_array = await _decrypt_after_extracting_nonce(encryptedEntityKey, masterKey);
+  const content_uint8array = await _decrypt_after_extracting_nonce(encryptedContent, entityKey_bytes_array);
+  const content = window.atob(new TextDecoder().decode(content_uint8array));
 
-    return {
-      content,
-      entityKey: entityKey_bytes_array,
-    };
-  } catch (errorDecrypt) {
-    if (errorDecrypt.message.includes('wrong secret key for the given ciphertext')) throw new Error('FAILURE');
-    throw errorDecrypt;
-  }
+  return {
+    content,
+    entityKey: entityKey_bytes_array,
+  };
 };
 
 /*

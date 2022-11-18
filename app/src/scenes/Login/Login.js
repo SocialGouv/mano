@@ -67,10 +67,7 @@ const Login = ({ navigation }) => {
       const storedToken = await AsyncStorage.getItem('persistent_token');
       if (!storedToken) return RNBootSplash.hide({ duration: 250 });
       API.token = storedToken;
-      const { token, ok, user } = await API.get({
-        path: '/user/signin-token',
-        skipEncryption: '/user/signin-token',
-      });
+      const { token, ok, user } = await API.get({ path: '/user/signin-token' });
       if (ok && token && user) {
         setAuthViaCookie(true);
         API.onLogIn();
@@ -130,11 +127,8 @@ const Login = ({ navigation }) => {
     setLoading(true);
     const userDebugInfos = await API.getUserDebugInfos();
     const response = authViaCookie
-      ? await API.get({
-          path: '/user/signin-token',
-          skipEncryption: '/user/signin-token',
-        })
-      : await API.post({ path: '/user/signin', body: { password, email, ...userDebugInfos }, skipEncryption: true });
+      ? await API.get({ path: '/user/signin-token' })
+      : await API.post({ path: '/user/signin', body: { password, email, ...userDebugInfos } });
     if (response.error) {
       Alert.alert(response.error, null, [{ text: 'OK', onPress: () => passwordRef.current.focus() }], {
         cancelable: true,
