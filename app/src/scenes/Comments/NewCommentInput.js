@@ -40,7 +40,7 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
       return;
     }
     setComments((comments) => [response.decryptedData, ...comments]);
-    createReportAtDateIfNotExist(response.decryptedData.date);
+    await createReportAtDateIfNotExist(response.decryptedData.date);
     Keyboard.dismiss();
     setPosting(false);
     setComment('');

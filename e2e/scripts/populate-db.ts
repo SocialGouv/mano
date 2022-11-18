@@ -15,13 +15,11 @@ async function createUsersAndOrgas() {
     connectionString: `${process.env.PGBASEURL}/manotest`,
   });
   await client.connect();
-  await client.query(
-    `delete from mano."Organisation" where name like 'Orga Test - %'`
-  );
+  await client.query(`delete from mano."Organisation" where name like 'Orga Test - %'`);
   await client.query(`delete from mano."User" where name like 'User Test - %'`);
   await client.query(`delete from mano."Team" where name like 'Team Test - %'`);
 
-  for (let i = 1; i < 10; i++) {
+  for (let i = 1; i < 12; i++) {
     console.log("create user", i);
 
     const orgId = uuidv4();
@@ -94,15 +92,7 @@ async function createUsersAndOrgas() {
         $4,
         true
       );`,
-      [
-        userId,
-        bcrypt.hashSync("secret", 10),
-        orgId,
-        date,
-        date,
-        `User Test - ${i}`,
-        `admin${i}@example.org`,
-      ]
+      [userId, bcrypt.hashSync("secret", 10), orgId, date, date, `User Test - ${i}`, `admin${i}@example.org`]
     );
 
     await client.query(

@@ -100,7 +100,7 @@ const TerritoryObservation = ({ route, navigation }) => {
     Alert.alert('Nouvelle observation créée !');
     setObs(castToTerritoryObservation(response.decryptedData));
     setTerritoryObservations((territoryObservations) => [response.decryptedData, ...territoryObservations]);
-    createReportAtDateIfNotExist(response.decryptedData.observedAt);
+    await createReportAtDateIfNotExist(response.decryptedData.observedAt);
     setObsDB(response.decryptedData);
     setUpdating(false);
     setEditable(false);
