@@ -138,12 +138,30 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom
-                  type="submit"
-                  disabled={isSubmitting}
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
+                <div className="tw-flex tw-justify-end tw-gap-2">
+                  {!isNewComment && (
+                    <ButtonCustom
+                      type="button"
+                      color="danger"
+                      disabled={isSubmitting}
+                      onClick={async () => {
+                        if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) return;
+                        window.sessionStorage.removeItem('currentComment');
+                        await API.delete({ path: `/comment/${comment._id}` });
+                        setComments((comments) => comments.filter((c) => c._id !== comment._id));
+                        toast.success('Commentaire supprimé !');
+                        onClose();
+                      }}
+                      title="Supprimer"
+                    />
+                  )}
+                  <ButtonCustom
+                    type="submit"
+                    disabled={isSubmitting}
+                    onClick={() => !isSubmitting && handleSubmit()}
+                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                  />
+                </div>
               </React.Fragment>
             )}
           </Formik>

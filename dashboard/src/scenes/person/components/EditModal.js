@@ -28,6 +28,9 @@ import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import useApi from '../../../services/api';
+import { DeletePersonButton } from '../view';
+import OutOfActiveList from '../OutOfActiveList';
+import MergeTwoPersons from '../MergeTwoPersons';
 
 export default function EditModal({ person, selectedPanel, onClose }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
@@ -375,7 +378,14 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                   )}
                 </div>
                 <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
+                  {!['restricted-access'].includes(user.role) && <MergeTwoPersons person={person} />}
                   <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
+                  {!['restricted-access'].includes(user.role) && (
+                    <>
+                      <OutOfActiveList person={person} />
+                      <DeletePersonButton person={person} />
+                    </>
+                  )}
                   <ButtonCustom disabled={isSubmitting} color="primary" type="submit" onClick={handleSubmit} title="Enregistrer" />
                 </div>
               </>

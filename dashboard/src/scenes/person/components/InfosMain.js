@@ -2,8 +2,9 @@ import { theme } from '../../../config';
 import { dayjsInstance } from '../../../services/date';
 import styled from 'styled-components';
 import ButtonCustom from '../../../components/ButtonCustom';
-import { useState } from 'react';
+import React, { useState } from 'react';
 import EditModal from './EditModal';
+import TagTeam from '../../../components/TagTeam';
 
 export function InfosMain({ person }) {
   const [editModal, setEditModal] = useState(false);
@@ -15,6 +16,7 @@ export function InfosMain({ person }) {
           <div className="person-name">
             <b>{person.name}</b>
             {person.otherNames && <span> ({person.otherNames})</span>}
+            <Teams person={person} />
           </div>
           <div className="person-description">
             <div>
@@ -50,6 +52,14 @@ export function InfosMain({ person }) {
     </Container>
   );
 }
+
+const Teams = ({ person: { _id, assignedTeams } }) => (
+  <React.Fragment key={_id}>
+    {assignedTeams?.map((teamId) => (
+      <TagTeam key={teamId} teamId={teamId} />
+    ))}
+  </React.Fragment>
+);
 
 const Container = styled.div`
   .card {

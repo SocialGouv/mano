@@ -141,7 +141,7 @@ const MergeTwoPersons = ({ person }) => {
 
   return (
     <>
-      <ButtonCustom title="Fusionner avec un autre dossier" color="link" onClick={() => setOpen(true)} />
+      <ButtonCustom title="Fusionner" color="link" onClick={() => setOpen(true)} />
       <StyledModal isOpen={open} toggle={() => setOpen(false)} size="xl" centered>
         <ModalHeader toggle={() => setOpen(false)} color="danger">
           <Row style={{ justifyContent: 'center', marginTop: 10 }}>
