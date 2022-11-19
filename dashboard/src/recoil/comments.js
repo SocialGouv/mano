@@ -8,7 +8,7 @@ export const commentsState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['comment', 'person', 'action', 'team', 'user', 'date', 'urgent'];
+const encryptedFields = ['comment', 'person', 'action', 'group', 'team', 'user', 'date', 'urgent'];
 
 export const prepareCommentForEncryption = (comment) => {
   const decrypted = {};

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled from 'styled-components';
 import { Modal, Input, Button as CloseButton, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
@@ -20,6 +20,7 @@ import { useDataLoader } from './DataLoader';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import { useParams } from 'react-router-dom';
 import { itemsGroupedByActionSelector, itemsGroupedByPersonSelector } from '../recoil/selectors';
+import { groupsState } from '../recoil/group';
 
 const commentsByActionOrPersonSelector = selectorFamily({
   key: 'commentsByActionOrPersonSelector',
@@ -69,10 +70,11 @@ const Comments = ({ onUpdateResults }) => {
     }
   };
 
-  const addData = async ({ comment, urgent }) => {
+  const addData = async ({ comment, urgent, group }) => {
     const commentBody = {
       comment,
       urgent,
+      group,
       user: user._id,
       date: new Date(),
       team: currentTeam._id,
@@ -136,7 +138,7 @@ const Comments = ({ onUpdateResults }) => {
                 <div className="content">
                   {!!comment.urgent && <ExclamationMarkButton />}
                   {!!comment.group && (
-                    <span className="tw-text-3xl" aria-label="Action familiale">
+                    <span className="tw-text-3xl tw-not-italic" aria-label="Action familiale">
                       👪
                     </span>
                   )}
@@ -172,6 +174,9 @@ const Comments = ({ onUpdateResults }) => {
 
 const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment }) => {
   const user = useRecoilValue(userState);
+  const { personId } = useParams();
+  const groups = useRecoilValue(groupsState);
+
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -182,6 +187,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
     setOpen(false);
     if (onCancel) onCancel();
   };
+  const canToggleGroupCheck = useMemo(() => !!personId && groups.find((group) => group.persons.includes(personId)), [groups, personId]);
 
   return (
     <>
@@ -194,7 +200,12 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
         <ModalHeader toggle={onCancelRequest}>{newComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ ...value, comment: value.comment || window.sessionStorage.getItem('currentComment') }}
+            initialValues={{
+              urgent: false,
+              group: false,
+              ...value,
+              comment: value.comment || window.sessionStorage.getItem('currentComment'),
+            }}
             onSubmit={async (body, actions) => {
               if (!body.user && !newComment) return toast.error("L'utilisateur est obligatoire");
               if (!body.date && !newComment) return toast.error('La date est obligatoire');
@@ -203,84 +214,103 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
               actions.setSubmitting(false);
               window.sessionStorage.removeItem('currentComment');
             }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => (
-              <React.Fragment>
-                <Row>
-                  {!newComment && (
-                    <>
-                      <Col md={6}>
-                        <FormGroup>
-                          <Label htmlFor="user">Créé par</Label>
-                          <SelectUser
-                            inputId="user"
-                            isDisabled={newComment}
-                            value={values.user || user._id}
-                            onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
-                          />
-                        </FormGroup>
-                      </Col>
-                      <Col md={6}>
-                        <FormGroup>
-                          <Label htmlFor="date">Créé le / Concerne le</Label>
-                          <div>
-                            <DatePicker
-                              locale="fr"
-                              name="date"
-                              id="date"
-                              className="form-control"
-                              selected={dateForDatePicker((values.date || values.createdAt) ?? new Date())}
-                              onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
-                              timeInputLabel="Heure :"
-                              dateFormat="dd/MM/yyyy HH:mm"
-                              showTimeInput
+            {({ values, handleChange, handleSubmit, isSubmitting }) => {
+              return (
+                <React.Fragment>
+                  <Row>
+                    {!newComment && (
+                      <>
+                        <Col md={6}>
+                          <FormGroup>
+                            <Label htmlFor="user">Créé par</Label>
+                            <SelectUser
+                              inputId="user"
+                              isDisabled={newComment}
+                              value={values.user || user._id}
+                              onChange={(userId) => handleChange({ target: { value: userId, name: 'user' } })}
                             />
-                          </div>
+                          </FormGroup>
+                        </Col>
+                        <Col md={6}>
+                          <FormGroup>
+                            <Label htmlFor="date">Créé le / Concerne le</Label>
+                            <div>
+                              <DatePicker
+                                locale="fr"
+                                name="date"
+                                id="date"
+                                className="form-control"
+                                selected={dateForDatePicker((values.date || values.createdAt) ?? new Date())}
+                                onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
+                                timeInputLabel="Heure :"
+                                dateFormat="dd/MM/yyyy HH:mm"
+                                showTimeInput
+                              />
+                            </div>
+                          </FormGroup>
+                        </Col>
+                      </>
+                    )}
+                    <Col md={12}>
+                      <FormGroup>
+                        <Label htmlFor="comment">Commentaire</Label>
+                        <Input
+                          id="comment"
+                          name="comment"
+                          type="textarea"
+                          value={values.comment}
+                          onChange={(e) => {
+                            window.sessionStorage.setItem('currentComment', e.target.value);
+                            handleChange(e);
+                          }}
+                        />
+                      </FormGroup>
+                    </Col>
+                    <Col md={canToggleGroupCheck ? 6 : 12}>
+                      <FormGroup>
+                        <Label htmlFor="create-comment-urgent">
+                          <input
+                            type="checkbox"
+                            id="create-comment-urgent"
+                            className="tw-mr-2"
+                            name="urgent"
+                            checked={values.urgent}
+                            onChange={handleChange}
+                          />
+                          Commentaire prioritaire <br />
+                          <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
+                        </Label>
+                      </FormGroup>
+                    </Col>
+                    {!!canToggleGroupCheck && (
+                      <Col md={6}>
+                        <FormGroup>
+                          <Label htmlFor="create-comment-for-group">
+                            <input
+                              type="checkbox"
+                              className="tw-mr-2"
+                              id="create-comment-for-group"
+                              name="group"
+                              checked={values.group}
+                              onChange={handleChange}
+                            />
+                            Commentaire familial <br />
+                            <small className="text-muted">Ce commentaire sera valable pour chaque membre de la famille</small>
+                          </Label>
                         </FormGroup>
                       </Col>
-                    </>
-                  )}
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label htmlFor="comment">Commentaire</Label>
-                      <Input
-                        id="comment"
-                        name="comment"
-                        type="textarea"
-                        value={values.comment}
-                        onChange={(e) => {
-                          window.sessionStorage.setItem('currentComment', e.target.value);
-                          handleChange(e);
-                        }}
-                      />
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label htmlFor="create-comment-urgent">
-                        <input
-                          type="checkbox"
-                          id="create-comment-urgent"
-                          style={{ marginRight: '0.5rem' }}
-                          name="urgent"
-                          checked={values.urgent}
-                          value={values.urgent}
-                          onChange={() => handleChange({ target: { value: !values.urgent, name: 'urgent' } })}
-                        />
-                        Commentaire prioritaire <br />
-                        <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
-                      </Label>
-                    </FormGroup>
-                  </Col>
-                </Row>
-                <br />
-                <ButtonCustom
-                  type="submit"
-                  disabled={isSubmitting}
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
-              </React.Fragment>
-            )}
+                    )}
+                  </Row>
+                  <br />
+                  <ButtonCustom
+                    type="submit"
+                    disabled={isSubmitting}
+                    onClick={() => !isSubmitting && handleSubmit()}
+                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                  />
+                </React.Fragment>
+              );
+            }}
           </Formik>
         </ModalBody>
       </Modal>

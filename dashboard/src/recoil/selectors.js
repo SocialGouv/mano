@@ -129,6 +129,15 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
       personsObject[comment.person].comments.push(comment);
+      if (!!comment.group) {
+        const group = personsObject[comment.person].group;
+        for (const person of group.persons) {
+          if (!personsObject[person]) continue;
+          if (person === comment.person) continue;
+          personsObject[person].comments = personsObject[person].comments || [];
+          personsObject[person].comments.push(comment);
+        }
+      }
     }
     for (const relPersonPlace of relsPersonPlace) {
       if (!personsObject[relPersonPlace.person]) continue;
