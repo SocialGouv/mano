@@ -28,7 +28,7 @@ import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import ConsultationButton from '../../components/ConsultationButton';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
@@ -136,7 +136,7 @@ const Actions = ({ search, onUpdateResults }) => {
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!actionOrConsult.urgent && <ExclamationMarkButton />}
                     {!!actionOrConsult.group && (
-                      <span className="tw-text-3xl" aria-label="Action familiale">
+                      <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪
                       </span>
                     )}
@@ -225,7 +225,13 @@ const Persons = ({ search, onUpdateResults }) => {
             {
               title: 'Vigilance',
               dataKey: 'alertness',
-              render: (p) => (p.alertness ? <ExclamationMarkButton /> : null),
+              render: (p) =>
+                p.alertness ? (
+                  <ExclamationMarkButton
+                    aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                    title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                  />
+                ) : null,
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
             { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },
@@ -322,6 +328,23 @@ const Comments = ({ search, onUpdateResults }) => {
           }}
           rowKey="_id"
           columns={[
+            {
+              title: '',
+              dataKey: 'urgentOrGroup',
+              small: true,
+              render: (comment) => {
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!comment.urgent && <ExclamationMarkButton />}
+                    {!!comment.group && (
+                      <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
+                        👪
+                      </span>
+                    )}
+                  </div>
+                );
+              },
+            },
             {
               title: 'Date',
               dataKey: 'date',

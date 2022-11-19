@@ -7,10 +7,10 @@ import Table from './table';
 import ActionStatus from './ActionStatus';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import PersonName from './PersonName';
-import ExclamationMarkButton from './ExclamationMarkButton';
 import ConsultationButton from './ConsultationButton';
 import { userState } from '../recoil/auth';
 import { disableConsultationRow } from '../recoil/consultations';
+import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut'] }) => {
   const history = useHistory();
@@ -78,7 +78,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
               <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                 {!!actionOrConsult.urgent && <ExclamationMarkButton />}
                 {!!actionOrConsult.group && (
-                  <span className="tw-text-3xl" aria-label="Action familiale">
+                  <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                     👪
                   </span>
                 )}

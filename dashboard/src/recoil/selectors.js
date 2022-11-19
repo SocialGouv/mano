@@ -111,6 +111,23 @@ export const itemsGroupedByPersonSelector = selector({
         personsObject[person].group = group;
       }
     }
+
+    for (const person of persons) {
+      if (!person.documents?.length) continue;
+      if (!personsObject[person._id].group) continue;
+      for (const document of person.documents) {
+        if (!document.group) continue;
+        for (const personIdInGroup of personsObject[person._id].group.persons) {
+          if (personIdInGroup === person._id) continue;
+          if (!personsObject[personIdInGroup]) continue;
+          if (!personsObject[personIdInGroup].groupDocuments) {
+            personsObject[personIdInGroup].groupDocuments = [];
+          }
+          personsObject[personIdInGroup].groupDocuments.push({ ...document, person: person._id, personPopulated: person });
+        }
+      }
+    }
+
     for (const action of actions) {
       if (!personsObject[action.person]) continue;
       personsObject[action.person].actions = personsObject[action.person].actions || [];

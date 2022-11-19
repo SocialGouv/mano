@@ -43,7 +43,7 @@ import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
 import Passage from '../../components/Passage';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
@@ -856,7 +856,7 @@ const ActionCompletedAt = ({ date, status, actions }) => {
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!action.urgent && <ExclamationMarkButton />}
                     {!!action.group && (
-                      <span className="tw-text-3xl" aria-label="Action familiale">
+                      <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪
                       </span>
                     )}
@@ -921,7 +921,7 @@ const ActionCreatedAt = ({ date, actions }) => {
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!action.urgent && <ExclamationMarkButton />}
                     {!!action.group && (
-                      <span className="tw-text-3xl" aria-label="Action familiale">
+                      <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪
                       </span>
                     )}
@@ -1100,14 +1100,14 @@ const CommentCreatedAt = ({ date, comments }) => {
               small: true,
               render: (comment) => {
                 return (
-                  <>
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!comment.urgent && <ExclamationMarkButton />}
                     {!!comment.group && (
-                      <span className="tw-text-3xl" aria-label="Action familiale">
+                      <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
                         👪
                       </span>
                     )}
-                  </>
+                  </div>
                 );
               },
             },

@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import ActionStatus from './ActionStatus';
-import ExclamationMarkButton from './ExclamationMarkButton';
+import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import PersonName from './PersonName';
 
 // TODO: remove inline style when UI is stabilized.

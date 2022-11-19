@@ -19,7 +19,7 @@ import { mappedIdsToLabels, TODO } from '../../recoil/actions';
 import { currentTeamState, userState } from '../../recoil/auth';
 import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ConsultationButton from '../../components/ConsultationButton';
@@ -264,7 +264,7 @@ const List = () => {
                     <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                       {!!actionOrConsult.urgent && <ExclamationMarkButton />}
                       {!!actionOrConsult.group && (
-                        <span className="tw-text-3xl" aria-label="Action familiale">
+                        <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                           👪
                         </span>
                       )}

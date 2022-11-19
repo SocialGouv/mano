@@ -15,7 +15,7 @@ import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date';
 import useApi from '../services/api';
-import ExclamationMarkButton from './ExclamationMarkButton';
+import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import { useDataLoader } from './DataLoader';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import { useParams } from 'react-router-dom';
@@ -138,7 +138,7 @@ const Comments = ({ onUpdateResults }) => {
                 <div className="content">
                   {!!comment.urgent && <ExclamationMarkButton />}
                   {!!comment.group && (
-                    <span className="tw-text-3xl tw-not-italic" aria-label="Action familiale">
+                    <span className="tw-text-3xl tw-not-italic" aria-label="Action familiale" title="Action familiale">
                       👪
                     </span>
                   )}
