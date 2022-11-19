@@ -46,6 +46,7 @@ function updateUserDebugInfos(req, user) {
   if (req.headers.platform === "android") {
     try {
       z.object({
+        version: z.optional(z.string()),
         apilevel: z.optional(z.number()),
         brand: z.optional(z.string()),
         carrier: z.optional(z.string()),
@@ -71,6 +72,7 @@ function updateUserDebugInfos(req, user) {
       return;
     }
     user.debugApp = {
+      version: req.headers.version,
       apilevel: req.body.apilevel,
       brand: req.body.brand,
       carrier: req.body.carrier,
