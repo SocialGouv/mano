@@ -111,6 +111,7 @@ const _encrypt_and_prepend_nonce_uint8array = async (message_string_or_uint8arra
 const encodeContent = (content) => {
   try {
     const purifiedContent = content
+      // https://stackoverflow.com/a/31652607/5225096
       .replace(/[\u007F-\uFFFF]/g, (chr) => '\\u' + ('0000' + chr.charCodeAt(0).toString(16)).substr(-4))
       .replace(/\//g, '\\/');
     const base64PurifiedContent = window.btoa(purifiedContent);
