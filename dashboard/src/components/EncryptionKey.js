@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
 import styled from 'styled-components';
 import { Formik } from 'formik';
@@ -61,7 +61,14 @@ const EncryptionKey = ({ isMain }) => {
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const reports = useRecoilValue(reportsState);
   const API = useApi();
-  const { isLoading } = useDataLoader();
+  const { isLoading, refresh } = useDataLoader();
+
+  useEffect(() => {
+    if (open) {
+      refresh();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, encryptionKey]);
 
   const totalToEncrypt =
     persons.length +
@@ -77,7 +84,7 @@ const EncryptionKey = ({ isMain }) => {
     relsPersonPlace.length +
     places.length +
     reports.length;
-  const totalDurationOnServer = totalToEncrypt * 0.032; // average 32 ms in server
+  const totalDurationOnServer = totalToEncrypt * 0.005; // average 5 ms in server
 
   if (!['admin'].includes(user.role)) return null;
 
