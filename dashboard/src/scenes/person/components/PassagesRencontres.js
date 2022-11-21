@@ -1,11 +1,11 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import Passage from '../../../components/Passage';
 import Rencontre from '../../../components/Rencontre';
 import TagTeam from '../../../components/TagTeam';
 import { currentTeamState, usersState, userState } from '../../../recoil/auth';
-import { formatDateTimeWithNameOfDay } from '../../../services/date';
+import { dayjsInstance, formatDateTimeWithNameOfDay } from '../../../services/date';
 
 export default function PassagesRencontres({ person }) {
   const { passages, rencontres } = person;
@@ -15,6 +15,14 @@ export default function PassagesRencontres({ person }) {
   const [passageToEdit, setPassageToEdit] = useState(null);
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
   const [selected, setSelected] = useState('passages');
+  const personPassages = useMemo(
+    () => [...(person?.passages || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    [person]
+  );
+  const personRencontres = useMemo(
+    () => [...(person?.rencontres || [])].sort((r1, r2) => (dayjsInstance(r1.date).isBefore(dayjsInstance(r2.date), 'day') ? 1 : -1)),
+    [person]
+  );
   return (
     <Container className="tw-relative">
       <div className="tw-sticky tw-top-0 tw-z-50 tw-mb-3 tw-flex tw-bg-white tw-px-3 tw-pt-3 tw-text-main">
@@ -42,7 +50,7 @@ export default function PassagesRencontres({ person }) {
           <button
             className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
             onClick={() => {
-              if (selected === 'passages') {
+              if (selected === 'rencontres') {
                 setRencontreToEdit({
                   user: user._id,
                   team: currentTeam._id,
@@ -65,7 +73,7 @@ export default function PassagesRencontres({ person }) {
       <table className="table table-striped">
         <tbody className="small">
           {selected === 'passages'
-            ? (passages || []).map((passage) => {
+            ? (personPassages || []).map((passage) => {
                 return (
                   <tr
                     onClick={() => {
@@ -84,7 +92,7 @@ export default function PassagesRencontres({ person }) {
                   </tr>
                 );
               })
-            : (rencontres || []).map((rencontre) => {
+            : (personRencontres || []).map((rencontre) => {
                 return (
                   <tr onClick={() => setRencontreToEdit(rencontre)}>
                     <td>

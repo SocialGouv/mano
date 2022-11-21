@@ -1,18 +1,21 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-import ButtonCustom from '../../../components/ButtonCustom';
 import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 import TagTeam from '../../../components/TagTeam';
 import { usersState } from '../../../recoil/auth';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import CommentModal from './CommentModal';
 
-export default function Comments({ comments, person }) {
+export default function Comments({ person }) {
   const users = useRecoilValue(usersState);
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [modalEditOpen, setModalEditOpen] = useState(false);
   const [commentToEdit, setCommentToEdit] = useState(null);
+  const comments = useMemo(
+    () => [...(person?.comments || [])].sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt)),
+    [person]
+  );
   return (
     <Container className="tw-relative">
       {modalCreateOpen && <CommentModal isNewComment={true} person={person} onClose={() => setModalCreateOpen(false)} />}

@@ -29,7 +29,7 @@ export default function Summary({ person }) {
           <Actions person={person} />
         </div>
         <div className="span-3 col-alt border shadow rounded">
-          <Comments comments={person.comments} person={person} />
+          <Comments person={person} />
         </div>
       </ContainerRow>
       <ContainerRow>

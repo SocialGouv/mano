@@ -89,7 +89,7 @@ export const Actions = ({ person }) => {
                   <div style={{ display: 'flex' }}>
                     <div style={{ flexGrow: 1 }}>{action.urgent ? <ExclamationMarkButton /> : null} Vendredi 29 Septembre 22:30</div>
                     <div>
-                      <ActionStatus status={'A FAIRE'} />
+                      <ActionStatus status={action.status} />
                     </div>
                   </div>
                   <div style={{ display: 'flex', marginTop: '0.5rem' }}>
