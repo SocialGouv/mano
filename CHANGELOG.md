@@ -1,3 +1,10 @@
+## [1.176.17](https://github.com/SocialGouv/mano/compare/v1.176.16...v1.176.17) (2022-11-21)
+
+
+### Bug Fixes
+
+* **dashboard:** refresh before encryption ([#991](https://github.com/SocialGouv/mano/issues/991)) ([5df4085](https://github.com/SocialGouv/mano/commit/5df4085da8dde7757297e44c2bdbe90429212510))
+
 ## [1.176.16](https://github.com/SocialGouv/mano/compare/v1.176.15...v1.176.16) (2022-11-19)
 
 
