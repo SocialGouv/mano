@@ -1,3 +1,10 @@
+## [1.176.18](https://github.com/SocialGouv/mano/compare/v1.176.17...v1.176.18) (2022-11-21)
+
+
+### Bug Fixes
+
+* **dashboard:** quick fix on datepicker ([704fdb7](https://github.com/SocialGouv/mano/commit/704fdb7e0207d9abae83b33618e302ea80a6f274))
+
 ## [1.176.17](https://github.com/SocialGouv/mano/compare/v1.176.16...v1.176.17) (2022-11-21)
 
 
