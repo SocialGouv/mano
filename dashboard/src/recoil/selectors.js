@@ -105,6 +105,7 @@ export const itemsGroupedByPersonSelector = selector({
     const places = get(placesObjectSelector);
     const rencontres = get(rencontresState);
     const groups = get(groupsState);
+
     for (const group of groups) {
       for (const person of group.persons) {
         if (!personsObject[person]) continue;
@@ -134,6 +135,7 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[action.person].actions.push(action);
       if (!!action.group) {
         const group = personsObject[action.person].group;
+        if (!group) continue;
         for (const person of group.persons) {
           if (!personsObject[person]) continue;
           if (person === action.person) continue;

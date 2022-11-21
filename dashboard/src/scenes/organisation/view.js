@@ -143,7 +143,11 @@ const View = () => {
         </nav>
         <div ref={scrollContainer} className="tw-basis-full tw-overflow-auto tw-py-4 tw-px-6">
           <Formik
-            initialValues={{ ...organisation, receptionEnabled: organisation.receptionEnabled || false }}
+            initialValues={{
+              ...organisation,
+              receptionEnabled: organisation.receptionEnabled || false,
+              groupsEnabled: organisation.groupsEnabled || false,
+            }}
             enableReinitialize
             onSubmit={async (body) => {
               try {
@@ -251,6 +255,7 @@ const View = () => {
                       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Accueil de jour</h3>
                       <Row>
                         <Col md={12}>
+                          <h4 className="tw-my-8">Activer la fonctionnalité Accueil de jour</h4>
                           <FormGroup>
                             <Label />
                             <div className="tw-ml-5 tw-flex tw-w-4/5 tw-flex-col">
@@ -264,10 +269,18 @@ const View = () => {
                               />
                             </div>
                           </FormGroup>
+                          <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                            <ButtonCustom
+                              title={'Mettre à jour'}
+                              disabled={values.receptionEnabled === organisation.receptionEnabled}
+                              loading={isSubmitting}
+                              onClick={handleSubmit}
+                            />
+                          </div>
                         </Col>
                         <Col md={12}>
+                          <h4 className="tw-my-8">Services disponibles</h4>
                           <FormGroup>
-                            <Label htmlFor="services">Services disponibles</Label>
                             <SortableGrid
                               list={values.services || []}
                               editItemTitle="Changer le nom du service"
@@ -405,20 +418,45 @@ const View = () => {
                       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Personnes suivies</h3>
                       {organisation.encryptionEnabled ? (
                         <>
-                          <Label>Champs permanents - options modulables</Label>
+                          <h4 className="tw-my-8">Activer la fonctionnalité Liens familiaux</h4>
+                          <FormGroup>
+                            <Label />
+                            <div className="tw-ml-5 tw-flex tw-w-4/5 tw-flex-col">
+                              <label htmlFor="groupsEnabled">
+                                Activer la possibilité d'ajouter des liens familiaux entre personnes. Un onglet "Famille" sera rajouté dans les
+                                personnes, et vous pourrez créer des actions, des commentaires et des documents visibles pour toute la famille.
+                              </label>
+                              <Input
+                                type="checkbox"
+                                name="groupsEnabled"
+                                id="groupsEnabled"
+                                checked={values.groupsEnabled || false}
+                                onChange={handleChange}
+                              />
+                            </div>
+                          </FormGroup>
+                          <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                            <ButtonCustom
+                              title={'Mettre à jour'}
+                              disabled={values.groupsEnabled === organisation.groupsEnabled}
+                              loading={isSubmitting}
+                              onClick={handleSubmit}
+                            />
+                          </div>
+                          <h4 className="tw-my-8">Champs permanents - options modulables</h4>
                           <TableCustomFields
                             customFields="fieldsPersonsCustomizableOptions"
                             key="fieldsPersonsCustomizableOptions"
                             data={fieldsPersonsCustomizableOptions}
                             onlyOptionsEditable
                           />
-                          <Label>Champs personnalisés - informations sociales</Label>
+                          <h4 className="tw-my-8">Champs personnalisés - informations sociales</h4>
                           <TableCustomFields
                             customFields="customFieldsPersonsSocial"
                             key="customFieldsPersonsSocial"
                             data={customFieldsPersonsSocial}
                           />
-                          <Label>Champs personnalisés - informations médicales</Label>
+                          <h4 className="tw-my-8">Champs personnalisés - informations médicales</h4>
                           <TableCustomFields
                             customFields="customFieldsPersonsMedical"
                             key="customFieldsPersonsMedical"

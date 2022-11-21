@@ -8,7 +8,7 @@ import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
 import useApi from '../services/api';
 import { useRecoilValue } from 'recoil';
-import { userState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 
 const Documents = ({
   person,
@@ -23,9 +23,14 @@ const Documents = ({
 }) => {
   const API = useApi();
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
+
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
 
-  const withDocForGroup = useMemo(() => documents?.filter((doc) => doc.group).length > 0, [documents]);
+  const withDocForGroup = useMemo(
+    () => !!organisation.groupEnabled && documents?.filter((doc) => doc.group).length > 0,
+    [documents, organisation.groupEnabled]
+  );
 
   return (
     <>

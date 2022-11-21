@@ -137,7 +137,7 @@ const Comments = ({ onUpdateResults }) => {
                 <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                 <div className="content">
                   {!!comment.urgent && <ExclamationMarkButton />}
-                  {!!comment.group && (
+                  {!!organisation.groupEnabled && !!comment.group && (
                     <span className="tw-text-3xl tw-not-italic" aria-label="Action familiale" title="Action familiale">
                       👪
                     </span>

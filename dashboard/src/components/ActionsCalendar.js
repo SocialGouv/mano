@@ -8,7 +8,7 @@ import ActionStatus from './ActionStatus';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import PersonName from './PersonName';
 import ConsultationButton from './ConsultationButton';
-import { userState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 import { disableConsultationRow } from '../recoil/consultations';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 
@@ -16,6 +16,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   const history = useHistory();
   const location = useLocation();
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
   const [theDayBeforeActions, setTheDayBeforeActions] = useState([]);
   const [theDayAfterActions, setTheDayAfterActions] = useState([]);
   const [theCurrentDayActions, setTheCurrentDayActions] = useState([]);
@@ -77,7 +78,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
             return (
               <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                 {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                {!!actionOrConsult.group && (
+                {!!organisation.groupEnabled && !!actionOrConsult.group && (
                   <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                     👪
                   </span>

@@ -16,6 +16,10 @@ module.exports = async () => {
         CONSTRAINT "Group_organisation_fkey" FOREIGN KEY ("organisation") REFERENCES "mano"."Organisation"("_id") ON DELETE CASCADE ON UPDATE CASCADE
       );
     `);
+    await sequelize.query(`
+      ALTER TABLE "mano"."Organisation"
+      ADD COLUMN IF NOT EXISTS "groupsEnabled" boolean DEFAULT false
+    `);
   } catch (e) {
     capture(e);
   }

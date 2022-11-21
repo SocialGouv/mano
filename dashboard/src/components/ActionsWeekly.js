@@ -7,6 +7,8 @@ import ActionOrConsultationName from './ActionOrConsultationName';
 import ActionStatus from './ActionStatus';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import PersonName from './PersonName';
+import { organisationState } from '../recoil/auth';
+import { useRecoilValue } from 'recoil';
 
 // TODO: remove inline style when UI is stabilized.
 
@@ -79,6 +81,7 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
 
 function ActionsOfDay({ actions }) {
   const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
 
   const sortedActions = [
     // Urgent actions first
@@ -144,7 +147,7 @@ function ActionsOfDay({ actions }) {
           <div>
             🧑 <PersonName item={action} />
           </div>
-          {Boolean(action.group) && <div>👪 Action familiale</div>}
+          {!!organisation.groupEnabled && !!action.group && <div>👪 Action familiale</div>}
           <ActionStatus status={action.status} />
         </div>
       ))}

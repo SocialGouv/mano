@@ -811,6 +811,8 @@ const ServicesWrapper = styled.div`
 const ActionCompletedAt = ({ date, status, actions }) => {
   const data = actions;
   const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
+
   const [modalOpen, setModalOpen] = useState(false);
 
   if (!data) return <div />;
@@ -855,7 +857,7 @@ const ActionCompletedAt = ({ date, status, actions }) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!action.urgent && <ExclamationMarkButton />}
-                    {!!action.group && (
+                    {!!organisation.groupEnabled && !!action.group && (
                       <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪
                       </span>
@@ -896,6 +898,7 @@ const ActionCompletedAt = ({ date, status, actions }) => {
 const ActionCreatedAt = ({ date, actions }) => {
   const data = actions;
   const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -920,7 +923,7 @@ const ActionCreatedAt = ({ date, actions }) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!action.urgent && <ExclamationMarkButton />}
-                    {!!action.group && (
+                    {!!organisation.groupEnabled && !!action.group && (
                       <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪
                       </span>
@@ -1073,6 +1076,7 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
 const CommentCreatedAt = ({ date, comments }) => {
   const history = useHistory();
   const data = comments;
+  const organisation = useRecoilValue(organisationState);
 
   if (!data) return <div />;
 
@@ -1102,7 +1106,7 @@ const CommentCreatedAt = ({ date, comments }) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!comment.urgent && <ExclamationMarkButton />}
-                    {!!comment.group && (
+                    {!!organisation.groupEnabled && !!comment.group && (
                       <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
                         👪
                       </span>

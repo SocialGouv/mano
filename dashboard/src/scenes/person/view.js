@@ -147,6 +147,7 @@ const View = () => {
       <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }} className="noprint">
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
+          if (!organisation.groupsEnabled && tabCaption.includes('Famille')) return null;
           if (!user.healthcareProfessional && tabCaption.includes('Dossier Médical')) return null;
           if (['restricted-access'].includes(user.role)) {
             let showTab = false;
@@ -712,6 +713,7 @@ const Actions = ({ onUpdateResults }) => {
   const data = person?.actions || [];
   const history = useHistory();
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [filterCategories, setFilterCategories] = useState([]);
@@ -776,7 +778,7 @@ const Actions = ({ onUpdateResults }) => {
               return (
                 <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                   {!!action.urgent && <ExclamationMarkButton />}
-                  {!!action.group && (
+                  {!!organisation.groupEnabled && !!action.group && (
                     <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                       👪
                     </span>

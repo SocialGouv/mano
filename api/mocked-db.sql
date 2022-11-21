@@ -78,6 +78,7 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     "encryptionLastUpdateAt" timestamp with time zone,
     encrypting boolean DEFAULT false,
     "receptionEnabled" boolean DEFAULT false,
+    "groupsEnabled" boolean DEFAULT false,
     services text[],
     collaborations text[],
     "customFieldsObs" jsonb,

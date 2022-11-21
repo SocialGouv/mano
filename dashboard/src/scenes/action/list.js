@@ -16,7 +16,7 @@ import ActionOrConsultationName from '../../components/ActionOrConsultationName'
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
 import { mappedIdsToLabels, TODO } from '../../recoil/actions';
-import { currentTeamState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
@@ -119,6 +119,7 @@ const List = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [page, setPage] = useSearchParamState('page', 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
@@ -263,7 +264,7 @@ const List = () => {
                   return (
                     <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                       {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                      {!!actionOrConsult.group && (
+                      {!!organisation.groupEnabled && !!actionOrConsult.group && (
                         <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                           👪
                         </span>

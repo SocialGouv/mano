@@ -13,13 +13,13 @@ import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
-import { teamsState } from '../../recoil/auth';
+import { organisationState, teamsState } from '../../recoil/auth';
 import { actionsState } from '../../recoil/actions';
 import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
-import { onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
+import { itemsGroupedByPersonSelector, onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
 import PersonName from '../../components/PersonName';
 import { formatBirthDate, formatDateWithFullMonth, formatTime } from '../../services/date';
 import { useDataLoader } from '../../components/DataLoader';
@@ -101,6 +101,7 @@ const View = () => {
 const Actions = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const actions = useRecoilValue(actionsState);
+  const organisation = useRecoilValue(organisationState);
 
   const data = useMemo(() => {
     if (!search?.length) return [];
@@ -135,7 +136,7 @@ const Actions = ({ search, onUpdateResults }) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                    {!!actionOrConsult.group && (
+                    {!!organisation.groupEnabled && !!actionOrConsult.group && (
                       <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪
                       </span>
@@ -177,22 +178,24 @@ const personsWithFormattedBirthDateSelector = selector({
   },
 });
 
-const personsFilteredBySearchSelector = selectorFamily({
-  key: 'personsFilteredBySearchSelector',
+const personsFilteredBySearchForSearchSelector = selectorFamily({
+  key: 'personsFilteredBySearchForSearchSelector',
   get:
     ({ search }) =>
     ({ get }) => {
       const persons = get(personsWithFormattedBirthDateSelector);
+      const personsPopulated = get(itemsGroupedByPersonSelector);
       if (!search?.length) return [];
-      return filterBySearch(search, persons);
+      return filterBySearch(search, persons).map((p) => personsPopulated[p._id]);
     },
 });
 
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
+  const organisation = useRecoilValue(organisationState);
 
-  const data = useRecoilValue(personsFilteredBySearchSelector({ search }));
+  const data = useRecoilValue(personsFilteredBySearchForSearchSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -221,6 +224,21 @@ const Persons = ({ search, onUpdateResults }) => {
           noData="Pas de personne suivie"
           onRowClick={(p) => history.push(`/person/${p._id}`)}
           columns={[
+            {
+              title: '',
+              dataKey: 'group',
+              small: true,
+              render: (person) => {
+                if (!person.group) return null;
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    <span className="tw-text-3xl" aria-label="Person avec des liens familiaux" title="Person avec des liens familiaux">
+                      👪
+                    </span>
+                  </div>
+                );
+              },
+            },
             { title: 'Nom', dataKey: 'name' },
             {
               title: 'Vigilance',
@@ -235,7 +253,7 @@ const Persons = ({ search, onUpdateResults }) => {
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
             { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },
-          ]}
+          ].filter((c) => organisation.groupsEnabled || c.dataKey !== 'group')}
         />
       </StyledBox>
       <hr />
@@ -299,6 +317,7 @@ const commentsFilteredBySearchSelector = selectorFamily({
 
 const Comments = ({ search, onUpdateResults }) => {
   const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
 
   const data = useRecoilValue(commentsFilteredBySearchSelector({ search }));
 
@@ -336,7 +355,7 @@ const Comments = ({ search, onUpdateResults }) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!comment.urgent && <ExclamationMarkButton />}
-                    {!!comment.group && (
+                    {!!organisation.groupEnabled && !!comment.group && (
                       <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
                         👪
                       </span>

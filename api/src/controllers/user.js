@@ -153,6 +153,7 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
       encryptionEnabled: organisation.encryptionEnabled,
       encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
       receptionEnabled: organisation.receptionEnabled,
+      groupsEnabled: organisation.groupsEnabled,
       services: organisation.services,
       collaborations: organisation.collaborations,
       customFieldsObs: organisation.customFieldsObs,

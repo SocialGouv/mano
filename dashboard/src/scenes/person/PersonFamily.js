@@ -34,17 +34,20 @@ const PersonFamily = ({ person }) => {
     if (personGroup.persons.find((_personId) => _personId === personId)) {
       return toast.error('Il y a déjà un lien entre ces deux personnes');
     }
-    if (groups.find((group) => group.persons.find((_personId) => _personId === personId))) {
+    const personDoesntBelongToAGroupYet = !personGroup?.persons?.length;
+    const personAlreadyBelongToAGroup = !personDoesntBelongToAGroupYet;
+    const otherPersonAlreadyBelongToAGroup = groups.find((group) => group.persons.find((_personId) => _personId === personId));
+    if (personAlreadyBelongToAGroup && otherPersonAlreadyBelongToAGroup) {
       return toast.error(
-        "Cette personne fait déjà partie d'une autre famille",
-        "Vous ne pouvez pour l'instant pas ajouter une personne à plusieurs familles. N'hésitez pas à nous contacter si vous souhaitez faire évoluer cette fonctionnalité."
+        "Cette personne fait déjà partie d'une autre famille.\nVous ne pouvez pour l'instant pas ajouter une personne à plusieurs familles.\nN'hésitez pas à nous contacter si vous souhaitez faire évoluer cette fonctionnalité."
       );
     }
+    const groupToEdit = otherPersonAlreadyBelongToAGroup || personGroup;
     const nextGroup = {
-      ...personGroup,
-      persons: [...new Set([...personGroup.persons, person._id, personId])],
+      ...groupToEdit,
+      persons: [...new Set([...groupToEdit.persons, person._id, personId])],
       relations: [
-        ...personGroup.relations,
+        ...groupToEdit.relations,
         {
           _id: uuidv4(),
           persons: [person._id, personId],
@@ -55,13 +58,13 @@ const PersonFamily = ({ person }) => {
         },
       ],
     };
-    const isNew = !personGroup?._id;
+    const isNew = !groupToEdit?._id;
     const response = isNew
       ? await API.post({ path: '/group', body: prepareGroupForEncryption(nextGroup) })
-      : await API.put({ path: `/group/${personGroup._id}`, body: prepareGroupForEncryption(nextGroup) });
+      : await API.put({ path: `/group/${groupToEdit._id}`, body: prepareGroupForEncryption(nextGroup) });
     if (response.ok) {
       setGroups((groups) =>
-        isNew ? [...groups, response.decryptedData] : groups.map((group) => (group._id === personGroup._id ? response.decryptedData : group))
+        isNew ? [...groups, response.decryptedData] : groups.map((group) => (group._id === groupToEdit._id ? response.decryptedData : group))
       );
       setNewRelationModalOpen(false);
       toast.success('Le lien familial a été ajouté');
