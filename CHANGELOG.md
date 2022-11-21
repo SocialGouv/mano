@@ -1,3 +1,10 @@
+## [1.176.20](https://github.com/SocialGouv/mano/compare/v1.176.19...v1.176.20) (2022-11-21)
+
+
+### Bug Fixes
+
+* **dashboard:** try to decrypt when encrypt to check if encryption is correct ([#990](https://github.com/SocialGouv/mano/issues/990)) ([7718e5e](https://github.com/SocialGouv/mano/commit/7718e5ebd21a3bc1379a32e736de22c46dd9c0bf))
+
 ## [1.176.19](https://github.com/SocialGouv/mano/compare/v1.176.18...v1.176.19) (2022-11-21)
 
 
