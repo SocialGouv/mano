@@ -137,7 +137,7 @@ const Comments = ({ onUpdateResults }) => {
                 <div className="time">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                 <div className="content">
                   {!!comment.urgent && <ExclamationMarkButton />}
-                  {!!organisation.groupEnabled && !!comment.group && (
+                  {!!organisation.groupsEnabled && !!comment.group && (
                     <span className="tw-text-3xl tw-not-italic" aria-label="Action familiale" title="Action familiale">
                       👪
                     </span>
@@ -189,8 +189,8 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
     if (onCancel) onCancel();
   };
   const canToggleGroupCheck = useMemo(
-    () => !!organisation.groupEnabled && !!personId && groups.find((group) => group.persons.includes(personId)),
-    [groups, personId, organisation.groupEnabled]
+    () => !!organisation.groupsEnabled && !!personId && groups.find((group) => group.persons.includes(personId)),
+    [groups, personId, organisation.groupsEnabled]
   );
 
   return (

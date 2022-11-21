@@ -78,7 +78,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
             return (
               <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                 {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                {!!organisation.groupEnabled && !!actionOrConsult.group && (
+                {!!organisation.groupsEnabled && !!actionOrConsult.group && (
                   <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                     👪
                   </span>

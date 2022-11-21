@@ -28,8 +28,8 @@ const Documents = ({
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
 
   const withDocForGroup = useMemo(
-    () => !!organisation.groupEnabled && documents?.filter((doc) => doc.group).length > 0,
-    [documents, organisation.groupEnabled]
+    () => !!organisation.groupsEnabled && documents?.filter((doc) => doc.group).length > 0,
+    [documents, organisation.groupsEnabled]
   );
 
   return (

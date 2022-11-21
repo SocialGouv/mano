@@ -136,7 +136,7 @@ const Actions = ({ search, onUpdateResults }) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                    {!!organisation.groupEnabled && !!actionOrConsult.group && (
+                    {!!organisation.groupsEnabled && !!actionOrConsult.group && (
                       <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                         👪
                       </span>
@@ -355,7 +355,7 @@ const Comments = ({ search, onUpdateResults }) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                     {!!comment.urgent && <ExclamationMarkButton />}
-                    {!!organisation.groupEnabled && !!comment.group && (
+                    {!!organisation.groupsEnabled && !!comment.group && (
                       <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
                         👪
                       </span>

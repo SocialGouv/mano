@@ -778,7 +778,7 @@ const Actions = ({ onUpdateResults }) => {
               return (
                 <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
                   {!!action.urgent && <ExclamationMarkButton />}
-                  {!!organisation.groupEnabled && !!action.group && (
+                  {!!organisation.groupsEnabled && !!action.group && (
                     <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
                       👪
                     </span>
@@ -966,8 +966,8 @@ const PersonDocuments = ({ onUpdateResults, onGoToMedicalFiles }) => {
 
   const groups = useRecoilValue(groupsState);
   const canToggleGroupCheck = useMemo(
-    () => !!organisation.groupEnabled && groups.find((group) => group.persons.includes(person._id)),
-    [groups, person._id, organisation.groupEnabled]
+    () => !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
+    [groups, person._id, organisation.groupsEnabled]
   );
 
   useEffect(() => {
