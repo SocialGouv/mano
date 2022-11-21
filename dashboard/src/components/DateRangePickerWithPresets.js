@@ -77,42 +77,25 @@ const periods = [
 ];
 
 // https://reactdatepicker.com/#example-date-range
-
 const DateRangePickerWithPresets = ({ period, setPeriod }) => {
-  /* FIXME: there is a bug with playwright tests
-  it doesn't always show the picker if no hack is made
-  so here below is a hack to make playwright work...
-  */
-
-  const forTest = process.env.REACT_APP_TEST_PLAYWRIGHT === 'true';
   const [showDatePicker, setShowDatepicker] = useState(false);
   const [preset, setPreset] = useState(null);
-  const [datePickerFocused, setDatePickerFocused] = useState(null);
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
 
   const handleWindowResize = useCallback(() => {
-    if (window.innerWidth < 1100) {
-      setNumberOfMonths(1);
-    } else {
-      setNumberOfMonths(2);
-    }
-  }, [setNumberOfMonths]);
+    setNumberOfMonths(window.innerWidth < 1100 ? 1 : 2);
+  }, []);
 
   useEffect(() => {
     window.addEventListener('resize', handleWindowResize);
     return () => window.removeEventListener('resize', handleWindowResize);
   });
 
-  useEffect(() => {
-    if (forTest) return;
-    if (!datePickerFocused) closeDatePicker();
-  }, [datePickerFocused, forTest]);
-
   const openDatePicker = (event) => {
-    setDatePickerFocused('startDate');
     if (!!showDatePicker) return event.preventDefault();
     setShowDatepicker(true);
   };
+
   const onChange = (dates) => {
     const [startDate, endDate] = dates;
     setPeriod({
@@ -123,10 +106,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   };
 
   const closeDatePicker = () => {
-    setTimeout(() => {
-      setShowDatepicker(false);
-      setDatePickerFocused(null);
-    }, 50);
+    setShowDatepicker(false);
   };
 
   const setPresetRequest = (preset) => {
@@ -149,18 +129,11 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
     return `Entre... et le...`;
   };
 
-  const Wrapper = forTest ? 'div' : OutsideClickHandler;
-  const wrapperProps = forTest
-    ? {
-        style: showDatePicker ? {} : { display: 'none' },
-      }
-    : { onOutsideClick: closeDatePicker };
-
   return (
     <Container>
       <OpenPickerButton onClick={openDatePicker}>{renderLabel()}</OpenPickerButton>
       {!!showDatePicker && (
-        <Wrapper {...wrapperProps}>
+        <OutsideClickHandler onOutsideClick={closeDatePicker}>
           <PickerContainer>
             <Presets>
               {periods.map((p) => (
@@ -181,7 +154,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
               endDate={period.endDate}
             />
           </PickerContainer>
-        </Wrapper>
+        </OutsideClickHandler>
       )}
     </Container>
   );
