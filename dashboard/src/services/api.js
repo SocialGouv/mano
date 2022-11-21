@@ -48,6 +48,13 @@ export const encryptItem =
       if (!item.entityKey) item.entityKey = await generateEntityKey();
       const { encryptedContent, encryptedEntityKey } = await encrypt(JSON.stringify(item.decrypted), item.entityKey, hashedOrgEncryptionKey);
 
+      try {
+        decryptDBItem({ encryptedContent, encryptedEntityKey }, hashedOrgEncryptionKey);
+      } catch (e) {
+        // TODO: remove when debug is done
+        capture('error decrypting item after encrypting', { extra: { e, item } });
+      }
+
       item.encrypted = encryptedContent;
       item.encryptedEntityKey = encryptedEntityKey;
       delete item.decrypted;
