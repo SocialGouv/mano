@@ -85,7 +85,7 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   */
 
   const forTest = process.env.REACT_APP_TEST_PLAYWRIGHT === 'true';
-  const [showDatePicker, setShowDatepicker] = useState(forTest ? false : true);
+  const [showDatePicker, setShowDatepicker] = useState(false);
   const [preset, setPreset] = useState(null);
   const [datePickerFocused, setDatePickerFocused] = useState(null);
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
@@ -159,28 +159,30 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   return (
     <Container>
       <OpenPickerButton onClick={openDatePicker}>{renderLabel()}</OpenPickerButton>
-      <Wrapper {...wrapperProps}>
-        <PickerContainer>
-          <Presets>
-            {periods.map((p) => (
-              <PresetButton key={p.label} onClick={() => setPresetRequest(p)}>
-                {p.label}
-              </PresetButton>
-            ))}
-          </Presets>
-          <DatePicker
-            monthsShown={numberOfMonths}
-            selectsRange
-            inline
-            locale="fr"
-            name="date"
-            selected={period.startDate}
-            onChange={onChange}
-            startDate={period.startDate}
-            endDate={period.endDate}
-          />
-        </PickerContainer>
-      </Wrapper>
+      {!!showDatePicker && (
+        <Wrapper {...wrapperProps}>
+          <PickerContainer>
+            <Presets>
+              {periods.map((p) => (
+                <PresetButton key={p.label} onClick={() => setPresetRequest(p)}>
+                  {p.label}
+                </PresetButton>
+              ))}
+            </Presets>
+            <DatePicker
+              monthsShown={numberOfMonths}
+              selectsRange
+              inline
+              locale="fr"
+              name="date"
+              selected={period.startDate}
+              onChange={onChange}
+              startDate={period.startDate}
+              endDate={period.endDate}
+            />
+          </PickerContainer>
+        </Wrapper>
+      )}
     </Container>
   );
 };
@@ -197,7 +199,6 @@ const OpenPickerButton = styled.button`
   box-shadow: none;
   min-width: 15rem;
   border: 1px solid #ccc;
-  color: blue;
 `;
 
 const Presets = styled.div`

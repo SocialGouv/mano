@@ -13,12 +13,14 @@ fileignoreconfig:
   checksum: 7b02f5bf51bec5d4be59d9d43c26f2e7fa87b26cab71baf7d2ec0f2d274dfe56
 - filename: app/src/components/ActionCategoriesModalSelect.js
   checksum: 7b03aa1b13e211fd0d8bdb188a9dcaaae3b4ce2f822cc849483fcd5fab19f284
+- filename: app/src/services/api.js
+  checksum: 80f4e31299ceebffe355fe0c3666fef45364f867a9b4877ff67bef89eb9d9b2d
 - filename: dashboard/src/components/ActionName.js
   checksum: 85c84d11d7d840c01a671650b1665c0ad2e0dd01fb5d85ee946128ad0fc7a84f
 - filename: dashboard/src/components/DataLoader.js
-  checksum: e2fd738febd0f55007db268737697c71b1477d537769360e9fbaba45bf3886f5
+  checksum: f07dd01934ecf1e9344f55187bb0742c199eef51ff763256795a424699c5779d
 - filename: dashboard/src/components/DateRangePickerWithPresets.js
-  checksum: 9351169dd8564856c9f6375bd4c72a4b42d256294e3468c002e3298adc9b901c
+  checksum: 63edc19b7ba985f1b51e721e72a13af660c94d46b1a876cf89280381752b2ede
 - filename: dashboard/src/components/Documents.js
   checksum: 79d5aebca22723be6546c3804476901a6f579cdf996aac687d88f5d1dd3bc1a6
 - filename: dashboard/src/components/tailwind/ActionsCategorySelect.js
@@ -28,12 +30,7 @@ fileignoreconfig:
 - filename: dashboard/src/index.scss
   checksum: b0c164892558dd35b2260af1311433d88ee0322526b9172646042fd6d9839c42
 - filename: dashboard/src/scenes/organisation/ActionCategoriesSettings.js
-  checksum: 285d945a640542c3265e54d311d7458395d386c99b1b2dcbeba8b74be32dcf8f
   checksum: c47f6bc22846aa5918fb1746356eb8c2c21e08628b48a73e6167b90dd05c5c0d
-- filename: app/src/services/api.js
-  checksum: 80f4e31299ceebffe355fe0c3666fef45364f867a9b4877ff67bef89eb9d9b2d
-- filename: dashboard/src/components/DataLoader.js
-  checksum: f07dd01934ecf1e9344f55187bb0742c199eef51ff763256795a424699c5779d
 - filename: dashboard/src/services/api.js
   checksum: 2e6404fe5ba55e87a6cab3287e39c3e77d5c3807efc5d47906567e2373bc224b
 - filename: dashboard/src/services/encryption.js
@@ -42,6 +39,12 @@ fileignoreconfig:
   checksum: 760314340593e904bcf21e2997a8bfeb0afcfd4b488be13a18905c113e981169
 - filename: e2e/scripts/populate-db.ts
   checksum: 2d044f1f6ddb6c28b65c2b5037be9d00f54e4f9ec8e453d37936b28a3fce9456
+- filename: tests/src/scripts/db.sql
+  checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
+scopeconfig:
+- scope: node
+version: "1.0"
+b65c2b5037be9d00f54e4f9ec8e453d37936b28a3fce9456
 - filename: tests/src/scripts/db.sql
   checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
 scopeconfig:
