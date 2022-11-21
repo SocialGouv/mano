@@ -1,3 +1,10 @@
+## [1.176.19](https://github.com/SocialGouv/mano/compare/v1.176.18...v1.176.19) (2022-11-21)
+
+
+### Bug Fixes
+
+* **dashboard:** fix tests ([7267ad0](https://github.com/SocialGouv/mano/commit/7267ad0c1649aa3c1aad5d897395b622b02737ba))
+
 ## [1.176.18](https://github.com/SocialGouv/mano/compare/v1.176.17...v1.176.18) (2022-11-21)
 
 
