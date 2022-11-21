@@ -67,7 +67,7 @@ const Loader = () => {
   const [loading, setLoading] = useRecoilState(loadingState);
   const [progress, setProgress] = useRecoilState(progressState);
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
-  const organisation = useRecoilValue(organisationState);
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
   const organisationId = organisation?._id;
   const user = useRecoilValue(userState);
 
@@ -92,6 +92,12 @@ const Loader = () => {
     const { showFullScreen, initialLoad } = refreshTrigger.options;
     setLoading('Chargement...');
     setFullScreen(showFullScreen);
+    /*
+    Refresh the organisation data
+    */
+
+    const { user } = await API.get({ path: '/user/signin-token' });
+    setOrganisation(user.organisation);
     /*
     Get number of data to download to show the appropriate loading progress bar
     */

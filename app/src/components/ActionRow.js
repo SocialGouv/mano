@@ -1,5 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
+import { View } from 'react-native';
 import { useRecoilValue } from 'recoil';
 import ButtonRight from './ButtonRight';
 import RowContainer from './RowContainer';
@@ -9,9 +10,11 @@ import TeamsTags from './TeamsTags';
 import { personsState } from '../recoil/persons';
 import { DONE } from '../recoil/actions';
 import DateAndTimeCalendarDisplay from './DateAndTimeCalendarDisplay';
+import { organisationState } from '../recoil/auth';
 
 const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamName, testID = 'action' }) => {
   const persons = useRecoilValue(personsState);
+  const organisation = useRecoilValue(organisationState);
 
   const name = action?.name;
   const status = action?.status;
@@ -33,7 +36,14 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
     <RowContainer onPress={onRowPress} testID={`${testID}-row-${name?.split(' ').join('-').toLowerCase()}-button`}>
       <DateAndTimeCalendarDisplay date={dueAt} withTime={withTime} />
       <CaptionsContainer>
-        <Name bold>{name}</Name>
+        <View className="flex-row items-center">
+          {!!organisation.groupsEnabled && !!action.group && (
+            <View className="mr-2">
+              <MyText>👪</MyText>
+            </View>
+          )}
+          <Name bold>{name}</Name>
+        </View>
         {!!withTeamName && <TeamsTags teams={[action.team]} />}
         {showStatus ? (
           <StatusContainer>
@@ -84,6 +94,7 @@ const Status = styled(MyText)`
 const PseudoContainer = styled.TouchableOpacity`
   margin-top: 15px;
   align-self: flex-start;
+  flex-direction: row;
 `;
 
 const Pseudo = styled(MyText)`
