@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
-import ButtonCustom from '../../../components/ButtonCustom';
 import Passage from '../../../components/Passage';
 import Rencontre from '../../../components/Rencontre';
 import TagTeam from '../../../components/TagTeam';
@@ -10,116 +9,100 @@ import { formatDateTimeWithNameOfDay } from '../../../services/date';
 
 export default function PassagesRencontres({ person }) {
   const { passages, rencontres } = person;
-  const [selected, setSelected] = useState('passages');
-  return (
-    <Container>
-      <div class="tw-mb-4 tw-flex tw-items-center tw-justify-center tw-font-semibold">
-        <button
-          className={`tw-rounded-l-lg tw-border-y tw-border-l tw-border-main tw-py-2 tw-px-4 tw-transition ${
-            selected === 'passages' ? ' tw-bg-main tw-text-white' : 'tw-bg-white tw-text-main'
-          }`}
-          onClick={() => setSelected('passages')}>
-          Passages
-        </button>
-        <button
-          className={`tw-rounded-r-lg tw-border-y tw-border-r tw-border-main tw-py-2 tw-px-4 tw-transition ${
-            selected === 'rencontres' ? ' tw-bg-main tw-text-white' : 'tw-bg-white tw-text-main'
-          }`}
-          onClick={() => setSelected('rencontres')}>
-          Rencontres
-        </button>
-      </div>
-      <table className="table table-striped">
-        <tbody className="small">
-          {selected === 'passages' ? (
-            <Passages passages={passages} personId={person._id} />
-          ) : (
-            <Rencontres rencontres={rencontres} personId={person._id} />
-          )}
-        </tbody>
-      </table>
-    </Container>
-  );
-}
-
-function Passages({ passages, personId }) {
   const users = useRecoilValue(usersState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
   const [passageToEdit, setPassageToEdit] = useState(null);
-  return (
-    <>
-      <button
-        className="rounded px-2 py-1 tw-mb-4 tw-bg-main tw-text-sm tw-text-white"
-        onClick={() =>
-          setPassageToEdit({
-            user: user._id,
-            team: currentTeam._id,
-            person: personId,
-          })
-        }>
-        Ajouter un passage
-      </button>
-      <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
-      {(passages || []).map((passage) => {
-        return (
-          <tr
-            onClick={() => {
-              setPassageToEdit(passage);
-            }}>
-            <td>
-              <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
-              <div className="content">
-                {(passage.comment || '').split('\n').map((e) => (
-                  <p>{e}</p>
-                ))}
-              </div>
-              <div className="small">Créé par {users.find((e) => e._id === passage.user)?.name}</div>
-              <TagTeam teamId={passage.team} />
-            </td>
-          </tr>
-        );
-      })}
-    </>
-  );
-}
-
-function Rencontres({ rencontres, personId }) {
-  const users = useRecoilValue(usersState);
-  const user = useRecoilValue(userState);
-  const currentTeam = useRecoilValue(currentTeamState);
   const [rencontreToEdit, setRencontreToEdit] = useState(null);
+  const [selected, setSelected] = useState('passages');
   return (
-    <>
-      <button
-        className="rounded px-2 py-1 tw-mb-4 tw-bg-main tw-text-sm tw-text-white"
-        onClick={() =>
-          setRencontreToEdit({
-            user: user._id,
-            team: currentTeam._id,
-            person: personId,
-          })
-        }>
-        Ajouter une rencontre
-      </button>
+    <Container className="tw-relative">
+      <div className="tw-sticky tw-top-0 tw-z-50 tw-mb-3 tw-flex tw-bg-white tw-px-3 tw-pt-3 tw-text-main">
+        <div className="tw-flex tw-flex-1">
+          <button
+            className={
+              selected === 'passages'
+                ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-2'
+                : 'tw-border-b tw-border-slate-300 tw-p-2'
+            }
+            onClick={() => setSelected('passages')}>
+            Passages
+          </button>
+          <button
+            className={
+              selected === 'rencontres'
+                ? 'tw-rounded-t tw-border-t tw-border-l tw-border-r tw-border-slate-300 tw-p-2'
+                : 'tw-border-b tw-border-slate-300 tw-p-2'
+            }
+            onClick={() => setSelected('rencontres')}>
+            Rencontres
+          </button>
+        </div>
+        <div>
+          <button
+            className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
+            onClick={() => {
+              if (selected === 'passages') {
+                setRencontreToEdit({
+                  user: user._id,
+                  team: currentTeam._id,
+                  person: person._id,
+                });
+              } else {
+                setPassageToEdit({
+                  user: user._id,
+                  team: currentTeam._id,
+                  person: person._id,
+                });
+              }
+            }}>
+            ＋
+          </button>
+        </div>
+      </div>
       <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
-      {(rencontres || []).map((rencontre) => {
-        return (
-          <tr onClick={() => setRencontreToEdit(rencontre)}>
-            <td>
-              <div>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
-              <div className="content">
-                {(rencontre.comment || '').split('\n').map((e) => (
-                  <p>{e}</p>
-                ))}
-              </div>
-              <div className="small">Créé par {users.find((e) => e._id === rencontre.user)?.name}</div>
-              <TagTeam teamId={rencontre.team} />
-            </td>
-          </tr>
-        );
-      })}
-    </>
+      <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+      <table className="table table-striped">
+        <tbody className="small">
+          {selected === 'passages'
+            ? (passages || []).map((passage) => {
+                return (
+                  <tr
+                    onClick={() => {
+                      setPassageToEdit(passage);
+                    }}>
+                    <td>
+                      <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
+                      <div className="content">
+                        {(passage.comment || '').split('\n').map((e) => (
+                          <p>{e}</p>
+                        ))}
+                      </div>
+                      <div className="small">Créé par {users.find((e) => e._id === passage.user)?.name}</div>
+                      <TagTeam teamId={passage.team} />
+                    </td>
+                  </tr>
+                );
+              })
+            : (rencontres || []).map((rencontre) => {
+                return (
+                  <tr onClick={() => setRencontreToEdit(rencontre)}>
+                    <td>
+                      <div>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
+                      <div className="content">
+                        {(rencontre.comment || '').split('\n').map((e) => (
+                          <p>{e}</p>
+                        ))}
+                      </div>
+                      <div className="small">Créé par {users.find((e) => e._id === rencontre.user)?.name}</div>
+                      <TagTeam teamId={rencontre.team} />
+                    </td>
+                  </tr>
+                );
+              })}
+        </tbody>
+      </table>
+    </Container>
   );
 }
 

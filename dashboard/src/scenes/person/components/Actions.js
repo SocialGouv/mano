@@ -30,8 +30,8 @@ export const Actions = ({ person }) => {
   const filteredData = useRecoilValue(filteredPersonActionsSelector({ personId: person._id, filterCategories, filterStatus }));
 
   return (
-    <div>
-      <div className="p-3 tw-flex tw-bg-white">
+    <div className="tw-relative">
+      <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1">Actions</h4>
         <div>
           <button

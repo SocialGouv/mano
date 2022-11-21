@@ -14,10 +14,10 @@ export default function Comments({ comments, person }) {
   const [modalEditOpen, setModalEditOpen] = useState(false);
   const [commentToEdit, setCommentToEdit] = useState(null);
   return (
-    <Container>
+    <Container className="tw-relative">
       {modalCreateOpen && <CommentModal isNewComment={true} person={person} onClose={() => setModalCreateOpen(false)} />}
       {modalEditOpen && <CommentModal comment={commentToEdit} person={person} isNewComment={false} onClose={() => setModalEditOpen(false)} />}
-      <div className="p-3 tw-flex">
+      <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1">Commentaires</h4>
         <div>
           <button

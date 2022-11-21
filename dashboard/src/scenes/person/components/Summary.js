@@ -36,7 +36,7 @@ export default function Summary({ person }) {
         <div className="span-9 col-main pt-4 border shadow rounded p-3">
           <InfosSociales person={person} />
         </div>
-        <div className="span-3 col-alt border shadow rounded p-3">
+        <div className="span-3 col-alt border shadow rounded">
           <PassagesRencontres person={person} />
         </div>
       </ContainerRow>
@@ -44,7 +44,7 @@ export default function Summary({ person }) {
         <div className="span-9 col-main pt-4 border shadow rounded p-3">
           <InfosMedicales person={person} />
         </div>
-        <div className="span-3 col-alt border shadow rounded p-3">
+        <div className="span-3 col-alt border shadow rounded">
           <PersonDocuments person={person} onUpdateResults={() => {}} onGoToMedicalFiles={() => {}} />
         </div>
       </ContainerRow>
