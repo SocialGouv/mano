@@ -176,6 +176,7 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
   const user = useRecoilValue(userState);
   const { personId } = useParams();
   const groups = useRecoilValue(groupsState);
+  const organisation = useRecoilValue(organisationState);
 
   const [open, setOpen] = useState(false);
 
@@ -187,7 +188,10 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
     setOpen(false);
     if (onCancel) onCancel();
   };
-  const canToggleGroupCheck = useMemo(() => !!personId && groups.find((group) => group.persons.includes(personId)), [groups, personId]);
+  const canToggleGroupCheck = useMemo(
+    () => !!organisation.groupEnabled && !!personId && groups.find((group) => group.persons.includes(personId)),
+    [groups, personId, organisation.groupEnabled]
+  );
 
   return (
     <>

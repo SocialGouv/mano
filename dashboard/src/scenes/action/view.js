@@ -174,7 +174,7 @@ const View = () => {
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
-          const canToggleGroupCheck = !!values.person && groups.find((group) => group.persons.includes(values.person));
+          const canToggleGroupCheck = !!organisation.groupEnabled && !!values.person && groups.find((group) => group.persons.includes(values.person));
           return (
             <>
               <div className="tw-flex tw-flex-row">

@@ -957,6 +957,7 @@ const Rencontres = ({ onUpdateResults }) => {
 const PersonDocuments = ({ onUpdateResults, onGoToMedicalFiles }) => {
   const user = useRecoilValue(userState);
   const setPersons = useSetRecoilState(personsState);
+  const organisation = useRecoilValue(organisationState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const API = useApi();
@@ -964,7 +965,10 @@ const PersonDocuments = ({ onUpdateResults, onGoToMedicalFiles }) => {
   const person = useRecoilValue(populatedPersonSelector({ personId }));
 
   const groups = useRecoilValue(groupsState);
-  const canToggleGroupCheck = useMemo(() => groups.find((group) => group.persons.includes(person._id)), [groups, person._id]);
+  const canToggleGroupCheck = useMemo(
+    () => !!organisation.groupEnabled && groups.find((group) => group.persons.includes(person._id)),
+    [groups, person._id, organisation.groupEnabled]
+  );
 
   useEffect(() => {
     if (!!onUpdateResults) onUpdateResults((person.documents?.length || 0) + (person.groupDocuments?.length || 0));
