@@ -50,7 +50,9 @@ const History = ({ person }) => {
                         );
                       }
                       return (
-                        <div>
+                        <div
+                          key={key}
+                          data-test-id={`${personField?.label}: ${JSON.stringify(value.oldValue || '')} ➔ ${JSON.stringify(value.newValue)}`}>
                           {personField?.label} : <br />
                           <code>{JSON.stringify(value.oldValue || '')}</code> ➔ <code>{JSON.stringify(value.newValue)}</code>
                         </div>
