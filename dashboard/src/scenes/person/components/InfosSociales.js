@@ -73,12 +73,12 @@ function InfoSocialeLine({ label, value }) {
           <ul className="tw-list-disc">
             {value.map((v) => (
               <li key={v}>
-                <b style={{ color: theme.main }}>{v || '-'}</b>
+                <b className="tw-text-main">{v || '-'}</b>
               </li>
             ))}
           </ul>
         ) : (
-          <b style={{ color: theme.main }}>{value || '-'}</b>
+          <b className="tw-text-main">{value || '-'}</b>
         )}
       </div>
     </div>

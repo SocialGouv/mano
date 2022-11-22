@@ -1,7 +1,6 @@
 import { theme } from '../../../config';
 import { dayjsInstance } from '../../../services/date';
 import styled from 'styled-components';
-import ButtonCustom from '../../../components/ButtonCustom';
 import React, { useState } from 'react';
 import EditModal from './EditModal';
 import TagTeam from '../../../components/TagTeam';

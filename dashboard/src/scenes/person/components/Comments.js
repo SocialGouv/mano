@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import styled from 'styled-components';
 import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 import TagTeam from '../../../components/TagTeam';
 import { usersState } from '../../../recoil/auth';
@@ -17,7 +16,7 @@ export default function Comments({ person }) {
     [person]
   );
   return (
-    <Container className="tw-relative">
+    <div className="tw-relative">
       {modalCreateOpen && <CommentModal isNewComment={true} person={person} onClose={() => setModalCreateOpen(false)} />}
       {modalEditOpen && <CommentModal comment={commentToEdit} person={person} isNewComment={false} onClose={() => setModalEditOpen(false)} />}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
@@ -45,7 +44,7 @@ export default function Comments({ person }) {
                     {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
                     <div className="tw-text-xs">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                   </div>
-                  <div className="content">
+                  <div style={{ overflowWrap: 'anywhere' }}>
                     {(comment.comment || '').split('\n').map((e) => (
                       <p>{e}</p>
                     ))}
@@ -60,12 +59,6 @@ export default function Comments({ person }) {
           })}
         </tbody>
       </table>
-    </Container>
+    </div>
   );
 }
-
-const Container = styled.div`
-  .content {
-    overflow-wrap: anywhere;
-  }
-`;

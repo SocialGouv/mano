@@ -1,10 +1,9 @@
 import { useState } from 'react';
-import { useHistory, useLocation, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { Alert } from 'reactstrap';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import styled from 'styled-components';
 import Places from '../../components/Places';
-import { itemsGroupedByPersonSelector, personsObjectSelector } from '../../recoil/selectors';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import History from './components/History';
@@ -20,17 +19,6 @@ import {
 } from '../../recoil/persons';
 import { toast } from 'react-toastify';
 
-// we take this selector to go faster when a change happens
-const personSelector = selectorFamily({
-  key: 'personSelector',
-  get:
-    ({ personId }) =>
-    ({ get }) => {
-      const persons = get(personsObjectSelector);
-      return persons[personId] || {};
-    },
-});
-
 const populatedPersonSelector = selectorFamily({
   key: 'populatedPersonSelector',
   get:
@@ -43,8 +31,6 @@ const populatedPersonSelector = selectorFamily({
 
 export default function NewView() {
   const { personId } = useParams();
-  const location = useLocation();
-  const history = useHistory();
   const API = useApi();
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
@@ -53,13 +39,13 @@ export default function NewView() {
   const [currentTab, setCurrentTab] = useState('Résumé');
 
   return (
-    <StyledContainer>
-      <div style={{ display: 'flex', width: '100%' }}>
+    <div>
+      <div className="tw-flex tw-w-full">
         <div>
           <BackButton />
         </div>
-        <div style={{ flexGrow: 1, display: 'flex' }}>
-          <ul className="nav nav-tabs" style={{ margin: 'auto' }}>
+        <div className="tw-flex tw-flex-1">
+          <ul className="nav nav-tabs tw-m-auto">
             <li role="presentation" className="nav-item">
               <button onClick={() => setCurrentTab('Résumé')} className={currentTab === 'Résumé' ? 'active nav-link' : 'btn-link nav-link'}>
                 Résumé
@@ -112,7 +98,7 @@ export default function NewView() {
           />
         </div>
       </div>
-      <div className="pt-4">
+      <div className="tw-pt-4">
         {person.outOfActiveList && (
           <Alert color="warning" className="noprint">
             {person?.name} est en dehors de la file active, pour{' '}
@@ -126,12 +112,6 @@ export default function NewView() {
         {currentTab === 'Lieux fréquentés' && <Places personId={person?._id} />}
         {currentTab === 'Historique' && <History person={person} />}
       </div>
-    </StyledContainer>
+    </div>
   );
 }
-
-const StyledContainer = styled.div`
-  div.row {
-    padding: 10px 0;
-  }
-`;

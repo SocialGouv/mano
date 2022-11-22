@@ -1,8 +1,4 @@
-import { Col, Row } from 'reactstrap';
 import { Actions } from './Actions';
-import { theme } from '../../../config';
-
-import { formatBirthDate, dayjsInstance } from '../../../services/date';
 import InfosSociales from './InfosSociales';
 import { InfosMain } from './InfosMain';
 import PersonDocuments from './PersonDocuments';
@@ -45,7 +41,7 @@ export default function Summary({ person }) {
           <InfosMedicales person={person} />
         </div>
         <div className="span-3 col-alt border shadow rounded">
-          <PersonDocuments person={person} onUpdateResults={() => {}} onGoToMedicalFiles={() => {}} />
+          <PersonDocuments person={person} />
         </div>
       </ContainerRow>
       {!['restricted-access'].includes(user.role) && (

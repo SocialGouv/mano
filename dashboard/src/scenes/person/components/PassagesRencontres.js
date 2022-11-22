@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import styled from 'styled-components';
 import Passage from '../../../components/Passage';
 import Rencontre from '../../../components/Rencontre';
 import TagTeam from '../../../components/TagTeam';
@@ -8,7 +7,6 @@ import { currentTeamState, usersState, userState } from '../../../recoil/auth';
 import { dayjsInstance, formatDateTimeWithNameOfDay } from '../../../services/date';
 
 export default function PassagesRencontres({ person }) {
-  const { passages, rencontres } = person;
   const users = useRecoilValue(usersState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -24,7 +22,7 @@ export default function PassagesRencontres({ person }) {
     [person]
   );
   return (
-    <Container className="tw-relative">
+    <div className="tw-relative">
       <div className="tw-sticky tw-top-0 tw-z-50 tw-mb-3 tw-flex tw-bg-white tw-px-3 tw-pt-3 tw-text-main">
         <div className="tw-flex tw-flex-1">
           <button
@@ -81,7 +79,7 @@ export default function PassagesRencontres({ person }) {
                     }}>
                     <td>
                       <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
-                      <div className="content">
+                      <div style={{ overflowWrap: 'anywhere' }}>
                         {(passage.comment || '').split('\n').map((e) => (
                           <p>{e}</p>
                         ))}
@@ -97,7 +95,7 @@ export default function PassagesRencontres({ person }) {
                   <tr onClick={() => setRencontreToEdit(rencontre)}>
                     <td>
                       <div>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
-                      <div className="content">
+                      <div style={{ overflowWrap: 'anywhere' }}>
                         {(rencontre.comment || '').split('\n').map((e) => (
                           <p>{e}</p>
                         ))}
@@ -110,12 +108,6 @@ export default function PassagesRencontres({ person }) {
               })}
         </tbody>
       </table>
-    </Container>
+    </div>
   );
 }
-
-const Container = styled.div`
-  .content {
-    overflow-wrap: anywhere;
-  }
-`;

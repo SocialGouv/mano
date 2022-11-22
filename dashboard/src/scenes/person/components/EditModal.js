@@ -28,9 +28,6 @@ import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import useApi from '../../../services/api';
-import { DeletePersonButton } from '../view';
-import OutOfActiveList from '../OutOfActiveList';
-import MergeTwoPersons from '../MergeTwoPersons';
 
 export default function EditModal({ person, selectedPanel, onClose }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
