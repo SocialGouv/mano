@@ -599,7 +599,7 @@ const Summary = ({ person }) => {
   );
 };
 
-const DeletePersonButton = ({ person }) => {
+export const DeletePersonButton = ({ person }) => {
   const API = useApi();
   const setPersons = useSetRecoilState(personsState);
 

@@ -56,8 +56,6 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByText(person1Name).last().click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
-  await page.getByText("Actions (1)").click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText("action avec commentaire").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
   await page.getByText("Une personne avec un commentaire prioritaire").click();
@@ -77,8 +75,6 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByText(person2Name).first().click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
-  await page.getByText("Actions (1)").click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText("Action sur deux personnes").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
   await page.getByText("Un commentaire pour tout le monde").click();
@@ -93,9 +89,6 @@ test("Create action with comments", async ({ page }) => {
     })
     .getByText(person1Name)
     .click();
-  await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
-
-  await page.getByText("Actions (2)").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
   await page.getByText("Action sur deux personnes").click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);

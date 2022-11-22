@@ -238,12 +238,14 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                 </Col>
               </Row>
               <br />
-              <ButtonCustom
-                type="submit"
-                disabled={isSubmitting}
-                onClick={() => !isSubmitting && handleSubmit()}
-                title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-              />
+              <div className="tw-flex tw-justify-end">
+                <ButtonCustom
+                  type="submit"
+                  disabled={isSubmitting}
+                  onClick={() => !isSubmitting && handleSubmit()}
+                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                />
+              </div>
             </React.Fragment>
           )}
         </Formik>

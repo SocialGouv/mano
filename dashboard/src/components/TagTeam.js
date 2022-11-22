@@ -1,6 +1,5 @@
 import React from 'react';
 import { useRecoilValue } from 'recoil';
-import styled from 'styled-components';
 import { teamsState } from '../recoil/auth';
 
 const TagTeam = ({ teamId }) => {
@@ -9,20 +8,19 @@ const TagTeam = ({ teamId }) => {
   const team = teams?.find((t) => t._id === teamId);
   if (!team) return null;
   return (
-    <Team key={team?._id} teamIndex={teamIndex}>
+    <div
+      key={team?._id}
+      style={{
+        backgroundColor: teamsColors[teamIndex % teamsColors?.length],
+        borderColor: borderColors[teamIndex % borderColors?.length],
+      }}
+      className="tw-rounded tw-border tw-py-0.5 tw-px-2.5 tw-text-center tw-text-xs tw-text-white">
       {team?.name}
-    </Team>
+    </div>
   );
 };
 
-const teamsColors = ['#255c99', '#74776bff', '#00c6a5ff', '#ff4b64ff', '#ef798aff'];
-
-const Team = styled.div`
-  background-color: ${({ teamIndex }) => teamsColors[teamIndex % teamsColors?.length]};
-  margin: 3px 4px;
-  padding: 2px 10px;
-  border-radius: 5px;
-  color: #fff;
-`;
+const teamsColors = ['#255c99cc', '#74776bcc', '#00c6a5cc', '#ff4b64cc', '#ef798acc'];
+const borderColors = ['#255c99', '#74776b', '#00c6a5', '#ff4b64', '#ef798a'];
 
 export default TagTeam;

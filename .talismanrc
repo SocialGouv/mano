@@ -1,10 +1,12 @@
 fileignoreconfig:
-- filename: .github/workflows/release.yml
-  checksum: 9de8b8b08e706e957ee60cf9b4eb5524c4120a32d6b9d97e3ee930ca24ebb378
-- filename: .kube-workflow/prod/templates/api.sealed-secret.yaml
-  checksum: b970e343d3f2b5d1dfdf3a17c008b9c439668cb2c66789b8904a83debe777af1
-- filename: CHANGELOG.md
-  checksum: 56a538010c6c74166b1f41a6269494a4a7a4364e5e4f9e913ff6fc8e7cda038f
+- filename: dashboard/src/scenes/person/list.js
+  checksum: 573cf99af0b1ef0ba0eed1b451f7d71a0109bc8d0c9519f1ac52677a2634de8f
+version: ""
+dashboard/src/scenes/person/components/InfosMain.js
+  checksum: f96afc758ff57b71f8d6fd9fa2d0765f35b883b998aebcd4d52a6c8f09e359b2
+version: ""
+sion: ""
+ checksum: 56a538010c6c74166b1f41a6269494a4a7a4364e5e4f9e913ff6fc8e7cda038f
 - filename: api/mocked-db.sql
   checksum: 8e4237460d92f383c05fbf7d45ded8b503ee6e71f96b2bd45ad7519df2ec0833
 - filename: api/src/controllers/organisation.js
@@ -42,11 +44,11 @@ fileignoreconfig:
 - filename: tests/src/scripts/db.sql
   checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
 scopeconfig:
-- scope: node
+  - scope: node
 version: "1.0"
 b65c2b5037be9d00f54e4f9ec8e453d37936b28a3fce9456
 - filename: tests/src/scripts/db.sql
   checksum: 5263cfbea26e898709a9abef751155a3e81d11b6e6858edb7672a4f96577fab1
 scopeconfig:
-  - scope: node
+- scope: node
 version: "1.0"

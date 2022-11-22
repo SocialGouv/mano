@@ -40,9 +40,7 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page
-    .getByRole("button", { name: "Créer une nouvelle personne" })
-    .click();
+  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
 
   await page.getByLabel("Nom").click();
 
@@ -51,19 +49,15 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
-  await page.getByLabel("Autres pseudos").click();
-
+  await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByLabel("Autres pseudos").fill(originPersonOtherName);
-
-  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page
-    .getByRole("button", { name: "Créer une nouvelle personne" })
-    .click();
+  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
 
   await page.getByLabel("Nom").click();
 
@@ -72,11 +66,9 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
-  await page.getByLabel("Autres pseudos").click();
-
+  await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByLabel("Autres pseudos").fill(mergePersonOtherName);
-
-  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
@@ -84,53 +76,25 @@ test("test", async ({ page }) => {
 
   await page.getByRole("cell", { name: originPersonName }).click();
 
-  await page
-    .getByRole("button", { name: "Fusionner avec un autre dossier" })
-    .click();
+  await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
 
-  await clickOnEmptyReactSelect(
-    page,
-    "person-to-merge-with-select",
-    mergePersonName
-  );
+  await clickOnEmptyReactSelect(page, "person-to-merge-with-select", mergePersonName);
 
-  await page
-    .locator('[data-test-id="name"]')
-    .getByRole("cell", { name: originPersonName })
-    .click();
-  await page
-    .locator('[data-test-id="name"]')
-    .getByRole("cell", { name: mergePersonName })
-    .click();
-  await page
-    .locator('[data-test-id="otherNames"]')
-    .getByRole("cell", { name: originPersonOtherName })
-    .click();
-  await page
-    .locator('[data-test-id="otherNames"]')
-    .getByRole("cell", { name: mergePersonOtherName })
-    .click();
+  await page.locator('[data-test-id="name"]').getByRole("cell", { name: originPersonName }).click();
+  await page.locator('[data-test-id="name"]').getByRole("cell", { name: mergePersonName }).click();
+  await page.locator('[data-test-id="otherNames"]').getByRole("cell", { name: originPersonOtherName }).click();
+  await page.locator('[data-test-id="otherNames"]').getByRole("cell", { name: mergePersonOtherName }).click();
 
-  await page
-    .locator('[data-test-id="otherNames"] input[name="otherNames"]')
-    .fill(mergedPersonOtherName);
+  await page.locator('[data-test-id="otherNames"] input[name="otherNames"]').fill(mergedPersonOtherName);
 
   page.once("dialog", (dialog) => dialog.accept());
 
   await page.getByRole("button", { name: "Fusionner" }).click();
 
   await page.locator(".Toastify__close-button").last().click();
-  await page.locator('a:has-text("Historique")').click();
+  await page.getByRole("button", { name: "Historique" }).click();
 
-  await page
-    .locator(
-      `[data-test-id="Autres pseudos\\: \\"${originPersonOtherName}\\" ➔ \\"${mergedPersonOtherName}\\""]`
-    )
-    .click();
+  await page.locator(`[data-test-id="Autres pseudos\\: \\"${originPersonOtherName}\\" ➔ \\"${mergedPersonOtherName}\\""]`).click();
 
-  await page
-    .locator(
-      `[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"${originPersonOtherName}\\""]`
-    )
-    .click();
+  await page.locator(`[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"${originPersonOtherName}\\""]`).click();
 });
