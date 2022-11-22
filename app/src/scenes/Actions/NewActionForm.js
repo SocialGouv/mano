@@ -32,6 +32,7 @@ const NewActionForm = ({ route, navigation }) => {
   const [dueAt, setDueAt] = useState(null);
   const [withTime, setWithTime] = useState(false);
   const [urgent, setUrgent] = useState(false);
+  const [group, setGroup] = useState(false);
   const [actionPersons, setActionPersons] = useState(() => (route.params?.person ? [route.params?.person] : []));
   const [categories, setCategories] = useState([]);
   const forCurrentPerson = useRef(!!route.params?.person).current;
@@ -79,6 +80,7 @@ const NewActionForm = ({ route, navigation }) => {
           dueAt,
           withTime,
           urgent,
+          group,
           status,
           categories,
           user: user._id,
@@ -162,7 +164,7 @@ const NewActionForm = ({ route, navigation }) => {
 
   const isOnePerson = actionPersons?.length === 1;
   const person = !isOnePerson ? null : actionPersons?.[0];
-  const canToggleGroupCheck = !!organisation.groupsEnabled && !!person && groups.find((group) => group.persons.includes(person));
+  const canToggleGroupCheck = !!organisation.groupsEnabled && !!person && groups.find((group) => group.persons.includes(person._id));
 
   return (
     <SceneContainer>
@@ -209,10 +211,10 @@ const NewActionForm = ({ route, navigation }) => {
           />
           {!!canToggleGroupCheck && (
             <CheckboxLabelled
-              label="Action familiale (Cette action sera à effectuer pour toute la famille)"
+              label="Action familiale (cette action sera à effectuer pour toute la famille)"
               alone
-              onPress={() => setUrgent(!urgent)}
-              value={urgent}
+              onPress={() => setGroup(!group)}
+              value={group}
             />
           )}
           <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateAction} loading={posting} testID="new-action-create" />

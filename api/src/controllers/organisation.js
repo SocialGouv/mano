@@ -48,7 +48,7 @@ router.get(
 
     const query = { where: { organisation: req.query.organisation } };
     const { after, withDeleted, withAllMedicalData } = req.query;
-    console.log({ after }, new Date(Number(after)), after && !isNaN(Number(after)) && withDeleted === "true", after && !isNaN(Number(after)));
+
     if (withDeleted === "true") query.paranoid = false;
     if (after && !isNaN(Number(after)) && withDeleted === "true") {
       query.where[Op.or] = [{ updatedAt: { [Op.gte]: new Date(Number(after)) } }, { deletedAt: { [Op.gte]: new Date(Number(after)) } }];
@@ -56,7 +56,6 @@ router.get(
       query.where.updatedAt = { [Op.gte]: new Date(Number(after)) };
     }
 
-    console.log({ query });
     const places = await Place.count(query);
     const relsPersonPlace = await RelPersonPlace.count(query);
     const actions = await Action.count(query);

@@ -128,8 +128,6 @@ const Loader = () => {
       response.data.groups +
       response.data.relsPersonPlace;
 
-    console.log('total', response.data);
-
     // medical data is never saved in cache
     // so we always have to download all at every page reload
     const medicalDataResponse = await API.get({
@@ -252,7 +250,7 @@ const Loader = () => {
     */
     if (initialLoad || response.data.groups) {
       setLoading('Chargement des familles');
-      const refreshedActions = await getData({
+      const refreshedGroups = await getData({
         collectionName: 'group',
         data: groups,
         isInitialization: initialLoad,
@@ -263,7 +261,7 @@ const Loader = () => {
         },
         API,
       });
-      if (refreshedActions) setActions(refreshedActions);
+      if (refreshedGroups) setGroups(refreshedGroups);
     }
     /*
     Switch to not full screen

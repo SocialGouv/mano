@@ -38,7 +38,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
       <CaptionsContainer>
         <View className="flex-row items-center">
           {!!organisation.groupsEnabled && !!action.group && (
-            <View className="mr-2">
+            <View className="mr-2 shrink-0">
               <MyText>👪</MyText>
             </View>
           )}
