@@ -1,3 +1,10 @@
+## [1.177.4](https://github.com/SocialGouv/mano/compare/v1.177.3...v1.177.4) (2022-11-22)
+
+
+### Bug Fixes
+
+* restricted access ([3b01335](https://github.com/SocialGouv/mano/commit/3b013353657e7e1c0aa1eaf57d809793a05c77d0))
+
 ## [1.177.3](https://github.com/SocialGouv/mano/compare/v1.177.2...v1.177.3) (2022-11-22)
 
 
