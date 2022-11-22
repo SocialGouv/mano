@@ -1,9 +1,8 @@
 fileignoreconfig:
-- filename: dashboard/src/components/TagTeam.js
-  checksum: 75bb12d418c49af1a9640773c9c938690977db2bbc20546a8dc1cade9b60c4d6
+- filename: dashboard/src/scenes/person/components/InfosMain.js
+  checksum: f96afc758ff57b71f8d6fd9fa2d0765f35b883b998aebcd4d52a6c8f09e359b2
 version: ""
-26a728e5e5a9
-version: ""
+sion: ""
 pi.sealed-secret.yaml
   checksum: b970e343d3f2b5d1dfdf3a17c008b9c439668cb2c66789b8904a83debe777af1
 - filename: CHANGELOG.md
