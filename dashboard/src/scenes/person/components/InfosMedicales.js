@@ -43,18 +43,18 @@ export default function InfosMedicales({ person }) {
 function InfoMedicaleLine({ label, value }) {
   return (
     <div className="my-2">
-      <div>{label} :</div>
+      <div className="tw-font-bold">{label} :</div>
       <div>
         {Array.isArray(value) ? (
           <ul className="tw-list-disc">
             {value.map((v) => (
               <li key={v}>
-                <b className="tw-overflow-ellipsis tw-text-main">{v || '-'}</b>
+                <span className="tw-overflow-ellipsis tw-break-words">{v || '-'}</span>
               </li>
             ))}
           </ul>
         ) : (
-          <p className="tw-overflow-ellipsis tw-break-words tw-text-main">{value || '-'}</p>
+          <p className="tw-overflow-ellipsis tw-break-words">{value || '-'}</p>
         )}
       </div>
     </div>
