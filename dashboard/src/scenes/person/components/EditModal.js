@@ -376,7 +376,13 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                 </div>
                 <div className="tw-flex tw-items-end tw-justify-end tw-gap-2">
                   <ButtonCustom disabled={isSubmitting} color="secondary" onClick={onClose} title="Annuler" />
-                  <ButtonCustom disabled={isSubmitting} color="primary" type="submit" onClick={handleSubmit} title="Enregistrer" />
+                  <ButtonCustom
+                    disabled={isSubmitting || JSON.stringify(person) === JSON.stringify(values)}
+                    color="primary"
+                    type="submit"
+                    onClick={handleSubmit}
+                    title="Enregistrer"
+                  />
                 </div>
               </>
             );
