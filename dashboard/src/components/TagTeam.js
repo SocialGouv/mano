@@ -2,7 +2,7 @@ import React from 'react';
 import { useRecoilValue } from 'recoil';
 import { teamsState } from '../recoil/auth';
 
-const TagTeam = ({ teamId, className = '' }) => {
+const TagTeam = ({ teamId }) => {
   const teams = useRecoilValue(teamsState);
   const teamIndex = teams?.findIndex((t) => t._id === teamId);
   const team = teams?.find((t) => t._id === teamId);
@@ -14,7 +14,7 @@ const TagTeam = ({ teamId, className = '' }) => {
         backgroundColor: teamsColors[teamIndex % teamsColors?.length],
         borderColor: borderColors[teamIndex % borderColors?.length],
       }}
-      className={['tw-rounded tw-border tw-py-0.5 tw-px-2.5 tw-text-center tw-text-xs tw-text-white', className].join(' ')}>
+      className="tw-rounded tw-border tw-py-0.5 tw-px-2.5 tw-text-center tw-text-xs tw-text-white">
       {team?.name}
     </div>
   );

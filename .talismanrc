@@ -1,7 +1,8 @@
 fileignoreconfig:
-- filename: dashboard/src/components/TagTeam.js
-  checksum: 75bb12d418c49af1a9640773c9c938690977db2bbc20546a8dc1cade9b60c4d6
-- filename: dashboard/src/scenes/person/components/InfosMain.js
+- filename: dashboard/src/scenes/person/list.js
+  checksum: 573cf99af0b1ef0ba0eed1b451f7d71a0109bc8d0c9519f1ac52677a2634de8f
+version: ""
+dashboard/src/scenes/person/components/InfosMain.js
   checksum: f96afc758ff57b71f8d6fd9fa2d0765f35b883b998aebcd4d52a6c8f09e359b2
 version: ""
 sion: ""
