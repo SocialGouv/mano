@@ -1,8 +1,8 @@
 fileignoreconfig:
-- filename: dashboard/src/scenes/person/list.js
-  checksum: 573cf99af0b1ef0ba0eed1b451f7d71a0109bc8d0c9519f1ac52677a2634de8f
+- filename: dashboard/src/scenes/person/components/Summary.js
+  checksum: 1b20c34d24dd73627d60483c116e4ba48dd48b39f3081bf64a627c7e7d985158
 version: ""
-dashboard/src/scenes/person/components/InfosMain.js
+scenes/person/components/InfosMain.js
   checksum: f96afc758ff57b71f8d6fd9fa2d0765f35b883b998aebcd4d52a6c8f09e359b2
 version: ""
 sion: ""

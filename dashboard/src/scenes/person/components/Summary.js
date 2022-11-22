@@ -25,25 +25,29 @@ export default function Summary({ person }) {
           <Actions person={person} />
         </div>
         <div className="span-3 col-alt border shadow rounded">
-          <Comments person={person} />
+          {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />}
         </div>
       </ContainerRow>
-      <ContainerRow>
-        <div className="span-9 col-main pt-4 border shadow rounded p-3">
-          <InfosSociales person={person} />
-        </div>
-        <div className="span-3 col-alt border shadow rounded">
-          <PassagesRencontres person={person} />
-        </div>
-      </ContainerRow>
-      <ContainerRow>
-        <div className="span-9 col-main pt-4 border shadow rounded p-3">
-          <InfosMedicales person={person} />
-        </div>
-        <div className="span-3 col-alt border shadow rounded">
-          <PersonDocuments person={person} />
-        </div>
-      </ContainerRow>
+      {!['restricted-access'].includes(user.role) && (
+        <>
+          <ContainerRow>
+            <div className="span-9 col-main pt-4 border shadow rounded p-3">
+              <InfosSociales person={person} />
+            </div>
+            <div className="span-3 col-alt border shadow rounded">
+              <PassagesRencontres person={person} />
+            </div>
+          </ContainerRow>
+          <ContainerRow>
+            <div className="span-9 col-main pt-4 border shadow rounded p-3">
+              <InfosMedicales person={person} />
+            </div>
+            <div className="span-3 col-alt border shadow rounded">
+              <PersonDocuments person={person} />
+            </div>
+          </ContainerRow>
+        </>
+      )}
       {!['restricted-access'].includes(user.role) && (
         <div className="tw-mt-4 tw-flex tw-justify-end tw-gap-2">
           <MergeTwoPersons person={person} />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import { organisationState } from '../../../recoil/auth';
+import { organisationState, userState } from '../../../recoil/auth';
 import { mappedIdsToLabels } from '../../../recoil/actions';
 import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
@@ -16,6 +16,7 @@ export const Actions = ({ person }) => {
   const data = person?.actions || [];
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
   const [modalOpen, setModalOpen] = useState(false);
   const [filterCategories, setFilterCategories] = useState([]);
   const [filterStatus, setFilterStatus] = useState([]);
@@ -98,8 +99,9 @@ export const Actions = ({ person }) => {
             <tr>
               <td>
                 <div
-                  className="tw-cursor-pointer tw-py-2"
+                  className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
                   onClick={() => {
+                    if (['restricted-access'].includes(user.role)) return;
                     history.push(`/action/${action._id}`);
                   }}>
                   <div className="tw-flex">
@@ -112,9 +114,7 @@ export const Actions = ({ person }) => {
                     </div>
                   </div>
                   <div className="tw-mt-2 tw-flex">
-                    <div className="tw-flex-1">
-                      <ActionName action={action} />
-                    </div>
+                    <div className="tw-flex-1">{!['restricted-access'].includes(user.role) && <ActionName action={action} />}</div>
                     <div>
                       <TagTeam teamId={action.team} />
                     </div>

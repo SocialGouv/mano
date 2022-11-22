@@ -47,34 +47,36 @@ export default function NewView() {
           <BackButton />
         </div>
         <div className="tw-flex tw-flex-1">
-          <ul className="nav nav-tabs tw-m-auto">
-            <li role="presentation" className="nav-item">
-              <button onClick={() => setCurrentTab('Résumé')} className={currentTab === 'Résumé' ? 'active nav-link' : 'btn-link nav-link'}>
-                Résumé
-              </button>
-            </li>
-            {Boolean(user.healthcareProfessional) && (
+          {!['restricted-access'].includes(user.role) && (
+            <ul className="nav nav-tabs tw-m-auto">
               <li role="presentation" className="nav-item">
-                <button
-                  onClick={() => setCurrentTab('Dossier Médical')}
-                  className={currentTab === 'Dossier Médical' ? 'active nav-link' : 'btn-link nav-link'}>
-                  Dossier Médical
+                <button onClick={() => setCurrentTab('Résumé')} className={currentTab === 'Résumé' ? 'active nav-link' : 'btn-link nav-link'}>
+                  Résumé
                 </button>
               </li>
-            )}
-            <li role="presentation" className="nav-item">
-              <button
-                onClick={() => setCurrentTab('Lieux fréquentés')}
-                className={currentTab === 'Lieux fréquentés' ? 'active nav-link' : 'btn-link nav-link'}>
-                Lieux fréquentés
-              </button>
-            </li>
-            <li role="presentation" className="nav-item">
-              <button onClick={() => setCurrentTab('Historique')} className={currentTab === 'Historique' ? 'active nav-link' : 'btn-link nav-link'}>
-                Historique
-              </button>
-            </li>
-          </ul>
+              {Boolean(user.healthcareProfessional) && (
+                <li role="presentation" className="nav-item">
+                  <button
+                    onClick={() => setCurrentTab('Dossier Médical')}
+                    className={currentTab === 'Dossier Médical' ? 'active nav-link' : 'btn-link nav-link'}>
+                    Dossier Médical
+                  </button>
+                </li>
+              )}
+              <li role="presentation" className="nav-item">
+                <button
+                  onClick={() => setCurrentTab('Lieux fréquentés')}
+                  className={currentTab === 'Lieux fréquentés' ? 'active nav-link' : 'btn-link nav-link'}>
+                  Lieux fréquentés
+                </button>
+              </li>
+              <li role="presentation" className="nav-item">
+                <button onClick={() => setCurrentTab('Historique')} className={currentTab === 'Historique' ? 'active nav-link' : 'btn-link nav-link'}>
+                  Historique
+                </button>
+              </li>
+            </ul>
+          )}
         </div>
         <div>
           <UserName
@@ -112,9 +114,11 @@ export default function NewView() {
           </Alert>
         )}
         {currentTab === 'Résumé' && <Summary person={person} />}
-        {currentTab === 'Dossier Médical' && user.healthcareProfessional && <MedicalFile person={person} />}
-        {currentTab === 'Lieux fréquentés' && <Places personId={person?._id} />}
-        {currentTab === 'Historique' && <History person={person} />}
+        {currentTab === 'Dossier Médical' && !['restricted-access'].includes(user.role) && user.healthcareProfessional && (
+          <MedicalFile person={person} />
+        )}
+        {currentTab === 'Lieux fréquentés' && !['restricted-access'].includes(user.role) && <Places personId={person?._id} />}
+        {currentTab === 'Historique' && !['restricted-access'].includes(user.role) && <History person={person} />}
       </div>
     </div>
   );
