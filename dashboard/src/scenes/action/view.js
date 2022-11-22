@@ -29,7 +29,7 @@ import { useDataLoader } from '../../components/DataLoader';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import { itemsGroupedByActionSelector } from '../../recoil/selectors';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
-import { groupsState } from '../../recoil/group';
+import { groupsState } from '../../recoil/groups';
 
 const actionByIdSelector = selectorFamily({
   key: 'actionByIdSelector',

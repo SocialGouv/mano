@@ -20,7 +20,7 @@ import { useDataLoader } from './DataLoader';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import { useParams } from 'react-router-dom';
 import { itemsGroupedByActionSelector, itemsGroupedByPersonSelector } from '../recoil/selectors';
-import { groupsState } from '../recoil/group';
+import { groupsState } from '../recoil/groups';
 
 const commentsByActionOrPersonSelector = selectorFamily({
   key: 'commentsByActionOrPersonSelector',

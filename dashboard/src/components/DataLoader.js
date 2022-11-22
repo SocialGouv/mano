@@ -24,7 +24,7 @@ import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
 import { capture } from '../services/sentry';
-import { groupsState } from '../recoil/group';
+import { groupsState } from '../recoil/groups';
 
 // Update to flush cache.
 

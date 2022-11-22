@@ -13,7 +13,7 @@ import { passagesState } from './passages';
 import { medicalFileState } from './medicalFiles';
 import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
-import { groupsState } from './group';
+import { groupsState } from './groups';
 
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',

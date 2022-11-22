@@ -63,7 +63,7 @@ import Rencontre from '../../components/Rencontre';
 import { itemsGroupedByPersonSelector, personsObjectSelector } from '../../recoil/selectors';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import PersonFamily from './PersonFamily';
-import { groupsState } from '../../recoil/group';
+import { groupsState } from '../../recoil/groups';
 import PersonName from '../../components/PersonName';
 
 const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Rencontres', 'Lieux', 'Documents', 'Historique', 'Famille'];
