@@ -1,3 +1,10 @@
+# [1.177.0](https://github.com/SocialGouv/mano/compare/v1.176.21...v1.177.0) (2022-11-22)
+
+
+### Features
+
+* **dashboard:**  mano person page update ([#950](https://github.com/SocialGouv/mano/issues/950)) ([9459ee1](https://github.com/SocialGouv/mano/commit/9459ee1a5c7c9b93cf8b590b238050faf36d5d32))
+
 ## [1.176.21](https://github.com/SocialGouv/mano/compare/v1.176.20...v1.176.21) (2022-11-22)
 
 
