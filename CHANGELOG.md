@@ -1,3 +1,10 @@
+## [1.176.21](https://github.com/SocialGouv/mano/compare/v1.176.20...v1.176.21) (2022-11-22)
+
+
+### Bug Fixes
+
+* **dashboard:** when no data is downloaded ([#988](https://github.com/SocialGouv/mano/issues/988)) ([d8d3499](https://github.com/SocialGouv/mano/commit/d8d34993899b42f8e0be5f188bfe2ddb597c24d6))
+
 ## [1.176.20](https://github.com/SocialGouv/mano/compare/v1.176.19...v1.176.20) (2022-11-21)
 
 
