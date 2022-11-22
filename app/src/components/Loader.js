@@ -7,7 +7,7 @@ import colors from '../utils/colors';
 import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
-import { atom, useRecoilState, useRecoilValue } from 'recoil';
+import { atom, useRecoilState } from 'recoil';
 import { appCurrentCacheKey, getData } from '../services/dataManagement';
 import { useMMKVNumber } from 'react-native-mmkv';
 import { organisationState, userState } from '../recoil/auth';
@@ -70,7 +70,7 @@ const Loader = () => {
   const [fullScreen, setFullScreen] = useRecoilState(loaderFullScreenState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const organisationId = organisation?._id;
-  const user = useRecoilValue(userState);
+  const [user, setUser] = useRecoilState(userState);
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
@@ -100,6 +100,7 @@ const Loader = () => {
 
     const userResponse = await API.get({ path: '/user/me' });
     setOrganisation(userResponse.user.organisation);
+    setUser(userResponse.user);
     /*
     Get number of data to download to show the appropriate loading progress bar
     */
