@@ -13,8 +13,6 @@ test("Cross teams report", async ({ page }) => {
   const person1Name = nanoid();
   const person2Name = nanoid();
 
-  test.setTimeout(120000);
-
   await test.step("Log in", async () => {
     await page.goto("http://localhost:8090/");
 
@@ -65,25 +63,15 @@ test("Cross teams report", async ({ page }) => {
   await test.step("Persons created should appear in report", async () => {
     await page.getByRole("link", { name: "Comptes rendus" }).click();
 
-    await expect(
-      page.locator(`data-test-id=report-dot-${dayjs().format("YYYY-MM-DD")}`)
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=report-dot-${dayjs().format("YYYY-MM-DD")}`)).toBeVisible();
     await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
 
     await page.getByText("Personnes créées (2)").click();
     await expect(page.locator(`data-test-id=${person1Name}`)).toBeVisible();
-    await expect(
-      page.locator(`data-test-id=${person1Name}`).getByRole("cell", { name: "User Test - 5" })
-    ).toBeVisible();
-    await expect(
-      page.locator(`data-test-id=${person1Name}`).getByRole("cell", { name: "Team Test - 5" })
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${person1Name}`).getByRole("cell", { name: "User Test - 5" })).toBeVisible();
+    await expect(page.locator(`data-test-id=${person1Name}`).getByRole("cell", { name: "Team Test - 5" })).toBeVisible();
     await expect(page.locator(`data-test-id=${person2Name}`)).toBeVisible();
-    await expect(
-      page.locator(`data-test-id=${person2Name}`).getByRole("cell", { name: "User Test - 5" })
-    ).toBeVisible();
-    await expect(
-      page.locator(`data-test-id=${person2Name}`).getByRole("cell", { name: "Team Test - 5" })
-    ).toBeVisible();
+    await expect(page.locator(`data-test-id=${person2Name}`).getByRole("cell", { name: "User Test - 5" })).toBeVisible();
+    await expect(page.locator(`data-test-id=${person2Name}`).getByRole("cell", { name: "Team Test - 5" })).toBeVisible();
   });
 });
