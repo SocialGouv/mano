@@ -1,5 +1,4 @@
 import { Col, Row } from 'reactstrap';
-import { theme } from '../../../config';
 import { useRecoilValue } from 'recoil';
 import { customFieldsPersonsSocialSelector } from '../../../recoil/persons';
 import { currentTeamState } from '../../../recoil/auth';
