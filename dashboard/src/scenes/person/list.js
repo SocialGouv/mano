@@ -275,11 +275,11 @@ const List = () => {
 };
 
 const Teams = ({ person: { _id, assignedTeams } }) => (
-  <React.Fragment key={_id}>
+  <div key={_id} className="tw-grid tw-gap-1">
     {assignedTeams?.map((teamId) => (
-      <TagTeam key={teamId} teamId={teamId} />
+      <TagTeam key={teamId} teamId={teamId} className="tw-text-xs" />
     ))}
-  </React.Fragment>
+  </div>
 );
 
 const PersonsActionsStyled = styled.div`

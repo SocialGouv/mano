@@ -102,7 +102,7 @@ const PersonDocuments = ({ person }) => {
           ))}
         </tbody>
       </table>
-      {!person.documents?.length && <div className="text-center  tw-italic">Aucun document</div>}
+      {!person.documents?.length && <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">Aucun document</div>}
     </div>
   );
 };

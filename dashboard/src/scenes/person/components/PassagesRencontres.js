@@ -68,6 +68,10 @@ export default function PassagesRencontres({ person }) {
       </div>
       <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
       <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
+      {selected === 'passages' && !personPassages.length && <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">Aucun passage</div>}
+      {selected === 'rencontres' && !personRencontres.length && (
+        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">Aucune rencontre</div>
+      )}
       <table className="table table-striped">
         <tbody className="small">
           {selected === 'passages'

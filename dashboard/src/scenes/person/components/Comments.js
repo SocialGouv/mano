@@ -30,6 +30,8 @@ export default function Comments({ person }) {
         </div>
       </div>
 
+      {!comments.length && <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">Aucun commentaire</div>}
+
       <table className="table table-striped">
         <tbody className="small">
           {(comments || []).map((comment) => {

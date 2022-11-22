@@ -10,6 +10,7 @@ import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionName from '../../../components/ActionName';
+import agendaIcon from '../../../assets/icons/agenda-icon-grey.svg';
 
 export const Actions = ({ person }) => {
   const data = person?.actions || [];
@@ -66,7 +67,12 @@ export const Actions = ({ person }) => {
             />
           </div>
         </div>
-      ) : null}
+      ) : (
+        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+          <img src={agendaIcon} alt="" className="tw-mx-auto tw-mb-8 tw-w-16" />
+          Aucune action associée à {person.name}
+        </div>
+      )}
 
       <table className="table table-striped">
         <tbody className="small">
