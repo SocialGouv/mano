@@ -39,7 +39,7 @@ export default function InfosSociales({ person }) {
           <InfoSocialeLine label="Hébergement" value={person.address} />
         </Col>
         <Col md={4}>
-          <InfoSocialeLine label="Type d'hébergement" value={person.addressDetails} />
+          <InfoSocialeLine label="Type d'hébergement" value={person.addressDetail} />
         </Col>
 
         <Col md={4}>
