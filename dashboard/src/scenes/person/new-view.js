@@ -18,6 +18,7 @@ import {
   preparePersonForEncryption,
 } from '../../recoil/persons';
 import { toast } from 'react-toastify';
+import { userState } from '../../recoil/auth';
 
 const populatedPersonSelector = selectorFamily({
   key: 'populatedPersonSelector',
@@ -36,6 +37,7 @@ export default function NewView() {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const person = useRecoilValue(populatedPersonSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
+  const user = useRecoilValue(userState);
   const [currentTab, setCurrentTab] = useState('Résumé');
 
   return (
@@ -51,13 +53,15 @@ export default function NewView() {
                 Résumé
               </button>
             </li>
-            <li role="presentation" className="nav-item">
-              <button
-                onClick={() => setCurrentTab('Dossier Médical')}
-                className={currentTab === 'Dossier Médical' ? 'active nav-link' : 'btn-link nav-link'}>
-                Dossier Médical
-              </button>
-            </li>
+            {Boolean(user.healthcareProfessional) && (
+              <li role="presentation" className="nav-item">
+                <button
+                  onClick={() => setCurrentTab('Dossier Médical')}
+                  className={currentTab === 'Dossier Médical' ? 'active nav-link' : 'btn-link nav-link'}>
+                  Dossier Médical
+                </button>
+              </li>
+            )}
             <li role="presentation" className="nav-item">
               <button
                 onClick={() => setCurrentTab('Lieux fréquentés')}
@@ -108,7 +112,7 @@ export default function NewView() {
           </Alert>
         )}
         {currentTab === 'Résumé' && <Summary person={person} />}
-        {currentTab === 'Dossier Médical' && <MedicalFile person={person} />}
+        {currentTab === 'Dossier Médical' && user.healthcareProfessional && <MedicalFile person={person} />}
         {currentTab === 'Lieux fréquentés' && <Places personId={person?._id} />}
         {currentTab === 'Historique' && <History person={person} />}
       </div>
