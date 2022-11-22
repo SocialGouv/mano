@@ -73,12 +73,12 @@ function InfoSocialeLine({ label, value }) {
           <ul className="tw-list-disc">
             {value.map((v) => (
               <li key={v}>
-                <b className="tw-text-main">{v || '-'}</b>
+                <b className="tw-overflow-ellipsis tw-break-words tw-text-main">{v || '-'}</b>
               </li>
             ))}
           </ul>
         ) : (
-          <b className="tw-text-main">{value || '-'}</b>
+          <p className="tw-overflow-ellipsis tw-break-words tw-text-main">{value || '-'}</p>
         )}
       </div>
     </div>
