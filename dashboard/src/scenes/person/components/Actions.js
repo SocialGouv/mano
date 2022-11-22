@@ -10,6 +10,7 @@ import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionName from '../../../components/ActionName';
+import { formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../../../services/date';
 
 export const Actions = ({ person }) => {
   const data = person?.actions || [];
@@ -102,7 +103,10 @@ export const Actions = ({ person }) => {
                     history.push(`/action/${action._id}`);
                   }}>
                   <div className="tw-flex">
-                    <div className="tw-flex-1">{action.urgent ? <ExclamationMarkButton /> : null} Vendredi 29 Septembre 22:30</div>
+                    <div className="tw-flex-1">
+                      {action.urgent ? <ExclamationMarkButton /> : null}{' '}
+                      {action.dueAt && action.withTime ? formatDateTimeWithNameOfDay(action.dueAt) : formatDateWithNameOfDay(action.dueAt)}
+                    </div>
                     <div>
                       <ActionStatus status={action.status} />
                     </div>
