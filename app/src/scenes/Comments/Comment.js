@@ -9,25 +9,30 @@ import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
-import { currentTeamState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
+import { groupsState } from '../../recoil/groups';
 
 const Comment = ({ navigation, route, onCommentWrite }) => {
   const [comments, setComments] = useRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
+  const groups = useRecoilValue(groupsState);
   const commentDB = useMemo(() => comments.find((c) => c._id === route.params?._id), [comments, route?.params]);
   const isNewComment = useMemo(() => !commentDB, [commentDB]);
   const [comment, setComment] = useState(route?.params?.comment?.split('\\n').join('\u000A') || '');
   const [urgent, setUrgent] = useState(route?.params?.urgent || false);
+  const [group, setGroup] = useState(route?.params?.group || false);
   const [updating, setUpdating] = useState(false);
 
   const isUpdateDisabled = useMemo(() => {
     if ((commentDB?.comment || '') !== comment) return false;
     if ((commentDB?.urgent || false) !== urgent) return false;
+    if ((commentDB?.group || false) !== group) return false;
     return true;
-  }, [comment, commentDB, urgent]);
+  }, [comment, commentDB, urgent, group]);
 
   const onUpdateComment = async () => {
     setUpdating(true);
@@ -37,6 +42,7 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
         ...commentDB,
         comment: comment.trim(),
         urgent,
+        group,
       }),
     });
 
@@ -156,6 +162,8 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
     onCommentWrite?.(newComment);
   };
 
+  const canToggleGroupCheck = !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(route.params?.person));
+
   return (
     <SceneContainer>
       <ScreenTitle title={`${route?.params?.commentTitle} - Commentaire`} onBack={onGoBackRequested} testID="comment" />
@@ -168,6 +176,14 @@ const Comment = ({ navigation, route, onCommentWrite }) => {
             onPress={() => setUrgent((u) => !u)}
             value={urgent}
           />
+          {!!canToggleGroupCheck && (
+            <CheckboxLabelled
+              label="Commentaire familial (ce commentaire sera visible pour toute la famille)"
+              alone
+              onPress={() => setGroup((g) => !g)}
+              value={group}
+            />
+          )}
           <ButtonsContainer>
             <ButtonDelete onPress={onDeleteRequest} />
             <Button

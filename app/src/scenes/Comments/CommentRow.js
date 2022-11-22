@@ -2,13 +2,14 @@ import React from 'react';
 import { connectActionSheet } from '@expo/react-native-action-sheet';
 import { Alert } from 'react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { userState } from '../../recoil/auth';
+import { organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import { commentsState } from '../../recoil/comments';
 import BubbleRow from '../../components/BubbleRow';
 
 const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions, itemName, onItemNamePress }) => {
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
   const setComments = useSetRecoilState(commentsState);
 
   const onMorePress = async () => {
@@ -54,6 +55,7 @@ const CommentRow = ({ onUpdate, comment, showActionSheetWithOptions, itemName, o
       date={comment.date || comment.createdAt}
       user={comment.user}
       urgent={comment.urgent}
+      group={!!organisation.groupsEnabled && comment.group}
       itemName={itemName}
       onItemNamePress={onItemNamePress}
       metaCaption="Commentaire de"
