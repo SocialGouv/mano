@@ -66,7 +66,7 @@ export default function InfosSociales({ person }) {
 function InfoSocialeLine({ label, value }) {
   return (
     <div className="my-2">
-      <div className="tw-font-bold">{label} :</div>
+      <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{label}</div>
       <div>
         {Array.isArray(value) ? (
           <ul className="tw-list-disc">
