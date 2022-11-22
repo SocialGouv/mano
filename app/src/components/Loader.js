@@ -25,6 +25,7 @@ import { medicalFileState } from '../recoil/medicalFiles';
 import { treatmentsState } from '../recoil/treatments';
 import { sortByName } from '../utils/sortByName';
 import { rencontresState } from '../recoil/rencontres';
+import { groupsState } from '../recoil/groups';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -73,6 +74,7 @@ const Loader = () => {
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
+  const [groups, setGroups] = useRecoilState(groupsState);
   const [consultations, setConsultations] = useRecoilState(consultationsState);
   const [treatments, setTreatments] = useRecoilState(treatmentsState);
   const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
@@ -96,8 +98,8 @@ const Loader = () => {
     Refresh the organisation data
     */
 
-    const { user } = await API.get({ path: '/user/signin-token' });
-    setOrganisation(user.organisation);
+    const userResponse = await API.get({ path: '/user/signin-token' });
+    setOrganisation(userResponse.user.organisation);
     /*
     Get number of data to download to show the appropriate loading progress bar
     */
@@ -123,7 +125,10 @@ const Loader = () => {
       response.data.comments +
       response.data.rencontres +
       response.data.reports +
+      response.data.groups +
       response.data.relsPersonPlace;
+
+    console.log('total', response.data);
 
     // medical data is never saved in cache
     // so we always have to download all at every page reload
@@ -237,6 +242,24 @@ const Loader = () => {
         lastRefresh,
         setBatchData: (newActions) => {
           setActions((oldActions) => (initialLoad ? [...oldActions, ...newActions] : mergeItems(oldActions, newActions)));
+        },
+        API,
+      });
+      if (refreshedActions) setActions(refreshedActions);
+    }
+    /*
+    Get groups
+    */
+    if (initialLoad || response.data.groups) {
+      setLoading('Chargement des familles');
+      const refreshedActions = await getData({
+        collectionName: 'group',
+        data: groups,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newGroups) => {
+          setGroups((oldGroups) => (initialLoad ? [...oldGroups, ...newGroups] : mergeItems(oldGroups, newGroups)));
         },
         API,
       });
