@@ -10,7 +10,6 @@ import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionName from '../../../components/ActionName';
-import agendaIcon from '../../../assets/icons/agenda-icon-grey.svg';
 
 export const Actions = ({ person }) => {
   const data = person?.actions || [];
