@@ -20,12 +20,14 @@ export function InfosMain({ person }) {
             <Teams person={person} />
           </div>
           <div className="person-description">
-            <div>
+            {person.birthdate && (
               <div>
-                <b>Age :</b> {dayjsInstance(person.birthdate).fromNow(true)}
+                <div>
+                  <b>Âge :</b> {dayjsInstance(dayjsInstance()).diff(person.birthdate, 'year')} ans
+                </div>
+                <i>{dayjsInstance(person.birthdate).format('DD/MM/YYYY')}</i>
               </div>
-              <i>{dayjsInstance(person.birthdate).format('DD/MM/YYYY')}</i>
-            </div>
+            )}
             <div>
               <b>Genre : </b>
               {person.gender}
