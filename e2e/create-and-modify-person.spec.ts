@@ -35,9 +35,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
 
-  await page
-    .getByRole("button", { name: "Créer une nouvelle personne" })
-    .click();
+  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
 
   await page.getByLabel("Nom").click();
 
@@ -47,96 +45,63 @@ test("Create and modify a person", async ({ page }) => {
   await page.locator(".Toastify__close-button").last().click();
 
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
-
+  await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByLabel("Autres pseudos").click();
   await page.getByLabel("Autres pseudos").fill("deuxième pseudo");
-
-  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
+  await page.getByRole("button", { name: "Modifier" }).click();
   await page.getByLabel("Autres pseudos").click();
   await page.getByLabel("Nom prénom ou Pseudonyme").click();
-
   await page.getByLabel("Date de naissance").fill("10/10/2022");
+  await page.getByLabel("Date de naissance").press("Enter");
   await page.getByLabel("En rue depuis le").fill("10/10/2022");
-
-  await page
-    .getByLabel(
-      "Personne très vulnérable, ou ayant besoin d'une attention particulière"
-    )
-    .check();
-
+  await page.getByLabel("En rue depuis le").press("Enter");
+  await page.getByLabel("Personne très vulnérable, ou ayant besoin d'une attention particulière").check();
   await page.getByLabel("Téléphone").click();
-  await page.getByLabel("Téléphone").fill("0123456789");
 
+  await page.getByLabel("Téléphone").fill("0123456789");
   await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("Test de description");
 
-  await clickOnEmptyReactSelect(
-    page,
-    "person-select-personalSituation",
-    "Famille"
-  );
-
+  await page.getByRole("dialog").getByText("Informations sociales").click();
+  await clickOnEmptyReactSelect(page, "person-select-personalSituation", "Famille");
   await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("aucune");
-
   await page.locator(".person-select-animals__value-container").click();
   await page.getByText("Oui", { exact: true }).click();
-
   await page.locator(".person-select-address__placeholder").click();
-  await page
-    .locator(".person-select-address__menu")
-    .getByText("Oui", { exact: true })
-    .click();
-
+  await page.locator(".person-select-address__menu").getByText("Oui", { exact: true }).click();
   await page.locator(".person-select-addressDetail__value-container").click();
   await page.getByText("Logement", { exact: true }).click();
-
-  await page
-    .locator(".person-select-nationalitySituation__value-container")
-    .click();
+  await page.locator(".person-select-nationalitySituation__value-container").click();
   await page.getByText("UE", { exact: true }).click();
-
   await page.locator(".person-select-employment__value-container").click();
   await page.getByText("CDD", { exact: true }).click();
-
   await page.locator(".person-select-resources__value-container").click();
   await page.getByText("SANS", { exact: true }).click();
-
   await page.locator(".person-select-reasons__value-container").click();
   await page.getByText("Départ de région", { exact: true }).click();
 
+  await page.getByRole("dialog").getByText("Informations médicales").click();
   await page.getByLabel("Structure de suivi médical").click();
   await page.getByLabel("Structure de suivi médical").fill("fdfdfs");
-
-  await page
-    .locator(".person-custom-select-consumptions__value-container")
-    .click();
+  await page.locator(".person-custom-select-consumptions__value-container").click();
   await page.getByText("Alcool", { exact: true }).click();
-
-  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").last().click();
 
-  await page.locator('a:has-text("Dossier Médical")').click();
-  await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/.*\?tab=dossier\+m%C3%A9dical/
-  );
-
+  await page.getByRole("button", { name: "Dossier Médical" }).click();
   await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
-
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("dsqdsqdsq");
-
   await page.getByPlaceholder("1mg").click();
   await page.getByPlaceholder("1mg").fill("dsqdsq");
-
   await page.getByPlaceholder("1 fois par jour").click();
   await page.getByPlaceholder("1 fois par jour").fill("sqdsdqs");
-
   await page.getByPlaceholder("Angine").click();
   await page.getByPlaceholder("Angine").fill("dsqdsqdqs");
-
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".Toastify__close-button").last().click();
 });
