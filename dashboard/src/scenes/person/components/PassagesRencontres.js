@@ -68,9 +68,45 @@ export default function PassagesRencontres({ person }) {
       </div>
       <Rencontre rencontre={rencontreToEdit} onFinished={() => setRencontreToEdit(null)} />
       <Passage passage={passageToEdit} onFinished={() => setPassageToEdit(null)} />
-      {selected === 'passages' && !personPassages.length && <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">Aucun passage</div>}
+      {selected === 'passages' && !personPassages.length && (
+        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
+            width={24}
+            height={24}
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <circle cx={12} cy={12} r={9}></circle>
+            <polyline points="12 7 12 12 15 15"></polyline>
+          </svg>
+          Aucun passage
+        </div>
+      )}
       {selected === 'rencontres' && !personRencontres.length && (
-        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">Aucune rencontre</div>
+        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
+            width={24}
+            height={24}
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <circle cx={12} cy={12} r={9}></circle>
+            <polyline points="12 7 12 12 15 15"></polyline>
+          </svg>
+          Aucune rencontre
+        </div>
       )}
       <table className="table table-striped">
         <tbody className="small">

@@ -30,7 +30,28 @@ export default function Comments({ person }) {
         </div>
       </div>
 
-      {!comments.length && <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">Aucun commentaire</div>}
+      {!comments.length && (
+        <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            className="tw-mx-auto tw-mb-2 tw-h-16 tw-w-16 tw-text-gray-200"
+            width={24}
+            height={24}
+            viewBox="0 0 24 24"
+            strokeWidth="2"
+            stroke="currentColor"
+            fill="none"
+            strokeLinecap="round"
+            strokeLinejoin="round">
+            <path stroke="none" d="M0 0h24v24H0z" fill="none"></path>
+            <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"></path>
+            <line x1={12} y1={12} x2={12} y2="12.01"></line>
+            <line x1={8} y1={12} x2={8} y2="12.01"></line>
+            <line x1={16} y1={12} x2={16} y2="12.01"></line>
+          </svg>
+          Aucun commentaire
+        </div>
+      )}
 
       <table className="table table-striped">
         <tbody className="small">
