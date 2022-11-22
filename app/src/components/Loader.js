@@ -98,7 +98,7 @@ const Loader = () => {
     Refresh the organisation data
     */
 
-    const userResponse = await API.get({ path: '/user/signin-token' });
+    const userResponse = await API.get({ path: '/user/me' });
     setOrganisation(userResponse.user.organisation);
     /*
     Get number of data to download to show the appropriate loading progress bar
