@@ -1,9 +1,10 @@
 fileignoreconfig:
-- filename: dashboard/src/scenes/person/components/PassagesRencontres.js
-  checksum: 915b25dc2883e97e419319bc6bb2811a9d62be6ed83dbbf0ff3ca9324b0a74d1
-- filename: dashboard/src/scenes/person/list.js
-  checksum: 6959f81c9fa373f95a56f6e3ad34680311e97715c1cc31ed3e471a8c18f855a4
+- filename: dashboard/src/components/TagTeam.js
+  checksum: 75bb12d418c49af1a9640773c9c938690977db2bbc20546a8dc1cade9b60c4d6
+- filename: dashboard/src/scenes/person/components/InfosMain.js
+  checksum: f96afc758ff57b71f8d6fd9fa2d0765f35b883b998aebcd4d52a6c8f09e359b2
 version: ""
+sion: ""
  checksum: 56a538010c6c74166b1f41a6269494a4a7a4364e5e4f9e913ff6fc8e7cda038f
 - filename: api/mocked-db.sql
   checksum: 8e4237460d92f383c05fbf7d45ded8b503ee6e71f96b2bd45ad7519df2ec0833

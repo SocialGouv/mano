@@ -57,7 +57,7 @@ export function InfosMain({ person }) {
 const Teams = ({ person: { _id, assignedTeams } }) => (
   <div key={_id} className="tw-mt-2 tw-grid tw-gap-1">
     {assignedTeams?.map((teamId) => (
-      <TagTeam key={teamId} teamId={teamId} className="tw-text-xs" />
+      <TagTeam key={teamId} teamId={teamId} />
     ))}
   </div>
 );

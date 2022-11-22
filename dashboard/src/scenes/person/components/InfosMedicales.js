@@ -1,5 +1,4 @@
 import { Col, Row } from 'reactstrap';
-import { theme } from '../../../config';
 import { useRecoilValue } from 'recoil';
 import { customFieldsPersonsMedicalSelector } from '../../../recoil/persons';
 import { currentTeamState } from '../../../recoil/auth';
@@ -50,12 +49,12 @@ function InfoMedicaleLine({ label, value }) {
           <ul className="tw-list-disc">
             {value.map((v) => (
               <li key={v}>
-                <b style={{ color: theme.main }}>{v || '-'}</b>
+                <b className="tw-overflow-ellipsis tw-text-main">{v || '-'}</b>
               </li>
             ))}
           </ul>
         ) : (
-          <b style={{ color: theme.main }}>{value || '-'}</b>
+          <p className="tw-overflow-ellipsis tw-break-words tw-text-main">{value || '-'}</p>
         )}
       </div>
     </div>
