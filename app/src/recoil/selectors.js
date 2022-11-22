@@ -13,6 +13,7 @@ import { rencontresState } from './rencontres';
 import { treatmentsState } from './treatments';
 import { medicalFileState } from './medicalFiles';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
+import dayjs from 'dayjs';
 
 export const personsSearchSelector = selectorFamily({
   key: 'personsSearchSelector',
@@ -324,7 +325,7 @@ export const actionsByStatusSelector = selectorFamily({
       }
       if (status === TODO) {
         const actions = get(actionsTodoSelector);
-        return actions;
+        return [...actions].sort((a, b) => dayjs(a.dueAt).diff(dayjs(b.dueAt)));
       }
       if (status === CANCEL) {
         const actions = get(actionsCanceledSelectorSliced({ limit }));
