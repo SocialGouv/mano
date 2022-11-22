@@ -1,3 +1,10 @@
+## [1.177.1](https://github.com/SocialGouv/mano/compare/v1.177.0...v1.177.1) (2022-11-22)
+
+
+### Bug Fixes
+
+* **dashboard:** fix remove dossier medical ([7ed4395](https://github.com/SocialGouv/mano/commit/7ed4395a50804d623c3ea9a7371df71921a95041))
+
 # [1.177.0](https://github.com/SocialGouv/mano/compare/v1.176.21...v1.177.0) (2022-11-22)
 
 
