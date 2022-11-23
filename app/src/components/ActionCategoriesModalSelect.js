@@ -74,10 +74,10 @@ const ActionCategoriesModalSelect = ({ values = [], onChange, editable, withMost
         onAddRequest={() => setOpen(true)}
         renderTag={(category) => <MyText>{category}</MyText>}
       />
-      <ScrollView horizontal className="flex-grow-0 flex-shrink-0 -mt-8 mb-8 -mx-[30px] px-2">
-        <MyText className="self-center">Catégories les plus utilisées: </MyText>
-        {!!withMostUsed &&
-          mostUsedCategoriesToShow.map((category) => (
+      {!!withMostUsed && !!mostUsedCategoriesToShow.length && (
+        <ScrollView horizontal className="flex-grow-0 flex-shrink-0 -mt-8 mb-8 -mx-[30px] px-2">
+          <MyText className="self-center">Catégories les plus utilisées: </MyText>
+          {mostUsedCategoriesToShow.map((category) => (
             <TouchableOpacity
               onPress={() => onChange([...values, category])}
               className="rounded-full ml-2 px-2 py-1 border border-main"
@@ -85,7 +85,8 @@ const ActionCategoriesModalSelect = ({ values = [], onChange, editable, withMost
               <MyText>{category}</MyText>
             </TouchableOpacity>
           ))}
-      </ScrollView>
+        </ScrollView>
+      )}
       <Modal animationType="fade" visible={!!open} onRequestClose={() => setOpen(false)}>
         <SceneContainer>
           <ScreenTitle title="Catégories de l'action" onBack={() => setOpen(false)} />
