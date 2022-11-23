@@ -6,7 +6,7 @@ import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
 import CreateActionModal from '../../../components/CreateActionModal';
 import SelectCustom from '../../../components/SelectCustom';
-import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';

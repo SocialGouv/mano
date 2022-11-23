@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
 import TagTeam from '../../../components/TagTeam';
 import { usersState } from '../../../recoil/auth';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
