@@ -159,22 +159,28 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[relPersonPlace.person].relsPersonPlace = personsObject[relPersonPlace.person].relsPersonPlace || [];
       personsObject[relPersonPlace.person].relsPersonPlace.push(relPersonPlace);
     }
-    if (user?.healthcareProfessional) {
-      for (const consultation of consultations) {
-        if (!personsObject[consultation.person]) continue;
-        personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
-        personsObject[consultation.person].consultations.push(consultation);
-      }
-      for (const treatment of treatments) {
-        if (!personsObject[treatment.person]) continue;
-        personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
-        personsObject[treatment.person].treatments.push(treatment);
-      }
-      for (const medicalFile of medicalFiles) {
-        if (!personsObject[medicalFile.person]) continue;
-        personsObject[medicalFile.person].medicalFile = medicalFile;
-      }
+    for (const consultation of consultations) {
+      if (!personsObject[consultation.person]) continue;
+      personsObject[consultation.person].consultations = personsObject[consultation.person].consultations || [];
+      personsObject[consultation.person].consultations.push(consultation);
     }
+    for (const treatment of treatments) {
+      if (!personsObject[treatment.person]) continue;
+      personsObject[treatment.person].treatments = personsObject[treatment.person].treatments || [];
+      personsObject[treatment.person].treatments.push(treatment);
+    }
+    for (const medicalFile of medicalFiles) {
+      if (!personsObject[medicalFile.person]) continue;
+      personsObject[medicalFile.person].medicalFile = medicalFile;
+    }
+    // we don't use passages in the app - no use, no load
+    // but we keep it here just to be aware of that app specificity
+
+    // for (const passage of passages) {
+    //   if (!personsObject[passage.person]) continue;
+    //   personsObject[passage.person].passages = personsObject[passage.person].passages || [];
+    //   personsObject[passage.person].passages.push(passage);
+    // }
     for (const rencontre of rencontres) {
       if (!personsObject[rencontre.person]) continue;
       personsObject[rencontre.person].rencontres = personsObject[rencontre.person].rencontres || [];
