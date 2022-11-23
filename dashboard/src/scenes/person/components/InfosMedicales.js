@@ -30,8 +30,8 @@ export default function InfosMedicales({ person }) {
         <Col md={4}>
           <InfoMedicaleLine label="Structure de suivi médical" value={person.structureMedical} />
         </Col>
-        {customFields.map((field) => (
-          <Col md={4}>
+        {customFields.map((field, i) => (
+          <Col key={field.label + i} md={4}>
             <InfoMedicaleLine label={field.label} value={person[field.name]} />
           </Col>
         ))}

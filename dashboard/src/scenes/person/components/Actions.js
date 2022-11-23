@@ -96,7 +96,7 @@ export const Actions = ({ person }) => {
       <table className="table table-striped">
         <tbody className="small">
           {filteredData.map((action, i) => (
-            <tr>
+            <tr key={action._id}>
               <td>
                 <div
                   className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}

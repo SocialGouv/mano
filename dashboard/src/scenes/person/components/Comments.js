@@ -57,7 +57,7 @@ export default function Comments({ person }) {
         <tbody className="small">
           {(comments || []).map((comment) => {
             return (
-              <tr>
+              <tr key={comment._id}>
                 <td
                   onClick={() => {
                     setModalEditOpen(true);
@@ -68,8 +68,8 @@ export default function Comments({ person }) {
                     <div className="tw-text-xs">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                   </div>
                   <div style={{ overflowWrap: 'anywhere' }}>
-                    {(comment.comment || '').split('\n').map((e) => (
-                      <p>{e}</p>
+                    {(comment.comment || '').split('\n').map((e, i) => (
+                      <p key={e + i}>{e}</p>
                     ))}
                   </div>
                   <div className="small">Créé par {users.find((e) => e._id === comment.user)?.name}</div>

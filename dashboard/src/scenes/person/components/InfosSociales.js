@@ -53,8 +53,8 @@ export default function InfosSociales({ person }) {
         <Col md={4}>
           <InfoSocialeLine label="Motif de la situation en rue" value={(person.reasons || []).join(', ')} />
         </Col>
-        {customFields.map((field) => (
-          <Col md={4}>
+        {customFields.map((field, i) => (
+          <Col key={field.label + i} md={4}>
             <InfoSocialeLine label={field.label} value={person[field.name]} />
           </Col>
         ))}

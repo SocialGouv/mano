@@ -87,7 +87,7 @@ const PersonDocuments = ({ person }) => {
         <tbody className="small">
           {(person.documents || []).map((doc) => (
             <tr
-              key={doc.id}
+              key={doc._id}
               onClick={() => {
                 setOpenModal(doc);
               }}>

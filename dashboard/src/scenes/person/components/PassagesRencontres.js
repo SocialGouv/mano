@@ -114,14 +114,15 @@ export default function PassagesRencontres({ person }) {
             ? (personPassages || []).map((passage) => {
                 return (
                   <tr
+                    key={passage._id}
                     onClick={() => {
                       setPassageToEdit(passage);
                     }}>
                     <td>
                       <div>{formatDateTimeWithNameOfDay(passage.date || passage.createdAt)}</div>
                       <div style={{ overflowWrap: 'anywhere' }}>
-                        {(passage.comment || '').split('\n').map((e) => (
-                          <p>{e}</p>
+                        {(passage.comment || '').split('\n').map((e, i) => (
+                          <p key={e + i}>{e}</p>
                         ))}
                       </div>
                       <div className="small">Créé par {users.find((e) => e._id === passage.user)?.name}</div>
@@ -132,12 +133,12 @@ export default function PassagesRencontres({ person }) {
               })
             : (personRencontres || []).map((rencontre) => {
                 return (
-                  <tr onClick={() => setRencontreToEdit(rencontre)}>
+                  <tr key={rencontre._id} onClick={() => setRencontreToEdit(rencontre)}>
                     <td>
                       <div>{formatDateTimeWithNameOfDay(rencontre.date || rencontre.createdAt)}</div>
                       <div style={{ overflowWrap: 'anywhere' }}>
-                        {(rencontre.comment || '').split('\n').map((e) => (
-                          <p>{e}</p>
+                        {(rencontre.comment || '').split('\n').map((e, i) => (
+                          <p key={e + i}>{e}</p>
                         ))}
                       </div>
                       <div className="small">Créé par {users.find((e) => e._id === rencontre.user)?.name}</div>

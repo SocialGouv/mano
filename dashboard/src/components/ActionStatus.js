@@ -5,19 +5,19 @@ import { DONE, TODO, CANCEL } from '../recoil/actions';
 const ActionStatus = ({ status }) => {
   if (status === TODO)
     return (
-      <Badge color="danger" pill="true">
+      <Badge color="danger" pill>
         {status}
       </Badge>
     );
   if (status === DONE)
     return (
-      <Badge color="success" pill="true">
+      <Badge color="success" pill>
         {status}
       </Badge>
     );
   if (status === CANCEL)
     return (
-      <Badge color="info" pill="true">
+      <Badge color="info" pill>
         {status}
       </Badge>
     );
