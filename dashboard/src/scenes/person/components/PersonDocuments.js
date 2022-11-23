@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import ButtonCustom from '../../../components/ButtonCustom';
-import { usersState, userState } from '../../../recoil/auth';
+import PersonName from '../../../components/PersonName';
+import { organisationState, usersState, userState } from '../../../recoil/auth';
+import { groupsState } from '../../../recoil/groups';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -16,7 +18,7 @@ import { capture } from '../../../services/sentry';
 import { download } from '../../../utils';
 
 const PersonDocuments = ({ person }) => {
-  const [openModal, setOpenModal] = useState(false);
+  const [documentToEdit, setDocumentToEdit] = useState(null);
   const API = useApi();
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
@@ -24,10 +26,19 @@ const PersonDocuments = ({ person }) => {
   const setPersons = useSetRecoilState(personsState);
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
   const users = useRecoilValue(usersState);
+  const organisation = useRecoilValue(organisationState);
+
+  const documents = [...(person.documents || []), ...(person.groupDocuments || [])].sort((a, b) => a.createdAt > b.createdAt);
+
+  // below there is `Note: Ce document est lié à <PersonName item={document} />`
+  // if the user clicks on the person name, we need to hide the DocumentModal
+  useEffect(() => {
+    setDocumentToEdit(null);
+  }, [person._id]);
 
   return (
     <div className="tw-relative">
-      {openModal && <DocumentModal document={openModal} person={person} onClose={() => setOpenModal(false)} />}
+      {documentToEdit && <DocumentModal document={documentToEdit} person={person} onClose={() => setDocumentToEdit(null)} key={documentToEdit._id} />}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1 tw-text-xl">Documents</h4>
         <label
@@ -86,30 +97,39 @@ const PersonDocuments = ({ person }) => {
           />
         </label>
       </div>
-      <table className="table table-striped">
-        <tbody className="small">
-          {(person.documents || []).map((doc) => {
-            return (
-              <tr
-                key={doc._id}
-                data-test-id={doc.downloadPath}
-                aria-label={`Document ${doc.name}`}
-                onClick={() => {
-                  setOpenModal(doc);
-                }}>
-                <td>
-                  <div>
-                    <b>{doc.name}</b>
-                  </div>
-                  <div>{formatDateTimeWithNameOfDay(doc.createdAt)}</div>
-                  <div className="small">Créé par {users.find((e) => e._id === doc.createdBy)?.name}</div>
-                </td>
-              </tr>
-            );
-          })}
+      <table className="tw-w-full tw-table-fixed">
+        <tbody className="tw-text-sm">
+          {(documents || []).map((doc, index) => (
+            <tr
+              key={doc._id}
+              data-test-id={doc.downloadPath}
+              aria-label={`Document ${doc.name}`}
+              className={['tw-w-full tw-border-t tw-border-zinc-200', Boolean(index % 2) ? '' : 'tw-bg-zinc-100'].join(' ')}
+              onClick={() => {
+                setDocumentToEdit(doc);
+              }}>
+              <td className="tw-p-3">
+                <p className="tw-m-0 tw-flex tw-items-center tw-overflow-hidden tw-break-all tw-font-bold">
+                  {!!organisation.groupsEnabled && !!doc.group && (
+                    <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
+                      👪
+                    </span>
+                  )}
+                  {doc.name}
+                </p>
+                {!!organisation.groupsEnabled && !!doc.group && !!doc.personPopulated && (
+                  <p className="tw-m-0 tw-mt-1 tw-text-xs">
+                    Ce document est lié à <PersonName item={doc} />
+                  </p>
+                )}
+                <p className="tw-m-0 tw-mt-1 tw-text-xs">{formatDateTimeWithNameOfDay(doc.createdAt)}</p>
+                <p className="tw-m-0 tw-text-xs">Créé par {users.find((e) => e._id === doc.createdBy)?.name}</p>
+              </td>
+            </tr>
+          ))}
         </tbody>
       </table>
-      {!person.documents?.length && (
+      {!documents?.length && (
         <div className="tw-mt-8 tw-w-full tw-text-center tw-text-gray-300">
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -139,6 +159,14 @@ function DocumentModal({ document, onClose, person }) {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const setPersons = useSetRecoilState(personsState);
   const API = useApi();
+  const groups = useRecoilValue(groupsState);
+  const organisation = useRecoilValue(organisationState);
+
+  const canToggleGroupCheck = useMemo(
+    () => !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
+    [groups, person._id, organisation.groupsEnabled]
+  );
+
   return (
     <Modal
       isOpen={true}
@@ -149,9 +177,62 @@ function DocumentModal({ document, onClose, person }) {
       backdrop="static">
       <ModalHeader toggle={() => onClose()}>{document.name}</ModalHeader>
       <ModalBody>
-        <div>Créé par {users.find((e) => e._id === document.createdBy)?.name}</div>
-        <div>Créé le {formatDateTimeWithNameOfDay(document.createdAt)}</div>
-
+        <div className="tw-flex tw-justify-between">
+          <p>
+            Créé par {users.find((e) => e._id === document.createdBy)?.name}
+            <br />
+            Créé le {formatDateTimeWithNameOfDay(document.createdAt)}
+          </p>
+          {!!canToggleGroupCheck && (
+            <div>
+              <label htmlFor="document-for-group">
+                <input
+                  type="checkbox"
+                  className="tw-mr-2"
+                  id="document-for-group"
+                  name="group"
+                  defaultChecked={document.group}
+                  value={document.group}
+                  onChange={async () => {
+                    const _person = !document.person ? person : document.personPopulated;
+                    const isAttachedToAnotherPerson = _person._id !== person._id;
+                    const personResponse = await API.put({
+                      path: `/person/${_person._id}`,
+                      body: preparePersonForEncryption(
+                        customFieldsPersonsMedical,
+                        customFieldsPersonsSocial
+                      )({
+                        ..._person,
+                        documents: _person.documents.map((_document) =>
+                          document._id === _document._id ? { ..._document, group: !_document.group } : _document
+                        ),
+                      }),
+                    });
+                    if (personResponse.ok) {
+                      toast.success('Document mis à jour !');
+                      const newPerson = personResponse.decryptedData;
+                      setPersons((persons) =>
+                        persons.map((p) => {
+                          if (p._id === _person._id) return newPerson;
+                          return p;
+                        })
+                      );
+                      if (isAttachedToAnotherPerson) onClose();
+                    }
+                  }}
+                />
+                Document familial
+                <br />
+                <small className="tw-block tw-text-gray-500">Ce document sera visible pour toute la famille</small>
+              </label>
+              {!!document.personPopulated && (
+                <small className="tw-block tw-text-gray-500">
+                  Note: Ce document est lié à <PersonName item={document} />
+                </small>
+              )}
+            </div>
+          )}
+        </div>
         <div className="tw-mt-4 tw-flex tw-justify-end tw-gap-2">
           <ButtonCustom
             type="button"

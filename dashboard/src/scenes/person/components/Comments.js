@@ -56,7 +56,7 @@ export default function Comments({ person }) {
         )}
 
         <table className="tw-w-full tw-table-fixed">
-          <tbody className="small">
+          <tbody className="tw-text-sm">
             {(comments || []).map((comment, index) => {
               return (
                 <tr key={comment._id} className={['tw-border-t tw-border-zinc-200', Boolean(index % 2) ? '' : 'tw-bg-zinc-100'].join(' ')}>

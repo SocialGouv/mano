@@ -20,6 +20,7 @@ import {
 import { toast } from 'react-toastify';
 import { organisationState, userState } from '../../recoil/auth';
 import PersonFamily from './PersonFamily';
+import { groupSelector } from '../../recoil/groups';
 
 const populatedPersonSelector = selectorFamily({
   key: 'populatedPersonSelector',
@@ -38,6 +39,7 @@ export default function NewView() {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const person = useRecoilValue(populatedPersonSelector({ personId }));
+  const personGroup = useRecoilValue(groupSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
   const user = useRecoilValue(userState);
   const [currentTab, setCurrentTab] = useState('Résumé');
@@ -82,7 +84,7 @@ export default function NewView() {
                   <button
                     onClick={() => setCurrentTab('Liens familiaux')}
                     className={currentTab === 'Liens familiaux' ? 'active nav-link' : 'btn-link nav-link'}>
-                    Liens familiaux
+                    Liens familiaux ({personGroup.relations.length})
                   </button>
                 </li>
               )}
