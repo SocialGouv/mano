@@ -85,6 +85,7 @@ const PersonSummary = ({
 
   const allPlaces = useRecoilValue(placesState);
   const places = useMemo(() => {
+    if (!relsPersonPlace) return [];
     const placesId = relsPersonPlace.map((rel) => rel.place);
     return allPlaces.filter((pl) => placesId.includes(pl._id));
   }, [allPlaces, relsPersonPlace]);
