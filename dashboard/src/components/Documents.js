@@ -87,7 +87,7 @@ const Documents = ({
                     onClick={async () => {
                       try {
                         const file = await API.download({
-                          path: `/person/${person._id}/document/${document.file.filename}`,
+                          path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}`,
                           encryptedEntityKey: document.encryptedEntityKey,
                         });
                         download(file, document.name);
@@ -111,7 +111,7 @@ const Documents = ({
                       style={{ margin: '0.5rem auto 0' }}
                       onClick={async () => {
                         if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-                        await API.delete({ path: `/person/${person._id}/document/${document.file.filename}` });
+                        await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
                         onDelete(document);
                       }}
                     />

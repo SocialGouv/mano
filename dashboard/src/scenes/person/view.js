@@ -961,6 +961,7 @@ const PersonDocuments = ({ person, onUpdateResults, onGoToMedicalFiles }) => {
                 encryptedEntityKey,
                 createdAt: new Date(),
                 createdBy: user._id,
+                downloadPath: `/person/${person._id}/document/${file.filename}`,
                 file,
               },
             ],

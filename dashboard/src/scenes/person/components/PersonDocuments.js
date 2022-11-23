@@ -64,6 +64,7 @@ const PersonDocuments = ({ person }) => {
                       encryptedEntityKey,
                       createdAt: new Date(),
                       createdBy: user._id,
+                      downloadPath: `/person/${person._id}/document/${file.filename}`,
                       file,
                     },
                   ],
@@ -151,7 +152,7 @@ function DocumentModal({ document, onClose, person }) {
             color="danger"
             onClick={async () => {
               if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-              await API.delete({ path: `/person/${person._id}/document/${document.file.filename}` });
+              await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
               const personResponse = await API.put({
                 path: `/person/${person._id}`,
                 body: preparePersonForEncryption(
@@ -179,7 +180,7 @@ function DocumentModal({ document, onClose, person }) {
             type="button"
             onClick={async () => {
               const file = await API.download({
-                path: `/person/${person._id}/document/${document.file.filename}`,
+                path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}`,
                 encryptedEntityKey: document.encryptedEntityKey,
               });
               download(file, document.name);
