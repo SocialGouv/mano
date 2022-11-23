@@ -54,7 +54,7 @@ const createSheet = (data) => {
           row.push(value.join(', ').substring(0, 32766));
           continue;
         }
-        row.push(JSON.stringify(value));
+        row.push(JSON.stringify(value).substring(0, 32766));
       }
       return [...xlsxData, row];
     },
