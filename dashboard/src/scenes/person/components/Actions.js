@@ -114,7 +114,18 @@ export const Actions = ({ person }) => {
                     </div>
                   </div>
                   <div className="tw-mt-2 tw-flex">
-                    <div className="tw-flex-1">{!['restricted-access'].includes(user.role) && <ActionOrConsultationName item={action} />}</div>
+                    <div className="tw-flex tw-flex-1 tw-flex-row tw-items-center">
+                      {!['restricted-access'].includes(user.role) && (
+                        <>
+                          {!!organisation.groupsEnabled && !!action.group && (
+                            <span className="tw-mr-2 tw-text-xl" aria-label="Action familiale" title="Action familiale">
+                              👪
+                            </span>
+                          )}
+                          <ActionOrConsultationName item={action} />
+                        </>
+                      )}
+                    </div>
                     <div>
                       <TagTeam teamId={action.team} />
                     </div>

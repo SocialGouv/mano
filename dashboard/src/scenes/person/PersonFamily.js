@@ -112,6 +112,7 @@ const PersonFamily = ({ person }) => {
       toast.success('Le lien familial a été supprimé');
     }
   };
+
   return (
     <>
       <div className="tw-my-10 tw-flex tw-items-center tw-gap-2">
@@ -126,54 +127,63 @@ const PersonFamily = ({ person }) => {
         />
         <NewRelation open={newRelationModalOpen} setOpen={setNewRelationModalOpen} onAddFamilyLink={onAddFamilyLink} person={person} />
       </div>
-      <table className="table table-striped table-bordered">
-        <thead>
-          <tr>
-            <th>Lien entre</th>
-            <th>Relation</th>
-            <th>Enregistré par</th>
-            <th>Date</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody className="small">
-          {personGroup.relations.map((_relation) => {
-            const { description, persons, createdAt, user } = _relation;
-            return (
-              <tr key={JSON.stringify(persons)}>
-                <td>
-                  <PersonName item={{ person: persons[0] }} redirectToTab="famille" />
-                  {' et '}
-                  <PersonName item={{ person: persons[1] }} redirectToTab="famille" />
-                </td>
-                <td>{description}</td>
-                <td width="15%">
-                  <UserName id={user} />
-                </td>
-                <td width="15%">{dayjsInstance(createdAt).format('DD/MM/YYYY HH:mm')}</td>
-                <td width="15%">
-                  <div className="tw-flex tw-flex-col tw-items-center tw-gap-2">
-                    <button type="button" className="button-classic" onClick={() => setRelationToEdit(_relation)}>
-                      Modifier
-                    </button>
-                    <button type="button" className="button-destructive" onClick={() => onDeleteRelation(_relation)}>
-                      Supprimer
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-        <EditRelation
-          open={!!relationToEdit}
-          setOpen={setRelationToEdit}
-          onEditRelation={onEditRelation}
-          onDeleteRelation={onDeleteRelation}
-          person={person}
-          relationToEdit={relationToEdit}
-        />
-      </table>
+      {!personGroup.persons.length ? (
+        <div className="tw-py-10 tw-text-center tw-text-gray-300">
+          <p className="tw-text-lg tw-font-bold">Cette personne n'a pas encore de lien familial</p>
+          <p className="tw-mt-2 tw-text-sm">
+            Pour ajouter un lien familial, cliquez sur le bouton <span className="tw-font-bold">Ajouter un lien</span> ci-dessus.
+          </p>
+        </div>
+      ) : (
+        <table className="table table-striped table-bordered">
+          <thead>
+            <tr>
+              <th>Lien entre</th>
+              <th>Relation</th>
+              <th>Enregistré par</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody className="small">
+            {personGroup.relations.map((_relation) => {
+              const { description, persons, createdAt, user } = _relation;
+              return (
+                <tr key={JSON.stringify(persons)}>
+                  <td>
+                    <PersonName item={{ person: persons[0] }} redirectToTab="famille" />
+                    {' et '}
+                    <PersonName item={{ person: persons[1] }} redirectToTab="famille" />
+                  </td>
+                  <td>{description}</td>
+                  <td width="15%">
+                    <UserName id={user} />
+                  </td>
+                  <td width="15%">{dayjsInstance(createdAt).format('DD/MM/YYYY HH:mm')}</td>
+                  <td width="15%">
+                    <div className="tw-flex tw-flex-col tw-items-center tw-gap-2">
+                      <button type="button" className="button-classic" onClick={() => setRelationToEdit(_relation)}>
+                        Modifier
+                      </button>
+                      <button type="button" className="button-destructive" onClick={() => onDeleteRelation(_relation)}>
+                        Supprimer
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+          <EditRelation
+            open={!!relationToEdit}
+            setOpen={setRelationToEdit}
+            onEditRelation={onEditRelation}
+            onDeleteRelation={onDeleteRelation}
+            person={person}
+            relationToEdit={relationToEdit}
+          />
+        </table>
+      )}
     </>
   );
 };
