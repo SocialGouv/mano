@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
@@ -11,13 +11,20 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../../recoil/comments';
 import useApi from '../../../services/api';
+import { groupsState } from '../../../recoil/groups';
 
 const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
   const user = useRecoilValue(userState);
+  const groups = useRecoilValue(groupsState);
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
   const setComments = useSetRecoilState(commentsState);
   const API = useApi();
+
+  const canToggleGroupCheck = useMemo(
+    () => !!organisation.groupsEnabled && !!person._id && groups.find((group) => group.persons.includes(person._id)),
+    [groups, person._id, organisation.groupsEnabled]
+  );
 
   return (
     <>
@@ -25,7 +32,7 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
         <ModalHeader toggle={onClose}>{isNewComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={{ ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
+            initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
             onSubmit={async (body, actions) => {
               if (!body.user && !isNewComment) return toast.error("L'utilisateur est obligatoire");
               if (!body.date && !isNewComment) return toast.error('La date est obligatoire');
@@ -34,6 +41,7 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
               const commentBody = {
                 comment: body.comment,
                 urgent: body.urgent || false,
+                group: body.group || false,
                 user: body.user || user._id,
                 date: body.date || new Date(),
                 team: body.team || currentTeam._id,
@@ -119,23 +127,40 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
                       />
                     </FormGroup>
                   </Col>
-                  <Col md={12}>
+                  <Col md={canToggleGroupCheck ? 6 : 12}>
                     <FormGroup>
                       <Label htmlFor="create-comment-urgent">
                         <input
                           type="checkbox"
                           id="create-comment-urgent"
-                          style={{ marginRight: '0.5rem' }}
+                          className="tw-mr-2"
                           name="urgent"
                           checked={values.urgent}
-                          value={values.urgent}
-                          onChange={() => handleChange({ target: { value: !values.urgent, name: 'urgent' } })}
+                          onChange={handleChange}
                         />
                         Commentaire prioritaire <br />
                         <small className="text-muted">Ce commentaire sera mis en avant par rapport aux autres</small>
                       </Label>
                     </FormGroup>
                   </Col>
+                  {!!canToggleGroupCheck && (
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label htmlFor="create-comment-for-group">
+                          <input
+                            type="checkbox"
+                            className="tw-mr-2"
+                            id="create-comment-for-group"
+                            name="group"
+                            checked={values.group}
+                            onChange={handleChange}
+                          />
+                          Commentaire familial <br />
+                          <small className="text-muted">Ce commentaire sera valable pour chaque membre de la famille</small>
+                        </Label>
+                      </FormGroup>
+                    </Col>
+                  )}
                 </Row>
                 <br />
                 <div className="tw-flex tw-justify-end tw-gap-2">
