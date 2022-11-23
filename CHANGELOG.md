@@ -1,3 +1,10 @@
+## [1.177.5](https://github.com/SocialGouv/mano/compare/v1.177.4...v1.177.5) (2022-11-23)
+
+
+### Bug Fixes
+
+* .substring(0, 32766) to json stringify ([3cd5470](https://github.com/SocialGouv/mano/commit/3cd5470dca6bc0bb4b58e797d75d43eac7e53eb9))
+
 ## [1.177.4](https://github.com/SocialGouv/mano/compare/v1.177.3...v1.177.4) (2022-11-22)
 
 
