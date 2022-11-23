@@ -110,8 +110,8 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[relPersonPlace.person]) continue;
       const place = places[relPersonPlace.place];
       if (!place) continue;
-      personsObject[relPersonPlace.person].places = personsObject[relPersonPlace.person].places || {};
-      personsObject[relPersonPlace.person].places[place._id] = place.name;
+      personsObject[relPersonPlace.person].places = personsObject[relPersonPlace.person].places || [];
+      personsObject[relPersonPlace.person].places.push(place.name);
       personsObject[relPersonPlace.person].relsPersonPlace = personsObject[relPersonPlace.person].relsPersonPlace || [];
       personsObject[relPersonPlace.person].relsPersonPlace.push(relPersonPlace);
     }
