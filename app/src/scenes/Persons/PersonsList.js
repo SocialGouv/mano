@@ -14,7 +14,6 @@ import { selector, selectorFamily, useRecoilState, useRecoilValue } from 'recoil
 import { loadingState, refreshTriggerState } from '../../components/Loader';
 import { formatBirthDate } from '../../services/dateDayjs';
 import { filterBySearch } from '../../utils/search';
-import { personsState } from '../../recoil/persons';
 
 const arrayOfitemsGroupedByPersonSelector = selector({
   key: 'arrayOfitemsGroupedByPersonSelector',
@@ -66,7 +65,7 @@ const personsFilteredBySearchSelector = selectorFamily({
     ({ filterTeams, filterOutOfActiveList, filterAlertness, search }) =>
     ({ get }) => {
       if (!search?.length && !filterTeams.length && !filterOutOfActiveList && !filterAlertness) {
-        const persons = get(personsState);
+        const persons = get(personsPopulatedWithFormattedBirthDateSelector);
         return persons;
       }
 
