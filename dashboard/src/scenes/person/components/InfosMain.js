@@ -11,7 +11,7 @@ export function InfosMain({ person }) {
   return (
     <Container>
       {Boolean(editModal) && <EditModal person={person} selectedPanel={'main'} onClose={() => setEditModal(false)} />}
-      <div className="card !tw-bg-main">
+      <div className="card !tw-rounded-lg !tw-bg-main">
         <div className="card-body">
           <div className="person-name">
             {person.alertness && <ExclamationMarkButton className="tw-mr-2" />}

@@ -114,11 +114,13 @@ export default function NewView() {
           </Alert>
         )}
         {currentTab === 'Résumé' && <Summary person={person} />}
-        {currentTab === 'Dossier Médical' && !['restricted-access'].includes(user.role) && user.healthcareProfessional && (
-          <MedicalFile person={person} />
+        {!['restricted-access'].includes(user.role) && (
+          <>
+            {currentTab === 'Dossier Médical' && user.healthcareProfessional && <MedicalFile person={person} />}
+            {currentTab === 'Lieux fréquentés' && <Places personId={person?._id} />}
+            {currentTab === 'Historique' && <History person={person} />}
+          </>
         )}
-        {currentTab === 'Lieux fréquentés' && !['restricted-access'].includes(user.role) && <Places personId={person?._id} />}
-        {currentTab === 'Historique' && !['restricted-access'].includes(user.role) && <History person={person} />}
       </div>
     </div>
   );
