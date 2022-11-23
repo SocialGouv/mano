@@ -19,14 +19,11 @@ import CheckboxLabelled from '../../components/CheckboxLabelled';
 import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
 import colors from '../../utils/colors';
 import PhoneIcon from '../../icons/PhoneIcon';
-import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
-import { actionsState } from '../../recoil/actions';
 import { placesState } from '../../recoil/places';
-import { commentsState } from '../../recoil/comments';
 import { teamsState } from '../../recoil/auth';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-import { rencontresState } from '../../recoil/rencontres';
 import RencontreRow from './RencontreRow';
+import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 
 const PersonSummary = ({
   navigation,
@@ -48,7 +45,7 @@ const PersonSummary = ({
   const onCommentUpdate = (comment) => {
     navigation.navigate('PersonComment', {
       ...comment,
-      name: personDB.name,
+      commentTitle: personDB.name,
       fromRoute: 'Person',
     });
   };
@@ -81,27 +78,16 @@ const PersonSummary = ({
     await onUpdatePerson(false, { outOfActiveListReasons: [], outOfActiveList: false });
   };
 
-  const allActions = useRecoilValue(actionsState);
-  const actions = useMemo(
-    () => allActions.filter((a) => a.person === personDB?._id).sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)),
-    [allActions, personDB?._id]
-  );
+  const populatedPersons = useRecoilValue(itemsGroupedByPersonSelector);
+  const { actions, comments, rencontres, relsPersonPlace } = useMemo(() => populatedPersons[personDB._id], [populatedPersons, personDB._id]);
 
-  const allRelsPersonPlace = useRecoilValue(relsPersonPlaceState);
-  const relsPersonPlace = useMemo(() => allRelsPersonPlace.filter((rel) => rel.person === personDB?._id), [allRelsPersonPlace, personDB?._id]);
+  const sortedActions = useMemo(() => [...actions].sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)), [actions]);
 
   const allPlaces = useRecoilValue(placesState);
-
   const places = useMemo(() => {
     const placesId = relsPersonPlace.map((rel) => rel.place);
     return allPlaces.filter((pl) => placesId.includes(pl._id));
   }, [allPlaces, relsPersonPlace]);
-
-  const allComments = useRecoilValue(commentsState);
-  const comments = useMemo(() => allComments.filter((c) => c.person === personDB?._id), [allComments, personDB?._id]);
-
-  const allRencontres = useRecoilValue(rencontresState);
-  const rencontres = useMemo(() => allRencontres.filter((c) => c.person === personDB?._id), [allRencontres, personDB?._id]);
 
   const teams = useRecoilValue(teamsState);
 
@@ -262,7 +248,7 @@ const PersonSummary = ({
         label="Actions"
         onAdd={onAddActionRequest}
         testID="person-actions-list"
-        data={actions}
+        data={sortedActions}
         renderItem={(action, index) => (
           <ActionRow key={index} action={action} showStatus withTeamName testID="person-action" onActionPress={onActionPress} />
         )}
