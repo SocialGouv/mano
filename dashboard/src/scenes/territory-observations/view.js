@@ -23,7 +23,6 @@ const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
 
   return (
     <StyledObservation noBorder={noBorder}>
-      {!!onDelete && <CloseButton close onClick={() => onDelete(obs._id)} />}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <UserName id={obs.user} wrapper={(name) => <span className="author">{name}</span>} />
         {!noTeams && (
@@ -46,6 +45,11 @@ const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
             );
           })}
       </div>
+      {!!onDelete && (
+        <button className="tw-text-xs tw-text-red-500 hover:tw-underline" onClick={() => onDelete(obs._id)}>
+          Supprimer l'observation
+        </button>
+      )}
     </StyledObservation>
   );
 };
