@@ -19,7 +19,7 @@ export const groupSelector = selectorFamily({
 
 const encryptedFields = ['persons', 'relations'];
 
-// @type Relation: { persons: uuid[], relation: string, createdAt: Date, updatedAt: Date, user: uuid };
+// @type Relation: { persons: uuid[], description: string, createdAt: Date, updatedAt: Date, user: uuid };
 
 export const prepareGroupForEncryption = (report) => {
   const decrypted = {};
