@@ -3,10 +3,14 @@ import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import "dayjs/locale/fr";
-import { changeReactSelectValue, clickOnEmptyReactSelect } from "./utils";
+import { populate } from "./scripts/populate-db";
 
 dayjs.extend(utc);
 dayjs.locale("fr");
+
+test.beforeAll(async () => {
+  await populate();
+});
 
 test("Cross teams report", async ({ page }) => {
   // Always use a new items

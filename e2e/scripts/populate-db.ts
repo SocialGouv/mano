@@ -10,7 +10,6 @@ if (!process.env.PGBASEURL || !process.env.PGDATABASE) {
 }
 
 async function createUsersAndOrgas() {
-  console.log("populate");
   const client = new pg.Client({
     connectionString: `${process.env.PGBASEURL}/manotest`,
   });
@@ -20,8 +19,6 @@ async function createUsersAndOrgas() {
   await client.query(`delete from mano."Team" where name like 'Team Test - %'`);
 
   for (let i = 1; i < 12; i++) {
-    console.log("create user", i);
-
     const orgId = uuidv4();
     const userId = uuidv4();
     const teamId = uuidv4();
