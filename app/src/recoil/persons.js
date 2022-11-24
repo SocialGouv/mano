@@ -340,9 +340,9 @@ const cleanPersonHistory = (history, encryptedFieldsIncludingCustom) => {
   if (!history) return history;
   return history
     .map((historyEntry) => {
-      if (!Object.keys(historyEntry.data).length) return false;
       const newData = {};
       for (const field of Object.keys(historyEntry.data)) {
+        if (field === 'history') continue;
         if (encryptedFieldsIncludingCustom.includes(field)) newData[field] = historyEntry.data[field];
       }
       return {
@@ -350,7 +350,7 @@ const cleanPersonHistory = (history, encryptedFieldsIncludingCustom) => {
         data: newData,
       };
     })
-    .filter((h) => !!Object.keys(historyEntry.data).length);
+    .filter((historyEntry) => !!Object.keys(historyEntry.data).length);
 };
 
 export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ name, ...rest }) => ({ field: name, ...rest }));
