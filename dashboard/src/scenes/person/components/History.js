@@ -11,6 +11,7 @@ const History = ({ person }) => {
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const teams = useRecoilValue(teamsState);
   const history = useMemo(() => [...(person.history || [])].reverse(), [person.history]);
+
   return (
     <div>
       <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
@@ -29,7 +30,7 @@ const History = ({ person }) => {
         <tbody className="small">
           {history.map((h) => {
             return (
-              <tr key={h.date}>
+              <tr key={h.date} className="tw-cursor-default">
                 <td>{dayjsInstance(h.date).format('DD/MM/YYYY HH:mm')}</td>
                 <td>
                   <UserName id={h.user} />
@@ -40,13 +41,12 @@ const History = ({ person }) => {
                       const personField = personFieldsIncludingCustomFields.find((f) => f.name === key);
                       if (key === 'assignedTeams') {
                         return (
-                          <div>
-                            {personField?.label} : <br />
-                            {(value.oldValue || []).map((teamId) => {
-                              const team = teams.find((t) => t._id === teamId);
-                              return <div key={teamId}>{team?.name}</div>;
-                            })}
-                          </div>
+                          <p className="tw-flex tw-flex-col" key={key}>
+                            <span>{personField?.label} : </span>
+                            <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                            <span>↓</span>
+                            <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          </p>
                         );
                       }
                       return (

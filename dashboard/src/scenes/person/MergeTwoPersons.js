@@ -218,7 +218,8 @@ const MergeTwoPersons = ({ person }) => {
                     historyEntry.data[key] = { oldValue: initMergedPerson[key], newValue: body[key] };
                   }
                 }
-                body.history = [...(initMergedPerson.history || []), historyEntry];
+
+                if (Object.keys(historyEntry.data)?.length) body.history = [...(initMergedPerson.history || []), historyEntry];
 
                 const mergedPerson = preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body);
 
