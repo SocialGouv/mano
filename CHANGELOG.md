@@ -1,3 +1,10 @@
+## [1.177.8](https://github.com/SocialGouv/mano/compare/v1.177.7...v1.177.8) (2022-11-24)
+
+
+### Bug Fixes
+
+* file to download when merge persons ([#995](https://github.com/SocialGouv/mano/issues/995)) ([4008636](https://github.com/SocialGouv/mano/commit/4008636470bc7bc68c8d0efdb03bc89c2d16ba66))
+
 ## [1.177.7](https://github.com/SocialGouv/mano/compare/v1.177.6...v1.177.7) (2022-11-24)
 
 
