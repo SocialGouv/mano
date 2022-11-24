@@ -1,3 +1,10 @@
+## [1.177.7](https://github.com/SocialGouv/mano/compare/v1.177.6...v1.177.7) (2022-11-24)
+
+
+### Bug Fixes
+
+* **dashboard:** name is mandatory to create territory ([d7f9937](https://github.com/SocialGouv/mano/commit/d7f9937ded5eb31b2c21b0897aa2b0a59c8ea2e2))
+
 ## [1.177.6](https://github.com/SocialGouv/mano/compare/v1.177.5...v1.177.6) (2022-11-24)
 
 
