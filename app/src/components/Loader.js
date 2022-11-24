@@ -54,7 +54,7 @@ export const refreshTriggerState = atom({
   },
 });
 
-const mergeItems = (oldItems, newItems) => {
+export const mergeItems = (oldItems, newItems) => {
   const newItemsIds = newItems.map((i) => i._id);
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
   return [...oldItemsPurged, ...newItems];
