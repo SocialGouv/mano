@@ -88,7 +88,7 @@ const Stats = () => {
   const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
   const [period, setPeriod] = useState({ startDate: null, endDate: null });
   const [actionsStatuses, setActionsStatuses] = useState(DONE);
-  const [actionsCategories, setActionsCategories] = useState([]);
+
   const [selectedTeams, setSelectedTeams] = useState([currentTeam]);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
@@ -183,6 +183,15 @@ const Stats = () => {
     () => actions.filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status)),
     [actions, actionsStatuses]
   );
+  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useState([]);
+  const [actionsCategories, setActionsCategories] = useState([]);
+
+  const filterableActionsCategories = useMemo(() => {
+    if (!actionsCategoriesGroups.length) return allCategories;
+    return groupsCategories
+      .filter((group) => actionsCategoriesGroups.includes(group.groupTitle))
+      .reduce((filteredCats, group) => [...filteredCats, ...group.categories], []);
+  }, [actionsCategoriesGroups, allCategories, groupsCategories]);
 
   const actionsWithDetailedGroupAndCategories = useMemo(
     () =>
@@ -201,8 +210,9 @@ const Stats = () => {
           }
           return actionsDetailed;
         }, [])
-        .filter((a) => !actionsCategories.length || actionsCategories.includes(a.group)),
-    [actionsFilteredByStatus, groupsCategories, actionsCategories]
+        .filter((a) => !actionsCategoriesGroups.length || actionsCategoriesGroups.includes(a.group))
+        .filter((a) => !actionsCategories.length || actionsCategories.includes(a.category)),
+    [actionsFilteredByStatus, groupsCategories, actionsCategoriesGroups, actionsCategories]
   );
 
   const numberOfActionsPerPerson = useMemo(() => {
@@ -427,7 +437,7 @@ const Stats = () => {
                 options={mappedIdsToLabels}
                 getOptionValue={(s) => s._id}
                 getOptionLabel={(s) => s.name}
-                name="status"
+                name="action-status"
                 onChange={(s) => setActionsStatuses(s.map((s) => s._id))}
                 isClearable
                 isMulti
@@ -437,7 +447,7 @@ const Stats = () => {
           </Col>
           <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
             <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-              Filtrer par catégorie:
+              Filtrer par groupe de catégories :
             </label>
             <div style={{ basis: 500, flexGrow: 1 }}>
               <SelectCustom
@@ -445,7 +455,25 @@ const Stats = () => {
                 options={groupsCategories.map((group) => group.groupTitle)}
                 getOptionValue={(s) => s}
                 getOptionLabel={(s) => s}
-                name="status"
+                name="action-category-group"
+                onChange={setActionsCategoriesGroups}
+                isClearable
+                isMulti
+                value={actionsCategoriesGroups}
+              />
+            </div>
+          </Col>
+          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+            <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+              Filtrer par catégorie:
+            </label>
+            <div style={{ basis: 500, flexGrow: 1 }}>
+              <SelectCustom
+                inputId="action-select-category-filter"
+                options={filterableActionsCategories}
+                getOptionValue={(s) => s}
+                getOptionLabel={(s) => s}
+                name="action-category"
                 onChange={setActionsCategories}
                 isClearable
                 isMulti
