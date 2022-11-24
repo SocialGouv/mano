@@ -305,6 +305,7 @@ const EncryptionKey = ({ isMain }) => {
           setEncryptingStatus('');
         }}
         size="lg"
+        data-test-id="encryption-modal"
         centered>
         <ModalHeader close={onboardingForEncryption ? <></> : null} toggle={() => setOpen(false)} color="danger">
           <span style={{ color: theme.black, textAlign: 'center', display: 'block' }}>
