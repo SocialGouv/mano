@@ -1,6 +1,6 @@
 import { selector, selectorFamily } from 'recoil';
 import { actionsState, CANCEL, DONE, TODO } from './actions';
-import { currentTeamState, userState } from './auth';
+import { currentTeamState } from './auth';
 import { commentsState } from './comments';
 import { personsState } from './persons';
 import { placesState } from './places';
@@ -84,7 +84,6 @@ export const itemsGroupedByPersonSelector = selector({
   get: ({ get }) => {
     const persons = get(personsState);
     const personsObject = {};
-    const user = get(userState);
     for (const person of persons) {
       personsObject[person._id] = { ...person };
     }

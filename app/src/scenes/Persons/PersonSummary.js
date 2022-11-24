@@ -1,5 +1,5 @@
 import React, { useCallback, useMemo, useRef } from 'react';
-import { Alert, Linking, Text } from 'react-native';
+import { Linking, Text } from 'react-native';
 import styled from 'styled-components';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilValue } from 'recoil';
@@ -20,13 +20,10 @@ import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiChe
 import colors from '../../utils/colors';
 import PhoneIcon from '../../icons/PhoneIcon';
 import { placesState } from '../../recoil/places';
-import { groupSelector } from '../../recoil/groups';
-import { organisationState, teamsState } from '../../recoil/auth';
+import { teamsState } from '../../recoil/auth';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import RencontreRow from './RencontreRow';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
-import { capture } from '../../services/sentry';
-import GroupRow from './GroupRow';
 
 const PersonSummary = ({
   navigation,
@@ -43,11 +40,6 @@ const PersonSummary = ({
   onDelete,
   onBack,
 }) => {
-  const organisation = useRecoilValue(organisationState);
-  const personGroup = useRecoilValue(groupSelector({ personId: personDB?._id }));
-
-  console.log({ personGroup });
-
   const onAddPlaceRequest = () => navigation.push('NewPersonPlaceForm', { person: personDB, fromRoute: 'Person' });
 
   const onCommentUpdate = (comment) => {
@@ -107,24 +99,6 @@ const PersonSummary = ({
     },
     [navigation]
   );
-
-  const onGroupFeaturePress = () => {
-    Alert.alert(
-      "Cette fonctionnalité n'est pas encore disponible sur l'app",
-      "Elle l'est sur navigateur, mais si elle vous intéresse sur l'app, n'hésitez pas à nous le signaler en cliquant sur le bouton ci-dessous",
-      [
-        {
-          text: "Ça m'intéresse !",
-          onPress: () => capture('interested in families in app', { extra: { organisation } }),
-        },
-        {
-          text: 'Non merci',
-          style: 'cancel',
-        },
-      ],
-      { cancelable: true }
-    );
-  };
 
   return (
     <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color} testID="person-summary">
@@ -271,16 +245,6 @@ const PersonSummary = ({
         />
       </ButtonsContainer>
 
-      {!!organisation.groupsEnabled && (
-        <SubList
-          label="Liens familiaux"
-          onAdd={onGroupFeaturePress}
-          testID="person-group"
-          data={personGroup.relations}
-          renderItem={(relation, index) => <GroupRow key={index} relation={relation} onMorePress={onGroupFeaturePress} />}
-          ifEmpty="Pas de liens familiaux"
-        />
-      )}
       <SubList
         label="Actions"
         onAdd={onAddActionRequest}

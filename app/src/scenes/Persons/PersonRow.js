@@ -25,7 +25,7 @@ const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } 
   return <Name>{name}</Name>;
 };
 
-const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionSheetWithOptions }) => {
+const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionSheetWithOptions, children }) => {
   const { outOfActiveList, birthdate, alertness } = person;
   const navigation = useNavigation();
   const organisation = useRecoilValue(organisationState);
@@ -74,6 +74,7 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
         </CaptionsFirstLine>
         {birthdate && !outOfActiveList && <Birthdate>{displayBirthDate(birthdate)}</Birthdate>}
         {birthdate && outOfActiveList && <BirthdateMuted>{displayBirthDate(birthdate)}</BirthdateMuted>}
+        {children}
         <TeamsTags teams={person.assignedTeams} />
       </CaptionsContainer>
     </RowContainer>
