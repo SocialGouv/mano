@@ -318,6 +318,11 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
   ];
   const decrypted = {};
   for (let field of encryptedFieldsIncludingCustom) {
+    console.log('field', field);
+    if (field === 'history') {
+      decrypted[field] = cleanPersonHistory(person[field], encryptedFieldsIncludingCustom);
+      continue;
+    }
     decrypted[field] = person[field];
   }
   return {
@@ -330,6 +335,30 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
     decrypted,
     entityKey: person.entityKey,
   };
+};
+
+const cleanPersonHistory = (history, encryptedFieldsIncludingCustom) => {
+  if (!history) return history;
+  return history
+    .map((historyEntry) => {
+      if (!Object.keys(historyEntry.data).length) return false;
+      const newData = {};
+      for (const field of Object.keys(historyEntry.data)) {
+        if (encryptedFieldsIncludingCustom.includes(field)) newData[field] = historyEntry.data[field];
+      }
+      console.log(
+        {
+          ...historyEntry,
+          data: newData,
+        },
+        encryptedFieldsIncludingCustom
+      );
+      return {
+        ...historyEntry,
+        data: newData,
+      };
+    })
+    .filter((h) => !!Object.keys(historyEntry.data).length);
 };
 
 export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ name, ...rest }) => ({ field: name, ...rest }));
