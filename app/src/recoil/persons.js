@@ -318,7 +318,6 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
   ];
   const decrypted = {};
   for (let field of encryptedFieldsIncludingCustom) {
-    console.log('field', field);
     if (field === 'history') {
       decrypted[field] = cleanPersonHistory(person[field], encryptedFieldsIncludingCustom);
       continue;
@@ -346,13 +345,6 @@ const cleanPersonHistory = (history, encryptedFieldsIncludingCustom) => {
       for (const field of Object.keys(historyEntry.data)) {
         if (encryptedFieldsIncludingCustom.includes(field)) newData[field] = historyEntry.data[field];
       }
-      console.log(
-        {
-          ...historyEntry,
-          data: newData,
-        },
-        encryptedFieldsIncludingCustom
-      );
       return {
         ...historyEntry,
         data: newData,
