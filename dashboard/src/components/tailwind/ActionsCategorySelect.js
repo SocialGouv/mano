@@ -24,10 +24,28 @@ const categoriesSortedByMostUsedSelector = selector({
   },
 });
 
+const allCatsTitle = 'Toutes les catégories';
+const allGroupsWithGroupForAllCategories = selector({
+  key: 'allGroupsWithGroupForAllCategories',
+  get: ({ get }) => {
+    const groupedCategories = get(actionsCategoriesSelector);
+    const allCats = groupedCategories.reduce((acc, group) => {
+      return [...acc, ...group.categories];
+    }, []);
+    return [
+      ...groupedCategories,
+      {
+        groupTitle: allCatsTitle,
+        categories: allCats,
+      },
+    ];
+  },
+});
+
 const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) => {
   const [open, setOpen] = useState(false);
   const [modalIsOpened, setModalIsOpened] = useState(false);
-  const allGroups = useRecoilValue(actionsCategoriesSelector);
+  const allGroups = useRecoilValue(allGroupsWithGroupForAllCategories);
   const categoriesSortedByMostUsed = useRecoilValue(categoriesSortedByMostUsedSelector);
   const [selected, setSelected] = useState(() => values || []);
   const [search, setSearch] = useState('');
@@ -154,7 +172,10 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
             ))}
             <input
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setGroupSelected(allCatsTitle);
+              }}
               type="search"
               className="not-draggable form-text !tw-mt-0 tw-border-none tw-p-0 tw-px-2  tw-py-1 tw-text-sm placeholder:tw-italic"
               placeholder="Recherchez..."
