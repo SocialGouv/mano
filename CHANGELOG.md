@@ -1,3 +1,10 @@
+## [1.177.6](https://github.com/SocialGouv/mano/compare/v1.177.5...v1.177.6) (2022-11-24)
+
+
+### Bug Fixes
+
+* **dashboard:**  group categories search and stats ([#997](https://github.com/SocialGouv/mano/issues/997)) ([bb81e96](https://github.com/SocialGouv/mano/commit/bb81e9656f6e30ac8adff05774f80b5ccf6013e9))
+
 ## [1.177.5](https://github.com/SocialGouv/mano/compare/v1.177.4...v1.177.5) (2022-11-23)
 
 
