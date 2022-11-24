@@ -88,21 +88,25 @@ const PersonDocuments = ({ person }) => {
       </div>
       <table className="table table-striped">
         <tbody className="small">
-          {(person.documents || []).map((doc) => (
-            <tr
-              key={doc._id}
-              onClick={() => {
-                setOpenModal(doc);
-              }}>
-              <td>
-                <div>
-                  <b>{doc.name}</b>
-                </div>
-                <div>{formatDateTimeWithNameOfDay(doc.createdAt)}</div>
-                <div className="small">Créé par {users.find((e) => e._id === doc.createdBy)?.name}</div>
-              </td>
-            </tr>
-          ))}
+          {(person.documents || []).map((doc) => {
+            return (
+              <tr
+                key={doc._id}
+                data-test-id={doc.downloadPath}
+                aria-label={`Document ${doc.name}`}
+                onClick={() => {
+                  setOpenModal(doc);
+                }}>
+                <td>
+                  <div>
+                    <b>{doc.name}</b>
+                  </div>
+                  <div>{formatDateTimeWithNameOfDay(doc.createdAt)}</div>
+                  <div className="small">Créé par {users.find((e) => e._id === doc.createdBy)?.name}</div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       {!person.documents?.length && (

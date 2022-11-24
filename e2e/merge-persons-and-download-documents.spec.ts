@@ -4,14 +4,22 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import "dayjs/locale/fr";
 import { changeReactSelectValue, clickOnEmptyReactSelect } from "./utils";
+import { populate } from "./scripts/populate-db";
 
 dayjs.extend(utc);
 dayjs.locale("fr");
 
-test("Merge persons ans download documents", async ({ page }) => {
+test.beforeAll(async () => {
+  await populate();
+});
+
+test("Merge persons", async ({ page }) => {
   // Always use a new items
   const person1Name = nanoid();
   const person2Name = nanoid();
+
+  let person1DocumentLink: string | null = null;
+  let person2DocumentLink: string | null = null;
 
   await test.step("Log in", async () => {
     await page.goto("http://localhost:8090/auth");
@@ -33,15 +41,8 @@ test("Merge persons ans download documents", async ({ page }) => {
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
     await page.locator("label[aria-label='Ajouter un document']").setInputFiles("e2e/files-to-upload/image-1.jpg");
-    await page.getByText("image-1.jpg").click();
-    const [download] = await Promise.all([
-      // Start waiting for the download
-      page.waitForEvent("download"),
-      // Perform the action that initiates download
-      await page.getByRole("button", { name: "Télécharger" }).click(),
-    ]);
-    const downloadPath1 = await download.path();
-    expect(downloadPath1).toBe("image-1.jpg");
+    await page.getByText("Document ajouté !").click();
+    person1DocumentLink = await page.locator("tr[aria-label='Document image-1.jpg']").getAttribute("data-test-id");
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
@@ -50,52 +51,22 @@ test("Merge persons ans download documents", async ({ page }) => {
     await page.getByRole("button", { name: "Sauvegarder" }).click();
     await page.getByText("Création réussie !").click();
     await page.locator("label[aria-label='Ajouter un document']").setInputFiles("e2e/files-to-upload/image-2.jpg");
-    await page.getByText("image-2.jpg").click();
-    await page.getByRole("button", { name: "Télécharger" }).click();
+    await page.getByText("Document ajouté !").click();
+    person2DocumentLink = await page.locator("tr[aria-label='Document image-2.jpg']").getAttribute("data-test-id");
   });
-  /*
-  await test.step("Upload file", async () => {});
 
-  await page.getByRole("link", { name: "Personnes suivies" }).click();
-  await expect(page).toHaveURL("http://localhost:8090/person");
+  await test.step("Merge persons", async () => {
+    await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
+    await clickOnEmptyReactSelect(page, "person-to-merge-with-select", person1Name);
 
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
+    page.on("dialog", async (dialog) => {
+      await dialog.accept();
+    });
 
-  await page.getByLabel("Nom").click();
+    await page.getByRole("button", { name: "Fusionner" }).click();
+    await page.getByText("Fusion réussie !").click();
 
-  await page.getByLabel("Nom").fill("person4");
-
-  await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await expect(page).toHaveURL("http://localhost:8090/person/73c56b5d-1585-4b9b-a419-fcb7cf349e34");
-
-  await page.getByRole("button", { name: "Créer une nouvelle personne" }).click();
-
-  await page.getByLabel("Nom").click();
-
-  await page.getByLabel("Nom").fill("person5");
-
-  await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await expect(page).toHaveURL("http://localhost:8090/person/ef461dfb-fb8e-4208-be2e-cca7ae29b665");
-
-  await page.locator('label:has-text("＋")').click();
-
-  await page
-    .locator('body:has-text("Création réussie !Orga Test - 1Team Test - 1User Test - 1User Test - 1 - adminBe")')
-    .setInputFiles("Toggl_Track_summary_report_2020-01-01_2020-12-31.pdf");
-
-  await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
-
-  await page.locator(".person-to-merge-with-select__value-container").click();
-
-  await page.locator("#react-select-8-option-1").click();
-
-  page.once("dialog", (dialog) => {
-    console.log(`Dialog message: ${dialog.message()}`);
-    dialog.dismiss().catch(() => {});
+    await expect(page.locator(`data-test-id=${person1DocumentLink}`)).toBeVisible();
+    await expect(page.locator(`data-test-id=${person2DocumentLink}`)).toBeVisible();
   });
-  await page.getByRole("button", { name: "Fusionner" }).click();
-
-  await page.getByRole("cell", { name: "image.png mercredi 23 novembre 2022 17:08 Créé par User Test - 1" }).click();
-
-  await page.getByRole("button", { name: "Télécharger" }).click(); */
 });
