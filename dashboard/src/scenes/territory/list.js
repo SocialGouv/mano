@@ -117,6 +117,7 @@ const CreateTerritory = () => {
           <Formik
             initialValues={{ name: '', types: [], perimeter: '' }}
             onSubmit={async (body, actions) => {
+              if (!body.name) return toast.error('Le nom est obligatoire');
               const res = await API.post({ path: '/territory', body: prepareTerritoryForEncryption({ ...body, user: user._id }) });
               if (res.ok) {
                 setTerritories((territories) => [res.decryptedData, ...territories]);
