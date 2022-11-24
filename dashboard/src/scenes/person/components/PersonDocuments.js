@@ -30,7 +30,9 @@ const PersonDocuments = ({ person }) => {
       {openModal && <DocumentModal document={openModal} person={person} onClose={() => setOpenModal(false)} />}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
         <h4 className="tw-flex-1 tw-text-xl">Documents</h4>
-        <label className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-main tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
+        <label
+          aria-label="Ajouter un document"
+          className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-main tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
           ＋
           <input
             type="file"
@@ -64,6 +66,7 @@ const PersonDocuments = ({ person }) => {
                       encryptedEntityKey,
                       createdAt: new Date(),
                       createdBy: user._id,
+                      downloadPath: `/person/${person._id}/document/${file.filename}`,
                       file,
                     },
                   ],
@@ -85,21 +88,25 @@ const PersonDocuments = ({ person }) => {
       </div>
       <table className="table table-striped">
         <tbody className="small">
-          {(person.documents || []).map((doc) => (
-            <tr
-              key={doc._id}
-              onClick={() => {
-                setOpenModal(doc);
-              }}>
-              <td>
-                <div>
-                  <b>{doc.name}</b>
-                </div>
-                <div>{formatDateTimeWithNameOfDay(doc.createdAt)}</div>
-                <div className="small">Créé par {users.find((e) => e._id === doc.createdBy)?.name}</div>
-              </td>
-            </tr>
-          ))}
+          {(person.documents || []).map((doc) => {
+            return (
+              <tr
+                key={doc._id}
+                data-test-id={doc.downloadPath}
+                aria-label={`Document ${doc.name}`}
+                onClick={() => {
+                  setOpenModal(doc);
+                }}>
+                <td>
+                  <div>
+                    <b>{doc.name}</b>
+                  </div>
+                  <div>{formatDateTimeWithNameOfDay(doc.createdAt)}</div>
+                  <div className="small">Créé par {users.find((e) => e._id === doc.createdBy)?.name}</div>
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       {!person.documents?.length && (
@@ -151,7 +158,7 @@ function DocumentModal({ document, onClose, person }) {
             color="danger"
             onClick={async () => {
               if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-              await API.delete({ path: `/person/${person._id}/document/${document.file.filename}` });
+              await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
               const personResponse = await API.put({
                 path: `/person/${person._id}`,
                 body: preparePersonForEncryption(
@@ -179,7 +186,7 @@ function DocumentModal({ document, onClose, person }) {
             type="button"
             onClick={async () => {
               const file = await API.download({
-                path: `/person/${person._id}/document/${document.file.filename}`,
+                path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}`,
                 encryptedEntityKey: document.encryptedEntityKey,
               });
               download(file, document.name);

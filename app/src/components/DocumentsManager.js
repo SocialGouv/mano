@@ -50,6 +50,7 @@ const DocumentsManager = ({ personDB, documents = [], onAddDocument, onDelete })
       encryptedEntityKey,
       createdAt: new Date(),
       createdBy: user._id,
+      downloadPath: `/person/${personDB._id}/document/${file.filename}`,
       file,
     });
     reset();

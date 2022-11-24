@@ -134,7 +134,13 @@ const MergeTwoPersons = ({ person }) => {
       createdAt: originPerson.createdAt,
       updatedAt: originPerson.updatedAt,
       entityKey: originPerson.entityKey,
-      documents: [...(originPerson.documents || []), ...(personToMergeAndDelete.documents || [])],
+      documents: [
+        ...(originPerson.documents || []),
+        ...(personToMergeAndDelete.documents || []).map((_doc) => ({
+          ..._doc,
+          downloadPath: _doc.downloadPath ?? `/person/${personToMergeAndDelete._id}/document/${_doc.file.filename}`,
+        })),
+      ],
       ...mergedPerson,
     };
   }, [originPerson, personToMergeAndDelete, fields, medicalFields, originPersonMedicalFile, personToMergeMedicalFile]);
@@ -263,7 +269,13 @@ const MergeTwoPersons = ({ person }) => {
                         _id: originPersonMedicalFile._id,
                         organisation: organisation._id,
                         person: originPerson._id,
-                        documents: [...(originPersonMedicalFile.documents || []), ...((personToMergeMedicalFile || {}).documents || [])],
+                        documents: [
+                          ...(originPersonMedicalFile.documents || []),
+                          ...((personToMergeMedicalFile || {}).documents || []).map((_doc) => ({
+                            ..._doc,
+                            downloadPath: _doc.downloadPath ?? `/person/${personToMergeAndDelete._id}/document/${_doc.file.filename}`,
+                          })),
+                        ],
                       }),
                       medicalFileToDeleteId: personToMergeMedicalFile?._id,
                     };
@@ -275,7 +287,10 @@ const MergeTwoPersons = ({ person }) => {
                         _id: personToMergeMedicalFile._id,
                         organisation: organisation._id,
                         person: originPerson._id,
-                        documents: personToMergeMedicalFile.documents || [],
+                        documents: (personToMergeMedicalFile.documents || []).map((_doc) => ({
+                          ..._doc,
+                          downloadPath: _doc.downloadPath ?? `/person/${personToMergeAndDelete._id}/document/${_doc.file.filename}`,
+                        })),
                       }),
                     };
                   }

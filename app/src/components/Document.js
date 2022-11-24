@@ -29,7 +29,7 @@ const Document = ({ showActionSheetWithOptions, personId, document, onDelete }) 
               style: 'destructive',
               onPress: async () => {
                 setIsDeleting(true);
-                await API.delete({ path: `/person/${personId}/document/${document.file.filename}` });
+                await API.delete({ path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}` });
                 onDelete(document);
                 setIsDeleting(false);
               },
@@ -47,7 +47,7 @@ const Document = ({ showActionSheetWithOptions, personId, document, onDelete }) 
         if (isDownloading) return;
         setIsDownloading(true);
         API.download({
-          path: `/person/${personId}/document/${document.file.filename}`,
+          path: document.downloadPath ?? `/person/${personId}/document/${document.file.filename}`,
           encryptedEntityKey: document.encryptedEntityKey,
           document,
         }).then(({ path }) => {
