@@ -129,6 +129,13 @@ export const personFieldsIncludingCustomFieldsSelector = selector({
   },
 });
 
+export const allowedFieldsInHistorySelector = selector({
+  key: 'allowedFieldsInHistorySelector',
+  get: ({ get }) => {
+    const allFields = get(personFieldsIncludingCustomFieldsSelector);
+    return allFields.map((f) => f.name).filter((f) => f !== 'history');
+  },
+});
 /*
 Choices on selects
 */
@@ -313,10 +320,6 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
   ];
   const decrypted = {};
   for (let field of encryptedFieldsIncludingCustom) {
-    if (field === 'history') {
-      decrypted[field] = cleanPersonHistory(person[field], encryptedFieldsIncludingCustom);
-      continue;
-    }
     decrypted[field] = person[field];
   }
   return {
@@ -329,23 +332,6 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
     decrypted,
     entityKey: person.entityKey,
   };
-};
-
-const cleanPersonHistory = (history, encryptedFieldsIncludingCustom) => {
-  if (!history) return history;
-  return history
-    .map((historyEntry) => {
-      const newData = {};
-      for (const field of Object.keys(historyEntry.data)) {
-        if (field === 'history') continue;
-        if (encryptedFieldsIncludingCustom.includes(field)) newData[field] = historyEntry.data[field];
-      }
-      return {
-        ...historyEntry,
-        data: newData,
-      };
-    })
-    .filter((historyEntry) => !!Object.keys(historyEntry.data).length);
 };
 
 export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ name, ...rest }) => ({ field: name, ...rest }));

@@ -7,6 +7,7 @@ import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
+  allowedFieldsInHistorySelector,
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
   personFieldsIncludingCustomFieldsSelector,
@@ -91,6 +92,7 @@ const MergeTwoPersons = ({ person }) => {
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
   const allFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
 
   const personsToMergeWith = useMemo(() => persons.filter((p) => p._id !== originPerson?._id), [persons, originPerson]);
 
@@ -213,6 +215,7 @@ const MergeTwoPersons = ({ person }) => {
                   data: {},
                 };
                 for (const key in body) {
+                  if (!allowedFieldsInHistory.includes(key)) continue;
                   if (fieldIsEmpty(body[key]) && fieldIsEmpty(originPerson[key])) continue;
                   if (JSON.stringify(body[key]) !== JSON.stringify(initMergedPerson[key])) {
                     historyEntry.data[key] = { oldValue: initMergedPerson[key], newValue: body[key] };

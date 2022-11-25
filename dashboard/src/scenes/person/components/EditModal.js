@@ -3,6 +3,7 @@ import SelectAsInput from '../../../components/SelectAsInput';
 import {
   addressDetails,
   addressDetailsFixedFields,
+  allowedFieldsInHistorySelector,
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
   employmentOptions,
@@ -34,6 +35,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
   const user = useRecoilValue(userState);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
   const API = useApi();
@@ -56,9 +58,10 @@ export default function EditModal({ person, selectedPanel, onClose }) {
               data: {},
             };
             for (const key in body) {
+              if (!allowedFieldsInHistory.includes(key)) continue;
               if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
             }
-            body.history = [...(person.history || []), historyEntry];
+            if (!!Object.keys(historyEntry.data.length)) body.history = [...(person.history || []), historyEntry];
 
             const response = await API.put({
               path: `/person/${person._id}`,
