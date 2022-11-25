@@ -743,7 +743,7 @@ const Service = ({ report, team, withMultipleTeams, dateString }) => {
         </div>
       )}
       <div className="services-list">
-        <ReceptionService team={team} report={report} />
+        <ReceptionService team={team} report={report} dataTestIdPrefix={`${team.name}-`} />
       </div>
     </ServicesWrapper>
   );

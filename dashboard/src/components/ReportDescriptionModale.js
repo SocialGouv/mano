@@ -29,7 +29,10 @@ const ReportDescriptionModale = ({ report }) => {
             className="noprint"
             initialValues={{ ...report, description: report.description || window.sessionStorage.getItem('currentReportDescription') || '' }}
             onSubmit={async (body) => {
-              const latestReportsRes = await API.get({ path: '/report', query: { after: lastLoad, withDeleted: true } });
+              const latestReportsRes = await API.get({
+                path: '/report',
+                query: { after: lastLoad, withDeleted: true },
+              });
               const allReports = mergeItems(reports, latestReportsRes.decryptedData);
               const reportAtDate = allReports.find((_report) => _report.date === report.date && _report.team === report.team);
               const reportUpdate = {

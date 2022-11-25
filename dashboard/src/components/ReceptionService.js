@@ -8,7 +8,7 @@ import useApi from '../services/api';
 import IncrementorSmall from './IncrementorSmall';
 import { lastLoadState, mergeItems } from './DataLoader';
 
-const ReceptionService = ({ report, team }) => {
+const ReceptionService = ({ report, team, dataTestIdPrefix = '' }) => {
   const organisation = useRecoilValue(organisationState);
 
   const [reports, setReports] = useRecoilState(reportsState);
@@ -105,7 +105,7 @@ const ReceptionService = ({ report, team }) => {
     <>
       {organisation?.services?.map((service) => (
         <IncrementorSmall
-          dataTestId={`${team?.name}-reception-${service}-${services[service] || 0}`}
+          dataTestId={`${dataTestIdPrefix}${service}-${services[service] || 0}`}
           key={service}
           service={service}
           count={services[service] || 0}

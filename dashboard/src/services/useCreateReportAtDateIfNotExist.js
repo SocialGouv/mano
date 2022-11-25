@@ -13,7 +13,10 @@ const useCreateReportAtDateIfNotExist = () => {
   const API = useApi();
 
   return async (date) => {
-    const latestReportsRes = await API.get({ path: '/report', query: { after: lastLoad, withDeleted: true } });
+    const latestReportsRes = await API.get({
+      path: '/report',
+      query: { after: lastLoad, withDeleted: true, page: 0 },
+    });
     const allReports = mergeItems(reports, latestReportsRes.decryptedData);
     setReports(allReports);
     date = dayjs(date).startOf('day').format('YYYY-MM-DD');
