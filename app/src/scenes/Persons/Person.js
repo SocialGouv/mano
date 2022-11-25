@@ -13,6 +13,7 @@ import colors from '../../utils/colors';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
+  allowedFieldsInHistorySelector,
   personsState,
   preparePersonForEncryption,
 } from '../../recoil/persons';
@@ -32,6 +33,7 @@ const cleanValue = (value) => {
 const Person = ({ route, navigation }) => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
@@ -131,9 +133,10 @@ const Person = ({ route, navigation }) => {
       data: {},
     };
     for (const key in personToUpdate) {
+      if (!allowedFieldsInHistory.includes(key)) continue;
       if (personToUpdate[key] !== oldPerson[key]) historyEntry.data[key] = { oldValue: oldPerson[key], newValue: personToUpdate[key] };
     }
-    personToUpdate.history = [...(oldPerson.history || []), historyEntry];
+    if (!!Object.keys(historyEntry.data).length) personToUpdate.history = [...(oldPerson.history || []), historyEntry];
 
     const response = await API.put({
       path: `/person/${personDB._id}`,

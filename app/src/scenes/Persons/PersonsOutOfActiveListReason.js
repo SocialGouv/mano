@@ -8,6 +8,7 @@ import ScrollContainer from '../../components/ScrollContainer';
 import OutOfActiveListReasonMultiCheckBox from '../../components/Selects/OutOfActiveListReasonMultiCheckBox';
 import { userState } from '../../recoil/auth';
 import {
+  allowedFieldsInHistorySelector,
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
   personsState,
@@ -21,6 +22,8 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
   const [persons, setPersons] = useRecoilState(personsState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
+
   const user = useRecoilValue(userState);
 
   const updatePerson = async () => {
@@ -33,9 +36,10 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
       data: {},
     };
     for (const key in person) {
+      if (!allowedFieldsInHistory.includes(key)) continue;
       if (person[key] !== oldPerson[key]) historyEntry.data[key] = { oldValue: oldPerson[key], newValue: person[key] };
     }
-    person.history = [...(oldPerson.history || []), historyEntry];
+    if (!!Object.keys(historyEntry.data).length) person.history = [...(oldPerson.history || []), historyEntry];
 
     const response = await API.put({
       path: `/person/${person._id}`,

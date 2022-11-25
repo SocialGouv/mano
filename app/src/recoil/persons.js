@@ -133,6 +133,14 @@ export const personFieldsIncludingCustomFieldsSelector = selector({
   },
 });
 
+export const allowedFieldsInHistorySelector = selector({
+  key: 'allowedFieldsInHistorySelector',
+  get: ({ get }) => {
+    const allFields = get(personFieldsIncludingCustomFieldsSelector);
+    return allFields.map((f) => f.name).filter((f) => f !== 'history');
+  },
+});
+
 /*
 Choices on selects
 */
