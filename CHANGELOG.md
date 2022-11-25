@@ -1,3 +1,10 @@
+## [1.177.11](https://github.com/SocialGouv/mano/compare/v1.177.10...v1.177.11) (2022-11-25)
+
+
+### Bug Fixes
+
+* **dashboard:** flush cache ([1d07f8e](https://github.com/SocialGouv/mano/commit/1d07f8e9e605449265941caaee72f89ac24720ab))
+
 ## [1.177.10](https://github.com/SocialGouv/mano/compare/v1.177.9...v1.177.10) (2022-11-25)
 
 
