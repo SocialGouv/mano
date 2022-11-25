@@ -1,3 +1,10 @@
+## [1.177.14](https://github.com/SocialGouv/mano/compare/v1.177.13...v1.177.14) (2022-11-25)
+
+
+### Bug Fixes
+
+* history whitelist ([#1003](https://github.com/SocialGouv/mano/issues/1003)) ([aac221e](https://github.com/SocialGouv/mano/commit/aac221eaf88b26f42e912ecc1ffaab843c35eef6))
+
 ## [1.177.13](https://github.com/SocialGouv/mano/compare/v1.177.12...v1.177.13) (2022-11-25)
 
 
