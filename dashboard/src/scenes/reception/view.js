@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useRef } from 'react';
 import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -124,6 +124,7 @@ const Reception = () => {
 
   const history = useHistory();
   const location = useLocation();
+  const reportCreatedRef = useRef(!!todaysReport?._id);
 
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
@@ -160,7 +161,10 @@ const Reception = () => {
     const response = await API.post({ path: '/passage', body: preparePassageForEncryption(newPassage) });
     if (response.ok) {
       setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== optimisticId)]);
-      await createReportAtDateIfNotExist(response.decryptedData.date);
+      if (!reportCreatedRef.current) {
+        reportCreatedRef.current = true;
+        await createReportAtDateIfNotExist(response.decryptedData.date);
+      }
     }
   };
 
@@ -184,7 +188,10 @@ const Reception = () => {
         const response = await API.post({ path: '/passage', body: preparePassageForEncryption(passage) });
         if (response.ok) {
           setPassages((passages) => [response.decryptedData, ...passages.filter((p) => p.optimisticId !== index)]);
-          await createReportAtDateIfNotExist(response.decryptedData.date);
+          if (!reportCreatedRef.current) {
+            reportCreatedRef.current = true;
+            await createReportAtDateIfNotExist(response.decryptedData.date);
+          }
         }
       }
       setAddingPassage(false);

@@ -20,7 +20,31 @@ export const reportsState = atom({
           }, {})
         ).filter(([key, reportsByDate]) => reportsByDate.length > 1);
         if (duplicateReports.length > 0) {
-          capture('Duplicated reports', { extra: { duplicateReports } });
+          capture('Duplicated reports', {
+            extra: {
+              duplicateReports: duplicateReports.map(([key, reportsByDate]) => [
+                key,
+                reportsByDate.map((report) => ({
+                  _id: report._id,
+                  date: report.date,
+                  team: report.team,
+                  services: report.services,
+                  description: report.description,
+                  collaborations: report.collaborations,
+                })),
+              ]),
+              duplicateReportsIds: duplicateReports.map(([key, reportsByDate]) => [
+                key,
+                reportsByDate.map((report) => ({
+                  _id: report._id,
+                  date: report.date,
+                  team: report.team,
+                  createdAt: report.createdAt,
+                  deletedAt: report.deletedAt,
+                })),
+              ]),
+            },
+          });
         }
       }),
   ],
