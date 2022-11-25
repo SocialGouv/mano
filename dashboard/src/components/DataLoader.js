@@ -25,7 +25,7 @@ import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
 
 // Update to flush cache.
-const currentCacheKey = 'mano-last-refresh-2022-11-17';
+const currentCacheKey = 'mano-last-refresh-2022-11-25';
 
 const cacheEffect = ({ onSet }) => {
   onSet(async (newValue) => {
