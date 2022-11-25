@@ -17,7 +17,7 @@ const useCreateReportAtDateIfNotExist = () => {
     setReports(allReports);
     date = dayjs(date).startOf('day').format('YYYY-MM-DD');
     const reportAtDate = allReports.find((report) => report.date === date && report.team === currentTeam._id);
-    if (!!reportAtDate) return;
+    if (!!reportAtDate) return reportAtDate;
     const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date }) });
     if (!res.ok) return;
     setReports((reports) => [res.decryptedData, ...reports]);
