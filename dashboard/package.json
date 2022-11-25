@@ -55,7 +55,7 @@
     "path": "npm:path-browserify",
     "postcss": "^8.4.18",
     "prettier": "^2.7.1",
-    "prettier-plugin-tailwindcss": "^0.1.13",
+    "prettier-plugin-tailwindcss": "^0.2.0",
     "react-scripts": "5.0.1",
     "stream": "npm:stream-browserify",
     "tailwindcss": "^3.2.1"
