@@ -13,7 +13,7 @@ import colors from '../../utils/colors';
 import { useRecoilValue } from 'recoil';
 import { organisationState } from '../../recoil/auth';
 
-const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } }) => {
+export const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } }) => {
   if (outOfActiveList) {
     return (
       <OutOfActiveListContainer>
