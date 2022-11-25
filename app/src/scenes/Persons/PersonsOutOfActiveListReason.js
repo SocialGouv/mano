@@ -39,7 +39,7 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
       if (!allowedFieldsInHistory.includes(key)) continue;
       if (person[key] !== oldPerson[key]) historyEntry.data[key] = { oldValue: oldPerson[key], newValue: person[key] };
     }
-    if (!!Object.keys(historyEntry.data.length)) person.history = [...(oldPerson.history || []), historyEntry];
+    if (!!Object.keys(historyEntry.data).length) person.history = [...(oldPerson.history || []), historyEntry];
 
     const response = await API.put({
       path: `/person/${person._id}`,

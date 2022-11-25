@@ -136,7 +136,7 @@ const Person = ({ route, navigation }) => {
       if (!allowedFieldsInHistory.includes(key)) continue;
       if (personToUpdate[key] !== oldPerson[key]) historyEntry.data[key] = { oldValue: oldPerson[key], newValue: personToUpdate[key] };
     }
-    if (!!Object.keys(historyEntry.data.length)) personToUpdate.history = [...(oldPerson.history || []), historyEntry];
+    if (!!Object.keys(historyEntry.data).length) personToUpdate.history = [...(oldPerson.history || []), historyEntry];
 
     const response = await API.put({
       path: `/person/${personDB._id}`,
