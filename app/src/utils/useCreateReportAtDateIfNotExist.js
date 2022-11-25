@@ -13,7 +13,7 @@ const useCreateReportAtDateIfNotExist = () => {
 
   return async (date) => {
     const latestReportsRes = await API.get({ path: '/report', query: { after: lastRefresh, withDeleted: true } });
-    const allReports = mergeItems([...reports, ...latestReportsRes.decryptedData]);
+    const allReports = mergeItems(reports, latestReportsRes.decryptedData);
     setReports(allReports);
     date = dayjs(date).startOf('day').format('YYYY-MM-DD');
     const reportAtDate = allReports.find((report) => report.date === date && report.team === currentTeam._id);
@@ -24,3 +24,5 @@ const useCreateReportAtDateIfNotExist = () => {
     return res.decryptedData;
   };
 };
+
+export default useCreateReportAtDateIfNotExist;

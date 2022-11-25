@@ -51,10 +51,10 @@ import { consultationsState, disableConsultationRow } from '../../recoil/consult
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
-import { flushSync } from 'react-dom';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import TagTeam from '../../components/TagTeam';
+import ReceptionService from '../../components/ReceptionService';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -335,7 +335,9 @@ const View = () => {
 
   const scrollContainer = useRef(null);
   useEffect(() => {
+    refresh();
     scrollContainer.current.scrollTo({ top: 0 });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const renderPrintOnly = () => {
@@ -720,43 +722,7 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
 
 const Service = ({ report, team, withMultipleTeams, dateString }) => {
   const organisation = useRecoilValue(organisationState);
-  const setReports = useSetRecoilState(reportsState);
-  const API = useApi();
-  const [services, setServices] = useState(() => (report?.services?.length ? JSON.parse(report?.services) : {}));
   const [show, toggleShow] = useState(!withMultipleTeams);
-
-  const changeTimeout = useRef(null);
-  const onServiceUpdate = async (service, newCount) => {
-    const newServices = {
-      ...services,
-      [service]: newCount,
-    };
-    flushSync(() => setServices(newServices));
-    const reportUpdate = {
-      ...report,
-      services: JSON.stringify(newServices),
-    };
-    clearTimeout(changeTimeout.current);
-    changeTimeout.current = setTimeout(
-      async () => {
-        const isNew = !report._id;
-        const res = isNew
-          ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-          : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
-        if (res.ok) {
-          setReports((reports) =>
-            isNew
-              ? [res.decryptedData, ...reports]
-              : reports.map((a) => {
-                  if (a._id === report._id) return res.decryptedData;
-                  return a;
-                })
-          );
-        }
-      },
-      process.env.REACT_APP_TEST === 'true' ? 0 : 1100
-    );
-  };
 
   if (!organisation.receptionEnabled) return null;
   if (!organisation?.services) return null;
@@ -777,15 +743,7 @@ const Service = ({ report, team, withMultipleTeams, dateString }) => {
         </div>
       )}
       <div className="services-list">
-        {organisation?.services?.map((service) => (
-          <IncrementorSmall
-            key={service}
-            dataTestId={`${team?.name}-${service}-${services[service] || 0}`}
-            service={service}
-            count={services[service] || 0}
-            onChange={(newCount) => onServiceUpdate(service, newCount)}
-          />
-        ))}
+        <ReceptionService team={team} report={report} />
       </div>
     </ServicesWrapper>
   );

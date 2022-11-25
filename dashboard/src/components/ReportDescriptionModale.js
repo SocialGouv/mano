@@ -5,14 +5,16 @@ import ButtonCustom from './ButtonCustom';
 import { Formik } from 'formik';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import useApi from '../services/api';
-import { useSetRecoilState } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import { useHistory } from 'react-router-dom';
+import { lastLoadState, mergeItems } from './DataLoader';
 
 const ReportDescriptionModale = ({ report }) => {
-  const setReports = useSetRecoilState(reportsState);
+  const [reports, setReports] = useRecoilState(reportsState);
   const API = useApi();
   const [open, setOpen] = useState(false);
   const history = useHistory();
+  const lastLoad = useRecoilValue(lastLoadState);
 
   return (
     <>
@@ -29,20 +31,23 @@ const ReportDescriptionModale = ({ report }) => {
             className="noprint"
             initialValues={{ ...report, description: report.description || window.sessionStorage.getItem('currentReportDescription') || '' }}
             onSubmit={async (body) => {
+              const latestReportsRes = await API.get({ path: '/report', query: { after: lastLoad, withDeleted: true } });
+              const allReports = mergeItems(reports, latestReportsRes.decryptedData);
+              const reportAtDate = allReports.find((_report) => _report.date === report.date && _report.team === report.team);
               const reportUpdate = {
-                ...report,
-                ...body,
+                ...(reportAtDate || { team: report.team, date: report.date }),
+                description: body.description,
               };
-              const isNew = !report._id;
+              const isNew = !reportAtDate._id;
               const res = isNew
                 ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-                : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+                : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });
               if (res.ok) {
                 setReports((reports) =>
                   isNew
                     ? [res.decryptedData, ...reports]
                     : reports.map((a) => {
-                        if (a._id === report._id) return res.decryptedData;
+                        if (a._id === reportAtDate._id) return res.decryptedData;
                         return a;
                       })
                 );
