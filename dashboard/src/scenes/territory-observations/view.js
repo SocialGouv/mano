@@ -1,6 +1,5 @@
 import React from 'react';
 import styled from 'styled-components';
-import { Button as CloseButton } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import UserName from '../../components/UserName';
 import { customFieldsObsSelector } from '../../recoil/territoryObservations';
