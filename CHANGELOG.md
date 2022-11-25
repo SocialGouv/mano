@@ -1,3 +1,10 @@
+## [1.177.12](https://github.com/SocialGouv/mano/compare/v1.177.11...v1.177.12) (2022-11-25)
+
+
+### Bug Fixes
+
+* filter old reports ([ef12332](https://github.com/SocialGouv/mano/commit/ef12332af63034710ad3e9fd21c6c971172b14f8))
+
 ## [1.177.11](https://github.com/SocialGouv/mano/compare/v1.177.10...v1.177.11) (2022-11-25)
 
 
