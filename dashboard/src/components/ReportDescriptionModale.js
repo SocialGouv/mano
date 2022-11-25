@@ -6,14 +6,12 @@ import { Formik } from 'formik';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import useApi from '../services/api';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import { useHistory } from 'react-router-dom';
 import { lastLoadState, mergeItems } from './DataLoader';
 
 const ReportDescriptionModale = ({ report }) => {
   const [reports, setReports] = useRecoilState(reportsState);
   const API = useApi();
   const [open, setOpen] = useState(false);
-  const history = useHistory();
   const lastLoad = useRecoilValue(lastLoadState);
 
   return (
@@ -51,7 +49,6 @@ const ReportDescriptionModale = ({ report }) => {
                         return a;
                       })
                 );
-                if (isNew) history.replace(`/report/${res.decryptedData._id}`);
                 setOpen(false);
                 window.sessionStorage.removeItem('currentReportDescription');
               }

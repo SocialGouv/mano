@@ -49,7 +49,7 @@ import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
 import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
-import { useDataLoader } from '../../components/DataLoader';
+import { lastLoadState, mergeItems, useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
@@ -1425,6 +1425,7 @@ const PersonCreatedAt = ({ date, persons }) => {
 const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString }) => {
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
+  const lastLoad = useRecoilValue(lastLoadState);
 
   return (
     <StyledBox>
@@ -1446,20 +1447,23 @@ const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString
                 initialValues={report}
                 enableReinitialize
                 onSubmit={async (body) => {
+                  const latestReportsRes = await API.get({ path: '/report', query: { after: lastLoad, withDeleted: true } });
+                  const allReports = mergeItems(reports, latestReportsRes.decryptedData);
+                  const reportAtDate = allReports.find((_report) => _report.date === report.date && _report.team === report.team);
                   const reportUpdate = {
-                    ...report,
-                    ...body,
+                    ...(reportAtDate || { team: report.team, date: report.date }),
+                    collaborations: body.collaborations,
                   };
-                  const isNew = !report._id;
+                  const isNew = !reportAtDate._id;
                   const res = isNew
                     ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-                    : await API.put({ path: `/report/${report._id}`, body: prepareReportForEncryption(reportUpdate) });
+                    : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });
                   if (res.ok) {
                     setReports((reports) =>
                       isNew
                         ? [res.decryptedData, ...reports]
                         : reports.map((a) => {
-                            if (a._id === report._id) return res.decryptedData;
+                            if (a._id === reportAtDate._id) return res.decryptedData;
                             return a;
                           })
                     );
