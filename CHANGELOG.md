@@ -1,3 +1,10 @@
+## [1.177.9](https://github.com/SocialGouv/mano/compare/v1.177.8...v1.177.9) (2022-11-25)
+
+
+### Bug Fixes
+
+* report sync with backend ([#999](https://github.com/SocialGouv/mano/issues/999)) ([41dabe7](https://github.com/SocialGouv/mano/commit/41dabe7c041c4c71afee8dd704b3a4c591777351))
+
 ## [1.177.8](https://github.com/SocialGouv/mano/compare/v1.177.7...v1.177.8) (2022-11-24)
 
 
