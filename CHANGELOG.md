@@ -1,3 +1,10 @@
+## [1.177.13](https://github.com/SocialGouv/mano/compare/v1.177.12...v1.177.13) (2022-11-25)
+
+
+### Bug Fixes
+
+* create report on new passage ([00c9a11](https://github.com/SocialGouv/mano/commit/00c9a112bbe095b9a57a919763072acb162be592))
+
 ## [1.177.12](https://github.com/SocialGouv/mano/compare/v1.177.11...v1.177.12) (2022-11-25)
 
 
