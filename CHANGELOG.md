@@ -1,3 +1,10 @@
+## [1.177.10](https://github.com/SocialGouv/mano/compare/v1.177.9...v1.177.10) (2022-11-25)
+
+
+### Bug Fixes
+
+* **dashboard:** check duplicated reports ([7182aa3](https://github.com/SocialGouv/mano/commit/7182aa33ca941ba554d89111b31085d9622c7937))
+
 ## [1.177.9](https://github.com/SocialGouv/mano/compare/v1.177.8...v1.177.9) (2022-11-25)
 
 
