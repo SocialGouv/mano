@@ -37,7 +37,7 @@ const loaderTriggerState = atom({ key: 'loaderTriggerState', default: false });
 const isLoadingState = atom({ key: 'isLoadingState', default: false });
 const initialLoadState = atom({ key: 'isInitialLoadState', default: false });
 const fullScreenState = atom({ key: 'fullScreenState', default: true });
-const lastLoadState = atom({ key: 'lastLoadState', default: null, effects: [cacheEffect] });
+export const lastLoadState = atom({ key: 'lastLoadState', default: null, effects: [cacheEffect] });
 export const loadingTextState = atom({ key: 'loadingTextState', default: 'Chargement des données' });
 
 export default function DataLoader() {
@@ -449,11 +449,11 @@ export function useDataLoader(options = { refreshOnMount: false }) {
   };
 }
 
-function mergeItems(oldItems, newItems = []) {
+export const mergeItems = (oldItems, newItems = []) => {
   const newItemsIds = newItems?.map((i) => i._id) || [];
   const oldItemsPurged = oldItems.filter((i) => !newItemsIds.includes(i._id));
   return [...oldItemsPurged, ...newItems].filter((e) => !e.deletedAt);
-}
+};
 
 const FullScreenContainer = styled.div`
   width: 100%;

@@ -78,7 +78,7 @@ router.put(
           }
         }
 
-        if (req.params.migrationName === "clean-duplicated-reports-2") {
+        if (req.params.migrationName === "clean-duplicated-reports-3") {
           try {
             z.object({
               reportIdsToDelete: z.array(z.string().regex(looseUuidRegex)),
@@ -91,7 +91,7 @@ router.put(
               ),
             }).parse(req.body);
           } catch (e) {
-            const error = new Error(`Invalid request in clean-duplicated-reports-2: ${e}`);
+            const error = new Error(`Invalid request in clean-duplicated-reports-3: ${e}`);
             error.status = 400;
             throw error;
           }

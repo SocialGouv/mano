@@ -68,7 +68,7 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
-      if (!organisation.migrations?.includes('clean-duplicated-reports-2')) {
+      if (!organisation.migrations?.includes('clean-duplicated-reports-3')) {
         setLoadingText(LOADING_TEXT);
         const res = await API.get({
           path: '/report',
@@ -100,19 +100,33 @@ export default function useDataMigrator() {
             // collaborations
           };
           for (const [index, report] of Object.entries(reports)) {
-            if (report.services) consolidatedReport.services = report.services;
-            if (report.description) consolidatedReport.description = report.description;
+            if (report.services) {
+              const oldServices = JSON.parse(consolidatedReport.services || '{}');
+              const newServices = JSON.parse(report.services || '{}');
+              consolidatedReport.services = {};
+              for (const [serviceKey, serviceValue] of Object.entries(oldServices)) {
+                consolidatedReport.services[serviceKey] = (serviceValue || 0) + (consolidatedReport.services[serviceKey] || 0);
+              }
+              for (const [serviceKey, serviceValue] of Object.entries(newServices)) {
+                consolidatedReport.services[serviceKey] = (serviceValue || 0) + (consolidatedReport.services[serviceKey] || 0);
+              }
+              consolidatedReport.services = JSON.stringify(consolidatedReport.services);
+            }
+            if (report.description) {
+              consolidatedReport.description = `${consolidatedReport.description || ''}\n\n${report.description}`;
+            }
             if (report.collaborations) consolidatedReport.collaborations = report.collaborations;
             if (Number(index) !== 0) reportIdsToDelete.push(report._id);
           }
           return consolidatedReport;
         });
+
         const encryptedConsolidatedReports = await Promise.all(
           consolidatedReports.map(prepareReportForEncryption).map(encryptItem(hashedOrgEncryptionKey))
         );
 
         const response = await API.put({
-          path: `/migration/clean-duplicated-reports-2`,
+          path: `/migration/clean-duplicated-reports-3`,
           body: { consolidatedReports: encryptedConsolidatedReports, reportIdsToDelete },
           query: { migrationLastUpdateAt },
         });

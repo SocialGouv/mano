@@ -1,19 +1,23 @@
 import dayjs from 'dayjs';
-import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useMMKVNumber } from 'react-native-mmkv';
+import { useRecoilValue, useRecoilState } from 'recoil';
+import { mergeItems } from '../components/Loader';
 import { currentTeamState } from '../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
-import { currentTeamReportsSelector } from '../scenes/Reports/selectors';
 import API from '../services/api';
 
 const useCreateReportAtDateIfNotExist = () => {
   const currentTeam = useRecoilValue(currentTeamState);
-  const currentTeamReports = useRecoilValue(currentTeamReportsSelector);
-  const setReports = useSetRecoilState(reportsState);
+  const [reports, setReports] = useRecoilState(reportsState);
+  const [lastRefresh] = useMMKVNumber('mano-last-refresh-2022-11-04');
 
   return async (date) => {
+    const latestReportsRes = await API.get({ path: '/report', query: { after: lastRefresh, withDeleted: true } });
+    const allReports = mergeItems(reports, latestReportsRes.decryptedData);
+    setReports(allReports);
     date = dayjs(date).startOf('day').format('YYYY-MM-DD');
-    const reportAtDate = currentTeamReports.find((report) => report.date === date);
-    if (!!reportAtDate) return;
+    const reportAtDate = allReports.find((report) => report.date === date && report.team === currentTeam._id);
+    if (!!reportAtDate) return reportAtDate;
     const res = await API.post({ path: '/report', body: prepareReportForEncryption({ team: currentTeam._id, date }) });
     if (!res.ok) return;
     setReports((reports) => [res.decryptedData, ...reports]);

@@ -1,11 +1,10 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
-import { useDebounce } from 'react-use';
 import { useHistory, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { SmallHeader } from '../../components/header';
-import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
+import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import CreateActionModal from '../../components/CreateActionModal';
@@ -14,9 +13,8 @@ import ButtonCustom from '../../components/ButtonCustom';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import SelectStatus from '../../components/SelectStatus';
 import { actionsState, TODO } from '../../recoil/actions';
-import { currentTeamState, organisationState, userState } from '../../recoil/auth';
+import { currentTeamState, userState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
-import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import useApi from '../../services/api';
 import dayjs from 'dayjs';
@@ -25,12 +23,12 @@ import useTitle from '../../services/useTitle';
 import { capture } from '../../services/sentry';
 import { consultationsState } from '../../recoil/consultations';
 import plusIcon from '../../assets/icons/plus-icon.svg';
-import IncrementorSmall from '../../components/IncrementorSmall';
 import PersonName from '../../components/PersonName';
 import Table from '../../components/table';
 import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
+import ReceptionService from '../../components/ReceptionService';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -103,10 +101,8 @@ const todaysPassagesSelector = selector({
 const Reception = () => {
   useTitle('Accueil');
 
-  const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const setReports = useSetRecoilState(reportsState);
   const setPassages = useSetRecoilState(passagesState);
   const passages = useRecoilValue(todaysPassagesSelector);
   const [status, setStatus] = useState(TODO);
@@ -129,22 +125,11 @@ const Reception = () => {
   const history = useHistory();
   const location = useLocation();
 
-  // for better UX when increase passage
-  const [addingPassage, setAddingPassage] = useState(false);
-
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
     if (!params) return [];
     return params.map((id) => persons.find((p) => p._id === id)).filter(Boolean);
   });
-
-  const [services, setServices] = useState(() => (todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {}));
-  useEffect(() => {
-    // when we change the team, we change the report and we reset the services
-    setServices(todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {});
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [todaysReport?._id]);
-
   const onSelectPerson = (persons) => {
     persons = persons?.filter(Boolean) || [];
     const searchParams = new URLSearchParams(location.search);
@@ -159,53 +144,8 @@ const Reception = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
-  useDebounce(
-    async () => {
-      /*
-      The target of this complicated process is to not create empty reports automatically
-      like we used to do before, so that the page /report is not cluttered with empty reports.
-      The solution is to create a report only if there is at least one thing going one, including a service.
-      */
-
-      // we need to prevent create report on first mount with empty services
-      if (!Object.keys(services).length) return;
-      // we need to prevent update on first mount for nothing
-      if (JSON.stringify(services) === todaysReport?.services) return;
-      const reportUpdate = {
-        team: currentTeam._id,
-        date: startOfToday().format('YYYY-MM-DD'),
-        ...(todaysReport || {}),
-        services: JSON.stringify(services),
-      };
-      const isNew = !todaysReport?._id;
-      if (isNew) {
-        const res = await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) });
-        if (res.ok) {
-          setReports((reports) => [...reports, res.decryptedData]);
-        }
-      } else {
-        const res = await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
-        if (res.ok) {
-          setReports((reports) =>
-            reports.map((a) => {
-              if (a._id === reportUpdate._id) return res.decryptedData;
-              return a;
-            })
-          );
-        }
-      }
-    },
-    process.env.REACT_APP_TEST === 'true' ? 0 : 900,
-    [services]
-  );
-
-  const onServiceUpdate = async (service, newCount) => {
-    const newServices = {
-      ...services,
-      [service]: newCount,
-    };
-    setServices(newServices);
-  };
+  // for better UX when increase passage
+  const [addingPassage, setAddingPassage] = useState(false);
 
   const onAddAnonymousPassage = async () => {
     const optimisticId = Date.now();
@@ -332,15 +272,7 @@ const Reception = () => {
           <ServicesWrapper>
             <h5 className="services-title">Services</h5>
             <div className="services-incrementators">
-              {organisation?.services?.map((service) => (
-                <IncrementorSmall
-                  dataTestId={`${currentTeam?.name}-reception-${service}-${services[service] || 0}`}
-                  key={service}
-                  service={service}
-                  count={services[service] || 0}
-                  onChange={(newCount) => onServiceUpdate(service, newCount)}
-                />
-              ))}
+              <ReceptionService report={todaysReport} team={currentTeam} />
             </div>
           </ServicesWrapper>
         </Col>

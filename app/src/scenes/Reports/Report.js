@@ -141,11 +141,11 @@ const Report = ({ navigation, route }) => {
   const onEdit = () => setEditable((e) => !e);
 
   const onUpdateReport = async () => {
-    const reportToUpdate = reportDB || (await createReportAtDateIfNotExist(day));
+    const reportToUpdate = await createReportAtDateIfNotExist(day); // to make sure we have the last one
     setUpdating(true);
     const response = await API.put({
       path: `/report/${reportToUpdate?._id}`,
-      body: prepareReportForEncryption({ ...reportToUpdate, ...castToReport(report) }),
+      body: prepareReportForEncryption({ ...reportToUpdate, description: report.description }),
     });
     if (response.error) {
       setUpdating(false);
@@ -226,6 +226,7 @@ const Report = ({ navigation, route }) => {
           {editable ? <Label label="Collaboration(s)" /> : <InlineLabel>Collaboration(s) :</InlineLabel>}
           <Tags
             data={report.collaborations}
+            key={report.collaborations}
             onChange={(collaborations) => setReport((r) => ({ ...r, collaborations }))}
             editable={editable}
             onAddRequest={() => navigation.navigate('Collaborations', { report: reportDB, day })}

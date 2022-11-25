@@ -62,7 +62,7 @@ const Collaborations = ({ route, navigation }) => {
   };
 
   const onSubmit = async (newCollaboration) => {
-    const reportToUpdate = route.params?.report || (await createReportAtDateIfNotExist(day));
+    const reportToUpdate = await createReportAtDateIfNotExist(day); // to make sure we have the last one
     setPosting(true);
     const reportUpdate = {
       ...reportToUpdate,
