@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useDebounce } from 'react-use';
@@ -31,6 +31,7 @@ import Table from '../../components/table';
 import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
+import { useDataLoader } from '../../components/DataLoader';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -106,6 +107,7 @@ const Reception = () => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
+  const { refresh, isLoading } = useDataLoader();
   const setReports = useSetRecoilState(reportsState);
   const setPassages = useSetRecoilState(passagesState);
   const passages = useRecoilValue(todaysPassagesSelector);
@@ -139,6 +141,8 @@ const Reception = () => {
   });
 
   const [services, setServices] = useState(() => (todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {}));
+  const servicesRef = useRef(services);
+
   useEffect(() => {
     // when we change the team, we change the report and we reset the services
     setServices(todaysReport?.services?.length ? JSON.parse(todaysReport?.services) : {});
@@ -159,14 +163,21 @@ const Reception = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
+  useDebounce(refresh, process.env.REACT_APP_TEST === 'true' ? 0 : 900, [services]);
+
   useDebounce(
     async () => {
       /*
       The target of this complicated process is to not create empty reports automatically
       like we used to do before, so that the page /report is not cluttered with empty reports.
       The solution is to create a report only if there is at least one thing going one, including a service.
+      And to handle multiple users on the same team working at the same tiem,
+      so that they don't overwrite each other's reports.
+      The solution is to fetch the latest reports and check if there is already a report for today.
       */
 
+      // we wait for the refresh to finish
+      if (isLoading) return;
       // we need to prevent create report on first mount with empty services
       if (!Object.keys(services).length) return;
       // we need to prevent update on first mount for nothing
@@ -196,7 +207,7 @@ const Reception = () => {
       }
     },
     process.env.REACT_APP_TEST === 'true' ? 0 : 900,
-    [services]
+    [isLoading]
   );
 
   const onServiceUpdate = async (service, newCount) => {
