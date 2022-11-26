@@ -133,7 +133,7 @@ const TerritoryObservation = ({ route, navigation }) => {
         return a;
       })
     );
-    createReportAtDateIfNotExist(response.decryptedData.observedAt);
+    await createReportAtDateIfNotExist(response.decryptedData.observedAt);
     setObsDB(response.decryptedData);
     Alert.alert('Observation mise à jour !');
     setUpdating(false);

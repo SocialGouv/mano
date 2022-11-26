@@ -21,6 +21,7 @@ import CheckboxLabelled from '../../components/CheckboxLabelled';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
+import { dayjsInstance } from '../../services/dateDayjs';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -60,7 +61,7 @@ const Consultation = ({ navigation, route }) => {
         organisation: consult.organisation || organisation._id,
       };
     },
-    [organisation._id, organisation.consultations, personDB?._id, user._id]
+    [organisation?._id, organisation.consultations, personDB?._id, user?._id]
   );
 
   const [posting, setPosting] = useState(false);
@@ -114,8 +115,13 @@ const Consultation = ({ navigation, route }) => {
           .sort((a, b) => new Date(b.startDate) - new Date(a.startDate))
       );
     }
-    await createReportAtDateIfNotExist(consultationResponse.decryptedData.createdAt);
-    if (consultationResponse.decryptedData.completedAt) await createReportAtDateIfNotExist(consultationResponse.decryptedData.completedAt);
+    const { createdAt, completedAt } = consultationResponse.decryptedData;
+    await createReportAtDateIfNotExist(createdAt);
+    if (!!completedAt) {
+      if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
+        await createReportAtDateIfNotExist(completedAt);
+      }
+    }
     onBack();
   };
 

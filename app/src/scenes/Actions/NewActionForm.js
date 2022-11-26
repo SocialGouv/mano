@@ -19,6 +19,7 @@ import API from '../../services/api';
 import ActionCategoriesModalSelect from '../../components/ActionCategoriesModalSelect';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
+import { dayjsInstance } from '../../services/dateDayjs';
 
 const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
@@ -91,7 +92,11 @@ const NewActionForm = ({ route, navigation }) => {
       actions.push(response.decryptedData);
     }
     await createReportAtDateIfNotExist(newAction.createdAt);
-    if (newAction.completedAt) await createReportAtDateIfNotExist(newAction.completedAt);
+    if (!!newAction.completedAt) {
+      if (dayjsInstance(newAction.completedAt).format('YYYY-MM-DD') !== dayjsInstance(newAction.createdAt).format('YYYY-MM-DD')) {
+        await createReportAtDateIfNotExist(newAction.completedAt);
+      }
+    }
     // because when we go back from Action to ActionsList, we don't want the Back popup to be triggered
     backRequestHandledRef.current = true;
     Sentry.setContext('action', { _id: newAction._id });

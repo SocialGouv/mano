@@ -7,7 +7,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { organisationState, teamsState, userState } from '../recoil/auth';
-import { dateForDatePicker } from '../services/date';
+import { dateForDatePicker, dayjsInstance } from '../services/date';
 import useApi from '../services/api';
 
 import SelectTeam from './SelectTeam';
@@ -31,7 +31,13 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
     if (body.status !== TODO) body.completedAt = completedAt || Date.now();
     const response = await API.post({ path: '/action', body: prepareActionForEncryption(body) });
     if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
-    await createReportAtDateIfNotExist(response.decryptedData.date);
+    const { createdAt } = response.decryptedData;
+    await createReportAtDateIfNotExist(createdAt);
+    if (!!completedAt) {
+      if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
+        await createReportAtDateIfNotExist(completedAt);
+      }
+    }
     return response;
   };
 

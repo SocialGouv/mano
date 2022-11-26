@@ -21,7 +21,7 @@ import SelectTeam from '../../components/SelectTeam';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker, now } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
@@ -147,7 +147,11 @@ const View = () => {
               })
             );
             await createReportAtDateIfNotExist(newAction.createdAt);
-            if (newAction.completedAt) await createReportAtDateIfNotExist(newAction.completedAt);
+            if (!!newAction.completedAt) {
+              if (dayjsInstance(newAction.completedAt).format('YYYY-MM-DD') !== dayjsInstance(newAction.createdAt).format('YYYY-MM-DD')) {
+                await createReportAtDateIfNotExist(newAction.completedAt);
+              }
+            }
             if (statusChanged) {
               const comment = {
                 comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
