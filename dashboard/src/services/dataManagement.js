@@ -2,7 +2,7 @@ import localforage from 'localforage';
 import { capture } from './sentry';
 
 export let manoCacheStorage = undefined;
-
+export const dashboardCurrentCacheKey = 'mano-last-refresh-2022-11-27';
 // init
 export async function getManoCacheStorage() {
   if (manoCacheStorage !== undefined) return manoCacheStorage;
@@ -10,11 +10,19 @@ export async function getManoCacheStorage() {
   for (const driver of allowedDrivers) {
     if (localforage.supports(driver)) {
       try {
+        localforage.dropInstance({
+          name: 'mano-dashboard',
+          storeName: 'mano_cache',
+        });
+      } catch (e) {
+        capture(e);
+      }
+      try {
         localforage.config({
           name: 'mano-dashboard',
           version: 1.0,
           driver: allowedDrivers,
-          storeName: 'mano_cache', // Should be alphanumeric, with underscores.
+          storeName: dashboardCurrentCacheKey, // Should be alphanumeric, with underscores.
           description: 'save Mano organisation data to cache to make the app faster',
         });
 
@@ -45,6 +53,7 @@ export async function getManoCacheStorage() {
 export async function clearCache() {
   (await getManoCacheStorage())?.clear();
   window.localStorage?.clear();
+  window.sessionStorage?.clear();
 }
 
 export async function setCacheItem(key, value) {

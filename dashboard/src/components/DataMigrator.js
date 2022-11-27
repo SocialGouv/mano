@@ -68,7 +68,7 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
-      if (!organisation.migrations?.includes('clean-duplicated-reports-3')) {
+      if (!organisation.migrations?.includes('clean-duplicated-reports-4')) {
         setLoadingText(LOADING_TEXT);
         const res = await API.get({
           path: '/report',
@@ -126,7 +126,7 @@ export default function useDataMigrator() {
         );
 
         const response = await API.put({
-          path: `/migration/clean-duplicated-reports-3`,
+          path: `/migration/clean-duplicated-reports-4`,
           body: { consolidatedReports: encryptedConsolidatedReports, reportIdsToDelete },
           query: { migrationLastUpdateAt },
         });

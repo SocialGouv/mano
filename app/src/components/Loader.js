@@ -8,7 +8,7 @@ import picture1 from '../assets/MANO_livraison_elements-04.png';
 import picture2 from '../assets/MANO_livraison_elements-05.png';
 import picture3 from '../assets/MANO_livraison_elements_Plan_de_travail.png';
 import { atom, useRecoilState, useRecoilValue } from 'recoil';
-import { getData } from '../services/dataManagement';
+import { appCurrentCacheKey, getData } from '../services/dataManagement';
 import { useMMKVNumber } from 'react-native-mmkv';
 import { organisationState, userState } from '../recoil/auth';
 import { actionsState } from '../recoil/actions';
@@ -62,7 +62,7 @@ export const mergeItems = (oldItems, newItems) => {
 
 const Loader = () => {
   const [picture, setPicture] = useState([picture1, picture3, picture2][randomIntFromInterval(0, 2)]);
-  const [lastRefresh, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-11-04');
+  const [lastRefresh, setLastRefresh] = useMMKVNumber(appCurrentCacheKey);
 
   const [loading, setLoading] = useRecoilState(loadingState);
   const [progress, setProgress] = useRecoilState(progressState);

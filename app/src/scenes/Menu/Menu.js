@@ -10,7 +10,7 @@ import { FRAMAFORM_MANO, MANO_DOWNLOAD_URL } from '../../config';
 import { useRecoilValue, useResetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { useMMKVNumber } from 'react-native-mmkv';
-import { clearCache } from '../../services/dataManagement';
+import { clearCache, appCurrentCacheKey } from '../../services/dataManagement';
 
 const Menu = ({ navigation }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -18,7 +18,7 @@ const Menu = ({ navigation }) => {
   const resetUser = useResetRecoilState(userState);
   const resetTeams = useResetRecoilState(teamsState);
   const resetCurrentTeam = useResetRecoilState(currentTeamState);
-  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-11-04');
+  const [_, setLastRefresh] = useMMKVNumber(appCurrentCacheKey);
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 

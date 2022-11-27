@@ -18,18 +18,17 @@ import { consultationsState, whitelistAllowedData } from '../recoil/consultation
 import { commentsState } from '../recoil/comments';
 import { organisationState, userState } from '../recoil/auth';
 
-import { clearCache, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
+import { clearCache, dashboardCurrentCacheKey, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
 import useApi from '../services/api';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
 
 // Update to flush cache.
-const currentCacheKey = 'mano-last-refresh-2022-11-25';
 
 const cacheEffect = ({ onSet }) => {
   onSet(async (newValue) => {
-    await setCacheItem(currentCacheKey, newValue);
+    await setCacheItem(dashboardCurrentCacheKey, newValue);
   });
 };
 
@@ -98,7 +97,7 @@ export default function DataLoader() {
     if (shouldStart) {
       Promise.resolve()
         .then(() => (initialLoad ? migrateData() : Promise.resolve()))
-        .then(() => getCacheItem(currentCacheKey))
+        .then(() => getCacheItem(dashboardCurrentCacheKey))
         .then((lastLoadValue) => {
           setLastLoad(lastLoadValue || 0);
           API.get({
