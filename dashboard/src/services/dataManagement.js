@@ -10,10 +10,11 @@ export async function getManoCacheStorage() {
   for (const driver of allowedDrivers) {
     if (localforage.supports(driver)) {
       try {
-        localforage.dropInstance({
-          name: 'mano-dashboard',
-          storeName: 'mano_cache',
-        });
+        const currentCacheKey = window.localStorage.getItem('mano-currentCacheKey');
+        if (currentCacheKey !== dashboardCurrentCacheKey) {
+          localforage.dropInstance({ name: 'mano-dashboard' });
+        }
+        window.localStorage.setItem('mano-currentCacheKey', dashboardCurrentCacheKey);
       } catch (e) {
         capture(e);
       }
