@@ -1,3 +1,10 @@
+## [1.177.17](https://github.com/SocialGouv/mano/compare/v1.177.16...v1.177.17) (2022-11-27)
+
+
+### Bug Fixes
+
+* **app,dashboard:** report creation for action completedAt ([#1006](https://github.com/SocialGouv/mano/issues/1006)) ([c236f46](https://github.com/SocialGouv/mano/commit/c236f460c8a70e26585de299b88cc2aa172cb815))
+
 ## [1.177.16](https://github.com/SocialGouv/mano/compare/v1.177.15...v1.177.16) (2022-11-26)
 
 
