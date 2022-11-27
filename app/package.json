@@ -1,6 +1,6 @@
 {
   "name": "mano",
-  "version": "2.27.4",
+  "version": "2.27.5",
   "private": true,
   "scripts": {
     "get-ip": "./get-ip.sh",
