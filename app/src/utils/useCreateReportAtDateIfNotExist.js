@@ -5,11 +5,12 @@ import { mergeItems } from '../components/Loader';
 import { currentTeamState } from '../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import API from '../services/api';
+import { appCurrentCacheKey } from '../services/dataManagement';
 
 const useCreateReportAtDateIfNotExist = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const [reports, setReports] = useRecoilState(reportsState);
-  const [lastRefresh] = useMMKVNumber('mano-last-refresh-2022-11-04');
+  const [lastRefresh] = useMMKVNumber(appCurrentCacheKey);
 
   return async (date) => {
     const latestReportsRes = await API.get({ path: '/report', query: { after: lastRefresh, withDeleted: true } });

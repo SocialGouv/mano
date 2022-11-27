@@ -2,6 +2,8 @@ import API from '../services/api';
 import { MMKV } from 'react-native-mmkv';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+export const appCurrentCacheKey = 'mano_last_refresh_2022_11_28';
+
 export const mergeNewUpdatedData = (newData, oldData) => {
   const oldDataIds = oldData.map((p) => p._id);
   const updatedItems = newData.filter((p) => oldDataIds.includes(p._id));
@@ -22,7 +24,17 @@ export const storage = new MMKV();
 export async function clearCache() {
   storage.clearAll();
   await AsyncStorage.clear();
+  initCacheAndcheckIfExpired();
 }
+
+export const initCacheAndcheckIfExpired = () => {
+  const storedCurrentCacheKey = storage.getString('mano-currentCacheKey');
+  if (storedCurrentCacheKey !== appCurrentCacheKey) {
+    clearCache();
+  }
+  storage.set('mano-currentCacheKey', appCurrentCacheKey);
+};
+initCacheAndcheckIfExpired();
 
 // Get data from cache or fetch from server.
 export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {

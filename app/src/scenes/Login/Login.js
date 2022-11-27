@@ -18,7 +18,7 @@ import Title, { SubTitle } from '../../components/Title';
 import { DEVMODE_ENCRYPTION_KEY, DEVMODE_PASSWORD, MANO_DOWNLOAD_URL, VERSION } from '../../config';
 import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import { clearCache } from '../../services/dataManagement';
+import { clearCache, appCurrentCacheKey } from '../../services/dataManagement';
 import { refreshTriggerState } from '../../components/Loader';
 import { useIsFocused } from '@react-navigation/native';
 
@@ -35,7 +35,7 @@ const Login = ({ navigation }) => {
   const [loading, setLoading] = useState(false);
   const setUser = useSetRecoilState(userState);
   // eslint-disable-next-line no-unused-vars
-  const [_, setLastRefresh] = useMMKVNumber('mano-last-refresh-2022-11-04');
+  const [_, setLastRefresh] = useMMKVNumber(appCurrentCacheKey);
   const setOrganisation = useSetRecoilState(organisationState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
@@ -72,8 +72,8 @@ const Login = ({ navigation }) => {
         setAuthViaCookie(true);
         API.onLogIn();
         const { organisation } = user;
-        if (organisation._id !== storageOrganisationId) {
-          clearCache();
+        if (!!storageOrganisationId && organisation._id !== storageOrganisationId) {
+          clearCache('not same org');
           setLastRefresh(0);
         }
         setStorageOrganisationId(organisation._id);
@@ -171,8 +171,8 @@ const Login = ({ navigation }) => {
       setUser(response.user);
       setOrganisation(response.user.organisation);
       // We need to reset cache if organisation has changed.
-      if (response.user.organisation._id !== storageOrganisationId) {
-        clearCache();
+      if (!!storageOrganisationId && response.user.organisation._id !== storageOrganisationId) {
+        clearCache('again not same org');
         setLastRefresh(0);
       }
       setStorageOrganisationId(response.user.organisation._id);
