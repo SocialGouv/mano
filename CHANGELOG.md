@@ -1,3 +1,10 @@
+## [1.177.18](https://github.com/SocialGouv/mano/compare/v1.177.17...v1.177.18) (2022-11-27)
+
+
+### Bug Fixes
+
+* clear cache method ([#1007](https://github.com/SocialGouv/mano/issues/1007)) ([e7f7426](https://github.com/SocialGouv/mano/commit/e7f74268f85d64ed3983b24bf181883e2975016e))
+
 ## [1.177.17](https://github.com/SocialGouv/mano/compare/v1.177.16...v1.177.17) (2022-11-27)
 
 
