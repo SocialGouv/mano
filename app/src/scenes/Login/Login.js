@@ -72,8 +72,8 @@ const Login = ({ navigation }) => {
         setAuthViaCookie(true);
         API.onLogIn();
         const { organisation } = user;
-        if (organisation._id !== storageOrganisationId) {
-          clearCache();
+        if (!!storageOrganisationId && organisation._id !== storageOrganisationId) {
+          clearCache('not same org');
           setLastRefresh(0);
         }
         setStorageOrganisationId(organisation._id);
@@ -171,8 +171,8 @@ const Login = ({ navigation }) => {
       setUser(response.user);
       setOrganisation(response.user.organisation);
       // We need to reset cache if organisation has changed.
-      if (response.user.organisation._id !== storageOrganisationId) {
-        clearCache();
+      if (!!storageOrganisationId && response.user.organisation._id !== storageOrganisationId) {
+        clearCache('again not same org');
         setLastRefresh(0);
       }
       setStorageOrganisationId(response.user.organisation._id);

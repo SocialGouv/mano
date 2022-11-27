@@ -20,23 +20,21 @@ export const mergeNewUpdatedData = (newData, oldData) => {
 };
 
 export const storage = new MMKV();
-const keys = storage.getAllKeys();
 
-export async function clearCache() {
+export async function clearCache(from) {
   storage.clearAll();
   await AsyncStorage.clear();
+  initCacheAndcheckIfExpired();
 }
 
-const checkIfCacheIsExpired = () => {
+export const initCacheAndcheckIfExpired = () => {
   const storedCurrentCacheKey = storage.getString('mano-currentCacheKey');
   if (storedCurrentCacheKey !== appCurrentCacheKey) {
-    console.log('CLEAR CACHE');
     clearCache();
   }
-  console.log(storage.getAllKeys());
   storage.set('mano-currentCacheKey', appCurrentCacheKey);
 };
-checkIfCacheIsExpired();
+initCacheAndcheckIfExpired();
 
 // Get data from cache or fetch from server.
 export async function getData({ collectionName, data = [], isInitialization = false, setProgress = () => {}, setBatchData = null, lastRefresh = 0 }) {
