@@ -16,7 +16,7 @@ import {
   healthInsuranceOptions,
 } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
-import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
 import SelectAsInput from '../../components/SelectAsInput';
 import CustomFieldInput from '../../components/CustomFieldInput';
@@ -722,8 +722,13 @@ export function MedicalFile({ person }) {
                   .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
               );
             }
-            await createReportAtDateIfNotExist(consultationResponse.decryptedData.createdAt);
-            if (consultationResponse.decryptedData.completedAt) await createReportAtDateIfNotExist(consultationResponse.decryptedData.completedAt);
+            const { createdAt, completedAt } = consultationResponse.decryptedData;
+            await createReportAtDateIfNotExist(createdAt);
+            if (!!completedAt) {
+              if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
+                await createReportAtDateIfNotExist(completedAt);
+              }
+            }
             resetCurrentConsultation();
           }}>
           {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (

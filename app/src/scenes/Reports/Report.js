@@ -72,6 +72,7 @@ const Report = ({ navigation, route }) => {
   const [day] = useState(() => route.params?.day);
   const [reportDB, setReportDB] = useState(() => route?.params?.report);
   const [report, setReport] = useState(() => castToReport(reportDB));
+  const reportCreatedRef = useRef(!!reportDB?._id);
 
   const actionsCreated = useRecoilValue(actionsCreatedForReport({ date: day }));
   const actionsCompleted = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: DONE }));
@@ -94,6 +95,7 @@ const Report = ({ navigation, route }) => {
       }
       // to update regarding actions etc.
       if (actionsCreated.length || actionsCompleted.length || actionsCanceled.length || comments.length || observations.length) {
+        if (!!reportCreatedRef.current) return;
         (async () => {
           const newReport = await createReportAtDateIfNotExist(day);
           setReportDB(newReport);

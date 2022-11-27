@@ -30,6 +30,7 @@ import { currentTeamState, organisationState, userState } from '../../recoil/aut
 import { capture } from '../../services/sentry';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
+import { dayjsInstance } from '../../services/dateDayjs';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -214,8 +215,7 @@ const Action = ({ navigation, route }) => {
           return a;
         })
       );
-      await createReportAtDateIfNotExist(newAction.createdAt);
-      if (newAction.completedAt) await createReportAtDateIfNotExist(newAction.completedAt);
+      if (!!newAction.completedAt) await createReportAtDateIfNotExist(newAction.completedAt);
       if (!statusChanged) return response;
       const comment = {
         comment: `${user.name} a changé le status de l'action: ${mappedIdsToLabels.find((status) => status._id === newAction.status)?.name}`,
@@ -297,7 +297,7 @@ const Action = ({ navigation, route }) => {
       return;
     }
     setActions((actions) => [response.decryptedData, ...actions]);
-    createReportAtDateIfNotExist(response.decryptedData.createdAt);
+    await createReportAtDateIfNotExist(response.decryptedData.createdAt);
 
     for (let c of comments.filter((c) => c.action === actionDB._id).filter((c) => !c.comment.includes('a changé le status'))) {
       const body = {

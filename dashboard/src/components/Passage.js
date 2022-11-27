@@ -80,9 +80,9 @@ const Passage = ({ passage, onFinished }) => {
                     });
                     if (response.ok) {
                       setPassages((passages) => [response.decryptedData, ...passages]);
-                      await createReportAtDateIfNotExist(response.decryptedData.date);
                     }
                   }
+                  await createReportAtDateIfNotExist(newPassage.date);
                 } else if (showMultiSelect) {
                   for (const person of body.persons) {
                     const response = await API.post({
