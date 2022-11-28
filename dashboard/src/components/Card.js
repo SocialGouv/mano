@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { theme } from '../config';
 
-const Card = ({ title, count, unit, children, onChange, countId }) => {
+const Card = ({ title, count, unit, children, onChange, countId, dataTestId }) => {
   const [localcount, setLocalcount] = useState(count);
 
   const changeTimeout = useRef(null);
@@ -32,7 +32,9 @@ const Card = ({ title, count, unit, children, onChange, countId }) => {
             onChange={(e) => onChangeRequest(Number(e.currentTarget.value))}
           />
         ) : (
-          <span id={countId}>{count}</span>
+          <span data-test-id={`${dataTestId}-${count}`} id={countId}>
+            {count}
+          </span>
         )}
         {!!unit && <Unit>{unit}</Unit>}
       </CardCount>

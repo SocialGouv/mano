@@ -1,21 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { populate } from "./scripts/populate-db";
+import { loginWith } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
 });
 
 test("test", async ({ page }) => {
-  await page.goto("http://localhost:8090/");
-  await page.goto("http://localhost:8090/auth");
-
-  await page.getByLabel("Email").click();
-  await page.getByLabel("Email").fill("admin8@example.org");
-  await page.getByLabel("Mot de passe").click();
-  await page.getByLabel("Mot de passe").fill("secret");
-  await page.getByLabel("Mot de passe").press("Enter");
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
-  await page.getByRole("button", { name: "Se connecter" }).click();
+  await loginWith(page, "admin8@example.org");
 
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Chiffrement" }).click();
@@ -34,7 +26,7 @@ test("test", async ({ page }) => {
   await page.getByText("Données chiffrées ! Veuillez noter la clé puis vous reconnecter").click();
   await page.locator("data-test-id=encryption-modal").getByRole("button", { name: "Close" }).click();
 
-  await page.getByRole("button", { name: "User Test - 8" }).click();
+  await page.getByRole("button", { name: "User Admin Test - 8" }).click();
   await page.getByRole("menuitem", { name: "Se déconnecter" }).click();
 
   await expect(page).toHaveURL("http://localhost:8090/auth");
