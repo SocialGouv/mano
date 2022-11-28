@@ -212,7 +212,9 @@ const MergeTwoPersons = ({ person }) => {
                 const historyEntry = {
                   date: new Date(),
                   user: user._id,
-                  data: {},
+                  data: {
+                    merge: { _id: personToMergeAndDelete._id, name: personToMergeAndDelete.name },
+                  },
                 };
                 for (const key in body) {
                   if (!allowedFieldsInHistory.includes(key)) continue;

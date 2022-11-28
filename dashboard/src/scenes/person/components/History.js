@@ -39,6 +39,18 @@ const History = ({ person }) => {
                   <div>
                     {Object.entries(h.data).map(([key, value]) => {
                       const personField = personFieldsIncludingCustomFields.find((f) => f.name === key);
+                      if (key === 'merge') {
+                        return (
+                          <p className="tw-flex tw-flex-col" key={key}>
+                            <span>
+                              Fusion avec : <code>"{value.name}"</code>
+                            </span>
+                            <small className="tw-opacity-30">
+                              Identifiant: <code>"{value._id}"</code>
+                            </small>
+                          </p>
+                        );
+                      }
                       if (key === 'assignedTeams') {
                         return (
                           <p className="tw-flex tw-flex-col" key={key}>
