@@ -29,6 +29,7 @@ async function createUsersAndOrgas() {
     const normalUserId = uuidv4();
     const restrictedUserId = uuidv4();
     const teamId = uuidv4();
+    const passwordSecret = bcrypt.hashSync("secret", 10);
 
     const date = "2021-01-01";
 
@@ -95,7 +96,7 @@ async function createUsersAndOrgas() {
         $4,
         true
       );`,
-      [adminId, bcrypt.hashSync("secret", 10), orgId, date, date, `User Admin Test - ${i}`, `admin${i}@example.org`]
+      [adminId, passwordSecret, orgId, date, date, `User Admin Test - ${i}`, `admin${i}@example.org`]
     );
 
     await client.query(
@@ -130,15 +131,7 @@ async function createUsersAndOrgas() {
         $4,
         true
       );`,
-      [
-        healthProfessionalId,
-        bcrypt.hashSync("secret", 10),
-        orgId,
-        date,
-        date,
-        `User Health Professional Test - ${i}`,
-        `healthProfessional${i}@example.org`,
-      ]
+      [healthProfessionalId, passwordSecret, orgId, date, date, `User Health Professional Test - ${i}`, `healthprofessional${i}@example.org`]
     );
 
     await client.query(
@@ -173,7 +166,7 @@ async function createUsersAndOrgas() {
         $4,
         false
       );`,
-      [normalUserId, bcrypt.hashSync("secret", 10), orgId, date, date, `User Normal Test - ${i}`, `normal${i}@example.org`]
+      [normalUserId, passwordSecret, orgId, date, date, `User Normal Test - ${i}`, `normal${i}@example.org`]
     );
 
     await client.query(
@@ -201,14 +194,14 @@ async function createUsersAndOrgas() {
         $4,
         $4,
         $4,
-        'normal',
+        'restricted-access',
         $5::date,
         null,
         null,
         $4,
         false
       );`,
-      [restrictedUserId, bcrypt.hashSync("secret", 10), orgId, date, date, `User Restricted Test - ${i}`, `restricted${i}@example.org`]
+      [restrictedUserId, passwordSecret, orgId, date, date, `User Restricted Test - ${i}`, `restricted${i}@example.org`]
     );
 
     await client.query(
