@@ -7,7 +7,7 @@ test.beforeAll(async () => {
   await populate();
 });
 
-test("test", async ({ page }) => {
+test("Add history to merged person", async ({ page }) => {
   // Always use a new items
   const originPersonName = nanoid();
   const originPersonOtherName = nanoid();
@@ -94,7 +94,7 @@ test("test", async ({ page }) => {
   await page.locator(".Toastify__close-button").last().click();
   await page.getByRole("button", { name: "Historique" }).click();
 
-  await page.locator(`[data-test-id="Autres pseudos\\: \\"${originPersonOtherName}\\" ➔ \\"${mergedPersonOtherName}\\""]`).click();
-
-  await page.locator(`[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"${originPersonOtherName}\\""]`).click();
+  await expect(page.locator(`[data-test-id="Autres pseudos\\: \\"${originPersonOtherName}\\" ➔ \\"${mergedPersonOtherName}\\""]`)).toBeVisible();
+  await expect(page.locator(`[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"${originPersonOtherName}\\""]`)).toBeVisible();
+  await expect(page.getByText(`Fusion avec : "${mergePersonName}"`)).toBeVisible();
 });
