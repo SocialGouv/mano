@@ -3,6 +3,7 @@ import { useHistory } from 'react-router-dom';
 import { Badge, Button } from 'reactstrap';
 import styled from 'styled-components';
 import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
+import ActionName from './ActionName';
 import ActionStatus from './ActionStatus';
 import ExclamationMarkButton from './ExclamationMarkButton';
 import PersonName from './PersonName';
@@ -130,7 +131,7 @@ function ActionsOfDay({ actions }) {
             </div>
           )}
           <div>
-            <div>{action.name}</div>
+            <ActionName action={action} />
             <div>
               {action.categories?.map((category) => (
                 <Badge style={{ margin: '2px', fontSize: '11px', fontWeight: 'normal', whiteSpace: 'break-spaces' }} color="info" key={category}>

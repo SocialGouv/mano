@@ -53,7 +53,7 @@ router.post(
 router.get(
   "/",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"], { healthcareProfessional: true }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({

@@ -31,6 +31,12 @@ export const prepareConsultationForEncryption = (customFieldsConsultations) => (
   };
 };
 
+export const defaultConsultationFields = { isConsultation: true, withTime: true };
+
+export const formatConsultation = (consultation) => {
+  return { ...consultation, ...defaultConsultationFields };
+};
+
 const allowedFieldsForNonProfessional = [
   '_id',
   'organisation',
@@ -45,17 +51,14 @@ const allowedFieldsForNonProfessional = [
   'user',
 ];
 
-export const defaultConsultationFields = { isConsultation: true, withTime: true };
-
-export const whitelistAllowedData = (consultation, user) => {
+export const getConsultationField = (consultation, field, user) => {
+  console.log(consultation, field, user);
+  console.log(!user.healthcareProfessional || (consultation.onlyVisibleBy?.length && !consultation.onlyVisibleBy.includes(user._id)));
   if (!user.healthcareProfessional || (consultation.onlyVisibleBy?.length && !consultation.onlyVisibleBy.includes(user._id))) {
-    const allowedConsultation = { ...defaultConsultationFields };
-    for (const allowedField of allowedFieldsForNonProfessional) {
-      allowedConsultation[allowedField] = consultation[allowedField];
-    }
-    return allowedConsultation;
+    if (allowedFieldsForNonProfessional.includes(field)) return consultation[field];
+    return '';
   }
-  return { ...consultation, ...defaultConsultationFields };
+  return consultation[field];
 };
 
 export const disableConsultationRow = (actionOrConsultation, user) => {
