@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import "dayjs/locale/fr";
-import { changeReactSelectValue, clickOnEmptyReactSelect } from "./utils";
+import { changeReactSelectValue, clickOnEmptyReactSelect, loginWith } from "./utils";
 import { populate } from "./scripts/populate-db";
 
 dayjs.extend(utc);
@@ -21,17 +21,7 @@ test("Merge persons", async ({ page }) => {
   let person1DocumentLink: string | null = null;
   let person2DocumentLink: string | null = null;
 
-  await test.step("Log in", async () => {
-    await page.goto("http://localhost:8090/auth");
-    await page.getByLabel("Email").click();
-    await page.getByLabel("Email").fill("admin5@example.org");
-    await page.getByLabel("Mot de passe").click();
-    await page.getByLabel("Mot de passe").fill("secret");
-    await page.getByRole("button", { name: "Se connecter" }).click();
-    await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
-    await page.getByRole("button", { name: "Se connecter" }).click();
-    await expect(page).toHaveURL("http://localhost:8090/reception?calendarTab=2");
-  });
+  await loginWith(page, "admin5@example.org");
 
   await test.step("Create persons and upload files", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();

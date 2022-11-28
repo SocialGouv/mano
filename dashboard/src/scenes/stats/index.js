@@ -636,6 +636,7 @@ const Stats = () => {
             <CustomFieldsStats
               data={observations}
               customFields={customFieldsObs}
+              dataTestId="number-observations"
               additionalCols={[
                 {
                   title: "Nombre d'observation de territoire",
@@ -978,7 +979,7 @@ const BlockTotal = ({ title, unit, data, field }) => {
   return null;
 };
 
-function CustomFieldsStats({ customFields, data, additionalCols = [] }) {
+function CustomFieldsStats({ customFields, data, additionalCols = [], dataTestId = '' }) {
   const team = useRecoilValue(currentTeamState);
   function getColsSize(totalCols) {
     if (totalCols === 1) return 12;
@@ -1007,7 +1008,7 @@ function CustomFieldsStats({ customFields, data, additionalCols = [] }) {
           {additionalCols.map((col) => (
             <Col md={colSize} style={{ marginBottom: 20 }} key={col.title}>
               {/* TODO: fix alignment. */}
-              <Card title={col.title} count={col.value} children={<div></div>} />
+              <Card title={col.title} count={col.value} children={<div></div>} dataTestId={dataTestId} />
             </Col>
           ))}
           {customFieldsNumber.map((field) => (

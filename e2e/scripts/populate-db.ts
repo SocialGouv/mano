@@ -16,13 +16,19 @@ async function createUsersAndOrgas() {
   await client.connect();
   await client.query(`delete from mano."Organisation" where name like 'Orga Test - %'`);
   await client.query(`delete from mano."User" where name like 'User Test - %'`);
+  await client.query(`delete from mano."User" where name like 'User Admin Test - %'`);
+  await client.query(`delete from mano."User" where name like 'User Health Professional Test - %'`);
+  await client.query(`delete from mano."User" where name like 'User Normal Test - %'`);
+  await client.query(`delete from mano."User" where name like 'User Restricted Test - %'`);
   await client.query(`delete from mano."Team" where name like 'Team Test - %'`);
 
   for (let i = 1; i < 12; i++) {
     const orgId = uuidv4();
-    const userId = uuidv4();
+    const adminId = uuidv4();
+    const healthProfessionalId = uuidv4();
+    const normalUserId = uuidv4();
+    const restrictedUserId = uuidv4();
     const teamId = uuidv4();
-    const relUserTeamId = uuidv4();
 
     const date = "2021-01-01";
 
@@ -89,7 +95,120 @@ async function createUsersAndOrgas() {
         $4,
         true
       );`,
-      [userId, bcrypt.hashSync("secret", 10), orgId, date, date, `User Test - ${i}`, `admin${i}@example.org`]
+      [adminId, bcrypt.hashSync("secret", 10), orgId, date, date, `User Admin Test - ${i}`, `admin${i}@example.org`]
+    );
+
+    await client.query(
+      `INSERT INTO mano."User" (
+        _id,
+        name,
+        email,
+        password,
+        organisation,
+        "lastLoginAt",
+        "createdAt",
+        "updatedAt",
+        role,
+        "lastChangePasswordAt",
+        "forgotPasswordResetExpires",
+        "forgotPasswordResetToken",
+        "termsAccepted",
+        "healthcareProfessional"
+      ) VALUES (
+        $1,
+        $6,
+        $7,
+        $2,
+        $3,
+        $4,
+        $4,
+        $4,
+        'normal',
+        $5::date,
+        null,
+        null,
+        $4,
+        true
+      );`,
+      [
+        healthProfessionalId,
+        bcrypt.hashSync("secret", 10),
+        orgId,
+        date,
+        date,
+        `User Health Professional Test - ${i}`,
+        `healthProfessional${i}@example.org`,
+      ]
+    );
+
+    await client.query(
+      `INSERT INTO mano."User" (
+        _id,
+        name,
+        email,
+        password,
+        organisation,
+        "lastLoginAt",
+        "createdAt",
+        "updatedAt",
+        role,
+        "lastChangePasswordAt",
+        "forgotPasswordResetExpires",
+        "forgotPasswordResetToken",
+        "termsAccepted",
+        "healthcareProfessional"
+      ) VALUES (
+        $1,
+        $6,
+        $7,
+        $2,
+        $3,
+        $4,
+        $4,
+        $4,
+        'normal',
+        $5::date,
+        null,
+        null,
+        $4,
+        false
+      );`,
+      [normalUserId, bcrypt.hashSync("secret", 10), orgId, date, date, `User Normal Test - ${i}`, `normal${i}@example.org`]
+    );
+
+    await client.query(
+      `INSERT INTO mano."User" (
+        _id,
+        name,
+        email,
+        password,
+        organisation,
+        "lastLoginAt",
+        "createdAt",
+        "updatedAt",
+        role,
+        "lastChangePasswordAt",
+        "forgotPasswordResetExpires",
+        "forgotPasswordResetToken",
+        "termsAccepted",
+        "healthcareProfessional"
+      ) VALUES (
+        $1,
+        $6,
+        $7,
+        $2,
+        $3,
+        $4,
+        $4,
+        $4,
+        'normal',
+        $5::date,
+        null,
+        null,
+        $4,
+        false
+      );`,
+      [restrictedUserId, bcrypt.hashSync("secret", 10), orgId, date, date, `User Restricted Test - ${i}`, `restricted${i}@example.org`]
     );
 
     await client.query(
@@ -123,7 +242,58 @@ async function createUsersAndOrgas() {
         $4,
         $4
       );`,
-      [relUserTeamId, userId, teamId, date]
+      [uuidv4(), adminId, teamId, date]
+    );
+
+    await client.query(
+      `INSERT INTO mano."RelUserTeam" (
+        _id,
+        "user",
+        "team",
+        "createdAt",
+        "updatedAt"
+      ) VALUES (
+        $1,
+        $2,
+        $3,
+        $4,
+        $4
+      );`,
+      [uuidv4(), healthProfessionalId, teamId, date]
+    );
+
+    await client.query(
+      `INSERT INTO mano."RelUserTeam" (
+        _id,
+        "user",
+        "team",
+        "createdAt",
+        "updatedAt"
+      ) VALUES (
+        $1,
+        $2,
+        $3,
+        $4,
+        $4
+      );`,
+      [uuidv4(), normalUserId, teamId, date]
+    );
+
+    await client.query(
+      `INSERT INTO mano."RelUserTeam" (
+        _id,
+        "user",
+        "team",
+        "createdAt",
+        "updatedAt"
+      ) VALUES (
+        $1,
+        $2,
+        $3,
+        $4,
+        $4
+      );`,
+      [uuidv4(), restrictedUserId, teamId, date]
     );
   }
   await client.end();

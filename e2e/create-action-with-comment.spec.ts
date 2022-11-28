@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { changeReactSelectValue } from "./utils";
+import { changeReactSelectValue, loginWith } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
@@ -12,15 +12,7 @@ test("Create action with comments", async ({ page }) => {
   const person2Name = nanoid();
   // const person2Name = "person 2";
 
-  await page.goto("http://localhost:8090/");
-  await page.goto("http://localhost:8090/auth");
-  await page.getByLabel("Email").click();
-  await page.getByLabel("Email").fill("admin7@example.org");
-  await page.getByLabel("Mot de passe").fill("secret");
-  await page.getByLabel("Mot de passe").press("Enter");
-  await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
-  await page.getByLabel("Clé de chiffrement d'organisation").press("Enter");
-  await expect(page).toHaveURL("http://localhost:8090/reception?calendarTab=2");
+  await loginWith(page, "admin7@example.org");
 
   await page.getByRole("link", { name: "Personnes suivies" }).click();
   await expect(page).toHaveURL("http://localhost:8090/person");
