@@ -13,7 +13,7 @@ test.beforeAll(async () => {
   await populate();
 });
 
-test("Cross teams report", async ({ page }) => {
+test("Person creation", async ({ page }) => {
   // Always use a new items
   const person1Name = nanoid();
   const person2Name = nanoid();

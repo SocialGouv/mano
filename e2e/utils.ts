@@ -17,5 +17,11 @@ export async function loginWith(page: Page, email: string, password: string = "s
   await page.getByRole("button", { name: "Se connecter" }).click();
   await page.getByLabel("Clé de chiffrement d'organisation").fill(orgKey);
   await page.getByRole("button", { name: "Se connecter" }).click();
-  await expect(page).toHaveURL("http://localhost:8090/reception?calendarTab=2");
+}
+
+export async function logOut(page: Page, name: string) {
+  await page.getByRole("button", { name }).click();
+  await page.getByRole("menuitem", { name: "Se déconnecter et supprimer toute trace de mon passage" }).click();
+  await page.getByText("Vous êtes déconnecté(e)").click();
+  await expect(page).toHaveURL("http://localhost:8090/auth");
 }
