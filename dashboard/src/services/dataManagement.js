@@ -2,7 +2,7 @@ import localforage from 'localforage';
 import { capture } from './sentry';
 
 export let manoCacheStorage = undefined;
-export const dashboardCurrentCacheKey = 'mano-last-refresh-2022-11-27';
+export const dashboardCurrentCacheKey = 'mano_last_refresh_2022_11_27';
 // init
 export async function getManoCacheStorage() {
   if (manoCacheStorage !== undefined) return manoCacheStorage;
