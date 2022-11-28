@@ -1,3 +1,10 @@
+## [1.177.20](https://github.com/SocialGouv/mano/compare/v1.177.19...v1.177.20) (2022-11-28)
+
+
+### Bug Fixes
+
+* snake case key ([6a97c8a](https://github.com/SocialGouv/mano/commit/6a97c8afa54a60448f57415c687c65329a3dafea))
+
 ## [1.177.19](https://github.com/SocialGouv/mano/compare/v1.177.18...v1.177.19) (2022-11-27)
 
 
