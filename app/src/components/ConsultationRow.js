@@ -13,7 +13,7 @@ import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth';
 import { StyleSheet } from 'react-native';
 import { personsState } from '../recoil/persons';
-import { getConsultationField } from '../recoil/consultations';
+import { disableConsultationRow } from '../recoil/consultations';
 
 const isVisibleByMe = (consultation, me) => {
   if (!me?.healthcareProfessional) return false;
@@ -33,10 +33,10 @@ const ConsultationRow = ({
   const persons = useRecoilValue(personsState);
   const me = useRecoilValue(userState);
 
-  const name = getConsultationField(consultation, 'name', me);
-  const type = getConsultationField(consultation, 'type', me);
-  const status = getConsultationField(consultation, 'status', me);
-  const user = getConsultationField(consultation, 'user', me);
+  const name = disableConsultationRow(consultation, me) ? '' : consultation.name;
+  const type = disableConsultationRow(consultation, me) ? '' : consultation.type;
+  const status = consultation.status;
+  const user = consultation.user;
   const person = useMemo(() => (consultation?.person ? persons?.find((p) => p._id === consultation.person) : null), [persons, consultation.person]);
   const pseudo = useMemo(() => consultation?.personName || person?.name, [consultation, person?.name]);
   const visibleByMe = isVisibleByMe(consultation, me);

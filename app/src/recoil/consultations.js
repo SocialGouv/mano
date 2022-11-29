@@ -37,28 +37,6 @@ export const formatConsultation = (consultation) => {
   return { ...consultation, ...defaultConsultationFields };
 };
 
-const allowedFieldsForNonProfessional = [
-  '_id',
-  'organisation',
-  'createdAt',
-  'updatedAt',
-  'completedAt',
-  'dueAt',
-  'status',
-  'onlyVisibleBy',
-  'entityKey',
-  'person',
-  'user',
-];
-
-export const getConsultationField = (consultation, field, user) => {
-  if (!user.healthcareProfessional || (consultation.onlyVisibleBy?.length && !consultation.onlyVisibleBy.includes(user._id))) {
-    if (allowedFieldsForNonProfessional.includes(field)) return consultation[field];
-    return null;
-  }
-  return consultation[field];
-};
-
 export const disableConsultationRow = (actionOrConsultation, user) => {
   if (!actionOrConsultation.isConsultation) return false;
   if (!user.healthcareProfessional) return true;
