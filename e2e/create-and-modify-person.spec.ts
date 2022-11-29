@@ -71,7 +71,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByRole("dialog").getByText("Informations médicales").click();
   await page.getByLabel("Structure de suivi médical").click();
   await page.getByLabel("Structure de suivi médical").fill("fdfdfs");
-  await page.locator(".person-custom-select-consumptions__value-container").click();
+  await page.locator(".person-custom-select-consommations__value-container").click();
   await page.getByText("Alcool", { exact: true }).click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.locator(".Toastify__close-button").last().click();

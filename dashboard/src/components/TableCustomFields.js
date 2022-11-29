@@ -243,6 +243,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
                         <Label htmlFor="type">Type</Label>
                         <SelectCustom
                           inputId="type"
+                          classNamePrefix="type"
                           isDisabled={onlyOptionsEditable}
                           options={typeOptions}
                           value={getValueFromType(field.type)}
@@ -256,6 +257,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
                           <Label htmlFor="options">Choix</Label>
                           <SelectCustom
                             inputId="options"
+                            classNamePrefix="options"
                             creatable
                             options={[...(editingField?.options || field?.options || [])]
                               .sort((c1, c2) => c1.localeCompare(c2))

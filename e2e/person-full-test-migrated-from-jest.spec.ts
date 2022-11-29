@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { loginWith } from "./utils";
+import { clickOnEmptyReactSelect, loginWith } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
@@ -66,14 +66,9 @@ test("test", async ({ page }) => {
   await page.locator("#react-select-healthInsurances-option-3").click();
   await page.locator("div:nth-child(3) > .row > div:nth-child(2)").dblclick();
   await page.getByLabel("Structure de suivi médical").fill("dedede");
-  await page.getByText("-- Choisir --").nth(1).click();
-  await page.locator("#react-select-consumptions-option-1").click();
-  await page.locator(".person-custom-select-vulnerabilities__value-container").click();
-  await page.locator("#react-select-vulnerabilities-option-2").dblclick();
-  await page.locator("div:nth-child(3) > .row > div:nth-child(5)").click();
-  await page.locator(".person-custom-select-caseHistoryTypes__value-container").click();
-  await page.locator("#react-select-caseHistoryTypes-option-3").dblclick();
-  await page.getByLabel("Informations complémentaires (antécédents)").click();
+  await clickOnEmptyReactSelect(page, "person-custom-select-consommations", "Amphétamine/MDMA/Ecstasy");
+  await clickOnEmptyReactSelect(page, "person-custom-select-vulnérabilités", "Injecteur");
+  await clickOnEmptyReactSelect(page, "person-custom-select-catégorie-dantécédents", "Pulmonaire");
   await page.getByLabel("Informations complémentaires (antécédents)").fill("hello ionfo complémentaires");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Suivi·e depuis le : 12/11/2001").click();

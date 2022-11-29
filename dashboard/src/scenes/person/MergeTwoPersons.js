@@ -154,7 +154,7 @@ const MergeTwoPersons = ({ person }) => {
     // if there is some choices to make regarding medical data,
     // then we forbid any no health professional to merge the persons
     for (const medicalField of medicalFields) {
-      const originValue = originPersonMedicalFile[medicalField.name];
+      const originValue = originPersonMedicalFile?.[medicalField.name];
       const mergeValue = personToMergeMedicalFile?.[medicalField.name];
       if (!originValue?.length && !mergeValue?.length) continue;
       if (!originValue?.length && !!mergeValue?.length) continue;
