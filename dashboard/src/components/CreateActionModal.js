@@ -146,11 +146,11 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                 <div className="tw-flex tw-flex-row">
                   <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
                     <FormGroup>
-                      <Label htmlFor="name">Nom</Label>
+                      <Label htmlFor="name">Nom de l'action</Label>
                       <Input name="name" id="name" type="textarea" value={values.name} onChange={handleChange} />
                     </FormGroup>
                     <FormGroup>
-                      <SelectPerson value={values.person} onChange={handleChange} inputId="create-action-person-select" />
+                      <SelectPerson value={values.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
                     </FormGroup>
                     <FormGroup>
                       <ActionsCategorySelect
@@ -218,7 +218,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                       <SelectTeam
                         teams={user.role === 'admin' ? teams : user.teams}
                         teamId={values.team}
-                        inputId="team"
+                        inputId="create-action-team-select"
                         onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                       />
                     </FormGroup>

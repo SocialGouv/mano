@@ -20,7 +20,6 @@ test("Familles", async ({ page }) => {
   const person4Name = nanoid();
   const action1Name = nanoid();
   const comment1Name = nanoid();
-  const action3Name = nanoid();
 
   await loginWith(page, "admin1@example.org");
 

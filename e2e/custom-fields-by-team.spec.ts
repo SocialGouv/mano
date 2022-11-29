@@ -157,14 +157,14 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.locator(`data-test-id=${testPersonSocialField}`).getByLabel(teamExcludeCustomFieldName).uncheck();
 
-  await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
+  await page.getByRole("button", { name: "Mettre à jour" }).nth(2).click();
   await page.locator(".Toastify__close-button").last().click();
 
   await page.locator(`data-test-id=${testPersonMedicalField}`).getByText("Toute l'organisation").click();
 
   await page.locator(`data-test-id=${testPersonMedicalField}`).getByLabel(teamExcludeCustomFieldName).uncheck();
 
-  await page.getByRole("button", { name: "Mettre à jour" }).nth(2).click();
+  await page.getByRole("button", { name: "Mettre à jour" }).nth(3).click();
   await page.locator(".Toastify__close-button").last().click();
 
   await page.getByRole("button", { name: "Dossier Médical 🧑‍⚕️" }).click();

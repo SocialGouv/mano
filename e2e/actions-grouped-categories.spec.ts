@@ -76,7 +76,7 @@ test("Actions", async ({ page }) => {
   });
 
   await test.step("Create second group", async () => {
-    await createGroup(group2Name);
+    await createGroup(page, group2Name);
   });
 
   await test.step("Create first category in second group", async () => {
@@ -96,7 +96,7 @@ test("Actions", async ({ page }) => {
   });
 
   await test.step("Create third group and category to be deleted", async () => {
-    await createGroup(groupe3Name);
+    await createGroup(page, groupe3Name);
 
     await page.locator(`details[data-group='${groupe3Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe3cat1ToBeDeleted);
 

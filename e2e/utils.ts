@@ -6,7 +6,7 @@ export async function clickOnEmptyReactSelect(page: Page, name: string, text: st
 }
 
 export async function changeReactSelectValue(page: Page, name: string, text: string) {
-  await page.locator(`.${name}__control`).click();
+  await page.locator(`.${name}__indicator`).nth(0).click();
   await page.locator(`.${name}__menu`).getByText(text, { exact: true }).click();
 }
 
@@ -36,7 +36,7 @@ export async function createAction(
 ) {
   await page.getByRole("link", { name: "Agenda" }).click();
   await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
-  await page.getByLabel("Nom").fill(actionName);
+  await page.getByLabel("Nom de l'action").fill(actionName);
   await clickOnEmptyReactSelect(page, "create-action-person-select", personName);
   const { categories = [], group = false } = options;
   if (categories.length > 0) {
