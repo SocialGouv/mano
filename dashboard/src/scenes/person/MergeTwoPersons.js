@@ -29,7 +29,6 @@ import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../
 import { consultationsState, prepareConsultationForEncryption } from '../../recoil/consultations';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../../recoil/medicalFiles';
-import { theme } from '../../config';
 import { useDataLoader } from '../../components/DataLoader';
 
 const getRawValue = (field, value) => {
@@ -66,13 +65,6 @@ const fieldIsEmpty = (value) => {
 const MergeTwoPersons = ({ person }) => {
   const API = useApi();
   const [open, setOpen] = useState(false);
-
-  const [originPerson, setOriginPerson] = useState(person);
-  useEffect(() => {
-    setOriginPerson(person);
-  }, [person]);
-  const [personToMergeAndDelete, setPersonToMergeAndDelete] = useState(null);
-
   const [persons, setPersons] = useRecoilState(personsState);
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
@@ -85,11 +77,17 @@ const MergeTwoPersons = ({ person }) => {
   const consultations = useRecoilValue(consultationsState);
   const medicalFiles = useRecoilValue(medicalFileState);
   const treatments = useRecoilValue(treatmentsState);
-  const { refresh } = useDataLoader();
-
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+
+  const { refresh } = useDataLoader();
+
+  const [originPerson, setOriginPerson] = useState(person);
+  useEffect(() => {
+    setOriginPerson(person);
+  }, [person]);
+  const [personToMergeAndDelete, setPersonToMergeAndDelete] = useState(null);
 
   const allFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
@@ -147,6 +145,27 @@ const MergeTwoPersons = ({ person }) => {
     };
   }, [originPerson, personToMergeAndDelete, fields, medicalFields, originPersonMedicalFile, personToMergeMedicalFile]);
 
+  useEffect(() => {
+    if (!originPerson || !personToMergeAndDelete) return;
+    if (user.healthcareProfessional) return;
+
+    // a non professional is not allowed to see medical data
+    // so we need to check if there is some medical data to merge
+    // if there is some choices to make regarding medical data,
+    // then we forbid any no health professional to merge the persons
+    for (const medicalField of medicalFields) {
+      const originValue = originPersonMedicalFile[medicalField.name];
+      const mergeValue = personToMergeMedicalFile?.[medicalField.name];
+      if (!originValue?.length && !mergeValue?.length) continue;
+      if (!originValue?.length && !!mergeValue?.length) continue;
+      if (!!originValue?.length && !mergeValue?.length) continue;
+      if (JSON.stringify(originValue) === JSON.stringify(mergeValue)) continue;
+      alert('Les champs médicaux ne sont pas identiques. Vous devez être un professionnel de santé pour fusionner des dossiers médicaux différents.');
+      setPersonToMergeAndDelete(null);
+      return;
+    }
+  }, [originPerson, personToMergeAndDelete, user, medicalFields, originPersonMedicalFile, personToMergeMedicalFile]);
+
   return (
     <>
       <ButtonCustom title="Fusionner avec un autre dossier" color="link" onClick={() => setOpen(true)} />
@@ -190,14 +209,6 @@ const MergeTwoPersons = ({ person }) => {
             </Col>
             <Col md={2} />
           </Row>
-          {!user.healthcareProfessional && (
-            <p style={{ color: theme.redDark, textAlign: 'center', lineHeight: '1rem', width: '75%', margin: '5px auto' }}>
-              <small>
-                Attention: si cette personne a un dossier médical, il faut que la fusion soit effectuée par un professionnel de santé. Sinon, toute
-                donnée médicale de la personne fusionnée sera définitivement perdue.
-              </small>
-            </p>
-          )}
         </ModalHeader>
         <ModalBody>
           {!!initMergedPerson && (
@@ -337,7 +348,7 @@ const MergeTwoPersons = ({ person }) => {
               {({ values, handleChange, handleSubmit, isSubmitting }) => (
                 <>
                   <Table
-                    data={[...fields, ...medicalFields]}
+                    data={[...fields, ...(user.healthcareProfessional ? medicalFields : [])]}
                     // use this key prop to reset table and reset sortablejs on each element added/removed
                     rowKey="name"
                     columns={[

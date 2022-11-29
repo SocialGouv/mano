@@ -150,8 +150,6 @@ export default function DataLoader() {
               return;
             }
 
-            console.log('stats.treatments', stats.treatments);
-
             setLoadingText('Récupération des données dans le cache');
             Promise.resolve()
               .then(() => getCacheItemDefaultValue('person', []))
