@@ -171,9 +171,12 @@ test("merging normal user with health data", async ({ page }) => {
       await dialog.accept();
     });
     await clickOnEmptyReactSelect(page, "person-to-merge-with-select", "2");
-    await expect(page.locator(".person-to-merge-with-select__value-container")).not.toHaveText("2");
+    await expect(page.locator(".person-to-merge-with-select__value-container")).toHaveText("2");
+    await page.locator('input[name="numeroSecuriteSociale"]').fill("456");
     await page.getByRole("button", { name: "Fusionner" }).click();
     await page.getByText("Fusion réussie !").click();
-    await expect(page.getByRole("cell", { name: "Numéro de sécurité sociale" })).toHaveText("123");
+    await page.getByRole("button", { name: "Dossier Médical" }).click();
+    await expect(page.getByLabel("Numéro de sécurité sociale")).toHaveValue("456");
+    await expect(page.locator("div.person-custom-select-multi-champ__value-container")).toHaveText("choix 1choix 2");
   });
 });
