@@ -2,13 +2,14 @@ import localforage from 'localforage';
 import { capture } from './sentry';
 
 export let manoCacheStorage = undefined;
-export const dashboardCurrentCacheKey = 'mano_last_refresh_2022_11_27';
+export const dashboardCurrentCacheKey = 'mano_last_refresh_2022_11_29';
 // init
 export async function getManoCacheStorage() {
   if (manoCacheStorage !== undefined) return manoCacheStorage;
   const allowedDrivers = [localforage.INDEXEDDB, localforage.WEBSQL];
   for (const driver of allowedDrivers) {
     if (localforage.supports(driver)) {
+      // clean the all DB when required
       try {
         const currentCacheKey = window.localStorage.getItem('mano-currentCacheKey');
         if (currentCacheKey !== dashboardCurrentCacheKey) {
@@ -39,6 +40,7 @@ export async function getManoCacheStorage() {
         // The error is thenb: No available storage method found.
         if (e.message === 'No available storage method found.') {
           manoCacheStorage = null;
+          console.log('CLEAR FROM method not found');
           window.localStorage?.clear();
         } else {
           capture(e);
@@ -53,6 +55,7 @@ export async function getManoCacheStorage() {
 
 export async function clearCache() {
   (await getManoCacheStorage())?.clear();
+  manoCacheStorage = undefined; // needed so that the clean the all DB when required functions
   window.localStorage?.clear();
   window.sessionStorage?.clear();
 }
