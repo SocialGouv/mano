@@ -59,7 +59,7 @@ router.put(
       capture("error updating service", e);
       throw e;
     }
-    return res.status(200).send({ ok: true });
+    return res.status(200).send({ ok: true, data: organisation });
   })
 );
 

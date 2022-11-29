@@ -10,8 +10,8 @@ import { toast } from 'react-toastify';
 import { capture } from '../../services/sentry';
 import { servicesSelector, flattenedServicesSelector, reportsState, prepareReportForEncryption } from '../../recoil/reports';
 
-const groupTitlesSelector = selector({
-  key: 'groupTitlesSelector',
+const servicesGroupTitlesSelector = selector({
+  key: 'servicesGroupTitlesSelector',
   get: ({ get }) => {
     const groupedServices = get(servicesSelector);
     return groupedServices.map((group) => group.groupTitle);
@@ -134,7 +134,7 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
   const listRef = useRef(null);
   const sortableRef = useRef(null);
   const [isEditingGroupTitle, setIsEditingGroupTitle] = useState(false);
-  const groupTitles = useRecoilValue(groupTitlesSelector);
+  const groupTitles = useRecoilValue(servicesGroupTitlesSelector);
   const groupedServices = useRecoilValue(servicesSelector);
   // const reports = useRecoilValue(reportsState);
   const flattenedServices = useRecoilValue(flattenedServicesSelector);
@@ -189,33 +189,6 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
   const onDeleteGroup = async () => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce groupe et tous ses services ? Cette opération est irréversible')) return;
     const newGroupedServices = groupedServices.filter((group) => group.groupTitle !== groupTitle);
-    // TODO: Check if we remove services in previous reports
-    /*
-    const servicesToDelete = groupedServices.find((group) => group.groupTitle === groupTitle).services;
-    const encryptedReports = await Promise.all(
-      reports
-        .map((a) => {
-          if(report?.services?.length) {
-            let services = JSON.parse(report?.services);
-
-          }
-          report?.services?.length ? JSON.parse(report?.services) : {})
-          for (const service of a.services || []) {
-            if (servicesToDelete.includes(service)) {
-              return a;
-            }
-          }
-          return null;
-        })
-        .filter(Boolean)
-        .map((report) => ({
-          ...report,
-          services: (report.services || []).map((service) => (servicesToDelete.includes(service) ? null : service)).filter(Boolean),
-        }))
-        .map(prepareReportForEncryption)
-        .map(encryptItem(hashedOrgEncryptionKey))
-    );
-    */
 
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, groupedServices: newGroupedServices }); // optimistic UI
@@ -225,7 +198,6 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
       path: `/service`,
       body: {
         groupedServices: newGroupedServices,
-        // reports: encryptedReports,
       },
     });
     if (response.ok) {
@@ -363,7 +335,7 @@ const Service = ({ service, groupTitle }) => {
       const existingGroupTitle = groupedServices.find(({ services }) => services.includes(newService)).groupTitle;
       return toast.error(`Ce service existe déjà: ${existingGroupTitle} > ${newService}`);
     }
-    const reportsWithService = reports.filter((r) => Object.keys(JSON.parse(r.services || '{}')).includes(newService.trim()));
+    const reportsWithService = reports.filter((r) => Object.keys(JSON.parse(r.services || '{}')).includes(oldService.trim()));
     const encryptedReports = await Promise.all(
       reportsWithService
         .filter((a) => a.services.includes(oldService))

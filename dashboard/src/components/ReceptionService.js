@@ -1,17 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDebounce } from 'react-use';
-import { organisationState } from '../recoil/auth';
-import { prepareReportForEncryption, reportsState } from '../recoil/reports';
+import { flattenedServicesSelector, prepareReportForEncryption, reportsState, servicesSelector } from '../recoil/reports';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import useApi from '../services/api';
 import IncrementorSmall from './IncrementorSmall';
 import { lastLoadState, mergeItems } from './DataLoader';
 
 const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) => {
-  const organisation = useRecoilValue(organisationState);
-
+  // const organisation = useRecoilValue(organisationState);
+  const groupedServices = useRecoilValue(servicesSelector);
+  const flattenedServices = useRecoilValue(flattenedServicesSelector);
   const [reports, setReports] = useRecoilState(reportsState);
-
   const lastLoad = useRecoilValue(lastLoadState);
 
   const API = useApi();
@@ -57,13 +56,13 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
       // now we need to merge services with the latest report
       const originalServices = servicesRef.current;
       const myAddedServices = {};
-      for (const service of organisation.services) {
+      for (const service of flattenedServices) {
         if (services[service] == null) continue;
         myAddedServices[service] = (services[service] || 0) - (originalServices[service] || 0);
       }
       const latestReportServices = reportAtDate?.services?.length ? JSON.parse(reportAtDate?.services) : {};
       const newServices = {};
-      for (const service of organisation.services) {
+      for (const service of flattenedServices) {
         if (!myAddedServices[service]) {
           newServices[service] = latestReportServices[service];
         } else {
@@ -101,17 +100,22 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
   );
 
   return (
-    <>
-      {organisation?.services?.map((service) => (
-        <IncrementorSmall
-          dataTestId={`${dataTestIdPrefix}${service}-${services[service] || 0}`}
-          key={service}
-          service={service}
-          count={services[service] || 0}
-          onChange={(newCount) => onServiceUpdate(service, newCount)}
-        />
+    <div>
+      {groupedServices.map((group) => (
+        <div key={group.groupTitle}>
+          <h3>{group.groupTitle}</h3>
+          {group.services?.map((service) => (
+            <IncrementorSmall
+              dataTestId={`${dataTestIdPrefix}${service}-${services[service] || 0}`}
+              key={service}
+              service={service}
+              count={services[service] || 0}
+              onChange={(newCount) => onServiceUpdate(service, newCount)}
+            />
+          ))}
+        </div>
       ))}
-    </>
+    </div>
   );
 };
 
