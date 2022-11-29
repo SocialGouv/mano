@@ -1,3 +1,10 @@
+## [1.177.23](https://github.com/SocialGouv/mano/compare/v1.177.22...v1.177.23) (2022-11-29)
+
+
+### Bug Fixes
+
+* **dashboard:** datestring for services in report ([#1015](https://github.com/SocialGouv/mano/issues/1015)) ([14633f8](https://github.com/SocialGouv/mano/commit/14633f804784fe99d3942c42366ac5a834197ad3))
+
 ## [1.177.22](https://github.com/SocialGouv/mano/compare/v1.177.21...v1.177.22) (2022-11-29)
 
 
