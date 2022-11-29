@@ -55,7 +55,7 @@ export async function getManoCacheStorage() {
 
 export async function clearCache() {
   (await getManoCacheStorage())?.clear();
-  // manoCacheStorage = undefined; // needed so that the clean the all DB when required functions
+  manoCacheStorage = undefined; // needed so that the clean the all DB when required functions
   window.localStorage?.clear();
   window.sessionStorage?.clear();
 }

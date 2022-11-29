@@ -93,15 +93,8 @@ test("Person creation", async ({ page }) => {
 
   await expect(page.getByRole("cell", { name: person1Name })).toBeVisible();
 
-  await page.getByRole("button", { name: "User Admin Test - 5" }).click();
-  await page.getByRole("menuitem", { name: "Se déconnecter et supprimer toute trace de mon passage" }).click();
-  await expect(page).toHaveURL("http://localhost:8090/auth");
-
   await page.goto("http://localhost:8090/auth");
 
-  await page.getByLabel("Email").fill("admin5@example.org");
-  await page.getByLabel("Mot de passe").fill("secret");
-  await page.getByRole("button", { name: "Se connecter" }).click();
   await page.getByLabel("Clé de chiffrement d'organisation").fill("plouf");
   await page.getByRole("button", { name: "Se connecter" }).click();
   await expect(page).toHaveURL("http://localhost:8090/reception?calendarTab=2");
