@@ -6,16 +6,17 @@ import { disableConsultationRow } from '../recoil/consultations';
 
 export default function ActionOrConsultationName({ item }) {
   const me = useRecoilValue(userState);
+  if (disableConsultationRow(item, me)) return <div />;
   return (
     <>
-      <div>{disableConsultationRow(item, me) ? '' : item.name}</div>
+      <div>{item.name}</div>
       <div>
         {item.categories?.map((category) => (
           <Badge style={{ margin: '0 2px' }} color="info" key={category} data-test-id={item.name + category}>
             {category}
           </Badge>
         ))}
-        {!!item.isConsultation && <small className="text-muted">{disableConsultationRow(item, me) ? '' : item.type}</small>}
+        {!!item.isConsultation && <small className="text-muted">{item.type}</small>}
       </div>
     </>
   );
