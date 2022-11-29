@@ -714,7 +714,13 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
         </ServicesWrapper>
       )}
       {reports.map((report) => (
-        <Service report={report} key={report.team} withMultipleTeams={reports.length > 1} team={selectedTeamsObject[report.team]} />
+        <Service
+          report={report}
+          key={report.team}
+          withMultipleTeams={reports.length > 1}
+          team={selectedTeamsObject[report.team]}
+          dateString={dateString}
+        />
       ))}
     </StyledBox>
   );
@@ -743,7 +749,7 @@ const Service = ({ report, team, withMultipleTeams, dateString }) => {
         </div>
       )}
       <div className="services-list">
-        <ReceptionService team={team} report={report} dataTestIdPrefix={`${team.name}-`} />
+        <ReceptionService team={team} report={report} dateString={dateString} dataTestIdPrefix={`${team.name}-`} />
       </div>
     </ServicesWrapper>
   );

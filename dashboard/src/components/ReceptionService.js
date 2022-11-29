@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDebounce } from 'react-use';
-import { startOfToday } from '../services/date';
 import { organisationState } from '../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
 import { useRecoilState, useRecoilValue } from 'recoil';
@@ -8,7 +7,7 @@ import useApi from '../services/api';
 import IncrementorSmall from './IncrementorSmall';
 import { lastLoadState, mergeItems } from './DataLoader';
 
-const ReceptionService = ({ report, team, dataTestIdPrefix = '' }) => {
+const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) => {
   const organisation = useRecoilValue(organisationState);
 
   const [reports, setReports] = useRecoilState(reportsState);
@@ -53,7 +52,7 @@ const ReceptionService = ({ report, team, dataTestIdPrefix = '' }) => {
       const allReports = mergeItems(reports, latestReportsRes.decryptedData);
       const reportAtDate = !!report?._id
         ? allReports.find((_report) => _report._id === report._id)
-        : allReports.find((_report) => _report.date === startOfToday().format('YYYY-MM-DD') && _report.team === team._id);
+        : allReports.find((_report) => _report.date === dateString && _report.team === team._id);
 
       // now we need to merge services with the latest report
       const originalServices = servicesRef.current;
@@ -74,7 +73,7 @@ const ReceptionService = ({ report, team, dataTestIdPrefix = '' }) => {
 
       const reportUpdate = {
         team: team._id,
-        date: startOfToday().format('YYYY-MM-DD'),
+        date: dateString,
         ...(reportAtDate || {}),
         services: JSON.stringify(newServices),
       };

@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { SmallHeader } from '../../components/header';
-import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now } from '../../services/date';
+import { formatDateWithNameOfDay, getIsDayWithinHoursOffsetOfPeriod, isToday, now, startOfToday } from '../../services/date';
 import { currentTeamReportsSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
 import CreateActionModal from '../../components/CreateActionModal';
@@ -279,7 +279,7 @@ const Reception = () => {
           <ServicesWrapper>
             <h5 className="services-title">Services</h5>
             <div className="services-incrementators">
-              <ReceptionService report={todaysReport} team={currentTeam} />
+              <ReceptionService report={todaysReport} dateString={startOfToday().format('YYYY-MM-DD')} team={currentTeam} />
             </div>
           </ServicesWrapper>
         </Col>
