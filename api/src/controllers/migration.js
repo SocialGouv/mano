@@ -168,6 +168,7 @@ router.put(
         updatedAt: organisation.updatedAt,
         categories: organisation.categories,
         actionsGroupedCategories: organisation.actionsGroupedCategories,
+        groupedServices: organisation.groupedServices,
         encryptionEnabled: organisation.encryptionEnabled,
         encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
         receptionEnabled: organisation.receptionEnabled,
