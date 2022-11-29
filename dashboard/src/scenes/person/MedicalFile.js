@@ -34,7 +34,7 @@ import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/tre
 import { medicalFileState, prepareMedicalFileForEncryption, customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { modalConfirmState } from '../../components/ModalConfirm';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
-import ActionName from '../../components/ActionName';
+import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -564,7 +564,7 @@ export function MedicalFile({ person }) {
           {
             title: 'Nom',
             dataKey: 'name',
-            render: (e) => <ActionName action={e} />,
+            render: (e) => <ActionOrConsultationName item={e} />,
           },
           {
             title: 'Créé par',

@@ -5,7 +5,7 @@ import { useRecoilValue } from 'recoil';
 import { addOneDay, dayjsInstance, formatCalendarDate, formatDateTimeWithNameOfDay, formatTime, isOnSameDay, subtractOneDay } from '../services/date';
 import Table from './table';
 import ActionStatus from './ActionStatus';
-import ActionName from './ActionName';
+import ActionOrConsultationName from './ActionOrConsultationName';
 import PersonName from './PersonName';
 import ExclamationMarkButton from './ExclamationMarkButton';
 import ConsultationButton from './ConsultationButton';
@@ -91,7 +91,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
         {
           title: ['restricted-access'].includes(user.role) ? null : 'Nom',
           dataKey: 'name',
-          render: (action) => <ActionName action={action} />,
+          render: (action) => <ActionOrConsultationName item={action} />,
         },
         {
           title: 'Personne suivie',

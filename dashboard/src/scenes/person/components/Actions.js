@@ -9,7 +9,7 @@ import SelectCustom from '../../../components/SelectCustom';
 import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
-import ActionName from '../../../components/ActionName';
+import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
 import { formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../../../services/date';
 
 export const Actions = ({ person }) => {
@@ -114,7 +114,7 @@ export const Actions = ({ person }) => {
                     </div>
                   </div>
                   <div className="tw-mt-2 tw-flex">
-                    <div className="tw-flex-1">{!['restricted-access'].includes(user.role) && <ActionName action={action} />}</div>
+                    <div className="tw-flex-1">{!['restricted-access'].includes(user.role) && <ActionOrConsultationName item={action} />}</div>
                     <div>
                       <TagTeam teamId={action.team} />
                     </div>

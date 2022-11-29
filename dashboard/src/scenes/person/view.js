@@ -38,7 +38,7 @@ import UserName from '../../components/UserName';
 import SelectCustom from '../../components/SelectCustom';
 import SelectAsInput from '../../components/SelectAsInput';
 import Places from '../../components/Places';
-import ActionName from '../../components/ActionName';
+import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import OutOfActiveList from './OutOfActiveList';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import Documents from '../../components/Documents';
@@ -780,7 +780,12 @@ const Actions = ({ onUpdateResults }) => {
               return formatTime(action.dueAt);
             },
           },
-          { title: 'Nom', noShow: ['restricted-access'].includes(user.role), dataKey: 'name', render: (action) => <ActionName action={action} /> },
+          {
+            title: 'Nom',
+            noShow: ['restricted-access'].includes(user.role),
+            dataKey: 'name',
+            render: (action) => <ActionOrConsultationName item={action} />,
+          },
           { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
           {
             title: 'Équipe',
