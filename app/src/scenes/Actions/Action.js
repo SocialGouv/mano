@@ -441,7 +441,7 @@ const Action = ({ navigation, route }) => {
           editable={editable}
         />
         <DateAndTimeInput
-          label="Échéance"
+          label="À faire le"
           setDate={(dueAt) => setAction((a) => ({ ...a, dueAt }))}
           date={dueAt}
           showTime

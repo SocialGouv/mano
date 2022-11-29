@@ -193,7 +193,7 @@ const NewActionForm = ({ route, navigation }) => {
           )}
           <ActionStatusSelect onSelect={setStatus} value={status} editable testID="new-action-status" />
           <DateAndTimeInput
-            label="Échéance"
+            label="À faire le"
             setDate={setDueAt}
             date={dueAt}
             showTime

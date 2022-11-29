@@ -74,7 +74,11 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
 
     const personId = await page.locator("tr", { has: page.getByRole("cell", { name: person1Name }) }).getAttribute("data-test-id");
-    await expect(page.locator(`[data-test-id="${personId}"]`).getByRole("button", { name: "!" })).toBeVisible();
+    await expect(
+      page
+        .locator(`[data-test-id="${personId}"]`)
+        .getByRole("button", { name: "Personne très vulnérable, ou ayant besoin d'une attention particulière" })
+    ).toBeVisible();
     await page.getByRole("cell", { name: person1Name }).click();
 
     await expect(page).toHaveURL(`http://localhost:8090/person/${personId}`);
@@ -124,7 +128,11 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
 
     const personId = await page.locator("tr", { has: page.getByRole("cell", { name: person1Name }) }).getAttribute("data-test-id");
-    await expect(page.locator(`[data-test-id="${personId}"]`).getByRole("button", { name: "!" })).toBeVisible();
+    await expect(
+      page
+        .locator(`[data-test-id="${personId}"]`)
+        .getByRole("button", { name: "Personne très vulnérable, ou ayant besoin d'une attention particulière" })
+    ).toBeVisible();
     await page.getByRole("cell", { name: person1Name }).click();
 
     await expect(page).toHaveURL(`http://localhost:8090/person/${personId}`);
@@ -167,14 +175,72 @@ test("test restricted accesses", async ({ page }) => {
 
   await logOut(page, "User Health Professional Test - 1");
 
-  await test.step("Restricted user can see nothing related to medical", async () => {
+  await test.step("Normal user can see everything except my consultation", async () => {
+    await loginWith(page, "normal1@example.org");
+
+    await page.getByRole("link", { name: "Personnes suivies" }).click();
+    await expect(page).toHaveURL("http://localhost:8090/person");
+
+    const personId = await page.locator("tr", { has: page.getByRole("cell", { name: person1Name }) }).getAttribute("data-test-id");
+    await expect(
+      page
+        .locator(`[data-test-id="${personId}"]`)
+        .getByRole("button", { name: "Personne très vulnérable, ou ayant besoin d'une attention particulière" })
+    ).toBeVisible();
+    await page.getByRole("cell", { name: person1Name }).click();
+
+    await expect(page).toHaveURL(`http://localhost:8090/person/${personId}`);
+
+    await expect(page.getByText("Genre : Homme")).toBeVisible();
+    await expect(page.locator('i:has-text("11/11/2001")')).toBeVisible();
+    await expect(page.getByText("En rue depuis le : 12/11/2001")).toBeVisible();
+    await expect(page.getByText("Suivi·e depuis le : 13/11/2001")).toBeVisible();
+
+    await expect(page.getByRole("heading", { name: "Actions" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Commentaires" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Informations sociales" })).toBeVisible();
+    await expect(page.getByText("cool man")).toBeVisible();
+    await expect(page.getByText("Homme isolé")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Informations Médicales" })).toBeVisible();
+    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
+
+    await expect(page.getByRole("button", { name: "Dossier Médical" })).not.toBeVisible();
+    await expect(page.getByRole("button", { name: "Lieux fréquentés" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Historique" })).toBeVisible();
+
+    // await page.getByRole("button", { name: "Dossier Médical" }).click();
+
+    // await expect(page.getByText("Régime Général")).toBeVisible();
+    // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
+    // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
+    // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
+
+    await page.getByRole("link", { name: "Agenda" }).click();
+
+    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).not.toBeVisible();
+    await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
+
+    await expect(page.getByRole("link", { name: "Organisation" })).not.toBeVisible();
+    await expect(page.getByRole("link", { name: "Équipes" })).not.toBeVisible();
+    await expect(page.getByRole("link", { name: "Utilisateurs" })).not.toBeVisible();
+    await expect(page.getByRole("link", { name: "Comptes rendus" })).toBeVisible();
+  });
+
+  await logOut(page, "User Normal Test - 1");
+
+  await test.step("Restricted user can see everything except my consultation", async () => {
     await loginWith(page, "restricted1@example.org");
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
 
     const personId = await page.locator("tr", { has: page.getByRole("cell", { name: person1Name }) }).getAttribute("data-test-id");
-    await expect(page.locator(`[data-test-id="${personId}"]`).getByRole("button", { name: "!" })).toBeVisible();
+    await expect(
+      page
+        .locator(`[data-test-id="${personId}"]`)
+        .getByRole("button", { name: "Personne très vulnérable, ou ayant besoin d'une attention particulière" })
+    ).toBeVisible();
     await page.getByRole("cell", { name: person1Name }).click();
 
     await expect(page).toHaveURL(`http://localhost:8090/person/${personId}`);

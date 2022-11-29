@@ -244,7 +244,7 @@ const View = () => {
                           handleChange({ target: { name: 'withTime', checked: Boolean(!values.withTime), value: Boolean(!values.withTime) } });
                         }}
                       />
-                      <label htmlFor="withTime">Afficher l'heure</label>
+                      <label htmlFor="withTime">Montrer l'heure</label>
                     </div>
                   </FormGroup>
                   <FormGroup>
