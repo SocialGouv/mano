@@ -1,3 +1,10 @@
+## [1.177.22](https://github.com/SocialGouv/mano/compare/v1.177.21...v1.177.22) (2022-11-29)
+
+
+### Bug Fixes
+
+* reset cache dashboard ([#1013](https://github.com/SocialGouv/mano/issues/1013)) ([f8a1304](https://github.com/SocialGouv/mano/commit/f8a13049621bec71c507103835f6b352a88b06d2))
+
 ## [1.177.21](https://github.com/SocialGouv/mano/compare/v1.177.20...v1.177.21) (2022-11-28)
 
 
