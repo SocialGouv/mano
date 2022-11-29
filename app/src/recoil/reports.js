@@ -37,6 +37,8 @@ export const prepareReportForEncryption = (report) => {
     createdAt: report.createdAt,
     updatedAt: report.updatedAt,
     organisation: report.organisation,
+    date: report.date,
+    team: report.team,
 
     decrypted,
     entityKey: report.entityKey,

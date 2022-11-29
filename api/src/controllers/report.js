@@ -61,6 +61,11 @@ router.post(
       z.object({
         encrypted: z.string(),
         encryptedEntityKey: z.string(),
+        team: z.string().regex(looseUuidRegex).optional(),
+        date: z
+          .string()
+          .regex(/^\d{4}-\d{2}-\d{2}$/)
+          .optional(),
       }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in report creation: ${e}`);
@@ -68,11 +73,35 @@ router.post(
       return next(error);
     }
 
+    if (req.body.date && req.body.team) {
+      const existingReport = await Report.findOne({
+        where: { organisation: req.user.organisation, team: req.body.team, date: req.body.date },
+      });
+      if (!!existingReport) {
+        return res.status(200).send({
+          ok: true,
+          data: {
+            _id: data._id,
+            encrypted: data.encrypted,
+            encryptedEntityKey: data.encryptedEntityKey,
+            organisation: data.organisation,
+            team: data.team,
+            date: data.date,
+            createdAt: data.createdAt,
+            updatedAt: data.updatedAt,
+            deletedAt: data.deletedAt,
+          },
+        });
+      }
+    }
+
     const data = await Report.create(
       {
         organisation: req.user.organisation,
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
+        team: req.body.team,
+        date: req.body.date,
       },
       { returning: true }
     );
@@ -83,6 +112,8 @@ router.post(
         encrypted: data.encrypted,
         encryptedEntityKey: data.encryptedEntityKey,
         organisation: data.organisation,
+        team: data.team,
+        date: data.date,
         createdAt: data.createdAt,
         updatedAt: data.updatedAt,
         deletedAt: data.deletedAt,
@@ -129,6 +160,8 @@ router.put(
         encrypted: report.encrypted,
         encryptedEntityKey: report.encryptedEntityKey,
         organisation: report.organisation,
+        team: report.team,
+        date: report.date,
         createdAt: report.createdAt,
         updatedAt: report.updatedAt,
         deletedAt: report.deletedAt,

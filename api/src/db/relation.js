@@ -55,6 +55,8 @@ Organisation.hasMany(Structure, organisationForeignKey);
 // Report
 Report.belongsTo(Organisation, organisationForeignKey);
 Organisation.hasMany(Report, organisationForeignKey);
+Report.belongsTo(Team, teamForeignKey);
+Team.hasMany(Report, teamForeignKey);
 
 // Comment
 Comment.belongsTo(Organisation, organisationForeignKey);
