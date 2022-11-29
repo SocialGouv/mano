@@ -47,6 +47,7 @@ export default function PassagesRencontres({ person }) {
         <div>
           <button
             className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
+            aria-label={selected === 'passages' ? 'Ajouter un passage' : 'Ajouter une rencontre'}
             onClick={() => {
               if (selected === 'rencontres') {
                 setRencontreToEdit({

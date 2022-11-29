@@ -150,7 +150,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                       <Input name="name" id="name" type="textarea" value={values.name} onChange={handleChange} />
                     </FormGroup>
                     <FormGroup>
-                      <SelectPerson value={values.person} onChange={handleChange} />
+                      <SelectPerson value={values.person} onChange={handleChange} inputId="create-action-person-select" />
                     </FormGroup>
                     <FormGroup>
                       <ActionsCategorySelect

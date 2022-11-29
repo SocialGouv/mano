@@ -198,7 +198,7 @@ const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
             <label htmlFor="personId" className="form-text tailwindui">
               Nouvelle relation entre {person.name} et...
             </label>
-            <SelectPerson name="personId" noLabel disableAccessToPerson />
+            <SelectPerson name="personId" noLabel disableAccessToPerson inputId="person-family-relation" />
           </div>
           <div>
             <label htmlFor="description" className="form-text tailwindui">

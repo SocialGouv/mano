@@ -29,6 +29,7 @@ export const Actions = ({ person }) => {
         <h4 className="tw-flex-1">Actions</h4>
         <div>
           <button
+            aria-label="Ajouter une action"
             className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
             onClick={() => setModalOpen(true)}>
             ＋

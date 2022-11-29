@@ -1,9 +1,8 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import ButtonCustom from '../../../components/ButtonCustom';
 import PersonName from '../../../components/PersonName';
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
 import { organisationState, usersState, userState } from '../../../recoil/auth';
 import { groupsState } from '../../../recoil/groups';
 import {
@@ -168,21 +167,13 @@ function DocumentModal({ document, onClose, person }) {
   );
 
   return (
-    <Modal
-      isOpen={true}
-      toggle={() => {
-        onClose();
-      }}
-      size="lg"
-      backdrop="static">
-      <ModalHeader toggle={() => onClose()}>{document.name}</ModalHeader>
+    <ModalContainer open>
+      <ModalHeader title={document.name} />
       <ModalBody>
-        <div className="tw-flex tw-justify-between">
-          <p>
-            Créé par {users.find((e) => e._id === document.createdBy)?.name}
-            <br />
-            Créé le {formatDateTimeWithNameOfDay(document.createdAt)}
-          </p>
+        <div className="tw-flex tw-w-full tw-flex-col tw-justify-between tw-gap-4 tw-px-8">
+          <small className="tw-opacity-60">
+            Créé par {users.find((e) => e._id === document.createdBy)?.name} le {formatDateTimeWithNameOfDay(document.createdAt)}
+          </small>
           {!!canToggleGroupCheck && (
             <div>
               <label htmlFor="document-for-group">
@@ -233,51 +224,55 @@ function DocumentModal({ document, onClose, person }) {
             </div>
           )}
         </div>
-        <div className="tw-mt-4 tw-flex tw-justify-end tw-gap-2">
-          <ButtonCustom
-            type="button"
-            color="danger"
-            onClick={async () => {
-              if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-              await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
-              const personResponse = await API.put({
-                path: `/person/${person._id}`,
-                body: preparePersonForEncryption(
-                  customFieldsPersonsMedical,
-                  customFieldsPersonsSocial
-                )({
-                  ...person,
-                  documents: person.documents.filter((d) => d._id !== document._id),
-                }),
-              });
-              if (personResponse.ok) {
-                const newPerson = personResponse.decryptedData;
-                setPersons((persons) =>
-                  persons.map((p) => {
-                    if (p._id === person._id) return newPerson;
-                    return p;
-                  })
-                );
-              }
-              onClose();
-            }}
-            title={'Supprimer'}
-          />
-          <ButtonCustom
-            type="button"
-            onClick={async () => {
-              const file = await API.download({
-                path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}`,
-                encryptedEntityKey: document.encryptedEntityKey,
-              });
-              download(file, document.name);
-              onClose();
-            }}
-            title={'Télécharger'}
-          />
-        </div>
       </ModalBody>
-    </Modal>
+      <ModalFooter>
+        <button
+          type="button"
+          className="button-submit"
+          onClick={async () => {
+            const file = await API.download({
+              path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}`,
+              encryptedEntityKey: document.encryptedEntityKey,
+            });
+            download(file, document.name);
+            onClose();
+          }}>
+          Télécharger
+        </button>
+        <button
+          type="button"
+          className="button-destructive"
+          onClick={async () => {
+            if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
+            await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
+            const personResponse = await API.put({
+              path: `/person/${person._id}`,
+              body: preparePersonForEncryption(
+                customFieldsPersonsMedical,
+                customFieldsPersonsSocial
+              )({
+                ...person,
+                documents: person.documents.filter((d) => d._id !== document._id),
+              }),
+            });
+            if (personResponse.ok) {
+              const newPerson = personResponse.decryptedData;
+              setPersons((persons) =>
+                persons.map((p) => {
+                  if (p._id === person._id) return newPerson;
+                  return p;
+                })
+              );
+            }
+            onClose();
+          }}>
+          Supprimer
+        </button>
+        <button type="button" name="cancel" className="button-cancel" onClick={() => onClose()}>
+          Annuler
+        </button>
+      </ModalFooter>
+    </ModalContainer>
   );
 }
 
