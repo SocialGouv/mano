@@ -120,26 +120,30 @@ test("merging normal user with health data", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
     await page.getByRole("cell", { name: "1" }).click();
     await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
-    page.on("dialog", async (dialog) => {
+    const forbiddenMergeListener = async (dialog) => {
       expect(dialog.message()).toBe(
         "Les champs médicaux ne sont pas identiques. Vous devez être un professionnel de santé pour fusionner des dossiers médicaux différents."
       );
       await dialog.accept();
-    });
+    };
+    page.on("dialog", forbiddenMergeListener);
     await clickOnEmptyReactSelect(page, "person-to-merge-with-select", "2");
     await expect(page.locator(".person-to-merge-with-select__value-container")).not.toHaveText("2");
+    page.off("dialog", forbiddenMergeListener);
   });
 
   await test.step("merge two people, one with medical field the other not, to be possible, but without being visible", async () => {
     await clickOnEmptyReactSelect(page, "person-to-merge-with-select", "3");
     await expect(page.locator(".person-to-merge-with-select__value-container")).toHaveText("3");
     await expect(page.getByRole("cell", { name: "Multi-champ" })).not.toBeVisible();
-    page.on("dialog", async (dialog) => {
+    const mergeListener = async (dialog) => {
       expect(dialog.message()).toBe("Cette opération est irréversible, êtes-vous sûr ?");
       await dialog.accept();
-    });
+    };
+    page.on("dialog", mergeListener);
     await page.getByRole("button", { name: "Fusionner" }).click();
     await page.getByText("Fusion réussie !").click();
+    page.off("dialog", mergeListener);
   });
 
   await test.step("login as health professional and try to merge", async () => {
@@ -158,8 +162,8 @@ test("merging normal user with health data", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/person");
     await page.getByRole("cell", { name: "1" }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-    await expect(page.getByRole("cell", { name: "Numéro de sécurité sociale" })).toHaveText("123");
-    await expect(page.getByRole("cell", { name: "Multi-champ" })).toHaveText("choix 1, choix 2");
+    await expect(page.getByLabel("Numéro de sécurité sociale")).toHaveValue("123");
+    await expect(page.locator("div.person-custom-select-multi-champ__value-container")).toHaveText("choix 1choix 2");
     await page.getByRole("button", { name: "Résumé" }).click();
     await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
     page.on("dialog", async (dialog) => {
