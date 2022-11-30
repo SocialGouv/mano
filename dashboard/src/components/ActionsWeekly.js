@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
+import { useLocalStorage } from 'react-use';
 import { Badge, Button } from 'reactstrap';
 import styled from 'styled-components';
 import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
@@ -11,16 +12,15 @@ import PersonName from './PersonName';
 // TODO: remove inline style when UI is stabilized.
 
 export default function ActionsWeekly({ actions, onCreateAction }) {
-  const [startOfWeek, setStartOfWeek] = useState(dayjsInstance(window.localStorage.getItem('startOfWeek') || new Date()).startOf('week'));
+  const [startOfWeek, setStartOfWeek] = useLocalStorage('startOfWeek', dayjsInstance().startOf('week'), {
+    raw: false,
+    deserializer: (v) => dayjsInstance(v),
+    serializer: (v) => v.toISOString(),
+  });
 
   const actionsInWeek = useMemo(() => {
     return actions.filter((action) => dayjsInstance(action.dueAt).isBetween(startOfWeek, startOfWeek.add(7, 'day').endOf('day')));
   }, [actions, startOfWeek]);
-
-  useEffect(() => {
-    window.localStorage.setItem('startOfWeek', startOfWeek.toISOString());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startOfWeek]);
 
   return (
     <div>

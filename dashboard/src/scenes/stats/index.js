@@ -1,5 +1,6 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
 import styled from 'styled-components';
+import { useLocalStorage } from 'react-use';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
@@ -82,14 +83,13 @@ const Stats = () => {
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
   const { isLoading } = useDataLoader({ refreshOnMount: true });
 
-  const [selectedTerritories, setSelectedTerritories] = useState([]);
-  const [activeTab, setActiveTab] = useState(0);
-  const [filterPersons, setFilterPersons] = useState([]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
-  const [period, setPeriod] = useState({ startDate: null, endDate: null });
-  const [actionsStatuses, setActionsStatuses] = useState(DONE);
-
-  const [selectedTeams, setSelectedTeams] = useState([currentTeam]);
+  const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
+  const [activeTab, setActiveTab] = useLocalStorage('stats-tab', 0);
+  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons', []);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
+  const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
+  const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
+  const [selectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
 
@@ -183,8 +183,8 @@ const Stats = () => {
     () => actions.filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status)),
     [actions, actionsStatuses]
   );
-  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useState([]);
-  const [actionsCategories, setActionsCategories] = useState([]);
+  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
+  const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
 
   const filterableActionsCategories = useMemo(() => {
     if (!actionsCategoriesGroups.length) return allCategories;
