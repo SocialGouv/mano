@@ -84,14 +84,14 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("En rue depuis le : 12/11/2001")).toBeVisible();
     await expect(page.getByText("Suivi·e depuis le : 13/11/2001")).toBeVisible();
 
-    await expect(page.getByRole("heading", { name: "Actions" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Commentaires" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Actions (0)" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Commentaires (0)" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Informations sociales" })).toBeVisible();
     await expect(page.getByText("cool man")).toBeVisible();
     await expect(page.getByText("Homme isolé")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Informations Médicales" })).toBeVisible();
     await expect(page.getByText("Régime Général")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Documents (0)" })).toBeVisible();
 
     await expect(page.getByRole("button", { name: "Dossier Médical" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Lieux fréquentés" })).toBeVisible();
@@ -134,14 +134,14 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("En rue depuis le : 12/11/2001")).toBeVisible();
     await expect(page.getByText("Suivi·e depuis le : 13/11/2001")).toBeVisible();
 
-    await expect(page.getByRole("heading", { name: "Actions" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Commentaires" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Actions (0)" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Commentaires (0)" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Informations sociales" })).toBeVisible();
     await expect(page.getByText("cool man")).toBeVisible();
     await expect(page.getByText("Homme isolé")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Informations Médicales" })).toBeVisible();
     await expect(page.getByText("Régime Général")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Documents (0)" })).toBeVisible();
 
     await expect(page.getByRole("button", { name: "Dossier Médical" })).toBeVisible();
     await expect(page.getByRole("button", { name: "Lieux fréquentés" })).toBeVisible();
@@ -184,14 +184,14 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("En rue depuis le : 12/11/2001")).toBeVisible();
     await expect(page.getByText("Suivi·e depuis le : 13/11/2001")).toBeVisible();
 
-    await expect(page.getByRole("heading", { name: "Actions" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Commentaires" })).not.toBeVisible();
+    await expect(page.getByRole("heading", { name: "Actions (0)" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Commentaires (0)" })).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Informations sociales" })).not.toBeVisible();
     await expect(page.getByText("cool man")).not.toBeVisible();
     await expect(page.getByText("Homme isolé")).not.toBeVisible();
     await expect(page.getByRole("heading", { name: "Informations Médicales" })).not.toBeVisible();
     await expect(page.getByText("Régime Général")).not.toBeVisible();
-    await expect(page.getByRole("heading", { name: "Documents" })).not.toBeVisible();
+    await expect(page.getByRole("heading", { name: "Documents (0)" })).not.toBeVisible();
 
     await expect(page.getByRole("button", { name: "Dossier Médical" })).not.toBeVisible();
     await expect(page.getByRole("button", { name: "Lieux fréquentés" })).not.toBeVisible();
@@ -234,14 +234,14 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByText("En rue depuis le : 12/11/2001")).toBeVisible();
     await expect(page.getByText("Suivi·e depuis le : 13/11/2001")).toBeVisible();
 
-    await expect(page.getByRole("heading", { name: "Actions" })).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Commentaires" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Actions (0)" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Commentaires (0)" })).toBeVisible();
     await expect(page.getByRole("heading", { name: "Informations sociales" })).toBeVisible();
     await expect(page.getByText("cool man")).toBeVisible();
     await expect(page.getByText("Homme isolé")).toBeVisible();
     await expect(page.getByRole("heading", { name: "Informations Médicales" })).toBeVisible();
     await expect(page.getByText("Régime Général")).toBeVisible();
-    await expect(page.getByRole("heading", { name: "Documents" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Documents (0)" })).toBeVisible();
 
     await expect(page.getByRole("button", { name: "Dossier Médical" })).not.toBeVisible();
     await expect(page.getByRole("button", { name: "Lieux fréquentés" })).toBeVisible();

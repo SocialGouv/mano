@@ -123,7 +123,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Commentaire").fill("hello commentaire passage je veux dire");
   await page.getByRole("button", { name: "Enregistrer" }).click();
 
-  await page.getByRole("button", { name: "Rencontres" }).click();
+  await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "＋" }).nth(2).click();
   await page.getByLabel("Date").click();
   await page.getByLabel("Date").press("Meta+a");
