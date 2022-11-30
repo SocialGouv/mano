@@ -1,3 +1,10 @@
+# [1.178.0](https://github.com/SocialGouv/mano/compare/v1.177.24...v1.178.0) (2022-11-30)
+
+
+### Features
+
+* show items numbers in person ([#1016](https://github.com/SocialGouv/mano/issues/1016)) ([562df2c](https://github.com/SocialGouv/mano/commit/562df2c3ff2fe6eb875cc4e1fbfb2c0fbb78e831))
+
 ## [1.177.24](https://github.com/SocialGouv/mano/compare/v1.177.23...v1.177.24) (2022-11-30)
 
 
