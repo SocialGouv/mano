@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import styled, { css } from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -11,6 +11,7 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { dayjsInstance } from '../../services/date';
 import { selectedTeamsReportsSelector } from '../../recoil/selectors';
 import useSearchParamState from '../../services/useSearchParamState';
+import { useLocalStorage } from 'react-use';
 
 const List = () => {
   useTitle('Comptes rendus');
@@ -36,7 +37,7 @@ const List = () => {
     history.push(`/report/${dateString}?${searchParams.toString()}`);
   };
 
-  const [startOfMonth, setStartOfMonth] = useState(dayjsInstance(window.localStorage.getItem('startOfMonth') || new Date()).startOf('month'));
+  const [startOfMonth, setStartOfMonth] = useLocalStorage('startOfMonth', dayjsInstance().startOf('month'));
   const endOfMonth = useMemo(() => dayjsInstance(startOfMonth).endOf('month'), [startOfMonth]);
   const firstDayToShow = useMemo(() => dayjsInstance(startOfMonth).startOf('week'), [startOfMonth]);
   const lastDayToShow = useMemo(() => dayjsInstance(endOfMonth).endOf('week'), [endOfMonth]);
@@ -49,11 +50,6 @@ const List = () => {
     }
     return days;
   }, [firstDayToShow, lastDayToShow]);
-
-  useEffect(() => {
-    window.localStorage.setItem('startOfMonth', startOfMonth.toISOString());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [startOfMonth]);
 
   return (
     <>

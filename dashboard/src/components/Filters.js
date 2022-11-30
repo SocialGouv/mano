@@ -62,6 +62,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   function getFilterValuesByField(field, base) {
     if (!field) return [];
     const current = base.find((filter) => filter.field === field);
+    if (current?.field === 'outOfActiveList') return current.options;
     if (current?.options?.length) return [...current?.options, 'Non renseigné'];
     if (current.type === 'yes-no') return ['Oui', 'Non', 'Non renseigné'];
     return ['Non renseigné'];

@@ -1,4 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useMemo } from 'react';
+import { useLocalStorage } from 'react-use';
 import styled from 'styled-components';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
@@ -58,7 +59,9 @@ const getDataForPeriod = (
     getIsDayWithinHoursOffsetOfPeriod(item[field] || item.createdAt, { referenceStartDay: startDate, referenceEndDay: endDate }, offsetHours)
   );
 };
+
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Rencontres', 'Observations', 'Comptes-rendus', 'Consultations'];
+
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -82,14 +85,15 @@ const Stats = () => {
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
   const { isLoading } = useDataLoader({ refreshOnMount: true });
 
-  const [selectedTerritories, setSelectedTerritories] = useState([]);
-  const [activeTab, setActiveTab] = useState(0);
-  const [filterPersons, setFilterPersons] = useState([]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useState(teams.length === 1);
-  const [period, setPeriod] = useState({ startDate: null, endDate: null });
-  const [actionsStatuses, setActionsStatuses] = useState(DONE);
-
-  const [selectedTeams, setSelectedTeams] = useState([currentTeam]);
+  const [selectedTerritories, setSelectedTerritories] = useLocalStorage('territories', []);
+  const [activeTab, setActiveTab] = useLocalStorage('tab', 0);
+  const [filterPersons, setFilterPersons] = useLocalStorage('filterPersons', [
+    { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
+  ]);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('viewAllOrganisationData', teams.length === 1);
+  const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
+  const [actionsStatuses, setActionsStatuses] = useLocalStorage('actionsStatuses', DONE);
+  const [selectedTeams, setSelectedTeams] = useLocalStorage('teams', [currentTeam]);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
 
@@ -107,7 +111,7 @@ const Stats = () => {
   const persons = useMemo(
     () =>
       getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, selectedTeams, viewAllOrganisationData, {
-        filters: filterPersons,
+        filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
         field: 'followedSince',
       }),
     [allPersons, filterByTeam, filterPersons, period, selectedTeams, viewAllOrganisationData]
@@ -121,7 +125,7 @@ const Stats = () => {
         selectedTeams,
         viewAllOrganisationData,
         {
-          filters: filterPersons,
+          filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
           field: 'followedSince',
         },
         (data, offsetHours) => {
@@ -152,15 +156,17 @@ const Stats = () => {
   );
 
   const personsForStats = useMemo(() => {
-    return filterPersons.find((f) => f.field === 'outOfActiveList' && f.value === 'Oui')
-      ? persons.filter((p) => p.outOfActiveList)
-      : persons.filter((p) => !p.outOfActiveList);
+    const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
+    if (outOfActiveListFilter === 'Oui') return persons.filter((p) => p.outOfActiveList);
+    if (outOfActiveListFilter === 'Non') return persons.filter((p) => !p.outOfActiveList);
+    return persons;
   }, [filterPersons, persons]);
 
   const personsUpdatedForStats = useMemo(() => {
-    return filterPersons.find((f) => f.field === 'outOfActiveList' && f.value === 'Oui')
-      ? personsUpdated.filter((p) => p.outOfActiveList)
-      : personsUpdated.filter((p) => !p.outOfActiveList);
+    const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
+    if (outOfActiveListFilter === 'Oui') return personsUpdated.filter((p) => p.outOfActiveList);
+    if (outOfActiveListFilter === 'Non') return personsUpdated.filter((p) => !p.outOfActiveList);
+    return personsUpdated;
   }, [filterPersons, personsUpdated]);
 
   const personsWithActions = useMemo(() => {
@@ -183,8 +189,8 @@ const Stats = () => {
     () => actions.filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status)),
     [actions, actionsStatuses]
   );
-  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useState([]);
-  const [actionsCategories, setActionsCategories] = useState([]);
+  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('catGroups', []);
+  const [actionsCategories, setActionsCategories] = useLocalStorage('categories', []);
 
   const filterableActionsCategories = useMemo(() => {
     if (!actionsCategoriesGroups.length) return allCategories;

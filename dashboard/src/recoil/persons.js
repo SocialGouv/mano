@@ -334,4 +334,15 @@ export const preparePersonForEncryption = (customFieldsMedical, customFieldsSoci
   };
 };
 
-export const filterPersonsBase = personFields.filter((m) => m.filterable).map(({ name, ...rest }) => ({ field: name, ...rest }));
+export const filterPersonsBase = personFields
+  .map((f) =>
+    f.name !== 'outOfActiveList'
+      ? f
+      : {
+          ...f,
+          options: ['Oui', 'Non', "Oui et non (c'est-à-dire tout le monde)"],
+          type: 'multi-choice',
+        }
+  )
+  .filter((m) => m.filterable)
+  .map(({ name, ...rest }) => ({ field: name, ...rest }));
