@@ -338,7 +338,15 @@ const Stats = () => {
 
   // Add enabled custom fields in filters.
   const filterPersonsWithAllFields = [
-    ...filterPersonsBase,
+    ...filterPersonsBase.map((f) =>
+      f.field !== 'outOfActiveList'
+        ? f
+        : {
+            ...f,
+            options: ['Oui', 'Non', "Oui et non (c'est-à-dire tout le monde)"],
+            type: 'multi-choice',
+          }
+    ),
     ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
