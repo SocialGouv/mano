@@ -855,7 +855,11 @@ const ActionCompletedAt = ({ date, status, actions }) => {
                 return action.urgent ? <ExclamationMarkButton /> : null;
               },
             },
-            { title: 'À faire le ', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
+            {
+              title: status === CANCEL ? 'Annulée le' : 'Faite le',
+              dataKey: 'completedAt',
+              render: (action) => <DateBloc date={action.completedAt} />,
+            },
             {
               title: 'Heure',
               dataKey: '_id',

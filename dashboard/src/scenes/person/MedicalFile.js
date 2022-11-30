@@ -559,7 +559,7 @@ export function MedicalFile({ person }) {
           {
             title: 'Heure',
             dataKey: 'dueAt-hour',
-            render: (e) => formatTime(e.dueAt),
+            render: (e) => formatTime(e.completedAt || e.dueAt),
           },
           {
             title: 'Nom',

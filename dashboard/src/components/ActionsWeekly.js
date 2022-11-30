@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Badge, Button } from 'reactstrap';
 import styled from 'styled-components';
+import { CANCEL, DONE } from '../recoil/actions';
 import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import ActionStatus from './ActionStatus';
@@ -14,7 +15,12 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
   const [startOfWeek, setStartOfWeek] = useState(dayjsInstance(window.localStorage.getItem('startOfWeek') || new Date()).startOf('week'));
 
   const actionsInWeek = useMemo(() => {
-    return actions.filter((action) => dayjsInstance(action.dueAt).isBetween(startOfWeek, startOfWeek.add(7, 'day').endOf('day')));
+    return actions.filter((action) =>
+      dayjsInstance([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt).isBetween(
+        startOfWeek,
+        startOfWeek.add(7, 'day').endOf('day')
+      )
+    );
   }, [actions, startOfWeek]);
 
   useEffect(() => {
@@ -66,7 +72,11 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
                 </div>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
-                <ActionsOfDay actions={actionsInWeek.filter((action) => isOnSameDay(action.dueAt, day))} />
+                <ActionsOfDay
+                  actions={actionsInWeek.filter((action) =>
+                    isOnSameDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt, day)
+                  )}
+                />
                 <ButtonAddAction onClick={() => onCreateAction(day.toDate())}>+ ajouter une action</ButtonAddAction>
               </div>
             </div>
@@ -87,7 +97,7 @@ function ActionsOfDay({ actions }) {
     ...actions
       .filter((action) => !action.urgent)
       .filter((action) => Boolean(action.withTime))
-      .sort((a, b) => dayjsInstance(a.dueAt).diff(dayjsInstance(b.dueAt))),
+      .sort((a, b) => dayjsInstance(a.completedAt || a.dueAt).diff(dayjsInstance(b.completedAt || b.dueAt))),
     // Then actions without time.
     ...actions.filter((action) => !action.urgent).filter((action) => !action.withTime),
   ];

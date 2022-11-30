@@ -14,7 +14,7 @@ import UserName from '../../components/UserName';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
 import { teamsState } from '../../recoil/auth';
-import { actionsState } from '../../recoil/actions';
+import { actionsState, CANCEL, DONE } from '../../recoil/actions';
 import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
@@ -126,10 +126,14 @@ const Actions = ({ search, onUpdateResults }) => {
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
           columns={[
-            { title: 'À faire le ', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
+            {
+              title: 'À faire / Faite / Annulée le',
+              dataKey: 'dueAt',
+              render: (a) => <DateBloc date={[DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt} />,
+            },
             {
               title: 'Heure',
-              dataKey: '_id',
+              dataKey: 'time',
               render: (action) => {
                 if (!action.dueAt || !action.withTime) return null;
                 return formatTime(action.dueAt);

@@ -5,7 +5,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { theme } from '../config';
-import { actionsState, TODO } from '../recoil/actions';
+import { actionsState, CANCEL, DONE, TODO } from '../recoil/actions';
 import { currentTeamState } from '../recoil/auth';
 import { commentsState } from '../recoil/comments';
 import { personsState } from '../recoil/persons';
@@ -100,10 +100,10 @@ const Actions = ({ setShowModal, actions }) => {
           }}
           columns={[
             {
-              title: 'À faire le',
+              title: 'À faire / Faite / Annulée le',
               dataKey: 'dueAt' || '_id',
               render: (action) => {
-                return <DateBloc date={action.dueAt} />;
+                return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
               },
             },
             {

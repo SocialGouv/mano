@@ -113,7 +113,7 @@ const Reception = () => {
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const dataConsolidated = useMemo(
-    () => [...actionsByStatus, ...consultationsByStatus].sort((a, b) => new Date(b.dueAt || b.date) - new Date(a.dueAt || a.date)),
+    () => [...actionsByStatus, ...consultationsByStatus].sort((a, b) => new Date(b.completedAt || b.dueAt) - new Date(a.completedAt || a.dueAt)),
     [actionsByStatus, consultationsByStatus]
   );
 
