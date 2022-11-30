@@ -20,7 +20,7 @@ export default function Comments({ person }) {
       {modalCreateOpen && <CommentModal isNewComment={true} person={person} onClose={() => setModalCreateOpen(false)} />}
       {modalEditOpen && <CommentModal comment={commentToEdit} person={person} isNewComment={false} onClose={() => setModalEditOpen(false)} />}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
-        <h4 className="tw-flex-1">Commentaires</h4>
+        <h4 className="tw-flex-1">Commentaires ({comments.length})</h4>
         <div>
           <button
             className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"

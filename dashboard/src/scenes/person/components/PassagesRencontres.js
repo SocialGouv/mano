@@ -32,7 +32,7 @@ export default function PassagesRencontres({ person }) {
                 : 'tw-border-b tw-border-slate-300 tw-p-2'
             }
             onClick={() => setSelected('passages')}>
-            Passages
+            Passages ({personPassages.length})
           </button>
           <button
             className={
@@ -41,7 +41,7 @@ export default function PassagesRencontres({ person }) {
                 : 'tw-border-b tw-border-slate-300 tw-p-2'
             }
             onClick={() => setSelected('rencontres')}>
-            Rencontres
+            Rencontres ({personRencontres.length})
           </button>
         </div>
         <div>
