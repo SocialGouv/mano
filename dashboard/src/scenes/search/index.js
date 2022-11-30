@@ -127,7 +127,7 @@ const Actions = ({ search, onUpdateResults }) => {
           rowKey="_id"
           columns={[
             {
-              title: 'À faire / Faite / Annulée le',
+              title: 'Date',
               dataKey: 'dueAt',
               render: (a) => <DateBloc date={[DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt} />,
             },

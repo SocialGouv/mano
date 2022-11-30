@@ -100,7 +100,7 @@ const Actions = ({ setShowModal, actions }) => {
           }}
           columns={[
             {
-              title: 'À faire / Faite / Annulée le',
+              title: 'Date',
               dataKey: 'dueAt' || '_id',
               render: (action) => {
                 return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
