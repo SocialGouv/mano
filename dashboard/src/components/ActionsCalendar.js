@@ -30,7 +30,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
 
   useEffect(() => {
     if (!currentDate) return;
-    const filteredActions = actions.filter((a) => a.dueAt || a.completedAt);
+    const filteredActions = actions.filter((a) => a.completedAt || a.dueAt);
     setTheDayBeforeActions(
       filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, subtractOneDay(currentDate)))
     );

@@ -553,13 +553,13 @@ export function MedicalFile({ person }) {
             title: 'Date',
             dataKey: 'dueAt-day',
             render: (e) => {
-              return <DateBloc date={e.dueAt} />;
+              return <DateBloc date={[DONE, CANCEL].includes(e.status) ? e.completedAt : e.dueAt} />;
             },
           },
           {
             title: 'Heure',
             dataKey: 'dueAt-hour',
-            render: (e) => formatTime(e.completedAt || e.dueAt),
+            render: (e) => formatTime(e.dueAt),
           },
           {
             title: 'Nom',
