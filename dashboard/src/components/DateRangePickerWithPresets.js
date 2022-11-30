@@ -4,6 +4,7 @@ import OutsideClickHandler from 'react-outside-click-handler';
 import DatePicker from 'react-datepicker';
 import { dayjsInstance, dateForDatePicker } from '../services/date';
 import { theme } from '../config';
+import { useLocalStorage } from 'react-use';
 
 const getOffsetFromToday = (value, unit, end) => {
   const a = dayjsInstance();
@@ -79,7 +80,7 @@ const periods = [
 // https://reactdatepicker.com/#example-date-range
 const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   const [showDatePicker, setShowDatepicker] = useState(false);
-  const [preset, setPreset] = useState(null);
+  const [preset, setPreset] = useLocalStorage('stats-date-preset', null);
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
 
   const handleWindowResize = useCallback(() => {
@@ -148,10 +149,10 @@ const DateRangePickerWithPresets = ({ period, setPeriod }) => {
               inline
               locale="fr"
               name="date"
-              selected={period.startDate}
+              selected={dateForDatePicker(period.startDate)}
               onChange={onChange}
-              startDate={period.startDate}
-              endDate={period.endDate}
+              startDate={dateForDatePicker(period.startDate)}
+              endDate={dateForDatePicker(period.endDate)}
             />
           </PickerContainer>
         </OutsideClickHandler>
