@@ -10,7 +10,7 @@ import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
-import { formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../../../services/date';
+import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 
 export const Actions = ({ person }) => {
   const data = person?.actions || [];
@@ -96,7 +96,8 @@ export const Actions = ({ person }) => {
       <table className="table table-striped">
         <tbody className="small">
           {filteredData.map((action, i) => {
-            const date = [DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt;
+            const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
+            const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : '';
             return (
               <tr key={action._id}>
                 <td>
@@ -108,8 +109,7 @@ export const Actions = ({ person }) => {
                     }}>
                     <div className="tw-flex">
                       <div className="tw-flex-1">
-                        {action.urgent ? <ExclamationMarkButton /> : null}{' '}
-                        {date && action.withTime ? formatDateTimeWithNameOfDay(date) : formatDateWithNameOfDay(date)}
+                        {action.urgent ? <ExclamationMarkButton /> : null} {`${date}${time}`}
                       </div>
                       <div>
                         <ActionStatus status={action.status} />
