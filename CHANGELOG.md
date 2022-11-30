@@ -1,3 +1,10 @@
+# [1.179.0](https://github.com/SocialGouv/mano/compare/v1.178.0...v1.179.0) (2022-11-30)
+
+
+### Features
+
+* useLocalStorage ([#1020](https://github.com/SocialGouv/mano/issues/1020)) ([1d613f9](https://github.com/SocialGouv/mano/commit/1d613f9034f4b0c427a6894f6b38aa86da96fbad))
+
 # [1.178.0](https://github.com/SocialGouv/mano/compare/v1.177.24...v1.178.0) (2022-11-30)
 
 
