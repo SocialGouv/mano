@@ -85,15 +85,15 @@ const Stats = () => {
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
   const { isLoading } = useDataLoader({ refreshOnMount: true });
 
-  const [selectedTerritories, setSelectedTerritories] = useLocalStorage('territories', []);
-  const [activeTab, setActiveTab] = useLocalStorage('tab', 0);
-  const [filterPersons, setFilterPersons] = useLocalStorage('filterPersons', [
+  const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
+  const [activeTab, setActiveTab] = useLocalStorage('stats-tab', 0);
+  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons', [
     { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
   ]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('viewAllOrganisationData', teams.length === 1);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
-  const [actionsStatuses, setActionsStatuses] = useLocalStorage('actionsStatuses', DONE);
-  const [selectedTeams, setSelectedTeams] = useLocalStorage('teams', [currentTeam]);
+  const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
+  const [selectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
 
@@ -189,8 +189,8 @@ const Stats = () => {
     () => actions.filter((a) => !actionsStatuses.length || actionsStatuses.includes(a.status)),
     [actions, actionsStatuses]
   );
-  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('catGroups', []);
-  const [actionsCategories, setActionsCategories] = useLocalStorage('categories', []);
+  const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
+  const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
 
   const filterableActionsCategories = useMemo(() => {
     if (!actionsCategoriesGroups.length) return allCategories;

@@ -80,7 +80,7 @@ const periods = [
 // https://reactdatepicker.com/#example-date-range
 const DateRangePickerWithPresets = ({ period, setPeriod }) => {
   const [showDatePicker, setShowDatepicker] = useState(false);
-  const [preset, setPreset] = useLocalStorage('statsPreset', null);
+  const [preset, setPreset] = useLocalStorage('stats-date-preset', null);
   const [numberOfMonths, setNumberOfMonths] = useState(() => (window.innerWidth < 1100 ? 1 : 2));
 
   const handleWindowResize = useCallback(() => {
