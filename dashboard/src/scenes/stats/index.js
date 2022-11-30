@@ -42,7 +42,7 @@ const getDataForPeriod = (
   { startDate, endDate },
   selectedTeams,
   viewAllOrganisationData,
-  { filters = [], field = 'createdAt' } = {},
+  { filters = [], field = 'createdAt', backupField = 'createdAt' } = {},
   callback = null
 ) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
@@ -55,7 +55,11 @@ const getDataForPeriod = (
     return callback(data, offsetHours);
   }
   return data.filter((item) =>
-    getIsDayWithinHoursOffsetOfPeriod(item[field] || item.createdAt, { referenceStartDay: startDate, referenceEndDay: endDate }, offsetHours)
+    getIsDayWithinHoursOffsetOfPeriod(
+      item[field] || item[backupField] || item.createdAt,
+      { referenceStartDay: startDate, referenceEndDay: endDate },
+      offsetHours
+    )
   );
 };
 const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Rencontres', 'Observations', 'Comptes-rendus', 'Consultations'];
@@ -175,7 +179,11 @@ const Stats = () => {
   }, [period.endDate, period.startDate, personsUpdatedForStats, selectedTeams, viewAllOrganisationData]);
 
   const actions = useMemo(
-    () => getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData),
+    () =>
+      getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData, {
+        field: 'completedAt',
+        backupField: 'dueAt',
+      }),
     [allActions, filterByTeam, period, selectedTeams, viewAllOrganisationData]
   );
 
