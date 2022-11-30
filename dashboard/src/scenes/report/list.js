@@ -37,7 +37,11 @@ const List = () => {
     history.push(`/report/${dateString}?${searchParams.toString()}`);
   };
 
-  const [startOfMonth, setStartOfMonth] = useLocalStorage('startOfMonth', dayjsInstance().startOf('month'), { deserializer: dayjsInstance });
+  const [startOfMonth, setStartOfMonth] = useLocalStorage('startOfMonth', dayjsInstance().startOf('month'), {
+    raw: false,
+    deserializer: (v) => dayjsInstance(v),
+    serializer: (v) => v.toISOString(),
+  });
   const endOfMonth = useMemo(() => dayjsInstance(startOfMonth).endOf('month'), [startOfMonth]);
   const firstDayToShow = useMemo(() => dayjsInstance(startOfMonth).startOf('week'), [startOfMonth]);
   const lastDayToShow = useMemo(() => dayjsInstance(endOfMonth).endOf('week'), [endOfMonth]);
