@@ -12,7 +12,7 @@ import Search from '../../components/search';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import ActionsWeekly from '../../components/ActionsWeekly';
 import SelectCustom from '../../components/SelectCustom';
-import ActionName from '../../components/ActionName';
+import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
 import { mappedIdsToLabels, TODO } from '../../recoil/actions';
@@ -283,7 +283,7 @@ const List = () => {
               {
                 title: 'Nom',
                 dataKey: 'name',
-                render: (action) => <ActionName action={action} />,
+                render: (action) => <ActionOrConsultationName item={action} />,
               },
               {
                 title: 'Personne suivie',

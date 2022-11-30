@@ -14,7 +14,7 @@ import { territoriesState } from '../recoil/territory';
 import { placesState } from '../recoil/places';
 import { relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { territoryObservationsState } from '../recoil/territoryObservations';
-import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
+import { consultationsState, formatConsultation } from '../recoil/consultations';
 import { commentsState } from '../recoil/comments';
 import { organisationState, userState } from '../recoil/auth';
 
@@ -214,9 +214,7 @@ export default function DataLoader() {
       const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastLoad } });
       if (!res.data) return resetLoaderOnError();
       setConsultations(
-        res.hasMore
-          ? mergeItems(consultations, res.decryptedData)
-          : mergeItems(consultations, res.decryptedData).map((c) => whitelistAllowedData(c, user))
+        res.hasMore ? mergeItems(consultations, res.decryptedData) : mergeItems(consultations, res.decryptedData).map(formatConsultation)
       );
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);

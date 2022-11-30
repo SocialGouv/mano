@@ -57,12 +57,8 @@ export default function EditModal({ person, selectedPanel, onClose }) {
               user: user._id,
               data: {},
             };
-            console.log({ allowedFieldsInHistory });
             for (const key in body) {
-              console.log({ key });
-              console.log(!allowedFieldsInHistory.includes(key));
               if (!allowedFieldsInHistory.includes(key)) continue;
-              console.log(body[key], person[key]);
               if (body[key] !== person[key]) historyEntry.data[key] = { oldValue: person[key], newValue: body[key] };
             }
             if (!!Object.keys(historyEntry.data).length) body.history = [...(person.history || []), historyEntry];

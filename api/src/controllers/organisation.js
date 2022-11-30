@@ -70,12 +70,8 @@ router.get(
     const medicalDataQuery =
       withAllMedicalData !== "true" ? query : { where: { organisation: req.query.organisation }, paranoid: withDeleted === "true" };
     const consultations = await Consultation.count(medicalDataQuery);
-    let treatments = 0;
-    let medicalFiles = 0;
-    if (req.user.healthcareProfessional) {
-      medicalFiles = await MedicalFile.count(medicalDataQuery);
-      treatments = await Treatment.count(medicalDataQuery);
-    }
+    const medicalFiles = await MedicalFile.count(medicalDataQuery);
+    const treatments = await Treatment.count(medicalDataQuery);
 
     return res.status(200).send({
       ok: true,

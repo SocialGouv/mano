@@ -29,7 +29,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import Card from '../../components/Card';
 import CreateObservation from '../../components/CreateObservation';
 import SelectAndCreateCollaboration from './SelectAndCreateCollaboration';
-import ActionName from '../../components/ActionName';
+import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
@@ -864,7 +864,7 @@ const ActionCompletedAt = ({ date, status, actions }) => {
                 return formatTime(action.dueAt);
               },
             },
-            { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
+            { title: 'Nom', dataKey: 'name', render: (action) => <ActionOrConsultationName item={action} /> },
             {
               title: 'Personne suivie',
               dataKey: 'person',
@@ -920,7 +920,7 @@ const ActionCreatedAt = ({ date, actions }) => {
                 return formatTime(action.dueAt);
               },
             },
-            { title: 'Nom', dataKey: 'name', render: (action) => <ActionName action={action} /> },
+            { title: 'Nom', dataKey: 'name', render: (action) => <ActionOrConsultationName item={action} /> },
             {
               title: 'Personne suivie',
               dataKey: 'person',
@@ -981,7 +981,7 @@ const Consultations = ({ date, status, consultations }) => {
             {
               title: 'Nom',
               dataKey: 'name',
-              render: (consultation) => <ActionName action={consultation} />,
+              render: (consultation) => <ActionOrConsultationName item={consultation} />,
             },
             {
               title: 'Personne suivie',
@@ -1036,7 +1036,7 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
             {
               title: 'Nom',
               dataKey: 'name',
-              render: (action) => <ActionName action={action} />,
+              render: (action) => <ActionOrConsultationName item={action} />,
             },
             {
               title: 'Personne suivie',

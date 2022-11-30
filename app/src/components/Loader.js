@@ -20,7 +20,7 @@ import { territoryObservationsState } from '../recoil/territoryObservations';
 import { commentsState } from '../recoil/comments';
 import { capture } from '../services/sentry';
 import { reportsState } from '../recoil/reports';
-import { consultationsState, whitelistAllowedData } from '../recoil/consultations';
+import { consultationsState, formatConsultation } from '../recoil/consultations';
 import { medicalFileState } from '../recoil/medicalFiles';
 import { treatmentsState } from '../recoil/treatments';
 import { sortByName } from '../utils/sortByName';
@@ -173,15 +173,12 @@ const Loader = () => {
         setBatchData: (newConsultations) =>
           setConsultations((oldConsultations) =>
             initialLoad
-              ? [...oldConsultations, ...newConsultations.map((c) => whitelistAllowedData(c, user))]
-              : mergeItems(
-                  oldConsultations,
-                  newConsultations.map((c) => whitelistAllowedData(c, user))
-                )
+              ? [...oldConsultations, ...newConsultations.map(formatConsultation)]
+              : mergeItems(oldConsultations, newConsultations.map(formatConsultation))
           ),
         API,
       });
-      if (refreshedConsultations) setConsultations(refreshedConsultations.map((c) => whitelistAllowedData(c, user)));
+      if (refreshedConsultations) setConsultations(refreshedConsultations.map(formatConsultation));
     }
     /*
     Get treatments

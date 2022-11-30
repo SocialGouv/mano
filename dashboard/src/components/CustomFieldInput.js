@@ -8,13 +8,14 @@ import { dateForDatePicker } from '../services/date';
 
 const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
-    if (['text', 'number'].includes(field.type)) return `${model}-custom-input-${field.name}`;
-    if (['textarea'].includes(field.type)) return `${model}-custom-textarea-${field.name}`;
-    if (['date-with-time', 'date'].includes(field.type)) return `${model}-custom-datepicker-${field.name}`;
-    if (['boolean'].includes(field.type)) return `${model}-custom-checkbox-${field.name}`;
-    if (['yes-no'].includes(field.type)) return `${model}-custom-select-${field.name}`;
-    if (['enum'].includes(field.type)) return `${model}-custom-select-${field.name}`;
-    if (['multi-choice'].includes(field.type)) return `${model}-custom-select-${field.name}`;
+    const slugifiedLabel = field.label.toLowerCase().replace(/ /g, '-').replace("'", '') ?? field.name;
+    if (['text', 'number'].includes(field.type)) return `${model}-custom-input-${slugifiedLabel}`;
+    if (['textarea'].includes(field.type)) return `${model}-custom-textarea-${slugifiedLabel}`;
+    if (['date-with-time', 'date'].includes(field.type)) return `${model}-custom-datepicker-${slugifiedLabel}`;
+    if (['boolean'].includes(field.type)) return `${model}-custom-checkbox-${slugifiedLabel}`;
+    if (['yes-no'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
+    if (['enum'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
+    if (['multi-choice'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
   }, [field, model]);
 
   return (

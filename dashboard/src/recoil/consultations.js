@@ -31,30 +31,9 @@ export const prepareConsultationForEncryption = (customFieldsConsultations) => (
   };
 };
 
-const allowedFieldsForNonProfessional = [
-  '_id',
-  'organisation',
-  'createdAt',
-  'updatedAt',
-  'completedAt',
-  'dueAt',
-  'status',
-  'onlyVisibleBy',
-  'entityKey',
-  'person',
-  'user',
-];
-
 export const defaultConsultationFields = { isConsultation: true, withTime: true };
 
-export const whitelistAllowedData = (consultation, user) => {
-  if (!user.healthcareProfessional || (consultation.onlyVisibleBy?.length && !consultation.onlyVisibleBy.includes(user._id))) {
-    const allowedConsultation = { ...defaultConsultationFields };
-    for (const allowedField of allowedFieldsForNonProfessional) {
-      allowedConsultation[allowedField] = consultation[allowedField];
-    }
-    return allowedConsultation;
-  }
+export const formatConsultation = (consultation) => {
   return { ...consultation, ...defaultConsultationFields };
 };
 

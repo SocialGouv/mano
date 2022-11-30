@@ -40,7 +40,6 @@ export async function getManoCacheStorage() {
         // The error is thenb: No available storage method found.
         if (e.message === 'No available storage method found.') {
           manoCacheStorage = null;
-          console.log('CLEAR FROM method not found');
           window.localStorage?.clear();
         } else {
           capture(e);
