@@ -29,7 +29,7 @@ const PersonDocuments = ({ person }) => {
     <div className="tw-relative">
       {openModal && <DocumentModal document={openModal} person={person} onClose={() => setOpenModal(false)} />}
       <div className="tw-sticky tw-top-0 tw-z-50 tw-flex tw-bg-white tw-p-3">
-        <h4 className="tw-flex-1 tw-text-xl">Documents</h4>
+        <h4 className="tw-flex-1 tw-text-xl">Documents ({person?.documents?.length ?? 0})</h4>
         <label
           aria-label="Ajouter un document"
           className="tw-text-md tw-h-8 tw-w-8 tw-cursor-pointer tw-rounded-full tw-bg-main tw-text-center tw-font-bold tw-leading-8 tw-text-white tw-transition hover:tw-scale-125">
