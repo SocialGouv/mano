@@ -1,3 +1,10 @@
+## [1.177.24](https://github.com/SocialGouv/mano/compare/v1.177.23...v1.177.24) (2022-11-30)
+
+
+### Bug Fixes
+
+* download medical file but not show it ([#1012](https://github.com/SocialGouv/mano/issues/1012)) ([1d18897](https://github.com/SocialGouv/mano/commit/1d188970a1bd3b385ddefdca6edb14c2df4212e6))
+
 ## [1.177.23](https://github.com/SocialGouv/mano/compare/v1.177.22...v1.177.23) (2022-11-29)
 
 
