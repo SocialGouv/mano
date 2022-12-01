@@ -9,7 +9,15 @@ import { theme } from '../config';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth';
 
-const DeleteButtonAndConfirmModal = ({ title, children, textToConfirm, onConfirm, buttonWidth = null }) => {
+const DeleteButtonAndConfirmModal = ({
+  title,
+  children,
+  textToConfirm,
+  onConfirm,
+  buttonWidth = null,
+  roles = ['admin', 'superadmin'],
+  roleErrorMessage = "Désolé, seul un admin peut supprimer ce type d'élément",
+}) => {
   const user = useRecoilValue(userState);
   const [open, setOpen] = useState(false);
   return (
@@ -18,7 +26,7 @@ const DeleteButtonAndConfirmModal = ({ title, children, textToConfirm, onConfirm
         title="Supprimer"
         color="danger"
         onClick={() => {
-          if (!['admin', 'superadmin'].includes(user.role)) return toast.error("Désolé, seul un admin peut supprimer ce type d'élément");
+          if (!roles.includes(user.role)) return toast.error(roleErrorMessage);
           setOpen(true);
         }}
         width={buttonWidth}
