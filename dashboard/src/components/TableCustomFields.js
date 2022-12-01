@@ -94,7 +94,7 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
   const handleSort = async (keys, oldData) => {
     setIsSubmitting(true);
     try {
-      const dataForApi = keys.map((key) => mutableData.find((field) => field.label === key));
+      const dataForApi = keys.map((key) => mutableData.find((field) => field.name === key));
       const response = await API.put({
         path: `/organisation/${organisation._id}`,
         body: { [customFields]: mergeData ? mergeData(dataForApi) : dataForApi },
@@ -118,7 +118,7 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
         data={mutableData}
         // use this key prop to reset table and reset sortablejs on each element added/removed
         key={(keyPrefix || customFields) + tableKey + organisation}
-        rowKey="label"
+        rowKey="name"
         isSortable
         onSort={handleSort}
         noData="Pas de champs personnalisés"
