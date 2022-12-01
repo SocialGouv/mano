@@ -1,3 +1,10 @@
+## [1.179.2](https://github.com/SocialGouv/mano/compare/v1.179.1...v1.179.2) (2022-12-01)
+
+
+### Bug Fixes
+
+* persons fetching sorted by _id instead of create at ([407852d](https://github.com/SocialGouv/mano/commit/407852d89f2fb3273776eb50c5f7bf331c930425))
+
 ## [1.179.1](https://github.com/SocialGouv/mano/compare/v1.179.0...v1.179.1) (2022-12-01)
 
 
