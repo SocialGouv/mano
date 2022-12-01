@@ -42,12 +42,12 @@ const periods = [
     period: { startDate: dayjsInstance().subtract(1, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
   },
   {
-    label: 'Les trois derniers mois',
-    period: { startDate: dayjsInstance().subtract(3, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
+    label: 'Les trois derniers mois glissants',
+    period: { startDate: dayjsInstance().subtract(3, 'month'), endDate: dayjsInstance() },
   },
   {
-    label: 'Les six derniers mois',
-    period: { startDate: dayjsInstance().subtract(6, 'month').startOf('month'), endDate: dayjsInstance().subtract(1, 'month').endOf('month') },
+    label: 'Les six derniers mois glissants',
+    period: { startDate: dayjsInstance().subtract(6, 'month'), endDate: dayjsInstance() },
   },
   {
     label: 'Ce semestre',
