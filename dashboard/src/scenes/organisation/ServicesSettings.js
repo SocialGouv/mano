@@ -113,7 +113,7 @@ const ServicesSettings = () => {
               <label htmlFor="groupTitle" className="form-text tailwindui">
                 Titre du groupe
               </label>
-              <input type="text" id="groupTitle" name="groupTitle" placeholder="Démarches administratives" className="form-text tailwindui" />
+              <input type="text" id="groupTitle" name="groupTitle" placeholder="Injection" className="form-text tailwindui" />
             </div>
           </form>
         </ModalBody>
