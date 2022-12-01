@@ -1,3 +1,10 @@
+## [1.180.3](https://github.com/SocialGouv/mano/compare/v1.180.2...v1.180.3) (2022-12-01)
+
+
+### Bug Fixes
+
+* consultations has no team so ne need to filter by team ([3c0fbd9](https://github.com/SocialGouv/mano/commit/3c0fbd981ece28d398b18c2e905afe33c701e32f))
+
 ## [1.180.2](https://github.com/SocialGouv/mano/compare/v1.180.1...v1.180.2) (2022-12-01)
 
 
