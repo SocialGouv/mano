@@ -35,6 +35,7 @@ import { Bounce, cssTransition, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import SentryRoute from './components/Sentryroute';
 import { ENV, VERSION } from './config';
+import TextChecker from './components/TextChecker';
 
 const ToastifyFastTransition = cssTransition({
   enter: 'Toastify--animate Toastify__hack-force-fast Toastify__bounce-enter',
@@ -103,6 +104,8 @@ const App = ({ resetRecoil }) => {
     <div className="main-container">
       <ToastContainer transition={process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' ? Bounce : ToastifyFastTransition} />
       <VersionOutdatedAlert />
+      <VersionOutdatedAlert />
+      {process.env.REACT_APP_TEST_PLAYWRIGHT === 'true' && <TextChecker />}
       <Router history={history}>
         <ScrollToTop />
         <Switch>
