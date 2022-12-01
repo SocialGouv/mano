@@ -2,7 +2,7 @@ import API from '../services/api';
 import { MMKV } from 'react-native-mmkv';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-export const appCurrentCacheKey = 'mano_last_refresh_2022_11_28';
+export const appCurrentCacheKey = 'mano_last_refresh_2022_12_01';
 
 export const mergeNewUpdatedData = (newData, oldData) => {
   const oldDataIds = oldData.map((p) => p._id);
