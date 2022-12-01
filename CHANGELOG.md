@@ -1,3 +1,16 @@
+# [1.180.0](https://github.com/SocialGouv/mano/compare/v1.179.3...v1.180.0) (2022-12-01)
+
+
+### Bug Fixes
+
+* 3 months preset in stats ([#1021](https://github.com/SocialGouv/mano/issues/1021)) ([2bfe001](https://github.com/SocialGouv/mano/commit/2bfe001464f28bbbe105046a5139f08c789658bf))
+* action dates when completed ([#1019](https://github.com/SocialGouv/mano/issues/1019)) ([47143d0](https://github.com/SocialGouv/mano/commit/47143d0911d919beddb867370c9333a4ebd18de7))
+
+
+### Features
+
+* new filter outOfActiveList ([#1022](https://github.com/SocialGouv/mano/issues/1022)) ([4a10628](https://github.com/SocialGouv/mano/commit/4a10628d6671d2a901a37db3370b44ab3d35a87b))
+
 ## [1.179.3](https://github.com/SocialGouv/mano/compare/v1.179.2...v1.179.3) (2022-12-01)
 
 
