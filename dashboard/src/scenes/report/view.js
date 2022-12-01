@@ -178,18 +178,12 @@ const View = () => {
   const consultations = useCallback(
     (status) =>
       allConsultations
-        ?.filter((a) => !!selectedTeamsObject[a.team])
         .filter((c) => c.status === status)
         .filter((a) => {
-          const currentTeam = selectedTeamsObject[a.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            a.completedAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
+          return getIsDayWithinHoursOffsetOfPeriod(a.completedAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
         })
         .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
-    [allConsultations, dateString, selectedTeamsObject]
+    [allConsultations, dateString]
   );
   const consultationsDone = useMemo(() => consultations(DONE), [consultations]);
   const consultationsCancel = useMemo(() => consultations(CANCEL), [consultations]);
@@ -197,18 +191,12 @@ const View = () => {
   const consultationsCreatedAt = useMemo(
     () =>
       allConsultations
-        ?.filter((a) => !!selectedTeamsObject[a.team])
         .filter((a) => {
-          const currentTeam = selectedTeamsObject[a.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            a.createdAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
+          return getIsDayWithinHoursOffsetOfPeriod(a.createdAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
         })
         .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } }))
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [allConsultations, dateString, selectedTeamsObject]
+    [allConsultations, dateString]
   );
 
   const comments = useMemo(
