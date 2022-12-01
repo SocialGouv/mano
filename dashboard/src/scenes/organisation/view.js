@@ -21,7 +21,6 @@ import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
 import SortableGrid from '../../components/SortableGrid';
-import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import useTitle from '../../services/useTitle';
 import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
@@ -48,14 +47,12 @@ const getSettingTitle = (tabId) => {
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const user = useRecoilValue(userState);
-  const reports = useRecoilValue(reportsState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
-  const { refresh } = useDataLoader();
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
