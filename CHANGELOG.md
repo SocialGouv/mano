@@ -1,3 +1,10 @@
+## [1.180.2](https://github.com/SocialGouv/mano/compare/v1.180.1...v1.180.2) (2022-12-01)
+
+
+### Bug Fixes
+
+* action categories search ([0d16e8e](https://github.com/SocialGouv/mano/commit/0d16e8e0f30c910acf79866cba074cee2804fe6b))
+
 ## [1.180.1](https://github.com/SocialGouv/mano/compare/v1.180.0...v1.180.1) (2022-12-01)
 
 
