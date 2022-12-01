@@ -1,3 +1,10 @@
+## [1.179.3](https://github.com/SocialGouv/mano/compare/v1.179.2...v1.179.3) (2022-12-01)
+
+
+### Bug Fixes
+
+* normal people can delete person ([#1024](https://github.com/SocialGouv/mano/issues/1024)) ([7825d0e](https://github.com/SocialGouv/mano/commit/7825d0eaf120c54ac49ca9ef014f8189182a7ed8))
+
 ## [1.179.2](https://github.com/SocialGouv/mano/compare/v1.179.1...v1.179.2) (2022-12-01)
 
 
