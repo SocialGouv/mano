@@ -15,7 +15,7 @@ import SelectCustom from '../../components/SelectCustom';
 import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
-import { mappedIdsToLabels, TODO } from '../../recoil/actions';
+import { CANCEL, DONE, mappedIdsToLabels, TODO } from '../../recoil/actions';
 import { currentTeamState, userState } from '../../recoil/auth';
 import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
@@ -262,10 +262,10 @@ const List = () => {
                 },
               },
               {
-                title: 'À faire le',
+                title: 'Date',
                 dataKey: 'dueAt' || '_id',
                 render: (action) => {
-                  return <DateBloc date={action.dueAt} />;
+                  return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
                 },
               },
               {

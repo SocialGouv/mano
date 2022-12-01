@@ -553,7 +553,7 @@ export function MedicalFile({ person }) {
             title: 'Date',
             dataKey: 'dueAt-day',
             render: (e) => {
-              return <DateBloc date={e.dueAt} />;
+              return <DateBloc date={[DONE, CANCEL].includes(e.status) ? e.completedAt : e.dueAt} />;
             },
           },
           {

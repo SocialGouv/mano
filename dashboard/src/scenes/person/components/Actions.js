@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
-import { mappedIdsToLabels } from '../../../recoil/actions';
+import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
 import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
 import CreateActionModal from '../../../components/CreateActionModal';
@@ -10,7 +10,7 @@ import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
-import { formatDateTimeWithNameOfDay, formatDateWithNameOfDay } from '../../../services/date';
+import { formatDateWithNameOfDay, formatTime } from '../../../services/date';
 
 export const Actions = ({ person }) => {
   const data = person?.actions || [];
@@ -95,34 +95,37 @@ export const Actions = ({ person }) => {
 
       <table className="table table-striped">
         <tbody className="small">
-          {filteredData.map((action, i) => (
-            <tr key={action._id}>
-              <td>
-                <div
-                  className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
-                  onClick={() => {
-                    if (['restricted-access'].includes(user.role)) return;
-                    history.push(`/action/${action._id}`);
-                  }}>
-                  <div className="tw-flex">
-                    <div className="tw-flex-1">
-                      {action.urgent ? <ExclamationMarkButton /> : null}{' '}
-                      {action.dueAt && action.withTime ? formatDateTimeWithNameOfDay(action.dueAt) : formatDateWithNameOfDay(action.dueAt)}
+          {filteredData.map((action, i) => {
+            const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
+            const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : '';
+            return (
+              <tr key={action._id}>
+                <td>
+                  <div
+                    className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
+                    onClick={() => {
+                      if (['restricted-access'].includes(user.role)) return;
+                      history.push(`/action/${action._id}`);
+                    }}>
+                    <div className="tw-flex">
+                      <div className="tw-flex-1">
+                        {action.urgent ? <ExclamationMarkButton /> : null} {`${date}${time}`}
+                      </div>
+                      <div>
+                        <ActionStatus status={action.status} />
+                      </div>
                     </div>
-                    <div>
-                      <ActionStatus status={action.status} />
+                    <div className="tw-mt-2 tw-flex">
+                      <div className="tw-flex-1">{!['restricted-access'].includes(user.role) && <ActionOrConsultationName item={action} />}</div>
+                      <div>
+                        <TagTeam teamId={action.team} />
+                      </div>
                     </div>
                   </div>
-                  <div className="tw-mt-2 tw-flex">
-                    <div className="tw-flex-1">{!['restricted-access'].includes(user.role) && <ActionOrConsultationName item={action} />}</div>
-                    <div>
-                      <TagTeam teamId={action.team} />
-                    </div>
-                  </div>
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>
