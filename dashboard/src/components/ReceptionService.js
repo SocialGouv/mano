@@ -12,6 +12,7 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
   const flattenedServices = useRecoilValue(flattenedServicesSelector);
   const [reports, setReports] = useRecoilState(reportsState);
   const lastLoad = useRecoilValue(lastLoadState);
+  const [selected, setSelected] = useState(groupedServices[0]?.groupTitle || null);
 
   const API = useApi();
 
@@ -99,21 +100,31 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
     [services]
   );
 
+  const selectedServices = groupedServices.find((e) => e.groupTitle === selected)?.services || [];
+
   return (
     <div>
-      {groupedServices.map((group) => (
-        <div key={group.groupTitle}>
-          <h3>{group.groupTitle}</h3>
-          {group.services?.map((service) => (
-            <IncrementorSmall
-              dataTestId={`${dataTestIdPrefix}${service}-${services[service] || 0}`}
-              key={service}
-              service={service}
-              count={services[service] || 0}
-              onChange={(newCount) => onServiceUpdate(service, newCount)}
-            />
-          ))}
-        </div>
+      <div className="tw-mb-4 tw-border-b tw-border-slate-300">
+        {groupedServices.map((group) => (
+          <button
+            className={
+              selected === group.groupTitle
+                ? 'tw-mb-[-1px] tw-rounded-t tw-border tw-border-slate-300 tw-border-b-[#f8f8f8] tw-px-4 tw-py-2'
+                : 'tw-px-4 tw-py-2  tw-text-main tw-outline-slate-300 hover:tw-outline'
+            }
+            onClick={() => setSelected(group.groupTitle)}>
+            {group.groupTitle}
+          </button>
+        ))}
+      </div>
+      {selectedServices.map((service) => (
+        <IncrementorSmall
+          dataTestId={`${dataTestIdPrefix}${service}-${services[service] || 0}`}
+          key={service}
+          service={service}
+          count={services[service] || 0}
+          onChange={(newCount) => onServiceUpdate(service, newCount)}
+        />
       ))}
     </div>
   );
