@@ -1,5 +1,6 @@
 import { storage } from '../services/dataManagement';
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
+import { organisationState } from './auth';
 
 export const reportsState = atom({
   key: 'reportsState',
