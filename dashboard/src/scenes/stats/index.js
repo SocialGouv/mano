@@ -89,7 +89,9 @@ const Stats = () => {
 
   const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
   const [activeTab, setActiveTab] = useLocalStorage('stats-tab', 0);
-  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons', []);
+  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', [
+    { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
+  ]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
   const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
@@ -111,7 +113,7 @@ const Stats = () => {
   const persons = useMemo(
     () =>
       getDataForPeriod(filterByTeam(allPersons, 'assignedTeams'), period, selectedTeams, viewAllOrganisationData, {
-        filters: filterPersons,
+        filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
         field: 'followedSince',
       }),
     [allPersons, filterByTeam, filterPersons, period, selectedTeams, viewAllOrganisationData]
@@ -125,7 +127,7 @@ const Stats = () => {
         selectedTeams,
         viewAllOrganisationData,
         {
-          filters: filterPersons,
+          filters: filterPersons.filter((f) => f.field !== 'outOfActiveList'),
           field: 'followedSince',
         },
         (data, offsetHours) => {
@@ -141,6 +143,8 @@ const Stats = () => {
               item.comments?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
               item.passages?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
               item.passages?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
+              item.rencontres?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
+              item.rencontres?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
               item.relsPersonPlace?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
               item.relsPersonPlace?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
               item.treatments?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
@@ -156,15 +160,17 @@ const Stats = () => {
   );
 
   const personsForStats = useMemo(() => {
-    return filterPersons.find((f) => f.field === 'outOfActiveList' && f.value === 'Oui')
-      ? persons.filter((p) => p.outOfActiveList)
-      : persons.filter((p) => !p.outOfActiveList);
+    const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
+    if (outOfActiveListFilter === 'Oui') return persons.filter((p) => p.outOfActiveList);
+    if (outOfActiveListFilter === 'Non') return persons.filter((p) => !p.outOfActiveList);
+    return persons;
   }, [filterPersons, persons]);
 
   const personsUpdatedForStats = useMemo(() => {
-    return filterPersons.find((f) => f.field === 'outOfActiveList' && f.value === 'Oui')
-      ? personsUpdated.filter((p) => p.outOfActiveList)
-      : personsUpdated.filter((p) => !p.outOfActiveList);
+    const outOfActiveListFilter = filterPersons.find((f) => f.field === 'outOfActiveList')?.value;
+    if (outOfActiveListFilter === 'Oui') return personsUpdated.filter((p) => p.outOfActiveList);
+    if (outOfActiveListFilter === 'Non') return personsUpdated.filter((p) => !p.outOfActiveList);
+    return personsUpdated;
   }, [filterPersons, personsUpdated]);
 
   const personsWithActions = useMemo(() => {
@@ -340,7 +346,15 @@ const Stats = () => {
 
   // Add enabled custom fields in filters.
   const filterPersonsWithAllFields = [
-    ...filterPersonsBase,
+    ...filterPersonsBase.map((f) =>
+      f.field !== 'outOfActiveList'
+        ? f
+        : {
+            ...f,
+            options: ['Oui', 'Non', "Oui et non (c'est-à-dire tout le monde)"],
+            type: 'multi-choice',
+          }
+    ),
     ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
