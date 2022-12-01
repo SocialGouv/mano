@@ -1,3 +1,10 @@
+## [1.180.4](https://github.com/SocialGouv/mano/compare/v1.180.3...v1.180.4) (2022-12-01)
+
+
+### Bug Fixes
+
+* PersonSummary MANO-53 ([f338f97](https://github.com/SocialGouv/mano/commit/f338f971d2daef5335176e3470c789b2610056d4))
+
 ## [1.180.3](https://github.com/SocialGouv/mano/compare/v1.180.2...v1.180.3) (2022-12-01)
 
 
