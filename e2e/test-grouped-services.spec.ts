@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import { dayjsInstance } from "../dashboard/src/services/date";
 import { populate } from "./scripts/populate-db";
 
 test.beforeAll(async () => {
@@ -92,7 +93,11 @@ test("test", async ({ page }) => {
   await page.locator('[data-test-id="essai 1-1"]').click();
   await page.getByRole("button", { name: "Nouveau nom pour tous" }).click();
   await page.getByRole("link", { name: "Comptes rendus" }).click();
-  await page.getByRole("button", { name: "2022-12-02" }).click();
+  if (await page.getByRole("button", { name: dayjsInstance().add(1, "day").format("YYYY-MM-DD") }).isVisible()) {
+    await page.getByRole("button", { name: dayjsInstance().add(1, "day").format("YYYY-MM-DD") }).click();
+  } else {
+    await page.getByRole("button", { name: dayjsInstance().subtract(1, "day").format("YYYY-MM-DD") }).click();
+  }
   await page.getByRole("navigation", { name: "Navigation dans les catégories du compte-rendu" }).getByText("Accueil").click();
   await page.locator('[id="Café-add"]').click();
   await page.locator("#Douche-add").click();
