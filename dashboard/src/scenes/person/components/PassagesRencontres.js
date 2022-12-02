@@ -71,7 +71,7 @@ export default function PassagesRencontres({ person }) {
             }}>
             ＋
           </button>
-          {Boolean(personPassages.length) && (
+          {(selected === 'passages' ? Boolean(personPassages.length) : Boolean(personRencontres.length)) && (
             <button className="tw-h-6 tw-w-6 tw-rounded-full tw-text-main tw-transition hover:tw-scale-125" onClick={() => setFullScreen(true)}>
               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
                 <path
