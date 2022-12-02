@@ -14,7 +14,6 @@ import useApi from '../../../services/api';
 import { ModalBody, ModalContainer, ModalHeader } from '../../../components/tailwind/Modal';
 
 const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
-  console.log('comment', comment);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
