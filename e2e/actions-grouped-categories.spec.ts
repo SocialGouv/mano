@@ -50,7 +50,7 @@ test("Actions", async ({ page }) => {
       await page.getByRole("button", { name: category }).click();
     }
 
-    await page.getByRole("button", { name: "Fermer" }).click();
+    await page.getByRole("dialog", { name: "Sélectionner des catégories" }).getByRole("button", { name: "Fermer" }).click();
 
     await page.getByRole("button", { name: "Sauvegarder" }).click();
 

@@ -20,28 +20,28 @@ export default function Summary({ person }) {
         <div className="tw-col-span-3">
           <InfosMain person={person} />
         </div>
-        <div className="tw-relative tw-col-span-6 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-relative tw-col-span-5 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
           <Actions person={person} />
         </div>
-        <div className="tw-col-span-3 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
           {['restricted-access'].includes(user.role) ? <PassagesRencontres person={person} /> : <Comments person={person} />}
         </div>
       </div>
       {!['restricted-access'].includes(user.role) && (
         <>
           <div className="tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
-            <div className="pt-4 p-3 border tw-col-span-9 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+            <div className="pt-4 p-3 border tw-col-span-8 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
               <InfosSociales person={person} />
             </div>
-            <div className="tw-col-span-3 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+            <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
               <PassagesRencontres person={person} />
             </div>
           </div>
           <div className="tw-grid tw-grid-cols-12 tw-gap-4 tw-pt-4">
-            <div className="pt-4 p-3 border tw-col-span-9 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+            <div className="pt-4 p-3 border tw-col-span-8 tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
               <InfosMedicales person={person} />
             </div>
-            <div className="tw-col-span-3 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+            <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
               <PersonDocuments person={person} />
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
+import { Col, FormGroup, Row, Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
@@ -17,6 +17,7 @@ import SelectStatus from './SelectStatus';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import ActionsCategorySelect from './tailwind/ActionsCategorySelect';
+import { ModalBody, ModalContainer, ModalHeader } from './tailwind/Modal';
 
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
@@ -44,9 +45,9 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
   if (['restricted-access'].includes(user.role)) return null;
 
   return (
-    <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
-      <ModalHeader toggle={() => setOpen(false)}>{'Créer une nouvelle action'}</ModalHeader>
-      <ModalBody>
+    <ModalContainer open={open} onClose={() => setOpen(false)} size="3xl">
+      <ModalHeader title="Créer une nouvelle action" />
+      <ModalBody className="tw-px-4 tw-py-2">
         <Formik
           initialValues={{
             name: '',
@@ -256,7 +257,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
           )}
         </Formik>
       </ModalBody>
-    </Modal>
+    </ModalContainer>
   );
 };
 
