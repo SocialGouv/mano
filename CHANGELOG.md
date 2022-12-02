@@ -1,3 +1,10 @@
+# [1.181.0](https://github.com/SocialGouv/mano/compare/v1.180.5...v1.181.0) (2022-12-02)
+
+
+### Features
+
+* can view actions and comments full screen ([#1032](https://github.com/SocialGouv/mano/issues/1032)) ([c8564b5](https://github.com/SocialGouv/mano/commit/c8564b5449a1a613349d804b2c483d70fb8771df))
+
 ## [1.180.5](https://github.com/SocialGouv/mano/compare/v1.180.4...v1.180.5) (2022-12-02)
 
 
