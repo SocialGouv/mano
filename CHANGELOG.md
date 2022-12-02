@@ -1,3 +1,10 @@
+## [1.181.1](https://github.com/SocialGouv/mano/compare/v1.181.0...v1.181.1) (2022-12-02)
+
+
+### Bug Fixes
+
+* **dashboard:** incrementator size ([50ca927](https://github.com/SocialGouv/mano/commit/50ca9278efbfc77eb9f32dd96b5035a31d0a9841))
+
 # [1.181.0](https://github.com/SocialGouv/mano/compare/v1.180.5...v1.181.0) (2022-12-02)
 
 
