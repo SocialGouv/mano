@@ -244,13 +244,13 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
 
   return (
     <>
-      <div className="tw-basis-1/3 tw-p-1">
+      <div className="tw-min-h-full tw-basis-1/2 tw-p-1 xl:tw-basis-1/3">
         <details
           open
           key={groupTitle}
           id={groupTitle}
           data-group={groupTitle}
-          className="service-group tw-flex tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
+          className="service-group tw-flex tw-min-h-full tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
           <summary className="tw-basis-full tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">
             <div className="tw-group tw-inline-flex tw-w-11/12 tw-shrink tw-justify-between">
               <span className="service-group-title tw-pl-2">
@@ -265,21 +265,21 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
               </button>
             </div>
           </summary>
-          <div className="tw-mt-4 tw-flex tw-flex-col" ref={listRef}>
+          <div className="tw-mt-4 tw-flex tw-h-full tw-flex-col" ref={listRef}>
             {!services.length ? (
               <p className="tw-m-0 tw-text-xs tw-italic tw-opacity-30">Aucun service dans ce groupe</p>
             ) : (
               services.map((service) => <Service service={service} key={service} groupTitle={groupTitle} />)
             )}
-            <form className="tw-flex" onSubmit={onAddService}>
+            <form className="tw-mt-4 tw-flex" onSubmit={onAddService}>
               <input
                 type="text"
                 id="newService"
                 name="newService"
-                className="form-text tw-my-1 tw-rounded tw-bg-transparent tw-px-1.5 tw-py-1 placeholder:tw-opacity-60"
+                className="form-text tw-my-1  tw-w-full tw-rounded tw-bg-white/50 tw-px-1.5 tw-py-1 placeholder:tw-opacity-80"
                 placeholder="Ajouter un service"
               />
-              <button type="submit" className="tw-ml-auto tw-rounded tw-bg-transparent">
+              <button type="submit" className="tw-ml-4 tw-rounded tw-bg-transparent hover:tw-underline">
                 Ajouter
               </button>
             </form>
