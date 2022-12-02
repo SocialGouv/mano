@@ -39,7 +39,7 @@ const ReportDescriptionModale = ({ report }) => {
                 ...(reportAtDate || { team: report.team, date: report.date }),
                 description: body.description,
               };
-              const isNew = !reportAtDate._id;
+              const isNew = !reportAtDate?._id;
               const res = isNew
                 ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
                 : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });

@@ -1452,7 +1452,7 @@ const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString
                     ...(reportAtDate || { team: report.team, date: report.date }),
                     collaborations: body.collaborations,
                   };
-                  const isNew = !reportAtDate._id;
+                  const isNew = !reportAtDate?._id;
                   const res = isNew
                     ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
                     : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });
