@@ -1,3 +1,10 @@
+# [1.182.0](https://github.com/SocialGouv/mano/compare/v1.181.1...v1.182.0) (2022-12-02)
+
+
+### Features
+
+* add services groups ([#1014](https://github.com/SocialGouv/mano/issues/1014)) ([169c6c0](https://github.com/SocialGouv/mano/commit/169c6c0df5b71eadbcef6363aa89b17f773e0d6b))
+
 ## [1.181.1](https://github.com/SocialGouv/mano/compare/v1.181.0...v1.181.1) (2022-12-02)
 
 
