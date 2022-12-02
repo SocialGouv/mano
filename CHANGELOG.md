@@ -1,3 +1,10 @@
+## [1.182.1](https://github.com/SocialGouv/mano/compare/v1.182.0...v1.182.1) (2022-12-02)
+
+
+### Bug Fixes
+
+* **dashboard:** improve action and service settings display ([#1033](https://github.com/SocialGouv/mano/issues/1033)) ([5a80e33](https://github.com/SocialGouv/mano/commit/5a80e33f25b0bdd3a2536a30d341379808e96873))
+
 # [1.182.0](https://github.com/SocialGouv/mano/compare/v1.181.1...v1.182.0) (2022-12-02)
 
 
