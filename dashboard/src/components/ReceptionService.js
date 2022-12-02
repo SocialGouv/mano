@@ -1,18 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useDebounce } from 'react-use';
-import { organisationState } from '../recoil/auth';
-import { prepareReportForEncryption, reportsState } from '../recoil/reports';
+import { flattenedServicesSelector, prepareReportForEncryption, reportsState, servicesSelector } from '../recoil/reports';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import useApi from '../services/api';
 import IncrementorSmall from './IncrementorSmall';
 import { lastLoadState, mergeItems } from './DataLoader';
 
 const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) => {
-  const organisation = useRecoilValue(organisationState);
-
+  // const organisation = useRecoilValue(organisationState);
+  const groupedServices = useRecoilValue(servicesSelector);
+  const flattenedServices = useRecoilValue(flattenedServicesSelector);
   const [reports, setReports] = useRecoilState(reportsState);
-
   const lastLoad = useRecoilValue(lastLoadState);
+  const [selected, setSelected] = useState(groupedServices[0]?.groupTitle || null);
 
   const API = useApi();
 
@@ -57,13 +57,13 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
       // now we need to merge services with the latest report
       const originalServices = servicesRef.current;
       const myAddedServices = {};
-      for (const service of organisation.services) {
+      for (const service of flattenedServices) {
         if (services[service] == null) continue;
         myAddedServices[service] = (services[service] || 0) - (originalServices[service] || 0);
       }
       const latestReportServices = reportAtDate?.services?.length ? JSON.parse(reportAtDate?.services) : {};
       const newServices = {};
-      for (const service of organisation.services) {
+      for (const service of flattenedServices) {
         if (!myAddedServices[service]) {
           newServices[service] = latestReportServices[service];
         } else {
@@ -100,9 +100,24 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
     [services]
   );
 
+  const selectedServices = groupedServices.find((e) => e.groupTitle === selected)?.services || [];
+
   return (
-    <>
-      {organisation?.services?.map((service) => (
+    <div>
+      <div className="tw-mb-4 tw-border-b tw-border-slate-300">
+        {groupedServices.map((group) => (
+          <button
+            className={
+              selected === group.groupTitle
+                ? 'tw-mb-[-1px] tw-rounded-t tw-border tw-border-slate-300 tw-border-b-[#f8f8f8] tw-px-4 tw-py-2'
+                : 'tw-px-4 tw-py-2  tw-text-main tw-outline-slate-300 hover:tw-outline'
+            }
+            onClick={() => setSelected(group.groupTitle)}>
+            {group.groupTitle}
+          </button>
+        ))}
+      </div>
+      {selectedServices.map((service) => (
         <IncrementorSmall
           dataTestId={`${dataTestIdPrefix}${service}-${services[service] || 0}`}
           key={service}
@@ -111,7 +126,7 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
           onChange={(newCount) => onServiceUpdate(service, newCount)}
         />
       ))}
-    </>
+    </div>
   );
 };
 

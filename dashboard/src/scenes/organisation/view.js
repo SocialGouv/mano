@@ -21,7 +21,6 @@ import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
 import SortableGrid from '../../components/SortableGrid';
-import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import useTitle from '../../services/useTitle';
 import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
@@ -29,6 +28,7 @@ import { capture } from '../../services/sentry';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { useDataLoader } from '../../components/DataLoader';
 import ActionCategoriesSettings from './ActionCategoriesSettings';
+import ServicesSettings from './ServicesSettings';
 
 const getSettingTitle = (tabId) => {
   if (tabId === 'infos') return 'Infos';
@@ -47,14 +47,12 @@ const getSettingTitle = (tabId) => {
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const user = useRecoilValue(userState);
-  const reports = useRecoilValue(reportsState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
-  const { refresh } = useDataLoader();
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
@@ -266,104 +264,9 @@ const View = () => {
                           </FormGroup>
                         </Col>
                         <Col md={12}>
-                          <FormGroup>
-                            <Label htmlFor="services">Services disponibles</Label>
-                            <SortableGrid
-                              list={values.services || []}
-                              editItemTitle="Changer le nom du service"
-                              onUpdateList={(newServices) => handleChange({ target: { value: newServices, name: 'services' } })}
-                              onRemoveItem={(content) =>
-                                handleChange({ target: { value: values.services.filter((service) => service !== content), name: 'services' } })
-                              }
-                              onEditItem={async ({ content, newContent }) => {
-                                if (!newContent) {
-                                  toast.error('Vous devez saisir un nom pour le service');
-                                  return;
-                                }
-                                // two cases:
-                                // 1. just change 'one_service' to 'another_new_service'
-                                // 2. merge 'one_service' to 'an_existing_service'
-                                const reportsWithService = reports.filter((r) => Object.keys(JSON.parse(r.services || '{}')).includes(content));
-                                const encryptedReports = await Promise.all(
-                                  reportsWithService
-                                    .map((report) => {
-                                      const newServices = {};
-                                      const oldServices = JSON.parse(report.services || '{}');
-                                      for (const service of Object.keys(oldServices)) {
-                                        if (service === content) {
-                                          if (Object.keys(oldServices).includes(newContent)) {
-                                            // merge
-                                            if (!newServices[newContent]) newServices[newContent] = 0;
-                                            newServices[newContent] = newServices[newContent] + oldServices[newContent];
-                                          } else {
-                                            newServices[newContent] = oldServices[content];
-                                          }
-                                        } else {
-                                          if (!newServices[service]) newServices[service] = 0;
-                                          newServices[service] = newServices[service] + oldServices[service];
-                                        }
-                                      }
-                                      return {
-                                        ...report,
-                                        services: JSON.stringify(newServices),
-                                      };
-                                    })
-                                    .map(prepareReportForEncryption)
-                                    .map(encryptItem(hashedOrgEncryptionKey))
-                                );
-
-                                const newServices = [...new Set(values.services.map((service) => (service === content ? newContent : service)))];
-                                const response = await API.put({
-                                  path: `/service`,
-                                  body: {
-                                    services: newServices,
-                                    reports: encryptedReports,
-                                  },
-                                });
-                                if (response.ok) {
-                                  refresh();
-                                  handleChange({ target: { value: newServices, name: 'services' } });
-                                  setOrganisation({ ...organisation, services: newServices });
-                                  toast.success(
-                                    "Service mis à jour. Veuillez notifier vos équipes pour qu'elles rechargent leur app ou leur dashboard"
-                                  );
-                                } else {
-                                  toast.error("Une erreur inattendue est survenue, l'équipe technique a été prévenue. Désolé !");
-                                }
-                              }}
-                            />
-                          </FormGroup>
-                          <FormGroup>
-                            <Label htmlFor="organisation-select-services">Ajouter un service</Label>
-                            <SelectCustom
-                              key={JSON.stringify(values.services)}
-                              creatable
-                              isOptionDisabled={({ value }) => (values.services || []).includes(value)}
-                              options={[...(organisation.services || [])]
-                                .sort((c1, c2) => c1.localeCompare(c2))
-                                .map((cat) => ({ value: cat, label: cat }))}
-                              value={null}
-                              onCreateOption={async (name) => {
-                                handleChange({ target: { value: [...(values.services || []), name], name: 'services' } });
-                              }}
-                              isClearable
-                              inputId="organisation-select-services"
-                              classNamePrefix="organisation-select-services"
-                            />
-                          </FormGroup>
+                          <ServicesSettings />
                         </Col>
                       </Row>
-                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
-                        <ButtonCustom
-                          title={'Mettre à jour'}
-                          disabled={
-                            values.receptionEnabled === organisation.receptionEnabled &&
-                            JSON.stringify(organisation.services) === JSON.stringify(values.services || [])
-                          }
-                          loading={isSubmitting}
-                          onClick={handleSubmit}
-                        />
-                      </div>
                     </>
                   );
                 case 'territories':

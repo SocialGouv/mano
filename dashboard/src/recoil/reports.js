@@ -1,6 +1,7 @@
 import { setCacheItem } from '../services/dataManagement';
-import { atom } from 'recoil';
+import { atom, selector } from 'recoil';
 import { capture } from '../services/sentry';
+import { organisationState } from './auth';
 
 const collectionName = 'report';
 export const reportsState = atom({
@@ -40,6 +41,23 @@ export const reportsState = atom({
         }
       }),
   ],
+});
+
+export const servicesSelector = selector({
+  key: 'servicesSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    if (organisation.groupedServices) return organisation.groupedServices;
+    return [{ groupTitle: 'Tous mes services', services: organisation.services ?? [] }];
+  },
+});
+
+export const flattenedServicesSelector = selector({
+  key: 'flattenedServicesSelector',
+  get: ({ get }) => {
+    const groupedServices = get(servicesSelector);
+    return groupedServices.reduce((allServices, { services }) => [...allServices, ...services], []);
+  },
 });
 
 const encryptedFields = ['description', 'services', 'team', 'date', 'collaborations', 'oldDateSystem'];
