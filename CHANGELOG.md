@@ -1,3 +1,10 @@
+## [1.180.5](https://github.com/SocialGouv/mano/compare/v1.180.4...v1.180.5) (2022-12-02)
+
+
+### Bug Fixes
+
+* const isNew = !reportAtDate?._id; ([0b3f500](https://github.com/SocialGouv/mano/commit/0b3f50084f00c9d7ff5aead7354b6d10e50ec4f7))
+
 ## [1.180.4](https://github.com/SocialGouv/mano/compare/v1.180.3...v1.180.4) (2022-12-01)
 
 
