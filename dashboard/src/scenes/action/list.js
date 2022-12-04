@@ -244,7 +244,7 @@ const List = () => {
             rowKey={'_id'}
             onRowClick={(actionOrConsultation) => {
               if (actionOrConsultation.isConsultation) {
-                history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`);
+                history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`);
               } else {
                 history.push(`/action/${actionOrConsultation._id}`);
               }

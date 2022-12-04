@@ -109,7 +109,7 @@ function ActionsOfDay({ actions }) {
           key={action._id}
           onClick={() => {
             if (action.isConsultation) {
-              history.push(`/person/${action.person}?tab=dossier+médical&consultationId=${action._id}`);
+              history.push(`/person/${action.person}?tab=Dossier+Médical&consultationId=${action._id}`);
             } else {
               history.push(`/action/${action._id}`);
             }
