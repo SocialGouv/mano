@@ -45,7 +45,7 @@ export async function createAction(
       await page.getByRole("button", { name: `${group} (2)` }).click();
       await page.getByRole("button", { name: category }).click();
     }
-    await page.getByRole("button", { name: "Fermer" }).click();
+    await page.getByRole("dialog", { name: "Sélectionner des catégories" }).getByRole("button", { name: "Fermer" }).click();
   }
   if (group) {
     await page.getByLabel("Action familiale Cette action sera à effectuer pour toute la famille").check();
