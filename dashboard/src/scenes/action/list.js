@@ -203,6 +203,7 @@ const List = () => {
           <div style={{ width: '100%' }}>
             <SelectCustom
               inputId="action-select-status-filter"
+              classNamePrefix="action-select-status-filter"
               options={mappedIdsToLabels}
               getOptionValue={(s) => s._id}
               getOptionLabel={(s) => s.name}
