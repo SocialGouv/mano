@@ -156,6 +156,7 @@ const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStat
 const ActionsTable = ({ filteredData }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
 
   return (
     <table className="table table-striped">

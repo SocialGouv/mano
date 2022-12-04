@@ -8,8 +8,6 @@ import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import CommentModal from './CommentModal';
 
 export default function Comments({ person }) {
-  const users = useRecoilValue(usersState);
-  const organisation = useRecoilValue(organisationState);
   const [modalCreateOpen, setModalCreateOpen] = useState(false);
   const [commentToEdit, setCommentToEdit] = useState(null);
   const [fullScreen, setFullScreen] = useState(false);
@@ -90,6 +88,7 @@ export default function Comments({ person }) {
 
 const CommentsTable = ({ comments, setCommentToEdit }) => {
   const users = useRecoilValue(usersState);
+  const organisation = useRecoilValue(organisationState);
 
   return (
     <table className="table table-striped">
