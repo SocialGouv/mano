@@ -1,3 +1,10 @@
+## [1.182.2](https://github.com/SocialGouv/mano/compare/v1.182.1...v1.182.2) (2022-12-04)
+
+
+### Bug Fixes
+
+* navigate to consultation ([#1037](https://github.com/SocialGouv/mano/issues/1037)) ([bf4c950](https://github.com/SocialGouv/mano/commit/bf4c95088cfc5a10da022e433f83c3fe5395ff88))
+
 ## [1.182.1](https://github.com/SocialGouv/mano/compare/v1.182.0...v1.182.1) (2022-12-02)
 
 
