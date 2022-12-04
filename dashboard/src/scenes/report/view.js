@@ -1210,11 +1210,7 @@ const PassagesCreatedAt = ({ date, passages }) => {
                 title: 'Personne suivie',
                 dataKey: 'person',
                 render: (passage) =>
-                  passage.person ? (
-                    <PersonName item={passage} redirectToTab="passages" />
-                  ) : (
-                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
-                  ),
+                  passage.person ? <PersonName item={passage} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
               },
               {
                 title: 'Enregistré par',
@@ -1294,11 +1290,7 @@ const RencontresCreatedAt = ({ date, rencontres }) => {
                 title: 'Personne suivie',
                 dataKey: 'person',
                 render: (rencontre) =>
-                  rencontre.person ? (
-                    <PersonName item={rencontre} redirectToTab="rencontres" />
-                  ) : (
-                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
-                  ),
+                  rencontre.person ? <PersonName item={rencontre} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
               },
               {
                 title: 'Enregistré par',
