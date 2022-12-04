@@ -21,7 +21,7 @@ import SelectTeam from '../../components/SelectTeam';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
+import { dateForDatePicker, dayjsInstance } from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import useApi from '../../services/api';
 import useTitle from '../../services/useTitle';
