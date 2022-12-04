@@ -11,6 +11,7 @@ import ConsultationButton from './ConsultationButton';
 import { organisationState, userState } from '../recoil/auth';
 import { disableConsultationRow } from '../recoil/consultations';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
+import { CANCEL, DONE } from '../recoil/actions';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut'] }) => {
   const history = useHistory();
@@ -30,10 +31,14 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
 
   useEffect(() => {
     if (!currentDate) return;
-    const filteredActions = actions.filter((a) => a.dueAt);
-    setTheDayBeforeActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, subtractOneDay(currentDate))));
-    setTheDayAfterActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, addOneDay(currentDate))));
-    setTheCurrentDayActions(filteredActions.filter((a) => isOnSameDay(a.dueAt, currentDate)));
+    const filteredActions = actions.filter((a) => a.completedAt || a.dueAt);
+    setTheDayBeforeActions(
+      filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, subtractOneDay(currentDate)))
+    );
+    setTheDayAfterActions(
+      filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, addOneDay(currentDate)))
+    );
+    setTheCurrentDayActions(filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, currentDate)));
   }, [actions, currentDate]);
 
   useEffect(() => {

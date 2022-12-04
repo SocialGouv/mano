@@ -115,9 +115,9 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
         className="tw-flex tw-max-h-16 tw-flex-wrap tw-items-center tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300 tw-px-2.5 tw-py-1"
         onClick={() => setOpen(true)}
         ref={categories1Ref}>
-        {selected.map((category) => (
+        {selected.map((category, i) => (
           <div
-            key={category}
+            key={category + i}
             data-category={category}
             className="selected-action-category tw-cursor-pointer tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
             {category}
@@ -143,8 +143,8 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
       {!!withMostUsed && (
         <div className="mt-1 tw-flex tw-flex-wrap tw-items-center tw-gap-1 tw-text-xs tw-text-gray-500">
           <p className="tw-m-0">Catégories les plus utilisées :</p>
-          {mostUsedCategoriesToShow.map((cat) => (
-            <button className="tw-rounded-full tw-border tw-border-gray-300 tw-p-1" key={cat} onClick={() => setSelected((s) => [...s, cat])}>
+          {mostUsedCategoriesToShow.map((cat, i) => (
+            <button className="tw-rounded-full tw-border tw-border-gray-300 tw-p-1" key={cat + i} onClick={() => setSelected((s) => [...s, cat])}>
               {cat}
             </button>
           ))}
@@ -156,9 +156,9 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
           <div
             className="tw-mx-4 tw-flex tw-max-h-16 tw-flex-wrap tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300  tw-px-2.5 tw-py-1"
             ref={categories2Ref}>
-            {selected.map((category) => (
+            {selected.map((category, i) => (
               <div
-                key={category}
+                key={category + i}
                 data-category={category}
                 className="selected-action-category-modal tw-rounded tw-bg-gray-200 tw-px-2 tw-py-1 tw-text-sm">
                 {category}
@@ -204,9 +204,9 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
               <div className="tw-flex tw-flex-col tw-overflow-y-auto">
                 {groups
                   .find((group) => group.groupTitle === groupSelected)
-                  ?.categories.map((category) => (
+                  ?.categories.map((category, i) => (
                     <button
-                      key={category}
+                      key={category + i}
                       type="button"
                       className="action-category py-2 tw-border-b tw-border-gray-300 tw-px-4 tw-text-left"
                       onClick={() => {

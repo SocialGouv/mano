@@ -248,8 +248,8 @@ const Person = ({ person }) => {
             !person.lastAction
               ? null
               : ['restricted-access'].includes(user.role)
-              ? formatCalendarDate(person.lastAction.dueAt)
-              : `${person.lastAction?.name} - ${formatCalendarDate(person.lastAction.dueAt)}`
+              ? formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)
+              : `${person.lastAction?.name} - ${formatCalendarDate(person.lastAction.completedAt || person.lastAction.dueAt)}`
           }
         />
         <AdditionalInfo label="Dernier passage" value={person.lastPassage?.date ? formatCalendarDate(person.lastPassage?.date) : null} />

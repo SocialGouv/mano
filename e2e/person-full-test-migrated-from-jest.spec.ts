@@ -124,7 +124,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Passage enregistré").click();
 
-  await page.getByRole("button", { name: "Rencontres" }).click();
+  await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.locator("button[aria-label='Ajouter une rencontre']").click();
   await page.getByLabel("Date").click();
   await page.getByLabel("Date").press("Meta+a");

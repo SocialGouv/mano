@@ -1,3 +1,114 @@
+## [1.182.1](https://github.com/SocialGouv/mano/compare/v1.182.0...v1.182.1) (2022-12-02)
+
+
+### Bug Fixes
+
+* **dashboard:** improve action and service settings display ([#1033](https://github.com/SocialGouv/mano/issues/1033)) ([5a80e33](https://github.com/SocialGouv/mano/commit/5a80e33f25b0bdd3a2536a30d341379808e96873))
+
+# [1.182.0](https://github.com/SocialGouv/mano/compare/v1.181.1...v1.182.0) (2022-12-02)
+
+
+### Features
+
+* add services groups ([#1014](https://github.com/SocialGouv/mano/issues/1014)) ([169c6c0](https://github.com/SocialGouv/mano/commit/169c6c0df5b71eadbcef6363aa89b17f773e0d6b))
+
+## [1.181.1](https://github.com/SocialGouv/mano/compare/v1.181.0...v1.181.1) (2022-12-02)
+
+
+### Bug Fixes
+
+* **dashboard:** incrementator size ([50ca927](https://github.com/SocialGouv/mano/commit/50ca9278efbfc77eb9f32dd96b5035a31d0a9841))
+
+# [1.181.0](https://github.com/SocialGouv/mano/compare/v1.180.5...v1.181.0) (2022-12-02)
+
+
+### Features
+
+* can view actions and comments full screen ([#1032](https://github.com/SocialGouv/mano/issues/1032)) ([c8564b5](https://github.com/SocialGouv/mano/commit/c8564b5449a1a613349d804b2c483d70fb8771df))
+
+## [1.180.5](https://github.com/SocialGouv/mano/compare/v1.180.4...v1.180.5) (2022-12-02)
+
+
+### Bug Fixes
+
+* const isNew = !reportAtDate?._id; ([0b3f500](https://github.com/SocialGouv/mano/commit/0b3f50084f00c9d7ff5aead7354b6d10e50ec4f7))
+
+## [1.180.4](https://github.com/SocialGouv/mano/compare/v1.180.3...v1.180.4) (2022-12-01)
+
+
+### Bug Fixes
+
+* PersonSummary MANO-53 ([f338f97](https://github.com/SocialGouv/mano/commit/f338f971d2daef5335176e3470c789b2610056d4))
+
+## [1.180.3](https://github.com/SocialGouv/mano/compare/v1.180.2...v1.180.3) (2022-12-01)
+
+
+### Bug Fixes
+
+* consultations has no team so ne need to filter by team ([3c0fbd9](https://github.com/SocialGouv/mano/commit/3c0fbd981ece28d398b18c2e905afe33c701e32f))
+
+## [1.180.2](https://github.com/SocialGouv/mano/compare/v1.180.1...v1.180.2) (2022-12-01)
+
+
+### Bug Fixes
+
+* action categories search ([0d16e8e](https://github.com/SocialGouv/mano/commit/0d16e8e0f30c910acf79866cba074cee2804fe6b))
+
+## [1.180.1](https://github.com/SocialGouv/mano/compare/v1.180.0...v1.180.1) (2022-12-01)
+
+
+### Bug Fixes
+
+* sorting custom fields ([b26ee8b](https://github.com/SocialGouv/mano/commit/b26ee8b971dc97026beac4e0d8c371894b693055))
+
+# [1.180.0](https://github.com/SocialGouv/mano/compare/v1.179.3...v1.180.0) (2022-12-01)
+
+
+### Bug Fixes
+
+* 3 months preset in stats ([#1021](https://github.com/SocialGouv/mano/issues/1021)) ([2bfe001](https://github.com/SocialGouv/mano/commit/2bfe001464f28bbbe105046a5139f08c789658bf))
+* action dates when completed ([#1019](https://github.com/SocialGouv/mano/issues/1019)) ([47143d0](https://github.com/SocialGouv/mano/commit/47143d0911d919beddb867370c9333a4ebd18de7))
+
+
+### Features
+
+* new filter outOfActiveList ([#1022](https://github.com/SocialGouv/mano/issues/1022)) ([4a10628](https://github.com/SocialGouv/mano/commit/4a10628d6671d2a901a37db3370b44ab3d35a87b))
+
+## [1.179.3](https://github.com/SocialGouv/mano/compare/v1.179.2...v1.179.3) (2022-12-01)
+
+
+### Bug Fixes
+
+* normal people can delete person ([#1024](https://github.com/SocialGouv/mano/issues/1024)) ([7825d0e](https://github.com/SocialGouv/mano/commit/7825d0eaf120c54ac49ca9ef014f8189182a7ed8))
+
+## [1.179.2](https://github.com/SocialGouv/mano/compare/v1.179.1...v1.179.2) (2022-12-01)
+
+
+### Bug Fixes
+
+* persons fetching sorted by _id instead of create at ([407852d](https://github.com/SocialGouv/mano/commit/407852d89f2fb3273776eb50c5f7bf331c930425))
+
+## [1.179.1](https://github.com/SocialGouv/mano/compare/v1.179.0...v1.179.1) (2022-12-01)
+
+
+### Bug Fixes
+
+* better log duplicated reports ([75cc41b](https://github.com/SocialGouv/mano/commit/75cc41b2812173c4af8d3d383517ea60a8c8f179))
+
+# [1.179.0](https://github.com/SocialGouv/mano/compare/v1.178.0...v1.179.0) (2022-11-30)
+
+
+### Features
+
+* useLocalStorage ([#1020](https://github.com/SocialGouv/mano/issues/1020)) ([1d613f9](https://github.com/SocialGouv/mano/commit/1d613f9034f4b0c427a6894f6b38aa86da96fbad))
+
+# [1.178.0](https://github.com/SocialGouv/mano/compare/v1.177.24...v1.178.0) (2022-11-30)
+
+
+### Features
+
+* show items numbers in person ([#1016](https://github.com/SocialGouv/mano/issues/1016)) ([562df2c](https://github.com/SocialGouv/mano/commit/562df2c3ff2fe6eb875cc4e1fbfb2c0fbb78e831))
+
 ## [1.177.24](https://github.com/SocialGouv/mano/compare/v1.177.23...v1.177.24) (2022-11-30)
 
 

@@ -37,7 +37,7 @@ export const filteredPersonActionsSelector = selectorFamily({
         actionsToSet = actionsToSet.filter((a) => filterStatus.some((s) => a.status === s));
       }
       return [...actionsToSet]
-        .sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1))
+        .sort((p1, p2) => ((p1.completedAt || p1.dueAt) > (p2.completedAt || p2.dueAt) ? -1 : 1))
         .map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a));
     },
 });

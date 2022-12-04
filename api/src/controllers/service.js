@@ -19,14 +19,21 @@ router.put(
   catchErrors(async (req, res, next) => {
     try {
       z.object({
-        reports: z.array(
+        reports: z.optional(
+          z.array(
+            z.object({
+              _id: z.string().regex(looseUuidRegex),
+              encrypted: z.string(),
+              encryptedEntityKey: z.string(),
+            })
+          )
+        ),
+        groupedServices: z.array(
           z.object({
-            _id: z.string().regex(looseUuidRegex),
-            encrypted: z.string(),
-            encryptedEntityKey: z.string(),
+            groupTitle: z.string(),
+            services: z.array(z.string()),
           })
         ),
-        services: z.array(z.string()),
       }).parse(req.body);
     } catch (e) {
       const error = new Error(`Invalid request in services put: ${e}`);
@@ -39,20 +46,20 @@ router.put(
 
     try {
       await sequelize.transaction(async (tx) => {
-        const { reports = [] } = req.body;
+        const { reports = [], groupedServices = [] } = req.body;
 
         for (let { encrypted, encryptedEntityKey, _id } of reports) {
           await Report.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
 
-        organisation.set({ services: req.body.services });
+        organisation.set({ groupedServices });
         await organisation.save({ transaction: tx });
       });
     } catch (e) {
       capture("error updating service", e);
       throw e;
     }
-    return res.status(200).send({ ok: true });
+    return res.status(200).send({ ok: true, data: organisation });
   })
 );
 

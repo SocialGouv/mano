@@ -178,18 +178,12 @@ const View = () => {
   const consultations = useCallback(
     (status) =>
       allConsultations
-        ?.filter((a) => !!selectedTeamsObject[a.team])
         .filter((c) => c.status === status)
         .filter((a) => {
-          const currentTeam = selectedTeamsObject[a.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            a.completedAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
+          return getIsDayWithinHoursOffsetOfPeriod(a.completedAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
         })
         .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
-    [allConsultations, dateString, selectedTeamsObject]
+    [allConsultations, dateString]
   );
   const consultationsDone = useMemo(() => consultations(DONE), [consultations]);
   const consultationsCancel = useMemo(() => consultations(CANCEL), [consultations]);
@@ -197,18 +191,12 @@ const View = () => {
   const consultationsCreatedAt = useMemo(
     () =>
       allConsultations
-        ?.filter((a) => !!selectedTeamsObject[a.team])
         .filter((a) => {
-          const currentTeam = selectedTeamsObject[a.team];
-          return getIsDayWithinHoursOffsetOfPeriod(
-            a.createdAt,
-            { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
-          );
+          return getIsDayWithinHoursOffsetOfPeriod(a.createdAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
         })
         .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } }))
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [allConsultations, dateString, selectedTeamsObject]
+    [allConsultations, dateString]
   );
 
   const comments = useMemo(
@@ -866,7 +854,11 @@ const ActionCompletedAt = ({ date, status, actions }) => {
                 );
               },
             },
-            { title: 'À faire le ', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
+            {
+              title: status === CANCEL ? 'Annulée le' : 'Faite le',
+              dataKey: 'completedAt',
+              render: (action) => <DateBloc date={action.completedAt} />,
+            },
             {
               title: 'Heure',
               dataKey: '_id',
@@ -1490,7 +1482,7 @@ const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString
                     ...(reportAtDate || { team: report.team, date: report.date }),
                     collaborations: body.collaborations,
                   };
-                  const isNew = !reportAtDate._id;
+                  const isNew = !reportAtDate?._id;
                   const res = isNew
                     ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
                     : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });

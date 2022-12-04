@@ -81,7 +81,7 @@ const PersonSummary = ({
   const populatedPersons = useRecoilValue(itemsGroupedByPersonSelector);
   const { actions, comments, rencontres, relsPersonPlace } = useMemo(() => populatedPersons[personDB._id], [populatedPersons, personDB._id]);
 
-  const sortedActions = useMemo(() => [...actions].sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)), [actions]);
+  const sortedActions = useMemo(() => [...(actions || [])].sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)), [actions]);
 
   const allPlaces = useRecoilValue(placesState);
   const places = useMemo(() => {

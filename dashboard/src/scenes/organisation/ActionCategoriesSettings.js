@@ -263,13 +263,13 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
 
   return (
     <>
-      <div className="tw-basis-1/3 tw-p-1">
+      <div className="tw-min-h-full tw-basis-1/2 tw-p-1 xl:tw-basis-1/3">
         <details
           open
           key={groupTitle}
           id={groupTitle}
           data-group={groupTitle}
-          className="category-group tw-flex tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
+          className="service-group tw-flex tw-min-h-full tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
           <summary className="tw-basis-full tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">
             <div className="tw-group tw-inline-flex tw-w-11/12 tw-shrink tw-justify-between">
               <span className="category-group-title tw-pl-2">
@@ -284,21 +284,21 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
               </button>
             </div>
           </summary>
-          <div className="tw-mt-4 tw-flex tw-flex-col" ref={listRef}>
+          <div className="tw-mt-4 tw-flex tw-h-full tw-flex-col" ref={listRef}>
             {!categories.length ? (
               <p className="tw-m-0 tw-text-xs tw-italic tw-opacity-30">Aucune catégorie dans ce groupe</p>
             ) : (
               categories.map((category) => <Category category={category} key={category} groupTitle={groupTitle} />)
             )}
-            <form className="tw-flex" onSubmit={onAddCategory}>
+            <form className="tw-mt-4 tw-flex" onSubmit={onAddCategory}>
               <input
                 type="text"
                 id="newCategory"
                 name="newCategory"
-                className="form-text tw-my-1 tw-rounded tw-bg-transparent tw-px-1.5 tw-py-1 placeholder:tw-opacity-60"
+                className="form-text tw-my-1  tw-w-full tw-rounded tw-bg-white/50 tw-px-1.5 tw-py-1 placeholder:tw-opacity-80"
                 placeholder="Ajouter une catégorie"
               />
-              <button type="submit" className="tw-ml-auto tw-rounded tw-bg-transparent">
+              <button type="submit" className="tw-ml-4 tw-rounded tw-bg-transparent hover:tw-underline">
                 Ajouter
               </button>
             </form>

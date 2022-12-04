@@ -1,5 +1,6 @@
+
 import React, { useMemo } from 'react';
-import { Modal, Input, Col, Row, ModalHeader, ModalBody, FormGroup, Label } from 'reactstrap';
+import { Input, Col, Row, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 
@@ -12,8 +13,10 @@ import { dateForDatePicker } from '../../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../../recoil/comments';
 import useApi from '../../../services/api';
 import { groupsState } from '../../../recoil/groups';
+import { ModalBody, ModalContainer, ModalHeader } from '../../../components/tailwind/Modal';
 
 const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
+  console.log('comment', comment);
   const user = useRecoilValue(userState);
   const groups = useRecoilValue(groupsState);
   const organisation = useRecoilValue(organisationState);
@@ -28,9 +31,9 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
 
   return (
     <>
-      <Modal isOpen={true} toggle={onClose} size="lg" backdrop="static">
-        <ModalHeader toggle={onClose}>{isNewComment ? 'Créer un' : 'Éditer le'} commentaire</ModalHeader>
-        <ModalBody>
+      <ModalContainer open onClose={onClose} size="lg">
+        <ModalHeader toggle={onClose} title={isNewComment ? 'Créer un commentaire' : 'Éditer le commentaire'} />
+        <ModalBody className="tw-px-4 tw-py-2">
           <Formik
             initialValues={{ urgent: false, group: false, ...comment, comment: comment.comment || window.sessionStorage.getItem('currentComment') }}
             onSubmit={async (body, actions) => {
@@ -119,7 +122,7 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
                         id="comment"
                         name="comment"
                         type="textarea"
-                        value={values.comment}
+                        value={values.comment || ''}
                         onChange={(e) => {
                           window.sessionStorage.setItem('currentComment', e.target.value);
                           handleChange(e);
@@ -191,7 +194,7 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
             )}
           </Formik>
         </ModalBody>
-      </Modal>
+      </ModalContainer>
     </>
   );
 };

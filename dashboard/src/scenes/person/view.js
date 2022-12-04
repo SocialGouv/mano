@@ -623,6 +623,8 @@ export const DeletePersonButton = ({ person }) => {
     <DeleteButtonAndConfirmModal
       title={`Voulez-vous vraiment supprimer la personne ${person.name}`}
       textToConfirm={person.name}
+      roles={['normal', 'admin', 'superadmin']}
+      roleErrorMessage="Désolé, seules les personnes autorisées peuvent supprimer des personnes"
       onConfirm={async () => {
         const personRes = await API.delete({ path: `/person/${person._id}` });
         if (personRes.ok) {

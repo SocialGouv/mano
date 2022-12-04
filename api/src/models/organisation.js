@@ -13,7 +13,6 @@ Organisation.init(
       type: DataTypes.JSONB,
       // example: [{"groupTitle": "médical", categories: ["seringue", "pansement"]}, { "groupTitle": "local", "categories": ["entretien", "lavage"]}]
     },
-
     collaborations: { type: [DataTypes.ARRAY(DataTypes.TEXT)], defaultValue: [] },
     consultations: DataTypes.JSONB,
     encryptionEnabled: { type: DataTypes.BOOLEAN },
@@ -22,8 +21,11 @@ Organisation.init(
     encrypting: { type: DataTypes.BOOLEAN, default: false },
     receptionEnabled: { type: DataTypes.BOOLEAN },
     groupsEnabled: { type: DataTypes.BOOLEAN },
+    groupedServices: {
+      type: DataTypes.JSONB,
+      // example: [{"groupTitle": "injection", categories: ["Garrot", "1cc"]}, { "groupTitle": "inhalation", "categories": ["Kit base", "Grille"]}]
+    },
     services: DataTypes.ARRAY(DataTypes.TEXT),
-
     customFieldsObs: DataTypes.JSONB,
     fieldsPersonsCustomizableOptions: DataTypes.JSONB,
     customFieldsPersonsSocial: DataTypes.JSONB,

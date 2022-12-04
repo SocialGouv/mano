@@ -13,6 +13,7 @@ const IncrementorSmall = ({ service, count, onChange, dataTestId = null, disable
       </ButtonRemoveAdd>
       <LocalCount
         aria-label={`Nombre de ${service}`}
+        min="0"
         id={`${service}-count`}
         data-test-id={dataTestId || `${service}-count`}
         type="number"
@@ -29,7 +30,7 @@ const IncrementorSmall = ({ service, count, onChange, dataTestId = null, disable
 
 const IncrementorSmallWrapper = styled.div`
   display: flex;
-  gap: 5px;
+  gap: 2px;
   margin-bottom: 10px;
   .service-name {
     flex-grow: 1;
@@ -38,7 +39,7 @@ const IncrementorSmallWrapper = styled.div`
   }
 `;
 const LocalCount = styled.input`
-  width: 40px;
+  width: 48px;
   text-align: center;
   color: ${theme.black75};
   background: none;

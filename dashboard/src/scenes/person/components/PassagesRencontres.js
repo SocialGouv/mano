@@ -32,7 +32,7 @@ export default function PassagesRencontres({ person }) {
                 : 'tw-border-b tw-border-slate-300 tw-p-2'
             }
             onClick={() => setSelected('passages')}>
-            Passages
+            Passages ({personPassages.length})
           </button>
           <button
             className={
@@ -41,7 +41,7 @@ export default function PassagesRencontres({ person }) {
                 : 'tw-border-b tw-border-slate-300 tw-p-2'
             }
             onClick={() => setSelected('rencontres')}>
-            Rencontres
+            Rencontres ({personRencontres.length})
           </button>
         </div>
         <div>
@@ -127,7 +127,9 @@ export default function PassagesRencontres({ person }) {
                         ))}
                       </div>
                       <div className="small">Créé par {users.find((e) => e._id === passage.user)?.name}</div>
-                      <TagTeam teamId={passage.team} />
+                      <div className="tw-max-w-fit">
+                        <TagTeam teamId={passage.team} />
+                      </div>
                     </td>
                   </tr>
                 );
@@ -143,7 +145,9 @@ export default function PassagesRencontres({ person }) {
                         ))}
                       </div>
                       <div className="small">Créé par {users.find((e) => e._id === rencontre.user)?.name}</div>
-                      <TagTeam teamId={rencontre.team} />
+                      <div className="tw-max-w-fit">
+                        <TagTeam teamId={rencontre.team} />
+                      </div>
                     </td>
                   </tr>
                 );

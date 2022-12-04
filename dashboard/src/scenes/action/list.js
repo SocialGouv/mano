@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Col, Label, Row, Button } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
@@ -15,7 +15,7 @@ import SelectCustom from '../../components/SelectCustom';
 import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
-import { mappedIdsToLabels, TODO } from '../../recoil/actions';
+import { CANCEL, DONE, mappedIdsToLabels, TODO } from '../../recoil/actions';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
@@ -28,6 +28,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
+import { useLocalStorage } from 'react-use';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
@@ -127,17 +128,12 @@ const List = () => {
   const [categories, setCategories] = useSearchParamState('categories', []);
 
   const [actionDate, setActionDate] = useState(new Date());
-  const [showAs, setShowAs] = useState(window.localStorage.getItem('showAs') || showAsOptions[0]); // calendar, list
+  const [showAs, setShowAs] = useLocalStorage('showAs', showAsOptions[0]); // calendar, list
 
   const dataConsolidated = useRecoilValue(dataFilteredBySearchSelector({ search, statuses, categories }));
   const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
 
   const total = dataConsolidated.length;
-
-  useEffect(() => {
-    window.localStorage.setItem('showAs', showAs);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [showAs]);
 
   return (
     <>
@@ -275,10 +271,10 @@ const List = () => {
                 },
               },
               {
-                title: 'À faire le',
+                title: 'Date',
                 dataKey: 'dueAt' || '_id',
                 render: (action) => {
-                  return <DateBloc date={action.dueAt} />;
+                  return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
                 },
               },
               {

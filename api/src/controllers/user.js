@@ -149,12 +149,15 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
         ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
         : organisation.categories,
       actionsGroupedCategories: organisation.actionsGroupedCategories,
+      groupedServices: organisation.groupedServices,
       consultations: organisation.consultations,
       encryptionEnabled: organisation.encryptionEnabled,
       encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
       receptionEnabled: organisation.receptionEnabled,
       groupsEnabled: organisation.groupsEnabled,
-      services: organisation.services,
+      services: !!organisation.groupedServices
+        ? organisation.groupedServices.reduce((flattenedServices, group) => [...flattenedServices, ...group.services], [])
+        : organisation.services,
       collaborations: organisation.collaborations,
       customFieldsObs: organisation.customFieldsObs,
       encryptedVerificationKey: organisation.encryptedVerificationKey,

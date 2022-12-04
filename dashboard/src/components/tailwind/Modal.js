@@ -18,10 +18,12 @@ Use example:
 const ModalContainer = ({
   children,
   open,
+  onClose = null,
   // setOpen,
   className = '',
   onAfterEnter = () => null,
   onBeforeLeave = () => null,
+  size = 'lg', // lg, xl, 3xl, full
 }) => {
   return (
     <>
@@ -55,11 +57,30 @@ const ModalContainer = ({
                 leaveTo="tw-opacity-0 tw-translate-y-4 sm:tw-translate-y-0 sm:tw-scale-95"
                 afterEnter={onAfterEnter}
                 beforeLeave={onBeforeLeave}>
-                <Dialog.Panel className="tw-relative tw-transform tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full sm:tw-max-w-lg">
+                <Dialog.Panel
+                  className={[
+                    'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full ',
+                    size === 'lg' ? 'sm:tw-max-w-lg' : '',
+                    size === 'xl' ? 'sm:tw-max-w-xl' : '',
+                    size === '3xl' ? 'sm:tw-max-w-3xl' : '',
+                    size === 'full' ? 'sm:tw-max-w-[90vw]' : '',
+                  ].join(' ')}>
                   {children}
-                  {/* <ModalHeader title={title} /> */}
-                  {/* <ModalBody>{children}<ModalBody /> */}
-                  {/* <ModalFooter>{children}<ModalFooter /> */}
+                  {!!onClose && (
+                    <button
+                      type="button"
+                      aria-label="Fermer"
+                      className="tw-absolute tw-top-4 tw-right-0 tw-text-gray-900 sm:tw-px-6"
+                      onClick={onClose}>
+                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
+                        <path
+                          fillRule="evenodd"
+                          d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  )}
                 </Dialog.Panel>
               </Transition.Child>
             </div>
@@ -74,11 +95,11 @@ const nullFunction = () => null;
 
 const ModalHeader = ({ children, title }) => {
   return (
-    <div className="tw-bg-white tw-pt-5">
-      <div className="sm:tw-flex sm:tw-items-start">
+    <div className="tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-border-b tw-border-gray-200 tw-bg-white">
+      <div className="tw-w-full tw-py-4 sm:tw-flex sm:tw-items-start">
         <div className="tw-mt-3 tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left">
           {!!title && (
-            <Dialog.Title as="h3" className="tw-px-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
+            <Dialog.Title as="h3" className="tw-mb-0 tw-px-4 tw-text-lg tw-font-medium tw-leading-6 tw-text-gray-900 sm:tw-px-6">
               {title}
             </Dialog.Title>
           )}
@@ -89,18 +110,22 @@ const ModalHeader = ({ children, title }) => {
   );
 };
 
-const ModalBody = ({ children }) => {
+const ModalBody = ({ children, className = '' }) => {
   return (
-    <div className="tw-bg-white tw-pb-4">
+    <div className="tw-shrink tw-overflow-y-auto tw-bg-white tw-pb-4">
       <div className="sm:tw-flex sm:tw-items-start">
-        <div className="tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left">{children}</div>
+        <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
       </div>
     </div>
   );
 };
 
 const ModalFooter = ({ children }) => {
-  return <div className="tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-flex-row-reverse sm:tw-px-6">{children}</div>;
+  return (
+    <div className="tw-shrink-0 tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-flex-row-reverse sm:tw-px-6">
+      {children}
+    </div>
+  );
 };
 
 export { ModalHeader, ModalBody, ModalFooter, ModalContainer };
