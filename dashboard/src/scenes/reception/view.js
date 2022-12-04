@@ -320,11 +320,7 @@ const PassagesToday = ({ passages, isOpen, setOpen }) => {
                 title: 'Personne suivie',
                 dataKey: 'person',
                 render: (passage) =>
-                  passage.person ? (
-                    <PersonName item={passage} redirectToTab="passages" />
-                  ) : (
-                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
-                  ),
+                  passage.person ? <PersonName item={passage} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
               },
               {
                 title: 'Enregistré par',

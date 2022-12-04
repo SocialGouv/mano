@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Alert } from 'reactstrap';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import Places from '../../components/Places';
@@ -19,6 +18,7 @@ import {
 } from '../../recoil/persons';
 import { toast } from 'react-toastify';
 import { userState } from '../../recoil/auth';
+import useSearchParamState from '../../services/useSearchParamState';
 
 const populatedPersonSelector = selectorFamily({
   key: 'populatedPersonSelector',
@@ -32,13 +32,14 @@ const populatedPersonSelector = selectorFamily({
 
 export default function NewView() {
   const { personId } = useParams();
+  const location = useLocation();
   const API = useApi();
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const person = useRecoilValue(populatedPersonSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
   const user = useRecoilValue(userState);
-  const [currentTab, setCurrentTab] = useState('Résumé');
+  const [currentTab, setCurrentTab] = useSearchParamState('tab', new URLSearchParams(location.search)?.get('tab') || 'Résumé');
 
   return (
     <div>

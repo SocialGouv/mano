@@ -951,7 +951,7 @@ const Consultations = ({ date, status, consultations }) => {
           noData={`Pas de consultation ${status === DONE ? 'faite' : 'annulée'} ce jour`}
           data={data}
           onRowClick={(actionOrConsultation) =>
-            history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`)
+            history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`)
           }
           rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
           rowKey="_id"
@@ -1006,7 +1006,7 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
           noData="Pas de consultation créée ce jour"
           data={data}
           onRowClick={(actionOrConsultation) =>
-            history.push(`/person/${actionOrConsultation.person}?tab=dossier+médical&consultationId=${actionOrConsultation._id}`)
+            history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`)
           }
           rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
           rowKey="_id"
@@ -1210,11 +1210,7 @@ const PassagesCreatedAt = ({ date, passages }) => {
                 title: 'Personne suivie',
                 dataKey: 'person',
                 render: (passage) =>
-                  passage.person ? (
-                    <PersonName item={passage} redirectToTab="passages" />
-                  ) : (
-                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
-                  ),
+                  passage.person ? <PersonName item={passage} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
               },
               {
                 title: 'Enregistré par',
@@ -1294,11 +1290,7 @@ const RencontresCreatedAt = ({ date, rencontres }) => {
                 title: 'Personne suivie',
                 dataKey: 'person',
                 render: (rencontre) =>
-                  rencontre.person ? (
-                    <PersonName item={rencontre} redirectToTab="rencontres" />
-                  ) : (
-                    <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>
-                  ),
+                  rencontre.person ? <PersonName item={rencontre} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
               },
               {
                 title: 'Enregistré par',

@@ -23,6 +23,8 @@ const SelectCustom = ({ creatable, ...props }) => {
         },
       })}
       instanceId={props.name}
+      inputId={props.inputId}
+      classNamePrefix={props.classNamePrefix}
       {...props}
     />
   );
