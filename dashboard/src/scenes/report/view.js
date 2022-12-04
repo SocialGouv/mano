@@ -180,7 +180,7 @@ const View = () => {
       allConsultations
         .filter((c) => c.status === status)
         .filter((a) => {
-          return getIsDayWithinHoursOffsetOfPeriod(a.completedAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
+          return getIsDayWithinHoursOffsetOfPeriod(a.dueAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
         })
         .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
     [allConsultations, dateString]

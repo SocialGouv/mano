@@ -689,7 +689,7 @@ export function MedicalFile({ person }) {
           }}
           onSubmit={async (values) => {
             if ([DONE, CANCEL].includes(values.status)) {
-              if (!currentConsultation.completedAt) values.completedAt = new Date();
+              if (!currentConsultation.completedAt) values.completedAt = values.dueAt;
             } else {
               values.completedAt = null;
             }

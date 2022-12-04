@@ -198,7 +198,7 @@ const Action = ({ navigation, route }) => {
     try {
       if (statusChanged) {
         if ([DONE, CANCEL].includes(action.status)) {
-          action.completedAt = new Date().toISOString();
+          action.completedAt = action.dueAt;
         } else {
           action.completedAt = null;
         }

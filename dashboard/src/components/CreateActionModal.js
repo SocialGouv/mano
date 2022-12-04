@@ -29,7 +29,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const onAddAction = async (body) => {
-    if (body.status !== TODO) body.completedAt = completedAt || Date.now();
+    if (body.status !== TODO) body.completedAt = completedAt || body.dueAt;
     const response = await API.post({ path: '/action', body: prepareActionForEncryption(body) });
     if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
     const { createdAt } = response.decryptedData;

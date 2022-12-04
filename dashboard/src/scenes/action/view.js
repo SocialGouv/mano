@@ -127,8 +127,8 @@ const View = () => {
           const statusChanged = body.status && action.status !== body.status;
           if (statusChanged) {
             if ([DONE, CANCEL].includes(body.status)) {
-              // When status changed to finished (done, cancel) completedAt we set it to now if not set.
-              body.completedAt = body.completedAt || now();
+              // When status changed to finished (done, cancel) completedAt we set it to dueAt if not set.
+              body.completedAt = body.completedAt || body.dueAt;
             } else {
               // When status just changed to "todo" we set completedAt to null (since it's not done yet).
               body.completedAt = null;
@@ -245,7 +245,7 @@ const View = () => {
                           id="completedAt"
                           locale="fr"
                           className="form-control"
-                          selected={dateForDatePicker(values.completedAt ?? new Date())}
+                          selected={dateForDatePicker(values.completedAt ?? values.dueAt ?? new Date())}
                           onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
                           timeInputLabel="Heure :"
                           dateFormat="dd/MM/yyyy HH:mm"

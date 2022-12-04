@@ -94,7 +94,7 @@ const Consultation = ({ navigation, route }) => {
     Keyboard.dismiss();
     setPosting(true);
     if ([DONE, CANCEL].includes(consultation.status)) {
-      if (!consultation.completedAt) consultation.completedAt = new Date();
+      if (!consultation.completedAt) consultation.completedAt = consultation.dueAt;
     } else {
       consultation.completedAt = null;
     }
