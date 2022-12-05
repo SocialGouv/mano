@@ -1,3 +1,10 @@
+## [1.184.2](https://github.com/SocialGouv/mano/compare/v1.184.1...v1.184.2) (2022-12-05)
+
+
+### Bug Fixes
+
+* zod on actions and consultations ([#1041](https://github.com/SocialGouv/mano/issues/1041)) ([11441ec](https://github.com/SocialGouv/mano/commit/11441ec7917bbd272b01e87e61a9f424988cb0b4))
+
 ## [1.184.1](https://github.com/SocialGouv/mano/compare/v1.184.0...v1.184.1) (2022-12-05)
 
 
