@@ -108,10 +108,6 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
     />
   );
 
-  const renderDate = (date) => {
-    return formatCalendarDate(date);
-  };
-
   return (
     <>
       <Nav fill tabs style={{ marginBottom: 20 }}>
@@ -120,6 +116,13 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
             <NavLink
               key={index}
               className={`${activeTab === index && 'active'}`}
+              aria-label={
+                tabCaption === '<'
+                  ? 'Aller aux jours précédents'
+                  : tabCaption === '>'
+                  ? 'Aller aux jours suivants'
+                  : `Aller au ${formatCalendarDate(tabCaption)}`
+              }
               onClick={() => {
                 if (index === 0) return setCurrentDate(subtractOneDay(currentDate));
                 if (index === 4) return setCurrentDate(addOneDay(currentDate));
@@ -127,7 +130,9 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
               }}>
               {['<', '>'].includes(tabCaption)
                 ? tabCaption
-                : `${renderDate(tabCaption)} (${[theDayBeforeActions.length, theCurrentDayActions.length, theDayAfterActions.length][index - 1]})`}
+                : `${formatCalendarDate(tabCaption)} (${
+                    [theDayBeforeActions.length, theCurrentDayActions.length, theDayAfterActions.length][index - 1]
+                  })`}
             </NavLink>
           </NavItem>
         ))}

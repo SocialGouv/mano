@@ -115,11 +115,12 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Agenda" }).click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
 
-  await page.locator("svg").nth(2).click();
+  await page.locator(".action-select-status-filter__multi-value__remove").click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2&statuses=%5B%5D");
 
   await clickOnEmptyReactSelect(page, "action-select-status-filter", "FAITE");
 
+  await page.getByText("<").click({ clickCount: 2 });
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
@@ -171,8 +172,9 @@ test("test", async ({ page }) => {
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/report\/[0-9]{4}-[0-9]{2}-[0-9]{2}\?reportsTeam=%5B%22[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}%22%5D/
   );
+  await page.getByText("Consultations faites (0)").click();
+  await page.getByRole("button", { name: "Précédent" }).click({ clickCount: 2 });
   await page.getByText("Consultations faites (1)").click();
-
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
