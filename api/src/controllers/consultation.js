@@ -27,7 +27,7 @@ router.post(
       z.object({
         status: z.enum(STATUS),
         dueAt: z.preprocess((input) => new Date(input), z.date()),
-        ...(req.body.completedAt ? { completedAt: z.preprocess((input) => new Date(input), z.date()) } : {}),
+        ...([DONE, CANCEL].includes(req.body.status) ? { completedAt: z.preprocess((input) => new Date(input), z.date()) } : {}),
         encrypted: z.string(),
         encryptedEntityKey: z.string(),
         onlyVisibleBy: z.array(z.string().regex(looseUuidRegex)),
@@ -227,7 +227,7 @@ router.put(
         body: z.object({
           status: z.enum(STATUS),
           dueAt: z.preprocess((input) => new Date(input), z.date()),
-          ...(req.body.completedAt ? { completedAt: z.preprocess((input) => new Date(input), z.date()) } : {}),
+          ...([DONE, CANCEL].includes(req.body.status) ? { completedAt: z.preprocess((input) => new Date(input), z.date()) } : {}),
           encrypted: z.string(),
           encryptedEntityKey: z.string(),
           onlyVisibleBy: z.array(z.string().regex(looseUuidRegex)),
