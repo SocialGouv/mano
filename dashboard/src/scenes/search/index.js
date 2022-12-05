@@ -236,7 +236,7 @@ const Persons = ({ search, onUpdateResults }) => {
                 if (!person.group) return null;
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
-                    <span className="tw-text-3xl" aria-label="Person avec des liens familiaux" title="Person avec des liens familiaux">
+                    <span className="tw-text-3xl" aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
                       👪
                     </span>
                   </div>
