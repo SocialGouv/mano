@@ -1,3 +1,10 @@
+## [1.184.1](https://github.com/SocialGouv/mano/compare/v1.184.0...v1.184.1) (2022-12-05)
+
+
+### Bug Fixes
+
+* filter type number MANO-5D ([cb49620](https://github.com/SocialGouv/mano/commit/cb49620c15477f0001c0c881d9662bcfabebae7c))
+
 # [1.184.0](https://github.com/SocialGouv/mano/compare/v1.183.0...v1.184.0) (2022-12-05)
 
 
