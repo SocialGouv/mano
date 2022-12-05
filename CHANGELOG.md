@@ -1,3 +1,10 @@
+# [1.184.0](https://github.com/SocialGouv/mano/compare/v1.183.0...v1.184.0) (2022-12-05)
+
+
+### Features
+
+* can filter actions by team ([#1039](https://github.com/SocialGouv/mano/issues/1039)) ([8dd176a](https://github.com/SocialGouv/mano/commit/8dd176a45aab921d44a7eb099b3f928f351a5977))
+
 # [1.183.0](https://github.com/SocialGouv/mano/compare/v1.182.3...v1.183.0) (2022-12-05)
 
 
