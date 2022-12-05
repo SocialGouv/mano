@@ -51,7 +51,7 @@ const Passage = ({ passage, onFinished }) => {
 
   return (
     <>
-      <Modal isOpen={!!open && !!passage} toggle={onCancelRequest} size="lg" backdrop="static">
+      <Modal zIndex={5000} isOpen={!!open && !!passage} toggle={onCancelRequest} size="lg" backdrop="static">
         <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer un passage' : 'Éditer le passage'}</ModalHeader>
         <ModalBody>
           <Formik
