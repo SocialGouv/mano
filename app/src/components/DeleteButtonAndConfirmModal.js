@@ -13,15 +13,23 @@ import { MyText } from './MyText';
 import { useRecoilValue } from 'recoil';
 import { userState } from '../recoil/auth';
 
-const DeleteButtonAndConfirmModal = ({ children, title, onDelete, onBack, textToConfirm }) => {
+const DeleteButtonAndConfirmModal = ({
+  children,
+  title,
+  onDelete,
+  onBack,
+  textToConfirm,
+  roles = ['admin'],
+  roleErrorMessage = "Désolé, seul un admin peut supprimer ce type d'élément",
+}) => {
   const user = useRecoilValue(userState);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [textConfirmed, setTextConfirmed] = useState('');
   const [deleting, setDeleting] = useState(false);
 
   const onDeleteRequest = () => {
-    if (!['admin'].includes(user.role)) {
-      Alert.alert("Désolé, seul un admin peut supprimer ce type d'élément");
+    if (!roles.includes(user.role)) {
+      Alert.alert(roleErrorMessage);
       return;
     }
     setShowConfirmDelete(true);

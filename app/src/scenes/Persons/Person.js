@@ -22,6 +22,11 @@ import { commentsState } from '../../recoil/comments';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { userState } from '../../recoil/auth';
 import API from '../../services/api';
+import { rencontresState } from '../../recoil/rencontres';
+import { passagesState } from '../../recoil/passages';
+import { consultationsState } from '../../recoil/consultations';
+import { treatmentsState } from '../../recoil/treatments';
+import { medicalFileState } from '../../recoil/medicalFiles';
 
 const TabNavigator = createMaterialTopTabNavigator();
 
@@ -38,8 +43,13 @@ const Person = ({ route, navigation }) => {
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
   const [comments, setComments] = useRecoilState(commentsState);
-  const user = useRecoilValue(userState);
+  const [passages, setPassages] = useRecoilState(passagesState);
+  const [rencontres, setRencontres] = useRecoilState(rencontresState);
+  const [consultations, setConsultations] = useRecoilState(consultationsState);
+  const [treatments, setTreatments] = useRecoilState(treatmentsState);
+  const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const user = useRecoilValue(userState);
 
   const [personDB, setPersonDB] = useState(() => persons.find((p) => p._id === route.params?.person?._id));
 
@@ -164,40 +174,58 @@ const Person = ({ route, navigation }) => {
 
   const onDelete = async () => {
     setDeleting(true);
-    const res = await API.delete({ path: `/person/${personDB._id}` });
+    const personId = personDB._id;
+    const res = await API.delete({ path: `/person/${personId}` });
     if (res.error) {
       if (res.error === 'Not Found') {
-        setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
+        setPersons((persons) => persons.filter((p) => p._id !== personId));
       } else {
         Alert.alert(res.error);
         return false;
       }
     }
-    for (const action of actions.filter((a) => a.person === personDB._id)) {
+    for (const action of actions.filter((a) => a.person === personId)) {
       const actionRes = await API.delete({ path: `/action/${action._id}` });
       if (actionRes.ok) {
         setActions((actions) => actions.filter((a) => a._id !== action._id));
         for (let comment of comments.filter((c) => c.action === action._id)) {
           const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-          if (commentRes.ok) {
-            setComments((comments) => comments.filter((p) => p._id !== comment._id));
-          }
+          if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
         }
       }
     }
-    for (let comment of comments.filter((c) => c.person === personDB._id)) {
+    for (let comment of comments.filter((c) => c.person === personId)) {
       const commentRes = await API.delete({ path: `/comment/${comment._id}` });
-      if (commentRes.ok) {
-        setComments((comments) => comments.filter((p) => p._id !== comment._id));
-      }
+      if (commentRes.ok) setComments((comments) => comments.filter((c) => c._id !== comment._id));
     }
-    for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === personDB._id)) {
-      const res = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
-      if (res.ok) {
+    for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.person === personId)) {
+      const relRes = await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+      if (relRes.ok) {
         setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace._id));
       }
     }
-    setPersons((persons) => persons.filter((p) => p._id !== personDB._id));
+    for (let passage of passages.filter((c) => c.person === personId)) {
+      const passageRes = await API.delete({ path: `/passage/${passage._id}` });
+      if (passageRes.ok) setPassages((passages) => passages.filter((c) => c._id !== passage._id));
+    }
+    for (let rencontre of rencontres.filter((c) => c.person === personId)) {
+      const rencontreRes = await API.delete({ path: `/rencontre/${rencontre._id}` });
+      if (rencontreRes.ok) setRencontres((rencontres) => rencontres.filter((c) => c._id !== rencontre._id));
+    }
+
+    for (let medicalFile of medicalFiles.filter((c) => c.person === personId)) {
+      const medicalFileRes = await API.delete({ path: `/medical-file/${medicalFile._id}` });
+      if (medicalFileRes.ok) setMedicalFiles((medicalFiles) => medicalFiles.filter((c) => c._id !== medicalFile._id));
+    }
+    for (let treatment of treatments.filter((c) => c.person === personId)) {
+      const treatmentRes = await API.delete({ path: `/treatment/${treatment._id}` });
+      if (treatmentRes.ok) setTreatments((treatments) => treatments.filter((c) => c._id !== treatment._id));
+    }
+    for (let consultation of consultations.filter((c) => c.person === personId)) {
+      const consultationRes = await API.delete({ path: `/consultation/${consultation._id}` });
+      if (consultationRes.ok) setConsultations((consultations) => consultations.filter((c) => c._id !== consultation._id));
+    }
+    setPersons((persons) => persons.filter((p) => p._id !== personId));
     setDeleting(false);
     Alert.alert('Personne supprimée !');
     return true;

@@ -25,6 +25,7 @@ import { medicalFileState } from '../recoil/medicalFiles';
 import { treatmentsState } from '../recoil/treatments';
 import { sortByName } from '../utils/sortByName';
 import { rencontresState } from '../recoil/rencontres';
+import { passagesState } from '../recoil/passages';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -81,6 +82,7 @@ const Loader = () => {
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const [territoryObservations, setTerritoryObs] = useRecoilState(territoryObservationsState);
   const [comments, setComments] = useRecoilState(commentsState);
+  const [passages, setPassages] = useRecoilState(passagesState);
   const [rencontres, setRencontres] = useRecoilState(rencontresState);
   const [reports, setReports] = useRecoilState(reportsState);
   const [refreshTrigger, setRefreshTrigger] = useRecoilState(refreshTriggerState);
@@ -115,6 +117,7 @@ const Loader = () => {
       response.data.territoryObservations +
       response.data.places +
       response.data.comments +
+      response.data.passages +
       response.data.rencontres +
       response.data.reports +
       response.data.relsPersonPlace;
@@ -133,10 +136,7 @@ const Loader = () => {
       return;
     }
 
-    total =
-      total +
-      medicalDataResponse.data.consultations +
-      (!user?.healthcareProfessional ? 0 : medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles);
+    total = total + medicalDataResponse.data.consultations + medicalDataResponse.data.treatments + medicalDataResponse.data.medicalFiles;
 
     if (initialLoad) {
       const numberOfCollections = 9;
@@ -183,40 +183,38 @@ const Loader = () => {
     /*
     Get treatments
     */
-    if (['admin', 'normal'].includes(user?.role) && user?.healthcareProfessional) {
-      if (medicalDataResponse.data.treatments || initialLoad) {
-        setLoading('Chargement des traitements');
-        const refreshedTreatments = await getData({
-          collectionName: 'treatment',
-          data: treatments,
-          isInitialization: initialLoad,
-          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-          setBatchData: (newTreatments) =>
-            setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
-          API,
-        });
-        if (refreshedTreatments) setTreatments(refreshedTreatments);
-      }
-      /*
+    if (medicalDataResponse.data.treatments || initialLoad) {
+      setLoading('Chargement des traitements');
+      const refreshedTreatments = await getData({
+        collectionName: 'treatment',
+        data: treatments,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+        setBatchData: (newTreatments) =>
+          setTreatments((oldTreatments) => (initialLoad ? [...oldTreatments, ...newTreatments] : mergeItems(oldTreatments, newTreatments))),
+        API,
+      });
+      if (refreshedTreatments) setTreatments(refreshedTreatments);
+    }
+    /*
       Get medicalFiles
       */
-      if (medicalDataResponse.data.medicalFiles || initialLoad) {
-        setLoading('Chargement des informations médicales');
-        const refreshedMedicalFiles = await getData({
-          collectionName: 'medical-file',
-          data: medicalFiles,
-          isInitialization: initialLoad,
-          setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-          lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
-          setBatchData: (newMedicalFiles) =>
-            setMedicalFiles((oldMedicalFiles) =>
-              initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
-            ),
-          API,
-        });
-        if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
-      }
+    if (medicalDataResponse.data.medicalFiles || initialLoad) {
+      setLoading('Chargement des informations médicales');
+      const refreshedMedicalFiles = await getData({
+        collectionName: 'medical-file',
+        data: medicalFiles,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh: initialLoad ? 0 : lastRefresh, // because we never save medical data in cache
+        setBatchData: (newMedicalFiles) =>
+          setMedicalFiles((oldMedicalFiles) =>
+            initialLoad ? [...oldMedicalFiles, ...newMedicalFiles] : mergeItems(oldMedicalFiles, newMedicalFiles)
+          ),
+        API,
+      });
+      if (refreshedMedicalFiles) setMedicalFiles(refreshedMedicalFiles);
     }
     /*
     Get actions
@@ -320,6 +318,23 @@ const Loader = () => {
       if (refreshedComments) setComments(refreshedComments);
     }
 
+    /*
+    Get passages
+    */
+    if (initialLoad || response.data.passages) {
+      setLoading('Chargement des passages');
+      const refreshedRencontres = await getData({
+        collectionName: 'passage',
+        data: passages,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newPassages) =>
+          setPassages((oldPassages) => (initialLoad ? [...oldPassages, ...newPassages] : mergeItems(oldPassages, newPassages))),
+        API,
+      });
+      if (refreshedRencontres) setPassages(refreshedRencontres);
+    }
     /*
     Get rencontres
     */

@@ -1,9 +1,11 @@
 import { atom } from 'recoil';
+import { storage } from '../services/dataManagement';
 
 const collectionName = 'rencontre';
 export const rencontresState = atom({
   key: collectionName,
   default: [],
+  effects: [({ onSet }) => onSet(async (newValue) => storage.set(collectionName, JSON.stringify(newValue)))],
 });
 
 const encryptedFields = ['person', 'team', 'user', 'date', 'comment'];

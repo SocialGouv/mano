@@ -145,7 +145,7 @@ router.put(
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),
-  validateUser(["admin", "normal"], { healthcareProfessional: true }),
+  validateUser(["admin", "normal"]),
   catchErrors(async (req, res, next) => {
     try {
       z.object({
