@@ -94,7 +94,7 @@ const Consultation = ({ navigation, route }) => {
     Keyboard.dismiss();
     setPosting(true);
     if ([DONE, CANCEL].includes(consultation.status)) {
-      if (!consultation.completedAt) consultation.completedAt = new Date();
+      if (!consultation.completedAt) values.completedAt = new Date();
     } else {
       consultation.completedAt = null;
     }
@@ -229,7 +229,26 @@ const Consultation = ({ navigation, route }) => {
           />
           <Spacer />
           <ActionStatusSelect value={consultation.status} onSelect={(status) => onChange({ status })} editable testID="consultation-status" />
-          <DateAndTimeInput label="Date" date={consultation.dueAt} setDate={(dueAt) => onChange({ dueAt })} editable showYear showTime withTime />
+          <DateAndTimeInput
+            label="Échéance / À faire le"
+            date={consultation.dueAt}
+            setDate={(dueAt) => onChange({ dueAt })}
+            editable
+            showYear
+            showTime
+            withTime
+          />
+          {Boolean([DONE, CANCEL].includes(consultation.status)) && (
+            <DateAndTimeInput
+              label={consultation.status === DONE ? 'Faite le' : 'Annulée le'}
+              date={consultation.completedAt}
+              setDate={(completedAt) => onChange({ completedAt })}
+              editable
+              showYear
+              showTime
+              withTime
+            />
+          )}
           <CheckboxLabelled
             label="Seulement visible par moi"
             alone

@@ -689,7 +689,7 @@ export function MedicalFile({ person }) {
           }}
           onSubmit={async (values) => {
             if ([DONE, CANCEL].includes(values.status)) {
-              if (!currentConsultation.completedAt) values.completedAt = new Date();
+              if (!currentConsultation.completedAt && !values.completedAt) values.completedAt = new Date();
             } else {
               values.completedAt = null;
             }
@@ -802,7 +802,7 @@ export function MedicalFile({ person }) {
                   </Col>
                   <Col md={6}>
                     <FormGroup>
-                      <Label htmlFor="create-consultation-dueat">Date</Label>
+                      <Label htmlFor="create-consultation-dueat">Échéance / À faire le</Label>
                       <div>
                         <DatePicker
                           locale="fr"
@@ -818,6 +818,26 @@ export function MedicalFile({ person }) {
                       {touched.dueAt && errors.dueAt && <Error>{errors.dueAt}</Error>}
                     </FormGroup>
                   </Col>
+                  {Boolean([DONE, CANCEL].includes(values.status)) && (
+                    <Col md={6}>
+                      <FormGroup>
+                        <Label htmlFor="create-consultation-completedAt">{values.status === DONE ? 'Faite le' : 'Annulée le'}</Label>
+                        <div>
+                          <DatePicker
+                            locale="fr"
+                            className="form-control"
+                            id="create-consultation-completedAt"
+                            selected={values.completedAt ? dateForDatePicker(values.completedAt) : new Date()}
+                            onChange={(completedAt) => handleChange({ target: { value: completedAt, name: 'completedAt' } })}
+                            timeInputLabel="Heure :"
+                            dateFormat={'dd/MM/yyyy HH:mm'}
+                            showTimeInput
+                          />
+                        </div>
+                        {touched.completedAt && errors.completedAt && <Error>{errors.completedAt}</Error>}
+                      </FormGroup>
+                    </Col>
+                  )}
                   <Col md={12}>
                     <FormGroup>
                       <Label htmlFor="create-consultation-onlyme">

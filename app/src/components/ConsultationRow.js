@@ -6,7 +6,7 @@ import RowContainer from './RowContainer';
 import { MyText } from './MyText';
 import colors from '../utils/colors';
 
-import { DONE } from '../recoil/actions';
+import { CANCEL, DONE } from '../recoil/actions';
 import UserName from './UserName';
 import DateAndTimeCalendarDisplay from './DateAndTimeCalendarDisplay';
 import { useRecoilValue } from 'recoil';
@@ -63,7 +63,7 @@ const ConsultationRow = ({
           <MyText>🩺</MyText>
         </ConsultationBadge>
       )}
-      <DateAndTimeCalendarDisplay date={dueAt} withTime />
+      <DateAndTimeCalendarDisplay date={[DONE, CANCEL].includes(consultation?.status) ? new Date(consultation?.completedAt) : dueAt} withTime />
       <CaptionsContainer>
         <Name>{name}</Name>
         <Type>{type}</Type>
