@@ -1,3 +1,10 @@
+# [1.183.0](https://github.com/SocialGouv/mano/compare/v1.182.3...v1.183.0) (2022-12-05)
+
+
+### Features
+
+* **dashboard:** add fullscreen for passage and rencontres ([#1034](https://github.com/SocialGouv/mano/issues/1034)) ([7fce475](https://github.com/SocialGouv/mano/commit/7fce4756d8da1f708e7e646eb8acff53341d70ad))
+
 ## [1.182.3](https://github.com/SocialGouv/mano/compare/v1.182.2...v1.182.3) (2022-12-05)
 
 
