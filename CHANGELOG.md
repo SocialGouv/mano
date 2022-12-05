@@ -1,3 +1,10 @@
+## [1.182.3](https://github.com/SocialGouv/mano/compare/v1.182.2...v1.182.3) (2022-12-05)
+
+
+### Bug Fixes
+
+* checkbox default value with localstorage in stats ([#1038](https://github.com/SocialGouv/mano/issues/1038)) ([433489e](https://github.com/SocialGouv/mano/commit/433489e3028b1acee78d8998060030be59ae05d1))
+
 ## [1.182.2](https://github.com/SocialGouv/mano/compare/v1.182.1...v1.182.2) (2022-12-04)
 
 
