@@ -383,7 +383,8 @@ const Stats = () => {
                 <input
                   id="viewAllOrganisationData"
                   type="checkbox"
-                  style={{ marginRight: '0.5rem' }}
+                  className="tw-mr-2"
+                  checked={viewAllOrganisationData}
                   onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
                 />
                 Statistiques de toute l'organisation
