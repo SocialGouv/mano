@@ -52,7 +52,7 @@ test("test", async ({ page }) => {
   });
   await page.getByLabel("Nom").fill("Annulée");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.locator('span:has-text("' + dayjsInstance().add(1, "day").format("D") + '")').click();
+  await page.locator('span:has-text("' + dayjsInstance().format("D") + '")').click();
   await page.getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" }).click();
   await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
   await page.getByLabel("Nom").click();
