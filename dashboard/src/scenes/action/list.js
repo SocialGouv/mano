@@ -125,10 +125,10 @@ const List = () => {
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [page, setPage] = useSearchParamState('page', 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
-  const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
   const [categories, setCategories] = useSearchParamState('categories', []);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('allOrg', false);
+  const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
   const [selectedTeamIds, setSelectedTeamIds] = useSearchParamState('teams', [currentTeam._id]);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('allOrg', false);
 
   const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useLocalStorage('showAs', showAsOptions[0]); // calendar, list
@@ -139,8 +139,6 @@ const List = () => {
   const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
 
   const total = dataConsolidated.length;
-
-  console.log({ viewAllOrganisationData });
 
   return (
     <>
