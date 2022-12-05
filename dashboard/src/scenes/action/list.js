@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from 'react';
-import { Col, Label, Row, Button } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
@@ -16,7 +15,7 @@ import ActionOrConsultationName from '../../components/ActionOrConsultationName'
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
 import { CANCEL, DONE, mappedIdsToLabels, TODO } from '../../recoil/actions';
-import { currentTeamState, userState } from '../../recoil/auth';
+import { currentTeamState, teamsState, userState } from '../../recoil/auth';
 import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/ExclamationMarkButton';
@@ -29,6 +28,8 @@ import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import { useLocalStorage } from 'react-use';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
+import TagTeam from '../../components/TagTeam';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
@@ -44,13 +45,12 @@ const arrayOfitemsGroupedByActionSelector = selector({
 const actionsByTeamAndStatusSelector = selectorFamily({
   key: 'actionsByTeamAndStatusSelector',
   get:
-    ({ statuses, categories }) =>
+    ({ statuses, categories, teamIds, viewAllOrganisationData }) =>
     ({ get }) => {
-      const currentTeam = get(currentTeamState);
       const actions = get(arrayOfitemsGroupedByActionSelector);
       const actionsByTeamAndStatus = actions.filter(
         (action) =>
-          action.team === currentTeam._id &&
+          (viewAllOrganisationData || teamIds.includes(action.team)) &&
           (!statuses.length || statuses.includes(action.status)) &&
           (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
       );
@@ -95,9 +95,9 @@ const consultationsByStatusSelector = selectorFamily({
 const dataFilteredBySearchSelector = selectorFamily({
   key: 'dataFilteredBySearchSelector',
   get:
-    ({ search, statuses, categories }) =>
+    ({ search, statuses, categories, teamIds, viewAllOrganisationData }) =>
     ({ get }) => {
-      const actions = get(actionsByTeamAndStatusSelector({ statuses, categories }));
+      const actions = get(actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewAllOrganisationData }));
       // When we filter by category, we don't want to see all consultations.
       const consultations = categories?.length ? [] : get(consultationsByStatusSelector({ statuses }));
       if (!search) {
@@ -114,22 +114,28 @@ const dataFilteredBySearchSelector = selectorFamily({
 const limit = 20;
 
 const List = () => {
-  const history = useHistory();
   useTitle('Agenda');
-  const { isLoading, refresh } = useDataLoader();
-  const [modalOpen, setModalOpen] = useState(false);
+  const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
+  const teams = useRecoilValue(teamsState);
+
+  const { isLoading, refresh } = useDataLoader();
+  const [modalOpen, setModalOpen] = useState(false);
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [page, setPage] = useSearchParamState('page', 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
-  const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
   const [categories, setCategories] = useSearchParamState('categories', []);
+  const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
+  const [selectedTeamIds, setSelectedTeamIds] = useSearchParamState('teams', [currentTeam._id]);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('allOrg', false);
 
   const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useLocalStorage('showAs', showAsOptions[0]); // calendar, list
 
-  const dataConsolidated = useRecoilValue(dataFilteredBySearchSelector({ search, statuses, categories }));
+  const dataConsolidated = useRecoilValue(
+    dataFilteredBySearchSelector({ search, statuses, categories, teamIds: selectedTeamIds, viewAllOrganisationData })
+  );
   const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
 
   const total = dataConsolidated.length;
@@ -143,33 +149,28 @@ const List = () => {
           </span>
         }
       />
-      <Row style={{ marginBottom: 20, justifyContent: 'center' }}>
-        <Col md={12}>
-          <div className="noprint" style={{ display: 'flex', justifyContent: 'flex-end', width: '100%' }}>
-            <Button onClick={() => refresh()} disabled={isLoading} color="link" style={{ marginRight: 10 }}>
-              Rafraichir
-            </Button>
-            <ButtonCustom
-              icon={agendaIcon}
-              disabled={!currentTeam}
-              onClick={() => {
-                setActionDate(new Date());
-                setModalOpen(true);
-              }}
-              color="primary"
-              title="Créer une nouvelle action"
-              padding={'12px 24px'}
-            />
-          </div>
-        </Col>
-        <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
-      </Row>
-      <Row style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-        <Col md={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <label htmlFor="actions-show-as" style={{ marginRight: 10, width: 155, flexShrink: 0 }}>
+      <div className="tw-mb-5 tw-flex tw-flex-row tw-justify-center">
+        <div className="noprint tw-flex tw-w-full tw-justify-end">
+          <ButtonCustom onClick={() => refresh()} title="Rafraichir" disabled={isLoading} color="link" className="tw-mr-5" />
+          <ButtonCustom
+            icon={agendaIcon}
+            disabled={!currentTeam}
+            onClick={() => {
+              setActionDate(new Date());
+              setModalOpen(true);
+            }}
+            color="primary"
+            title="Créer une nouvelle action"
+            padding={'12px 24px'}
+          />
+        </div>
+      </div>
+      <div className="tw-mb-10 tw-flex tw-flex-wrap tw-border-b tw-border-gray-200">
+        <div className="tw-mb-5 tw-flex tw-w-full tw-items-center tw-px-2">
+          <label htmlFor="actions-show-as" className="tw-mr-5 tw-w-40 tw-shrink-0">
             Afficher par&nbsp;:
           </label>
-          <div style={{ width: 300 }}>
+          <div className="tw-basis-1/3">
             <SelectCustom
               onChange={setShowAs}
               value={[showAs]}
@@ -181,26 +182,47 @@ const List = () => {
               getOptionLabel={(i) => i}
             />
           </div>
-        </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <label htmlFor="search" style={{ marginRight: 10, width: 155, flexShrink: 0 }}>
+        </div>
+        <div className="tw-mb-5 tw-flex tw-w-full tw-items-center tw-px-2">
+          <label htmlFor="search" className="tw-mr-5 tw-w-40 tw-shrink-0">
             Recherche&nbsp;:
           </label>
           <Search placeholder="Par mot clé, présent dans le nom, la catégorie, un commentaire, ..." value={search} onChange={setSearch} />
-        </Col>
-        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-categories-filter">
-            Filtrer par catégorie&nbsp;:
-          </Label>
-          <div style={{ width: '100%' }}>
+        </div>
+        <div className="tw-mb-5 tw-flex tw-basis-1/3 tw-flex-col tw-items-start tw-px-2">
+          <label htmlFor="action-select-categories-filter">Filtrer par catégorie&nbsp;:</label>
+          <div className="tw-w-full">
             <ActionsCategorySelect id="action-select-categories-filter" onChange={(c) => setCategories(c)} values={categories} />
           </div>
-        </Col>
-        <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-status-filter">
-            Filtrer par statut&nbsp;:
-          </Label>
-          <div style={{ width: '100%' }}>
+        </div>
+        <div className="tw-mb-5 tw-flex tw-basis-1/3 tw-flex-col tw-items-start tw-px-2">
+          <label htmlFor="action-select-categories-filter">Filtrer par équipe&nbsp;:</label>
+          <div className="tw-w-full">
+            <SelectTeamMultiple
+              onChange={(teamsId) => {
+                setSelectedTeamIds(teams.filter((t) => teamsId.includes(t._id))?.map((t) => t._id));
+              }}
+              value={selectedTeamIds}
+              colored
+              isDisabled={viewAllOrganisationData}
+            />
+            {teams.length > 1 && (
+              <label htmlFor="viewAllOrganisationData" className="tw-text-sm">
+                <input
+                  id="viewAllOrganisationData"
+                  type="checkbox"
+                  className="tw-mr-2"
+                  checked={viewAllOrganisationData}
+                  onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
+                />
+                Actions de toute l'organisation
+              </label>
+            )}
+          </div>
+        </div>
+        <div className="tw-mb-5 tw-flex tw-basis-1/3 tw-flex-col tw-items-start tw-px-2">
+          <label htmlFor="action-select-status-filter">Filtrer par statut&nbsp;:</label>
+          <div className="tw-w-full">
             <SelectCustom
               inputId="action-select-status-filter"
               classNamePrefix="action-select-status-filter"
@@ -214,8 +236,8 @@ const List = () => {
               value={mappedIdsToLabels.filter((s) => statuses.includes(s._id))}
             />
           </div>
-        </Col>
-      </Row>
+        </div>
+      </div>
 
       {showAs === showAsOptions[2] && (
         <div style={{ minHeight: '100vh' }}>
@@ -288,11 +310,17 @@ const List = () => {
                 render: (action) => <PersonName item={action} />,
               },
               { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+              {
+                title: 'Équipe en charge',
+                dataKey: 'team',
+                render: (a) => <TagTeam teamId={a?.team} />,
+              },
             ]}
           />
           <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
         </>
       )}
+      <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
     </>
   );
 };
