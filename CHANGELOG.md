@@ -1,3 +1,31 @@
+# [1.184.0](https://github.com/SocialGouv/mano/compare/v1.183.0...v1.184.0) (2022-12-05)
+
+
+### Features
+
+* can filter actions by team ([#1039](https://github.com/SocialGouv/mano/issues/1039)) ([8dd176a](https://github.com/SocialGouv/mano/commit/8dd176a45aab921d44a7eb099b3f928f351a5977))
+
+# [1.183.0](https://github.com/SocialGouv/mano/compare/v1.182.3...v1.183.0) (2022-12-05)
+
+
+### Features
+
+* **dashboard:** add fullscreen for passage and rencontres ([#1034](https://github.com/SocialGouv/mano/issues/1034)) ([7fce475](https://github.com/SocialGouv/mano/commit/7fce4756d8da1f708e7e646eb8acff53341d70ad))
+
+## [1.182.3](https://github.com/SocialGouv/mano/compare/v1.182.2...v1.182.3) (2022-12-05)
+
+
+### Bug Fixes
+
+* checkbox default value with localstorage in stats ([#1038](https://github.com/SocialGouv/mano/issues/1038)) ([433489e](https://github.com/SocialGouv/mano/commit/433489e3028b1acee78d8998060030be59ae05d1))
+
+## [1.182.2](https://github.com/SocialGouv/mano/compare/v1.182.1...v1.182.2) (2022-12-04)
+
+
+### Bug Fixes
+
+* navigate to consultation ([#1037](https://github.com/SocialGouv/mano/issues/1037)) ([bf4c950](https://github.com/SocialGouv/mano/commit/bf4c95088cfc5a10da022e433f83c3fe5395ff88))
+
 ## [1.182.1](https://github.com/SocialGouv/mano/compare/v1.182.0...v1.182.1) (2022-12-02)
 
 

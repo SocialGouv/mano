@@ -1,5 +1,4 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useLocation, useParams } from 'react-router-dom';
 import { Alert } from 'reactstrap';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import Places from '../../components/Places';
@@ -21,6 +20,7 @@ import { toast } from 'react-toastify';
 import { organisationState, userState } from '../../recoil/auth';
 import PersonFamily from './PersonFamily';
 import { groupSelector } from '../../recoil/groups';
+import useSearchParamState from '../../services/useSearchParamState';
 
 const populatedPersonSelector = selectorFamily({
   key: 'populatedPersonSelector',
@@ -34,6 +34,7 @@ const populatedPersonSelector = selectorFamily({
 
 export default function NewView() {
   const { personId } = useParams();
+  const location = useLocation();
   const API = useApi();
   const organisation = useRecoilValue(organisationState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
@@ -42,7 +43,7 @@ export default function NewView() {
   const personGroup = useRecoilValue(groupSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
   const user = useRecoilValue(userState);
-  const [currentTab, setCurrentTab] = useState('Résumé');
+  const [currentTab, setCurrentTab] = useSearchParamState('tab', new URLSearchParams(location.search)?.get('tab') || 'Résumé');
 
   return (
     <div>

@@ -49,7 +49,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
 
   return (
     <>
-      <Modal isOpen={!!open && !!rencontre} toggle={onCancelRequest} size="lg" backdrop="static">
+      <Modal zIndex={5000} isOpen={!!open && !!rencontre} toggle={onCancelRequest} size="lg" backdrop="static">
         <ModalHeader toggle={onCancelRequest}>{isNew ? 'Enregistrer une rencontre' : 'Éditer la rencontre'}</ModalHeader>
         <ModalBody>
           <Formik

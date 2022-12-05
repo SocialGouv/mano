@@ -4,7 +4,7 @@ import { useHistory } from 'react-router';
 import { useRecoilValue } from 'recoil';
 import { personsState } from '../recoil/persons';
 
-export default function PersonName({ item, redirectToTab = 'résumé' }) {
+export default function PersonName({ item, redirectToTab = 'Résumé' }) {
   const history = useHistory();
   const persons = useRecoilValue(personsState);
   const personName = item?.personPopulated?.name || persons.find((p) => p._id === item.person)?.name;

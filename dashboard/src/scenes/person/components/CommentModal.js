@@ -16,7 +16,6 @@ import { groupsState } from '../../../recoil/groups';
 import { ModalBody, ModalContainer, ModalHeader } from '../../../components/tailwind/Modal';
 
 const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
-  console.log('comment', comment);
   const user = useRecoilValue(userState);
   const groups = useRecoilValue(groupsState);
   const organisation = useRecoilValue(organisationState);
