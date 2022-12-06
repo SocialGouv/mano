@@ -5,8 +5,8 @@ import { disableConsultationRow } from '../recoil/consultations';
 
 const getName = (item) => {
   if (item.name) return item.name;
-  if (!item.isConsultation) return 'Action'; // should never happen
-  return `Consultation ${item.type}`;
+  if (item.isConsultation) return `Consultation ${item.type}`;
+  return 'Action'; // should never happen
 };
 
 export default function ActionOrConsultationName({ item }) {
