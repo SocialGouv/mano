@@ -1,3 +1,10 @@
+## [1.184.5](https://github.com/SocialGouv/mano/compare/v1.184.4...v1.184.5) (2022-12-06)
+
+
+### Bug Fixes
+
+* **dashboard:** weekly dashboard display categories twice ([03d430e](https://github.com/SocialGouv/mano/commit/03d430edc5769b730c9b447caa95380e13605dc5))
+
 ## [1.184.4](https://github.com/SocialGouv/mano/compare/v1.184.3...v1.184.4) (2022-12-06)
 
 
