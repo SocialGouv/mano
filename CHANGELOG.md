@@ -1,3 +1,10 @@
+## [1.185.3](https://github.com/SocialGouv/mano/compare/v1.185.2...v1.185.3) (2022-12-06)
+
+
+### Bug Fixes
+
+* show team in actions calendar ([#1048](https://github.com/SocialGouv/mano/issues/1048)) ([7d8518f](https://github.com/SocialGouv/mano/commit/7d8518fc9c263c670387dffe7a1a570ff99b9f5f))
+
 ## [1.185.2](https://github.com/SocialGouv/mano/compare/v1.185.1...v1.185.2) (2022-12-06)
 
 
