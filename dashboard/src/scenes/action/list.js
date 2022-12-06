@@ -322,7 +322,11 @@ const List = () => {
               {
                 title: 'Équipe en charge',
                 dataKey: 'team',
-                render: (a) => <TagTeam teamId={a?.team} />,
+                render: (a) => (
+                  <div className="px-2 tw-flex-shrink-0">
+                    <TagTeam teamId={a?.team} />
+                  </div>
+                ),
               },
             ]}
           />

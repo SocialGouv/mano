@@ -12,8 +12,9 @@ import { organisationState, userState } from '../recoil/auth';
 import { disableConsultationRow } from '../recoil/consultations';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import { CANCEL, DONE } from '../recoil/actions';
+import TagTeam from './TagTeam';
 
-const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut'] }) => {
+const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut', 'Équipe en charge'] }) => {
   const history = useHistory();
   const location = useLocation();
   const user = useRecoilValue(userState);
@@ -113,6 +114,15 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           render: (action) => <PersonName item={action} />,
         },
         { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+        {
+          title: 'Équipe en charge',
+          dataKey: 'team',
+          render: (a) => (
+            <div className="px-2 tw-flex-shrink-0">
+              <TagTeam teamId={a?.team} />
+            </div>
+          ),
+        },
       ].filter((column) => columns.includes(column.title) || column.dataKey === 'urgentOrGroupOrConsultation')}
     />
   );

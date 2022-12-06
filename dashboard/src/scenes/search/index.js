@@ -162,6 +162,15 @@ const Actions = ({ search, onUpdateResults }) => {
             { title: 'Nom', dataKey: 'name' },
             { title: 'Personne suivie', dataKey: 'person', render: (action) => <PersonName item={action} /> },
             { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            {
+              title: 'Équipe en charge',
+              dataKey: 'team',
+              render: (a) => (
+                <div className="px-2 tw-flex-shrink-0">
+                  <TagTeam teamId={a?.team} />
+                </div>
+              ),
+            },
           ]}
         />
       </StyledBox>
