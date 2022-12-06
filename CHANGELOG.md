@@ -1,3 +1,10 @@
+## [1.184.7](https://github.com/SocialGouv/mano/compare/v1.184.6...v1.184.7) (2022-12-06)
+
+
+### Bug Fixes
+
+* enable accueil de jour ([#1047](https://github.com/SocialGouv/mano/issues/1047)) ([a8414ad](https://github.com/SocialGouv/mano/commit/a8414ad39e3e62d6826292c5fdb7f94b23e4c9b0))
+
 ## [1.184.6](https://github.com/SocialGouv/mano/compare/v1.184.5...v1.184.6) (2022-12-06)
 
 
