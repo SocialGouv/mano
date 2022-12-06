@@ -133,6 +133,7 @@ function ActionsOfDay({ actions }) {
               )}
             </div>
           )}
+          <TagTeam teamId={action.team} />
           <div>
             <ActionOrConsultationName item={action} />
           </div>
@@ -141,7 +142,6 @@ function ActionsOfDay({ actions }) {
             🧑 <PersonName item={action} />
           </div>
           {!!organisation.groupsEnabled && !!action.group && <div>👪 Action familiale</div>}
-          <TagTeam teamId={action.team} />
           <ActionStatus status={action.status} />
         </div>
       ))}
