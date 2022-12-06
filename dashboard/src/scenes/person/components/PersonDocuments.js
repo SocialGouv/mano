@@ -246,22 +246,23 @@ function DocumentModal({ document, onClose, person }) {
           className="button-destructive"
           onClick={async () => {
             if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
+            const _person = !document.person ? person : document.personPopulated;
             await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
             const personResponse = await API.put({
-              path: `/person/${person._id}`,
+              path: `/person/${_person._id}`,
               body: preparePersonForEncryption(
                 customFieldsPersonsMedical,
                 customFieldsPersonsSocial
               )({
-                ...person,
-                documents: person.documents.filter((d) => d._id !== document._id),
+                ..._person,
+                documents: _person.documents.filter((d) => d._id !== document._id),
               }),
             });
             if (personResponse.ok) {
               const newPerson = personResponse.decryptedData;
               setPersons((persons) =>
                 persons.map((p) => {
-                  if (p._id === person._id) return newPerson;
+                  if (p._id === _person._id) return newPerson;
                   return p;
                 })
               );
