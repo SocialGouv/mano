@@ -1,15 +1,14 @@
+import { useRecoilValue } from 'recoil';
+import { userState } from '../../../recoil/auth';
 import { Actions } from './Actions';
 import InfosSociales from './InfosSociales';
 import { InfosMain } from './InfosMain';
 import PersonDocuments from './PersonDocuments';
 import InfosMedicales from './InfosMedicales';
 import Comments from './Comments';
-
+import DeletePersonButton from './DeletePersonButton';
 import PassagesRencontres from './PassagesRencontres';
 import OutOfActiveList from '../OutOfActiveList';
-import { DeletePersonButton } from '../view';
-import { useRecoilValue } from 'recoil';
-import { userState } from '../../../recoil/auth';
 import MergeTwoPersons from '../MergeTwoPersons';
 
 export default function Summary({ person }) {

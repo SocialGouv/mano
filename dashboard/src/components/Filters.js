@@ -12,6 +12,10 @@ export const filterData = (data, filters) => {
       data = data
         .map((item, index) => {
           const itemValue = item[filter.field];
+          if (['number'].includes(filter.type)) {
+            if (itemValue === filter.value) return item;
+            return null;
+          }
           if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
           if (typeof itemValue === 'boolean') {
             return itemValue === (filter.value === 'Oui') ? item : null;

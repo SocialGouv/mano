@@ -82,8 +82,6 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByRole("button", { name: "Ajouter un champ" }).click();
 
-  await page.getByLabel("Nom").click();
-
   await page.getByLabel("Nom").fill(testConsultationField);
 
   await page.getByRole("button", { name: "Enregistrer" }).click();
@@ -125,7 +123,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.getByRole("button", { name: "Dossier Médical" }).click();
   await page.getByLabel(testMedicalFileField).click();
   await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
-  await page.getByRole("textbox", { name: "Nom" }).fill("Consult");
+  await page.getByRole("textbox", { name: "Nom (facultatif)" }).fill("Consult");
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
   await page.getByLabel(testConsultationField).click();
   await page.getByLabel(testConsultationField).fill("Super");
