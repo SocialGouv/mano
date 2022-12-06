@@ -355,6 +355,7 @@ export default function DataLoader() {
     } else if (current === 'group') {
       setLoadingText('Chargement des familles');
       const res = await API.get({ path: '/group', query });
+      if (!res.data) return resetLoaderOnError();
       setGroups(() => {
         const mergedItems = mergeItems(groups, res.decryptedData);
         if (res.hasMore) return mergedItems;
@@ -364,9 +365,6 @@ export default function DataLoader() {
         return mergedItems;
       });
       handleMore(res.hasMore);
-      if (!res.data) {
-        capture('Debug: No data in loader', { extra: { res, organisation }, user });
-      }
       setProgressBuffer(res.data.length);
     }
   }
