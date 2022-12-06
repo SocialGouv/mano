@@ -13,12 +13,14 @@ import useApi from '../services/api';
 import { rencontresState, prepareRencontreForEncryption } from '../recoil/rencontres';
 import SelectTeam from './SelectTeam';
 import SelectPerson from './SelectPerson';
+import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 
 const Rencontre = ({ rencontre, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
   const API = useApi();
+  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const setRencontres = useSetRecoilState(rencontresState);
 
@@ -93,21 +95,21 @@ const Rencontre = ({ rencontre, onFinished }) => {
                 onFinished();
                 toast.success(body.person.length > 1 ? 'Rencontre enregistrée' : 'Rencontres enregistrées');
                 actions.setSubmitting(false);
+                await createReportAtDateIfNotExist(newRencontre.date);
                 return;
               }
               const response = await API.put({
                 path: `/rencontre/${rencontre._id}`,
                 body: prepareRencontreForEncryption(body),
               });
-              if (response.ok) {
-                setRencontres((rencontres) =>
-                  rencontres.map((p) => {
-                    if (p._id === rencontre._id) return response.decryptedData;
-                    return p;
-                  })
-                );
-              }
               if (!response.ok) return;
+              setRencontres((rencontres) =>
+                rencontres.map((p) => {
+                  if (p._id === rencontre._id) return response.decryptedData;
+                  return p;
+                })
+              );
+              await createReportAtDateIfNotExist(rencontre.date);
               setOpen(false);
               onFinished();
               toast.success('Rencontre mise à jour');
