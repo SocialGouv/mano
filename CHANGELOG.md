@@ -1,3 +1,10 @@
+## [1.185.2](https://github.com/SocialGouv/mano/compare/v1.185.1...v1.185.2) (2022-12-06)
+
+
+### Bug Fixes
+
+* person deletion for no pro ([#1043](https://github.com/SocialGouv/mano/issues/1043)) ([4ed1704](https://github.com/SocialGouv/mano/commit/4ed1704143d00d563860c10ee6bd41d089dc6334))
+
 ## [1.185.1](https://github.com/SocialGouv/mano/compare/v1.185.0...v1.185.1) (2022-12-06)
 
 
