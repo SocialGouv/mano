@@ -151,9 +151,9 @@ const PersonFamily = ({ person }) => {
               return (
                 <tr key={JSON.stringify(persons)}>
                   <td>
-                    <PersonName item={{ person: persons[0] }} redirectToTab="famille" />
+                    <PersonName item={{ person: persons[0] }} />
                     {' et '}
-                    <PersonName item={{ person: persons[1] }} redirectToTab="famille" />
+                    <PersonName item={{ person: persons[1] }} />
                   </td>
                   <td>{description}</td>
                   <td width="15%">

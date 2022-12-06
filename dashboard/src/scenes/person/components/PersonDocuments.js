@@ -166,6 +166,8 @@ function DocumentModal({ document, onClose, person }) {
     [groups, person._id, organisation.groupsEnabled]
   );
 
+  console.log(document);
+
   return (
     <ModalContainer open>
       <ModalHeader title={document.name} />
@@ -231,7 +233,7 @@ function DocumentModal({ document, onClose, person }) {
           className="button-submit"
           onClick={async () => {
             const file = await API.download({
-              path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}`,
+              path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
               encryptedEntityKey: document.encryptedEntityKey,
             });
             download(file, document.name);
@@ -244,7 +246,7 @@ function DocumentModal({ document, onClose, person }) {
           className="button-destructive"
           onClick={async () => {
             if (!window.confirm('Voulez-vous vraiment supprimer ce document ?')) return;
-            await API.delete({ path: document.downloadPath ?? `/person/${person._id}/document/${document.file.filename}` });
+            await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
             const personResponse = await API.put({
               path: `/person/${person._id}`,
               body: preparePersonForEncryption(
@@ -269,7 +271,7 @@ function DocumentModal({ document, onClose, person }) {
           Supprimer
         </button>
         <button type="button" name="cancel" className="button-cancel" onClick={() => onClose()}>
-          Annuler
+          Fermer
         </button>
       </ModalFooter>
     </ModalContainer>
