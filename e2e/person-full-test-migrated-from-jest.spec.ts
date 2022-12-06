@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { clickOnEmptyReactSelect, loginWith } from "./utils";
+import { clickOnEmptyReactSelect, loginWith, logOut } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
@@ -18,6 +18,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill(personName);
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByText("Création réussie !").click();
 
   await page.getByText(personName).click();
   await page.getByRole("main").getByText("Team Test - 1").click();
@@ -71,6 +72,7 @@ test("test", async ({ page }) => {
   await clickOnEmptyReactSelect(page, "person-custom-select-catégorie-dantécédents", "Pulmonaire");
   await page.getByLabel("Informations complémentaires (antécédents)").fill("hello ionfo complémentaires");
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Mis à jour !").click();
   await page.getByText("Suivi·e depuis le : 12/11/2001").click();
   await page.getByText("En rue depuis le : 11/11/2001").click();
   await page.getByText("Téléphone : 010203040506").click();
@@ -104,6 +106,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Description").fill("tests description");
   await page.getByText("Action prioritaire Cette action sera mise en avant par rapport aux autres").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByText("Création réussie !").click();
 
   await page.getByRole("button", { name: "＋" }).nth(1).click();
   await page.getByRole("textbox", { name: "Commentaire" }).click();
@@ -122,6 +125,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("hello commentaire passage je veux dire");
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Passage enregistré").click();
 
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
   await page.getByRole("button", { name: "＋" }).nth(2).click();
@@ -132,6 +136,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Commentaire").click();
   await page.getByLabel("Commentaire").fill("BOUM");
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Rencontre enregistrée").click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
   await page.getByText("Femme").click();
@@ -141,6 +146,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Numéro de sécurité sociale").click();
   await page.getByLabel("Numéro de sécurité sociale").fill("082");
   await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
+  await page.getByText("Mise à jour effectuée !").click();
   await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
@@ -161,6 +167,7 @@ test("test", async ({ page }) => {
   await page.getByPlaceholder("1mg").click();
   await page.getByPlaceholder("1mg").fill("121212121");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByText("Traitement créé !").click();
 
   await expect(page.locator('small:has-text("dedededed")')).toBeVisible();
   await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
@@ -200,4 +207,24 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".alert-warning").getByText("Départ vers autre région").click();
   await page.getByText(personName + " est hors de la file active.").click();
+
+  await logOut(page, "User Admin Test - 1");
+
+  await loginWith(page, "normal1@example.org");
+
+  await page.getByRole("link", { name: "Personnes suivies" }).click();
+  await expect(page).toHaveURL("http://localhost:8090/person");
+
+  await page.getByRole("cell", { name: `${personName} Sortie de file active : Départ vers autre région` }).click();
+  await page.getByRole("button", { name: "Supprimer" }).click();
+
+  await page.locator('input[name="textToConfirm"]').fill(personName);
+  await page
+    .locator(`div[role="document"]:has-text("Voulez-vous vraiment supprimer la personne ${personName}×Cette opération")`)
+    .getByRole("button", { name: "Supprimer" })
+    .click();
+  await expect(page).toHaveURL("http://localhost:8090/person");
+
+  await page.getByText("Suppression réussie").click();
+  await expect(page.locator('div[role="alert"]:has-text("Désolé, une erreur est survenue, l\'équipe technique est prévenue.")')).not.toBeVisible();
 });
