@@ -107,11 +107,11 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
 
 const handleApiError = (res, path, query) => {
   if (res?.error?.message) {
-    toast?.error(res?.error?.message);
+    toast?.error(res?.error?.message, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
   } else if (res?.error) {
-    toast?.error(res?.error);
+    toast?.error(res?.error, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
   } else if (res?.code) {
-    toast?.error(res?.code);
+    toast?.error(res?.code, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
   } else {
     capture('api error unhandled', { extra: { res, path, query } });
   }
@@ -274,11 +274,11 @@ const useApi = () => {
         },
       });
       if (typeof errorExecuteApi === 'string') {
-        toast.error(errorExecuteApi, 'Désolé une erreur est survenue');
+        toast.error(errorExecuteApi, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
       } else if (errorExecuteApi?.message) {
-        toast.error(errorExecuteApi.message, 'Désolé une erreur est survenue');
+        toast.error(errorExecuteApi.message, { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
       } else {
-        toast.error('Une erreur est survenue', 'Désolé une erreur est survenue');
+        toast.error('Désolé, une erreur est survenue', { autoClose: process.env.REACT_APP_TEST_PLAYWRIGHT !== 'true' });
       }
 
       throw errorExecuteApi;

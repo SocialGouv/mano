@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { clickOnEmptyReactSelect, loginWith } from "./utils";
+import { clickOnEmptyReactSelect, loginWith, logOut } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
@@ -206,4 +206,29 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.locator(".alert-warning").getByText("Départ vers autre région").click();
   await page.getByText(personName + " est hors de la file active.").click();
+
+  await logOut(page, "User Admin Test - 1");
+
+  await loginWith(page, "normal1@example.org");
+
+  await page.getByRole("link", { name: "Personnes suivies" }).click();
+  await expect(page).toHaveURL("http://localhost:8090/person");
+
+  await page.getByRole("cell", { name: `${personName} Sortie de file active : Départ vers autre région` }).click();
+  await page.getByRole("button", { name: "Supprimer" }).click();
+
+  await page.locator('input[name="textToConfirm"]').fill(personName);
+
+  page.on("dialog", async (dialog) => {
+    await dialog.accept();
+  });
+
+  await page
+    .locator(`div[role="document"]:has-text("Voulez-vous vraiment supprimer la personne ${personName}×Cette opération")`)
+    .getByRole("button", { name: "Supprimer" })
+    .click();
+  await expect(page).toHaveURL("http://localhost:8090/person");
+
+  await page.getByText("Suppression réussie").click();
+  await expect(page.locator('div[role="alert"]:has-text("Désolé, une erreur est survenue, l\'équipe technique est prévenue.")')).not.toBeVisible();
 });

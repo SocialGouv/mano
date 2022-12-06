@@ -79,7 +79,7 @@ const PersonSummary = ({
   };
 
   const populatedPersons = useRecoilValue(itemsGroupedByPersonSelector);
-  const { actions, comments, rencontres, relsPersonPlace } = useMemo(() => populatedPersons[personDB._id], [populatedPersons, personDB._id]);
+  const { actions, comments, rencontres, relsPersonPlace } = useMemo(() => populatedPersons[personDB?._id] || {}, [populatedPersons, personDB._id]);
 
   const sortedActions = useMemo(() => [...(actions || [])].sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)), [actions]);
 
@@ -226,6 +226,8 @@ const PersonSummary = ({
           title={`Voulez-vous vraiment supprimer ${personDB?.name} ?`}
           onBack={onBack}
           textToConfirm={personDB?.name}
+          roles={['normal', 'admin']}
+          roleErrorMessage="Désolé, seules les personnes autorisées peuvent supprimer des personnes"
           onDelete={onDelete}>
           Cette opération est irréversible{'\n'}et entrainera la suppression définitive{'\n'}de toutes les données liées à la personne&nbsp;:{'\n\n'}
           actions, commentaires, lieux visités, passages, rencontres, documents...
