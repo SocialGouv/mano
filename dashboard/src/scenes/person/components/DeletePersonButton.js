@@ -44,7 +44,7 @@ const DeletePersonButton = ({ person }) => {
             !!consultations.find((c) => c.person === person._id))
         ) {
           if (
-            !window.confirm('Cette personne a peut-être des données médicales, qui seront supprimées aussi. Voulez-vous continuer la suppression ?')
+            !window.confirm('Des données médicales sont associées à cette personne. Si vous la supprimez, ces données seront également effacées. Vous n’avez pas accès à ces données médicales car vous n’êtes pas un professionnel de santé. Voulez-vous supprimer cette personne et toutes ses données ?')
           )
             return;
         }
