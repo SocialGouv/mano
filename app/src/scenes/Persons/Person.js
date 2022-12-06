@@ -182,7 +182,7 @@ const Person = ({ route, navigation }) => {
         !!consultations.find((c) => c.person === personId))
     ) {
       const keepGoing = await new Promise((res) => {
-        Alert.alert('Voulez-vous continuer la suppression ?', 'Cette personne a peut-être des données médicales, qui seront supprimées aussi', [
+        Alert.alert('Voulez-vous continuer la suppression ?', 'Des données médicales sont associées à cette personne. Si vous la supprimez, ces données seront également effacées. Vous n’avez pas accès à ces données médicales car vous n’êtes pas un professionnel de santé. Voulez-vous supprimer cette personne et toutes ses données ?', [
           { text: 'Annuler', style: 'cancel', onPress: () => res(false) },
           { text: 'Continuer', style: 'destructive', onPress: () => res(true) },
         ]);
