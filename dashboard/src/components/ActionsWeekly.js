@@ -2,18 +2,15 @@ import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { Button } from 'reactstrap';
+import { useRecoilValue } from 'recoil';
 import { CANCEL, DONE } from '../recoil/actions';
 import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import ActionStatus from './ActionStatus';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import PersonName from './PersonName';
-<<<<<<< HEAD
 import { organisationState } from '../recoil/auth';
-import { useRecoilValue } from 'recoil';
-=======
 import TagTeam from './TagTeam';
->>>>>>> 4ea5f081 (fix: show tag team in weekly)
 
 // TODO: remove inline style when UI is stabilized.
 
