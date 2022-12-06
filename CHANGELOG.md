@@ -1,3 +1,10 @@
+## [1.185.1](https://github.com/SocialGouv/mano/compare/v1.185.0...v1.185.1) (2022-12-06)
+
+
+### Bug Fixes
+
+* **api:** res is undefined ([#1051](https://github.com/SocialGouv/mano/issues/1051)) ([c26e154](https://github.com/SocialGouv/mano/commit/c26e154bcdc240e80ee365d96d6e67ab2563491e))
+
 # [1.185.0](https://github.com/SocialGouv/mano/compare/v1.184.7...v1.185.0) (2022-12-06)
 
 
