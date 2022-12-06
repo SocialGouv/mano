@@ -74,7 +74,7 @@ const List = () => {
             },
           },
           { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
-          { title: 'Dernière connection le', dataKey: 'lastLoginAt', render: (i) => formatDateWithFullMonth(i.lastLoginAt) },
+          { title: 'Dernière connection le', dataKey: 'lastLoginAt', render: (i) => (i.lastLoginAt ? formatDateWithFullMonth(i.lastLoginAt) : null) },
         ]}
       />
     </>
