@@ -1,3 +1,10 @@
+## [1.184.4](https://github.com/SocialGouv/mano/compare/v1.184.3...v1.184.4) (2022-12-06)
+
+
+### Bug Fixes
+
+* stop show lastLoginAt when never login ([f836d9c](https://github.com/SocialGouv/mano/commit/f836d9cd18cbbcc411c708c7e5d2d2fda27d82c8))
+
 ## [1.184.3](https://github.com/SocialGouv/mano/compare/v1.184.2...v1.184.3) (2022-12-06)
 
 
