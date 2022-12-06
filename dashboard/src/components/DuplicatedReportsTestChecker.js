@@ -1,7 +1,7 @@
 import { useRecoilValue } from 'recoil';
 import { reportsState } from '../recoil/reports';
 
-const TextChecker = () => {
+const DuplicatedReportsTestChecker = () => {
   const reports = useRecoilValue(reportsState);
   const duplicateReports = Object.entries(
     reports.reduce((reportsByDate, report) => {
@@ -26,4 +26,4 @@ const TextChecker = () => {
   );
 };
 
-export default TextChecker;
+export default DuplicatedReportsTestChecker;
