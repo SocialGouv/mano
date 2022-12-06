@@ -12,8 +12,8 @@ import { consultationsState } from './consultations';
 import { rencontresState } from './rencontres';
 import { treatmentsState } from './treatments';
 import { medicalFileState } from './medicalFiles';
-import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import dayjs from 'dayjs';
+import { groupsState } from './groups';
 
 export const personsSearchSelector = selectorFamily({
   key: 'personsSearchSelector',
@@ -92,19 +92,62 @@ export const itemsGroupedByPersonSelector = selector({
     const consultations = get(consultationsState);
     const treatments = get(treatmentsState);
     const medicalFiles = get(medicalFileState);
-    // const passages = get(passagesState);
     const relsPersonPlace = get(relsPersonPlaceState);
     const places = get(placesObjectSelector);
     const rencontres = get(rencontresState);
+    const groups = get(groupsState);
+
+    for (const group of groups) {
+      for (const person of group.persons) {
+        if (!personsObject[person]) continue;
+        personsObject[person].group = group;
+      }
+    }
+
+    for (const person of persons) {
+      if (!person.documents?.length) continue;
+      if (!personsObject[person._id].group) continue;
+      for (const document of person.documents) {
+        if (!document.group) continue;
+        for (const personIdInGroup of personsObject[person._id].group.persons) {
+          if (personIdInGroup === person._id) continue;
+          if (!personsObject[personIdInGroup]) continue;
+          if (!personsObject[personIdInGroup].groupDocuments) {
+            personsObject[personIdInGroup].groupDocuments = [];
+          }
+          personsObject[personIdInGroup].groupDocuments.push({ ...document, person: person._id, personPopulated: person });
+        }
+      }
+    }
+
     for (const action of actions) {
       if (!personsObject[action.person]) continue;
       personsObject[action.person].actions = personsObject[action.person].actions || [];
       personsObject[action.person].actions.push(action);
+      if (!!action.group) {
+        const group = personsObject[action.person].group;
+        if (!group) continue;
+        for (const person of group.persons) {
+          if (!personsObject[person]) continue;
+          if (person === action.person) continue;
+          personsObject[person].actions = personsObject[person].actions || [];
+          personsObject[person].actions.push(action);
+        }
+      }
     }
     for (const comment of comments) {
       if (!personsObject[comment.person]) continue;
       personsObject[comment.person].comments = personsObject[comment.person].comments || [];
       personsObject[comment.person].comments.push(comment);
+      if (!!comment.group) {
+        const group = personsObject[comment.person].group;
+        for (const person of group.persons) {
+          if (!personsObject[person]) continue;
+          if (person === comment.person) continue;
+          personsObject[person].comments = personsObject[person].comments || [];
+          personsObject[person].comments.push(comment);
+        }
+      }
     }
     for (const relPersonPlace of relsPersonPlace) {
       if (!personsObject[relPersonPlace.person]) continue;
@@ -129,7 +172,6 @@ export const itemsGroupedByPersonSelector = selector({
       if (!personsObject[medicalFile.person]) continue;
       personsObject[medicalFile.person].medicalFile = medicalFile;
     }
-
     // we don't use passages in the app - no use, no load
     // but we keep it here just to be aware of that app specificity
 

@@ -6,7 +6,7 @@ import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
 import CreateActionModal from '../../../components/CreateActionModal';
 import SelectCustom from '../../../components/SelectCustom';
-import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
 import ActionStatus from '../../../components/ActionStatus';
 import TagTeam from '../../../components/TagTeam';
 import ActionOrConsultationName from '../../../components/ActionOrConsultationName';
@@ -28,6 +28,7 @@ export const Actions = ({ person }) => {
           <h4 className="tw-flex-1">Actions {filteredData.length ? `(${filteredData.length})` : ''}</h4>
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
+              aria-label="Ajouter une action"
               className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
               onClick={() => setModalOpen(true)}>
               ＋
@@ -156,6 +157,7 @@ const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStat
 const ActionsTable = ({ filteredData }) => {
   const history = useHistory();
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
 
   return (
     <table className="table table-striped">
@@ -181,7 +183,18 @@ const ActionsTable = ({ filteredData }) => {
                     </div>
                   </div>
                   <div className="tw-mt-2 tw-flex">
-                    <div className="tw-flex-1">{!['restricted-access'].includes(user.role) && <ActionOrConsultationName item={action} />}</div>
+                    <div className="tw-flex tw-flex-1 tw-flex-row tw-items-center">
+                      {!['restricted-access'].includes(user.role) && (
+                        <>
+                          {!!organisation.groupsEnabled && !!action.group && (
+                            <span className="tw-mr-2 tw-text-xl" aria-label="Action familiale" title="Action familiale">
+                              👪
+                            </span>
+                          )}
+                          <ActionOrConsultationName item={action} />
+                        </>
+                      )}
+                    </div>
                     <div>
                       <TagTeam teamId={action.team} />
                     </div>

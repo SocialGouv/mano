@@ -23,6 +23,7 @@ import useApi from '../services/api';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
+import { groupsState } from '../recoil/groups';
 
 // Update to flush cache.
 
@@ -57,6 +58,7 @@ export default function DataLoader() {
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [comments, setComments] = useRecoilState(commentsState);
+  const [groups, setGroups] = useRecoilState(groupsState);
 
   const [loaderTrigger, setLoaderTrigger] = useRecoilState(loaderTriggerState);
   const [lastLoad, setLastLoad] = useRecoilState(lastLoadState);
@@ -126,7 +128,8 @@ export default function DataLoader() {
               stats.places +
               stats.relsPersonPlace +
               stats.territoryObservations +
-              stats.comments;
+              stats.comments +
+              stats.groups;
 
             if (stats.persons) newList.push('person');
             if (['admin', 'normal'].includes(user.role)) {
@@ -143,6 +146,7 @@ export default function DataLoader() {
             if (stats.relsPersonPlace) newList.push('relsPersonPlace');
             if (stats.territoryObservations) newList.push('territoryObservation');
             if (stats.comments) newList.push('comment');
+            if (stats.groups) newList.push('group');
 
             // In case this is not the initial load, we don't have to load from cache again.
             if (!initialLoad) {
@@ -172,6 +176,8 @@ export default function DataLoader() {
               .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
               .then(() => getCacheItemDefaultValue('comment', []))
               .then((comments) => setComments([...comments]))
+              .then(() => getCacheItemDefaultValue('group', []))
+              .then((groups) => setGroups([...groups]))
               .then(() => startLoader(newList, itemsCount));
           });
         });
@@ -340,6 +346,20 @@ export default function DataLoader() {
         if (res.hasMore) return mergedItems;
         if (mergedItems.length > comments.length) {
           return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+        }
+        return mergedItems;
+      });
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'group') {
+      setLoadingText('Chargement des familles');
+      const res = await API.get({ path: '/group', query });
+      if (!res.data) return resetLoaderOnError();
+      setGroups(() => {
+        const mergedItems = mergeItems(groups, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > groups.length) {
+          return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         }
         return mergedItems;
       });

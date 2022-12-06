@@ -8,10 +8,12 @@ import SelectCustom from './SelectCustom';
 
 const SelectPerson = ({
   value = '',
+  defaultValue = null,
   onChange,
   isMulti = false,
   noLabel = false,
   isClearable = false,
+  disableAccessToPerson = false,
   inputId = 'person',
   name = 'person',
   ...props
@@ -30,8 +32,11 @@ const SelectPerson = ({
         isMulti={isMulti}
         isClearable={isClearable}
         isSearchable
-        onChange={(person) => onChange({ currentTarget: { value: isMulti ? person.map((p) => p._id) : person?._id, name } })}
-        value={isMulti ? persons.filter((i) => value?.includes(i._id)) : persons.find((i) => i._id === value)}
+        onChange={(person) => onChange?.({ currentTarget: { value: isMulti ? person.map((p) => p._id) : person?._id, name } })}
+        value={value != null && isMulti ? persons.filter((i) => value?.includes(i._id)) : persons.find((i) => i._id === value)}
+        defaultValue={
+          defaultValue != null && isMulti ? persons.filter((i) => defaultValue?.includes(i._id)) : persons.find((i) => i._id === defaultValue)
+        }
         getOptionValue={(i) => i._id}
         getOptionLabel={(i) => i?.name || ''}
         formatOptionLabel={(i, options) => {
@@ -39,17 +44,19 @@ const SelectPerson = ({
           return (
             <div style={{ display: 'flex', alignItems: 'center' }}>
               {i?.name}
-              <ButtonCustom
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  history.push(`/person/${i._id}`);
-                }}
-                color="link"
-                title="Accéder au dossier"
-                padding="0"
-                style={{ marginLeft: '0.5rem' }}
-              />
+              {!disableAccessToPerson && (
+                <ButtonCustom
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    history.push(`/person/${i._id}`);
+                  }}
+                  color="link"
+                  title="Accéder au dossier"
+                  padding="0"
+                  style={{ marginLeft: '0.5rem' }}
+                />
+              )}
             </div>
           );
         }}

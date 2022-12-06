@@ -7,16 +7,17 @@ import Table from './table';
 import ActionStatus from './ActionStatus';
 import ActionOrConsultationName from './ActionOrConsultationName';
 import PersonName from './PersonName';
-import ExclamationMarkButton from './ExclamationMarkButton';
 import ConsultationButton from './ConsultationButton';
-import { userState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 import { disableConsultationRow } from '../recoil/consultations';
+import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import { CANCEL, DONE } from '../recoil/actions';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut'] }) => {
   const history = useHistory();
   const location = useLocation();
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
   const [theDayBeforeActions, setTheDayBeforeActions] = useState([]);
   const [theDayAfterActions, setTheDayAfterActions] = useState([]);
   const [theCurrentDayActions, setTheCurrentDayActions] = useState([]);
@@ -76,12 +77,20 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
       columns={[
         {
           title: '',
-          dataKey: 'urgent',
+          dataKey: 'urgentOrGroupOrConsultation',
           small: true,
           render: (actionOrConsult) => {
-            if (actionOrConsult.urgent) return <ExclamationMarkButton />;
-            if (actionOrConsult.isConsultation) return <ConsultationButton />;
-            return null;
+            return (
+              <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                {!!organisation.groupsEnabled && !!actionOrConsult.group && (
+                  <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
+                    👪
+                  </span>
+                )}
+                {!!actionOrConsult.isConsultation && <ConsultationButton />}
+              </div>
+            );
           },
         },
         {
@@ -104,7 +113,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           render: (action) => <PersonName item={action} />,
         },
         { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
-      ].filter((column) => columns.includes(column.title) || column.dataKey === 'urgent')}
+      ].filter((column) => columns.includes(column.title) || column.dataKey === 'urgentOrGroupOrConsultation')}
     />
   );
 

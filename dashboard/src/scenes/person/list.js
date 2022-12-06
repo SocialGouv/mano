@@ -26,7 +26,7 @@ import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 
 const limit = 20;
@@ -224,6 +224,21 @@ const List = () => {
         onRowClick={(p) => history.push(`/person/${p._id}`)}
         columns={[
           {
+            title: '',
+            dataKey: 'group',
+            small: true,
+            render: (person) => {
+              if (!person.group) return null;
+              return (
+                <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                  <span className="tw-text-3xl" aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
+                    👪
+                  </span>
+                </div>
+              );
+            },
+          },
+          {
             title: 'Nom',
             dataKey: 'name',
             render: (p) => {
@@ -254,7 +269,12 @@ const List = () => {
             title: 'Vigilance',
             dataKey: 'alertness',
             render: (p) => {
-              return p.alertness ? <ExclamationMarkButton /> : null;
+              return p.alertness ? (
+                <ExclamationMarkButton
+                  aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                  title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                />
+              ) : null;
             },
           },
           { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams person={person} /> },
@@ -267,7 +287,7 @@ const List = () => {
               return formatDateWithFullMonth(p.followedSince || p.createdAt || '');
             },
           },
-        ]}
+        ].filter((c) => organisation.groupsEnabled || c.dataKey !== 'group')}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
     </>

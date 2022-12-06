@@ -43,7 +43,7 @@ import useApi from '../../services/api';
 import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
 import Passage from '../../components/Passage';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
@@ -799,6 +799,8 @@ const ServicesWrapper = styled.div`
 const ActionCompletedAt = ({ date, status, actions }) => {
   const data = actions;
   const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
+
   const [modalOpen, setModalOpen] = useState(false);
 
   if (!data) return <div />;
@@ -840,7 +842,16 @@ const ActionCompletedAt = ({ date, status, actions }) => {
               dataKey: 'urgent',
               small: true,
               render: (action) => {
-                return action.urgent ? <ExclamationMarkButton /> : null;
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!action.urgent && <ExclamationMarkButton />}
+                    {!!organisation.groupsEnabled && !!action.group && (
+                      <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
+                        👪
+                      </span>
+                    )}
+                  </div>
+                );
               },
             },
             {
@@ -879,6 +890,7 @@ const ActionCompletedAt = ({ date, status, actions }) => {
 const ActionCreatedAt = ({ date, actions }) => {
   const data = actions;
   const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
 
   if (!data) return <div />;
   const moreThanOne = data.length > 1;
@@ -900,7 +912,16 @@ const ActionCreatedAt = ({ date, actions }) => {
               dataKey: 'urgent',
               small: true,
               render: (action) => {
-                return action.urgent ? <ExclamationMarkButton /> : null;
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!action.urgent && <ExclamationMarkButton />}
+                    {!!organisation.groupsEnabled && !!action.group && (
+                      <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
+                        👪
+                      </span>
+                    )}
+                  </div>
+                );
               },
             },
             { title: 'À faire le ', dataKey: 'dueAt', render: (d) => <DateBloc date={d.dueAt} /> },
@@ -1047,6 +1068,7 @@ const ConsultationsCreatedAt = ({ date, consultations }) => {
 const CommentCreatedAt = ({ date, comments }) => {
   const history = useHistory();
   const data = comments;
+  const organisation = useRecoilValue(organisationState);
 
   if (!data) return <div />;
 
@@ -1073,8 +1095,16 @@ const CommentCreatedAt = ({ date, comments }) => {
               dataKey: 'urgent',
               small: true,
               render: (comment) => {
-                if (comment.urgent) return <ExclamationMarkButton />;
-                return null;
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!comment.urgent && <ExclamationMarkButton />}
+                    {!!organisation.groupsEnabled && !!comment.group && (
+                      <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
+                        👪
+                      </span>
+                    )}
+                  </div>
+                );
               },
             },
             {

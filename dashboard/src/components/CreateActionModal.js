@@ -1,11 +1,11 @@
 import React from 'react';
-import { Col, FormGroup, Row, Input, Label } from 'reactstrap';
+import { FormGroup, Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
-import { actionsState, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
+import { actionsState, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { organisationState, teamsState, userState } from '../recoil/auth';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
 import useApi from '../services/api';
@@ -17,19 +17,21 @@ import SelectStatus from './SelectStatus';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import ActionsCategorySelect from './tailwind/ActionsCategorySelect';
+import { groupsState } from '../recoil/groups';
 import { ModalBody, ModalContainer, ModalHeader } from './tailwind/Modal';
 
-const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt, dueAt, open = false, setOpen = () => {} }) => {
+const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt = null, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const setActions = useSetRecoilState(actionsState);
+  const groups = useRecoilValue(groupsState);
   const setComments = useSetRecoilState(commentsState);
   const API = useApi();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const onAddAction = async (body) => {
-    if (body.status !== TODO) body.completedAt = completedAt || Date.now();
+    if (body.status !== TODO) body.completedAt = body.completedAt || Date.now();
     const response = await API.post({ path: '/action', body: prepareActionForEncryption(body) });
     if (response.ok) setActions((actions) => [response.decryptedData, ...actions]);
     const { createdAt } = response.decryptedData;
@@ -56,9 +58,11 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
             dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
             withTime: false,
             status: !!completedAt ? DONE : TODO,
+            completedAt,
             categories: [],
             description: '',
             urgent: false,
+            group: false,
             comment: '',
             commentUrgent: false,
           }}
@@ -72,11 +76,13 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
               name: values.name,
               team: values.team,
               dueAt: values.dueAt,
+              completedAt: values.completedAt,
               withTime: values.withTime,
               status: values.status,
               categories: values.categories,
               description: values.description,
               urgent: values.urgent,
+              group: values.group,
               user: user._id,
             };
             let actionsId = [];
@@ -132,98 +138,139 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
               setComments((comments) => [...commentsToAdd, ...comments]);
             }
           }}>
-          {({ values, handleChange, handleSubmit, isSubmitting }) => (
-            <React.Fragment>
-              <Row>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="create-action-name">Nom de l'action</Label>
-                    <Input id="create-action-name" name="name" value={values.name} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="create-action-team-select">Sous l'équipe</Label>
-                    <SelectTeam
-                      teams={user.role === 'admin' ? teams : user.teams}
-                      teamId={values.team}
-                      onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
-                      inputId="create-action-team-select"
-                    />
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <SelectPerson value={values.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <Label htmlFor="new-action-select-status">Statut</Label>
-                  <SelectStatus
-                    name="status"
-                    value={values.status || ''}
-                    onChange={handleChange}
-                    inputId="new-action-select-status"
-                    classNamePrefix="new-action-select-status"
-                  />
-                </Col>
-                <Col lg={3} md={6}>
-                  <FormGroup>
-                    <Label htmlFor="create-action-dueat">Échéance</Label>
-                    <div>
-                      <DatePicker
-                        locale="fr"
-                        className="form-control"
-                        id="create-action-dueat"
-                        selected={dateForDatePicker(values.dueAt)}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
-                        timeInputLabel="Heure :"
-                        dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
-                        showTimeInput
+          {({ values, handleChange, handleSubmit, isSubmitting }) => {
+            const isOnePerson = typeof values?.person === 'string' || values?.person?.length === 1;
+            const person = !isOnePerson ? null : typeof values?.person === 'string' ? values.person : values.person?.[0];
+            const canToggleGroupCheck = !!organisation.groupsEnabled && !!person && groups.find((group) => group.persons.includes(person));
+            return (
+              <>
+                <div className="tw-flex tw-flex-row">
+                  <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
+                    <FormGroup>
+                      <Label htmlFor="name">Nom de l'action</Label>
+                      <Input name="name" id="name" type="textarea" value={values.name} onChange={handleChange} />
+                    </FormGroup>
+                    <FormGroup>
+                      <SelectPerson value={values.person} onChange={handleChange} isMulti={isMulti} inputId="create-action-person-select" />
+                    </FormGroup>
+                    <FormGroup>
+                      <ActionsCategorySelect
+                        values={values.categories}
+                        id="categories"
+                        label="Catégories"
+                        onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
                       />
-                    </div>
-                  </FormGroup>
-                </Col>
-                <Col lg={3} md={6}>
-                  <FormGroup>
-                    <Label />
-                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                      <label htmlFor="withTime">Montrer l'heure</label>
-                      <Input type="checkbox" id="withTime" name="withTime" checked={values.withTime} onChange={handleChange} />
-                    </div>
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <ActionsCategorySelect
-                      id="categories"
-                      label="Catégories"
-                      withMostUsed
-                      onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
-                    />
-                  </FormGroup>
-                </Col>
-                <Col lg={6} md={6}>
-                  <FormGroup>
-                    <Label htmlFor="create-action-description">Description</Label>
-                    <Input id="create-action-description" type="textarea" name="description" value={values.description} onChange={handleChange} />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label htmlFor="create-action-urgent">
-                      <input
-                        type="checkbox"
-                        id="create-action-urgent"
-                        style={{ marginRight: '0.5rem' }}
-                        name="urgent"
-                        checked={values.urgent}
+                    </FormGroup>
+                    <FormGroup>
+                      <Label htmlFor="description">Description</Label>
+                      <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
+                    </FormGroup>
+                    {!!canToggleGroupCheck && (
+                      <FormGroup>
+                        <Label htmlFor="create-action-for-group">
+                          <input
+                            type="checkbox"
+                            className="tw-mr-2"
+                            id="create-action-for-group"
+                            name="group"
+                            checked={values.group}
+                            onChange={handleChange}
+                          />
+                          Action familiale <br />
+                          <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
+                        </Label>
+                      </FormGroup>
+                    )}
+                  </div>
+                  <div className="tw-flex tw-shrink-0 tw-flex-col tw-px-4">
+                    <hr className="tw-m-0 tw-w-px tw-shrink-0 tw-basis-full tw-border tw-bg-gray-300" />
+                  </div>
+                  <div className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col">
+                    <FormGroup>
+                      <Label htmlFor="dueAt">À faire le</Label>
+                      <div>
+                        <DatePicker
+                          id="dueAt"
+                          name="dueAt"
+                          locale="fr"
+                          className="form-control"
+                          selected={dateForDatePicker(values.dueAt ?? new Date())}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
+                          dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
+                          showTimeInput={values.withTime}
+                        />
+                      </div>
+                      <div>
+                        <input
+                          type="checkbox"
+                          id="withTime"
+                          name="withTime"
+                          className="tw-mr-2"
+                          checked={values.withTime || false}
+                          onChange={() => {
+                            handleChange({ target: { name: 'withTime', checked: Boolean(!values.withTime), value: Boolean(!values.withTime) } });
+                          }}
+                        />
+                        <label htmlFor="withTime">Montrer l'heure</label>
+                      </div>
+                    </FormGroup>
+                    <FormGroup>
+                      <Label htmlFor="team">Sous l'équipe</Label>
+                      <SelectTeam
+                        teams={user.role === 'admin' ? teams : user.teams}
+                        teamId={values.team}
+                        inputId="create-action-team-select"
+                        onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                      />
+                    </FormGroup>
+                    <FormGroup>
+                      <Label htmlFor="create-action-urgent">
+                        <input
+                          type="checkbox"
+                          id="create-action-urgent"
+                          className="tw-mr-2"
+                          name="urgent"
+                          checked={values.urgent}
+                          onChange={() => {
+                            handleChange({ target: { name: 'urgent', checked: Boolean(!values.urgent), value: Boolean(!values.urgent) } });
+                          }}
+                        />
+                        Action prioritaire <br />
+                        <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
+                      </Label>
+                    </FormGroup>
+                    <FormGroup>
+                      <Label htmlFor="update-action-select-status">Statut</Label>
+                      <SelectStatus
+                        name="status"
+                        value={values.status || ''}
                         onChange={handleChange}
+                        inputId="update-action-select-status"
+                        classNamePrefix="update-action-select-status"
                       />
-                      Action prioritaire <br />
-                      <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
-                    </Label>
-                  </FormGroup>
-                </Col>
-                <Col lg={6} md={6}>
+                    </FormGroup>
+                    {[DONE, CANCEL].includes(values.status) && (
+                      <FormGroup>
+                        {values.status === DONE && <Label htmlFor="completedAt">Faite le</Label>}
+                        {values.status === CANCEL && <Label htmlFor="completedAt">Annulée le</Label>}
+                        <div>
+                          <DatePicker
+                            id="completedAt"
+                            name="completedAt"
+                            locale="fr"
+                            className="form-control"
+                            selected={dateForDatePicker(values.completedAt ?? new Date())}
+                            onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
+                            timeInputLabel="Heure :"
+                            dateFormat="dd/MM/yyyy HH:mm"
+                            showTimeInput
+                          />
+                        </div>
+                      </FormGroup>
+                    )}
+                  </div>
+                </div>
+                <div>
                   <FormGroup>
                     <Label htmlFor="create-comment-description">Commentaire (optionnel)</Label>
                     <Input id="create-comment-description" type="textarea" name="comment" value={values.comment} onChange={handleChange} />
@@ -242,19 +289,18 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                       <small className="text-muted">Ce commentaire sera mise en avant par rapport aux autres</small>
                     </Label>
                   </FormGroup>
-                </Col>
-              </Row>
-              <br />
-              <div className="tw-flex tw-justify-end">
-                <ButtonCustom
-                  type="submit"
-                  disabled={isSubmitting}
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
-              </div>
-            </React.Fragment>
-          )}
+                </div>
+                <div className="tw-mt-4 tw-flex tw-justify-end">
+                  <ButtonCustom
+                    type="submit"
+                    disabled={isSubmitting}
+                    onClick={() => !isSubmitting && handleSubmit()}
+                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                  />
+                </div>
+              </>
+            );
+          }}
         </Formik>
       </ModalBody>
     </ModalContainer>

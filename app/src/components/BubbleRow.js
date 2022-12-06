@@ -11,7 +11,7 @@ const hitSlop = {
   bottom: 20,
 };
 
-const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent, itemName, onItemNamePress }) => (
+const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent, group, itemName, onItemNamePress }) => (
   <Container urgent={urgent}>
     <CaptionsContainer>
       {itemName ? (
@@ -19,7 +19,8 @@ const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent, item
           <ItemNameStyled>{itemName}</ItemNameStyled>
         </TouchableOpacity>
       ) : null}
-      {urgent ? <Urgent>❗ Prioritaire </Urgent> : null}
+      {urgent ? <MyText className="-ml-2.5 -mt-4 mb-4 py-0.5 px-1.5">❗ Prioritaire </MyText> : null}
+      {group ? <MyText className="-ml-2.5 -mt-4 mb-4 py-0.5 px-1.5">👪</MyText> : null}
       <CommentStyled>{caption?.split('\\n')?.join('\u000A')}</CommentStyled>
       <CreationDate>
         {!!user && <UserName caption={metaCaption} id={user?._id || user} />}
@@ -84,14 +85,6 @@ const Dot = styled.View`
   border-radius: 3px;
   background-color: rgba(30, 36, 55, 0.5);
   margin-right: 3px;
-`;
-
-const Urgent = styled(MyText)`
-  margin-left: -10px;
-  margin-top: -15px;
-  margin-bottom: 15px;
-  padding: 2px 5px;
-  color: red;
 `;
 
 const ItemNameStyled = styled(MyText)`

@@ -17,7 +17,9 @@ import {
   preparePersonForEncryption,
 } from '../../recoil/persons';
 import { toast } from 'react-toastify';
-import { userState } from '../../recoil/auth';
+import { organisationState, userState } from '../../recoil/auth';
+import PersonFamily from './PersonFamily';
+import { groupSelector } from '../../recoil/groups';
 import useSearchParamState from '../../services/useSearchParamState';
 
 const populatedPersonSelector = selectorFamily({
@@ -34,9 +36,11 @@ export default function NewView() {
   const { personId } = useParams();
   const location = useLocation();
   const API = useApi();
+  const organisation = useRecoilValue(organisationState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const person = useRecoilValue(populatedPersonSelector({ personId }));
+  const personGroup = useRecoilValue(groupSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
   const user = useRecoilValue(userState);
   const [currentTab, setCurrentTab] = useSearchParamState('tab', new URLSearchParams(location.search)?.get('tab') || 'Résumé');
@@ -76,6 +80,15 @@ export default function NewView() {
                   Historique
                 </button>
               </li>
+              {Boolean(organisation.groupsEnabled) && (
+                <li role="presentation" className="nav-item">
+                  <button
+                    onClick={() => setCurrentTab('Liens familiaux')}
+                    className={currentTab === 'Liens familiaux' ? 'active nav-link' : 'btn-link nav-link'}>
+                    Liens familiaux ({personGroup.relations.length})
+                  </button>
+                </li>
+              )}
             </ul>
           )}
         </div>
@@ -120,6 +133,7 @@ export default function NewView() {
             {currentTab === 'Dossier Médical' && user.healthcareProfessional && <MedicalFile person={person} />}
             {currentTab === 'Lieux fréquentés' && <Places personId={person?._id} />}
             {currentTab === 'Historique' && <History person={person} />}
+            {currentTab === 'Liens familiaux' && <PersonFamily person={person} />}
           </>
         )}
       </div>

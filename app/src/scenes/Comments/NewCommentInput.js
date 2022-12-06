@@ -11,13 +11,18 @@ import { commentsState, prepareCommentForEncryption } from '../../recoil/comment
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
+import CheckboxLabelled from '../../components/CheckboxLabelled';
+import { groupsState } from '../../recoil/groups';
 
 const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }) => {
   const [comment, setComment] = useState('');
+  const [urgent, setUrgent] = useState(false);
+  const [group, setGroup] = useState(false);
   const [posting, setPosting] = useState(false);
   const setComments = useSetRecoilState(commentsState);
-  const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+  const groups = useRecoilValue(groupsState);
   const user = useRecoilValue(userState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
@@ -27,6 +32,8 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
     const body = {
       comment,
       date: dayjs(),
+      urgent,
+      group,
     };
     if (person) body.person = person;
     if (action) body.action = action;
@@ -67,6 +74,7 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
     setComment(newComment);
     onCommentWrite?.(newComment);
   };
+  const canToggleGroupCheck = !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person));
 
   return (
     <>
@@ -74,6 +82,20 @@ const NewCommentInput = ({ person, action, forwardRef, onFocus, onCommentWrite }
       {!!comment.length && (
         <>
           <Spacer />
+          <CheckboxLabelled
+            label="Commentaire prioritaire (ce commentaire sera mis en avant par rapport aux autres)"
+            alone
+            onPress={() => setUrgent((u) => !u)}
+            value={urgent}
+          />
+          {!!canToggleGroupCheck && (
+            <CheckboxLabelled
+              label="Commentaire familial (ce commentaire sera visible pour toute la famille)"
+              alone
+              onPress={() => setGroup((g) => !g)}
+              value={group}
+            />
+          )}
           <ButtonsContainer>
             <ButtonDelete onPress={onCancelRequest} caption="Annuler" />
             <Button caption="Créer" onPress={onCreateComment} loading={posting} />

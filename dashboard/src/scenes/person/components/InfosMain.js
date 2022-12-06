@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import React, { useState } from 'react';
 import EditModal from './EditModal';
 import TagTeam from '../../../components/TagTeam';
-import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
 
 export function InfosMain({ person }) {
   const [editModal, setEditModal] = useState(false);

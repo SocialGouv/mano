@@ -14,21 +14,25 @@ import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import { MyText } from '../../components/MyText';
 import { actionsState, prepareActionForEncryption, TODO } from '../../recoil/actions';
-import { currentTeamState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import API from '../../services/api';
 import ActionCategoriesModalSelect from '../../components/ActionCategoriesModalSelect';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { dayjsInstance } from '../../services/dateDayjs';
+import { groupsState } from '../../recoil/groups';
 
 const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
   const currentTeam = useRecoilValue(currentTeamState);
+  const organisation = useRecoilValue(organisationState);
+  const groups = useRecoilValue(groupsState);
   const user = useRecoilValue(userState);
   const [name, setName] = useState('');
   const [dueAt, setDueAt] = useState(null);
   const [withTime, setWithTime] = useState(false);
   const [urgent, setUrgent] = useState(false);
+  const [group, setGroup] = useState(false);
   const [actionPersons, setActionPersons] = useState(() => (route.params?.person ? [route.params?.person] : []));
   const [categories, setCategories] = useState([]);
   const forCurrentPerson = useRef(!!route.params?.person).current;
@@ -76,6 +80,7 @@ const NewActionForm = ({ route, navigation }) => {
           dueAt,
           withTime,
           urgent,
+          group,
           status,
           categories,
           user: user._id,
@@ -157,6 +162,10 @@ const NewActionForm = ({ route, navigation }) => {
     ]);
   };
 
+  const isOnePerson = actionPersons?.length === 1;
+  const person = !isOnePerson ? null : actionPersons?.[0];
+  const canToggleGroupCheck = !!organisation.groupsEnabled && !!person && groups.find((group) => group.persons.includes(person._id));
+
   return (
     <SceneContainer>
       <ScreenTitle title="Nouvelle action" onBack={onGoBackRequested} testID="new-action" />
@@ -184,7 +193,7 @@ const NewActionForm = ({ route, navigation }) => {
           )}
           <ActionStatusSelect onSelect={setStatus} value={status} editable testID="new-action-status" />
           <DateAndTimeInput
-            label="Échéance"
+            label="À faire le"
             setDate={setDueAt}
             date={dueAt}
             showTime
@@ -200,6 +209,14 @@ const NewActionForm = ({ route, navigation }) => {
             onPress={() => setUrgent(!urgent)}
             value={urgent}
           />
+          {!!canToggleGroupCheck && (
+            <CheckboxLabelled
+              label="Action familiale (cette action sera à effectuer pour toute la famille)"
+              alone
+              onPress={() => setGroup(!group)}
+              value={group}
+            />
+          )}
           <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateAction} loading={posting} testID="new-action-create" />
         </View>
       </ScrollContainer>

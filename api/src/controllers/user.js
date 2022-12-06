@@ -154,6 +154,7 @@ function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
       encryptionEnabled: organisation.encryptionEnabled,
       encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
       receptionEnabled: organisation.receptionEnabled,
+      groupsEnabled: organisation.groupsEnabled,
       services: !!organisation.groupedServices
         ? organisation.groupedServices.reduce((flattenedServices, group) => [...flattenedServices, ...group.services], [])
         : organisation.services,

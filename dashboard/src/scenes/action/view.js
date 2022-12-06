@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, FormGroup, Input, Label } from 'reactstrap';
+import { FormGroup, Input, Label } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
@@ -29,6 +29,7 @@ import { useDataLoader } from '../../components/DataLoader';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import { itemsGroupedByActionSelector } from '../../recoil/selectors';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
+import { groupsState } from '../../recoil/groups';
 
 const actionByIdSelector = selectorFamily({
   key: 'actionByIdSelector',
@@ -50,6 +51,7 @@ const View = () => {
   const setActions = useSetRecoilState(actionsState);
   const setComments = useSetRecoilState(commentsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+  const groups = useRecoilValue(groupsState);
 
   const history = useHistory();
   const API = useApi();
@@ -172,37 +174,52 @@ const View = () => {
           }
         }}>
         {({ values, handleChange, handleSubmit, isSubmitting }) => {
+          const canToggleGroupCheck =
+            !!organisation.groupsEnabled && !!values.person && groups.find((group) => group.persons.includes(values.person));
           return (
-            <React.Fragment>
-              <Row>
-                <Col md={6}>
+            <>
+              <div className="tw-flex tw-flex-row">
+                <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
                   <FormGroup>
                     <Label htmlFor="name">Nom</Label>
                     <Input name="name" id="name" type="textarea" value={values.name} onChange={handleChange} />
                   </FormGroup>
-                </Col>
-                <Col md={3}>
-                  <Label htmlFor="update-action-select-status">Statut</Label>
-                  <SelectStatus
-                    name="status"
-                    value={values.status || ''}
-                    onChange={handleChange}
-                    inputId="update-action-select-status"
-                    classNamePrefix="update-action-select-status"
-                  />
-                </Col>
-                <Col md={3}>
                   <FormGroup>
-                    <Label htmlFor="team">Sous l'équipe</Label>
-                    <SelectTeam
-                      teams={user.role === 'admin' ? teams : user.teams}
-                      teamId={values.team}
-                      inputId="team"
-                      onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                    <SelectPerson value={values.person} onChange={handleChange} />
+                  </FormGroup>
+                  <FormGroup>
+                    <ActionsCategorySelect
+                      values={values.categories}
+                      id="categories"
+                      label="Catégories"
+                      onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
                     />
                   </FormGroup>
-                </Col>
-                <Col md={4}>
+                  <FormGroup>
+                    <Label htmlFor="description">Description</Label>
+                    <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
+                  </FormGroup>
+                  {!!canToggleGroupCheck && (
+                    <FormGroup>
+                      <Label htmlFor="create-action-for-group">
+                        <input
+                          type="checkbox"
+                          className="tw-mr-2"
+                          id="create-action-for-group"
+                          name="group"
+                          checked={values.group}
+                          onChange={handleChange}
+                        />
+                        Action familiale <br />
+                        <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
+                      </Label>
+                    </FormGroup>
+                  )}
+                </div>
+                <div className="tw-flex tw-shrink-0 tw-flex-col tw-px-4">
+                  <hr className="tw-m-0 tw-w-px tw-shrink-0 tw-basis-full tw-border tw-bg-gray-300" />
+                </div>
+                <div className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col">
                   <FormGroup>
                     <Label htmlFor="dueAt">À faire le</Label>
                     <div>
@@ -216,26 +233,55 @@ const View = () => {
                         showTimeInput={values.withTime}
                       />
                     </div>
-                  </FormGroup>
-                </Col>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label />
-                    <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20, width: '80%' }}>
-                      <label htmlFor="withTime">Afficher l'heure</label>
-                      <Input
+                    <div>
+                      <input
                         type="checkbox"
                         id="withTime"
                         name="withTime"
+                        className="tw-mr-2"
                         checked={values.withTime || false}
                         onChange={() => {
                           handleChange({ target: { name: 'withTime', checked: Boolean(!values.withTime), value: Boolean(!values.withTime) } });
                         }}
                       />
+                      <label htmlFor="withTime">Montrer l'heure</label>
                     </div>
                   </FormGroup>
-                </Col>
-                <Col md={4}>
+                  <FormGroup>
+                    <Label htmlFor="team">Sous l'équipe</Label>
+                    <SelectTeam
+                      teams={user.role === 'admin' ? teams : user.teams}
+                      teamId={values.team}
+                      inputId="team"
+                      onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="create-action-urgent">
+                      <input
+                        type="checkbox"
+                        id="create-action-urgent"
+                        className="tw-mr-2"
+                        name="urgent"
+                        checked={values.urgent}
+                        onChange={() => {
+                          handleChange({ target: { name: 'urgent', checked: Boolean(!values.urgent), value: Boolean(!values.urgent) } });
+                        }}
+                      />
+                      Action prioritaire <br />
+                      <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
+                    </Label>
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="update-action-select-status">Statut</Label>
+                    <SelectStatus
+                      name="status"
+                      value={values.status || ''}
+                      onChange={handleChange}
+                      inputId="update-action-select-status"
+                      classNamePrefix="update-action-select-status"
+                    />
+                  </FormGroup>
                   {[DONE, CANCEL].includes(values.status) && (
                     <FormGroup>
                       {values.status === DONE && <Label htmlFor="completedAt">Faite le</Label>}
@@ -254,52 +300,18 @@ const View = () => {
                       </div>
                     </FormGroup>
                   )}
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <SelectPerson value={values.person} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={6}>
-                  <FormGroup>
-                    <ActionsCategorySelect
-                      values={values.categories}
-                      id="categories"
-                      label="Catégories"
-                      onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
-                    />
-                  </FormGroup>
-                </Col>
-                <Col md={12}>
-                  <FormGroup>
-                    <Label htmlFor="description">Description</Label>
-                    <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={12}>
-                  <FormGroup>
-                    <Label htmlFor="create-action-urgent">
-                      <input
-                        type="checkbox"
-                        id="create-action-urgent"
-                        style={{ marginRight: '0.5rem' }}
-                        name="urgent"
-                        checked={values.urgent}
-                        onChange={() => {
-                          handleChange({ target: { name: 'urgent', checked: Boolean(!values.urgent), value: Boolean(!values.urgent) } });
-                        }}
-                      />
-                      Action prioritaire <br />
-                      <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
-                    </Label>
-                  </FormGroup>
-                </Col>
-              </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
-                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} />
-                <ButtonCustom title={'Mettre à jour'} loading={isSubmitting} onClick={handleSubmit} />
+                </div>
               </div>
-            </React.Fragment>
+              <div className="tw-mt-4 tw-flex tw-justify-end">
+                <ButtonCustom title={'Supprimer'} type="button" style={{ marginRight: 10 }} color="danger" onClick={deleteData} />
+                <ButtonCustom
+                  title={'Mettre à jour'}
+                  loading={isSubmitting}
+                  onClick={handleSubmit}
+                  disabled={JSON.stringify(action) === JSON.stringify(values)}
+                />
+              </div>
+            </>
           );
         }}
       </Formik>
