@@ -85,7 +85,7 @@ export default function PassagesRencontres({ person }) {
         </div>
       </div>
       <ModalContainer open={!!fullScreen} size="full" onClose={() => setFullScreen(false)}>
-        <ModalHeader title={`Passages de  ${person?.name} (${personPassages.length})`}></ModalHeader>
+        <ModalHeader title={`${selected.capitalize()} de  ${person?.name} (${personPassages.length})`}></ModalHeader>
         <ModalBody>
           {selected === 'passages' ? (
             <PassagesTable personPassages={personPassages} setPassageToEdit={setPassageToEdit} users={users} />
@@ -101,7 +101,7 @@ export default function PassagesRencontres({ person }) {
               if (selected === 'rencontres') handleAddRencontre();
               else handleAddPassage();
             }}>
-            ＋ Ajouter un commentaire
+            ＋ Ajouter {selected === 'rencontres' ? 'une rencontre' : 'un passage'}
           </button>
           <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
             Fermer

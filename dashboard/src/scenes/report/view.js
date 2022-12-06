@@ -1242,9 +1242,9 @@ const RencontresCreatedAt = ({ date, rencontres }) => {
     <>
       <StyledBox>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 20 }}>
-          <TabTitle>Rencontres enregistrés le {formatDateWithFullMonth(date)}</TabTitle>
+          <TabTitle>Rencontres enregistrées le {formatDateWithFullMonth(date)}</TabTitle>
           <ButtonCustom
-            title="Ajouter un rencontre ce jour"
+            title="Ajouter une rencontre ce jour"
             style={{ marginLeft: 'auto', marginBottom: '10px' }}
             onClick={() =>
               setRencontreToEdit({
@@ -1293,7 +1293,7 @@ const RencontresCreatedAt = ({ date, rencontres }) => {
                   rencontre.person ? <PersonName item={rencontre} /> : <span style={{ opacity: 0.3, fontStyle: 'italic' }}>Anonyme</span>,
               },
               {
-                title: 'Enregistré par',
+                title: 'Enregistrée par',
                 dataKey: 'user',
                 render: (rencontre) => (rencontre.user ? <UserName id={rencontre.user} /> : null),
               },
