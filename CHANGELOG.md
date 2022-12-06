@@ -1,3 +1,10 @@
+## [1.184.3](https://github.com/SocialGouv/mano/compare/v1.184.2...v1.184.3) (2022-12-06)
+
+
+### Bug Fixes
+
+* rencontres fullscreen + default date for passage ([#1044](https://github.com/SocialGouv/mano/issues/1044)) ([07d315c](https://github.com/SocialGouv/mano/commit/07d315c369849c2744585e1d79707183e0bad82d))
+
 ## [1.184.2](https://github.com/SocialGouv/mano/compare/v1.184.1...v1.184.2) (2022-12-05)
 
 
