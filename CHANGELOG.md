@@ -1,3 +1,10 @@
+# [1.185.0](https://github.com/SocialGouv/mano/compare/v1.184.7...v1.185.0) (2022-12-06)
+
+
+### Features
+
+* famille/groupe ([#978](https://github.com/SocialGouv/mano/issues/978)) ([aedfbf0](https://github.com/SocialGouv/mano/commit/aedfbf04b188ca94b9afb1719c8bcb5838e3d430))
+
 ## [1.184.7](https://github.com/SocialGouv/mano/compare/v1.184.6...v1.184.7) (2022-12-06)
 
 
