@@ -13,13 +13,13 @@ import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
-import { teamsState } from '../../recoil/auth';
+import { organisationState, teamsState } from '../../recoil/auth';
 import { actionsState, CANCEL, DONE } from '../../recoil/actions';
 import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
-import { onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
+import { itemsGroupedByPersonSelector, onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
 import PersonName from '../../components/PersonName';
 import { formatBirthDate, formatDateWithFullMonth, formatTime } from '../../services/date';
 import { useDataLoader } from '../../components/DataLoader';
@@ -28,7 +28,8 @@ import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
+import ConsultationButton from '../../components/ConsultationButton';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -100,6 +101,7 @@ const View = () => {
 const Actions = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const actions = useRecoilValue(actionsState);
+  const organisation = useRecoilValue(organisationState);
 
   const data = useMemo(() => {
     if (!search?.length) return [];
@@ -126,6 +128,24 @@ const Actions = ({ search, onUpdateResults }) => {
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
           columns={[
+            {
+              title: '',
+              dataKey: 'urgentOrGroupOrConsultation',
+              small: true,
+              render: (actionOrConsult) => {
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                    {!!organisation.groupsEnabled && !!actionOrConsult.group && (
+                      <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
+                        👪
+                      </span>
+                    )}
+                    {!!actionOrConsult.isConsultation && <ConsultationButton />}
+                  </div>
+                );
+              },
+            },
             {
               title: 'Date',
               dataKey: 'dueAt',
@@ -162,22 +182,24 @@ const personsWithFormattedBirthDateSelector = selector({
   },
 });
 
-const personsFilteredBySearchSelector = selectorFamily({
-  key: 'personsFilteredBySearchSelector',
+const personsFilteredBySearchForSearchSelector = selectorFamily({
+  key: 'personsFilteredBySearchForSearchSelector',
   get:
     ({ search }) =>
     ({ get }) => {
       const persons = get(personsWithFormattedBirthDateSelector);
+      const personsPopulated = get(itemsGroupedByPersonSelector);
       if (!search?.length) return [];
-      return filterBySearch(search, persons);
+      return filterBySearch(search, persons).map((p) => personsPopulated[p._id]);
     },
 });
 
 const Persons = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const teams = useRecoilValue(teamsState);
+  const organisation = useRecoilValue(organisationState);
 
-  const data = useRecoilValue(personsFilteredBySearchSelector({ search }));
+  const data = useRecoilValue(personsFilteredBySearchForSearchSelector({ search }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -206,15 +228,36 @@ const Persons = ({ search, onUpdateResults }) => {
           noData="Pas de personne suivie"
           onRowClick={(p) => history.push(`/person/${p._id}`)}
           columns={[
+            {
+              title: '',
+              dataKey: 'group',
+              small: true,
+              render: (person) => {
+                if (!person.group) return null;
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    <span className="tw-text-3xl" aria-label="Personne avec des liens familiaux" title="Personne avec des liens familiaux">
+                      👪
+                    </span>
+                  </div>
+                );
+              },
+            },
             { title: 'Nom', dataKey: 'name' },
             {
               title: 'Vigilance',
               dataKey: 'alertness',
-              render: (p) => (p.alertness ? <ExclamationMarkButton /> : null),
+              render: (p) =>
+                p.alertness ? (
+                  <ExclamationMarkButton
+                    aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                    title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                  />
+                ) : null,
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
             { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },
-          ]}
+          ].filter((c) => organisation.groupsEnabled || c.dataKey !== 'group')}
         />
       </StyledBox>
       <hr />
@@ -278,6 +321,7 @@ const commentsFilteredBySearchSelector = selectorFamily({
 
 const Comments = ({ search, onUpdateResults }) => {
   const history = useHistory();
+  const organisation = useRecoilValue(organisationState);
 
   const data = useRecoilValue(commentsFilteredBySearchSelector({ search }));
 
@@ -307,6 +351,23 @@ const Comments = ({ search, onUpdateResults }) => {
           }}
           rowKey="_id"
           columns={[
+            {
+              title: '',
+              dataKey: 'urgentOrGroup',
+              small: true,
+              render: (comment) => {
+                return (
+                  <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                    {!!comment.urgent && <ExclamationMarkButton />}
+                    {!!organisation.groupsEnabled && !!comment.group && (
+                      <span className="tw-text-3xl" aria-label="Commentaire familial" title="Commentaire familial">
+                        👪
+                      </span>
+                    )}
+                  </div>
+                );
+              },
+            },
             {
               title: 'Date',
               dataKey: 'date',

@@ -17,7 +17,7 @@ import { rencontresState } from '../../recoil/rencontres';
 import { useHistory } from 'react-router-dom';
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState, userState } from '../../recoil/auth';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import { theme } from '../../config';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import dayjs from 'dayjs';
@@ -215,7 +215,12 @@ const Person = ({ person }) => {
         <div className="person-name">
           {person.outOfActiveList ? <b style={{ color: theme.black25 }}>Sortie de file active : {person.name}</b> : <b>{person.name}</b>}
           {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
-          {!!person.alertness && <ExclamationMarkButton />}
+          {!!person.alertness && (
+            <ExclamationMarkButton
+              aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+              title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+            />
+          )}
         </div>
         <ButtonCustom
           onClick={(e) => {

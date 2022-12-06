@@ -48,15 +48,18 @@ import useApi from '../../services/api';
 import { MedicalFile } from './MedicalFile';
 import DateBloc from '../../components/DateBloc';
 import Passage from '../../components/Passage';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import MergeTwoPersons from './MergeTwoPersons';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import Rencontre from '../../components/Rencontre';
 import { itemsGroupedByPersonSelector, personsObjectSelector } from '../../recoil/selectors';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
+import PersonFamily from './PersonFamily';
+import { groupsState } from '../../recoil/groups';
+import PersonName from '../../components/PersonName';
 
-const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Rencontres', 'Lieux', 'Documents', 'Historique'];
+const initTabs = ['Résumé', 'Dossier Médical', 'Actions', 'Commentaires', 'Passages', 'Rencontres', 'Lieux', 'Documents', 'Historique', 'Famille'];
 const tabsForRestrictedRole = ['Résumé', 'Actions', 'Passages', 'Rencontres'];
 
 // we take this selector to go faster when a change happens
@@ -137,6 +140,7 @@ const View = () => {
       <Nav tabs fill style={{ marginTop: 20, marginBottom: 0 }} className="noprint">
         {tabsContents.map((tabCaption, index) => {
           if (!organisation.receptionEnabled && tabCaption.includes('Passages')) return null;
+          if (!organisation.groupsEnabled && tabCaption.includes('Famille')) return null;
           if (!user.healthcareProfessional && tabCaption.includes('Dossier Médical')) return null;
           if (['restricted-access'].includes(user.role)) {
             let showTab = false;
@@ -193,7 +197,6 @@ const View = () => {
             <TabPane tabId={7}>
               {
                 <PersonDocuments
-                  person={person}
                   onUpdateResults={(total) => updateTabContent(7, `Documents (${total})`)}
                   onGoToMedicalFiles={async () => {
                     const searchParams = new URLSearchParams(location.search);
@@ -209,6 +212,9 @@ const View = () => {
             </TabPane>
             <TabPane tabId={8}>
               <PersonHistory person={person} />
+            </TabPane>
+            <TabPane tabId={9}>
+              <PersonFamily person={person} />
             </TabPane>
           </>
         )}
@@ -534,9 +540,9 @@ const Summary = ({ person }) => {
                     </Col>
                     {customFieldsPersonsSocial
                       .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                      .map((field) => (
-                        <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                      ))}
+                      .map((field) => {
+                        return <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />;
+                      })}
                   </Row>
 
                   <hr />
@@ -566,9 +572,9 @@ const Summary = ({ person }) => {
                     </Col>
                     {customFieldsPersonsMedical
                       .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                      .map((field) => (
-                        <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                      ))}
+                      .map((field) => {
+                        return <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />;
+                      })}
                   </Row>
 
                   <hr />
@@ -620,6 +626,7 @@ const Actions = ({ onUpdateResults }) => {
   const data = person?.actions || [];
   const history = useHistory();
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
 
   const [modalOpen, setModalOpen] = useState(false);
   const [filterCategories, setFilterCategories] = useState([]);
@@ -681,7 +688,16 @@ const Actions = ({ onUpdateResults }) => {
             dataKey: 'urgent',
             small: true,
             render: (action) => {
-              return action.urgent ? <ExclamationMarkButton /> : null;
+              return (
+                <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                  {!!action.urgent && <ExclamationMarkButton />}
+                  {!!organisation.groupsEnabled && !!action.group && (
+                    <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
+                      👪
+                    </span>
+                  )}
+                </div>
+              );
             },
           },
           { title: 'À faire le', dataKey: 'dueAt', render: (action) => <DateBloc date={action.dueAt} /> },
@@ -703,7 +719,9 @@ const Actions = ({ onUpdateResults }) => {
           {
             title: 'Équipe',
             dataKey: 'team',
-            render: (action) => <TagTeam key={action.team} teamId={action.team} />,
+            render: (action) => {
+              return <TagTeam key={action.team} teamId={action.team} />;
+            },
           },
         ].filter((c) => !c.noShow)}
       />
@@ -764,7 +782,9 @@ const Passages = ({ onUpdateResults }) => {
           {
             title: 'Équipe',
             dataKey: 'team',
-            render: (passage) => <TagTeam key={passage.team} teamId={passage.team} />,
+            render: (passage) => {
+              return <TagTeam key={passage.team} teamId={passage.team} />;
+            },
           },
           {
             title: 'Enregistré par',
@@ -831,7 +851,9 @@ const Rencontres = ({ onUpdateResults }) => {
           {
             title: 'Équipe',
             dataKey: 'team',
-            render: (rencontre) => <TagTeam key={rencontre.team} teamId={rencontre.team} />,
+            render: (rencontre) => {
+              return <TagTeam key={rencontre.team} teamId={rencontre.team} />;
+            },
           },
           {
             title: 'Enregistrée par',
@@ -845,84 +867,159 @@ const Rencontres = ({ onUpdateResults }) => {
   );
 };
 
-const PersonDocuments = ({ person, onUpdateResults, onGoToMedicalFiles }) => {
+const PersonDocuments = ({ onUpdateResults, onGoToMedicalFiles }) => {
   const user = useRecoilValue(userState);
   const setPersons = useSetRecoilState(personsState);
+  const organisation = useRecoilValue(organisationState);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const API = useApi();
+  const { personId } = useParams();
+  const person = useRecoilValue(populatedPersonSelector({ personId }));
+
+  const groups = useRecoilValue(groupsState);
+  const canToggleGroupCheck = useMemo(
+    () => !!organisation.groupsEnabled && groups.find((group) => group.persons.includes(person._id)),
+    [groups, person._id, organisation.groupsEnabled]
+  );
 
   useEffect(() => {
-    if (!!onUpdateResults) onUpdateResults(person.documents?.length || 0);
+    if (!!onUpdateResults) onUpdateResults((person.documents?.length || 0) + (person.groupDocuments?.length || 0));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [person.documents?.length]);
 
+  const onAdd = async (docResponse) => {
+    const { data: file, encryptedEntityKey } = docResponse;
+    const personResponse = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(
+        customFieldsPersonsMedical,
+        customFieldsPersonsSocial
+      )({
+        ...person,
+        documents: [
+          ...(person.documents || []),
+          {
+            _id: file.filename,
+            name: file.originalname,
+            encryptedEntityKey,
+            createdAt: new Date(),
+            createdBy: user._id,
+            group: false,
+            file,
+          },
+        ],
+      }),
+    });
+    if (personResponse.ok) {
+      const newPerson = personResponse.decryptedData;
+      setPersons((persons) =>
+        persons.map((p) => {
+          if (p._id === person._id) return newPerson;
+          return p;
+        })
+      );
+    }
+  };
+
+  const onDelete = async (document) => {
+    const personResponse = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(
+        customFieldsPersonsMedical,
+        customFieldsPersonsSocial
+      )({
+        ...person,
+        documents: person.documents.filter((d) => d._id !== document._id),
+      }),
+    });
+    if (personResponse.ok) {
+      const newPerson = personResponse.decryptedData;
+      setPersons((persons) =>
+        persons.map((p) => {
+          if (p._id === person._id) return newPerson;
+          return p;
+        })
+      );
+    }
+    onUpdateResults(person.documents.length);
+  };
+
+  const onToggleIsGroup = async (document) => {
+    const personResponse = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(
+        customFieldsPersonsMedical,
+        customFieldsPersonsSocial
+      )({
+        ...person,
+        documents: person.documents.map((_document) => (document._id === _document._id ? { ..._document, group: !_document.group } : _document)),
+      }),
+    });
+    if (personResponse.ok) {
+      const newPerson = personResponse.decryptedData;
+      setPersons((persons) =>
+        persons.map((p) => {
+          if (p._id === person._id) return newPerson;
+          return p;
+        })
+      );
+    }
+    onUpdateResults(person.documents.length);
+  };
+
   return (
-    <Documents
-      title={<Title>Documents</Title>}
-      documents={person.documents}
-      person={person}
-      onAdd={async (docResponse) => {
-        const { data: file, encryptedEntityKey } = docResponse;
-        const personResponse = await API.put({
-          path: `/person/${person._id}`,
-          body: preparePersonForEncryption(
-            customFieldsPersonsMedical,
-            customFieldsPersonsSocial
-          )({
-            ...person,
-            documents: [
-              ...(person.documents || []),
-              {
-                _id: file.filename,
-                name: file.originalname,
-                encryptedEntityKey,
-                createdAt: new Date(),
-                createdBy: user._id,
-                downloadPath: `/person/${person._id}/document/${file.filename}`,
-                file,
-              },
-            ],
-          }),
-        });
-        if (personResponse.ok) {
-          const newPerson = personResponse.decryptedData;
-          setPersons((persons) =>
-            persons.map((p) => {
-              if (p._id === person._id) return newPerson;
-              return p;
-            })
-          );
-        }
-      }}
-      onDelete={async (document) => {
-        const personResponse = await API.put({
-          path: `/person/${person._id}`,
-          body: preparePersonForEncryption(
-            customFieldsPersonsMedical,
-            customFieldsPersonsSocial
-          )({
-            ...person,
-            documents: person.documents.filter((d) => d._id !== document._id),
-          }),
-        });
-        if (personResponse.ok) {
-          const newPerson = personResponse.decryptedData;
-          setPersons((persons) =>
-            persons.map((p) => {
-              if (p._id === person._id) return newPerson;
-              return p;
-            })
-          );
-        }
-        onUpdateResults(person.documents.length);
-      }}>
+    <>
       {!!user.healthcareProfessional && (
-        <LinkButton onClick={onGoToMedicalFiles} color="link">
-          Voir les documents médicaux
-        </LinkButton>
+        <div className="-tw-mb-5 tw-mt-8 tw-flex tw-justify-end">
+          <LinkButton onClick={onGoToMedicalFiles} color="link">
+            Voir les documents médicaux
+          </LinkButton>
+        </div>
       )}
-    </Documents>
+      <Documents
+        title={<Title>Documents</Title>}
+        documents={person.documents}
+        person={person}
+        additionalColumns={
+          canToggleGroupCheck
+            ? [
+                {
+                  title: 'Document familial',
+                  dataKey: 'type',
+                  render: (document) => {
+                    return (
+                      <input
+                        type="checkbox"
+                        id="toggle-document-group"
+                        name="toggle-document-group"
+                        defaultChecked={document.group || false}
+                        onChange={() => onToggleIsGroup(document)}
+                      />
+                    );
+                  },
+                },
+              ]
+            : []
+        }
+        onAdd={onAdd}
+        onDelete={onDelete}
+      />
+      {!!person.groupDocuments?.length && (
+        <Documents
+          title={<Title>Documents familiaux</Title>}
+          documents={person.groupDocuments}
+          person={person}
+          additionalColumns={[
+            {
+              title: 'Personne',
+              dataKey: 'type',
+              render: (document) => <PersonName item={document} redirectToTab="documents" />,
+            },
+          ]}
+        />
+      )}
+    </>
   );
 };
 

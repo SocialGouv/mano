@@ -1,7 +1,4 @@
-import React, { useState } from 'react';
-import { theme } from '../config';
-import { Field, Formik } from 'formik';
-import styled from 'styled-components';
+import React, { useMemo, useState } from 'react';
 import Table from './table';
 import UserName from './UserName';
 import { download } from '../utils';
@@ -10,9 +7,8 @@ import { formatDateWithFullMonth } from '../services/date';
 import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
 import useApi from '../services/api';
-import { Col, Row } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
-import { userState } from '../recoil/auth';
+import { organisationState, userState } from '../recoil/auth';
 
 const Documents = ({
   person,
@@ -27,41 +23,46 @@ const Documents = ({
 }) => {
   const API = useApi();
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
+
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
+
+  const withDocForGroup = useMemo(
+    () => !!organisation.groupsEnabled && documents?.filter((doc) => doc.group).length > 0,
+    [documents, organisation.groupsEnabled]
+  );
 
   return (
     <>
-      <Formik initialValues={{ place: null }} onSubmit={async () => {}}>
-        {() => (
-          <Row style={{ marginTop: '30px', marginBottom: '5px', alignItems: 'center', justifyContent: 'space-between' }}>
-            {!!title && <Col md={6}>{title}</Col>}
-            <Col md={6} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-              <FileWrapper>
-                Ajouter un document
-                <Field
-                  key={resetFileInputKey}
-                  type="file"
-                  name="file"
-                  hidden
-                  onChange={async (e) => {
-                    const docResponse = await API.upload({
-                      path: `/person/${person._id}/document`,
-                      file: e.target.files[0],
-                    });
-                    if (!docResponse.ok || !docResponse.data) {
-                      capture('Error uploading document', { extra: { docResponse } });
-                      toast.error("Une erreur est survenue lors de l'envoi du document");
-                      return;
-                    }
-                    onAdd(docResponse);
-                    setResetFileInputKey((k) => k + 1);
-                  }}
-                />
-              </FileWrapper>
-            </Col>
-          </Row>
+      <div className="tw-mt-8 tw-mb-1.5 tw-flex tw-items-center tw-justify-between">
+        {!!title && <div className="tw-m-0 tw-flex-1">{title}</div>}
+        {!!onAdd && (
+          <div className="tw-flex">
+            <label className="button-submit">
+              Ajouter un document
+              <input
+                key={resetFileInputKey}
+                type="file"
+                name="file"
+                hidden
+                onChange={async (e) => {
+                  const docResponse = await API.upload({
+                    path: `/person/${person._id}/document`,
+                    file: e.target.files[0],
+                  });
+                  if (!docResponse.ok || !docResponse.data) {
+                    capture('Error uploading document', { extra: { docResponse } });
+                    toast.error("Une erreur est survenue lors de l'envoi du document");
+                    return;
+                  }
+                  onAdd(docResponse);
+                  setResetFileInputKey((k) => k + 1);
+                }}
+              />
+            </label>
+          </div>
         )}
-      </Formik>
+      </div>
       {children}
       <Table
         data={documents}
@@ -69,6 +70,22 @@ const Documents = ({
         rowKey={'_id'}
         onRowClick={onRowClick}
         columns={[
+          {
+            title: '',
+            dataKey: 'group',
+            small: true,
+            render: (document) => {
+              return (
+                <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                  {!!document.group && (
+                    <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
+                      👪
+                    </span>
+                  )}
+                </div>
+              );
+            },
+          },
           { title: 'Nom', dataKey: 'name', render: (document) => <b>{document.name}</b> },
           { title: 'Ajouté le', dataKey: 'createdAt', render: (document) => formatDateWithFullMonth(document.createdAt) },
           { title: 'Ajouté par', dataKey: 'createdBy', render: (document) => <UserName id={document.createdBy} /> },
@@ -120,22 +137,12 @@ const Documents = ({
               );
             },
           },
-        ]}
+        ]
+          .filter((col) => col.dataKey !== 'group' || !!withDocForGroup)
+          .filter((col) => col.dataKey !== 'action' || !!onAdd || !!onDelete)}
       />
     </>
   );
 };
-
-const FileWrapper = styled.label`
-  background: ${theme.main};
-  color: ${theme.white};
-  border-radius: 8px;
-  font-size: 14px;
-  box-shadow: none;
-  border: none;
-  cursor: pointer;
-  padding: 12px 24px;
-  margin: 0;
-`;
 
 export default Documents;

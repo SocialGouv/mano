@@ -94,7 +94,6 @@ const ServicesSettings = () => {
         <h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">Services</h3>
         <ButtonCustom title="Ajouter un groupe" className="tw-ml-auto" onClick={() => setAddGroupModalVisible(true)} />
       </div>
-      <hr />
       <div key={JSON.stringify(groupedServices)} className={isDisabled ? 'tw-cursor-wait' : ''}>
         <div
           id="service-groups"

@@ -26,6 +26,7 @@ import { treatmentsState } from '../recoil/treatments';
 import { sortByName } from '../utils/sortByName';
 import { rencontresState } from '../recoil/rencontres';
 import { passagesState } from '../recoil/passages';
+import { groupsState } from '../recoil/groups';
 
 function randomIntFromInterval(min, max) {
   // min and max included
@@ -74,6 +75,7 @@ const Loader = () => {
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
+  const [groups, setGroups] = useRecoilState(groupsState);
   const [consultations, setConsultations] = useRecoilState(consultationsState);
   const [treatments, setTreatments] = useRecoilState(treatmentsState);
   const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
@@ -94,6 +96,7 @@ const Loader = () => {
     const { showFullScreen, initialLoad } = refreshTrigger.options;
     setLoading('Chargement...');
     setFullScreen(showFullScreen);
+
     /*
     Get number of data to download to show the appropriate loading progress bar
     */
@@ -120,6 +123,7 @@ const Loader = () => {
       response.data.passages +
       response.data.rencontres +
       response.data.reports +
+      response.data.groups +
       response.data.relsPersonPlace;
 
     // medical data is never saved in cache
@@ -233,6 +237,24 @@ const Loader = () => {
         API,
       });
       if (refreshedActions) setActions(refreshedActions);
+    }
+    /*
+    Get groups
+    */
+    if (initialLoad || response.data.groups) {
+      setLoading('Chargement des familles');
+      const refreshedGroups = await getData({
+        collectionName: 'group',
+        data: groups,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newGroups) => {
+          setGroups((oldGroups) => (initialLoad ? [...oldGroups, ...newGroups] : mergeItems(oldGroups, newGroups)));
+        },
+        API,
+      });
+      if (refreshedGroups) setGroups(refreshedGroups);
     }
     /*
     Switch to not full screen

@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
 import { useRecoilValue } from 'recoil';
-import ExclamationMarkButton from '../../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../../components/tailwind/ExclamationMarkButton';
 import TagTeam from '../../../components/TagTeam';
+import { organisationState, usersState } from '../../../recoil/auth';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
-import { usersState } from '../../../recoil/auth';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import CommentModal from './CommentModal';
 
@@ -23,6 +23,7 @@ export default function Comments({ person }) {
           <h4 className="tw-flex-1">Commentaires {comments.length ? `(${comments.length})` : ''}</h4>
           <div className="flex-col tw-flex tw-items-center tw-gap-2">
             <button
+              aria-label="Ajouter un commentaire"
               className="tw-text-md tw-h-8 tw-w-8 tw-rounded-full tw-bg-main tw-font-bold tw-text-white tw-transition hover:tw-scale-125"
               onClick={() => setModalCreateOpen(true)}>
               ＋
@@ -87,6 +88,7 @@ export default function Comments({ person }) {
 
 const CommentsTable = ({ comments, setCommentToEdit }) => {
   const users = useRecoilValue(usersState);
+  const organisation = useRecoilValue(organisationState);
 
   return (
     <table className="table table-striped">
@@ -102,10 +104,17 @@ const CommentsTable = ({ comments, setCommentToEdit }) => {
                   {!!comment.urgent && <ExclamationMarkButton className="tw-mr-4" />}
                   <div className="tw-text-xs">{formatDateTimeWithNameOfDay(comment.date || comment.createdAt)}</div>
                 </div>
-                <div style={{ overflowWrap: 'anywhere' }}>
-                  {(comment.comment || '').split('\n').map((e, i) => (
-                    <p key={e + i}>{e}</p>
-                  ))}
+                <div className="tw-flex tw-items-start">
+                  {!!organisation.groupsEnabled && !!comment.group && (
+                    <span className="tw-mr-2 tw-text-xl" aria-label="Commentaire familial" title="Commentaire familial">
+                      👪
+                    </span>
+                  )}
+                  <div className="tw-break-words">
+                    {(comment.comment || '').split('\n').map((e, i) => (
+                      <p key={e + i}>{e}</p>
+                    ))}
+                  </div>
                 </div>
                 <div className="small">Créé par {users.find((e) => e._id === comment.user)?.name}</div>
                 <div className="tw-max-w-fit">

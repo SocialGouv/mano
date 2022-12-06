@@ -20,10 +20,8 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Tous mes services" }).click();
   await page.locator("#Repas-add").click();
   await page.locator("#Kit-add").click();
-  await page.locator('[id="Don\\ chaussures-add"]').click();
-  await page.locator('[id="Don\\ chaussures-add"]').click();
-  await page.locator('[id="Distribution\\ seringue-add"]').click();
-  await page.locator('[id="Distribution\\ seringue-add"]').click();
+  await page.locator('[id="Don\\ chaussures-add"]').click({ clickCount: 2 });
+  await page.locator('[id="Distribution\\ seringue-add"]').click({ clickCount: 2 });
   await page.locator('[data-test-id="Don chaussures-2"]').click();
   await page.locator('[data-test-id="Distribution seringue-2"]').click();
   await page.locator('[data-test-id="Kit-1"]').click();
@@ -33,6 +31,16 @@ test("test", async ({ page }) => {
 
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Accueil de jour" }).click();
+
+  await expect(page.getByRole("link", { name: "Accueil" })).toBeVisible();
+  await page.getByText("Activer l'accueil de jour").click();
+  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByText("Mise à jour !").click();
+  await expect(page.getByRole("link", { name: "Accueil" })).not.toBeVisible();
+  await page.getByText("Activer l'accueil de jour").click();
+  await page.getByRole("button", { name: "Mettre à jour" }).click();
+  await page.getByText("Mise à jour !").click();
+  await expect(page.getByRole("link", { name: "Accueil" })).toBeVisible();
 
   await page.hover(".service-group-title");
   await page.getByRole("button", { name: "Modifier le groupe Tous mes services" }).click();
@@ -55,6 +63,7 @@ test("test", async ({ page }) => {
   await page.getByPlaceholder("Injection").click();
   await page.getByPlaceholder("Injection").fill("Le deux");
   await page.getByRole("dialog", { name: "Ajouter un groupe de services" }).getByRole("button", { name: "Ajouter" }).click();
+  await page.locator('div[role="alert"]:has-text("Groupe ajouté")').click();
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").click();
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").fill("essai 1");
   await page.locator("details[data-group='Le deux']").getByRole("button", { name: "Ajouter" }).click();
@@ -110,22 +119,17 @@ test("test", async ({ page }) => {
   await page.locator('[data-test-id$="Don chaussures-0"]').click();
   await page.locator('[data-test-id$="Distribution seringue-1"]').click();
   await page.getByRole("button", { name: "Le deux" }).click();
-  await page.getByRole("button", { name: "plus" }).first().click();
-  await page.getByRole("button", { name: "plus" }).first().click();
+  await page.getByRole("button", { name: "plus" }).first().click({ clickCount: 2 });
   await page.locator('[data-test-id$="essai 1-2"]').click();
   await page.locator('[data-test-id$="test 12ED-0"]').click();
   await page.getByRole("button", { name: "Trois" }).click();
-  await page.getByRole("button", { name: "plus" }).click();
-  await page.getByRole("button", { name: "plus" }).click();
-  await page.getByRole("button", { name: "plus" }).click();
+  await page.getByRole("button", { name: "plus" }).click({ clickCount: 3 });
   await page.locator('[data-test-id$="dans le trois-3"]').click();
   await page.getByRole("button", { name: "Le deux" }).click();
   await page.locator('[data-test-id$="essai 1-2"]').click();
   await page.getByRole("button", { name: "Nouveau nom pour tous" }).click();
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Accueil de jour" }).click();
-  await page.getByText("essai 1").click();
-  await page.getByText("essai 1").click();
-  await page.getByText("essai 1").click();
+  await page.getByText("essai 1").click({ clickCount: 3 });
   await page.locator("#service-groups").click();
 });

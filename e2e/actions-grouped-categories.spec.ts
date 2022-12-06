@@ -1,11 +1,18 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, Page } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { changeReactSelectValue, clickOnEmptyReactSelect, loginWith } from "./utils";
+import { changeReactSelectValue, clickOnEmptyReactSelect, createAction, loginWith } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
 });
+
+const createGroup = async (page: Page, groupName: string) => {
+  await page.getByRole("button", { name: "Ajouter un groupe" }).click();
+  await page.getByLabel("Titre du groupe").fill(groupName);
+  await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Ajouter" }).click();
+  await page.getByText("Groupe ajouté").click();
+};
 
 test("Actions", async ({ page }) => {
   // Always use a new items
@@ -24,47 +31,12 @@ test("Actions", async ({ page }) => {
   const action2Name = nanoid();
   const action3Name = nanoid();
 
-  const createGroup = async (groupName: string) => {
-    await page.getByRole("button", { name: "Ajouter un groupe" }).click();
-
-    await page.getByLabel("Titre du groupe").fill(groupName);
-
-    await page.getByRole("dialog", { name: "Ajouter un groupe de catégories" }).getByRole("button", { name: "Ajouter" }).click();
-
-    await page.getByText("Groupe ajouté").click();
-  };
-
-  const createAction = async (actionName: string, categories: Array<{ group: string; category: string }>) => {
-    await page.getByRole("link", { name: "Agenda" }).click();
-
-    await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
-
-    await page.getByLabel("Nom de l'action").fill(actionName);
-
-    await clickOnEmptyReactSelect(page, "create-action-person-select", personName);
-
-    await page.locator("#categories").getByText("-- Choisir --").click();
-
-    for (const { group, category } of categories) {
-      await page.getByRole("button", { name: `${group} (2)` }).click();
-      await page.getByRole("button", { name: category }).click();
-    }
-
-    await page.getByRole("dialog", { name: "Sélectionner des catégories" }).getByRole("button", { name: "Fermer" }).click();
-
-    await page.getByRole("button", { name: "Sauvegarder" }).click();
-
-    await page.getByText("Création réussie !").click();
-  };
-
   await loginWith(page, "admin6@example.org");
 
   await test.step("Create first group to be renamed", async () => {
     await page.getByRole("link", { name: "Organisation" }).click();
-
     await page.getByRole("button", { name: "Actions" }).click();
-
-    await createGroup(group1Name);
+    await createGroup(page, group1Name);
   });
 
   await test.step("Create first category in first group", async () => {
@@ -104,7 +76,7 @@ test("Actions", async ({ page }) => {
   });
 
   await test.step("Create second group", async () => {
-    await createGroup(group2Name);
+    await createGroup(page, group2Name);
   });
 
   await test.step("Create first category in second group", async () => {
@@ -124,7 +96,7 @@ test("Actions", async ({ page }) => {
   });
 
   await test.step("Create third group and category to be deleted", async () => {
-    await createGroup(groupe3Name);
+    await createGroup(page, groupe3Name);
 
     await page.locator(`details[data-group='${groupe3Name}']`).getByPlaceholder("Ajouter une catégorie").fill(groupe3cat1ToBeDeleted);
 
@@ -170,17 +142,21 @@ test("Actions", async ({ page }) => {
   });
 
   await test.step("Create actions", async () => {
-    await createAction(action1Name, [
-      { group: group1Name, category: groupe1cat1 },
-      { group: group2Name, category: groupe2cat1 },
-    ]);
+    await createAction(page, action1Name, personName, {
+      categories: [
+        { group: group1Name, category: groupe1cat1 },
+        { group: group2Name, category: groupe2cat1 },
+      ],
+    });
 
-    await createAction(action2Name, [
-      { group: group1Name, category: groupe1cat2 },
-      { group: group2Name, category: groupe2cat2 },
-    ]);
+    await createAction(page, action2Name, personName, {
+      categories: [
+        { group: group1Name, category: groupe1cat2 },
+        { group: group2Name, category: groupe2cat2 },
+      ],
+    });
 
-    await createAction(action3Name, [{ group: groupe3Name, category: groupe3cat1ToBeDeleted }]);
+    await createAction(page, action3Name, personName, { categories: [{ group: groupe3Name, category: groupe3cat1ToBeDeleted }] });
   });
 
   await test.step("Search for category", async () => {

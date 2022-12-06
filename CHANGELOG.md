@@ -1,3 +1,45 @@
+# [1.185.0](https://github.com/SocialGouv/mano/compare/v1.184.7...v1.185.0) (2022-12-06)
+
+
+### Features
+
+* famille/groupe ([#978](https://github.com/SocialGouv/mano/issues/978)) ([aedfbf0](https://github.com/SocialGouv/mano/commit/aedfbf04b188ca94b9afb1719c8bcb5838e3d430))
+
+## [1.184.7](https://github.com/SocialGouv/mano/compare/v1.184.6...v1.184.7) (2022-12-06)
+
+
+### Bug Fixes
+
+* enable accueil de jour ([#1047](https://github.com/SocialGouv/mano/issues/1047)) ([a8414ad](https://github.com/SocialGouv/mano/commit/a8414ad39e3e62d6826292c5fdb7f94b23e4c9b0))
+
+## [1.184.6](https://github.com/SocialGouv/mano/compare/v1.184.5...v1.184.6) (2022-12-06)
+
+
+### Bug Fixes
+
+* name in consultations ([#1046](https://github.com/SocialGouv/mano/issues/1046)) ([dc2ce80](https://github.com/SocialGouv/mano/commit/dc2ce8011e7543b80cbf10e490b89d2a96c61ebc))
+
+## [1.184.5](https://github.com/SocialGouv/mano/compare/v1.184.4...v1.184.5) (2022-12-06)
+
+
+### Bug Fixes
+
+* **dashboard:** weekly dashboard display categories twice ([03d430e](https://github.com/SocialGouv/mano/commit/03d430edc5769b730c9b447caa95380e13605dc5))
+
+## [1.184.4](https://github.com/SocialGouv/mano/compare/v1.184.3...v1.184.4) (2022-12-06)
+
+
+### Bug Fixes
+
+* stop show lastLoginAt when never login ([f836d9c](https://github.com/SocialGouv/mano/commit/f836d9cd18cbbcc411c708c7e5d2d2fda27d82c8))
+
+## [1.184.3](https://github.com/SocialGouv/mano/compare/v1.184.2...v1.184.3) (2022-12-06)
+
+
+### Bug Fixes
+
+* rencontres fullscreen + default date for passage ([#1044](https://github.com/SocialGouv/mano/issues/1044)) ([07d315c](https://github.com/SocialGouv/mano/commit/07d315c369849c2744585e1d79707183e0bad82d))
+
 ## [1.184.2](https://github.com/SocialGouv/mano/compare/v1.184.1...v1.184.2) (2022-12-05)
 
 

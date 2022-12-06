@@ -93,14 +93,11 @@ test("test", async ({ page }) => {
   await page.getByText("Injecteur").click();
   await page.getByText("Pulmonaire").click();
   await page.getByText("hello ionfo complémentaires").click();
-  await page.getByRole("button", { name: "＋" }).first().click();
+  await page.locator("button[aria-label='Ajouter une action']").click();
   await page.getByLabel("Nom de l'action").click();
   await page.getByLabel("Nom de l'action").fill("hello action");
   await page.getByLabel("Montrer l'heure").check();
-  await page.getByLabel("Échéance").click();
-  await page.getByLabel("Échéance").press("Meta+a");
-  await page.getByLabel("Échéance").fill("11/12/2002");
-  await page.getByLabel("Échéance").press("Enter");
+  await page.getByLabel("À faire le").fill("11/12/2002");
   //  await page.locator('body:has-text("Orga Test - 1Team Test - 1User Test - 1User Test - 1 - adminBesoin d\'aide ? Donn")').press("Enter");
   await page.getByLabel("Description").click();
   await page.getByLabel("Description").fill("tests description");
@@ -108,7 +105,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Création réussie !").click();
 
-  await page.getByRole("button", { name: "＋" }).nth(1).click();
+  await page.locator("button[aria-label='Ajouter un commentaire']").click();
   await page.getByRole("textbox", { name: "Commentaire" }).click();
   await page.getByRole("textbox", { name: "Commentaire" }).fill("Premier commentaire");
   await page.getByText("Commentaire prioritaire Ce commentaire sera mis en avant par rapport aux autres").click();
@@ -118,7 +115,7 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Commentaire enregistré").click();
 
-  await page.getByRole("button", { name: "＋" }).nth(2).click();
+  await page.locator("button[aria-label='Ajouter un passage']").click();
   await page.getByLabel("Date").click();
   await page.getByLabel("Date").fill("10/10/2004");
   await page.getByLabel("Date").press("Enter");
@@ -128,7 +125,7 @@ test("test", async ({ page }) => {
   await page.getByText("Passage enregistré").click();
 
   await page.getByRole("button", { name: "Rencontres (0)" }).click();
-  await page.getByRole("button", { name: "＋" }).nth(2).click();
+  await page.locator("button[aria-label='Ajouter une rencontre']").click();
   await page.getByLabel("Date").click();
   await page.getByLabel("Date").press("Meta+a");
   await page.getByLabel("Date").fill("09/09/2006");
@@ -147,6 +144,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Numéro de sécurité sociale").fill("082");
   await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
   await page.getByText("Mise à jour effectuée !").click();
+
   await page.getByRole("button", { name: "💊 Ajouter un traitement" }).click();
   await page.getByPlaceholder("Amoxicilline").click();
   await page.getByPlaceholder("Amoxicilline").fill("hdeyygdeygde");
@@ -182,6 +180,7 @@ test("test", async ({ page }) => {
   await page.locator("#type svg").click();
   await page.locator("#react-select-type-option-0").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+
   await page.locator('small:has-text("Médicale")').click();
   await page.getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" }).click();
   await page.getByRole("button", { name: "Lieux fréquentés" }).click();

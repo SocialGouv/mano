@@ -15,10 +15,10 @@ import ActionOrConsultationName from '../../components/ActionOrConsultationName'
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
 import { CANCEL, DONE, mappedIdsToLabels, TODO } from '../../recoil/actions';
-import { currentTeamState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState, teamsState, organisationState, userState } from '../../recoil/auth';
 import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
-import ExclamationMarkButton from '../../components/ExclamationMarkButton';
+import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ConsultationButton from '../../components/ConsultationButton';
@@ -118,6 +118,7 @@ const List = () => {
   const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
+  const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
 
   const { isLoading, refresh } = useDataLoader();
@@ -276,12 +277,20 @@ const List = () => {
             columns={[
               {
                 title: '',
-                dataKey: 'urgentOrConsultation',
+                dataKey: 'urgentOrGroupOrConsultation',
                 small: true,
-                render: (action) => {
-                  if (action.urgent) return <ExclamationMarkButton />;
-                  if (action.isConsultation) return <ConsultationButton />;
-                  return null;
+                render: (actionOrConsult) => {
+                  return (
+                    <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
+                      {!!actionOrConsult.urgent && <ExclamationMarkButton />}
+                      {!!organisation.groupsEnabled && !!actionOrConsult.group && (
+                        <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
+                          👪
+                        </span>
+                      )}
+                      {!!actionOrConsult.isConsultation && <ConsultationButton />}
+                    </div>
+                  );
                 },
               },
               {

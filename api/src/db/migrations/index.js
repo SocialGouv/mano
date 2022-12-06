@@ -20,5 +20,6 @@
   await require("./2022-06-17-custom-fields-persons-2")();
   await require("./2022-09-19_add_rencontre_table")();
   await require("./2022-11-07_add_grouped_categories")();
+  await require("./2022-11-14_add_group_table")();
   await require("./2022-11-29_add_grouped_services")();
 })();

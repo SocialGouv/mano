@@ -172,6 +172,7 @@ router.put(
         encryptionEnabled: organisation.encryptionEnabled,
         encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
         receptionEnabled: organisation.receptionEnabled,
+        groupsEnabled: organisation.groupsEnabled,
         services: organisation.services,
         consultations: organisation.consultations,
         collaborations: organisation.collaborations,

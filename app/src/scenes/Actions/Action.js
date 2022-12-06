@@ -31,6 +31,7 @@ import { capture } from '../../services/sentry';
 import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { dayjsInstance } from '../../services/dateDayjs';
+import { groupsState } from '../../recoil/groups';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -44,11 +45,11 @@ const castToAction = (action) => {
     dueAt: action.dueAt || null,
     withTime: action.withTime || false,
     urgent: action.urgent || false,
+    group: action.group || false,
     completedAt: action.completedAt || null,
     entityKey: action.entityKey || '',
     team: action.team || null,
     structure: action.structure || null,
-    group: action.group || false,
   };
 };
 
@@ -57,6 +58,7 @@ const Action = ({ navigation, route }) => {
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
   const allPersons = useRecoilValue(personsState);
+  const groups = useRecoilValue(groupsState);
   const [comments, setComments] = useRecoilState(commentsState);
   const currentTeam = useRecoilValue(currentTeamState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
@@ -383,12 +385,18 @@ const Action = ({ navigation, route }) => {
     }, 250);
   };
 
-  const { name, dueAt, withTime, description, categories, status, urgent } = action;
+  const isOnePerson = persons.length === 1;
+  const person = !isOnePerson ? null : persons?.[0];
+  const canToggleGroupCheck = !!organisation.groupsEnabled && !!person && groups.find((group) => group.persons.includes(person._id));
+
+  const { name, dueAt, withTime, description, categories, status, urgent, group } = action;
 
   return (
     <SceneContainer>
       <ScreenTitle
-        title={persons?.length && persons.length === 1 ? `${name} - ${persons[0]?.name}` : name}
+        title={
+          persons?.length && persons.length === 1 ? `${!!organisation.groupsEnabled && !!group ? '👪 ' : ''}${name} - ${persons[0]?.name}` : name
+        }
         onBack={onGoBackRequested}
         onEdit={!editable ? () => setEditable(true) : null}
         onSave={!editable || isUpdateDisabled ? null : onUpdateRequest}
@@ -433,7 +441,7 @@ const Action = ({ navigation, route }) => {
           editable={editable}
         />
         <DateAndTimeInput
-          label="Échéance"
+          label="À faire le"
           setDate={(dueAt) => setAction((a) => ({ ...a, dueAt }))}
           date={dueAt}
           showTime
@@ -459,6 +467,14 @@ const Action = ({ navigation, route }) => {
             alone
             onPress={() => setAction((a) => ({ ...a, urgent: !a.urgent }))}
             value={urgent}
+          />
+        ) : null}
+        {editable && !!canToggleGroupCheck ? (
+          <CheckboxLabelled
+            label="Action familiale (cette action sera à effectuer pour toute la famille)"
+            alone
+            onPress={() => setAction((a) => ({ ...a, group: !a.group }))}
+            value={group}
           />
         ) : null}
 

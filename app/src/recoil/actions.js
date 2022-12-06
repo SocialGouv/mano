@@ -25,7 +25,7 @@ export const flattenedCategoriesSelector = selector({
   },
 });
 
-const encryptedFields = ['category', 'categories', 'group', 'person', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];
+const encryptedFields = ['category', 'categories', 'person', 'group', 'structure', 'name', 'description', 'withTime', 'team', 'user', 'urgent'];
 
 export const prepareActionForEncryption = (action) => {
   const decrypted = {};

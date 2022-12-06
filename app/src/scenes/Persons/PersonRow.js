@@ -1,5 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
+import { View } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { connectActionSheet } from '@expo/react-native-action-sheet';
 import * as Sentry from '@sentry/react-native';
 import ButtonTopPlus from '../../components/ButtonTopPlus';
 import { displayBirthDate } from '../../components/DateAndTimeInput';
@@ -7,10 +10,10 @@ import { MyText } from '../../components/MyText';
 import RowContainer from '../../components/RowContainer';
 import TeamsTags from '../../components/TeamsTags';
 import colors from '../../utils/colors';
-import { useNavigation } from '@react-navigation/native';
-import { connectActionSheet } from '@expo/react-native-action-sheet';
+import { useRecoilValue } from 'recoil';
+import { organisationState } from '../../recoil/auth';
 
-const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } }) => {
+export const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } }) => {
   if (outOfActiveList) {
     return (
       <OutOfActiveListContainer>
@@ -22,9 +25,10 @@ const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } 
   return <Name>{name}</Name>;
 };
 
-const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionSheetWithOptions }) => {
+const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionSheetWithOptions, children }) => {
   const { outOfActiveList, birthdate, alertness } = person;
   const navigation = useNavigation();
+  const organisation = useRecoilValue(organisationState);
 
   const onMorePress = async () => {
     const options = ['Ajouter une rencontre', 'Ajouter une action', 'Ajouter un commentaire', 'Ajouter un lieu fréquenté', 'Annuler'];
@@ -60,11 +64,17 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
               <ExclamationMark>!</ExclamationMark>
             </ExclamationMarkButton>
           )}
+          {!!organisation.groupsEnabled && !!person.group && (
+            <View className="mr-2 shrink-0">
+              <MyText>👪</MyText>
+            </View>
+          )}
           <PersonName person={person} />
           {!isPersonsSearchRow && <ButtonTopPlus onPress={onMorePress} />}
         </CaptionsFirstLine>
         {birthdate && !outOfActiveList && <Birthdate>{displayBirthDate(birthdate)}</Birthdate>}
         {birthdate && outOfActiveList && <BirthdateMuted>{displayBirthDate(birthdate)}</BirthdateMuted>}
+        {children}
         <TeamsTags teams={person.assignedTeams} />
       </CaptionsContainer>
     </RowContainer>
