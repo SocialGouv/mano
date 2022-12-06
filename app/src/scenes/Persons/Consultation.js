@@ -87,7 +87,6 @@ const Consultation = ({ navigation, route }) => {
   }, []);
 
   const onSaveConsultationRequest = async () => {
-    if (!consultation.name) return Alert.alert('Veuillez indiquer un nom');
     if (!consultation.status) return Alert.alert('Veuillez indiquer un status');
     if (!consultation.dueAt) return Alert.alert('Veuillez indiquer une date');
     if (!consultation.type) return Alert.alert('Veuillez indiquer un type');
@@ -194,10 +193,10 @@ const Consultation = ({ navigation, route }) => {
       <ScrollContainer keyboardShouldPersistTaps="handled">
         <View>
           <InputLabelled
-            label="Nom"
+            label="Nom (facultatif)"
             value={consultation.name}
             onChangeText={(name) => onChange({ name })}
-            placeholder="Nom de la consultation"
+            placeholder="Nom de la consultation (facultatif)"
             testID="consultation-name"
           />
           <ConsultationTypeSelect editable value={consultation.type} onSelect={(type) => onChange({ type })} />
