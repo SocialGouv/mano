@@ -681,7 +681,6 @@ export function MedicalFile({ person }) {
           validate={(values) => {
             const errors = {};
             if (!values._id) errors._id = "L'identifiant est obligatoire";
-            // if (!values.name) errors.name = 'Le nom est obligatoire';
             if (!values.status) errors.status = 'Le statut est obligatoire';
             if (!values.dueAt) errors.dueAt = 'La date est obligatoire';
             if (!values.type) errors.type = 'Le type est obligatoire';
