@@ -22,6 +22,6 @@ ENV SENTRY_PROJECT=mano
 
 RUN yarn build && node scripts/sentry.js
 
-FROM ghcr.io/socialgouv/docker/nginx4spa:7.0.1
+FROM ghcr.io/socialgouv/docker/nginx4spa:7.3.0
 
 COPY --from=builder /app/build /usr/share/nginx/html
