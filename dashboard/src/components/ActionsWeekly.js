@@ -1,7 +1,7 @@
 import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
-import { Badge, Button } from 'reactstrap';
+import { Button } from 'reactstrap';
 import styled from 'styled-components';
 import { CANCEL, DONE } from '../recoil/actions';
 import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
@@ -142,13 +142,6 @@ function ActionsOfDay({ actions }) {
           )}
           <div>
             <ActionOrConsultationName item={action} />
-            <div>
-              {action.categories?.map((category) => (
-                <Badge style={{ margin: '2px', fontSize: '11px', fontWeight: 'normal', whiteSpace: 'break-spaces' }} color="info" key={category}>
-                  {category}
-                </Badge>
-              ))}
-            </div>
           </div>
           {Boolean(action.withTime) && <div>🕑 {formatTime(action.dueAt)}</div>}
           <div>
