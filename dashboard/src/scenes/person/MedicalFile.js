@@ -681,7 +681,7 @@ export function MedicalFile({ person }) {
           validate={(values) => {
             const errors = {};
             if (!values._id) errors._id = "L'identifiant est obligatoire";
-            if (!values.name) errors.name = 'Le nom est obligatoire';
+            // if (!values.name) errors.name = 'Le nom est obligatoire';
             if (!values.status) errors.status = 'Le statut est obligatoire';
             if (!values.dueAt) errors.dueAt = 'La date est obligatoire';
             if (!values.type) errors.type = 'Le type est obligatoire';
@@ -753,13 +753,13 @@ export function MedicalFile({ person }) {
                     },
                   });
                 }}>
-                {isNewConsultation ? 'Ajouter une consultation' : currentConsultation?.name}
+                {isNewConsultation ? 'Ajouter une consultation' : currentConsultation?.name || `Consultation ${currentConsultation?.type}`}
               </ModalHeader>
               <ModalBody>
                 <Row>
                   <Col md={6}>
                     <FormGroup>
-                      <Label htmlFor="create-consultation-name">Nom</Label>
+                      <Label htmlFor="create-consultation-name">Nom (facultatif)</Label>
                       <Input id="create-consultation-name" name="name" value={values.name} onChange={handleChange} />
                       {touched.name && errors.name && <Error>{errors.name}</Error>}
                     </FormGroup>

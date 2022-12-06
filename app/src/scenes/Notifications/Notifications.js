@@ -43,7 +43,7 @@ export const urgentItemsSelector = selector({
           const id = comment.action;
           const action = actionsObject[id];
           commentPopulated.action = action;
-          if (action.person) commentPopulated.person = persons[action.person];
+          if (action?.person) commentPopulated.person = persons[action?.person];
           commentPopulated.type = 'action';
         }
         return commentPopulated;

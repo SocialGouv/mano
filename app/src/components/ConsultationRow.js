@@ -33,7 +33,7 @@ const ConsultationRow = ({
   const persons = useRecoilValue(personsState);
   const me = useRecoilValue(userState);
 
-  const name = disableConsultationRow(consultation, me) ? '' : consultation.name;
+  const name = disableConsultationRow(consultation, me) ? '' : consultation.name || `Consultation ${consultation.type}`;
   const type = disableConsultationRow(consultation, me) ? '' : consultation.type;
   const status = consultation.status;
   const user = consultation.user;
