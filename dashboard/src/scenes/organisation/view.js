@@ -247,26 +247,31 @@ const View = () => {
                   return (
                     <>
                       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Accueil de jour</h3>
-                      <Row>
-                        <Col md={12}>
-                          <FormGroup>
-                            <Label />
-                            <div className="tw-ml-5 tw-flex tw-w-4/5 tw-flex-col">
-                              <label htmlFor="receptionEnabled">Accueil de jour activé</label>
-                              <Input
-                                type="checkbox"
-                                name="receptionEnabled"
-                                id="receptionEnabled"
-                                checked={values.receptionEnabled || false}
-                                onChange={handleChange}
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={12}>
-                          <ServicesSettings />
-                        </Col>
-                      </Row>
+                      <div className="tw-flex tw-flex-col">
+                        <FormGroup>
+                          <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
+                            <input
+                              type="checkbox"
+                              className="tw-mr-2"
+                              name="receptionEnabled"
+                              id="receptionEnabled"
+                              checked={values.receptionEnabled || false}
+                              onChange={handleChange}
+                            />
+                            <label htmlFor="receptionEnabled">Activer l'accueil de jour</label>
+                          </div>
+                        </FormGroup>
+                        <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                          <ButtonCustom
+                            title={'Mettre à jour'}
+                            disabled={values.receptionEnabled === organisation.receptionEnabled}
+                            loading={isSubmitting}
+                            onClick={handleSubmit}
+                          />
+                        </div>
+                        <hr />
+                        <ServicesSettings />
+                      </div>
                     </>
                   );
                 case 'territories':
