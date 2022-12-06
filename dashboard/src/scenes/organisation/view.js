@@ -323,19 +323,19 @@ const View = () => {
                         <>
                           <h4 className="tw-my-8">Activer la fonctionnalité Liens familiaux</h4>
                           <FormGroup>
-                            <Label />
-                            <div className="tw-ml-5 tw-flex tw-w-4/5 tw-flex-col">
-                              <label htmlFor="groupsEnabled">
-                                Activer la possibilité d'ajouter des liens familiaux entre personnes. Un onglet "Famille" sera rajouté dans les
-                                personnes, et vous pourrez créer des actions, des commentaires et des documents visibles pour toute la famille.
-                              </label>
-                              <Input
+                            <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
+                              <input
                                 type="checkbox"
                                 name="groupsEnabled"
+                                className="tw-mr-2"
                                 id="groupsEnabled"
                                 checked={values.groupsEnabled || false}
                                 onChange={handleChange}
                               />
+                              <label htmlFor="groupsEnabled">
+                                Activer la possibilité d'ajouter des liens familiaux entre personnes. Un onglet "Famille" sera rajouté dans les
+                                personnes, et vous pourrez créer des actions, des commentaires et des documents visibles pour toute la famille.
+                              </label>
                             </div>
                           </FormGroup>
                           <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
