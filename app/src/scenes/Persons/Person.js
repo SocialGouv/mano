@@ -175,6 +175,23 @@ const Person = ({ route, navigation }) => {
   const onDelete = async () => {
     setDeleting(true);
     const personId = personDB._id;
+    if (
+      !user.healthcareProfessional &&
+      (!!medicalFiles.find((c) => c.person === personId) ||
+        !!treatments.find((c) => c.person === personId) ||
+        !!consultations.find((c) => c.person === personId))
+    ) {
+      const keepGoing = await new Promise((res) => {
+        Alert.alert('Voulez-vous continuer la suppression ?', 'Cette personne a peut-être des données médicales, qui seront supprimées aussi', [
+          { text: 'Annuler', style: 'cancel', onPress: () => res(false) },
+          { text: 'Continuer', style: 'destructive', onPress: () => res(true) },
+        ]);
+      });
+      if (!keepGoing) {
+        setDeleting(false);
+        return false;
+      }
+    }
     const res = await API.delete({ path: `/person/${personId}` });
     if (res.error) {
       if (res.error === 'Not Found') {

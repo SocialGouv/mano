@@ -13,6 +13,7 @@ import { relsPersonPlaceState } from '../../../recoil/relPersonPlace';
 import { medicalFileState } from '../../../recoil/medicalFiles';
 import { consultationsState } from '../../../recoil/consultations';
 import { treatmentsState } from '../../../recoil/treatments';
+import { userState } from '../../../recoil/auth';
 
 const DeletePersonButton = ({ person }) => {
   const API = useApi();
@@ -26,6 +27,7 @@ const DeletePersonButton = ({ person }) => {
   const [treatments, setTreatments] = useRecoilState(treatmentsState);
   const [medicalFiles, setMedicalFiles] = useRecoilState(medicalFileState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+  const user = useRecoilState(userState);
   const history = useHistory();
 
   return (
@@ -35,6 +37,17 @@ const DeletePersonButton = ({ person }) => {
       roles={['normal', 'admin', 'superadmin']}
       roleErrorMessage="Désolé, seules les personnes autorisées peuvent supprimer des personnes"
       onConfirm={async () => {
+        if (
+          !user.healthcareProfessional &&
+          (!!medicalFiles.find((c) => c.person === person._id) ||
+            !!treatments.find((c) => c.person === person._id) ||
+            !!consultations.find((c) => c.person === person._id))
+        ) {
+          if (
+            !window.confirm('Cette personne a peut-être des données médicales, qui seront supprimées aussi. Voulez-vous continuer la suppression ?')
+          )
+            return;
+        }
         const personRes = await API.delete({ path: `/person/${person._id}` });
         if (personRes.ok) {
           setPersons((persons) => persons.filter((p) => p._id !== person._id));

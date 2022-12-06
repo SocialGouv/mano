@@ -219,6 +219,11 @@ test("test", async ({ page }) => {
   await page.getByRole("button", { name: "Supprimer" }).click();
 
   await page.locator('input[name="textToConfirm"]').fill(personName);
+
+  page.on("dialog", async (dialog) => {
+    await dialog.accept();
+  });
+
   await page
     .locator(`div[role="document"]:has-text("Voulez-vous vraiment supprimer la personne ${personName}×Cette opération")`)
     .getByRole("button", { name: "Supprimer" })
