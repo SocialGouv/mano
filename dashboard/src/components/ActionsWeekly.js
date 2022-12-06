@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
 import { useLocalStorage } from 'react-use';
 import { Button } from 'reactstrap';
-import styled from 'styled-components';
+import { useRecoilValue } from 'recoil';
 import { CANCEL, DONE } from '../recoil/actions';
 import { dayjsInstance, formatTime, isOnSameDay } from '../services/date';
 import ActionOrConsultationName from './ActionOrConsultationName';
@@ -10,7 +10,7 @@ import ActionStatus from './ActionStatus';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import PersonName from './PersonName';
 import { organisationState } from '../recoil/auth';
-import { useRecoilValue } from 'recoil';
+import TagTeam from './TagTeam';
 
 // TODO: remove inline style when UI is stabilized.
 
@@ -32,11 +32,11 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
 
   return (
     <div>
-      <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem', marginBottom: '1rem', alignItems: 'center' }}>
+      <div className="tw-mb-4 tw-flex tw-flex-row tw-items-center tw-gap-8">
         <Button color="secondary" outline={true} onClick={() => setStartOfWeek(dayjsInstance().startOf('week'))}>
           Aujourd'hui
         </Button>
-        <div style={{ display: 'flex', flexDirection: 'row', gap: '0.2rem' }}>
+        <div className="tw-flex tw-flex-row tw-gap-1">
           <Button size="sm" color="secondary" outline={true} onClick={() => setStartOfWeek(startOfWeek.subtract(1, 'week').startOf('week'))}>
             &lt;
           </Button>
@@ -46,45 +46,39 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
         </div>
         <div style={{ textTransform: 'capitalize' }}>{startOfWeek.format('MMMM YYYY')}</div>
       </div>
-      <WeekContainer>
+      <div className="tw-grid tw-w-full tw-auto-rows-fr tw-grid-cols-7 tw-gap-x-2 tw-gap-y-0">
         {[...Array(7)].map((_, index) => {
           const day = startOfWeek.add(index, 'day');
           const isToday = day.isSame(dayjsInstance(), 'day');
           return (
             <div key={day.format('YYYY-MM-DD')}>
-              <div style={{ textAlign: 'center', marginTop: '5px', marginBottom: '5px' }}>
-                <div style={{ fontSize: '11px', ...(isToday ? { color: '#1a73e8' } : {}) }}>{day.format('ddd')}</div>
+              <div className="tw-my-1.5 tw-text-center">
+                <div className={['tw-text-xs', isToday ? 'tw-text-[#1a73e8]' : ''].join(' ')}>{day.format('ddd')}</div>
                 <div
-                  style={{
-                    fontSize: '20px',
-                    marginTop: '5px',
-                    ...(isToday
-                      ? {
-                          backgroundColor: '#1a73e8',
-                          borderRadius: '50%',
-                          width: '36px',
-                          height: '36px',
-                          margin: '2px auto auto',
-                          color: 'white',
-                          lineHeight: '36px',
-                        }
-                      : {}),
-                  }}>
+                  className={[
+                    'tw-mx-auto tw-mt-1 tw-h-9 tw-w-9 tw-text-xl tw-leading-9',
+                    isToday ? 'tw-rounded-full tw-bg-[#1a73e8] tw-text-white' : '',
+                  ].join(' ')}>
                   {day.format('D')}
                 </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginBottom: '1rem' }}>
+              <div className="tw-mb-4 tw-flex tw-flex-col tw-gap-0.5">
                 <ActionsOfDay
                   actions={actionsInWeek.filter((action) =>
                     isOnSameDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt, day)
                   )}
                 />
-                <ButtonAddAction onClick={() => onCreateAction(day.toDate())}>+ ajouter une action</ButtonAddAction>
+                <button
+                  type="button"
+                  className="tw-my-0 tw-mx-auto tw-text-xs tw-text-neutral-400 tw-no-underline hover:tw-text-zinc-500 hover:tw-underline"
+                  onClick={() => onCreateAction(day.toDate())}>
+                  + ajouter une action
+                </button>
               </div>
             </div>
           );
         })}
-      </WeekContainer>
+      </div>
     </div>
   );
 }
@@ -117,32 +111,26 @@ function ActionsOfDay({ actions }) {
               history.push(`/action/${action._id}`);
             }
           }}
-          style={{
-            border: '1px solid #ccc',
-            backgroundColor: Boolean(action.isConsultation) ? '#DDF4FF' : Boolean(action.urgent) ? '#fecaca' : '#fafafa',
-            borderRadius: '3px',
-            padding: '3px',
-            fontSize: '12px',
-            gap: '0.5rem',
-            display: 'flex',
-            flexDirection: 'column',
-            cursor: 'pointer',
-          }}>
+          className={[
+            Boolean(action.isConsultation) ? 'tw-bg-[#DDF4FF]' : Boolean(action.urgent) ? 'tw-bg-[#fecaca]' : 'tw-bg-[#fafafa]',
+            'tw-flex tw-cursor-pointer tw-flex-col tw-gap-2 tw-rounded-sm tw-border tw-border-gray-300 tw-p-1 tw-text-xs',
+          ].join(' ')}>
           {(Boolean(action.isConsultation) || Boolean(action.urgent)) && (
             <div>
               {Boolean(action.urgent) && (
-                <div style={{ display: 'flex', flexDirection: 'row', fontWeight: 'bold', color: '#dc2626', alignItems: 'center', gap: '10px' }}>
+                <div className="tw-flex tw-flex-row tw-items-center tw-gap-2.5 tw-font-bold tw-text-[#dc2626]">
                   <ExclamationMarkButton />
                   Urgent
                 </div>
               )}
               {Boolean(action.isConsultation) && (
-                <div style={{ display: 'flex', flexDirection: 'row', fontWeight: 'bold', color: '#43738b' }}>
+                <div className="tw-flex tw-flex-row tw-items-center tw-font-bold tw-text-[#43738b]">
                   <i>🩺 Consultation</i>
                 </div>
               )}
             </div>
           )}
+          <TagTeam teamId={action.team} />
           <div>
             <ActionOrConsultationName item={action} />
           </div>
@@ -157,24 +145,3 @@ function ActionsOfDay({ actions }) {
     </>
   );
 }
-
-const ButtonAddAction = styled.button`
-  all: unset;
-  margin: 0 auto;
-  cursor: pointer;
-  color: #aaa;
-  font-size: 11px;
-  &:hover {
-    color: #888;
-    text-decoration: underline;
-  }
-`;
-
-const WeekContainer = styled.div`
-  display: grid;
-  width: 100%;
-  grid-template-columns: repeat(7, 1fr);
-  grid-template-rows: 1fr;
-  grid-column-gap: 7px;
-  grid-row-gap: 0px;
-`;

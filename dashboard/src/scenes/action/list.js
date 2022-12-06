@@ -50,7 +50,7 @@ const actionsByTeamAndStatusSelector = selectorFamily({
       const actions = get(arrayOfitemsGroupedByActionSelector);
       const actionsByTeamAndStatus = actions.filter(
         (action) =>
-          (viewAllOrganisationData || teamIds.includes(action.team)) &&
+          (viewAllOrganisationData || !teamIds.length || teamIds.includes(action.team)) &&
           (!statuses.length || statuses.includes(action.status)) &&
           (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
       );
@@ -322,7 +322,11 @@ const List = () => {
               {
                 title: 'Équipe en charge',
                 dataKey: 'team',
-                render: (a) => <TagTeam teamId={a?.team} />,
+                render: (a) => (
+                  <div className="px-2 tw-flex-shrink-0">
+                    <TagTeam teamId={a?.team} />
+                  </div>
+                ),
               },
             ]}
           />

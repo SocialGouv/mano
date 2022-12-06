@@ -10,7 +10,7 @@ test.beforeAll(async () => {
 test("Create action with comments", async ({ page }) => {
   const person1Name = nanoid();
   const person2Name = nanoid();
-  // const person2Name = "person 2";
+  const actionFor2PersonName = nanoid();
 
   await loginWith(page, "admin7@example.org");
 
@@ -58,7 +58,7 @@ test("Create action with comments", async ({ page }) => {
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
   await page.getByRole("button", { name: "Créer une nouvelle action" }).click();
   await page.getByLabel("Nom de l'action").click();
-  await page.getByLabel("Nom de l'action").fill("Action sur deux personnes");
+  await page.getByLabel("Nom de l'action").fill(actionFor2PersonName);
   await changeReactSelectValue(page, "create-action-person-select", person1Name);
   await changeReactSelectValue(page, "create-action-person-select", person2Name);
   await page.getByLabel("Commentaire (optionnel)").fill("Un commentaire pour tout le monde");
@@ -67,7 +67,7 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByText(person2Name).first().click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
-  await page.getByText("Action sur deux personnes").click();
+  await page.getByText(actionFor2PersonName).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
   await page.getByText("Un commentaire pour tout le monde").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
@@ -75,14 +75,9 @@ test("Create action with comments", async ({ page }) => {
 
   await page.getByRole("link", { name: "Agenda" }).click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
-  await page
-    .getByRole("row", {
-      name: "Action sur deux personnes " + person1Name + " A FAIRE",
-    })
-    .getByText(person1Name)
-    .click();
+  await page.locator(`data-test-id=${actionFor2PersonName}`).getByText(person1Name).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/person\/.*/);
-  await page.getByText("Action sur deux personnes").click();
+  await page.getByText(actionFor2PersonName).click();
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
   await page.getByText("Un commentaire pour tout le monde").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();

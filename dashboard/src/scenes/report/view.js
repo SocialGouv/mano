@@ -877,7 +877,11 @@ const ActionCompletedAt = ({ date, status, actions }) => {
             {
               title: 'Équipe en charge',
               dataKey: 'team',
-              render: (action) => <TagTeam teamId={action?.team} />,
+              render: (action) => (
+                <div className="px-2 tw-flex-shrink-0">
+                  <TagTeam teamId={action?.team} />
+                </div>
+              ),
             },
           ]}
         />
