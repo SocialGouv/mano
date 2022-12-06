@@ -72,7 +72,6 @@ test("test", async ({ page }) => {
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").click();
   await page.locator("details[data-group='Le deux']").getByPlaceholder("Ajouter un service").fill("test 12ED");
   await page.locator("details[data-group='Le deux']").getByRole("button", { name: "Ajouter" }).click();
-  await page.locator('div[role="alert"]:has-text("Groupe ajouté")').click();
   await page.getByRole("button", { name: "Ajouter un groupe" }).click();
   await page.getByPlaceholder("Injection").fill("Trois");
   await page.getByRole("dialog", { name: "Ajouter un groupe de services" }).getByRole("button", { name: "Ajouter" }).click();
