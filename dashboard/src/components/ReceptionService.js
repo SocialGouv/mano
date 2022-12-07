@@ -105,8 +105,9 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
   return (
     <div>
       <div className="tw-mb-4 tw-border-b tw-border-slate-300">
-        {groupedServices.map((group) => (
+        {groupedServices.map((group, index) => (
           <button
+            key={group + index}
             className={
               selected === group.groupTitle
                 ? 'tw-mb-[-1px] tw-rounded-t tw-border tw-border-slate-300 tw-border-b-[#f8f8f8] tw-px-4 tw-py-2'
