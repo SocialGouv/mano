@@ -1,5 +1,7 @@
 fileignoreconfig:
 - filename: dashboard/src/components/TextChecker.js
   checksum: bbb3aa8ca24814c3133f1cd61ef107e88b253369ad4b88760dbee3d3e100a06a
+- filename: dashboard/yarn.lock
+  checksum: 4a161a074e61c724aadd42e5283e7539cb5c55d2bc9c92abafb760680d634733
 threshold: high
 version: "1.0"

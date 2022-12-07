@@ -12,6 +12,7 @@ import SelectCustom from './SelectCustom';
 import Table from './table';
 import DeleteButtonAndConfirmModal from './DeleteButtonAndConfirmModal';
 import TableCustomFieldteamSelector from './TableCustomFieldTeamSelector';
+import SelectDraggable from './SelectDraggable';
 
 const newField = () => ({
   // Todo: I guess could use crypto here.
@@ -256,15 +257,14 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
                       {!!['enum', 'multi-choice'].includes(field.type) && (
                         <FormGroup>
                           <Label htmlFor="options">Choix</Label>
-                          <SelectCustom
+                          <SelectDraggable
                             inputId="options"
                             classNamePrefix="options"
                             creatable
                             options={[...(editingField?.options || field?.options || [])]
-                              .sort((c1, c2) => c1.localeCompare(c2))
+                              .sort((c1, c2) => c1?.localeCompare(c2))
                               .map((opt) => ({ value: opt, label: opt }))}
                             value={(field.options || []).map((opt) => ({ value: opt, label: opt }))}
-                            isMulti
                             onChange={(v) => handleChange({ currentTarget: { value: v.map((v) => v.value), name: 'options' } })}
                           />
                         </FormGroup>
