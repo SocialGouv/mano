@@ -20,12 +20,8 @@ const List = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
   const allTeamIds = useMemo(() => teams.map((t) => t._id), [teams]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1, {
-    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
-  });
-  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id], {
-    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
-  });
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
+  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
   const reports = useRecoilValue(selectedTeamsReportsSelector({ teamIds: viewAllOrganisationData ? allTeamIds : selectedTeamIds }));
 
   const history = useHistory();

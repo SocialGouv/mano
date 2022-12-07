@@ -116,7 +116,7 @@ test("test", async ({ page }) => {
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
 
   await page.locator(".action-select-status-filter__multi-value__remove").click();
-  await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2&statuses=%5B%5D");
+  await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
 
   await clickOnEmptyReactSelect(page, "action-select-status-filter", "FAITE");
 

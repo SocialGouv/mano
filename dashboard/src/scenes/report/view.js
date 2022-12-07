@@ -71,12 +71,8 @@ const View = () => {
   const allComments = useRecoilValue(commentsState);
   const allPersons = useRecoilValue(personsState);
   const teams = useRecoilValue(teamsState);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1, {
-    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
-  });
-  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id], {
-    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
-  });
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
+  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
 
   const selectedTeams = useMemo(
     () => (viewAllOrganisationData ? teams : teams.filter((team) => selectedTeamIds.includes(team._id))),
@@ -413,7 +409,10 @@ const View = () => {
               <SelectTeamMultiple
                 inputId="report-select-teams"
                 classNamePrefix="report-select-teams"
-                onChange={setSelectedTeamIds}
+                onChange={(teamIds) => {
+                  console.log({ teamIds });
+                  setSelectedTeamIds(teamIds);
+                }}
                 value={selectedTeamIds}
                 key={selectedTeamIds}
                 colored
@@ -454,7 +453,7 @@ const View = () => {
         className="noprint"
         style={{
           height: '100%',
-          display: selectedTeamIds.length ? 'flex' : 'none',
+          display: viewAllOrganisationData || selectedTeamIds.length ? 'flex' : 'none',
           overflow: 'hidden',
           flex: 1,
           marginTop: '1rem',
