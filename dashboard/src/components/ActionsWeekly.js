@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useHistory } from 'react-router-dom';
-import { useLocalStorage } from 'react-use';
 import { Button } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import { CANCEL, DONE } from '../recoil/actions';
@@ -11,21 +10,18 @@ import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import PersonName from './PersonName';
 import { organisationState } from '../recoil/auth';
 import TagTeam from './TagTeam';
+import useSearchParamState from '../services/useSearchParamState';
 
 // TODO: remove inline style when UI is stabilized.
 
 export default function ActionsWeekly({ actions, onCreateAction }) {
-  const [startOfWeek, setStartOfWeek] = useLocalStorage('startOfWeek', dayjsInstance().startOf('week'), {
-    raw: false,
-    deserializer: (v) => dayjsInstance(v),
-    serializer: (v) => v.toISOString(),
-  });
+  const [startOfWeek, setStartOfWeek] = useSearchParamState('startOfWeek', dayjsInstance().startOf('week').format('YYYY-MM-DD'));
 
   const actionsInWeek = useMemo(() => {
     return actions.filter((action) =>
       dayjsInstance([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt).isBetween(
-        startOfWeek,
-        startOfWeek.add(7, 'day').endOf('day')
+        dayjsInstance(startOfWeek),
+        dayjsInstance(startOfWeek).add(7, 'day').endOf('day')
       )
     );
   }, [actions, startOfWeek]);
@@ -33,22 +29,30 @@ export default function ActionsWeekly({ actions, onCreateAction }) {
   return (
     <div>
       <div className="tw-mb-4 tw-flex tw-flex-row tw-items-center tw-gap-8">
-        <Button color="secondary" outline={true} onClick={() => setStartOfWeek(dayjsInstance().startOf('week'))}>
+        <Button color="secondary" outline={true} onClick={() => setStartOfWeek(dayjsInstance().startOf('week').format('YYYY-MM-DD'))}>
           Aujourd'hui
         </Button>
         <div className="tw-flex tw-flex-row tw-gap-1">
-          <Button size="sm" color="secondary" outline={true} onClick={() => setStartOfWeek(startOfWeek.subtract(1, 'week').startOf('week'))}>
+          <Button
+            size="sm"
+            color="secondary"
+            outline={true}
+            onClick={() => setStartOfWeek(dayjsInstance(startOfWeek).subtract(1, 'week').startOf('week').format('YYYY-MM-DD'))}>
             &lt;
           </Button>
-          <Button size="sm" color="secondary" outline={true} onClick={() => setStartOfWeek(startOfWeek.add(1, 'week').startOf('week'))}>
+          <Button
+            size="sm"
+            color="secondary"
+            outline={true}
+            onClick={() => setStartOfWeek(dayjsInstance(startOfWeek).add(1, 'week').startOf('week').format('YYYY-MM-DD'))}>
             &gt;
           </Button>
         </div>
-        <div style={{ textTransform: 'capitalize' }}>{startOfWeek.format('MMMM YYYY')}</div>
+        <div style={{ textTransform: 'capitalize' }}>{dayjsInstance(startOfWeek).format('MMMM YYYY')}</div>
       </div>
       <div className="tw-grid tw-w-full tw-auto-rows-fr tw-grid-cols-7 tw-gap-x-2 tw-gap-y-0">
         {[...Array(7)].map((_, index) => {
-          const day = startOfWeek.add(index, 'day');
+          const day = dayjsInstance(startOfWeek).add(index, 'day');
           const isToday = day.isSame(dayjsInstance(), 'day');
           return (
             <div key={day.format('YYYY-MM-DD')}>

@@ -173,7 +173,7 @@ test("Cross teams report", async ({ page }) => {
   await test.step("should be able to go to report from reception and see activity of team 1", async () => {
     await changeReactSelectValue(page, "team-selector-topBar", team1Name);
     await page.getByRole("button", { name: "Modifier les passages" }).click();
-    await expect(page).toHaveURL(`http://localhost:8090/report/${dayjs().format("YYYY-MM-DD")}?tab=6`);
+    await expect(page).toHaveURL(`http://localhost:8090/report/${dayjs().format("YYYY-MM-DD")}?tab=passages`);
     await page.getByText("Passages (2)").click();
     await page.getByText("Actions créées (1)").click();
     await expect(page.locator(`data-test-id=${person1action}`)).toBeVisible();

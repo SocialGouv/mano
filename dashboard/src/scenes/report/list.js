@@ -20,10 +20,10 @@ const List = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const teams = useRecoilValue(teamsState);
   const allTeamIds = useMemo(() => teams.map((t) => t._id), [teams]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrgData', teams.length === 1, {
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1, {
     resetToDefaultIfTheFollowingValueChange: currentTeam._id,
   });
-  const [selectedTeamIds, setSelectedTeamIds] = useSearchParamState('reportsTeams', [currentTeam._id], {
+  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id], {
     resetToDefaultIfTheFollowingValueChange: currentTeam._id,
   });
   const reports = useRecoilValue(selectedTeamsReportsSelector({ teamIds: viewAllOrganisationData ? allTeamIds : selectedTeamIds }));
@@ -37,11 +37,7 @@ const List = () => {
     history.push(`/report/${dateString}?${searchParams.toString()}`);
   };
 
-  const [startOfMonth, setStartOfMonth] = useLocalStorage('startOfMonth', dayjsInstance().startOf('month'), {
-    raw: false,
-    deserializer: (v) => dayjsInstance(v),
-    serializer: (v) => v.toISOString(),
-  });
+  const [startOfMonth, setStartOfMonth] = useSearchParamState('startOfMonth', dayjsInstance().startOf('month').format('YYYY-MM-DD'));
   const endOfMonth = useMemo(() => dayjsInstance(startOfMonth).endOf('month'), [startOfMonth]);
   const firstDayToShow = useMemo(() => dayjsInstance(startOfMonth).startOf('week'), [startOfMonth]);
   const lastDayToShow = useMemo(() => dayjsInstance(endOfMonth).endOf('week'), [endOfMonth]);
@@ -93,18 +89,26 @@ const List = () => {
       </HeaderStyled>
       <div style={{ width: '100%' }}>
         <div style={{ display: 'flex', flexDirection: 'row', gap: '2rem', marginBottom: '1rem', alignItems: 'center' }}>
-          <Button color="secondary" outline={true} onClick={() => setStartOfMonth(dayjsInstance().startOf('month'))}>
+          <Button color="secondary" outline={true} onClick={() => setStartOfMonth(dayjsInstance().startOf('month').format('YYYY-MM-DD'))}>
             Aujourd'hui
           </Button>
           <div style={{ display: 'flex', flexDirection: 'row', gap: '0.2rem' }}>
-            <Button size="sm" color="secondary" outline={true} onClick={() => setStartOfMonth(startOfMonth.subtract(1, 'month').startOf('month'))}>
+            <Button
+              size="sm"
+              color="secondary"
+              outline={true}
+              onClick={() => setStartOfMonth(dayjsInstance(startOfMonth).subtract(1, 'month').startOf('month').format('YYYY-MM-DD'))}>
               &lt;
             </Button>
-            <Button size="sm" color="secondary" outline={true} onClick={() => setStartOfMonth(startOfMonth.add(1, 'month').startOf('month'))}>
+            <Button
+              size="sm"
+              color="secondary"
+              outline={true}
+              onClick={() => setStartOfMonth(dayjsInstance(startOfMonth).add(1, 'month').startOf('month').format('YYYY-MM-DD'))}>
               &gt;
             </Button>
           </div>
-          <div style={{ textTransform: 'capitalize' }}>{startOfMonth.format('MMMM YYYY')}</div>
+          <div style={{ textTransform: 'capitalize' }}>{dayjsInstance(startOfMonth).format('MMMM YYYY')}</div>
         </div>
         <WeekContainer>
           {[...Array(7)].map((_, index) => {
@@ -121,7 +125,7 @@ const List = () => {
             {[...Array(7)].map((_, index) => {
               const day = firstDay.add(index, 'day');
               const isToday = day.isSame(dayjsInstance(), 'day');
-              const isOutOfMonth = !day.isSame(startOfMonth, 'month');
+              const isOutOfMonth = !day.isSame(dayjsInstance(startOfMonth), 'month');
               const dateString = day.format('YYYY-MM-DD');
               const report = reports.find((rep) => rep.date === dateString);
               return (

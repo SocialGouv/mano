@@ -32,7 +32,7 @@ const populatedPersonSelector = selectorFamily({
     },
 });
 
-export default function View() {
+export default function NewView() {
   const { personId } = useParams();
   const location = useLocation();
   const API = useApi();

@@ -28,6 +28,7 @@ import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
+import { useLocalStorage } from 'react-use';
 
 const limit = 20;
 
@@ -114,10 +115,10 @@ const List = () => {
   const filterPersonsWithAllFields = useRecoilValue(filterPersonsWithAllFieldsSelector);
 
   const [search, setSearch] = useSearchParamState('search', '');
-  const [alertness, setFilterAlertness] = useSearchParamState('alertness', false);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrganisationData', []);
-  const [filterTeams, setFilterTeams] = useSearchParamState('filterTeams', []);
-  const [filters, setFilters] = useSearchParamState('filters', []);
+  const [alertness, setFilterAlertness] = useLocalStorage('person-alertness', false);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('person-allOrg', false);
+  const [filterTeams, setFilterTeams] = useLocalStorage('person-teams', []);
+  const [filters, setFilters] = useLocalStorage('person-filters', []);
   const [page, setPage] = useSearchParamState('page', 0);
   const currentTeam = useRecoilValue(currentTeamState);
 

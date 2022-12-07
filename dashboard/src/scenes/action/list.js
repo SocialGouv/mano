@@ -126,13 +126,13 @@ const List = () => {
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [page, setPage] = useSearchParamState('page', 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
-  const [categories, setCategories] = useSearchParamState('categories', []);
-  const [statuses, setStatuses] = useSearchParamState('statuses', [TODO]);
-  const [selectedTeamIds, setSelectedTeamIds] = useSearchParamState('teams', [currentTeam._id]);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('allOrg', false);
+  const [categories, setCategories] = useLocalStorage('action-categories', []);
+  const [statuses, setStatuses] = useLocalStorage('action-statuses', [TODO]);
+  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('action-teams', [currentTeam._id]);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('action-allOrg', false);
 
   const [actionDate, setActionDate] = useState(new Date());
-  const [showAs, setShowAs] = useLocalStorage('showAs', showAsOptions[0]); // calendar, list
+  const [showAs, setShowAs] = useLocalStorage('action-showAs', showAsOptions[0]); // calendar, list
 
   const dataConsolidated = useRecoilValue(
     dataFilteredBySearchSelector({ search, statuses, categories, teamIds: selectedTeamIds, viewAllOrganisationData })

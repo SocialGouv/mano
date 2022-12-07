@@ -140,7 +140,7 @@ const Comments = ({ setShowModal, comments }) => {
           rowKey={'_id'}
           onRowClick={(comment) => {
             setShowModal(false);
-            history.push(`/${comment.type}/${comment[comment.type]._id}?tab=commentaires`);
+            history.push(`/${comment.type}/${comment[comment.type]._id}?tab=Résumé`);
           }}
           columns={[
             {
