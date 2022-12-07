@@ -1,1 +1,5 @@
+fileignoreconfig:
+- filename: dashboard/yarn.lock
+  checksum: 4ac3a690937e16370bdfa124fbffb82650f4a69b07c9255687e878cda7a42592
 threshold: high
+version: "1.0"
