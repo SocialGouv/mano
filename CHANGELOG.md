@@ -1,3 +1,10 @@
+## [1.185.4](https://github.com/SocialGouv/mano/compare/v1.185.3...v1.185.4) (2022-12-08)
+
+
+### Bug Fixes
+
+* add date and team in decrypted report ([#1026](https://github.com/SocialGouv/mano/issues/1026)) ([66d1348](https://github.com/SocialGouv/mano/commit/66d1348fb883cc209f17f6176da36e451e3f9ee0))
+
 ## [1.185.3](https://github.com/SocialGouv/mano/compare/v1.185.2...v1.185.3) (2022-12-06)
 
 
