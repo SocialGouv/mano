@@ -16,26 +16,24 @@ import {
   healthInsuranceOptions,
 } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
-import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
 import SelectAsInput from '../../components/SelectAsInput';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import Table from '../../components/table';
-import SelectStatus from '../../components/SelectStatus';
 import ActionStatus from '../../components/ActionStatus';
 import SelectCustom from '../../components/SelectCustom';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import DateBloc from '../../components/DateBloc';
-import useSearchParamState from '../../services/useSearchParamState';
-import { mappedIdsToLabels, DONE, CANCEL, TODO } from '../../recoil/actions';
+import { mappedIdsToLabels, DONE, CANCEL } from '../../recoil/actions';
 import Documents from '../../components/Documents';
-import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../../recoil/consultations';
+import { consultationsState } from '../../recoil/consultations';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
 import { medicalFileState, prepareMedicalFileForEncryption, customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { modalConfirmState } from '../../components/ModalConfirm';
-import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import { useLocalStorage } from 'react-use';
+import ConsultationModal from '../../components/ConsultationModal';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -46,12 +44,9 @@ export function MedicalFile({ person }) {
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const team = useRecoilValue(currentTeamState);
 
-  const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null);
-  const [currentConsultation, setCurrentConsultation] = useState(
-    !currentConsultationId ? null : allConsultations?.find((c) => c._id === currentConsultationId)
-  );
-  const [showAddConsultation, setShowAddConsultation] = useState(!!currentConsultation);
-  const [isNewConsultation, setIsNewConsultation] = useState(false);
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+  const [consultation, setConsultation] = useState(null);
+
   const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
   const [consultationStatuses, setConsultationStatuses] = useLocalStorage('consultation-statuses', []);
 
@@ -66,20 +61,6 @@ export function MedicalFile({ person }) {
   const user = useRecoilValue(userState);
   const users = useRecoilValue(usersState);
   const API = useApi();
-  const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
-
-  const loadConsultation = (consultation) => {
-    setShowAddConsultation(true);
-    setIsNewConsultation(false);
-    setCurrentConsultation(consultation);
-    setCurrentConsultationId(consultation._id);
-  };
-
-  const resetCurrentConsultation = () => {
-    setIsNewConsultation(false);
-    setCurrentConsultationId(null);
-    setShowAddConsultation(false);
-  };
 
   const loadTreatment = (treatment) => {
     setShowAddTreatment(true);
@@ -429,24 +410,10 @@ export function MedicalFile({ person }) {
           <ButtonCustom
             icon={false}
             disabled={false}
+            ariaLabel="Ajouter une consultation"
             onClick={() => {
-              setShowAddConsultation(true);
-              setIsNewConsultation(true);
-              const _id = uuidv4();
-              setCurrentConsultationId(_id);
-              setCurrentConsultation({
-                _id,
-                dueAt: new Date(),
-                completedAt: null,
-                name: '',
-                type: '',
-                status: TODO,
-                user: user._id,
-                person: person._id,
-                organisation: organisation._id,
-                onlyVisibleBy: [],
-                createdAt: new Date(),
-              });
+              setConsultation(null);
+              setShowConsultationModal(true);
             }}
             color="primary"
             title={'🩺\u00A0\u00A0Ajouter une consultation'}
@@ -548,7 +515,10 @@ export function MedicalFile({ person }) {
         className="noprint"
         data={consultations}
         rowKey={'_id'}
-        onRowClick={loadConsultation}
+        onRowClick={(item) => {
+          setConsultation(item);
+          setShowConsultationModal(true);
+        }}
         columns={[
           {
             title: 'Date',
@@ -611,7 +581,10 @@ export function MedicalFile({ person }) {
         person={person}
         onRowClick={(document) => {
           if (document.type === 'treatment') loadTreatment(document.treatment);
-          if (document.type === 'consultation') loadConsultation(document.consultation);
+          if (document.type === 'consultation') {
+            setConsultation(document.consultation);
+            setShowConsultationModal(true);
+          }
           return null;
         }}
         additionalColumns={[
@@ -675,214 +648,6 @@ export function MedicalFile({ person }) {
         }}
       />
       <div style={{ height: '50vh' }} className="noprint" />
-      <Modal keyboard={false} isOpen={showAddConsultation} toggle={resetCurrentConsultation} size="lg" backdrop="static">
-        <Formik
-          enableReinitialize
-          initialValues={currentConsultation}
-          validate={(values) => {
-            const errors = {};
-            if (!values._id) errors._id = "L'identifiant est obligatoire";
-            if (!values.status) errors.status = 'Le statut est obligatoire';
-            if (!values.dueAt) errors.dueAt = 'La date est obligatoire';
-            if (!values.type) errors.type = 'Le type est obligatoire';
-            return errors;
-          }}
-          onSubmit={async (values) => {
-            if ([DONE, CANCEL].includes(values.status)) {
-              if (!currentConsultation.completedAt) values.completedAt = new Date();
-            } else {
-              values.completedAt = null;
-            }
-            const consultationResponse = isNewConsultation
-              ? await API.post({
-                  path: '/consultation',
-                  body: prepareConsultationForEncryption(organisation.consultations)(values),
-                })
-              : await API.put({
-                  path: `/consultation/${currentConsultation._id}`,
-                  body: prepareConsultationForEncryption(organisation.consultations)(values),
-                });
-            if (!consultationResponse.ok) return;
-            const consult = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
-            if (isNewConsultation) {
-              setAllConsultations((all) => [...all, consult].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt)));
-            } else {
-              setAllConsultations((all) =>
-                all
-                  .map((c) => {
-                    if (c._id === currentConsultation._id) return consult;
-                    return c;
-                  })
-                  .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
-              );
-            }
-            const { createdAt, completedAt } = consultationResponse.decryptedData;
-            await createReportAtDateIfNotExist(createdAt);
-            if (!!completedAt) {
-              if (dayjsInstance(completedAt).format('YYYY-MM-DD') !== dayjsInstance(createdAt).format('YYYY-MM-DD')) {
-                await createReportAtDateIfNotExist(completedAt);
-              }
-            }
-            resetCurrentConsultation();
-          }}>
-          {({ values, handleChange, handleSubmit, isSubmitting, touched, errors }) => (
-            <React.Fragment>
-              <ModalHeader
-                closeAriaLabel="Fermer la fenêtre de modification de la consultation"
-                toggle={async () => {
-                  if (JSON.stringify(values) === JSON.stringify(currentConsultation)) return resetCurrentConsultation();
-                  setModalConfirmState({
-                    open: true,
-                    options: {
-                      title: 'Voulez-vous enregistrer vos modifications ?',
-                      buttons: [
-                        {
-                          text: 'Annuler',
-                          style: 'cancel',
-                        },
-                        {
-                          text: 'Non',
-                          style: 'danger',
-                          onClick: resetCurrentConsultation,
-                        },
-                        {
-                          text: 'Oui',
-                          onClick: handleSubmit,
-                        },
-                      ],
-                    },
-                  });
-                }}>
-                {isNewConsultation ? 'Ajouter une consultation' : currentConsultation?.name || `Consultation ${currentConsultation?.type}`}
-              </ModalHeader>
-              <ModalBody>
-                <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="create-consultation-name">Nom (facultatif)</Label>
-                      <Input id="create-consultation-name" name="name" value={values.name} onChange={handleChange} />
-                      {touched.name && errors.name && <Error>{errors.name}</Error>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="type">Type</Label>
-                      <SelectAsInput
-                        id="type"
-                        name="type"
-                        inputId="consultation-modal-type"
-                        classNamePrefix="consultation-modal-type"
-                        value={values.type || ''}
-                        onChange={handleChange}
-                        placeholder="-- Choisissez le type de consultation --"
-                        options={organisation.consultations.map((e) => e.name)}
-                      />
-                      {touched.type && errors.type && <Error>{errors.type}</Error>}
-                    </FormGroup>
-                  </Col>
-                  {organisation.consultations
-                    .find((e) => e.name === values.type)
-                    ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                    .map((field) => {
-                      return (
-                        <CustomFieldInput colWidth={6} model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                      );
-                    })}
-
-                  <Col md={6}>
-                    <Label htmlFor="new-consultation-select-status">Statut</Label>
-                    <SelectStatus
-                      name="status"
-                      value={values.status || ''}
-                      onChange={handleChange}
-                      inputId="new-consultation-select-status"
-                      classNamePrefix="new-consultation-select-status"
-                    />
-                    {touched.status && errors.status && <Error>{errors.status}</Error>}
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="create-consultation-dueat">Date</Label>
-                      <div>
-                        <DatePicker
-                          locale="fr"
-                          className="form-control"
-                          id="create-consultation-dueat"
-                          selected={dateForDatePicker(values.dueAt)}
-                          onChange={(dueAt) => handleChange({ target: { value: dueAt, name: 'dueAt' } })}
-                          timeInputLabel="Heure :"
-                          dateFormat={'dd/MM/yyyy HH:mm'}
-                          showTimeInput
-                        />
-                      </div>
-                      {touched.dueAt && errors.dueAt && <Error>{errors.dueAt}</Error>}
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <FormGroup>
-                      <Label htmlFor="create-consultation-onlyme">
-                        <input
-                          type="checkbox"
-                          id="create-consultation-onlyme"
-                          style={{ marginRight: '0.5rem' }}
-                          name="onlyVisibleByCreator"
-                          checked={values.onlyVisibleBy?.includes(user._id)}
-                          onChange={() =>
-                            handleChange({ target: { value: values.onlyVisibleBy?.includes(user._id) ? [] : [user._id], name: 'onlyVisibleBy' } })
-                          }
-                        />
-                        Seulement visible par moi
-                      </Label>
-                    </FormGroup>
-                  </Col>
-                  <Col md={12}>
-                    <Documents
-                      title="Documents"
-                      person={person}
-                      documents={values.documents || []}
-                      onAdd={async (docResponse) => {
-                        const { data: file, encryptedEntityKey } = docResponse;
-                        handleChange({
-                          currentTarget: {
-                            value: [
-                              ...(values.documents || []),
-                              {
-                                _id: file.filename,
-                                name: file.originalname,
-                                encryptedEntityKey,
-                                createdAt: new Date(),
-                                createdBy: user._id,
-                                downloadPath: `/person/${person._id}/document/${file.filename}`,
-                                file,
-                              },
-                            ],
-                            name: 'documents',
-                          },
-                        });
-                      }}
-                      onDelete={async (document) => {
-                        handleChange({
-                          currentTarget: {
-                            value: values.documents.filter((d) => d._id !== document._id),
-                            name: 'documents',
-                          },
-                        });
-                      }}
-                    />
-                  </Col>
-                </Row>
-                <br />
-                <ButtonCustom
-                  type="submit"
-                  disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentConsultation)}
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
-              </ModalBody>
-            </React.Fragment>
-          )}
-        </Formik>
-      </Modal>
       <Modal isOpen={showAddTreatment} toggle={resetCurrentTreatment} size="lg" backdrop="static">
         <Formik
           enableReinitialize
@@ -1063,6 +828,7 @@ export function MedicalFile({ person }) {
           )}
         </Formik>
       </Modal>
+      {showConsultationModal && <ConsultationModal consultation={consultation} onClose={() => setShowConsultationModal(false)} person={person} />}
     </>
   );
 }

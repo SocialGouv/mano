@@ -216,11 +216,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await page.locator("tbody > tr > td:nth-child(5)").click();
   await page.locator(`data-test-id=${testConsultationField}`).click();
 
-  await page
-    .getByRole("button", {
-      name: "Fermer la fenêtre de modification de la consultation",
-    })
-    .click();
+  await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("link", { name: "Territoires" }).click();
   await expect(page).toHaveURL("http://localhost:8090/territory");
@@ -257,11 +253,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
   await expect(page.locator(`data-test-id=${testMedicalFileField}`)).toBeHidden();
   await page.locator("tbody > tr > td:nth-child(5)").click();
   await expect(page.locator(`data-test-id=${testConsultationField}`)).toBeHidden();
-  await page
-    .getByRole("button", {
-      name: "Fermer la fenêtre de modification de la consultation",
-    })
-    .click();
+  await page.getByRole("button", { name: "Annuler" }).click();
 
   await page.getByRole("link", { name: "Territoires" }).click();
   await expect(page).toHaveURL("http://localhost:8090/territory");
