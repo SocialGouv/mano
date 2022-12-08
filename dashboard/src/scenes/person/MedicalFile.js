@@ -206,17 +206,17 @@ export function MedicalFile({ person }) {
                 <Col md={4}>
                   <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
                   <SelectCustom
-                    options={healthInsuranceOptions}
+                    options={healthInsuranceOptions.map((_option) => ({ value: _option, label: _option }))}
+                    value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
+                    getOptionValue={(i) => i.value}
+                    getOptionLabel={(i) => i.label}
+                    onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
                     name="healthInsurances"
-                    onChange={(v) => handleChange({ currentTarget: { value: v, name: 'healthInsurances' } })}
                     isClearable={false}
                     isMulti
                     inputId="person-select-healthInsurances"
                     classNamePrefix="person-select-healthInsurances"
-                    value={values.healthInsurances || []}
                     placeholder={' -- Choisir -- '}
-                    getOptionValue={(i) => i}
-                    getOptionLabel={(i) => i}
                   />
                 </Col>
               </Row>

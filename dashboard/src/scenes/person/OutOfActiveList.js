@@ -73,17 +73,21 @@ const OutOfActiveList = ({ person }) => {
                       <label htmlFor="person-select-outOfActiveListReasons">
                         Veuillez préciser le(s) motif(s) de sortie
                         <SelectCustom
-                          options={fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReasons').options}
+                          options={fieldsPersonsCustomizableOptions
+                            .find((f) => f.name === 'outOfActiveListReasons')
+                            .options?.map((_option) => ({ value: _option, label: _option }))}
                           name="outOfActiveListReasons"
-                          onChange={(v) => handleChange({ currentTarget: { value: v, name: 'outOfActiveListReasons' } })}
+                          onChange={(values) =>
+                            handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'outOfActiveListReasons' } })
+                          }
                           isClearable={false}
                           isMulti
                           inputId="person-select-outOfActiveListReasons"
                           classNamePrefix="person-select-outOfActiveListReasons"
-                          value={values.outOfActiveListReasons || []}
+                          value={values.outOfActiveListReasons?.map((_option) => ({ value: _option, label: _option })) || []}
                           placeholder={' -- Choisir -- '}
-                          getOptionValue={(i) => i}
-                          getOptionLabel={(i) => i}
+                          getOptionValue={(i) => i.value}
+                          getOptionLabel={(i) => i.label}
                           styles={{ width: '800px' }}
                           style={{ width: '800px' }}
                         />

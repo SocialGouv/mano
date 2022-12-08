@@ -60,8 +60,9 @@ export const filterData = (data, filters) => {
 };
 
 const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams = false }) => {
-  filters = !!filters.length ? filters : [{}];
+  filters = !!filters.length ? filters : [{ field: null, type: null, value: null }];
   const onAddFilter = () => onChange([...filters, {}], saveInURLParams);
+  const filterFields = base.filter((_filter) => _filter.field !== 'alertness').map((f) => ({ label: f.label, field: f.field, type: f.type }));
 
   function getFilterValuesByField(field, base) {
     if (!field) return [];
@@ -87,44 +88,48 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
             </AddButton>
           </Col>
         </Row>
-        {filters.map(({ field, value }, index) => {
-          const filterFields = base.filter((f) => f.field !== 'alertness').map((filter) => filter.field);
-          const filterValues = getFilterValuesByField(field, base);
-          const { type } = base.find((filter) => filter.field === field) || {};
+        {filters.map((filter, index) => {
+          // filter: field, value, type
+          const filterValues = getFilterValuesByField(filter.field, base);
 
-          const onChangeField = (newField) =>
+          const onChangeField = (newField) => {
             onChange(
-              filters.map((f, i) => (i === index ? { field: newField, value: null, type } : f)),
+              filters.map((_filter, i) => (i === index ? { field: newField?.field, value: null, type: newField?.type } : _filter)),
               saveInURLParams
             );
-          const onChangeValue = (newValue) =>
+          };
+          const onChangeValue = ({ value }) => {
             onChange(
-              filters.map((f, i) => (i === index ? { field, value: newValue, type } : f)),
+              filters.map((_filter, i) => (i === index ? { field: filter.field, value, type: filter.type } : _filter)),
               saveInURLParams
             );
-          const onRemoveFilter = () =>
+          };
+          const onRemoveFilter = () => {
             onChange(
-              filters.filter((f, i) => i !== index),
+              filters.filter((_f, i) => i !== index),
               saveInURLParams
             );
+          };
 
           return (
-            <Row style={{ marginBottom: 10 }} key={`${field || 'empty'}${index}`}>
+            <Row style={{ marginBottom: 10 }} key={`${filter.field || 'empty'}${index}`}>
               <Col md={4}>
                 <SelectCustom
                   options={filterFields}
-                  value={[field]}
+                  value={filter.field ? filter : null}
                   onChange={onChangeField}
-                  getOptionLabel={(f) => base.find((filter) => filter.field === f)?.label}
-                  getOptionValue={(f) => f}
+                  getOptionLabel={(_option) => filterFields.find((_filter) => _filter.field === _option.field)?.label}
+                  getOptionValue={(_option) => _option.field}
                   isClearable={true}
                   isMulti={false}
                 />
               </Col>
               <Col md={4}>
-                <ValueSelector field={field} filterValues={filterValues} value={value} base={base} onChangeValue={onChangeValue} />
+                <ValueSelector field={filter.field} filterValues={filterValues} value={filter.value} base={base} onChangeValue={onChangeValue} />
               </Col>
-              <Col md={2}>{!!filters.filter((f) => Boolean(f.field)).length && <DeleteButton onClick={onRemoveFilter}>Retirer</DeleteButton>}</Col>
+              <Col md={2}>
+                {!!filters.filter((_filter) => Boolean(_filter.field)).length && <DeleteButton onClick={onRemoveFilter}>Retirer</DeleteButton>}
+              </Col>
             </Row>
           );
         })}
@@ -198,10 +203,10 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
 
   return (
     <SelectCustom
-      options={filterValues}
-      value={[value]}
-      getOptionLabel={(f) => f}
-      getOptionValue={(f) => f}
+      options={filterValues.map((_value) => ({ label: _value, value: _value }))}
+      value={value ? { label: value, value } : null}
+      getOptionLabel={(f) => f.label}
+      getOptionValue={(f) => f.value}
       onChange={onChangeValue}
       isClearable={!value}
     />

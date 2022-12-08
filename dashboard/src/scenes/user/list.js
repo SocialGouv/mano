@@ -150,7 +150,7 @@ const Create = ({ onChange }) => {
                       <Label htmlFor="team">Équipes</Label>
                       <div>
                         <SelectTeamMultiple
-                          onChange={(team) => handleChange({ target: { value: team || [], name: 'team' } })}
+                          onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'team' } })}
                           value={values.team || []}
                           colored
                           inputId="team"

@@ -412,7 +412,7 @@ const MergeTwoPersons = ({ person }) => {
                             return (
                               <Col md={12}>
                                 <SelectTeamMultiple
-                                  onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
+                                  onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
                                   value={values.assignedTeams}
                                   colored
                                   inputId="person-select-assigned-team"

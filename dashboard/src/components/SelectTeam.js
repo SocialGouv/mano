@@ -10,21 +10,14 @@ const SelectTeam = ({ name, onChange = () => null, teamId = null, teams = null, 
   if (!teams) return <div />;
 
   return (
-    <div
-      style={{
-        display: 'flex',
-        flexDirection: 'column',
-        width: '100%',
-        borderRadius: '5px',
-        ...style,
-      }}>
+    <div style={style} className="tw-flex tw-w-full tw-flex-col tw-rounded-md">
       <SelectCustom
         name={name}
-        options={teams.map(({ _id }) => _id)}
-        value={[teamId]}
-        onChange={(id) => onChange(teams.find((team) => team._id === id))}
-        getOptionValue={(id) => id}
-        getOptionLabel={(id) => teams.find((team) => team._id === id)?.name}
+        onChange={onChange}
+        value={teams.find((_team) => _team._id === teamId)}
+        options={teams}
+        getOptionValue={(team) => team._id}
+        getOptionLabel={(team) => team.name}
         isClearable={false}
         inputId={inputId}
         classNamePrefix={inputId}
