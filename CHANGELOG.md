@@ -1,3 +1,10 @@
+# [1.186.0](https://github.com/SocialGouv/mano/compare/v1.185.5...v1.186.0) (2022-12-08)
+
+
+### Features
+
+* can move options around in custom field select ([#1053](https://github.com/SocialGouv/mano/issues/1053)) ([9dabf6d](https://github.com/SocialGouv/mano/commit/9dabf6dcd249646267f9cf914e0573e648df24f5))
+
 ## [1.185.5](https://github.com/SocialGouv/mano/compare/v1.185.4...v1.185.5) (2022-12-08)
 
 
