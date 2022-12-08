@@ -1,7 +1,6 @@
 node_modules
 .DS_Store
 .github/.DS_Store
-.vscode
 .env
 .cache_ggshield
 test-local.js
