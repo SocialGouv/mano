@@ -1,3 +1,10 @@
+## [1.186.2](https://github.com/SocialGouv/mano/compare/v1.186.1...v1.186.2) (2022-12-08)
+
+
+### Bug Fixes
+
+* react-select v5 ([#1058](https://github.com/SocialGouv/mano/issues/1058)) ([650ec85](https://github.com/SocialGouv/mano/commit/650ec8527243f62f0d41e58c184f5d9a9623bf32))
+
 ## [1.186.1](https://github.com/SocialGouv/mano/compare/v1.186.0...v1.186.1) (2022-12-08)
 
 
