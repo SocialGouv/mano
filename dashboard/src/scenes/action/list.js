@@ -146,7 +146,20 @@ const List = () => {
       <SmallHeader
         title={
           <span>
-            Agenda de l'équipe <b>{currentTeam?.name || ''}</b>
+            Agenda{' '}
+            {viewAllOrganisationData ? (
+              <>de toute l'organisation</>
+            ) : (
+              <>
+                {selectedTeamIds.length > 1 ? 'des équipes' : "de l'équipe"}{' '}
+                <b>
+                  {teams
+                    .filter((t) => selectedTeamIds.includes(t._id))
+                    .map((e) => e?.name)
+                    .join(', ')}
+                </b>
+              </>
+            )}
           </span>
         }
       />
