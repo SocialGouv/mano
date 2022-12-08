@@ -102,17 +102,19 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
         )}
         {!!['multi-choice'].includes(field.type) && (
           <SelectCustom
-            options={field.options}
+            options={field.options.map((o) => ({ value: o, label: o }))}
             name={field.name}
-            onChange={(v) => handleChange({ currentTarget: { value: v, name: field.name } })}
+            onChange={(values) => {
+              handleChange({ currentTarget: { value: values.map((o) => o.value), name: field.name } });
+            }}
             isClearable={false}
             isMulti
             inputId={id}
             classNamePrefix={id}
-            value={values[field.name]}
+            value={values[field.name]?.map((o) => ({ value: o, label: o }))}
             placeholder={' -- Choisir -- '}
-            getOptionValue={(i) => i}
-            getOptionLabel={(i) => i}
+            getOptionValue={(i) => i.value}
+            getOptionLabel={(i) => i.label}
             isDisabled={disabled}
           />
         )}

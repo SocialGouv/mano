@@ -86,7 +86,7 @@ const View = () => {
                   <Label htmlFor="team">Équipes</Label>
                   <div>
                     <SelectTeamMultiple
-                      onChange={(team) => handleChange({ target: { value: team || [], name: 'team' } })}
+                      onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'team' } })}
                       organisation={organisation._id}
                       value={values.team || []}
                       colored

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../../../recoil/auth';
-import { CANCEL, DONE, mappedIdsToLabels } from '../../../recoil/actions';
+import { CANCEL, DONE, flattenedCategoriesSelector, mappedIdsToLabels } from '../../../recoil/actions';
 import { filteredPersonActionsSelector } from '../selectors/selectors';
 import { useHistory } from 'react-router-dom';
 import CreateActionModal from '../../../components/CreateActionModal';
@@ -87,9 +87,9 @@ export const Actions = ({ person }) => {
 };
 
 const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStatus, filterStatus, filterCategories }) => {
-  const organisation = useRecoilValue(organisationState);
+  const categories = useRecoilValue(flattenedCategoriesSelector);
 
-  const catsSelect = ['-- Aucune --', ...(organisation.categories || [])];
+  const catsSelect = ['-- Aucune --', ...(categories || [])];
 
   return (
     <>
@@ -98,17 +98,15 @@ const ActionsFilters = ({ data, filteredData, setFilterCategories, setFilterStat
           <div className="tw-shrink-0 tw-flex-grow">
             <label htmlFor="action-select-categories-filter">Filtrer par catégorie</label>
             <SelectCustom
-              options={catsSelect}
+              options={catsSelect.map((_option) => ({ value: _option, label: _option }))}
+              value={filterCategories?.map((_option) => ({ value: _option, label: _option })) || []}
+              getOptionValue={(i) => i.value}
+              getOptionLabel={(i) => i.label}
+              onChange={(values) => setFilterCategories(values.map((v) => v.value))}
               inputId="action-select-categories-filter"
               name="categories"
-              onChange={(c) => {
-                setFilterCategories(c);
-              }}
               isClearable
               isMulti
-              value={filterCategories}
-              getOptionValue={(c) => c}
-              getOptionLabel={(c) => c}
             />
           </div>
           <div className="tw-shrink-0 tw-flex-grow">

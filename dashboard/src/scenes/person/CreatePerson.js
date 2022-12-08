@@ -84,7 +84,7 @@ const CreatePerson = ({ refreshable }) => {
                     <FormGroup>
                       <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
                       <SelectTeamMultiple
-                        onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
+                        onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
                         value={values.assignedTeams}
                         colored
                         inputId="person-select-assigned-team"

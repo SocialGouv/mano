@@ -190,7 +190,7 @@ test("Cross teams report", async ({ page }) => {
 
   await test.step("should be able to add a collab and a description in team 1", async () => {
     await page.getByText("Résumé").click();
-    await page.getByText("-- Choisir une collaboration --").click();
+    await page.locator(".report-select-collaboration__value-container").click();
     await page.getByLabel("Collaboration").fill(team1Collab);
     await page.getByText(`Créer "${team1Collab}"`).click();
     await page.locator(".Toastify__close-button").last().click();
@@ -218,7 +218,7 @@ test("Cross teams report", async ({ page }) => {
 
   await test.step("should be able to add a collab and a description in team 2", async () => {
     await page.getByText("Résumé").click();
-    await page.getByText("-- Choisir une collaboration --").click();
+    await page.locator(".report-select-collaboration__value-container").click();
     await page.getByLabel("Collaboration").fill(team2Collab);
     await page.getByText(`Créer "${team2Collab}"`).click();
     await page.locator(".Toastify__close-button").last().click();

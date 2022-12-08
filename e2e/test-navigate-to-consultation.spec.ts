@@ -61,9 +61,7 @@ test("test", async ({ page }) => {
 
   await page.getByLabel("Nom").fill("consult");
 
-  await page.getByText("Choisissez le type de consultation").click();
-
-  await page.locator("#react-select-type-option-0").click();
+  await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
 
   await page.getByRole("textbox", { name: "Date" }).fill(`${dayjs().add(-1, "day").format("YYYY-MM-DD")} 10:00`);
 
@@ -81,15 +79,11 @@ test("test", async ({ page }) => {
 
   await page.getByLabel("Nom").fill("faite");
 
-  await page.getByText("Choisissez le type de consultation").click();
-
-  await page.locator("#react-select-type-option-0").click();
+  await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
 
   await page.getByRole("textbox", { name: "Date" }).fill(`${dayjs().add(-2, "day").format("YYYY-MM-DD")} 10:00`);
 
-  await page.getByText("À FAIRE").click();
-
-  await page.locator("#react-select-7-option-1").click();
+  await changeReactSelectValue(page, "new-consultation-select-status", "FAITE");
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await expect(page).toHaveURL(

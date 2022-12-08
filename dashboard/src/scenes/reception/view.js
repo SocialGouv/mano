@@ -253,7 +253,7 @@ const Reception = () => {
           <AgendaWrapper>
             <div className="agenda-title">Agenda</div>
             <div className="agenda-status">
-              <SelectStatus noTitle onChange={(event) => setStatus(event.target.value)} value={status} />
+              <SelectStatus onChange={(event) => setStatus(event.target.value)} value={status} />
             </div>
           </AgendaWrapper>
           <ActionsCalendar actions={dataConsolidated} columns={['Heure', 'Nom', 'Personne suivie', 'Statut']} />

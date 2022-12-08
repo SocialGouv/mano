@@ -383,8 +383,7 @@ const Stats = () => {
                 <input
                   id="viewAllOrganisationData"
                   type="checkbox"
-                  className="tw-mr-2"
-                  checked={viewAllOrganisationData}
+                  style={{ marginRight: '0.5rem' }}
                   onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
                 />
                 Statistiques de toute l'organisation
@@ -474,15 +473,15 @@ const Stats = () => {
             </label>
             <div style={{ basis: 500, flexGrow: 1 }}>
               <SelectCustom
-                inputId="action-select-group-category-filter"
-                options={groupsCategories.map((group) => group.groupTitle)}
-                getOptionValue={(s) => s}
-                getOptionLabel={(s) => s}
+                value={actionsCategoriesGroups?.map((_option) => ({ value: _option, label: _option })) || []}
+                options={groupsCategories.map((group) => group.groupTitle).map((_option) => ({ value: _option, label: _option }))}
+                getOptionValue={(s) => s.value}
+                getOptionLabel={(s) => s.label}
+                onChange={(groups) => setActionsCategoriesGroups(groups.map((s) => s.value))}
                 name="action-category-group"
-                onChange={setActionsCategoriesGroups}
+                inputId="action-select-group-category-filter"
                 isClearable
                 isMulti
-                value={actionsCategoriesGroups}
               />
             </div>
           </Col>
@@ -492,15 +491,15 @@ const Stats = () => {
             </label>
             <div style={{ basis: 500, flexGrow: 1 }}>
               <SelectCustom
+                options={filterableActionsCategories.map((_option) => ({ value: _option, label: _option }))}
+                value={actionsCategories?.map((_option) => ({ value: _option, label: _option })) || []}
+                getOptionValue={(s) => s.value}
+                getOptionLabel={(s) => s.label}
+                onChange={(categories) => setActionsCategories(categories.map((s) => s.value))}
                 inputId="action-select-category-filter"
-                options={filterableActionsCategories}
-                getOptionValue={(s) => s}
-                getOptionLabel={(s) => s}
                 name="action-category"
-                onChange={setActionsCategories}
                 isClearable
                 isMulti
-                value={actionsCategories}
               />
             </div>
           </Col>

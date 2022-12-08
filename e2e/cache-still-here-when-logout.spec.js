@@ -37,7 +37,7 @@ test("Person creation", async ({ page }) => {
   await test.step("Create person through Accueil page", async () => {
     await page.getByRole("link", { name: "Accueil" }).click();
 
-    await page.getByText("Entrez un nom, une date de naissance…").click();
+    await page.locator(".person-select-and-create-reception__value-container").click();
 
     await page.locator("#person-select-and-create-reception").fill(person2Name);
 

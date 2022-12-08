@@ -174,7 +174,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                             <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
                             <div>
                               <SelectTeamMultiple
-                                onChange={(teams) => handleChange({ target: { value: teams || [], name: 'assignedTeams' } })}
+                                onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
                                 value={values.assignedTeams}
                                 colored
                                 inputId="person-select-assigned-team"
@@ -348,17 +348,17 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <Col md={4}>
                             <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
                             <SelectCustom
-                              options={healthInsuranceOptions}
+                              options={healthInsuranceOptions.map((_option) => ({ value: _option, label: _option }))}
+                              value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
+                              getOptionValue={(i) => i.value}
+                              getOptionLabel={(i) => i.label}
+                              onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
                               name="healthInsurances"
-                              onChange={(v) => handleChange({ currentTarget: { value: v, name: 'healthInsurances' } })}
                               isClearable={false}
                               isMulti
                               inputId="person-select-healthInsurances"
                               classNamePrefix="person-select-healthInsurances"
-                              value={values.healthInsurances || []}
                               placeholder={' -- Choisir -- '}
-                              getOptionValue={(i) => i}
-                              getOptionLabel={(i) => i}
                             />
                           </Col>
                           <Col md={4}>
@@ -445,14 +445,14 @@ const Reasons = ({ value, onChange }) => (
   <FormGroup>
     <Label htmlFor="person-select-reasons">Motif de la situation en rue</Label>
     <SelectCustom
-      options={reasonsOptions}
+      options={reasonsOptions.map((_option) => ({ value: _option, label: _option }))}
+      value={value?.map((_option) => ({ value: _option, label: _option })) || []}
+      getOptionValue={(i) => i.value}
+      getOptionLabel={(i) => i.label}
+      onChange={(values) => onChange({ currentTarget: { value: values.map((v) => v.value), name: 'reasons' } })}
       name="reasons"
-      onChange={(v) => onChange({ currentTarget: { value: v, name: 'reasons' } })}
       isClearable={false}
       isMulti
-      value={value}
-      getOptionValue={(i) => i}
-      getOptionLabel={(i) => i}
       inputId="person-select-reasons"
       classNamePrefix="person-select-reasons"
     />
@@ -463,14 +463,14 @@ const Ressources = ({ value, onChange }) => (
   <FormGroup>
     <Label htmlFor="person-select-resources">Ressources</Label>
     <SelectCustom
-      options={ressourcesOptions}
+      options={ressourcesOptions.map((_option) => ({ value: _option, label: _option }))}
+      value={value?.map((_option) => ({ value: _option, label: _option })) || []}
+      getOptionValue={(i) => i.value}
+      getOptionLabel={(i) => i.label}
+      onChange={(values) => onChange({ currentTarget: { value: values.map((v) => v.value), name: 'resources' } })}
       name="resources"
-      onChange={(v) => onChange({ currentTarget: { value: v, name: 'resources' } })}
       isClearable={false}
       isMulti
-      value={value}
-      getOptionValue={(i) => i}
-      getOptionLabel={(i) => i}
       inputId="person-select-resources"
       classNamePrefix="person-select-resources"
     />

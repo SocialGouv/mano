@@ -142,14 +142,14 @@ const CreateTerritory = () => {
                     <FormGroup>
                       <Label htmlFor="territory-select-types">Types</Label>
                       <SelectCustom
-                        options={territoryTypes}
+                        options={territoryTypes.map((_option) => ({ value: _option, label: _option }))}
                         name="types"
-                        onChange={(v) => handleChange({ currentTarget: { value: v, name: 'types' } })}
+                        onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'types' } })}
                         isClearable={false}
                         isMulti
-                        value={values.types}
-                        getOptionValue={(i) => i}
-                        getOptionLabel={(i) => i}
+                        value={values.types?.map((_option) => ({ value: _option, label: _option })) || []}
+                        getOptionValue={(i) => i.value}
+                        getOptionLabel={(i) => i.label}
                         inputId="territory-select-types"
                         classNamePrefix="territory-select-types"
                       />

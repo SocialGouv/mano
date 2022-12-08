@@ -186,14 +186,14 @@ const List = () => {
           </label>
           <div className="tw-basis-1/3">
             <SelectCustom
-              onChange={setShowAs}
-              value={[showAs]}
-              options={showAsOptions}
+              onChange={({ value }) => setShowAs(value)}
+              value={{ value: showAs, label: showAs }}
+              options={showAsOptions.map((_option) => ({ value: _option, label: _option }))}
               isClearable={false}
               isMulti={false}
               inputId="actions-show-as"
-              getOptionValue={(i) => i}
-              getOptionLabel={(i) => i}
+              getOptionValue={(o) => o.value}
+              getOptionLabel={(o) => o.label}
             />
           </div>
         </div>
@@ -213,8 +213,8 @@ const List = () => {
           <label htmlFor="action-select-categories-filter">Filtrer par équipe&nbsp;:</label>
           <div className="tw-w-full">
             <SelectTeamMultiple
-              onChange={(teamsId) => {
-                setSelectedTeamIds(teams.filter((t) => teamsId.includes(t._id))?.map((t) => t._id));
+              onChange={(teamIds) => {
+                setSelectedTeamIds(teamIds);
               }}
               value={selectedTeamIds}
               colored
