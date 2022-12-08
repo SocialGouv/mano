@@ -59,7 +59,7 @@ const ModalContainer = ({
                 beforeLeave={onBeforeLeave}>
                 <Dialog.Panel
                   className={[
-                    'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-overflow-hidden tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full ',
+                    'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full ',
                     size === 'lg' ? 'sm:tw-max-w-lg' : '',
                     size === 'xl' ? 'sm:tw-max-w-xl' : '',
                     size === '3xl' ? 'sm:tw-max-w-3xl' : '',
@@ -95,7 +95,7 @@ const nullFunction = () => null;
 
 const ModalHeader = ({ children, title }) => {
   return (
-    <div className="tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-border-b tw-border-gray-200 tw-bg-white">
+    <div className="tw-flex tw-w-full tw-shrink-0 tw-items-center tw-justify-between tw-rounded-t-lg tw-border-b tw-border-gray-200 tw-bg-white">
       <div className="tw-w-full tw-py-4 sm:tw-flex sm:tw-items-start">
         <div className="tw-mt-3 tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left">
           {!!title && (
@@ -112,7 +112,7 @@ const ModalHeader = ({ children, title }) => {
 
 const ModalBody = ({ children, className = '' }) => {
   return (
-    <div className="tw-shrink tw-overflow-y-auto tw-bg-white tw-pb-4">
+    <div className="tw-shrink tw-bg-white tw-pb-4">
       <div className="sm:tw-flex sm:tw-items-start">
         <div className={['tw-w-full tw-text-center sm:tw-mt-0 sm:tw-text-left', className].join(' ')}>{children}</div>
       </div>
@@ -122,7 +122,7 @@ const ModalBody = ({ children, className = '' }) => {
 
 const ModalFooter = ({ children }) => {
   return (
-    <div className="tw-shrink-0 tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-flex-row-reverse sm:tw-px-6">
+    <div className="tw-shrink-0 tw-rounded-b-lg tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-flex-row-reverse sm:tw-px-6">
       {children}
     </div>
   );
