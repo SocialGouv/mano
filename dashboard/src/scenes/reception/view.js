@@ -267,7 +267,7 @@ const Reception = () => {
             {!!todaysReport?._id && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <ButtonCustom
-                  onClick={() => history.push(`/report/${todaysReport?.date}?tab=6`)}
+                  onClick={() => history.push(`/report/${todaysReport?.date}?tab=passages`)}
                   color="link"
                   title="Modifier les passages"
                   padding="0px"

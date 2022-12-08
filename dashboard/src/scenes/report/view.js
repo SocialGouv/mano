@@ -51,10 +51,11 @@ import { consultationsState, disableConsultationRow } from '../../recoil/consult
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { lastLoadState, mergeItems, useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
-import useSearchParamState from '../../services/useSearchParamState';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import TagTeam from '../../components/TagTeam';
 import ReceptionService from '../../components/ReceptionService';
+import { useLocalStorage } from 'react-use';
+import useSearchParamState from '../../services/useSearchParamState';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -70,12 +71,8 @@ const View = () => {
   const allComments = useRecoilValue(commentsState);
   const allPersons = useRecoilValue(personsState);
   const teams = useRecoilValue(teamsState);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useSearchParamState('viewAllOrgData', teams.length === 1, {
-    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
-  });
-  const [selectedTeamIds, setSelectedTeamIds] = useSearchParamState('reportsTeams', [currentTeam._id], {
-    resetToDefaultIfTheFollowingValueChange: currentTeam._id,
-  });
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('reports-allOrg', teams.length === 1);
+  const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('reports-teams', [currentTeam._id]);
 
   const selectedTeams = useMemo(
     () => (viewAllOrganisationData ? teams : teams.filter((team) => selectedTeamIds.includes(team._id))),
@@ -98,7 +95,7 @@ const View = () => {
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
-  const [activeTab, setActiveTab] = useState(['restricted-access'].includes(user.role) ? 'reception' : 'resume');
+  const [activeTab, setActiveTab] = useSearchParamState('tab', ['restricted-access'].includes(user.role) ? 'reception' : 'resume');
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
 
@@ -412,7 +409,10 @@ const View = () => {
               <SelectTeamMultiple
                 inputId="report-select-teams"
                 classNamePrefix="report-select-teams"
-                onChange={setSelectedTeamIds}
+                onChange={(teamIds) => {
+                  console.log({ teamIds });
+                  setSelectedTeamIds(teamIds);
+                }}
                 value={selectedTeamIds}
                 key={selectedTeamIds}
                 colored
@@ -453,7 +453,7 @@ const View = () => {
         className="noprint"
         style={{
           height: '100%',
-          display: selectedTeamIds.length ? 'flex' : 'none',
+          display: viewAllOrganisationData || selectedTeamIds.length ? 'flex' : 'none',
           overflow: 'hidden',
           flex: 1,
           marginTop: '1rem',

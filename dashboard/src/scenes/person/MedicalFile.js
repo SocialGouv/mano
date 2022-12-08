@@ -35,6 +35,7 @@ import { medicalFileState, prepareMedicalFileForEncryption, customFieldsMedicalF
 import { modalConfirmState } from '../../components/ModalConfirm';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import ActionOrConsultationName from '../../components/ActionOrConsultationName';
+import { useLocalStorage } from 'react-use';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -51,8 +52,8 @@ export function MedicalFile({ person }) {
   );
   const [showAddConsultation, setShowAddConsultation] = useState(!!currentConsultation);
   const [isNewConsultation, setIsNewConsultation] = useState(false);
-  const [consultationTypes, setConsultationTypes] = useSearchParamState('consultationTypes', []);
-  const [consultationStatuses, setConsultationStatuses] = useSearchParamState('consultationStatuses', []);
+  const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
+  const [consultationStatuses, setConsultationStatuses] = useLocalStorage('consultation-statuses', []);
 
   const [showAddTreatment, setShowAddTreatment] = useState(false);
   const [currentTreatment, setCurrentTreatment] = useState(null);

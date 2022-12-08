@@ -120,7 +120,7 @@ test("Familles", async ({ page }) => {
     await page.getByRole("link", { name: "🔍 Recherche" }).click();
     await expect(page).toHaveURL("http://localhost:8090/search");
     await page.getByPlaceholder("Par mot clé").fill(person1Name);
-    await expect(page).toHaveURL(`http://localhost:8090/search?search=${person1Name}`);
+    await expect(page).toHaveURL(`http://localhost:8090/search`);
     await page.getByText("Personnes (1)").click();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: person1Name }) }).getByText("👪")).toBeVisible();
   });
@@ -175,7 +175,7 @@ test("Familles", async ({ page }) => {
     await page.getByRole("link", { name: "🔍 Recherche" }).click();
     await expect(page).toHaveURL("http://localhost:8090/search");
     await page.getByPlaceholder("Par mot clé").fill(action1Name);
-    await expect(page).toHaveURL(`http://localhost:8090/search?search=${action1Name}`);
+    await expect(page).toHaveURL(`http://localhost:8090/search`);
     await page.getByText("Actions (1)").click();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: action1Name }) }).getByText("👪")).toBeVisible();
 
@@ -209,7 +209,6 @@ test("Familles", async ({ page }) => {
     await expect(page).toHaveURL("http://localhost:8090/search");
 
     await page.getByPlaceholder("Par mot clé").fill(comment1Name);
-    await expect(page).toHaveURL(`http://localhost:8090/search?search=${comment1Name}`);
 
     await page.getByText("Commentaires (1)").click();
     await expect(page.locator("tr", { has: page.getByText(comment1Name) }).getByText("👪")).toBeVisible();

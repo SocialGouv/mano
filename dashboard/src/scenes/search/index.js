@@ -27,9 +27,9 @@ import { placesState } from '../../recoil/places';
 import { filterBySearch } from './utils';
 import { commentsState } from '../../recoil/comments';
 import useTitle from '../../services/useTitle';
-import useSearchParamState from '../../services/useSearchParamState';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import ConsultationButton from '../../components/ConsultationButton';
+import { useLocalStorage } from 'react-use';
 
 const initTabs = ['Actions', 'Personnes', 'Commentaires', 'Lieux', 'Territoires', 'Observations'];
 
@@ -37,8 +37,8 @@ const View = () => {
   useTitle('Recherche');
   useDataLoader({ refreshOnMount: true });
 
-  const [search, setSearch] = useSearchParamState('search', '');
-  const [activeTab, setActiveTab] = useSearchParamState('tab', 0);
+  const [search, setSearch] = useLocalStorage('fullsearch', '');
+  const [activeTab, setActiveTab] = useLocalStorage('fullsearch-tab', 0);
   const [tabsContents, setTabsContents] = useState(initTabs);
 
   const updateTabContent = (tabIndex, content) => setTabsContents((contents) => contents.map((c, index) => (index === tabIndex ? content : c)));

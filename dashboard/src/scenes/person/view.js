@@ -43,7 +43,9 @@ export default function View() {
   const personGroup = useRecoilValue(groupSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
   const user = useRecoilValue(userState);
-  const [currentTab, setCurrentTab] = useSearchParamState('tab', new URLSearchParams(location.search)?.get('tab') || 'Résumé');
+  const [currentTab, setCurrentTab] = useSearchParamState('tab', new URLSearchParams(location.search)?.get('tab') || 'Résumé', {
+    resetToDefaultIfTheFollowingValueChange: personId,
+  });
 
   return (
     <div>
