@@ -117,7 +117,7 @@ const View = () => {
                   Professionnel de santé
                 </Label>
                 <div>
-                  <small className="text-muted">Un professionnel de santé à accès au dossier médical complet des personnes.</small>
+                  <small className="text-muted">Un professionnel de santé a accès au dossier médical complet des personnes.</small>
                 </div>
               </Col>
             </Row>
