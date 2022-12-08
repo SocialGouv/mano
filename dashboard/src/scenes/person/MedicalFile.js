@@ -774,7 +774,7 @@ export function MedicalFile({ person }) {
                         classNamePrefix="consultation-modal-type"
                         value={values.type || ''}
                         onChange={handleChange}
-                        placeholder="Choisissez le type de consultation"
+                        placeholder="-- Choisissez le type de consultation --"
                         options={organisation.consultations.map((e) => e.name)}
                       />
                       {touched.type && errors.type && <Error>{errors.type}</Error>}

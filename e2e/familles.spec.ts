@@ -12,6 +12,8 @@ test.beforeAll(async () => {
   await populate();
 });
 
+test.setTimeout(60000);
+
 test("Familles", async ({ page }) => {
   // Always use a new items
   const person1Name = nanoid();

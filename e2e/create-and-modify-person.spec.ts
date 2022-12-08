@@ -55,7 +55,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Structure de suivi social").fill("aucune");
   await page.locator(".person-select-animals__value-container").click();
   await page.getByText("Oui", { exact: true }).click();
-  await page.locator(".person-select-address__placeholder").click();
+  await page.locator(".person-select-address__value-container").click();
   await page.locator(".person-select-address__menu").getByText("Oui", { exact: true }).click();
   await page.locator(".person-select-addressDetail__value-container").click();
   await page.getByText("Logement", { exact: true }).click();

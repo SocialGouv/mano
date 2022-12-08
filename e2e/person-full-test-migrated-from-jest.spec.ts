@@ -1,12 +1,12 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { clickOnEmptyReactSelect, loginWith, logOut } from "./utils";
+import { changeReactSelectValue, clickOnEmptyReactSelect, loginWith, logOut } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
 });
-
+test.setTimeout(45000);
 test("test", async ({ page }) => {
   const personName = nanoid();
 
@@ -136,7 +136,7 @@ test("test", async ({ page }) => {
   await page.getByText("Rencontre enregistrée").click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await page.getByText("Femme").click();
+  await page.locator(".person-select-gender__input-container").click();
   await page.locator("#react-select-gender-option-1").click();
   await page.getByRole("button", { name: "Mettre à jour" }).first().click();
   await page.getByText("Mise à jour effectuée !").click();
@@ -173,12 +173,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom").fill("AZAZAZAZAZAZAZAZA");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await page.getByText("Le type est obligatoire").click();
-  await page.getByText("Choisissez le type de consultation").click();
-  await page.getByText("Choisissez le type de consultation").click();
-  await page.getByText("Choisissez le type de consultation").click();
-  await page.locator("#type svg").click();
-  await page.locator("#type svg").click();
-  await page.locator("#react-select-type-option-0").click();
+  await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
 
   await page.locator('small:has-text("Médicale")').click();
