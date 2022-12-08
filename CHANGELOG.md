@@ -1,3 +1,10 @@
+## [1.186.1](https://github.com/SocialGouv/mano/compare/v1.186.0...v1.186.1) (2022-12-08)
+
+
+### Bug Fixes
+
+* useLocalStorage vs useSearchParamsState ([#1052](https://github.com/SocialGouv/mano/issues/1052)) ([9b51ab6](https://github.com/SocialGouv/mano/commit/9b51ab6709ed38f74c4f8cdf3fef67297c66e825))
+
 # [1.186.0](https://github.com/SocialGouv/mano/compare/v1.185.5...v1.186.0) (2022-12-08)
 
 
