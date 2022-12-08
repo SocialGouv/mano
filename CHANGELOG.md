@@ -1,3 +1,10 @@
+## [1.185.5](https://github.com/SocialGouv/mano/compare/v1.185.4...v1.185.5) (2022-12-08)
+
+
+### Bug Fixes
+
+* agenda multi-team display ([#1056](https://github.com/SocialGouv/mano/issues/1056)) ([60c5630](https://github.com/SocialGouv/mano/commit/60c5630c86678149147c0e6f05e3dc493799fdcb))
+
 ## [1.185.4](https://github.com/SocialGouv/mano/compare/v1.185.3...v1.185.4) (2022-12-08)
 
 
