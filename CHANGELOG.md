@@ -1,3 +1,10 @@
+## [1.186.3](https://github.com/SocialGouv/mano/compare/v1.186.2...v1.186.3) (2022-12-09)
+
+
+### Bug Fixes
+
+* **dashboard:** block custom field to change type if already used ([#1060](https://github.com/SocialGouv/mano/issues/1060)) ([0e0df78](https://github.com/SocialGouv/mano/commit/0e0df788e0b097ef20db7ad5e05c7fa9408a1a77))
+
 ## [1.186.2](https://github.com/SocialGouv/mano/compare/v1.186.1...v1.186.2) (2022-12-08)
 
 
