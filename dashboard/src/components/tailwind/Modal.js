@@ -45,8 +45,8 @@ const ModalContainer = ({
             <div className="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity" />
           </Transition.Child>
 
-          <div className="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto">
-            <div className="tw-flex tw-min-h-full tw-items-end tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
+          <div className="tw-fixed tw-inset-0 tw-z-10">
+            <div className="tw-flex tw-h-full tw-items-center tw-justify-center tw-overflow-y-visible tw-p-4 tw-text-center sm:tw-items-start sm:tw-p-0">
               <Transition.Child
                 as={Fragment}
                 enter="tw-ease-out tw-duration-300"
@@ -59,28 +59,30 @@ const ModalContainer = ({
                 beforeLeave={onBeforeLeave}>
                 <Dialog.Panel
                   className={[
-                    'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full ',
+                    'tw-relative tw-flex tw-transform tw-rounded-lg tw-bg-white tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full ',
                     size === 'lg' ? 'sm:tw-max-w-lg' : '',
                     size === 'xl' ? 'sm:tw-max-w-xl' : '',
                     size === '3xl' ? 'sm:tw-max-w-3xl' : '',
                     size === 'full' ? 'sm:tw-max-w-[90vw]' : '',
                   ].join(' ')}>
-                  {children}
-                  {!!onClose && (
-                    <button
-                      type="button"
-                      aria-label="Fermer"
-                      className="tw-absolute tw-top-4 tw-right-0 tw-text-gray-900 sm:tw-px-6"
-                      onClick={onClose}>
-                      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
-                        <path
-                          fillRule="evenodd"
-                          d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  )}
+                  <div className="tw-relative tw-flex tw-h-full tw-max-h-[90vh] tw-flex-col tw-overflow-y-auto tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-w-full ">
+                    {children}
+                    {!!onClose && (
+                      <button
+                        type="button"
+                        aria-label="Fermer"
+                        className="tw-absolute tw-top-4 tw-right-0 tw-text-gray-900 sm:tw-px-6"
+                        onClick={onClose}>
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="tw-h-6 tw-w-6">
+                          <path
+                            fillRule="evenodd"
+                            d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                            clipRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    )}
+                  </div>
                 </Dialog.Panel>
               </Transition.Child>
             </div>
