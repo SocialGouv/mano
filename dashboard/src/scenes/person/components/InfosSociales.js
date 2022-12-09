@@ -18,7 +18,11 @@ export default function InfosSociales({ person }) {
       <div className="tw-flex">
         <h4 className="tw-flex-1">Informations sociales</h4>
         <div>
-          <button className="tw-transition hover:tw-scale-125" onClick={() => setEditModal('social')}>
+          <button
+            className="tw-transition hover:tw-scale-125"
+            onClick={() => setEditModal('social')}
+            aria-label="Éditer les informations sociales"
+            title="Éditer les informations sociales">
             ✏️
           </button>
         </div>
