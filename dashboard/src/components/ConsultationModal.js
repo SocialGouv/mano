@@ -254,11 +254,11 @@ export default function ConsultationModal({ onClose, person, consultation }) {
         </form>
       </ModalBody>
       <ModalFooter>
-        <button type="submit" className="button-submit" form="add-consultation-form">
-          Sauvegarder
-        </button>
         <button name="Annuler" type="button" className="button-cancel" onClick={() => onClose()}>
           Annuler
+        </button>
+        <button type="submit" className="button-submit" form="add-consultation-form">
+          Sauvegarder
         </button>
       </ModalFooter>
     </ModalContainer>
