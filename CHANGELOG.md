@@ -1,3 +1,10 @@
+## [1.186.7](https://github.com/SocialGouv/mano/compare/v1.186.6...v1.186.7) (2022-12-09)
+
+
+### Bug Fixes
+
+* restrict app access to admin and normal ([#1068](https://github.com/SocialGouv/mano/issues/1068)) ([7225b6b](https://github.com/SocialGouv/mano/commit/7225b6b62dcd13466921ef0457a7f0ffa25211ae))
+
 ## [1.186.6](https://github.com/SocialGouv/mano/compare/v1.186.5...v1.186.6) (2022-12-09)
 
 
