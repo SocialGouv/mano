@@ -113,7 +113,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
               isMulti
               inputId={id}
               classNamePrefix={id}
-              value={values[field.name]?.map((o) => ({ value: o, label: o }))}
+              value={(typeof values[field.name] === 'string' ? [values[field.name]] : values[field.name])?.map((o) => ({ value: o, label: o }))}
               placeholder={' -- Choisir -- '}
               getOptionValue={(i) => i.value}
               getOptionLabel={(i) => i.label}
@@ -134,7 +134,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
             {field.type !== 'boolean' ? field.label : ''}
           </Label>
         )}
-        {JSON.stringify(values)}
+        {JSON.stringify(values[field.name])}
       </FormGroup>
     </Col>
   );
