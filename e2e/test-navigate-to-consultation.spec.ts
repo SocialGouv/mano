@@ -120,7 +120,7 @@ test("test", async ({ page }) => {
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" }).click();
+  await page.getByRole("button", { name: "Annuler" }).click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=null/
   );
@@ -140,7 +140,7 @@ test("test", async ({ page }) => {
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" }).click();
+  await page.getByRole("button", { name: "Annuler" }).click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=null/
   );
@@ -157,7 +157,7 @@ test("test", async ({ page }) => {
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" }).click();
+  await page.getByRole("button", { name: "Annuler" }).click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=null/
   );
@@ -173,7 +173,7 @@ test("test", async ({ page }) => {
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" }).click();
+  await page.getByRole("button", { name: "Annuler" }).click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=null/
   );

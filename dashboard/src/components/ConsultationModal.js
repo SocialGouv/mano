@@ -182,7 +182,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
                 name="status"
                 value={data.status || ''}
                 onChange={(e) => {
-                  setData({ ...data, status: e.currentTarget.value });
+                  setData({ ...data, status: e.target.value });
                 }}
                 inputId="new-consultation-select-status"
                 classNamePrefix="new-consultation-select-status"
