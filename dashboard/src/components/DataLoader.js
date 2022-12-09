@@ -42,7 +42,7 @@ export const loadingTextState = atom({ key: 'loadingTextState', default: 'Charge
 
 export default function DataLoader() {
   const API = useApi();
-  const user = useRecoilValue(userState);
+  const [user, setUser] = useRecoilState(userState);
   const { migrateData } = useDataMigrator();
 
   const [persons, setPersons] = useRecoilState(personsState);
@@ -66,7 +66,7 @@ export default function DataLoader() {
   const [fullScreen, setFullScreen] = useRecoilState(fullScreenState);
   const [loadingText, setLoadingText] = useRecoilState(loadingTextState);
   const initialLoad = useRecoilValue(initialLoadState);
-  const organisation = useRecoilValue(organisationState);
+  const [organisation, setOrganisation] = useRecoilState(organisationState);
 
   const [loadList, setLoadList] = useState({ list: [], offset: 0 });
   const [progressBuffer, setProgressBuffer] = useState(null);
@@ -98,6 +98,15 @@ export default function DataLoader() {
 
     if (shouldStart) {
       Promise.resolve()
+        .then(async () => {
+          /*
+            Refresh organisation (and user), to get the latest organisation fields
+            and the latest user roles
+          */
+          const userResponse = await API.get({ path: '/user/me' });
+          setOrganisation(userResponse.user.organisation);
+          setUser(userResponse.user);
+        })
         .then(() => (initialLoad ? migrateData() : Promise.resolve()))
         .then(() => getCacheItem(dashboardCurrentCacheKey))
         .then((lastLoadValue) => {
