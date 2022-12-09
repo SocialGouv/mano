@@ -1,3 +1,10 @@
+## [1.186.6](https://github.com/SocialGouv/mano/compare/v1.186.5...v1.186.6) (2022-12-09)
+
+
+### Bug Fixes
+
+* handle enum to multi-choice ([#1065](https://github.com/SocialGouv/mano/issues/1065)) ([41ee977](https://github.com/SocialGouv/mano/commit/41ee9772deb565f7773661938db97b87b242b372))
+
 ## [1.186.5](https://github.com/SocialGouv/mano/compare/v1.186.4...v1.186.5) (2022-12-09)
 
 
