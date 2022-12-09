@@ -18,6 +18,7 @@ import {
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
+import useSearchParamState from '../../services/useSearchParamState';
 import SelectAsInput from '../../components/SelectAsInput';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import Table from '../../components/table';
@@ -44,8 +45,9 @@ export function MedicalFile({ person }) {
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const team = useRecoilValue(currentTeamState);
 
-  const [showConsultationModal, setShowConsultationModal] = useState(false);
-  const [consultation, setConsultation] = useState(null);
+  const [currentConsultationId, setCurrentConsultationId] = useSearchParamState('consultationId', null);
+  const [showConsultationModal, setShowConsultationModal] = useState(!!currentConsultationId);
+  const [consultation, setConsultation] = useState(!currentConsultationId ? null : allConsultations?.find((c) => c._id === currentConsultationId));
 
   const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
   const [consultationStatuses, setConsultationStatuses] = useLocalStorage('consultation-statuses', []);
@@ -412,6 +414,7 @@ export function MedicalFile({ person }) {
             disabled={false}
             ariaLabel="Ajouter une consultation"
             onClick={() => {
+              setCurrentConsultationId(null);
               setConsultation(null);
               setShowConsultationModal(true);
             }}
@@ -516,6 +519,7 @@ export function MedicalFile({ person }) {
         data={consultations}
         rowKey={'_id'}
         onRowClick={(item) => {
+          setCurrentConsultationId(item._id);
           setConsultation(item);
           setShowConsultationModal(true);
         }}
@@ -828,7 +832,16 @@ export function MedicalFile({ person }) {
           )}
         </Formik>
       </Modal>
-      {showConsultationModal && <ConsultationModal consultation={consultation} onClose={() => setShowConsultationModal(false)} person={person} />}
+      {showConsultationModal && (
+        <ConsultationModal
+          consultation={consultation}
+          onClose={() => {
+            setCurrentConsultationId(null);
+            setShowConsultationModal(false);
+          }}
+          person={person}
+        />
+      )}
     </>
   );
 }

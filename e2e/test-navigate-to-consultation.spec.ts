@@ -54,12 +54,12 @@ test("test", async ({ page }) => {
 
   await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=null/
   );
 
   await page.getByLabel("Nom").click();
 
-  await page.getByLabel("Nom").fill("consult");
+  await page.getByLabel("Nom").fill("consult abc");
 
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
 
@@ -72,7 +72,7 @@ test("test", async ({ page }) => {
 
   await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
   await expect(page).toHaveURL(
-    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
+    /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=null/
   );
 
   await page.getByLabel("Nom").click();
@@ -96,12 +96,13 @@ test("test", async ({ page }) => {
   await page.getByText("<").click();
   await expect(page).toHaveURL(`http://localhost:8090/action?calendarTab=2&calendarDate=${dayjs().add(-1, "day").format("YYYY-MM-DD")}`);
 
-  await page.getByText("consult").click();
+  await page.getByText("consult abc").click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );
 
-  await page.getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" }).click();
+  await page.getByRole("button", { name: "Annuler" }).click();
+
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=null/
   );
@@ -151,7 +152,7 @@ test("test", async ({ page }) => {
 
   await page.getByText("Consultations créées (2)").click();
 
-  await page.locator('[data-test-id="consult"]').getByText("consult").click();
+  await page.locator('[data-test-id="consult abc"]').getByText("consult abc").click();
   await expect(page).toHaveURL(
     /http:\/\/localhost:8090\/person\/[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}\?tab=Dossier\+M%C3%A9dical&consultationId=[a-f0-9]{8}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{4}-[a-f0-9]{12}/
   );

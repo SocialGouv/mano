@@ -2,6 +2,7 @@ import { useState, useMemo } from 'react';
 import ReactDatePicker from 'react-datepicker';
 import { Row } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { v4 as uuidv4 } from 'uuid';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
@@ -28,7 +29,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
   const initialState = useMemo(
     () =>
       consultation || {
-        _id: 'xxx',
+        _id: uuidv4(),
         dueAt: new Date(),
         completedAt: null,
         name: '',
