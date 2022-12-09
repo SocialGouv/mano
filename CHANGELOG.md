@@ -1,3 +1,10 @@
+## [1.186.5](https://github.com/SocialGouv/mano/compare/v1.186.4...v1.186.5) (2022-12-09)
+
+
+### Bug Fixes
+
+* modal overflow ([#1063](https://github.com/SocialGouv/mano/issues/1063)) ([7137df4](https://github.com/SocialGouv/mano/commit/7137df4ca6f7acc88428c87a3f6530e9775f23a3))
+
 ## [1.186.4](https://github.com/SocialGouv/mano/compare/v1.186.3...v1.186.4) (2022-12-09)
 
 
