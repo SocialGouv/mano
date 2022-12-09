@@ -12,6 +12,7 @@ dayjs.locale("fr");
 test.beforeAll(async () => {
   await populate();
 });
+test.setTimeout(60000);
 
 test("merging normal user with health data", async ({ page }) => {
   const person1Name = nanoid();
