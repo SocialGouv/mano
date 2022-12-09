@@ -34,12 +34,18 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
     if (!currentDate) return;
     const filteredActions = actions.filter((a) => a.completedAt || a.dueAt);
     setTheDayBeforeActions(
-      filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, subtractOneDay(currentDate)))
+      filteredActions.filter((a) =>
+        isOnSameDay(!a.isConsultation && [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, subtractOneDay(currentDate))
+      )
     );
     setTheDayAfterActions(
-      filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, addOneDay(currentDate)))
+      filteredActions.filter((a) =>
+        isOnSameDay(!a.isConsultation && [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, addOneDay(currentDate))
+      )
     );
-    setTheCurrentDayActions(filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, currentDate)));
+    setTheCurrentDayActions(
+      filteredActions.filter((a) => isOnSameDay(!a.isConsultation && [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, currentDate))
+    );
   }, [actions, currentDate]);
 
   useEffect(() => {

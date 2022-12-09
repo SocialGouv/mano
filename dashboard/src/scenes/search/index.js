@@ -149,7 +149,7 @@ const Actions = ({ search, onUpdateResults }) => {
             {
               title: 'Date',
               dataKey: 'dueAt',
-              render: (a) => <DateBloc date={[DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt} />,
+              render: (a) => <DateBloc date={!a.isConsultation && [DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt} />,
             },
             {
               title: 'Heure',

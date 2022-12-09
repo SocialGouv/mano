@@ -104,6 +104,8 @@ export function MedicalFile({ person }) {
 
   const medicalFile = useMemo(() => (allMedicalFiles || []).find((m) => m.person === person._id), [allMedicalFiles, person._id]);
 
+  console.log({ currentConsultation });
+
   useEffect(() => {
     if (!medicalFile) {
       (async () => {
@@ -554,7 +556,7 @@ export function MedicalFile({ person }) {
             title: 'Date',
             dataKey: 'dueAt-day',
             render: (e) => {
-              return <DateBloc date={[DONE, CANCEL].includes(e.status) ? e.completedAt : e.dueAt} />;
+              return <DateBloc date={e.dueAt} />;
             },
           },
           {
