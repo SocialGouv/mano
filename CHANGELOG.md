@@ -1,3 +1,10 @@
+## [1.186.8](https://github.com/SocialGouv/mano/compare/v1.186.7...v1.186.8) (2022-12-09)
+
+
+### Bug Fixes
+
+* load organisation at each refresh ([#1066](https://github.com/SocialGouv/mano/issues/1066)) ([4aaa796](https://github.com/SocialGouv/mano/commit/4aaa7964b380c3de10b5070e2a72306a7bb43636))
+
 ## [1.186.7](https://github.com/SocialGouv/mano/compare/v1.186.6...v1.186.7) (2022-12-09)
 
 
