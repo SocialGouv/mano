@@ -136,8 +136,7 @@ test("test", async ({ page }) => {
   await page.getByText("Rencontre enregistrée").click();
 
   await page.getByRole("button", { name: "Dossier Médical" }).click();
-  await page.locator(".person-select-gender__input-container").click();
-  await page.locator("#react-select-gender-option-1").click();
+  await changeReactSelectValue(page, "person-select-gender", "Homme");
   await page.getByRole("button", { name: "Mettre à jour" }).first().click();
   await page.getByText("Mise à jour effectuée !").click();
   await page.getByLabel("Numéro de sécurité sociale").click();

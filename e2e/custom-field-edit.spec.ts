@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
-import { loginWith } from "./utils";
+import { changeReactSelectValue, loginWith } from "./utils";
 
 test.beforeAll(async () => {
   await populate();
@@ -47,9 +47,8 @@ test("test", async ({ page }) => {
 
   await page.locator('[data-test-id="Champ non utilisé"]').getByRole("button", { name: "Modifier le champ" }).click();
   await expect(page.locator(".type--is-disabled")).not.toBeVisible();
-  await page.locator(".type__input-container").click();
 
-  await page.locator("#react-select-type-option-1").click();
+  await changeReactSelectValue(page, "type", "Zone de texte multi-lignes");
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
 });
