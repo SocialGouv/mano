@@ -1,4 +1,4 @@
-import { Fragment } from 'react';
+import { Fragment, useRef } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
 
 // inspired by https://tailwindui.com/components/application-ui/overlays/modals#component-47a5888a08838ad98779d50878d359b3
@@ -25,6 +25,8 @@ const ModalContainer = ({
   onBeforeLeave = () => null,
   size = 'lg', // lg, xl, 3xl, full
 }) => {
+  const backgroundRef = useRef(null);
+
   return (
     <>
       <Transition.Root show={open} as={Fragment}>
@@ -45,7 +47,7 @@ const ModalContainer = ({
             <div className="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity" />
           </Transition.Child>
 
-          <div className="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto">
+          <div className="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto" ref={backgroundRef}>
             <div className="tw-flex tw-min-h-full tw-items-end tw-justify-center tw-p-4 tw-text-center sm:tw-items-center sm:tw-p-0">
               <Transition.Child
                 as={Fragment}
@@ -55,7 +57,10 @@ const ModalContainer = ({
                 leave="tw-ease-in tw-duration-200"
                 leaveFrom="tw-opacity-100 tw-translate-y-0 sm:tw-scale-100"
                 leaveTo="tw-opacity-0 tw-translate-y-4 sm:tw-translate-y-0 sm:tw-scale-95"
-                afterEnter={onAfterEnter}
+                afterEnter={() => {
+                  backgroundRef?.current?.scrollTo(0, 0);
+                  onAfterEnter();
+                }}
                 beforeLeave={onBeforeLeave}>
                 <Dialog.Panel
                   className={[
