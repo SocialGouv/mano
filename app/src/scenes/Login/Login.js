@@ -143,6 +143,11 @@ const Login = ({ navigation }) => {
       setLoading(false);
       return;
     }
+    if (response?.user?.role === 'restricted-access') {
+      Alert.alert("Vous n'avez pas accès à l'application mobile Mano");
+      setLoading(false);
+      return;
+    }
     if (response.ok) {
       Keyboard.dismiss();
       API.token = response.token;
