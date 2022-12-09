@@ -112,6 +112,8 @@ test("test", async ({ page }) => {
   await page.locator(".action-select-status-filter__multi-value__remove").click();
   await expect(page).toHaveURL("http://localhost:8090/action?calendarTab=2");
 
+  await page.getByText("<").click({ clickCount: 2 });
+
   await clickOnEmptyReactSelect(page, "action-select-status-filter", "FAITE");
 
   await page.locator('[data-test-id="faite"]').getByText("faite").click();
