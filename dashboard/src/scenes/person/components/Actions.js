@@ -71,11 +71,11 @@ export const Actions = ({ person }) => {
             <ActionsTable filteredData={filteredData} />
           </ModalBody>
           <ModalFooter>
-            <button type="button" className="button-submit" onClick={() => setModalOpen(true)}>
-              ＋ Ajouter une action
-            </button>
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
               Fermer
+            </button>
+            <button type="button" className="button-submit" onClick={() => setModalOpen(true)}>
+              ＋ Ajouter une action
             </button>
           </ModalFooter>
         </ModalContainer>

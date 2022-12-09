@@ -117,11 +117,11 @@ const ServicesSettings = () => {
           </form>
         </ModalBody>
         <ModalFooter>
-          <button type="submit" className="button-submit" form="add-services-group-form">
-            Ajouter
-          </button>
           <button name="cancel" type="button" className="button-cancel" onClick={() => setAddGroupModalVisible(false)}>
             Annuler
+          </button>
+          <button type="submit" className="button-submit" form="add-services-group-form">
+            Ajouter
           </button>
         </ModalFooter>
       </ModalContainer>
@@ -298,14 +298,14 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
           </form>
         </ModalBody>
         <ModalFooter>
-          <button type="submit" className="button-submit" form="edit-service-group-form">
-            Enregistrer
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingGroupTitle(false)}>
+            Annuler
           </button>
           <button type="button" className="button-destructive" onClick={onDeleteGroup}>
             Supprimer
           </button>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingGroupTitle(false)}>
-            Annuler
+          <button type="submit" className="button-submit" form="edit-service-group-form">
+            Enregistrer
           </button>
         </ModalFooter>
       </ModalContainer>
@@ -466,14 +466,14 @@ const Service = ({ service, groupTitle }) => {
           </form>
         </ModalBody>
         <ModalFooter>
-          <button type="submit" className="button-submit" form="edit-service-form">
-            Enregistrer
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingService(false)}>
+            Annuler
           </button>
           <button type="button" className="button-destructive" onClick={onDeleteService}>
             Supprimer
           </button>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingService(false)}>
-            Annuler
+          <button type="submit" className="button-submit" form="edit-service-form">
+            Enregistrer
           </button>
         </ModalFooter>
       </ModalContainer>

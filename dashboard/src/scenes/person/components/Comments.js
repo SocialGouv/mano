@@ -70,11 +70,11 @@ export default function Comments({ person }) {
             <CommentsTable comments={comments} setCommentToEdit={setCommentToEdit} />
           </ModalBody>
           <ModalFooter>
-            <button type="button" className="button-submit" onClick={() => setModalCreateOpen(true)}>
-              ＋ Ajouter un commentaire
-            </button>
             <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
               Fermer
+            </button>
+            <button type="button" className="button-submit" onClick={() => setModalCreateOpen(true)}>
+              ＋ Ajouter un commentaire
             </button>
           </ModalFooter>
         </ModalContainer>

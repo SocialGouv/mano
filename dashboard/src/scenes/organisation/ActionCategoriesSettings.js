@@ -118,11 +118,11 @@ const ActionCategoriesSettings = () => {
           </form>
         </ModalBody>
         <ModalFooter>
-          <button type="submit" className="button-submit" form="add-action-categories-group-form">
-            Ajouter
-          </button>
           <button name="cancel" type="button" className="button-cancel" onClick={() => setAddGroupModalVisible(false)}>
             Annuler
+          </button>
+          <button type="submit" className="button-submit" form="add-action-categories-group-form">
+            Ajouter
           </button>
         </ModalFooter>
       </ModalContainer>
@@ -318,14 +318,14 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
           </form>
         </ModalBody>
         <ModalFooter>
-          <button type="submit" className="button-submit" form="edit-category-group-form">
-            Enregistrer
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingGroupTitle(false)}>
+            Annuler
           </button>
           <button type="button" className="button-destructive" onClick={onDeleteGroup}>
             Supprimer
           </button>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingGroupTitle(false)}>
-            Annuler
+          <button type="submit" className="button-submit" form="edit-category-group-form">
+            Enregistrer
           </button>
         </ModalFooter>
       </ModalContainer>
@@ -465,14 +465,14 @@ const Category = ({ category, groupTitle }) => {
           </form>
         </ModalBody>
         <ModalFooter>
-          <button type="submit" className="button-submit" form="edit-category-form">
-            Enregistrer
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingCategory(false)}>
+            Annuler
           </button>
           <button type="button" className="button-destructive" onClick={onDeleteCategory}>
             Supprimer
           </button>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setIsEditingCategory(false)}>
-            Annuler
+          <button type="submit" className="button-submit" form="edit-category-form">
+            Enregistrer
           </button>
         </ModalFooter>
       </ModalContainer>
