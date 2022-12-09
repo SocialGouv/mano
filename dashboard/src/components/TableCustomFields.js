@@ -283,9 +283,6 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
               disabled={onlyOptionsEditable}
               onChange={(e) => setField({ ...field, label: e.target.value })}
             />
-            {/* by default, if an input is disabled, it's not submitted with the form */}
-            {/* https://stackoverflow.com/questions/1355728/values-of-disabled-inputs-will-not-be-submitted#answer-1355734 */}
-            {onlyOptionsEditable && <input type="hidden" name="label" value={field.label} />}
           </div>
           <div className="tw-basis-1/2 tw-p-4">
             <label htmlFor="type" className="form-text tailwindui">
@@ -300,10 +297,6 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
               value={getValueFromType(field.type)}
               onChange={(v) => setField({ ...field, type: v.value })}
             />
-            {/* if the react-select is disabled, then the native input is not submitted */}
-            {/* because by default, if an input is disabled, it's not submitted with the form */}
-            {/* https://stackoverflow.com/questions/1355728/values-of-disabled-inputs-will-not-be-submitted#answer-1355734 */}
-            {(fieldIsUsed || onlyOptionsEditable) && <input type="hidden" name="type" value={field.type} />}
           </div>
           <div className="tw-basis-1/2 tw-p-4">
             {!!['enum', 'multi-choice'].includes(field.type) && (
