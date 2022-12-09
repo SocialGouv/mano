@@ -18,7 +18,11 @@ export default function InfosMedicales({ person }) {
       <div className="tw-flex">
         <h4 className="tw-flex-1">Informations Médicales</h4>
         <div>
-          <button className="tw-transition hover:tw-scale-125" onClick={() => setEditModal('medical')}>
+          <button
+            className="tw-transition hover:tw-scale-125"
+            onClick={() => setEditModal('medical')}
+            aria-label="Éditer les informations médicales"
+            title="Éditer les informations médicales">
             ✏️
           </button>
         </div>
