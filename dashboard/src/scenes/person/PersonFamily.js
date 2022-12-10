@@ -209,11 +209,11 @@ const NewRelation = ({ open, setOpen, onAddFamilyLink, person }) => {
         </form>
       </ModalBody>
       <ModalFooter>
-        <button type="submit" className="button-submit" form="new-family-relation">
-          Enregistrer
-        </button>
         <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
           Annuler
+        </button>
+        <button type="submit" className="button-submit" form="new-family-relation">
+          Enregistrer
         </button>
       </ModalFooter>
     </ModalContainer>
@@ -255,14 +255,14 @@ const EditRelation = ({ open, setOpen, onEditRelation, onDeleteRelation, relatio
         </form>
       </ModalBody>
       <ModalFooter>
-        <button type="submit" className="button-submit" form="edit-family-relation">
-          Enregistrer
+        <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(null)}>
+          Annuler
         </button>
         <button type="button" className="button-destructive" onClick={() => onDeleteRelation(relationToEdit)}>
           Supprimer
         </button>
-        <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(null)}>
-          Annuler
+        <button type="submit" className="button-submit" form="edit-family-relation">
+          Enregistrer
         </button>
       </ModalFooter>
     </ModalContainer>

@@ -127,7 +127,7 @@ const ModalBody = ({ children, className = '' }) => {
 
 const ModalFooter = ({ children }) => {
   return (
-    <div className="tw-shrink-0 tw-rounded-b-lg tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-flex-row-reverse sm:tw-px-6">
+    <div className="tw-shrink-0 tw-rounded-b-lg tw-border-t tw-border-gray-200 tw-bg-gray-50 tw-px-4 tw-py-3 sm:tw-flex sm:tw-justify-end sm:tw-px-6">
       {children}
     </div>
   );

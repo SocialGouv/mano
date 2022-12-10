@@ -228,18 +228,8 @@ function DocumentModal({ document, onClose, person }) {
         </div>
       </ModalBody>
       <ModalFooter>
-        <button
-          type="button"
-          className="button-submit"
-          onClick={async () => {
-            const file = await API.download({
-              path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
-              encryptedEntityKey: document.encryptedEntityKey,
-            });
-            download(file, document.name);
-            onClose();
-          }}>
-          Télécharger
+        <button type="button" name="cancel" className="button-cancel" onClick={() => onClose()}>
+          Fermer
         </button>
         <button
           type="button"
@@ -271,8 +261,18 @@ function DocumentModal({ document, onClose, person }) {
           }}>
           Supprimer
         </button>
-        <button type="button" name="cancel" className="button-cancel" onClick={() => onClose()}>
-          Fermer
+        <button
+          type="button"
+          className="button-submit"
+          onClick={async () => {
+            const file = await API.download({
+              path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}`,
+              encryptedEntityKey: document.encryptedEntityKey,
+            });
+            download(file, document.name);
+            onClose();
+          }}>
+          Télécharger
         </button>
       </ModalFooter>
     </ModalContainer>

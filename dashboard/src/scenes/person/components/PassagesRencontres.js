@@ -95,6 +95,9 @@ export default function PassagesRencontres({ person }) {
           )}
         </ModalBody>
         <ModalFooter>
+          <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
+            Fermer
+          </button>
           <button
             type="button"
             className="button-submit"
@@ -103,9 +106,6 @@ export default function PassagesRencontres({ person }) {
               else handleAddPassage();
             }}>
             ＋ Ajouter {selected === 'rencontres' ? 'une rencontre' : 'un passage'}
-          </button>
-          <button type="button" name="cancel" className="button-cancel" onClick={() => setFullScreen(false)}>
-            Fermer
           </button>
         </ModalFooter>
       </ModalContainer>

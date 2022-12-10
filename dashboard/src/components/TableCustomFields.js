@@ -350,11 +350,11 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
         </form>
       </ModalBody>
       <ModalFooter>
-        <button type="submit" className="button-submit" form="custom-field-form">
-          Enregistrer
-        </button>
         <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
           Annuler
+        </button>
+        <button type="submit" className="button-submit" form="custom-field-form">
+          Enregistrer
         </button>
       </ModalFooter>
     </ModalContainer>
