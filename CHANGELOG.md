@@ -1,3 +1,10 @@
+## [1.186.11](https://github.com/SocialGouv/mano/compare/v1.186.10...v1.186.11) (2022-12-10)
+
+
+### Bug Fixes
+
+* userResponse error ([00c7c7a](https://github.com/SocialGouv/mano/commit/00c7c7ab6b720173e3d6da5b16fab905e33fa7f8))
+
 ## [1.186.10](https://github.com/SocialGouv/mano/compare/v1.186.9...v1.186.10) (2022-12-10)
 
 
