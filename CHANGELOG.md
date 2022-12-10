@@ -1,3 +1,10 @@
+## [1.186.9](https://github.com/SocialGouv/mano/compare/v1.186.8...v1.186.9) (2022-12-10)
+
+
+### Bug Fixes
+
+* from row-reverse to justify-end ([#1061](https://github.com/SocialGouv/mano/issues/1061)) ([f49d8e0](https://github.com/SocialGouv/mano/commit/f49d8e0142bf2106fcdf0c222d60879b24495f4b))
+
 ## [1.186.8](https://github.com/SocialGouv/mano/compare/v1.186.7...v1.186.8) (2022-12-09)
 
 
