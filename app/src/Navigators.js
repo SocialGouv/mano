@@ -1,12 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import * as Sentry from '@sentry/react-native';
 import { ActionSheetProvider } from '@expo/react-native-action-sheet';
+import { Alert, InteractionManager } from 'react-native';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
+import { useMMKVNumber } from 'react-native-mmkv';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { AgendaIcon, PersonIcon, TerritoryIcon } from './icons';
 import { AppState } from 'react-native';
-import { RecoilRoot } from 'recoil';
+import { RecoilRoot, useRecoilValue, useResetRecoilState } from 'recoil';
 import logEvents from './services/logEvents';
 import Login from './scenes/Login/Login';
 import Action from './scenes/Actions/Action';
@@ -55,6 +57,8 @@ import Collaborations from './scenes/Reports/Collaborations';
 import Treatment from './scenes/Persons/Treatment';
 import Consultation from './scenes/Persons/Consultation';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { currentTeamState, organisationState, teamsState, userState } from './recoil/auth';
+import { appCurrentCacheKey, clearCache } from './services/dataManagement';
 
 const ActionsStack = createStackNavigator();
 const ActionsNavigator = () => {
@@ -269,7 +273,13 @@ const App = () => {
   const navigationRef = useNavigationContainerRef();
 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const resetOrganisation = useResetRecoilState(organisationState);
+  const resetUser = useResetRecoilState(userState);
+  const resetTeams = useResetRecoilState(teamsState);
+  const resetCurrentTeam = useResetRecoilState(currentTeamState);
+  const [_, setLastRefresh] = useMMKVNumber(appCurrentCacheKey);
   const [resetLoginStackKey, setResetLoginStackKey] = useState(0);
+  const clearAllRef = useRef(false);
 
   useEffect(() => {
     logEvents.initLogEvents().then(() => {
@@ -286,14 +296,9 @@ const App = () => {
     });
 
     API.onLogIn = () => setIsLoggedIn(true);
-    API.logout = () => {
-      setResetLoginStackKey((k) => k + 1);
-      API.token = null;
-      AsyncStorage.removeItem('persistent_token');
-      API.enableEncrypt = null;
-      API.hashedOrgEncryptionKey = null;
-      API.orgEncryptionKey = null;
-      API.organisation = null;
+
+    API.logout = async (clearAll) => {
+      clearAllRef.current = clearAll;
       setIsLoggedIn(false);
     };
 
@@ -303,24 +308,60 @@ const App = () => {
     };
   }, []);
 
+  const onLogout = async () => {
+    API.token = null;
+    AsyncStorage.removeItem('persistent_token');
+    API.enableEncrypt = null;
+    API.hashedOrgEncryptionKey = null;
+    API.orgEncryptionKey = null;
+    API.organisation = null;
+    if (clearAllRef.current) {
+      await clearCache();
+      setLastRefresh(0);
+    }
+    InteractionManager.runAfterInteractions(async () => {
+      resetUser();
+      resetOrganisation();
+      resetTeams();
+      resetCurrentTeam();
+      if (clearAllRef.current) {
+        Alert.alert('Vous êtes déconnecté(e)', 'Vous pouvez aussi supprimer Mano pour plus de sécurité');
+        clearAllRef.current = false;
+      }
+      setResetLoginStackKey((k) => k + 1);
+    });
+  };
+
+  const isMounted = useRef(false);
+  useEffect(() => {
+    if (isLoggedIn) return;
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
+    onLogout();
+  }, [isLoggedIn]);
+
   return (
-    <RecoilRoot>
-      <ActionSheetProvider>
-        <NavigationContainer
-          ref={navigationRef}
-          onReady={() => {
-            API.navigation = navigationRef;
-          }}>
-          <AppStack.Navigator initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false, headerShown: false }}>
-            <AppStack.Screen name="LoginStack" component={LoginNavigator} key={resetLoginStackKey} />
-            {!!isLoggedIn && <AppStack.Screen name="Home" component={TabNavigator} />}
-          </AppStack.Navigator>
-          <Loader />
-          <EnvironmentIndicator />
-        </NavigationContainer>
-      </ActionSheetProvider>
-    </RecoilRoot>
+    <ActionSheetProvider>
+      <NavigationContainer
+        ref={navigationRef}
+        onReady={() => {
+          API.navigation = navigationRef;
+        }}>
+        <AppStack.Navigator initialRouteName="LoginStack" screenOptions={{ gestureEnabled: false, headerShown: false }}>
+          <AppStack.Screen name="LoginStack" component={LoginNavigator} key={resetLoginStackKey} />
+          {!!isLoggedIn && <AppStack.Screen name="Home" component={TabNavigator} />}
+        </AppStack.Navigator>
+        <Loader />
+        <EnvironmentIndicator />
+      </NavigationContainer>
+    </ActionSheetProvider>
   );
 };
 
-export default Sentry.wrap(App);
+export default Sentry.wrap(() => (
+  <RecoilRoot>
+    <App />
+  </RecoilRoot>
+));

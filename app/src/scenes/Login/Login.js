@@ -206,6 +206,7 @@ const Login = ({ navigation }) => {
       setPassword('');
       setEncryptionKey('');
       setShowPassword(false);
+      setAuthViaCookie(false);
       setShowEncryptionKeyInput(false);
       setLoading(false);
     }, 500);

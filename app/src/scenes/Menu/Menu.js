@@ -7,33 +7,17 @@ import Spacer from '../../components/Spacer';
 import API from '../../services/api';
 import ScrollContainer from '../../components/ScrollContainer';
 import { FRAMAFORM_MANO, MANO_DOWNLOAD_URL } from '../../config';
-import { useRecoilValue, useResetRecoilState } from 'recoil';
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { useMMKVNumber } from 'react-native-mmkv';
-import { clearCache, appCurrentCacheKey } from '../../services/dataManagement';
+import { useRecoilValue } from 'recoil';
+import { currentTeamState, organisationState } from '../../recoil/auth';
 
 const Menu = ({ navigation }) => {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const resetOrganisation = useResetRecoilState(organisationState);
-  const resetUser = useResetRecoilState(userState);
-  const resetTeams = useResetRecoilState(teamsState);
-  const resetCurrentTeam = useResetRecoilState(currentTeamState);
-  const [_, setLastRefresh] = useMMKVNumber(appCurrentCacheKey);
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
 
   const onLogoutRequest = async (clearAll = false) => {
     setIsLoggingOut(true);
-    resetOrganisation();
-    resetUser();
-    resetTeams();
-    resetCurrentTeam();
-    if (clearAll) {
-      await clearCache();
-      setLastRefresh(0);
-    }
-    API.logout();
-    if (clearAll) Alert.alert('Vous êtes déconnecté(e)', 'Vous pouvez aussi supprimer Mano pour plus de sécurité');
+    API.logout(clearAll);
   };
 
   return (
