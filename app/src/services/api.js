@@ -143,8 +143,8 @@ class ApiService {
         hasMore = response.hasMore;
         page = response.hasMore ? page + 1 : page;
         // at least 1 for showing progress
-        if (args.setProgress) args.setProgress(response.data.length || 1);
-        if (args.setBatchData) args.setBatchData(response.data);
+        if (args.setProgress) args.setProgress(response.decryptedData.length || 1);
+        if (args.setBatchData) args.setBatchData(response.decryptedData);
         await new Promise((res) => setTimeout(res, 50));
       }
       return { ok: true, data, decryptedData };
