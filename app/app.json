@@ -1,7 +1,7 @@
 {
   "name": "mano",
   "displayName": "Mano",
-  "version": "2.27.6",
+  "version": "2.28.0",
   "bundle": {
     "android": "com.mano",
     "ios": "com.mano"
