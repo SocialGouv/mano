@@ -104,6 +104,7 @@ export default function DataLoader() {
             and the latest user roles
           */
           const userResponse = await API.get({ path: '/user/me' });
+          if (!userResponse.ok) return resetLoaderOnError();
           setOrganisation(userResponse.user.organisation);
           setUser(userResponse.user);
         })
