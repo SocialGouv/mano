@@ -1,3 +1,10 @@
+## [1.186.12](https://github.com/SocialGouv/mano/compare/v1.186.11...v1.186.12) (2022-12-12)
+
+
+### Bug Fixes
+
+* **api:** do not re-delete report columns ([#1069](https://github.com/SocialGouv/mano/issues/1069)) ([c5d4a15](https://github.com/SocialGouv/mano/commit/c5d4a15f6fc71987fa19b84af033bf59dc14c3ee))
+
 ## [1.186.11](https://github.com/SocialGouv/mano/compare/v1.186.10...v1.186.11) (2022-12-10)
 
 
