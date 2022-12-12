@@ -32,7 +32,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
       consultation || {
         _id: uuidv4(),
         dueAt: new Date(),
-        completedAt: null,
+        completedAt: new Date(),
         name: '',
         type: '',
         status: TODO,
@@ -45,6 +45,8 @@ export default function ConsultationModal({ onClose, person, consultation }) {
     [organisation._id, person?._id, user._id, consultation]
   );
   const [data, setData] = useState(initialState);
+
+  console.log(data);
 
   async function handleSubmit() {
     if (!data.type) {

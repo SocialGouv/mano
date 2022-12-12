@@ -63,7 +63,7 @@ test("test", async ({ page }) => {
 
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
 
-  await page.getByRole("textbox", { name: "Date" }).fill(`${dayjs().add(-1, "day").format("YYYY-MM-DD")} 10:00`);
+  await page.getByRole("textbox", { name: "Date prévue" }).fill(`${dayjs().add(-1, "day").format("YYYY-MM-DD")} 10:00`);
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await expect(page).toHaveURL(
@@ -81,9 +81,11 @@ test("test", async ({ page }) => {
 
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
 
-  await page.getByRole("textbox", { name: "Date" }).fill(`${dayjs().add(-2, "day").format("YYYY-MM-DD")} 10:00`);
+  await page.getByRole("textbox", { name: "Date prévue" }).fill(`${dayjs().add(-2, "day").format("DD/MM/YYYY")} 10:00`);
 
   await changeReactSelectValue(page, "new-consultation-select-status", "FAITE");
+
+  await expect(page.getByRole("textbox", { name: "Date réalisée" })).toHaveValue(dayjs().format("DD/MM/YYYY HH:mm"));
 
   await page.getByRole("button", { name: "Sauvegarder" }).click();
   await expect(page).toHaveURL(
