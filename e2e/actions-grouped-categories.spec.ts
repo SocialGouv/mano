@@ -6,7 +6,7 @@ import { changeReactSelectValue, clickOnEmptyReactSelect, createAction, loginWit
 test.beforeAll(async () => {
   await populate();
 });
-test.setTimeout(90000);
+test.setTimeout(120000);
 const createGroup = async (page: Page, groupName: string) => {
   await page.getByRole("button", { name: "Ajouter un groupe" }).click();
   await page.getByLabel("Titre du groupe").fill(groupName);

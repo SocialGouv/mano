@@ -12,7 +12,7 @@ dayjs.locale("fr");
 test.beforeAll(async () => {
   await populate();
 });
-test.setTimeout(60000);
+test.setTimeout(90000);
 test("test restricted accesses", async ({ page }) => {
   const person1Name = nanoid();
   const person2Name = nanoid();
