@@ -1,6 +1,6 @@
-import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import { useRecoilState, useSetRecoilState } from 'recoil';
 import { organisationState } from '../recoil/auth';
-import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, preparePersonForEncryption } from '../recoil/persons';
+import { usePreparePersonForEncryption } from '../recoil/persons';
 import { prepareReportForEncryption } from '../recoil/reports';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
 import { dayjsInstance } from '../services/date';
@@ -15,8 +15,7 @@ export default function useDataMigrator() {
 
   const organisationId = organisation?._id;
 
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   return {
     // One "if" for each migration.
@@ -146,11 +145,7 @@ export default function useDataMigrator() {
           outOfActiveListReasons: p.outOfActiveListReason ? [p.outOfActiveListReason] : [],
           healthInsurances: p.healthInsurance ? [p.healthInsurance] : [],
         }));
-        const encryptedPersonsToMigrate = await Promise.all(
-          personsToUpdate
-            .map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial))
-            .map(encryptItem(hashedOrgEncryptionKey))
-        );
+        const encryptedPersonsToMigrate = await Promise.all(personsToUpdate.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
         const response = await API.put({
           path: `/migration/update-outOfActiveListReason-and-healthInsurances-to-multi-choice`,
           body: { personsToUpdate: encryptedPersonsToMigrate },

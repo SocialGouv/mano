@@ -6,16 +6,11 @@ import { useRecoilValue } from 'recoil';
 import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
 import {
-  healthInsuranceOptions,
-  nationalitySituationOptions,
-  personalSituationOptions,
-  reasonsOptions,
-  ressourcesOptions,
-  filterPersonsBase,
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
-  genderOptions,
   fieldsPersonsCustomizableOptionsSelector,
+  filterPersonsBaseSelector,
+  personFieldsSelector,
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
@@ -82,6 +77,7 @@ const Stats = () => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const personFields = useRecoilValue(personFieldsSelector);
   const territories = useRecoilValue(territoriesState);
   const allCategories = useRecoilValue(flattenedCategoriesSelector);
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
@@ -344,6 +340,7 @@ const Stats = () => {
 
   const reportsServices = useMemo(() => reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean), [reports]);
 
+  const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);
   // Add enabled custom fields in filters.
   const filterPersonsWithAllFields = [
     ...filterPersonsBase.map((f) =>
@@ -525,31 +522,33 @@ const Stats = () => {
             onAddFilter={addFilter}
             title="Nationalité"
             field="nationalitySituation"
-            data={getPieData(personsForStats, 'nationalitySituation', { options: nationalitySituationOptions })}
+            data={getPieData(personsForStats, 'nationalitySituation', {
+              options: personFields.find((f) => f.name === 'nationalitySituation').options,
+            })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Genre"
             field="gender"
-            data={getPieData(personsForStats, 'gender', { options: genderOptions })}
+            data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Situation personnelle"
             field="personalSituation"
-            data={getPieData(personsForStats, 'personalSituation', { options: personalSituationOptions })}
+            data={getPieData(personsForStats, 'personalSituation', { options: personFields.find((f) => f.name === 'personalSituation').options })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Motif de la situation de rue"
             field="reasons"
-            data={getPieData(personsForStats, 'reasons', { options: reasonsOptions })}
+            data={getPieData(personsForStats, 'reasons', { options: personFields.find((f) => f.name === 'reasons').options })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Ressources des personnes suivies"
             field="resources"
-            data={getPieData(personsForStats, 'resources', { options: ressourcesOptions })}
+            data={getPieData(personsForStats, 'resources', { options: personFields.find((f) => f.name === 'resources').options })}
           />
           <AgeRangeBar persons={personsForStats} />
           <StatsCreatedAtRangeBar persons={personsForStats} />
@@ -559,7 +558,7 @@ const Stats = () => {
             onAddFilter={addFilter}
             title="Couverture médicale des personnes"
             field="healthInsurances"
-            data={getPieData(personsForStats, 'healthInsurances', { options: healthInsuranceOptions })}
+            data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
           />
           <CustomResponsivePie onAddFilter={addFilter} title="Avec animaux" data={getPieData(personsForStats, 'hasAnimal')} />
           <CustomResponsivePie
@@ -596,19 +595,21 @@ const Stats = () => {
             data={getPieData(
               passages.filter((p) => !!p.gender),
               'gender',
-              { options: [...genderOptions, 'Non précisé'] }
+              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
             )}
           />
           <CustomResponsivePie
             title="Nombre de personnes différentes passées (passages anonymes exclus)"
-            data={getPieData(personsInPassagesOfPeriod, 'gender', { options: [...genderOptions, 'Non précisé'] })}
+            data={getPieData(personsInPassagesOfPeriod, 'gender', {
+              options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'],
+            })}
           />
           <CustomResponsivePie
             title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
             data={getPieData(
               personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
               'gender',
-              { options: [...genderOptions, 'Non précisé'] }
+              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
             )}
           />
         </TabPane>
@@ -620,19 +621,21 @@ const Stats = () => {
             data={getPieData(
               rencontres.filter((p) => !!p.gender),
               'gender',
-              { options: [...genderOptions, 'Non précisé'] }
+              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
             )}
           />
           <CustomResponsivePie
             title="Nombre de personnes différentes rencontrées"
-            data={getPieData(personsInRencontresOfPeriod, 'gender', { options: [...genderOptions, 'Non précisé'] })}
+            data={getPieData(personsInRencontresOfPeriod, 'gender', {
+              options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'],
+            })}
           />
           <CustomResponsivePie
             title="Nombre de nouvelles personnes rencontrées"
             data={getPieData(
               personsInRencontresOfPeriod.filter((personId) => !personsInRencontresBeforePeriod.includes(personId)),
               'gender',
-              { options: [...genderOptions, 'Non précisé'] }
+              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
             )}
           />
         </TabPane>

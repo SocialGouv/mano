@@ -8,11 +8,9 @@ import dayjs from 'dayjs';
 import ButtonCustom from '../../components/ButtonCustom';
 import {
   allowedFieldsInHistorySelector,
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
   personFieldsIncludingCustomFieldsSelector,
   personsState,
-  preparePersonForEncryption,
+  usePreparePersonForEncryption,
 } from '../../recoil/persons';
 import SelectCustom from '../../components/SelectCustom';
 import CustomFieldInput from '../../components/CustomFieldInput';
@@ -77,9 +75,8 @@ const MergeTwoPersons = ({ person }) => {
   const consultations = useRecoilValue(consultationsState);
   const medicalFiles = useRecoilValue(medicalFileState);
   const treatments = useRecoilValue(treatmentsState);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const { refresh } = useDataLoader();
 
@@ -237,7 +234,7 @@ const MergeTwoPersons = ({ person }) => {
 
                 if (!!Object.keys(historyEntry.data)?.length) body.history = [...(initMergedPerson.history || []), historyEntry];
 
-                const mergedPerson = preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body);
+                const mergedPerson = preparePersonForEncryption(body);
 
                 const mergedActions = actions
                   .filter((a) => a.person === personToMergeAndDelete._id)

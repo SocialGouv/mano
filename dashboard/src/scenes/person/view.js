@@ -10,12 +10,7 @@ import { MedicalFile } from './MedicalFile';
 import Summary from './components/Summary';
 import BackButton from '../../components/backButton';
 import UserName from '../../components/UserName';
-import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../recoil/persons';
+import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { toast } from 'react-toastify';
 import { organisationState, userState } from '../../recoil/auth';
 import PersonFamily from './PersonFamily';
@@ -37,8 +32,6 @@ export default function View() {
   const location = useLocation();
   const API = useApi();
   const organisation = useRecoilValue(organisationState);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const person = useRecoilValue(populatedPersonSelector({ personId }));
   const personGroup = useRecoilValue(groupSelector({ personId }));
   const setPersons = useSetRecoilState(personsState);
@@ -46,6 +39,7 @@ export default function View() {
   const [currentTab, setCurrentTab] = useSearchParamState('tab', new URLSearchParams(location.search)?.get('tab') || 'Résumé', {
     resetToDefaultIfTheFollowingValueChange: personId,
   });
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   return (
     <div>
@@ -102,7 +96,7 @@ export default function View() {
             handleChange={async (newUser) => {
               const response = await API.put({
                 path: `/person/${person._id}`,
-                body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ ...person, user: newUser }),
+                body: preparePersonForEncryption({ ...person, user: newUser }),
               });
               if (response.ok) {
                 toast.success('Personne mise à jour (créée par)');

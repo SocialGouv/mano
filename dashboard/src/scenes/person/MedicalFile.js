@@ -7,14 +7,7 @@ import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
-import {
-  personsState,
-  customFieldsPersonsSocialSelector,
-  customFieldsPersonsMedicalSelector,
-  preparePersonForEncryption,
-  genderOptions,
-  healthInsuranceOptions,
-} from '../../recoil/persons';
+import { personsState, usePreparePersonForEncryption, personFieldsSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
@@ -56,9 +49,9 @@ export function MedicalFile({ person }) {
   const [currentTreatment, setCurrentTreatment] = useState(null);
   const [isNewTreatment, setIsNewTreatment] = useState(false);
 
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const personFields = useRecoilValue(personFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const user = useRecoilValue(userState);
   const users = useRecoilValue(usersState);
@@ -139,7 +132,7 @@ export function MedicalFile({ person }) {
         onSubmit={async (body) => {
           const response = await API.put({
             path: `/person/${person._id}`,
-            body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)({ ...person, ...body }),
+            body: preparePersonForEncryption({ ...person, ...body }),
           });
           if (!response.ok) return;
           setPersons((persons) =>
@@ -172,7 +165,7 @@ export function MedicalFile({ person }) {
                 <Col md={4}>
                   <Label htmlFor="person-select-gender">Genre</Label>
                   <SelectAsInput
-                    options={genderOptions}
+                    options={personFields.find((f) => f.name === 'gender').options}
                     name="gender"
                     value={values.gender || ''}
                     onChange={handleChange}
@@ -189,7 +182,7 @@ export function MedicalFile({ person }) {
                 <Col md={4}>
                   <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
                   <SelectCustom
-                    options={healthInsuranceOptions.map((_option) => ({ value: _option, label: _option }))}
+                    options={personFields.find((f) => f.name === 'healthInsurances').options.map((_option) => ({ value: _option, label: _option }))}
                     value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
                     getOptionValue={(i) => i.value}
                     getOptionLabel={(i) => i.label}

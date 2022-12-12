@@ -1,12 +1,7 @@
 import React, { useMemo, useRef, useState } from 'react';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
-import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../recoil/persons';
+import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { selector, useRecoilState, useRecoilValue } from 'recoil';
 import AsyncSelect from 'react-select/async-creatable';
 import useApi from '../../services/api';
@@ -69,11 +64,10 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
   const user = useRecoilValue(userState);
   const passages = useRecoilValue(passagesState);
   const rencontres = useRecoilValue(rencontresState);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const API = useApi();
   const optionsExist = useRef(null);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const searchablePersons = useRecoilValue(searchablePersonsSelector);
 
@@ -148,7 +142,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
         onChange([...currentValue, { ...newPerson, __isNew__: true }]);
         const personResponse = await API.post({
           path: '/person',
-          body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(newPerson),
+          body: preparePersonForEncryption(newPerson),
         });
         setIsDisabled(false);
         if (personResponse.ok) {

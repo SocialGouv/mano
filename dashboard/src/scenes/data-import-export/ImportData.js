@@ -4,13 +4,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
 import { Modal, ModalBody, ModalHeader, Alert } from 'reactstrap';
 import ButtonCustom from '../../components/ButtonCustom';
-import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  personFieldsIncludingCustomFieldsSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../recoil/persons';
+import { personFieldsIncludingCustomFieldsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { teamsState, userState } from '../../recoil/auth';
 import { isNullOrUndefined } from '../../utils';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
@@ -24,8 +18,7 @@ const ImportData = () => {
   const setAllPersons = useSetRecoilState(personsState);
   const teams = useRecoilValue(teamsState);
 
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const API = useApi();
 
@@ -126,13 +119,11 @@ const ImportData = () => {
       }
 
       if (hashedOrgEncryptionKey) {
-        const encryptedPersons = await Promise.all(
-          persons.map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)).map(encryptItem(hashedOrgEncryptionKey))
-        );
+        const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
         setDataToImport(encryptedPersons);
       } else {
         setDataToImport(
-          persons.map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)).map((person) => {
+          persons.map(preparePersonForEncryption).map((person) => {
             delete person.decrypted;
             return person;
           })

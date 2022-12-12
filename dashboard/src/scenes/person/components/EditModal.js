@@ -1,21 +1,12 @@
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import SelectAsInput from '../../../components/SelectAsInput';
 import {
-  addressDetails,
-  addressDetailsFixedFields,
   allowedFieldsInHistorySelector,
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
-  employmentOptions,
-  genderOptions,
-  healthInsuranceOptions,
-  nationalitySituationOptions,
-  personalSituationOptions,
+  personFieldsSelector,
   personsState,
-  preparePersonForEncryption,
-  reasonsOptions,
-  ressourcesOptions,
-  yesNoOptions,
+  usePreparePersonForEncryption,
 } from '../../../recoil/persons';
 import { dateForDatePicker } from '../../../services/date';
 import DatePicker from 'react-datepicker';
@@ -39,6 +30,8 @@ export default function EditModal({ person, selectedPanel, onClose }) {
   const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
   const API = useApi();
+  const preparePersonForEncryption = usePreparePersonForEncryption();
+  const personFields = useRecoilValue(personFieldsSelector);
 
   return (
     <Modal isOpen={true} toggle={() => onClose()} size="lg" backdrop="static">
@@ -65,7 +58,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
 
             const response = await API.put({
               path: `/person/${person._id}`,
-              body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
+              body: preparePersonForEncryption(body),
             });
             if (response.ok) {
               const newPerson = response.decryptedData;
@@ -115,7 +108,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                         <Col md={4}>
                           <Label htmlFor="person-select-gender">Genre</Label>
                           <SelectAsInput
-                            options={genderOptions}
+                            options={personFields.find((f) => f.name === 'gender').options}
                             name="gender"
                             value={values.gender || ''}
                             onChange={handleChange}
@@ -243,7 +236,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <Col md={4}>
                             <Label htmlFor="person-select-personalSituation">Situation personnelle</Label>
                             <SelectAsInput
-                              options={personalSituationOptions}
+                              options={personFields.find((f) => f.name === 'personalSituation').options}
                               name="personalSituation"
                               value={values.personalSituation || ''}
                               onChange={handleChange}
@@ -261,7 +254,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                             <FormGroup>
                               <Label htmlFor="person-select-animals">Avec animaux</Label>
                               <SelectAsInput
-                                options={yesNoOptions}
+                                options={personFields.find((f) => f.name === 'hasAnimal').options}
                                 name="hasAnimal"
                                 value={values.hasAnimal || ''}
                                 onChange={handleChange}
@@ -274,7 +267,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                             <FormGroup>
                               <Label htmlFor="person-select-address">Hébergement</Label>
                               <SelectAsInput
-                                options={yesNoOptions}
+                                options={personFields.find((f) => f.name === 'address').options}
                                 name="address"
                                 value={values.address || ''}
                                 onChange={handleChange}
@@ -290,7 +283,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                             <FormGroup>
                               <Label htmlFor="person-select-nationalitySituation">Nationalité</Label>
                               <SelectAsInput
-                                options={nationalitySituationOptions}
+                                options={personFields.find((f) => f.name === 'nationalitySituation').options}
                                 name="nationalitySituation"
                                 value={values.nationalitySituation || ''}
                                 onChange={handleChange}
@@ -303,7 +296,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                             <FormGroup>
                               <Label htmlFor="person-select-employment">Emploi</Label>
                               <SelectAsInput
-                                options={employmentOptions}
+                                options={personFields.find((f) => f.name === 'employment').options}
                                 name="employment"
                                 value={values.employment || ''}
                                 onChange={handleChange}
@@ -348,7 +341,9 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <Col md={4}>
                             <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
                             <SelectCustom
-                              options={healthInsuranceOptions.map((_option) => ({ value: _option, label: _option }))}
+                              options={personFields
+                                .find((f) => f.name === 'healthInsurances')
+                                .options.map((_option) => ({ value: _option, label: _option }))}
                               value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
                               getOptionValue={(i) => i.value}
                               getOptionLabel={(i) => i.label}
@@ -397,6 +392,11 @@ export default function EditModal({ person, selectedPanel, onClose }) {
 }
 
 const AddressDetails = ({ values, onChange }) => {
+  const personFields = useRecoilValue(personFieldsSelector);
+
+  const addressDetails = personFields.find((f) => f.name === 'addressDetail').options;
+  const addressDetailsFixedFields = addressDetails.filter((o) => o !== 'Autre');
+
   const isFreeFieldAddressDetail = (addressDetail = '') => {
     if (!addressDetail) return false;
     return !addressDetailsFixedFields.includes(addressDetail);
@@ -441,38 +441,44 @@ const AddressDetails = ({ values, onChange }) => {
   );
 };
 
-const Reasons = ({ value, onChange }) => (
-  <FormGroup>
-    <Label htmlFor="person-select-reasons">Motif de la situation en rue</Label>
-    <SelectCustom
-      options={reasonsOptions.map((_option) => ({ value: _option, label: _option }))}
-      value={value?.map((_option) => ({ value: _option, label: _option })) || []}
-      getOptionValue={(i) => i.value}
-      getOptionLabel={(i) => i.label}
-      onChange={(values) => onChange({ currentTarget: { value: values.map((v) => v.value), name: 'reasons' } })}
-      name="reasons"
-      isClearable={false}
-      isMulti
-      inputId="person-select-reasons"
-      classNamePrefix="person-select-reasons"
-    />
-  </FormGroup>
-);
+const Reasons = ({ value, onChange }) => {
+  const personFields = useRecoilValue(personFieldsSelector);
+  return (
+    <FormGroup>
+      <Label htmlFor="person-select-reasons">Motif de la situation en rue</Label>
+      <SelectCustom
+        options={personFields.find((f) => f.name === 'reasons').options.map((_option) => ({ value: _option, label: _option }))}
+        value={value?.map((_option) => ({ value: _option, label: _option })) || []}
+        getOptionValue={(i) => i.value}
+        getOptionLabel={(i) => i.label}
+        onChange={(values) => onChange({ currentTarget: { value: values.map((v) => v.value), name: 'reasons' } })}
+        name="reasons"
+        isClearable={false}
+        isMulti
+        inputId="person-select-reasons"
+        classNamePrefix="person-select-reasons"
+      />
+    </FormGroup>
+  );
+};
 
-const Ressources = ({ value, onChange }) => (
-  <FormGroup>
-    <Label htmlFor="person-select-resources">Ressources</Label>
-    <SelectCustom
-      options={ressourcesOptions.map((_option) => ({ value: _option, label: _option }))}
-      value={value?.map((_option) => ({ value: _option, label: _option })) || []}
-      getOptionValue={(i) => i.value}
-      getOptionLabel={(i) => i.label}
-      onChange={(values) => onChange({ currentTarget: { value: values.map((v) => v.value), name: 'resources' } })}
-      name="resources"
-      isClearable={false}
-      isMulti
-      inputId="person-select-resources"
-      classNamePrefix="person-select-resources"
-    />
-  </FormGroup>
-);
+const Ressources = ({ value, onChange }) => {
+  const personFields = useRecoilValue(personFieldsSelector);
+  return (
+    <FormGroup>
+      <Label htmlFor="person-select-resources">Ressources</Label>
+      <SelectCustom
+        options={personFields.find((f) => f.name === 'resources').options.map((_option) => ({ value: _option, label: _option }))}
+        value={value?.map((_option) => ({ value: _option, label: _option })) || []}
+        getOptionValue={(i) => i.value}
+        getOptionLabel={(i) => i.label}
+        onChange={(values) => onChange({ currentTarget: { value: values.map((v) => v.value), name: 'resources' } })}
+        name="resources"
+        isClearable={false}
+        isMulti
+        inputId="person-select-resources"
+        classNamePrefix="person-select-resources"
+      />
+    </FormGroup>
+  );
+};

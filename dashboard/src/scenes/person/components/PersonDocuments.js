@@ -5,12 +5,7 @@ import PersonName from '../../../components/PersonName';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../components/tailwind/Modal';
 import { organisationState, usersState, userState } from '../../../recoil/auth';
 import { groupsState } from '../../../recoil/groups';
-import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../../recoil/persons';
+import { personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
 import useApi from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
@@ -19,13 +14,12 @@ import { download } from '../../../utils';
 const PersonDocuments = ({ person }) => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
   const API = useApi();
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const user = useRecoilValue(userState);
   const setPersons = useSetRecoilState(personsState);
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
   const users = useRecoilValue(usersState);
   const organisation = useRecoilValue(organisationState);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const documents = [...(person.documents || []), ...(person.groupDocuments || [])].sort((a, b) => a.createdAt > b.createdAt);
 
@@ -63,10 +57,7 @@ const PersonDocuments = ({ person }) => {
               const { data: file, encryptedEntityKey } = docResponse;
               const personResponse = await API.put({
                 path: `/person/${person._id}`,
-                body: preparePersonForEncryption(
-                  customFieldsPersonsMedical,
-                  customFieldsPersonsSocial
-                )({
+                body: preparePersonForEncryption({
                   ...person,
                   documents: [
                     ...(person.documents || []),
@@ -154,8 +145,7 @@ const PersonDocuments = ({ person }) => {
 
 function DocumentModal({ document, onClose, person }) {
   const users = useRecoilValue(usersState);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
   const setPersons = useSetRecoilState(personsState);
   const API = useApi();
   const groups = useRecoilValue(groupsState);
@@ -191,10 +181,7 @@ function DocumentModal({ document, onClose, person }) {
                     const isAttachedToAnotherPerson = _person._id !== person._id;
                     const personResponse = await API.put({
                       path: `/person/${_person._id}`,
-                      body: preparePersonForEncryption(
-                        customFieldsPersonsMedical,
-                        customFieldsPersonsSocial
-                      )({
+                      body: preparePersonForEncryption({
                         ..._person,
                         documents: _person.documents.map((_document) =>
                           document._id === _document._id ? { ..._document, group: !_document.group } : _document
@@ -240,10 +227,7 @@ function DocumentModal({ document, onClose, person }) {
             await API.delete({ path: document.downloadPath ?? `/person/${document.person ?? person._id}/document/${document.file.filename}` });
             const personResponse = await API.put({
               path: `/person/${_person._id}`,
-              body: preparePersonForEncryption(
-                customFieldsPersonsMedical,
-                customFieldsPersonsSocial
-              )({
+              body: preparePersonForEncryption({
                 ..._person,
                 documents: _person.documents.filter((d) => d._id !== document._id),
               }),

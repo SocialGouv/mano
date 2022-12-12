@@ -10,6 +10,7 @@ const validateEncryptionAndMigrations = require("../middleware/validateEncryptio
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");
+const { serializeOrganisation } = require("../utils/data-serializer");
 
 router.put(
   "/",
@@ -54,7 +55,7 @@ router.put(
       organisation.set({ actionsGroupedCategories });
       await organisation.save({ transaction: tx });
     });
-    return res.status(200).send({ ok: true, data: organisation });
+    return res.status(200).send({ ok: true, data: serializeOrganisation(organisation) });
   })
 );
 
