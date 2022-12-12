@@ -24,7 +24,7 @@
     "libsodium-wrappers": "^0.7.9",
     "localforage": "^1.10.0",
     "page-lifecycle": "^0.1.2",
-    "query-string": "^7.1.1",
+    "query-string": "^8.0.0",
     "react": "^18.2.0",
     "react-datepicker": "^4.0.0",
     "react-dom": "^18.2.0",
