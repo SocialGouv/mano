@@ -16,6 +16,7 @@ import SelectAsInput from './SelectAsInput';
 import SelectStatus from './SelectStatus';
 import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
+import SelectPerson from './SelectPerson';
 
 export default function ConsultationModal({ onClose, person, consultation }) {
   const organisation = useRecoilValue(organisationState);
@@ -126,6 +127,18 @@ export default function ConsultationModal({ onClose, person, consultation }) {
             e.preventDefault();
             handleSubmit();
           }}>
+          <div>
+            {!person && (
+              <SelectPerson
+                value={data.person}
+                onChange={(e) => {
+                  setData({ ...data, person: e.currentTarget.value });
+                }}
+                isMulti={false}
+                inputId="create-consultation-person-select"
+              />
+            )}
+          </div>
           <div className="tw-grid tw-grid-cols-2 tw-gap-4">
             <div className="tw-flex tw-flex-col">
               <label htmlFor="create-consultation-name">Nom (facultatif)</label>
@@ -223,10 +236,10 @@ export default function ConsultationModal({ onClose, person, consultation }) {
               </div>
             </div>
           </div>
-          {person && (
+          {data.person && (
             <Documents
               title="Documents"
-              person={person}
+              person={data.person}
               documents={data.documents || []}
               onAdd={async (docResponse) => {
                 const { data: file, encryptedEntityKey } = docResponse;
@@ -240,7 +253,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
                       encryptedEntityKey,
                       createdAt: new Date(),
                       createdBy: user._id,
-                      downloadPath: `/person/${person._id}/document/${file.filename}`,
+                      downloadPath: `/person/${data.person._id}/document/${file.filename}`,
                       file,
                     },
                   ],

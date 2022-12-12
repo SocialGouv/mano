@@ -30,6 +30,7 @@ import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySele
 import { useLocalStorage } from 'react-use';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import TagTeam from '../../components/TagTeam';
+import ConsultationModal from '../../components/ConsultationModal';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
@@ -124,6 +125,8 @@ const List = () => {
   const { isLoading, refresh } = useDataLoader();
   const [modalOpen, setModalOpen] = useState(false);
 
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+
   const [search, setSearch] = useSearchParamState('search', '');
   const [page, setPage] = useSearchParamState('page', 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
   const [categories, setCategories] = useLocalStorage('action-categories', []);
@@ -164,8 +167,8 @@ const List = () => {
         }
       />
       <div className="tw-mb-5 tw-flex tw-flex-row tw-justify-center">
-        <div className="noprint tw-flex tw-w-full tw-justify-end">
-          <ButtonCustom onClick={() => refresh()} title="Rafraichir" disabled={isLoading} color="link" className="tw-mr-5" />
+        <div className="noprint tw-flex tw-w-full tw-justify-end tw-gap-3">
+          <ButtonCustom onClick={() => refresh()} title="Rafraichir" disabled={isLoading} color="link" />
           <ButtonCustom
             icon={agendaIcon}
             disabled={!currentTeam}
@@ -177,6 +180,18 @@ const List = () => {
             title="Créer une nouvelle action"
             padding={'12px 24px'}
           />
+          {Boolean(user.healthcareProfessional) && (
+            <ButtonCustom
+              icon={agendaIcon}
+              disabled={!currentTeam}
+              onClick={() => {
+                setShowConsultationModal(true);
+              }}
+              color="primary"
+              title="Créer une nouvelle consultation"
+              padding={'12px 24px'}
+            />
+          )}
         </div>
       </div>
       <div className="tw-mb-10 tw-flex tw-flex-wrap tw-border-b tw-border-gray-200">
@@ -347,6 +362,13 @@ const List = () => {
         </>
       )}
       <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
+      {showConsultationModal && (
+        <ConsultationModal
+          onClose={() => {
+            setShowConsultationModal(false);
+          }}
+        />
+      )}
     </>
   );
 };
