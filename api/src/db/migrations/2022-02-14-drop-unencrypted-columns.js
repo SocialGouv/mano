@@ -73,8 +73,6 @@ module.exports = async () => {
     await sequelize.query(
       `ALTER TABLE "mano"."Report"
       DROP COLUMN IF EXISTS "description",
-      DROP COLUMN IF EXISTS "date",
-      DROP COLUMN IF EXISTS "team",
       DROP COLUMN IF EXISTS "services",
       DROP COLUMN IF EXISTS "passages",
       DROP COLUMN IF EXISTS "collaborations";`
