@@ -50,9 +50,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
     if (!data.type) {
       return toast.error('Veuillez choisir un type de consultation');
     }
-    if ([DONE, CANCEL].includes(data.status)) {
-      if (!initialState.completedAt) data.completedAt = new Date();
-    } else {
+    if (![DONE, CANCEL].includes(data.status)) {
       data.completedAt = null;
     }
     const consultationResponse = isNewConsultation
@@ -188,6 +186,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
                 );
               })}
           </Row>
+          <hr />
           <div className="tw-grid tw-grid-cols-2 tw-gap-4">
             <div>
               <label htmlFor="new-consultation-select-status">Statut</label>
@@ -202,7 +201,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
               />
             </div>
             <div>
-              <label htmlFor="create-consultation-dueat">Date</label>
+              <label htmlFor="create-consultation-dueat">Date prévue</label>
               <div>
                 <ReactDatePicker
                   locale="fr"
@@ -235,7 +234,27 @@ export default function ConsultationModal({ onClose, person, consultation }) {
                 </label>
               </div>
             </div>
+            {[DONE, CANCEL].includes(data.status) && (
+              <div>
+                <label htmlFor="create-consultation-completedAt">Date réalisée</label>
+                <div>
+                  <ReactDatePicker
+                    locale="fr"
+                    className="form-control"
+                    id="create-consultation-completedAt"
+                    selected={dateForDatePicker(data.completedAt || dayjsInstance())}
+                    onChange={(completedAt) => {
+                      setData({ ...data, completedAt });
+                    }}
+                    timeInputLabel="Heure :"
+                    dateFormat={'dd/MM/yyyy HH:mm'}
+                    showTimeInput
+                  />
+                </div>
+              </div>
+            )}
           </div>
+          <hr />
           {data.person && (
             <Documents
               title="Documents"
