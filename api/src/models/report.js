@@ -8,6 +8,7 @@ const schema = {
   organisation: { type: DataTypes.UUID, references: { model: "Organisation", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
   date: { type: DataTypes.TEXT },
   team: { type: DataTypes.UUID, references: { model: "Team", key: "_id", deferrable: Deferrable.INITIALLY_IMMEDIATE } },
+  debug: { type: DataTypes.JSONB },
   encrypted: { type: DataTypes.TEXT },
   encryptedEntityKey: { type: DataTypes.TEXT },
 };
