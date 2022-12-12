@@ -1,3 +1,10 @@
+## [1.186.13](https://github.com/SocialGouv/mano/compare/v1.186.12...v1.186.13) (2022-12-12)
+
+
+### Bug Fixes
+
+* **dashboard:** custom field form when disabled ([908880c](https://github.com/SocialGouv/mano/commit/908880cf8285ed98761b6ed9c6d16709d03454d2))
+
 ## [1.186.12](https://github.com/SocialGouv/mano/compare/v1.186.11...v1.186.12) (2022-12-12)
 
 
