@@ -1,3 +1,10 @@
+# [1.187.0](https://github.com/SocialGouv/mano/compare/v1.186.13...v1.187.0) (2022-12-12)
+
+
+### Features
+
+* **dashboard:** create new consultation from agenda ([#1070](https://github.com/SocialGouv/mano/issues/1070)) ([eb6838f](https://github.com/SocialGouv/mano/commit/eb6838f0b00cec20db291ba69c68681f8a868d15))
+
 ## [1.186.13](https://github.com/SocialGouv/mano/compare/v1.186.12...v1.186.13) (2022-12-12)
 
 
