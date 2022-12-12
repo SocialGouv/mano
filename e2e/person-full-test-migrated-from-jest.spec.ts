@@ -171,12 +171,12 @@ test("test", async ({ page }) => {
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("AZAZAZAZAZAZAZAZA");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
-  await page.getByText("Le type est obligatoire").click();
+  await page.getByText("Veuillez choisir un type de consultation").click();
   await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
   await page.getByRole("button", { name: "Sauvegarder" }).click();
 
   await page.locator('small:has-text("Médicale")').click();
-  await page.getByRole("button", { name: "Fermer la fenêtre de modification de la consultation" }).click();
+  await page.getByRole("button", { name: "Annuler" }).click();
   await page.getByRole("button", { name: "Lieux fréquentés" }).click();
   await page.getByRole("button", { name: "Historique" }).click();
   await page.locator('[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"test pseudo\\""]').click();
