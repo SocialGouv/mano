@@ -283,6 +283,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
               disabled={onlyOptionsEditable}
               onChange={(e) => setField({ ...field, label: e.target.value })}
             />
+            {onlyOptionsEditable && <input type="hidden" name="label" value={field.type} />}
           </div>
           <div className="tw-basis-1/2 tw-p-4">
             <label htmlFor="type" className="form-text tailwindui">
@@ -297,6 +298,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
               value={getValueFromType(field.type)}
               onChange={(v) => setField({ ...field, type: v.value })}
             />
+            {(fieldIsUsed || onlyOptionsEditable) && <input type="hidden" name="type" value={field.type} />}
           </div>
           <div className="tw-basis-1/2 tw-p-4">
             {!!['enum', 'multi-choice'].includes(field.type) && (
@@ -332,6 +334,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
               />
               Activé
             </label>
+            {onlyOptionsEditable && <input type="hidden" name="enabled" value={field.enabled} />}
           </div>
           <div className="tw-basis-1/2 tw-p-4">
             <label htmlFor="showInStats" className="tw-items-center">
@@ -346,6 +349,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
               />
               Voir dans les statistiques
             </label>
+            {onlyOptionsEditable && <input type="hidden" name="showInStats" value={field.showInStats} />}
           </div>
         </form>
       </ModalBody>
