@@ -1450,6 +1450,7 @@ const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString
   const setReports = useSetRecoilState(reportsState);
   const API = useApi();
   const lastLoad = useRecoilValue(lastLoadState);
+  const component = useRef(new Error().stack.split('\n')[2].trim().split(' ')[1]);
 
   return (
     <StyledBox>
@@ -1480,7 +1481,15 @@ const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString
                   };
                   const isNew = !reportAtDate?._id;
                   const res = isNew
-                    ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+                    ? await API.post({
+                        path: '/report',
+                        body: prepareReportForEncryption(reportUpdate),
+                        headers: {
+                          'debug-report-component': 'DescriptionAndCollaborations',
+                          'debug-report-parent-component': component.current,
+                          'debug-report-function': new Error().stack.split('\n')[2].trim().split(' ')[1],
+                        },
+                      })
                     : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });
                   if (res.ok) {
                     setReports((reports) =>

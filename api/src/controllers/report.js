@@ -95,6 +95,21 @@ router.post(
       }
     }
 
+    console.log({
+      organisation: req.user.organisation,
+      encrypted: req.body.encrypted,
+      encryptedEntityKey: req.body.encryptedEntityKey,
+      team: req.body.team,
+      date: req.body.date,
+      debug: {
+        version: req.headers.version,
+        user: req.user._id,
+        component: req.headers["debug-report-component"],
+        parentComponent: req.headers["debug-report-parent-component"],
+        function: req.headers["debug-report-function"],
+      },
+    });
+
     const data = await Report.create(
       {
         organisation: req.user.organisation,
@@ -102,6 +117,13 @@ router.post(
         encryptedEntityKey: req.body.encryptedEntityKey,
         team: req.body.team,
         date: req.body.date,
+        debug: {
+          version: req.headers.version,
+          user: req.user._id,
+          component: req.headers["debug-report-component"],
+          parentComponent: req.headers["debug-report-parent-component"],
+          function: req.headers["debug-report-function"],
+        },
       },
       { returning: true }
     );

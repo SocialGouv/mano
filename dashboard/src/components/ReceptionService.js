@@ -13,6 +13,7 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
   const [reports, setReports] = useRecoilState(reportsState);
   const lastLoad = useRecoilValue(lastLoadState);
   const [selected, setSelected] = useState(groupedServices[0]?.groupTitle || null);
+  const component = useRef(new Error().stack.split('\n')[2].trim().split(' ')[1]);
 
   const API = useApi();
 
@@ -80,8 +81,19 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
 
       const isNew = !reportUpdate?._id;
       const res = isNew
-        ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-        : await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
+        ? await API.post({
+            path: '/report',
+            body: prepareReportForEncryption(reportUpdate),
+            headers: {
+              'debug-report-component': 'ReceptionService',
+              'debug-report-parent-component': component.current,
+              'debug-report-function': new Error().stack.split?.('\n')?.[2]?.trim()?.split?.(' ')?.[1],
+            },
+          })
+        : await API.put({
+            path: `/report/${reportUpdate._id}`,
+            body: prepareReportForEncryption(reportUpdate),
+          });
       if (res.ok) {
         setReports((reports) =>
           isNew

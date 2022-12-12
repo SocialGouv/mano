@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 
 import ButtonCustom from './ButtonCustom';
@@ -13,6 +13,7 @@ const ReportDescriptionModale = ({ report }) => {
   const API = useApi();
   const [open, setOpen] = useState(false);
   const lastLoad = useRecoilValue(lastLoadState);
+  const component = useRef(new Error().stack.split('\n')[2].trim().split(' ')[1]);
 
   return (
     <>
@@ -41,7 +42,15 @@ const ReportDescriptionModale = ({ report }) => {
               };
               const isNew = !reportAtDate?._id;
               const res = isNew
-                ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+                ? await API.post({
+                    path: '/report',
+                    body: prepareReportForEncryption(reportUpdate),
+                    headers: {
+                      'debug-report-component': 'ReportDescriptionModale',
+                      'debug-report-parent-component': component.current,
+                      'debug-report-function': new Error().stack.split('\n')[2].trim().split(' ')[1],
+                    },
+                  })
                 : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });
               if (res.ok) {
                 setReports((reports) =>
