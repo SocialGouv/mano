@@ -11,7 +11,7 @@ const useCreateReportAtDateIfNotExist = () => {
   const [reports, setReports] = useRecoilState(reportsState);
   const lastLoad = useRecoilValue(lastLoadState);
   // https://stackoverflow.com/questions/280389/how-do-you-find-out-the-caller-function-in-javascript
-  const component = useRef(new Error().stack.split('\n')[2].trim().split(' ')[1]);
+  const parentComponent = useRef(new Error().stack?.split('\n')[2]?.trim().split(' ')[1]);
 
   const API = useApi();
 
