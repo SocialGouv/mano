@@ -12,8 +12,10 @@ import {
   customFieldsPersonsSocialSelector,
   fieldsPersonsCustomizableOptionsSelector,
   personFieldsIncludingCustomFieldsSelector,
+  personsState,
+  usePreparePersonForEncryption,
 } from '../../recoil/persons';
-import { defaultCustomFields } from '../../recoil/territoryObservations';
+import { defaultCustomFields, territoryObservationsState } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState, userState } from '../../recoil/auth';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
@@ -25,7 +27,7 @@ import useTitle from '../../services/useTitle';
 import { consultationsState, consultationTypes, prepareConsultationForEncryption } from '../../recoil/consultations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 import { capture } from '../../services/sentry';
-import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
+import { customFieldsMedicalFileSelector, medicalFileState } from '../../recoil/medicalFiles';
 import { useDataLoader } from '../../components/DataLoader';
 import ActionCategoriesSettings from './ActionCategoriesSettings';
 import ServicesSettings from './ServicesSettings';
@@ -53,6 +55,11 @@ const View = () => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
 
+  const medicalFiles = useRecoilValue(medicalFileState);
+  const territoryObservations = useRecoilValue(territoryObservationsState);
+  const persons = useRecoilValue(personsState);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
+
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
@@ -73,6 +80,39 @@ const View = () => {
     updateOrganisation();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
+
+  const onEditPersonsCustomInputChoice =
+    (customFieldsRow) =>
+    async ({ oldChoice, newChoice, field, fields }) => {
+      const updatedPersons = persons
+        .map((person) => {
+          if (person[field.name]?.includes(oldChoice)) {
+            return {
+              ...person,
+              [field.name]:
+                typeof person[field.name] === 'string'
+                  ? newChoice
+                  : person[field.name].map((_choice) => (_choice === oldChoice ? newChoice : _choice)),
+            };
+          }
+          return null;
+        })
+        .filter(Boolean);
+      const response = await API.post({
+        path: '/custom-field',
+        body: {
+          customFields: {
+            [customFieldsRow]: fields,
+          },
+          persons: await Promise.all(updatedPersons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey))),
+        },
+      });
+      if (response.ok) {
+        console.log(response.data);
+        toast.success('Choix mis à jour !');
+        setOrganisation(response.data);
+      }
+    };
 
   return (
     <div className="tw--m-12 tw--mt-4 tw-flex tw-h-[calc(100%+4rem)] tw-flex-col">
@@ -225,7 +265,12 @@ const View = () => {
                           <hr />
                           <Row>
                             <Label>Champs personnalisés</Label>
-                            <TableCustomFields customFields="customFieldsMedicalFile" key="customFieldsMedicalFile" data={customFieldsMedicalFile} />
+                            <TableCustomFields
+                              data={medicalFiles}
+                              customFields="customFieldsMedicalFile"
+                              key="customFieldsMedicalFile"
+                              fields={customFieldsMedicalFile}
+                            />
                           </Row>
                         </>
                       ) : (
@@ -288,7 +333,8 @@ const View = () => {
                           <TableCustomFields
                             customFields="customFieldsObs"
                             key="customFieldsObs"
-                            data={(() => {
+                            data={territoryObservations}
+                            fields={(() => {
                               if (Array.isArray(organisation.customFieldsObs)) return organisation.customFieldsObs;
                               return defaultCustomFields;
                             })()}
@@ -346,20 +392,26 @@ const View = () => {
                           <TableCustomFields
                             customFields="fieldsPersonsCustomizableOptions"
                             key="fieldsPersonsCustomizableOptions"
-                            data={fieldsPersonsCustomizableOptions}
+                            data={persons}
+                            fields={fieldsPersonsCustomizableOptions}
                             onlyOptionsEditable
+                            onEditChoice={onEditPersonsCustomInputChoice('fieldsPersonsCustomizableOptions')}
                           />
                           <h4 className="tw-my-8">Champs personnalisés - informations sociales</h4>
                           <TableCustomFields
                             customFields="customFieldsPersonsSocial"
                             key="customFieldsPersonsSocial"
-                            data={customFieldsPersonsSocial}
+                            data={persons}
+                            fields={customFieldsPersonsSocial}
+                            onEditChoice={onEditPersonsCustomInputChoice('customFieldsPersonsSocial')}
                           />
                           <h4 className="tw-my-8">Champs personnalisés - informations médicales</h4>
                           <TableCustomFields
                             customFields="customFieldsPersonsMedical"
                             key="customFieldsPersonsMedical"
-                            data={customFieldsPersonsMedical}
+                            data={persons}
+                            fields={customFieldsPersonsMedical}
+                            onEditChoice={onEditPersonsCustomInputChoice('customFieldsPersonsMedical')}
                           />
                         </>
                       ) : (
@@ -463,6 +515,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   useEffect(() => {
     setOrgConsultations(organisation.consultations);
   }, [organisation, setOrgConsultations]);
+  const consultations = useRecoilValue(consultationsState);
 
   return (
     <>
@@ -570,6 +623,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
             </small>
             <TableCustomFields
               customFields="consultations"
+              data={consultations}
               keyPrefix={consultation.name}
               mergeData={(newData) => {
                 return organisation.consultations.map((e) => (e.name === consultation.name ? { ...e, fields: newData } : e));
@@ -577,7 +631,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
               extractData={(data) => {
                 return data.find((e) => e.name === consultation.name).fields || [];
               }}
-              data={(() => {
+              fields={(() => {
                 return Array.isArray(consultation.fields) ? consultation.fields : [];
               })()}
             />

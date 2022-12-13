@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
-import { selectorFamily, useRecoilState, useRecoilValue } from 'recoil';
+import { useRecoilState } from 'recoil';
 import { organisationState } from '../recoil/auth';
 import { typeOptions } from '../utils';
 import useApi from '../services/api';
@@ -11,7 +11,6 @@ import DeleteButtonAndConfirmModal from './DeleteButtonAndConfirmModal';
 import TableCustomFieldteamSelector from './TableCustomFieldTeamSelector';
 import SelectDraggable from './SelectDraggable';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
-import { personsState } from '../recoil/persons';
 
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
 
@@ -23,9 +22,18 @@ const sanitizeFields = (field) => {
   return sanitizedField;
 };
 
-const TableCustomFields = ({ data, customFields, mergeData = null, extractData = null, keyPrefix = null, onlyOptionsEditable }) => {
+const TableCustomFields = ({
+  data,
+  fields,
+  customFields,
+  mergeData = null,
+  extractData = null,
+  keyPrefix = null,
+  onEditChoice,
+  onlyOptionsEditable,
+}) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [mutableData, setMutableData] = useState(data);
+  const [mutableData, setMutableData] = useState(fields);
   const [editingField, setEditingField] = useState(null);
   const [isNewField, setIsNewField] = useState(false);
 
@@ -33,8 +41,8 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const API = useApi();
 
-  function onUpdate(fieldToUpdate, data) {
-    setMutableData(mutableData.map((f) => (f.name === fieldToUpdate.name ? { ...f, ...data } : f)));
+  function onUpdate(fieldToUpdate, fields) {
+    setMutableData(mutableData.map((f) => (f.name === fieldToUpdate.name ? { ...f, ...fields } : f)));
   }
 
   const onShowStatsChange = (fieldToUpdate) => (event) => {
@@ -204,11 +212,31 @@ const TableCustomFields = ({ data, customFields, mergeData = null, extractData =
           title="Mettre à jour"
           loading={isSubmitting}
           onClick={() => handleSubmit()}
-          disabled={JSON.stringify(mutableData) === JSON.stringify(data)}
+          disabled={JSON.stringify(mutableData) === JSON.stringify(fields)}
         />
       </div>
       <EditCustomField
         editingField={editingField}
+        data={data}
+        onEditChoice={({ oldChoice, newChoice, field }) => {
+          const updatedFields = mutableData.map((_field) =>
+            _field.name !== field.name
+              ? _field
+              : {
+                  ..._field,
+                  options: _field.options.map((option) => (option === oldChoice ? newChoice : option)),
+                }
+          );
+          setMutableData(updatedFields);
+          setEditingField(null);
+          setIsNewField(false);
+          onEditChoice({
+            oldChoice,
+            newChoice,
+            field,
+            fields: updatedFields,
+          });
+        }}
         onlyOptionsEditable={onlyOptionsEditable}
         onClose={() => {
           setEditingField(null);
@@ -232,20 +260,10 @@ const newField = () => ({
   showInStats: false,
 });
 
-const fieldIsUsedSelector = selectorFamily({
-  key: 'fieldIsUsedSelector',
-  get:
-    ({ name }) =>
-    ({ get }) => {
-      const persons = get(personsState);
-      return !!persons.find((p) => p[name]);
-    },
-});
-
-const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyOptionsEditable }) => {
+const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField, onEditChoice, onlyOptionsEditable }) => {
   const open = Boolean(editingField) || isNewField;
   const [field, setField] = useState(() => editingField || newField());
-  const fieldIsUsed = useRecoilValue(fieldIsUsedSelector({ name: field?.name }));
+  const fieldIsUsed = useMemo(() => !!data.find((p) => p[field?.name]), [data, field]);
 
   const onSubmit = (e) => {
     e.preventDefault();
@@ -311,6 +329,7 @@ const EditCustomField = ({ editingField, onClose, onSaveField, isNewField, onlyO
                   inputId="options"
                   name="options"
                   classNamePrefix="options"
+                  onEditChoice={({ oldChoice, newChoice }) => onEditChoice({ oldChoice, newChoice, field })}
                   creatable
                   options={[...(editingField?.options || field?.options || [])]
                     .sort((c1, c2) => c1?.localeCompare(c2))
