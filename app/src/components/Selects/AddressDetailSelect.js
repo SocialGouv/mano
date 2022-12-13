@@ -1,17 +1,14 @@
 import React from 'react';
-import { addressDetailsFixedFields } from '../../recoil/persons';
+import { useRecoilValue } from 'recoil';
+import { personFieldsSelector } from '../../recoil/persons';
 import SelectLabelled from './SelectLabelled';
 
-const addressDetailsFields = ['-- Choisissez --', ...addressDetailsFixedFields];
-
-export const addressDetails = [...addressDetailsFields, 'Autre'];
-
-export const isFreeFieldAddressDetail = (addressDetail) => {
+export const isFreeFieldAddressDetail = (addressDetail, addressDetailsFields) => {
   if (!addressDetail.length) return false;
-  return !addressDetailsFields.includes(addressDetail);
+  return !addressDetailsFields.filter((o) => o !== 'Autre').includes(addressDetail);
 };
 
-const computeValue = (value, editable) => {
+const computeValue = (value, editable, addressDetailsFields) => {
   if (!value.length) return addressDetails[0];
   if (!editable) return value;
   if (addressDetailsFields.includes(value)) return value;
@@ -19,11 +16,14 @@ const computeValue = (value, editable) => {
 };
 
 const AddressDetailSelect = ({ value = addressDetails[0], onSelect, editable }) => {
+  const personFields = useRecoilValue(personFieldsSelector);
+  const addressDetails = personFields.find((f) => f.name === 'addressDetail').options;
+
   return (
     <SelectLabelled
       label="Type d'hébergement"
-      values={addressDetails}
-      value={computeValue(value, editable)}
+      values={['-- Choisissez --', ...addressDetails]}
+      value={computeValue(value, editable, addressDetails)}
       onSelect={onSelect}
       editable={editable}
     />

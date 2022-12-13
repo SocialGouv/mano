@@ -15,7 +15,7 @@ import {
   customFieldsPersonsSocialSelector,
   allowedFieldsInHistorySelector,
   personsState,
-  preparePersonForEncryption,
+  usePreparePersonForEncryption,
 } from '../../recoil/persons';
 import { actionsState } from '../../recoil/actions';
 import { commentsState } from '../../recoil/comments';
@@ -39,6 +39,7 @@ const Person = ({ route, navigation }) => {
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const [persons, setPersons] = useRecoilState(personsState);
   const [actions, setActions] = useRecoilState(actionsState);
@@ -150,7 +151,7 @@ const Person = ({ route, navigation }) => {
 
     const response = await API.put({
       path: `/person/${personDB._id}`,
-      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(personToUpdate),
+      body: preparePersonForEncryption(personToUpdate),
     });
     if (response.error) {
       Alert.alert(response.error);
@@ -182,10 +183,14 @@ const Person = ({ route, navigation }) => {
         !!consultations.find((c) => c.person === personId))
     ) {
       const keepGoing = await new Promise((res) => {
-        Alert.alert('Voulez-vous continuer la suppression ?', 'Des données médicales sont associées à cette personne. Si vous la supprimez, ces données seront également effacées. Vous n’avez pas accès à ces données médicales car vous n’êtes pas un professionnel de santé. Voulez-vous supprimer cette personne et toutes ses données ?', [
-          { text: 'Annuler', style: 'cancel', onPress: () => res(false) },
-          { text: 'Continuer', style: 'destructive', onPress: () => res(true) },
-        ]);
+        Alert.alert(
+          'Voulez-vous continuer la suppression ?',
+          'Des données médicales sont associées à cette personne. Si vous la supprimez, ces données seront également effacées. Vous n’avez pas accès à ces données médicales car vous n’êtes pas un professionnel de santé. Voulez-vous supprimer cette personne et toutes ses données ?',
+          [
+            { text: 'Annuler', style: 'cancel', onPress: () => res(false) },
+            { text: 'Continuer', style: 'destructive', onPress: () => res(true) },
+          ]
+        );
       });
       if (!keepGoing) {
         setDeleting(false);

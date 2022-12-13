@@ -16,13 +16,14 @@ import EmploymentSituationSelect from '../../components/Selects/EmploymentSituat
 import AddressDetailSelect, { isFreeFieldAddressDetail } from '../../components/Selects/AddressDetailSelect';
 import colors from '../../utils/colors';
 import CustomFieldInput from '../../components/CustomFieldInput';
-import { customFieldsPersonsSocialSelector } from '../../recoil/persons';
+import { customFieldsPersonsSocialSelector, personFieldsSelector } from '../../recoil/persons';
 import { currentTeamState } from '../../recoil/auth';
 
 const InformationsSocial = ({ navigation, editable, updating, onChange, onUpdatePerson, onEdit, isUpdateDisabled, backgroundColor, person }) => {
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const currentTeam = useRecoilValue(currentTeamState);
-
+  const personFields = useRecoilValue(personFieldsSelector);
+  const addressDetails = personFields.find((f) => f.name === 'addressDetail').options;
   const scrollViewRef = useRef(null);
   const refs = useRef({});
   const _scrollToInput = (ref) => {
@@ -66,7 +67,7 @@ const InformationsSocial = ({ navigation, editable, updating, onChange, onUpdate
         {person.address === 'Oui' && (
           <>
             <AddressDetailSelect value={person.addressDetail} onSelect={(addressDetail) => onChange({ addressDetail })} editable={editable} />
-            {!!isFreeFieldAddressDetail(person.addressDetail) && !!editable && (
+            {!!isFreeFieldAddressDetail(person.addressDetail, addressDetails) && !!editable && (
               <InputLabelled
                 onChangeText={(addressDetail) => onChange({ addressDetail: addressDetail || 'Autre' })}
                 value={person.addressDetail === 'Autre' ? '' : person.addressDetail}
