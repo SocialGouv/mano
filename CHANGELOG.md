@@ -1,3 +1,10 @@
+## [1.187.2](https://github.com/SocialGouv/mano/compare/v1.187.1...v1.187.2) (2022-12-13)
+
+
+### Bug Fixes
+
+* can edit completedAt for consultation in dashboard ([#1074](https://github.com/SocialGouv/mano/issues/1074)) ([28910f5](https://github.com/SocialGouv/mano/commit/28910f5468e79afb0520297a489f1dd35ebe55a2))
+
 ## [1.187.1](https://github.com/SocialGouv/mano/compare/v1.187.0...v1.187.1) (2022-12-13)
 
 
