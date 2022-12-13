@@ -1,3 +1,10 @@
+## [1.187.1](https://github.com/SocialGouv/mano/compare/v1.187.0...v1.187.1) (2022-12-13)
+
+
+### Bug Fixes
+
+* person model in backend for dashboard ([#1072](https://github.com/SocialGouv/mano/issues/1072)) ([bc1dd03](https://github.com/SocialGouv/mano/commit/bc1dd031de322dc098434016a8099c47a1e1330d))
+
 # [1.187.0](https://github.com/SocialGouv/mano/compare/v1.186.13...v1.187.0) (2022-12-12)
 
 
