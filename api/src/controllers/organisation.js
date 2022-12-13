@@ -25,6 +25,7 @@ const { capture } = require("../sentry");
 const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const TerritoryObservation = require("../models/territoryObservation");
+const { serializeOrganisation } = require("../utils/data-serializer");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -278,7 +279,7 @@ router.put(
 
     if (req.user.role !== "admin") {
       await organisation.update({ collaborations: req.body.collaborations });
-      return res.status(200).send({ ok: true, data: organisation });
+      return res.status(200).send({ ok: true, data: serializeOrganisation(organisation) });
     }
 
     const updateOrg = {};
@@ -318,34 +319,7 @@ router.put(
 
     return res.status(200).send({
       ok: true,
-      data: {
-        _id: organisation._id,
-        name: organisation.name,
-        createdAt: organisation.createdAt,
-        updatedAt: organisation.updatedAt,
-        categories: !!organisation.actionsGroupedCategories
-          ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
-          : organisation.categories,
-        actionsGroupedCategories: organisation.actionsGroupedCategories,
-        groupedServices: organisation.groupedServices,
-        encryptionEnabled: organisation.encryptionEnabled,
-        encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
-        receptionEnabled: organisation.receptionEnabled,
-        groupsEnabled: organisation.groupsEnabled,
-        services: !!organisation.groupedServices
-          ? organisation.groupedServices.reduce((flattenedServices, group) => [...flattenedServices, ...group.services], [])
-          : organisation.services,
-        consultations: organisation.consultations,
-        collaborations: organisation.collaborations,
-        customFieldsObs: organisation.customFieldsObs,
-        encryptedVerificationKey: organisation.encryptedVerificationKey,
-        fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions,
-        customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
-        customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
-        customFieldsMedicalFile: organisation.customFieldsMedicalFile,
-        migrations: organisation.migrations,
-        migrationLastUpdateAt: organisation.migrationLastUpdateAt,
-      },
+      data: serializeOrganisation(organisation),
     });
   })
 );

@@ -5,13 +5,7 @@ import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
-import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  fieldsPersonsCustomizableOptionsSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../recoil/persons';
+import { fieldsPersonsCustomizableOptionsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import useApi from '../../services/api';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../../services/date';
@@ -20,21 +14,16 @@ import SelectCustom from '../../components/SelectCustom';
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
   const API = useApi();
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-
   const setPersons = useSetRecoilState(personsState);
 
   const handleSetOutOfActiveList = async (outOfActiveListReasons = [], outOfActiveListDate = Date.now()) => {
     const outOfActiveList = !person.outOfActiveList;
     const response = await API.put({
       path: `/person/${person._id}`,
-      body: preparePersonForEncryption(
-        customFieldsPersonsMedical,
-        customFieldsPersonsSocial
-      )({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReasons, outOfActiveListDate }),
+      body: preparePersonForEncryption({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReasons, outOfActiveListDate }),
     });
     if (response.ok) {
       const newPerson = response.decryptedData;

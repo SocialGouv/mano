@@ -7,12 +7,7 @@ import personIcon from '../../assets/icons/person-icon.svg';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState, userState } from '../../recoil/auth';
-import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../recoil/persons';
+import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import useApi from '../../services/api';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
@@ -26,8 +21,7 @@ const CreatePerson = ({ refreshable }) => {
   const user = useRecoilValue(userState);
   const history = useHistory();
   const [persons, setPersons] = useRecoilState(personsState);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
   const API = useApi();
   const { refresh, isLoading } = useDataLoader();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
@@ -60,7 +54,7 @@ const CreatePerson = ({ refreshable }) => {
               body.user = user._id;
               const response = await API.post({
                 path: '/person',
-                body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(body),
+                body: preparePersonForEncryption(body),
               });
               if (response.ok) {
                 setPersons((persons) => [response.decryptedData, ...persons].sort((p1, p2) => (p1.name || '').localeCompare(p2.name || '')));

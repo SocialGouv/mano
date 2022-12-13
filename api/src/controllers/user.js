@@ -16,6 +16,7 @@ const Team = require("../models/team");
 const validateUser = require("../middleware/validateUser");
 const { capture } = require("../sentry");
 const { ExtractJwt } = require("passport-jwt");
+const { serializeUserWithTeamsAndOrganisation, serializeTeam } = require("../utils/data-serializer");
 
 const EMAIL_OR_PASSWORD_INVALID = "EMAIL_OR_PASSWORD_INVALID";
 const PASSWORD_NOT_VALIDATED = "PASSWORD_NOT_VALIDATED";
@@ -119,56 +120,6 @@ function updateUserDebugInfos(req, user) {
       version: req.headers.version,
     };
   }
-}
-
-function serializeUserWithTeamsAndOrganisation(user, teams, organisation) {
-  return {
-    _id: user._id,
-    name: user.name,
-    email: user.email,
-    createdAt: user.createdAt,
-    updatedAt: user.updatedAt,
-    role: user.role,
-    healthcareProfessional: user.healthcareProfessional,
-    lastChangePasswordAt: user.lastChangePasswordAt,
-    termsAccepted: user.termsAccepted,
-    teams: teams.map((t) => ({
-      _id: t._id,
-      name: t.name,
-      organisation: t.organisation,
-      createdAt: t.createdAt,
-      updatedAt: t.updatedAt,
-      nightSession: t.nightSession,
-    })),
-    organisation: {
-      _id: organisation._id,
-      name: organisation.name,
-      createdAt: organisation.createdAt,
-      updatedAt: organisation.updatedAt,
-      categories: !!organisation.actionsGroupedCategories
-        ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
-        : organisation.categories,
-      actionsGroupedCategories: organisation.actionsGroupedCategories,
-      groupedServices: organisation.groupedServices,
-      consultations: organisation.consultations,
-      encryptionEnabled: organisation.encryptionEnabled,
-      encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
-      receptionEnabled: organisation.receptionEnabled,
-      groupsEnabled: organisation.groupsEnabled,
-      services: !!organisation.groupedServices
-        ? organisation.groupedServices.reduce((flattenedServices, group) => [...flattenedServices, ...group.services], [])
-        : organisation.services,
-      collaborations: organisation.collaborations,
-      customFieldsObs: organisation.customFieldsObs,
-      encryptedVerificationKey: organisation.encryptedVerificationKey,
-      fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions,
-      customFieldsPersonsSocial: organisation.customFieldsPersonsSocial,
-      customFieldsPersonsMedical: organisation.customFieldsPersonsMedical,
-      customFieldsMedicalFile: organisation.customFieldsMedicalFile,
-      migrations: organisation.migrations,
-      migrationLastUpdateAt: organisation.migrationLastUpdateAt,
-    },
-  };
 }
 
 router.get(
@@ -566,14 +517,7 @@ router.get(
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
         lastLoginAt: user.lastLoginAt,
-        teams: teams.map((t) => ({
-          _id: t._id,
-          name: t.name,
-          organisation: t.organisation,
-          createdAt: t.createdAt,
-          updatedAt: t.updatedAt,
-          nightSession: t.nightSession,
-        })),
+        teams: teams.map(serializeTeam),
       });
     }
     return res.status(200).send({ ok: true, data });

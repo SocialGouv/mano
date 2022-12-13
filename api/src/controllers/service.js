@@ -10,6 +10,7 @@ const Report = require("../models/report");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
+const { serializeOrganisation } = require("../utils/data-serializer");
 
 router.put(
   "/",
@@ -59,7 +60,7 @@ router.put(
       capture("error updating service", e);
       throw e;
     }
-    return res.status(200).send({ ok: true, data: organisation });
+    return res.status(200).send({ ok: true, data: serializeOrganisation(organisation) });
   })
 );
 

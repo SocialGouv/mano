@@ -9,7 +9,7 @@ import { useHistory } from 'react-router-dom';
 import ButtonCustom from './ButtonCustom';
 import { theme } from '../config';
 import { organisationState, teamsState, userState } from '../recoil/auth';
-import { customFieldsPersonsMedicalSelector, customFieldsPersonsSocialSelector, personsState, preparePersonForEncryption } from '../recoil/persons';
+import { personsState, usePreparePersonForEncryption } from '../recoil/persons';
 import { actionsState, prepareActionForEncryption } from '../recoil/actions';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
@@ -54,9 +54,8 @@ const EncryptionKey = ({ isMain }) => {
   const territories = useRecoilValue(territoriesState);
   const observations = useRecoilValue(territoryObservationsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
   const places = useRecoilValue(placesState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const reports = useRecoilValue(reportsState);
@@ -99,9 +98,7 @@ const EncryptionKey = ({ isMain }) => {
       const hashedOrgEncryptionKey = await setOrgEncryptionKey(values.encryptionKey.trim());
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
-      const encryptedPersons = await Promise.all(
-        persons.map(preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)).map(encryptItem(hashedOrgEncryptionKey))
-      );
+      const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
 
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedConsultations = await Promise.all(

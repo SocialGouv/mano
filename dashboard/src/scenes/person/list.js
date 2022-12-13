@@ -13,7 +13,7 @@ import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
   fieldsPersonsCustomizableOptionsSelector,
-  filterPersonsBase,
+  filterPersonsBaseSelector,
 } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
@@ -92,6 +92,7 @@ const filterPersonsWithAllFieldsSelector = selector({
     const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
     const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
     const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
+    const filterPersonsBase = get(filterPersonsBaseSelector);
     return [
       ...filterPersonsBase,
       ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),

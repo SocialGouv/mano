@@ -21,6 +21,7 @@ const sequelize = require("../db/sequelize");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex } = require("../utils");
+const { serializeOrganisation } = require("../utils/data-serializer");
 
 // This controller is required because:
 //   - If we encrypt one by one each of the actions, persons, comments, territories, observations, places, reports
@@ -174,7 +175,7 @@ router.post(
       throw e;
     }
 
-    return res.status(200).send({ ok: true, data: organisation });
+    return res.status(200).send({ ok: true, data: serializeOrganisation(organisation) });
   })
 );
 
