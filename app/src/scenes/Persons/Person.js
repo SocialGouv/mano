@@ -6,7 +6,6 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import PersonSummary from './PersonSummary';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
-import { genders } from '../../components/Selects/GenderSelect';
 import FoldersNavigator from './FoldersNavigator';
 import Tabs from '../../components/Tabs';
 import colors from '../../utils/colors';
@@ -72,7 +71,7 @@ const Person = ({ route, navigation }) => {
         wanderingAt: person.wanderingAt || null,
         followedSince: person.followedSince || person.createdAt,
         createdAt: person.createdAt,
-        gender: person.gender || genders[0],
+        gender: person.gender || '',
         phone: person.phone?.trim() || '',
         description: person.description?.trim() || '',
         personalSituation: person.personalSituation?.trim() || '',
