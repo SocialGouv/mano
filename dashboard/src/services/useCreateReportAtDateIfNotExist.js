@@ -10,6 +10,7 @@ const useCreateReportAtDateIfNotExist = () => {
   const currentTeam = useRecoilValue(currentTeamState);
   const [reports, setReports] = useRecoilState(reportsState);
   const lastLoad = useRecoilValue(lastLoadState);
+  // https://stackoverflow.com/questions/280389/how-do-you-find-out-the-caller-function-in-javascript
   const component = useRef(new Error().stack.split('\n')[2].trim().split(' ')[1]);
 
   const API = useApi();
@@ -28,6 +29,7 @@ const useCreateReportAtDateIfNotExist = () => {
       headers: {
         'debug-report-component': 'useCreateReportAtDateIfNotExist',
         'debug-report-parent-component': component.current,
+        // https://stackoverflow.com/questions/280389/how-do-you-find-out-the-caller-function-in-javascript
         'debug-report-function': new Error().stack.split('\n')[2].trim().split(' ')[1],
       },
     });
