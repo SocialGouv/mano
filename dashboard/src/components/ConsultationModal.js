@@ -46,8 +46,6 @@ export default function ConsultationModal({ onClose, person, consultation }) {
   );
   const [data, setData] = useState(initialState);
 
-  console.log(data);
-
   async function handleSubmit() {
     if (!data.type) {
       return toast.error('Veuillez choisir un type de consultation');
