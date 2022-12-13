@@ -1,3 +1,10 @@
+## [1.187.4](https://github.com/SocialGouv/mano/compare/v1.187.3...v1.187.4) (2022-12-13)
+
+
+### Bug Fixes
+
+* person recoil in app ([#1077](https://github.com/SocialGouv/mano/issues/1077)) ([50bd4fa](https://github.com/SocialGouv/mano/commit/50bd4fa4b1d4c47168081f78d04d66685da3d389))
+
 ## [1.187.3](https://github.com/SocialGouv/mano/compare/v1.187.2...v1.187.3) (2022-12-13)
 
 
