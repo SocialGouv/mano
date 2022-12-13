@@ -30,7 +30,7 @@ const useCreateReportAtDateIfNotExist = () => {
         'debug-report-component': 'useCreateReportAtDateIfNotExist',
         'debug-report-parent-component': component.current,
         // https://stackoverflow.com/questions/280389/how-do-you-find-out-the-caller-function-in-javascript
-        'debug-report-function': new Error().stack.split('\n')[2].trim().split(' ')[1],
+        'debug-report-function': new Error().stack?.split('\n')[2]?.trim().split(' ')[1],
       },
     });
     if (!res.ok) return;
