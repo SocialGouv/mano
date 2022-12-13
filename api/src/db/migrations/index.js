@@ -23,4 +23,5 @@
   await require("./2022-11-14_add_group_table")();
   await require("./2022-11-29_add_grouped_services")();
   await require("./2022-11-29_add_reports_columns")();
+  await require("./2022-12-12-debug_report")();
 })();

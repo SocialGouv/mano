@@ -737,7 +737,7 @@ const Service = ({ report, team, withMultipleTeams, dateString }) => {
         </div>
       )}
       <div className="services-list">
-        <ReceptionService team={team} report={report} dateString={dateString} dataTestIdPrefix={`${team.name}-`} />
+        <ReceptionService parentComponent="report" team={team} report={report} dateString={dateString} dataTestIdPrefix={`${team.name}-`} />
       </div>
     </ServicesWrapper>
   );
@@ -1480,7 +1480,13 @@ const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString
                   };
                   const isNew = !reportAtDate?._id;
                   const res = isNew
-                    ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+                    ? await API.post({
+                        path: '/report',
+                        body: prepareReportForEncryption(reportUpdate),
+                        headers: {
+                          'debug-report-component': 'DescriptionAndCollaborations',
+                        },
+                      })
                     : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });
                   if (res.ok) {
                     setReports((reports) =>

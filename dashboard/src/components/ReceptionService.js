@@ -6,7 +6,7 @@ import useApi from '../services/api';
 import IncrementorSmall from './IncrementorSmall';
 import { lastLoadState, mergeItems } from './DataLoader';
 
-const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) => {
+const ReceptionService = ({ parentComponent, report, team, dateString, dataTestIdPrefix = '' }) => {
   // const organisation = useRecoilValue(organisationState);
   const groupedServices = useRecoilValue(servicesSelector);
   const flattenedServices = useRecoilValue(flattenedServicesSelector);
@@ -80,8 +80,18 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
 
       const isNew = !reportUpdate?._id;
       const res = isNew
-        ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
-        : await API.put({ path: `/report/${reportUpdate._id}`, body: prepareReportForEncryption(reportUpdate) });
+        ? await API.post({
+            path: '/report',
+            body: prepareReportForEncryption(reportUpdate),
+            headers: {
+              'debug-report-component': 'ReceptionService',
+              'debug-report-parent-component': parentComponent,
+            },
+          })
+        : await API.put({
+            path: `/report/${reportUpdate._id}`,
+            body: prepareReportForEncryption(reportUpdate),
+          });
       if (res.ok) {
         setReports((reports) =>
           isNew

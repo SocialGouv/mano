@@ -41,7 +41,7 @@ const actionByIdSelector = selectorFamily({
     },
 });
 
-const View = () => {
+const ActionView = () => {
   const { actionId } = useParams();
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
@@ -334,4 +334,4 @@ const Title = styled.h2`
   }
 `;
 
-export default View;
+export default ActionView;

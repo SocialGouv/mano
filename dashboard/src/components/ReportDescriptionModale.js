@@ -41,7 +41,13 @@ const ReportDescriptionModale = ({ report }) => {
               };
               const isNew = !reportAtDate?._id;
               const res = isNew
-                ? await API.post({ path: '/report', body: prepareReportForEncryption(reportUpdate) })
+                ? await API.post({
+                    path: '/report',
+                    body: prepareReportForEncryption(reportUpdate),
+                    headers: {
+                      'debug-report-component': 'ReportDescriptionModale',
+                    },
+                  })
                 : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });
               if (res.ok) {
                 setReports((reports) =>

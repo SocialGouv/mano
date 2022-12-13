@@ -102,6 +102,13 @@ router.post(
         encryptedEntityKey: req.body.encryptedEntityKey,
         team: req.body.team,
         date: req.body.date,
+        debug: {
+          version: req.headers.version,
+          user: req.user._id,
+          component: req.headers["debug-report-component"],
+          parentComponent: req.headers["debug-report-parent-component"],
+          function: req.headers["debug-report-function"],
+        },
       },
       { returning: true }
     );
