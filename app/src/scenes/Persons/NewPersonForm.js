@@ -8,12 +8,7 @@ import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
 import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
-import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../recoil/persons';
+import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import API from '../../services/api';
 import TeamsMultiCheckBoxes from '../../components/MultiCheckBoxes/TeamsMultiCheckBoxes';
 import { currentTeamState, teamsState, userState } from '../../recoil/auth';
@@ -23,9 +18,8 @@ const NewPersonForm = ({ navigation, route }) => {
   const [persons, setPersons] = useRecoilState(personsState);
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const teams = useRecoilValue(teamsState);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const [name, setName] = useState('');
   const [assignedTeams, setAssignedTeams] = useState([currentTeam?._id]);
@@ -71,10 +65,7 @@ const NewPersonForm = ({ navigation, route }) => {
     }
     const response = await API.post({
       path: '/person',
-      body: preparePersonForEncryption(
-        customFieldsPersonsMedical,
-        customFieldsPersonsSocial
-      )({ name, followedSince: dayjs(), assignedTeams, user: user._id }),
+      body: preparePersonForEncryption({ name, followedSince: dayjs(), assignedTeams, user: user._id }),
     });
     if (response.ok) {
       setPersons((persons) =>

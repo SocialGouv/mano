@@ -7,22 +7,15 @@ import ScreenTitle from '../../components/ScreenTitle';
 import ScrollContainer from '../../components/ScrollContainer';
 import OutOfActiveListReasonMultiCheckBox from '../../components/Selects/OutOfActiveListReasonMultiCheckBox';
 import { userState } from '../../recoil/auth';
-import {
-  allowedFieldsInHistorySelector,
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  personsState,
-  preparePersonForEncryption,
-} from '../../recoil/persons';
+import { allowedFieldsInHistorySelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import API from '../../services/api';
 
 const PersonsOutOfActiveListReason = ({ navigation, route }) => {
   const [reasons, setReasons] = useState([]);
   const [submitting, setSubmitting] = useState(false);
   const [persons, setPersons] = useRecoilState(personsState);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
+  const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const user = useRecoilValue(userState);
 
@@ -43,7 +36,7 @@ const PersonsOutOfActiveListReason = ({ navigation, route }) => {
 
     const response = await API.put({
       path: `/person/${person._id}`,
-      body: preparePersonForEncryption(customFieldsPersonsMedical, customFieldsPersonsSocial)(person),
+      body: preparePersonForEncryption(person),
     });
     if (response.ok) {
       const newPerson = response.decryptedData;

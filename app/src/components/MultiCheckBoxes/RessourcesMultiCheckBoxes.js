@@ -1,12 +1,14 @@
 import React from 'react';
-import { ressourcesOptions } from '../../recoil/persons';
+import { useRecoilValue } from 'recoil';
+import { personFieldsSelector } from '../../recoil/persons';
 import MultiCheckBoxes from './MultiCheckBoxes';
 
 const RessourcesMultiCheckBoxes = ({ values = [], onChange, editable }) => {
+  const personFields = useRecoilValue(personFieldsSelector);
   return (
     <MultiCheckBoxes
       label="Ressources"
-      source={ressourcesOptions}
+      source={personFields.find((f) => f.name === 'resources').options}
       values={values}
       onChange={onChange}
       editable={editable}
