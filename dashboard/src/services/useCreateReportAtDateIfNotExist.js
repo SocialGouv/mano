@@ -22,7 +22,6 @@ const useCreateReportAtDateIfNotExist = () => {
     date = dayjs(date).startOf('day').format('YYYY-MM-DD');
     const reportAtDate = allReports.find((report) => report.date === date && report.team === currentTeam._id);
     if (!!reportAtDate) return reportAtDate;
-    // get the name of the Component that called this function
     const res = await API.post({
       path: '/report',
       body: prepareReportForEncryption({ team: currentTeam._id, date }),
