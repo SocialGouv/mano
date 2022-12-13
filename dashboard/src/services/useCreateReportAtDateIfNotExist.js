@@ -28,7 +28,7 @@ const useCreateReportAtDateIfNotExist = () => {
       body: prepareReportForEncryption({ team: currentTeam._id, date }),
       headers: {
         'debug-report-component': 'useCreateReportAtDateIfNotExist',
-        'debug-report-parent-component': component.current,
+        'debug-report-parent-component': parentComponent.current,
         // https://stackoverflow.com/questions/280389/how-do-you-find-out-the-caller-function-in-javascript
         'debug-report-function': new Error().stack?.split('\n')[2]?.trim().split(' ')[1],
       },
