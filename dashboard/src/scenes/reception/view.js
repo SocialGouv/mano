@@ -279,7 +279,12 @@ const Reception = () => {
           <ServicesWrapper>
             <h5 className="services-title">Services</h5>
             <div className="services-incrementators">
-              <ReceptionService report={todaysReport} dateString={startOfToday().format('YYYY-MM-DD')} team={currentTeam} />
+              <ReceptionService
+                parentComponent="reception"
+                report={todaysReport}
+                dateString={startOfToday().format('YYYY-MM-DD')}
+                team={currentTeam}
+              />
             </div>
           </ServicesWrapper>
         </Col>

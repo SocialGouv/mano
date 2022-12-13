@@ -13,7 +13,6 @@ const ReportDescriptionModale = ({ report }) => {
   const API = useApi();
   const [open, setOpen] = useState(false);
   const lastLoad = useRecoilValue(lastLoadState);
-  const component = useRef(new Error().stack.split('\n')[2].trim().split(' ')[1]);
 
   return (
     <>
@@ -47,8 +46,6 @@ const ReportDescriptionModale = ({ report }) => {
                     body: prepareReportForEncryption(reportUpdate),
                     headers: {
                       'debug-report-component': 'ReportDescriptionModale',
-                      'debug-report-parent-component': component.current,
-                      'debug-report-function': new Error().stack.split('\n')[2].trim().split(' ')[1],
                     },
                   })
                 : await API.put({ path: `/report/${reportAtDate._id}`, body: prepareReportForEncryption(reportUpdate) });

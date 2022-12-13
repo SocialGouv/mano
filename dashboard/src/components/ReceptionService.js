@@ -6,14 +6,13 @@ import useApi from '../services/api';
 import IncrementorSmall from './IncrementorSmall';
 import { lastLoadState, mergeItems } from './DataLoader';
 
-const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) => {
+const ReceptionService = ({ parentComponent, report, team, dateString, dataTestIdPrefix = '' }) => {
   // const organisation = useRecoilValue(organisationState);
   const groupedServices = useRecoilValue(servicesSelector);
   const flattenedServices = useRecoilValue(flattenedServicesSelector);
   const [reports, setReports] = useRecoilState(reportsState);
   const lastLoad = useRecoilValue(lastLoadState);
   const [selected, setSelected] = useState(groupedServices[0]?.groupTitle || null);
-  const component = useRef(new Error().stack.split('\n')[2].trim().split(' ')[1]);
 
   const API = useApi();
 
@@ -86,8 +85,7 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '' }) =
             body: prepareReportForEncryption(reportUpdate),
             headers: {
               'debug-report-component': 'ReceptionService',
-              'debug-report-parent-component': component.current,
-              'debug-report-function': new Error().stack.split?.('\n')?.[2]?.trim()?.split?.(' ')?.[1],
+              'debug-report-parent-component': parentComponent,
             },
           })
         : await API.put({
