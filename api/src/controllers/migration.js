@@ -107,45 +107,6 @@ router.put(
             await Report.destroy({ where: { _id, organisation: req.user.organisation }, transaction: tx });
           }
         }
-        if (req.params.migrationName === "update-outOfActiveListReason-and-healthInsurances-to-multi-choice") {
-          try {
-            z.array(
-              z.object({
-                _id: z.string().regex(looseUuidRegex),
-                encrypted: z.string(),
-                encryptedEntityKey: z.string(),
-              })
-            ).parse(req.body.personsToUpdate);
-          } catch (e) {
-            const error = new Error(`Invalid request in reports-from-real-date-to-date-id migration: ${e}`);
-            error.status = 400;
-            throw error;
-          }
-          for (const { _id, encrypted, encryptedEntityKey } of req.body.personsToUpdate) {
-            const person = await Person.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
-            if (person) {
-              person.set({ encrypted, encryptedEntityKey });
-              await person.save();
-            }
-          }
-
-          if (Array.isArray(organisation?.fieldsPersonsCustomizableOptions)) {
-            organisation.set({
-              fieldsPersonsCustomizableOptions: organisation?.fieldsPersonsCustomizableOptions.map((field) => {
-                if (field.name !== "outOfActiveListReason") return field;
-                return {
-                  name: "outOfActiveListReasons",
-                  type: "multi-choice",
-                  label: "Motif(s) de sortie de file active",
-                  options: field.options,
-                  showInStats: true,
-                  enabled: true,
-                };
-              }),
-            });
-          }
-          await organisation.save({ transaction: tx });
-        }
 
         organisation.set({
           migrations: [...(organisation.migrations || []), req.params.migrationName],

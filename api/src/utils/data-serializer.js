@@ -48,12 +48,15 @@ function serializeOrganisation(organisation) {
 
     // kept for retro-compatiblity only
     /* fixed fields persons */
-    personFields: organisation.customFieldsPersons.find((group) => group.name === "Résumé")?.fields || fixedFieldsPersonsBase,
+    personFields:
+      (organisation.customFieldsPersons || defaultFieldsPersons).find((group) => group.name === "Résumé")?.fields || fixedFieldsPersonsBase,
     /* custom fields persons */
     customFieldsPersonsSocial:
-      organisation.customFieldsPersons.find((group) => group.name === "Informations sociales")?.fields || customFieldsPersonsSocialBase,
+      (organisation.customFieldsPersons || defaultFieldsPersons).find((group) => group.name === "Informations sociales")?.fields ||
+      customFieldsPersonsSocialBase,
     customFieldsPersonsMedical:
-      organisation.customFieldsPersons.find((group) => group.name === "Informations médicales")?.fields || customFieldsPersonsMedicalBase,
+      (organisation.customFieldsPersons || defaultFieldsPersons).find((group) => group.name === "Informations médicales")?.fields ||
+      customFieldsPersonsMedicalBase,
 
     /* custom fields persons: fields with customizavble options only */
     fieldsPersonsCustomizableOptions:
