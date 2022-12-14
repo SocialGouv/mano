@@ -26,6 +26,7 @@ const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const TerritoryObservation = require("../models/territoryObservation");
 const { serializeOrganisation } = require("../utils/data-serializer");
+const { defaultFieldsPersons } = require("../utils/custom-fields/person");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
@@ -130,6 +131,7 @@ router.post(
         organisation: organisation._id,
         forgotPasswordResetToken: token,
         forgotPasswordResetExpires: new Date(Date.now() + JWT_MAX_AGE * 1000),
+        customFieldsPersons: defaultFieldsPersons,
       },
       { returning: true }
     );

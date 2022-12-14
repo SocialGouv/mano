@@ -1,5 +1,5 @@
 const { defaultMedicalFileCustomFields } = require("./custom-fields/medicalFile");
-const { fieldsPersonsCustomizableOptions, defaultMedicalCustomFields, personFields } = require("./custom-fields/person");
+const { customFieldsPersonsMedicalBase, customFieldsPersonsSocialBase, fixedFieldsPersonsBase } = require("./custom-fields/person");
 
 function serializeOrganisation(organisation) {
   return {
@@ -36,14 +36,23 @@ function serializeOrganisation(organisation) {
     consultations: organisation.consultations,
     /* custom fields observations */
     customFieldsObs: organisation.customFieldsObs,
-    /* fixed fields persons */
-    personFields: personFields,
-    /* custom fields persons: fields with customizavble options only */
-    fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions || fieldsPersonsCustomizableOptions,
     /* custom fields persons */
-    customFieldsPersonsSocial: organisation.customFieldsPersonsSocial || [],
-    customFieldsPersonsMedical: organisation.customFieldsPersonsMedical || defaultMedicalCustomFields,
+    customFieldsPersons: organisation.customFieldsPersons || defaultFieldsPersons,
+    /* custom fields medical file */
     customFieldsMedicalFile: organisation.customFieldsMedicalFile || defaultMedicalFileCustomFields,
+
+    // kept for retro-compatiblity only
+    /* fixed fields persons */
+    personFields: organisation.customFieldsPersons.find((group) => group.name === "Résumé")?.fields || fixedFieldsPersonsBase,
+    /* custom fields persons */
+    customFieldsPersonsSocial:
+      organisation.customFieldsPersons.find((group) => group.name === "Informations sociales")?.fields || customFieldsPersonsSocialBase,
+    customFieldsPersonsMedical:
+      organisation.customFieldsPersons.find((group) => group.name === "Informations médicales")?.fields || customFieldsPersonsMedicalBase,
+
+    /* custom fields persons: fields with customizavble options only */
+    fieldsPersonsCustomizableOptions:
+      organisation.fieldsPersonsCustomizableOptions || fixedFieldsPersonsBase.find((f) => f.name === "outOfActiveListReasons"),
   };
 }
 
