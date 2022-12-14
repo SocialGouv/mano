@@ -11,7 +11,7 @@ import RowContainer from '../../components/RowContainer';
 import TeamsTags from '../../components/TeamsTags';
 import colors from '../../utils/colors';
 import { useRecoilValue } from 'recoil';
-import { organisationState } from '../../recoil/auth';
+import { organisationState, userState } from '../../recoil/auth';
 
 export const PersonName = ({ person: { name, outOfActiveList, outOfActiveListReasons } }) => {
   if (outOfActiveList) {
@@ -29,9 +29,17 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
   const { outOfActiveList, birthdate, alertness } = person;
   const navigation = useNavigation();
   const organisation = useRecoilValue(organisationState);
+  const user = useRecoilValue(userState);
 
   const onMorePress = async () => {
-    const options = ['Ajouter une rencontre', 'Ajouter une action', 'Ajouter un commentaire', 'Ajouter un lieu fréquenté', 'Annuler'];
+    const options = [
+      'Ajouter une rencontre',
+      'Ajouter une action',
+      ...(user.healthcareProfessional ? ['Ajouter une consultation'] : []),
+      'Ajouter un commentaire',
+      'Ajouter un lieu fréquenté',
+      'Annuler',
+    ];
     showActionSheetWithOptions(
       {
         options,
@@ -44,6 +52,9 @@ const PersonRow = ({ onPress, person, isPersonsSearchRow = false, showActionShee
         }
         if (options[buttonIndex] === 'Ajouter une action') {
           navigation.push('NewActionForm', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
+        }
+        if (user.healthcareProfessional && options[buttonIndex] === 'Ajouter une consultation') {
+          navigation.push('Consultation', { personDB: person, fromRoute: 'PersonsList' });
         }
         if (options[buttonIndex] === 'Ajouter un commentaire') {
           navigation.push('PersonComment', { person, commentTitle: person.name, fromRoute: 'PersonsList' });
