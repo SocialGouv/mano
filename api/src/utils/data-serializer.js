@@ -1,5 +1,10 @@
 const { defaultMedicalFileCustomFields } = require("./custom-fields/medicalFile");
-const { customFieldsPersonsMedicalBase, customFieldsPersonsSocialBase, fixedFieldsPersonsBase } = require("./custom-fields/person");
+const {
+  customFieldsPersonsMedicalBase,
+  customFieldsPersonsSocialBase,
+  fixedFieldsPersonsBase,
+  defaultFieldsPersons,
+} = require("./custom-fields/person");
 
 function serializeOrganisation(organisation) {
   return {

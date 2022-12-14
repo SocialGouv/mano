@@ -11,6 +11,7 @@ module.exports = async () => {
     `);
     const organisations = await Organisation.findAll();
     for (const organisation of organisations) {
+      console.log(organisation.customFieldsPersons);
       if (!!organisation.customFieldsPersons) continue;
       organisation.set({
         customFieldsPersons: [
