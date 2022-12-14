@@ -1,3 +1,10 @@
+## [1.187.5](https://github.com/SocialGouv/mano/compare/v1.187.4...v1.187.5) (2022-12-14)
+
+
+### Bug Fixes
+
+* default observedAt ([#1081](https://github.com/SocialGouv/mano/issues/1081)) ([6cf48d7](https://github.com/SocialGouv/mano/commit/6cf48d7c3899de320c3061435a53d0ad443bf976))
+
 ## [1.187.4](https://github.com/SocialGouv/mano/compare/v1.187.3...v1.187.4) (2022-12-13)
 
 
