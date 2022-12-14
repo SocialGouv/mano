@@ -29,6 +29,7 @@ import Passage from '../../components/Passage';
 import UserName from '../../components/UserName';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
 import ReceptionService from '../../components/ReceptionService';
+import ConsultationModal from '../../components/ConsultationModal';
 
 export const actionsForCurrentTeamSelector = selector({
   key: 'actionsForCurrentTeamSelector',
@@ -145,6 +146,8 @@ const Reception = () => {
     history.replace({ pathname: location.pathname, search: searchParams.toString() });
   };
 
+  const [showConsultationModal, setShowConsultationModal] = useState(false);
+
   // for better UX when increase passage
   const [addingPassage, setAddingPassage] = useState(false);
 
@@ -239,12 +242,35 @@ const Reception = () => {
           persons={selectedPersons.map((p) => p?._id).filter(Boolean)}
         />
 
+        {Boolean(user.healthcareProfessional) && (
+          <>
+            <ButtonCustom
+              icon={plusIcon}
+              onClick={() => setShowConsultationModal(true)}
+              color="primary"
+              disabled={!selectedPersons.length || selectedPersons.length > 1}
+              title="Consultation"
+              padding={'8px 14px'}
+              style={{ height: 'fit-content' }}
+            />
+            {showConsultationModal && (
+              <ConsultationModal
+                onClose={() => {
+                  setShowConsultationModal(false);
+                }}
+                person={selectedPersons?.[0]}
+              />
+            )}
+          </>
+        )}
+
         <ButtonCustom
           onClick={onAddPassageForPersons}
           color="primary"
           style={{ height: 'fit-content' }}
           icon={plusIcon}
           title="Passage"
+          padding={'8px 14px'}
           disabled={addingPassage || !selectedPersons.length}
         />
       </PersonsWrapper>
