@@ -9,7 +9,7 @@ import SelectCustom from './SelectCustom';
 import Table from './table';
 import DeleteButtonAndConfirmModal from './DeleteButtonAndConfirmModal';
 import TableCustomFieldteamSelector from './TableCustomFieldTeamSelector';
-import SelectDraggable from './SelectDraggable';
+import SelectDraggableAndEditable from './SelectDraggableAndEditable';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
@@ -325,7 +325,7 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
                 <label htmlFor="options" className="form-text tailwindui">
                   Choix
                 </label>
-                <SelectDraggable
+                <SelectDraggableAndEditable
                   inputId="options"
                   name="options"
                   classNamePrefix="options"

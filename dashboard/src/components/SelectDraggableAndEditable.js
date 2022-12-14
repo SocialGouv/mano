@@ -4,7 +4,7 @@ import SortableJS from 'sortablejs';
 import SelectCustom from './SelectCustom';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 
-const SelectDraggable = ({ onChange, classNamePrefix, value, onEditChoice, editChoiceWarning, ...props }) => {
+const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditChoice, editChoiceWarning, ...props }) => {
   const [editingChoice, setEditingChoice] = useState('');
   const [newChoice, setNewChoice] = useState('');
 
@@ -36,27 +36,28 @@ const SelectDraggable = ({ onChange, classNamePrefix, value, onEditChoice, editC
         components={{
           MultiValueLabel: (props) => {
             return (
-              <components.MultiValueLabel
-                {...props}
-                innerProps={{
-                  ...props.innerProps,
-                  onMouseDown: (e) => {
-                    e.stopPropagation();
-                  },
-                  className: `${props.innerProps.className} tw-cursor-move`,
-                }}>
-                {props.children}
+              <>
+                <components.MultiValueLabel
+                  {...props}
+                  innerProps={{
+                    ...props.innerProps,
+                    onMouseDown: (e) => {
+                      e.stopPropagation();
+                    },
+                    className: `${props.innerProps.className} tw-cursor-move`,
+                  }}
+                />
                 {!!onEditChoice && (
                   <button
-                    aria-label="Modifier le choix"
-                    title="Modifier le choix"
-                    className={`tw-ml-2 ${classNamePrefix}__multi-value__edit`}
+                    aria-label={`Modifier le choix ${props.children}`}
+                    title={`Modifier le choix ${props.children}`}
+                    className={`tw-ml-2 ${classNamePrefix}__multi-value__edit tw-rounded-sm tw-px-1 hover:tw-bg-[#FFBDAD] hover:tw-text-[#DE350B]`}
                     onClick={() => setEditingChoice(props.children)}
                     type="button">
                     &#9998;
                   </button>
                 )}
-              </components.MultiValueLabel>
+              </>
             );
           },
         }}
@@ -133,4 +134,4 @@ const SelectDraggable = ({ onChange, classNamePrefix, value, onEditChoice, editC
   );
 };
 
-export default SelectDraggable;
+export default SelectDraggableAndEditable;

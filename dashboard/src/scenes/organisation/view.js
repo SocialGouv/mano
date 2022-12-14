@@ -60,45 +60,25 @@ const View = () => {
   const territoryObservations = useRecoilValue(territoryObservationsState);
   const persons = useRecoilValue(personsState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
+  const [refreshErrorKey, setRefreshErrorKey] = useState(0);
+  const { refresh } = useDataLoader();
 
   const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
   useTitle(`Organisation - ${getSettingTitle(tab)}`);
 
-  const updateOrganisation = async () => {
-    // we update the organisation on each tab change to mitigate
-    // to mitigate the sync problem between all the users of an organisation
-
-    const { user } = await API.get({ path: '/user/signin-token' });
-    if (user) {
-      setOrganisation(user.organisation);
-    }
-  };
-
   useEffect(() => {
     scrollContainer.current.scrollTo({ top: 0 });
-    updateOrganisation();
+    refresh();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tab]);
 
   const onEditPersonsCustomInputChoice =
     (customFieldsRow) =>
     async ({ oldChoice, newChoice, field, fields }) => {
-      const updatedPersons = persons
-        .map((person) => {
-          if (person[field.name]?.includes(oldChoice)) {
-            return {
-              ...person,
-              [field.name]:
-                typeof person[field.name] === 'string'
-                  ? newChoice
-                  : person[field.name].map((_choice) => (_choice === oldChoice ? newChoice : _choice)),
-            };
-          }
-          return null;
-        })
-        .filter(Boolean);
+      const updatedPersons = replaceOldChoiceByNewChoice(persons, oldChoice, newChoice, field);
+
       const response = await API.post({
         path: '/custom-field',
         body: {
@@ -111,7 +91,10 @@ const View = () => {
       if (response.ok) {
         toast.success('Choix mis à jour !');
         setOrganisation(response.data);
+      } else {
+        setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
       }
+      refresh();
     };
 
   return (
@@ -268,23 +251,11 @@ const View = () => {
                             <TableCustomFields
                               data={medicalFiles}
                               customFields="customFieldsMedicalFile"
-                              key="customFieldsMedicalFile"
+                              key={refreshErrorKey + 'customFieldsMedicalFile'}
                               fields={customFieldsMedicalFile}
                               onEditChoice={async ({ oldChoice, newChoice, field, fields }) => {
-                                const updatedMedicalFiles = medicalFiles
-                                  .map((medicalFile) => {
-                                    if (medicalFile[field.name]?.includes(oldChoice)) {
-                                      return {
-                                        ...medicalFile,
-                                        [field.name]:
-                                          typeof medicalFile[field.name] === 'string'
-                                            ? newChoice
-                                            : medicalFile[field.name].map((_choice) => (_choice === oldChoice ? newChoice : _choice)),
-                                      };
-                                    }
-                                    return null;
-                                  })
-                                  .filter(Boolean);
+                                const updatedMedicalFiles = replaceOldChoiceByNewChoice(medicalFiles, oldChoice, newChoice, field);
+
                                 const response = await API.post({
                                   path: '/custom-field',
                                   body: {
@@ -299,7 +270,10 @@ const View = () => {
                                 if (response.ok) {
                                   toast.success('Choix mis à jour !');
                                   setOrganisation(response.data);
+                                } else {
+                                  setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
                                 }
+                                refresh();
                               }}
                             />
                           </Row>
@@ -363,24 +337,12 @@ const View = () => {
                           <Label>Champs personnalisés</Label>
                           <TableCustomFields
                             customFields="customFieldsObs"
-                            key="customFieldsObs"
+                            key={refreshErrorKey + 'customFieldsObs'}
                             data={territoryObservations}
                             fields={customFieldsObs}
                             onEditChoice={async ({ oldChoice, newChoice, field, fields }) => {
-                              const updatedObservations = territoryObservations
-                                .map((obs) => {
-                                  if (obs[field.name]?.includes(oldChoice)) {
-                                    return {
-                                      ...obs,
-                                      [field.name]:
-                                        typeof obs[field.name] === 'string'
-                                          ? newChoice
-                                          : obs[field.name].map((_choice) => (_choice === oldChoice ? newChoice : _choice)),
-                                    };
-                                  }
-                                  return null;
-                                })
-                                .filter(Boolean);
+                              const updatedObservations = replaceOldChoiceByNewChoice(territoryObservations, oldChoice, newChoice, field);
+
                               const response = await API.post({
                                 path: '/custom-field',
                                 body: {
@@ -395,7 +357,10 @@ const View = () => {
                               if (response.ok) {
                                 toast.success('Choix mis à jour !');
                                 setOrganisation(response.data);
+                              } else {
+                                setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
                               }
+                              refresh();
                             }}
                           />
                         </>
@@ -450,7 +415,7 @@ const View = () => {
                           <h4 className="tw-my-8">Champs permanents - options modulables</h4>
                           <TableCustomFields
                             customFields="fieldsPersonsCustomizableOptions"
-                            key="fieldsPersonsCustomizableOptions"
+                            key={refreshErrorKey + 'fieldsPersonsCustomizableOptions'}
                             data={persons}
                             fields={fieldsPersonsCustomizableOptions}
                             onlyOptionsEditable
@@ -459,7 +424,7 @@ const View = () => {
                           <h4 className="tw-my-8">Champs personnalisés - informations sociales</h4>
                           <TableCustomFields
                             customFields="customFieldsPersonsSocial"
-                            key="customFieldsPersonsSocial"
+                            key={refreshErrorKey + 'customFieldsPersonsSocial'}
                             data={persons}
                             fields={customFieldsPersonsSocial}
                             onEditChoice={onEditPersonsCustomInputChoice('customFieldsPersonsSocial')}
@@ -467,7 +432,7 @@ const View = () => {
                           <h4 className="tw-my-8">Champs personnalisés - informations médicales</h4>
                           <TableCustomFields
                             customFields="customFieldsPersonsMedical"
-                            key="customFieldsPersonsMedical"
+                            key={refreshErrorKey + 'customFieldsPersonsMedical'}
                             data={persons}
                             fields={customFieldsPersonsMedical}
                             onEditChoice={onEditPersonsCustomInputChoice('customFieldsPersonsMedical')}
@@ -567,6 +532,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const [orgConsultations, setOrgConsultations] = useState([]);
   const allConsultations = useRecoilValue(consultationsState);
+  const [refreshErrorKey, setRefreshErrorKey] = useState(0);
 
   const { refresh } = useDataLoader();
   const API = useApi();
@@ -643,6 +609,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
           key={JSON.stringify(consultationsSortable || [])}
           creatable
           inputId="select-consultations"
+          classNamePrefix="select-consultations"
           options={consultationTypes
             .filter((cat) => !consultationsSortable.includes(cat))
             .sort((c1, c2) => c1.localeCompare(c2))
@@ -683,6 +650,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
             <TableCustomFields
               customFields="consultations"
               data={consultations}
+              key={refreshErrorKey + consultationType.name}
               keyPrefix={consultationType.name}
               mergeData={(newData) => {
                 return organisation.consultations.map((e) => (e.name === consultationType.name ? { ...e, fields: newData } : e));
@@ -694,20 +662,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
                 return Array.isArray(consultationType.fields) ? consultationType.fields : [];
               })()}
               onEditChoice={async ({ oldChoice, newChoice, field, fields }) => {
-                const updatedConsultations = consultations
-                  .map((_consult) => {
-                    if (_consult[field.name]?.includes(oldChoice)) {
-                      return {
-                        ..._consult,
-                        [field.name]:
-                          typeof _consult[field.name] === 'string'
-                            ? newChoice
-                            : _consult[field.name].map((_choice) => (_choice === oldChoice ? newChoice : _choice)),
-                      };
-                    }
-                    return null;
-                  })
-                  .filter(Boolean);
+                const updatedConsultations = replaceOldChoiceByNewChoice(consultations, oldChoice, newChoice, field);
                 const newConsultationsField = organisation.consultations.map((_consultationType) => {
                   if (_consultationType.name === field.name) {
                     return {
@@ -731,7 +686,10 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
                 if (response.ok) {
                   toast.success('Choix mis à jour !');
                   setOrganisation(response.data);
+                } else {
+                  setRefreshErrorKey((k) => k + 1); // to reset the table to its original values
                 }
+                refresh();
               }}
             />
           </div>
@@ -763,6 +721,27 @@ const ImportFieldDetails = ({ field }) => {
     return <code>Oui, Non</code>;
   }
   return <i style={{ color: '#666' }}>Un texte</i>;
+};
+
+const replaceOldChoiceByNewChoice = (data, oldChoice, newChoice, field) => {
+  return data
+    .map((item) => {
+      if (typeof item[field.name] === 'string') {
+        if (item[field.name] !== oldChoice) return null;
+        return {
+          ...item,
+          [field.name]: newChoice,
+        };
+      }
+      // if not string, then it's array
+      if (!Array.isArray(item[field.name])) return null;
+      if (!item[field.name]?.includes(oldChoice)) return null;
+      return {
+        ...item,
+        [field.name]: item[field.name].map((_choice) => (_choice === oldChoice ? newChoice : _choice)),
+      };
+    })
+    .filter(Boolean);
 };
 
 export default View;

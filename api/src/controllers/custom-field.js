@@ -14,21 +14,11 @@ const validateUser = require("../middleware/validateUser");
 const { looseUuidRegex, customFieldSchema } = require("../utils");
 const { serializeOrganisation } = require("../utils/data-serializer");
 
-// This controller is required because:
-//   - If we encrypt one by one each of the actions, persons, comments, territories, observations, places, reports
-//   - If we make a PUT for everyone of these items
-//   - IF WE LOSE INTERNET CONNECTION IN BETWEEN (which happened already in development mode)
-// => We end up with a part of the data encrypted with one key, another with another key
-//    so we lose a big part of the data
-//
-// So we need to send all the new encrypted data in one shot
-// and to make sure everything is changed by using a transaction.
 router.post(
   "/",
   passport.authenticate("user", { session: false }),
   validateUser("admin"),
   catchErrors(async (req, res, next) => {
-    console.log(JSON.stringify(req.body, null, 2));
     const collectionNames = ["consultations", "medicalFiles", "persons", "observations"];
     for (const objectKey of collectionNames) {
       try {
