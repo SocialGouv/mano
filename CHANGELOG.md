@@ -1,3 +1,10 @@
+# [1.188.0](https://github.com/SocialGouv/mano/compare/v1.187.5...v1.188.0) (2022-12-14)
+
+
+### Features
+
+* **dashboard:** add consultation from reception ([#1078](https://github.com/SocialGouv/mano/issues/1078)) ([0601e0c](https://github.com/SocialGouv/mano/commit/0601e0c61e161f2918a0670257c7c20a84c3f368))
+
 ## [1.187.5](https://github.com/SocialGouv/mano/compare/v1.187.4...v1.187.5) (2022-12-14)
 
 
