@@ -4,11 +4,11 @@ import { useRecoilValue } from 'recoil';
 import { Title } from '../../../components/header';
 import UserName from '../../../components/UserName';
 import { teamsState } from '../../../recoil/auth';
-import { personFieldsIncludingCustomFieldsSelector } from '../../../recoil/persons';
+import { flattenedPersonFieldsSelector } from '../../../recoil/persons';
 import { dayjsInstance } from '../../../services/date';
 
 const History = ({ person }) => {
-  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
   const teams = useRecoilValue(teamsState);
   const history = useMemo(() => [...(person.history || [])].reverse(), [person.history]);
 
@@ -38,7 +38,7 @@ const History = ({ person }) => {
                 <td>
                   <div>
                     {Object.entries(h.data).map(([key, value]) => {
-                      const personField = personFieldsIncludingCustomFields.find((f) => f.name === key);
+                      const personField = flattenedPersonFields.find((f) => f.name === key);
                       if (key === 'merge') {
                         return (
                           <p className="tw-flex tw-flex-col" key={key}>

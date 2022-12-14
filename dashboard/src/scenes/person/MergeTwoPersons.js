@@ -6,12 +6,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import { toast } from 'react-toastify';
 import dayjs from 'dayjs';
 import ButtonCustom from '../../components/ButtonCustom';
-import {
-  allowedFieldsInHistorySelector,
-  personFieldsIncludingCustomFieldsSelector,
-  personsState,
-  usePreparePersonForEncryption,
-} from '../../recoil/persons';
+import { allowedFieldsInHistorySelector, flattenedPersonFieldsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import SelectCustom from '../../components/SelectCustom';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
@@ -86,7 +81,7 @@ const MergeTwoPersons = ({ person }) => {
   }, [person]);
   const [personToMergeAndDelete, setPersonToMergeAndDelete] = useState(null);
 
-  const allFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const allFields = useRecoilValue(flattenedPersonFieldsSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
 
   const personsToMergeWith = useMemo(() => persons.filter((p) => p._id !== originPerson?._id), [persons, originPerson]);

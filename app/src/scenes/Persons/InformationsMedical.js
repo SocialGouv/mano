@@ -3,11 +3,8 @@ import { useRecoilValue } from 'recoil';
 import { View } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SubHeader from '../../components/SubHeader';
-import HealthInsuranceMultiCheckBox from '../../components/Selects/HealthInsuranceMultiCheckBox';
-import Spacer from '../../components/Spacer';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import Button from '../../components/Button';
-import InputLabelled from '../../components/InputLabelled';
 import colors from '../../utils/colors';
 import CustomFieldInput from '../../components/CustomFieldInput';
 import { customFieldsPersonsMedicalSelector } from '../../recoil/persons';
@@ -38,19 +35,6 @@ const InformationsMedical = ({ navigation, editable, onChange, onUpdatePerson, o
       <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Informations médicales" />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
         <View>
-          <HealthInsuranceMultiCheckBox
-            values={person.healthInsurances}
-            onChange={(healthInsurances) => onChange({ healthInsurances })}
-            editable={editable}
-          />
-          <InputLabelled
-            label="Structure de suivi médical"
-            onChangeText={(structureMedical) => onChange({ structureMedical })}
-            value={person.structureMedical || (editable ? null : '-- Non renseignée --')}
-            placeholder="Renseignez la structure médicale le cas échéant"
-            editable={editable}
-          />
-          {!editable && <Spacer />}
           {(customFieldsPersonsMedical || [])
             .filter((f) => f)
             .filter((f) => f.enabled || f.enabledTeams?.includes(currentTeam._id))

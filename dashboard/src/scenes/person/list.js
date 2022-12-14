@@ -9,12 +9,7 @@ import Search from '../../components/search';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
 import CreatePerson from './CreatePerson';
-import {
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  fieldsPersonsCustomizableOptionsSelector,
-  filterPersonsBaseSelector,
-} from '../../recoil/persons';
+import { filterPersonsBaseSelector } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
 import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
@@ -88,16 +83,10 @@ const filterPersonsWithAllFieldsSelector = selector({
     const places = get(placesState);
     const user = get(userState);
     const team = get(currentTeamState);
-    const fieldsPersonsCustomizableOptions = get(fieldsPersonsCustomizableOptionsSelector);
-    const customFieldsPersonsSocial = get(customFieldsPersonsSocialSelector);
-    const customFieldsPersonsMedical = get(customFieldsPersonsMedicalSelector);
     const customFieldsMedicalFile = get(customFieldsMedicalFileSelector);
     const filterPersonsBase = get(filterPersonsBaseSelector);
     return [
-      ...filterPersonsBase,
-      ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
-      ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
-      ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
+      ...filterPersonsBase.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a })),
       ...(user.healthcareProfessional
         ? customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(team._id)).map((a) => ({ field: a.name, ...a }))
         : []),

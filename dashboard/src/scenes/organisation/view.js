@@ -11,7 +11,7 @@ import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
   fieldsPersonsCustomizableOptionsSelector,
-  personFieldsIncludingCustomFieldsSelector,
+  flattenedPersonFieldsSelector,
 } from '../../recoil/persons';
 import { defaultCustomFields } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
@@ -47,7 +47,7 @@ const getSettingTitle = (tabId) => {
 const View = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
   const user = useRecoilValue(userState);
-  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
   const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
@@ -419,7 +419,7 @@ const View = () => {
                                   </tr>
                                 </thead>
                                 <tbody>
-                                  {personFieldsIncludingCustomFields
+                                  {flattenedPersonFields
                                     .filter((f) => f.importable)
                                     .map((f) => {
                                       return (

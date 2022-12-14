@@ -5,13 +5,7 @@ import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'rea
 import { useRecoilValue } from 'recoil';
 import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
-import {
-  customFieldsPersonsSocialSelector,
-  customFieldsPersonsMedicalSelector,
-  fieldsPersonsCustomizableOptionsSelector,
-  filterPersonsBaseSelector,
-  personFieldsSelector,
-} from '../../recoil/persons';
+import { filterPersonsBaseSelector, personFieldsSelector, flattenedPersonFieldsSelector } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
@@ -73,9 +67,7 @@ const Stats = () => {
   const allPassages = useRecoilValue(passagesState);
   const allRencontres = useRecoilValue(rencontresState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
-  const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
+  const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const personFields = useRecoilValue(personFieldsSelector);
   const territories = useRecoilValue(territoriesState);
@@ -352,8 +344,6 @@ const Stats = () => {
             type: 'multi-choice',
           }
     ),
-    ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
   ];
 
@@ -523,7 +513,7 @@ const Stats = () => {
             title="Nationalité"
             field="nationalitySituation"
             data={getPieData(personsForStats, 'nationalitySituation', {
-              options: personFields.find((f) => f.name === 'nationalitySituation').options,
+              options: flattenedPersonFields.find((f) => f.name === 'nationalitySituation').options,
             })}
           />
           <CustomResponsivePie
@@ -536,19 +526,21 @@ const Stats = () => {
             onAddFilter={addFilter}
             title="Situation personnelle"
             field="personalSituation"
-            data={getPieData(personsForStats, 'personalSituation', { options: personFields.find((f) => f.name === 'personalSituation').options })}
+            data={getPieData(personsForStats, 'personalSituation', {
+              options: flattenedPersonFields.find((f) => f.name === 'personalSituation').options,
+            })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Motif de la situation de rue"
             field="reasons"
-            data={getPieData(personsForStats, 'reasons', { options: personFields.find((f) => f.name === 'reasons').options })}
+            data={getPieData(personsForStats, 'reasons', { options: flattenedPersonFields.find((f) => f.name === 'reasons').options })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
             title="Ressources des personnes suivies"
             field="resources"
-            data={getPieData(personsForStats, 'resources', { options: personFields.find((f) => f.name === 'resources').options })}
+            data={getPieData(personsForStats, 'resources', { options: flattenedPersonFields.find((f) => f.name === 'resources').options })}
           />
           <AgeRangeBar persons={personsForStats} />
           <StatsCreatedAtRangeBar persons={personsForStats} />
@@ -558,7 +550,9 @@ const Stats = () => {
             onAddFilter={addFilter}
             title="Couverture médicale des personnes"
             field="healthInsurances"
-            data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
+            data={getPieData(personsForStats, 'healthInsurances', {
+              options: flattenedPersonFields.find((f) => f.name === 'healthInsurances').options,
+            })}
           />
           <CustomResponsivePie onAddFilter={addFilter} title="Avec animaux" data={getPieData(personsForStats, 'hasAnimal')} />
           <CustomResponsivePie
@@ -580,11 +574,10 @@ const Stats = () => {
             data={getPieData(
               persons.filter((p) => !!p.outOfActiveList),
               'outOfActiveListReasons',
-              { options: fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReasons').options }
+              { options: flattenedPersonFields.find((f) => f.name === 'outOfActiveListReasons').options }
             )}
           />
-          <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsMedical} />
-          <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsSocial} />
+          <CustomFieldsStats data={personsForStats} customFields={flattenedPersonFields} />
           <CustomFieldsStats data={personsForStats} customFields={customFieldsMedicalFile} />
         </TabPane>
         <TabPane tabId={4}>

@@ -7,7 +7,7 @@ import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
-import { personsState, usePreparePersonForEncryption, personFieldsSelector } from '../../recoil/persons';
+import { personsState, usePreparePersonForEncryption, flattenedPersonFieldsSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
@@ -49,7 +49,7 @@ export function MedicalFile({ person }) {
   const [currentTreatment, setCurrentTreatment] = useState(null);
   const [isNewTreatment, setIsNewTreatment] = useState(false);
 
-  const personFields = useRecoilValue(personFieldsSelector);
+  const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
@@ -165,7 +165,7 @@ export function MedicalFile({ person }) {
                 <Col md={4}>
                   <Label htmlFor="person-select-gender">Genre</Label>
                   <SelectAsInput
-                    options={personFields.find((f) => f.name === 'gender').options}
+                    options={flattenedPersonFields.find((f) => f.name === 'gender').options}
                     name="gender"
                     value={values.gender || ''}
                     onChange={handleChange}
@@ -182,7 +182,9 @@ export function MedicalFile({ person }) {
                 <Col md={4}>
                   <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
                   <SelectCustom
-                    options={personFields.find((f) => f.name === 'healthInsurances').options.map((_option) => ({ value: _option, label: _option }))}
+                    options={flattenedPersonFields
+                      .find((f) => f.name === 'healthInsurances')
+                      .options.map((_option) => ({ value: _option, label: _option }))}
                     value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
                     getOptionValue={(i) => i.value}
                     getOptionLabel={(i) => i.label}

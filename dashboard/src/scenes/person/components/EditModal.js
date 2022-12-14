@@ -4,7 +4,7 @@ import {
   allowedFieldsInHistorySelector,
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
-  personFieldsSelector,
+  flattenedPersonFieldsSelector,
   personsState,
   usePreparePersonForEncryption,
 } from '../../../recoil/persons';
@@ -14,7 +14,6 @@ import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../../components/CustomFieldInput';
-import SelectCustom from '../../../components/SelectCustom';
 import { useState } from 'react';
 import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';
@@ -31,7 +30,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
   const setPersons = useSetRecoilState(personsState);
   const API = useApi();
   const preparePersonForEncryption = usePreparePersonForEncryption();
-  const personFields = useRecoilValue(personFieldsSelector);
+  const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
 
   return (
     <Modal isOpen={true} toggle={() => onClose()} size="lg" backdrop="static">
@@ -108,7 +107,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                         <Col md={4}>
                           <Label htmlFor="person-select-gender">Genre</Label>
                           <SelectAsInput
-                            options={personFields.find((f) => f.name === 'gender').options}
+                            options={flattenedPersonFields.find((f) => f.name === 'gender').options}
                             name="gender"
                             value={values.gender || ''}
                             onChange={handleChange}
@@ -233,86 +232,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </div>
                       {openPanels.includes('social') && (
                         <Row>
-                          <Col md={4}>
-                            <Label htmlFor="person-select-personalSituation">Situation personnelle</Label>
-                            <SelectAsInput
-                              options={personFields.find((f) => f.name === 'personalSituation').options}
-                              name="personalSituation"
-                              value={values.personalSituation || ''}
-                              onChange={handleChange}
-                              inputId="person-select-personalSituation"
-                              classNamePrefix="person-select-personalSituation"
-                            />
-                          </Col>
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label htmlFor="structureSocial">Structure de suivi social</Label>
-                              <Input name="structureSocial" id="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />
-                            </FormGroup>
-                          </Col>
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label htmlFor="person-select-animals">Avec animaux</Label>
-                              <SelectAsInput
-                                options={personFields.find((f) => f.name === 'hasAnimal').options}
-                                name="hasAnimal"
-                                value={values.hasAnimal || ''}
-                                onChange={handleChange}
-                                inputId="person-select-animals"
-                                classNamePrefix="person-select-animals"
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label htmlFor="person-select-address">Hébergement</Label>
-                              <SelectAsInput
-                                options={personFields.find((f) => f.name === 'address').options}
-                                name="address"
-                                value={values.address || ''}
-                                onChange={handleChange}
-                                inputId="person-select-address"
-                                classNamePrefix="person-select-address"
-                              />
-                            </FormGroup>
-                          </Col>
-
-                          <AddressDetails values={values} onChange={handleChange} />
-
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label htmlFor="person-select-nationalitySituation">Nationalité</Label>
-                              <SelectAsInput
-                                options={personFields.find((f) => f.name === 'nationalitySituation').options}
-                                name="nationalitySituation"
-                                value={values.nationalitySituation || ''}
-                                onChange={handleChange}
-                                inputId="person-select-nationalitySituation"
-                                classNamePrefix="person-select-nationalitySituation"
-                              />
-                            </FormGroup>
-                          </Col>
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label htmlFor="person-select-employment">Emploi</Label>
-                              <SelectAsInput
-                                options={personFields.find((f) => f.name === 'employment').options}
-                                name="employment"
-                                value={values.employment || ''}
-                                onChange={handleChange}
-                                inputId="person-select-employment"
-                                classNamePrefix="person-select-employment"
-                              />
-                            </FormGroup>
-                          </Col>
-
-                          <Col md={4}>
-                            <Ressources value={values.resources} onChange={handleChange} />
-                          </Col>
-
-                          <Col md={4}>
-                            <Reasons value={values.reasons} onChange={handleChange} />
-                          </Col>
                           {customFieldsPersonsSocial
                             .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                             .map((field) => (
@@ -338,30 +257,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </div>
                       {openPanels.includes('medical') && (
                         <Row>
-                          <Col md={4}>
-                            <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
-                            <SelectCustom
-                              options={personFields
-                                .find((f) => f.name === 'healthInsurances')
-                                .options.map((_option) => ({ value: _option, label: _option }))}
-                              value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
-                              getOptionValue={(i) => i.value}
-                              getOptionLabel={(i) => i.label}
-                              onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
-                              name="healthInsurances"
-                              isClearable={false}
-                              isMulti
-                              inputId="person-select-healthInsurances"
-                              classNamePrefix="person-select-healthInsurances"
-                              placeholder={' -- Choisir -- '}
-                            />
-                          </Col>
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label htmlFor="structureMedical">Structure de suivi médical</Label>
-                              <Input name="structureMedical" id="structureMedical" value={values.structureMedical} onChange={handleChange} />
-                            </FormGroup>
-                          </Col>
                           {customFieldsPersonsMedical
                             .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                             .map((field) => (
@@ -390,95 +285,3 @@ export default function EditModal({ person, selectedPanel, onClose }) {
     </Modal>
   );
 }
-
-const AddressDetails = ({ values, onChange }) => {
-  const personFields = useRecoilValue(personFieldsSelector);
-
-  const addressDetails = personFields.find((f) => f.name === 'addressDetail').options;
-  const addressDetailsFixedFields = addressDetails.filter((o) => o !== 'Autre');
-
-  const isFreeFieldAddressDetail = (addressDetail = '') => {
-    if (!addressDetail) return false;
-    return !addressDetailsFixedFields.includes(addressDetail);
-  };
-
-  const computeValue = (value = '') => {
-    if (!value) return '';
-    if (addressDetailsFixedFields.includes(value)) return value;
-    return 'Autre';
-  };
-
-  const onChangeRequest = (event) => {
-    event.target.value = event.target.value || 'Autre';
-    onChange(event);
-  };
-
-  return (
-    <>
-      <Col md={4}>
-        <FormGroup>
-          <Label htmlFor="person-select-addressDetail">Type d'hébergement</Label>
-          <SelectAsInput
-            isDisabled={values.address !== 'Oui'}
-            name="addressDetail"
-            value={computeValue(values.addressDetail)}
-            options={addressDetails}
-            onChange={onChange}
-            inputId="person-select-addressDetail"
-            classNamePrefix="person-select-addressDetail"
-          />
-        </FormGroup>{' '}
-      </Col>
-      <Col md={4}>
-        {!!isFreeFieldAddressDetail(values.addressDetail) && (
-          <FormGroup>
-            <Label htmlFor="addressDetail">Autre type d'hébergement</Label>
-            <Input name="addressDetail" value={values.addressDetail === 'Autre' ? '' : values.addressDetail} onChange={onChangeRequest} />
-          </FormGroup>
-        )}
-      </Col>
-    </>
-  );
-};
-
-const Reasons = ({ value, onChange }) => {
-  const personFields = useRecoilValue(personFieldsSelector);
-  return (
-    <FormGroup>
-      <Label htmlFor="person-select-reasons">Motif de la situation en rue</Label>
-      <SelectCustom
-        options={personFields.find((f) => f.name === 'reasons').options.map((_option) => ({ value: _option, label: _option }))}
-        value={value?.map((_option) => ({ value: _option, label: _option })) || []}
-        getOptionValue={(i) => i.value}
-        getOptionLabel={(i) => i.label}
-        onChange={(values) => onChange({ currentTarget: { value: values.map((v) => v.value), name: 'reasons' } })}
-        name="reasons"
-        isClearable={false}
-        isMulti
-        inputId="person-select-reasons"
-        classNamePrefix="person-select-reasons"
-      />
-    </FormGroup>
-  );
-};
-
-const Ressources = ({ value, onChange }) => {
-  const personFields = useRecoilValue(personFieldsSelector);
-  return (
-    <FormGroup>
-      <Label htmlFor="person-select-resources">Ressources</Label>
-      <SelectCustom
-        options={personFields.find((f) => f.name === 'resources').options.map((_option) => ({ value: _option, label: _option }))}
-        value={value?.map((_option) => ({ value: _option, label: _option })) || []}
-        getOptionValue={(i) => i.value}
-        getOptionLabel={(i) => i.label}
-        onChange={(values) => onChange({ currentTarget: { value: values.map((v) => v.value), name: 'resources' } })}
-        name="resources"
-        isClearable={false}
-        isMulti
-        inputId="person-select-resources"
-        classNamePrefix="person-select-resources"
-      />
-    </FormGroup>
-  );
-};

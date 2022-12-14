@@ -2,11 +2,11 @@ import { useRecoilValue } from 'recoil';
 import { utils, writeFile } from 'xlsx';
 import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState } from '../../recoil/auth';
-import { personFieldsIncludingCustomFieldsSelector } from '../../recoil/persons';
+import { flattenedPersonFieldsSelector } from '../../recoil/persons';
 
 export default function DownloadExample() {
   const currentTeam = useRecoilValue(currentTeamState);
-  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
 
   function placeholder(f) {
     if (f.options?.length) return f.options[0];
@@ -23,7 +23,7 @@ export default function DownloadExample() {
   return (
     <ButtonCustom
       onClick={() => {
-        const importable = personFieldsIncludingCustomFields.filter((f) => f.importable);
+        const importable = flattenedPersonFields.filter((f) => f.importable);
         const ws = utils.aoa_to_sheet([importable.map((f) => f.label), importable.map((f) => placeholder(f))]);
         const workbook = { Sheets: { personne: ws }, SheetNames: ['personne'] };
         writeFile(workbook, 'data.xlsx');

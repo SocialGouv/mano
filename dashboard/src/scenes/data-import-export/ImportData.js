@@ -4,7 +4,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { toast } from 'react-toastify';
 import { Modal, ModalBody, ModalHeader, Alert } from 'reactstrap';
 import ButtonCustom from '../../components/ButtonCustom';
-import { personFieldsIncludingCustomFieldsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
+import { flattenedPersonFieldsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { teamsState, userState } from '../../recoil/auth';
 import { isNullOrUndefined } from '../../utils';
 import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
@@ -13,7 +13,7 @@ import { sanitizeFieldValueFromExcel } from './importSanitizer';
 
 const ImportData = () => {
   const user = useRecoilValue(userState);
-  const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
+  const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
   const fileDialogRef = useRef(null);
   const setAllPersons = useSetRecoilState(personsState);
   const teams = useRecoilValue(teamsState);
@@ -30,13 +30,13 @@ const ImportData = () => {
 
   const importableFields = useMemo(
     () =>
-      personFieldsIncludingCustomFields
+      flattenedPersonFields
         .filter((field) => field.importable)
         .map((field) => ({
           ...field,
           options: field.name === 'assignedTeams' ? teams.map((team) => team.name) : field.options,
         })),
-    [personFieldsIncludingCustomFields, teams]
+    [flattenedPersonFields, teams]
   );
   const importableLabels = useMemo(() => importableFields.map((f) => f.label), [importableFields]);
 
