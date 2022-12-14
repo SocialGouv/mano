@@ -13,7 +13,7 @@ import CustomFieldInput from './CustomFieldInput';
 import { currentTeamState, teamsState, userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker } from '../services/date';
+import { dateForDatePicker, dayjsInstance } from '../services/date';
 import useApi from '../services/api';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 export const policeSelect = ['Oui', 'Non'];
@@ -38,7 +38,9 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const addTerritoryObs = async (obs) => {
     const res = await API.post({ path: '/territory-observation', body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
-      setTerritoryObs((territoryObservations) => [res.decryptedData, ...territoryObservations]);
+      setTerritoryObs((territoryObservations) =>
+        [res.decryptedData, ...territoryObservations].sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt))
+      );
       await createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
     return res;
@@ -48,10 +50,12 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
     const res = await API.put({ path: `/territory-observation/${obs._id}`, body: prepareObsForEncryption(customFieldsObs)(obs) });
     if (res.ok) {
       setTerritoryObs((territoryObservations) =>
-        territoryObservations.map((a) => {
-          if (a._id === obs._id) return res.decryptedData;
-          return a;
-        })
+        territoryObservations
+          .map((a) => {
+            if (a._id === obs._id) return res.decryptedData;
+            return a;
+          })
+          .sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt))
       );
       await createReportAtDateIfNotExist(res.decryptedData.observedAt);
     }
@@ -70,7 +74,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
               if (!values.team) return toast.error("L'équipe est obligatoire");
               if (!values.territory) return toast.error('Le territoire est obligatoire');
               const body = {
-                observedAt: values.observedAt,
+                observedAt: values.observedAt || dayjsInstance(),
                 team: values.team,
                 user: values.user || user._id,
                 territory: values.territory,
