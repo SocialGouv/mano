@@ -1,3 +1,10 @@
+# [1.189.0](https://github.com/SocialGouv/mano/compare/v1.188.0...v1.189.0) (2022-12-14)
+
+
+### Features
+
+* **app:** add consultation from person list ([#1079](https://github.com/SocialGouv/mano/issues/1079)) ([c345e67](https://github.com/SocialGouv/mano/commit/c345e67c7423b20ee62eb7d228fb60298d36ae97))
+
 # [1.188.0](https://github.com/SocialGouv/mano/compare/v1.187.5...v1.188.0) (2022-12-14)
 
 
