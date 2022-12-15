@@ -81,15 +81,15 @@ router.post(
         return res.status(200).send({
           ok: true,
           data: {
-            _id: data._id,
-            encrypted: data.encrypted,
-            encryptedEntityKey: data.encryptedEntityKey,
-            organisation: data.organisation,
-            team: data.team,
-            date: data.date,
-            createdAt: data.createdAt,
-            updatedAt: data.updatedAt,
-            deletedAt: data.deletedAt,
+            _id: existingReport._id,
+            encrypted: existingReport.encrypted,
+            encryptedEntityKey: existingReport.encryptedEntityKey,
+            organisation: existingReport.organisation,
+            team: existingReport.team,
+            date: existingReport.date,
+            createdAt: existingReport.createdAt,
+            updatedAt: existingReport.updatedAt,
+            deletedAt: existingReport.deletedAt,
           },
         });
       }
