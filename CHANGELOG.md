@@ -1,3 +1,10 @@
+## [1.189.4](https://github.com/SocialGouv/mano/compare/v1.189.3...v1.189.4) (2022-12-15)
+
+
+### Bug Fixes
+
+* existingReports send instead of undefined data ([#1088](https://github.com/SocialGouv/mano/issues/1088)) ([41a5b5f](https://github.com/SocialGouv/mano/commit/41a5b5f18b42c1b642a8c2aa4d2498e71056a6a1))
+
 ## [1.189.3](https://github.com/SocialGouv/mano/compare/v1.189.2...v1.189.3) (2022-12-15)
 
 
