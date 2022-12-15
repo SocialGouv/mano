@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import slugify from 'slugify';
 import { Col, FormGroup, Input, Label } from 'reactstrap';
 import styled from 'styled-components';
 import SelectAsInput from './SelectAsInput';
@@ -10,7 +11,15 @@ import SelectTeamMultiple from './SelectTeamMultiple';
 
 const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
-    const slugifiedLabel = field.label.toLowerCase().replace(/ /g, '-').replace("'", '') ?? field.name;
+    const slugifiedLabel =
+      slugify(field.label, {
+        replacement: '-', // replace spaces with replacement character, defaults to `-`
+        remove: undefined, // remove characters that match regex, defaults to `undefined`
+        lower: true, // convert to lower case, defaults to `false`
+        strict: true, // strip special characters except replacement, defaults to `false`
+        locale: 'fr', // language code of the locale to use
+        trim: true, // trim leading and trailing replacement chars, defaults to `true`
+      }) ?? field.name;
     if (['text', 'number'].includes(field.type)) return `${model}-custom-input-${slugifiedLabel}`;
     if (['textarea'].includes(field.type)) return `${model}-custom-textarea-${slugifiedLabel}`;
     if (['date-with-time', 'date'].includes(field.type)) return `${model}-custom-datepicker-${slugifiedLabel}`;

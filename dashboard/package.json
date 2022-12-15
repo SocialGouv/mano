@@ -38,6 +38,7 @@
     "reactstrap": "^8.9.0",
     "recoil": "^0.7.0",
     "sass": "^1.48.0",
+    "slugify": "^1.6.5",
     "sortablejs": "^1.14.0",
     "styled-components": "^5.2.1",
     "urijs": "^1.19.11",

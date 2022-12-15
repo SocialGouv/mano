@@ -18,7 +18,7 @@ export const personFieldsSelector = selector({
   key: 'personFieldsSelector',
   get: ({ get }) => {
     const organisation = get(organisationState);
-    return organisation.customFieldsPersons;
+    return organisation.customFieldsPersons || [];
   },
 });
 
@@ -53,7 +53,7 @@ export const customFieldsPersonsMedicalSelector = selector({
   key: 'customFieldsPersonsMedicalSelector',
   get: ({ get }) => {
     const personFields = get(personFieldsSelector);
-    return personFields.find((group) => group.name === 'Informations médicales');
+    return personFields.find((group) => group.name === 'Informations médicales').fields;
   },
 });
 
@@ -61,7 +61,7 @@ export const customFieldsPersonsSocialSelector = selector({
   key: 'customFieldsPersonsSocialSelector',
   get: ({ get }) => {
     const personFields = get(personFieldsSelector);
-    return personFields.find((group) => group.name === 'Informations sociales');
+    return personFields.find((group) => group.name === 'Informations sociales').fields;
   },
 });
 
@@ -92,7 +92,7 @@ Prepare for encryption hook
 export const usePreparePersonForEncryption = () => {
   const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
   const preparePersonForEncryption = (person) => {
-    const encryptedFields = flattenedPersonFields.filter((f) => f.encrypted).map((f) => f.name);
+    const encryptedFields = flattenedPersonFields.filter((f) => f.encrypted !== false).map((f) => f.name);
     const decrypted = {};
     for (let field of encryptedFields) {
       decrypted[field] = person[field];

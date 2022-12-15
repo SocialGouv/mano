@@ -93,7 +93,7 @@ Prepare for encryption hook
 export const usePreparePersonForEncryption = () => {
   const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
   const preparePersonForEncryption = (person) => {
-    const encryptedFields = flattenedPersonFields.filter((f) => f.encrypted).map((f) => f.name);
+    const encryptedFields = flattenedPersonFields.filter((f) => f.encrypted !== false).map((f) => f.name);
     const decrypted = {};
     for (let field of encryptedFields) {
       decrypted[field] = person[field];
