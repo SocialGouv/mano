@@ -19,8 +19,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const personFields = useRecoilValue(personFieldsSelector);
 
-  console.log('personFields', personFields);
-
   return (
     <Modal isOpen={true} toggle={() => onClose()} size="lg" backdrop="static">
       <ModalHeader toggle={() => onClose()}>Modifier {person.name}</ModalHeader>
@@ -92,7 +90,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                               handleChange={handleChange}
                               field={field}
                               key={field.name}
-                              colWidth={field.columns}
+                              colWidth={field.colWidth}
                             />
                           ))}
                       </Row>
