@@ -31,10 +31,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
             if (!body.followedSince) body.followedSince = person.createdAt;
             body.entityKey = person.entityKey;
 
-            console.log('person', person);
-            console.log('body', body);
-            return;
-
             const historyEntry = {
               date: new Date(),
               user: user._id,
