@@ -1,3 +1,10 @@
+## [1.189.3](https://github.com/SocialGouv/mano/compare/v1.189.2...v1.189.3) (2022-12-15)
+
+
+### Bug Fixes
+
+* completedAt for done or canceled ([#1086](https://github.com/SocialGouv/mano/issues/1086)) ([a07df60](https://github.com/SocialGouv/mano/commit/a07df608cf13265cc5ce64945f232a872c41a08e))
+
 ## [1.189.2](https://github.com/SocialGouv/mano/compare/v1.189.1...v1.189.2) (2022-12-15)
 
 
