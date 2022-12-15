@@ -2,9 +2,10 @@ const { defaultMedicalFileCustomFields } = require("./custom-fields/medicalFile"
 const {
   customFieldsPersonsMedicalBase,
   customFieldsPersonsSocialBase,
-  fixedFieldsPersonsBase,
+  customFieldsPersonsSummaryBase,
   defaultFieldsPersons,
 } = require("./custom-fields/person");
+const deprecated = require("./custom-fields/person_deprecated");
 
 function serializeOrganisation(organisation) {
   return {
@@ -14,7 +15,6 @@ function serializeOrganisation(organisation) {
     updatedAt: organisation.updatedAt,
     encryptionEnabled: organisation.encryptionEnabled,
     encryptionLastUpdateAt: organisation.encryptionLastUpdateAt,
-    receptionEnabled: organisation.receptionEnabled,
     encryptedVerificationKey: organisation.encryptedVerificationKey,
     migrations: organisation.migrations,
     migrationLastUpdateAt: organisation.migrationLastUpdateAt,
@@ -23,44 +23,53 @@ function serializeOrganisation(organisation) {
     groupsEnabled: organisation.groupsEnabled,
 
     /* actions settings */
-    categories: !!organisation.actionsGroupedCategories
-      ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
-      : organisation.categories,
     actionsGroupedCategories: organisation.actionsGroupedCategories,
 
     /* services settings */
+    receptionEnabled: organisation.receptionEnabled,
     groupedServices: organisation.groupedServices,
-    services: !!organisation.groupedServices
-      ? organisation.groupedServices.reduce((flattenedServices, group) => [...flattenedServices, ...group.services], [])
-      : organisation.services,
 
     /* collaborations */
     collaborations: organisation.collaborations,
 
+    /* custom fields persons */
+    customFieldsPersons: organisation.customFieldsPersons || defaultFieldsPersons,
     /* custom fields consultations */
     consultations: organisation.consultations,
     /* custom fields observations */
     customFieldsObs: organisation.customFieldsObs,
-    /* custom fields persons */
-    customFieldsPersons: organisation.customFieldsPersons || defaultFieldsPersons,
     /* custom fields medical file */
     customFieldsMedicalFile: organisation.customFieldsMedicalFile || defaultMedicalFileCustomFields,
 
-    // kept for retro-compatiblity only
+    /*
+
+     kept for retro-compatiblity only
+
+
+
+
+    */
+    /* categories */
+    categories: !!organisation.actionsGroupedCategories
+      ? organisation.actionsGroupedCategories.reduce((flattenedCategories, group) => [...flattenedCategories, ...group.categories], [])
+      : organisation.categories,
+    /* services */
+    services: !!organisation.groupedServices
+      ? organisation.groupedServices.reduce((flattenedServices, group) => [...flattenedServices, ...group.services], [])
+      : organisation.services,
     /* fixed fields persons */
-    personFields:
-      (organisation.customFieldsPersons || defaultFieldsPersons).find((group) => group.name === "Résumé")?.fields || fixedFieldsPersonsBase,
+    personFields: deprecated.personFields,
     /* custom fields persons */
-    customFieldsPersonsSocial:
-      (organisation.customFieldsPersons || defaultFieldsPersons).find((group) => group.name === "Informations sociales")?.fields ||
-      customFieldsPersonsSocialBase,
-    customFieldsPersonsMedical:
-      (organisation.customFieldsPersons || defaultFieldsPersons).find((group) => group.name === "Informations médicales")?.fields ||
-      customFieldsPersonsMedicalBase,
+    customFieldsPersonsSocial: (
+      organisation.customFieldsPersons.find((group) => group.name === "Informations sociales")?.fields || customFieldsPersonsSocialBase
+    ).filter((f) => !deprecated.personFieldsNames.includes(f.name)),
+    customFieldsPersonsMedical: (
+      organisation.customFieldsPersons.find((group) => group.name === "Informations médicales")?.fields || customFieldsPersonsMedicalBase
+    ).filter((f) => !deprecated.personFieldsNames.includes(f.name)),
 
     /* custom fields persons: fields with customizavble options only */
     fieldsPersonsCustomizableOptions:
-      organisation.fieldsPersonsCustomizableOptions || fixedFieldsPersonsBase.find((f) => f.name === "outOfActiveListReasons"),
+      organisation.fieldsPersonsCustomizableOptions || customFieldsPersonsSummaryBase.find((f) => f.name === "outOfActiveListReasons"),
   };
 }
 

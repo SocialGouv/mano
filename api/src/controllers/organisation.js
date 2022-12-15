@@ -233,14 +233,25 @@ router.put(
     try {
       const bodyToParse = {
         name: z.optional(z.string().min(1)),
-        categories: z.optional(z.array(z.string().min(1))),
+        encryptedVerificationKey: z.optional(z.string().min(1)),
+        encryptionEnabled: z.optional(z.boolean()),
+        groupsEnabled: z.optional(z.boolean()),
+
         actionsGroupedCategories: z.optional(z.array(z.object({ actionsGroupedCategories: z.string(), categories: z.array(z.string().min(1)) }))),
-        groupedServices: z.optional(z.array(z.object({ groupedServices: z.string(), services: z.array(z.string().min(1)) }))),
+
         collaborations: z.optional(z.array(z.string().min(1))),
+        receptionEnabled: z.optional(z.boolean()),
+        groupedServices: z.optional(z.array(z.object({ groupedServices: z.string(), services: z.array(z.string().min(1)) }))),
+
+        customFieldsPersons: z.optional(
+          z.array(
+            z.object({
+              name: z.string().min(1),
+              fields: z.array(customFieldSchema),
+            })
+          )
+        ),
         customFieldsObs: z.optional(z.array(customFieldSchema)),
-        fieldsPersonsCustomizableOptions: z.optional(z.array(customFieldSchema)),
-        customFieldsPersonsSocial: z.optional(z.array(customFieldSchema)),
-        customFieldsPersonsMedical: z.optional(z.array(customFieldSchema)),
         customFieldsMedicalFile: z.optional(z.array(customFieldSchema)),
         consultations: z.optional(
           z.array(
@@ -250,11 +261,12 @@ router.put(
             })
           )
         ),
-        encryptedVerificationKey: z.optional(z.string().min(1)),
-        encryptionEnabled: z.optional(z.boolean()),
-        receptionEnabled: z.optional(z.boolean()),
-        groupsEnabled: z.optional(z.boolean()),
+        // kept for retro-compatibility only
+        categories: z.optional(z.array(z.string().min(1))),
         services: z.optional(z.array(z.string().min(1))),
+        fieldsPersonsCustomizableOptions: z.optional(z.array(customFieldSchema)),
+        customFieldsPersonsSocial: z.optional(z.array(customFieldSchema)),
+        customFieldsPersonsMedical: z.optional(z.array(customFieldSchema)),
       };
       if (req.body.encryptionLastUpdateAt) {
         bodyToParse.encryptionLastUpdateAt = z.preprocess((input) => new Date(input), z.date());
@@ -285,10 +297,17 @@ router.put(
 
     const updateOrg = {};
     if (req.body.hasOwnProperty("name")) updateOrg.name = req.body.name;
-    if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
+    if (req.body.hasOwnProperty("encryptedVerificationKey")) updateOrg.encryptedVerificationKey = req.body.encryptedVerificationKey;
+    if (req.body.hasOwnProperty("encryptionEnabled")) updateOrg.encryptionEnabled = req.body.encryptionEnabled;
+    if (req.body.hasOwnProperty("encryptionLastUpdateAt")) updateOrg.encryptionLastUpdateAt = req.body.encryptionLastUpdateAt;
+    if (req.body.hasOwnProperty("groupsEnabled")) updateOrg.groupsEnabled = req.body.groupsEnabled;
+
     if (req.body.hasOwnProperty("actionsGroupedCategories")) updateOrg.actionsGroupedCategories = req.body.actionsGroupedCategories;
-    if (req.body.hasOwnProperty("groupedServices")) updateOrg.groupedServices = req.body.groupedServices;
+
     if (req.body.hasOwnProperty("collaborations")) updateOrg.collaborations = req.body.collaborations;
+    if (req.body.hasOwnProperty("receptionEnabled")) updateOrg.receptionEnabled = req.body.receptionEnabled;
+    if (req.body.hasOwnProperty("groupedServices")) updateOrg.groupedServices = req.body.groupedServices;
+
     if (req.body.hasOwnProperty("customFieldsObs"))
       updateOrg.customFieldsObs = typeof req.body.customFieldsObs === "string" ? JSON.parse(req.body.customFieldsObs) : req.body.customFieldsObs;
     if (req.body.hasOwnProperty("customFieldsPersons"))
@@ -299,12 +318,23 @@ router.put(
         typeof req.body.customFieldsMedicalFile === "string" ? JSON.parse(req.body.customFieldsMedicalFile) : req.body.customFieldsMedicalFile;
     if (req.body.hasOwnProperty("consultations"))
       updateOrg.consultations = typeof req.body.consultations === "string" ? JSON.parse(req.body.consultations) : req.body.consultations;
-    if (req.body.hasOwnProperty("encryptedVerificationKey")) updateOrg.encryptedVerificationKey = req.body.encryptedVerificationKey;
-    if (req.body.hasOwnProperty("encryptionEnabled")) updateOrg.encryptionEnabled = req.body.encryptionEnabled;
-    if (req.body.hasOwnProperty("encryptionLastUpdateAt")) updateOrg.encryptionLastUpdateAt = req.body.encryptionLastUpdateAt;
-    if (req.body.hasOwnProperty("receptionEnabled")) updateOrg.receptionEnabled = req.body.receptionEnabled;
-    if (req.body.hasOwnProperty("groupsEnabled")) updateOrg.groupsEnabled = req.body.groupsEnabled;
+
+    // kept for retro-compatibility only
     if (req.body.hasOwnProperty("services")) updateOrg.services = req.body.services;
+    if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
+    if (req.body.hasOwnProperty("fieldsPersonsCustomizableOptions"))
+      updateOrg.fieldsPersonsCustomizableOptions =
+        typeof req.body.fieldsPersonsCustomizableOptions === "string"
+          ? JSON.parse(req.body.fieldsPersonsCustomizableOptions)
+          : req.body.fieldsPersonsCustomizableOptions;
+    if (req.body.hasOwnProperty("customFieldsPersonsSocial"))
+      updateOrg.customFieldsPersonsSocial =
+        typeof req.body.customFieldsPersonsSocial === "string" ? JSON.parse(req.body.customFieldsPersonsSocial) : req.body.customFieldsPersonsSocial;
+    if (req.body.hasOwnProperty("customFieldsPersonsMedical"))
+      updateOrg.customFieldsPersonsMedical =
+        typeof req.body.customFieldsPersonsMedical === "string"
+          ? JSON.parse(req.body.customFieldsPersonsMedical)
+          : req.body.customFieldsPersonsMedical;
 
     await organisation.update(updateOrg);
 

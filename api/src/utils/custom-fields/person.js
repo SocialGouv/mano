@@ -1,4 +1,4 @@
-const fixedFieldsPersonsBase = [
+const customFieldsPersonsSummaryBase = [
   { name: "user", type: "text", label: "", editable: "forbidden", encrypted: true, importable: false, filterable: false },
   { name: "name", type: "text", label: "Nom prénom ou Pseudonyme", editable: "forbidden", encrypted: true, importable: true, filterable: true },
   { name: "otherNames", type: "text", label: "Autres pseudos", editable: "forbidden", encrypted: true, importable: true, filterable: true },
@@ -331,13 +331,13 @@ const customFieldsPersonsMedicalBase = [
 ];
 
 const defaultFieldsPersons = [
-  { name: "Résumé", fields: fixedFieldsPersonsBase },
+  { name: "Résumé", fields: customFieldsPersonsSummaryBase },
   { name: "Informations sociales", fields: customFieldsPersonsSocialBase },
   { name: "Informations médicales", fields: customFieldsPersonsMedicalBase },
 ];
 
 module.exports = {
-  fixedFieldsPersonsBase,
+  customFieldsPersonsSummaryBase,
   customFieldsPersonsSocialBase,
   customFieldsPersonsMedicalBase,
   defaultFieldsPersons,

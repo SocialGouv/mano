@@ -24,5 +24,5 @@
   await require("./2022-11-29_add_grouped_services")();
   await require("./2022-11-29_add_reports_columns")();
   await require("./2022-12-12-debug_report")();
-  await require("./2022-12-14_add_base_fields_to_custom_fields")();
+  await require("./2022-12-14_add_custom_fields_persons")();
 })();

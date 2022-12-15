@@ -4,24 +4,22 @@ const sequelize = require("../sequelize");
 const {
   customFieldsPersonsSocialBase,
   customFieldsPersonsMedicalBase,
-  fixedFieldsPersonsBase,
+  customFieldsPersonsSummaryBase,
   defaultFieldsPersons,
 } = require("../../utils/custom-fields/person");
-
-const json = JSON.stringify(defaultFieldsPersons);
 
 module.exports = async () => {
   try {
     await sequelize.query(`
       ALTER TABLE "mano"."Organisation"
-      ADD COLUMN IF NOT EXISTS "customFieldsPersons" JSONB DEFAULT $$${json}$$::JSONB;
+      ADD COLUMN IF NOT EXISTS "customFieldsPersons" JSONB DEFAULT $$${JSON.stringify(defaultFieldsPersons)}$$::JSONB;
     `);
     const organisations = await Organisation.findAll();
     for (const organisation of organisations) {
       if (organisation.migrations?.includes("custom-fields-persons-setup")) continue;
       organisation.set({
         customFieldsPersons: [
-          { name: "Résumé", fields: fixedFieldsPersonsBase },
+          { name: "Résumé", fields: customFieldsPersonsSummaryBase },
           { name: "Informations sociales", fields: [...customFieldsPersonsSocialBase, ...(organisation.customFieldsPersonsSocial || [])] },
           { name: "Informations médicales", fields: [...customFieldsPersonsMedicalBase, ...(organisation.customFieldsPersonsMedical || [])] },
         ],
