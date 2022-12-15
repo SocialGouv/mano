@@ -247,6 +247,7 @@ const customFieldsPersonsSummaryBase = [
     filterable: true,
     colWidth: 12,
     enabled: true,
+    roles: ["admin", "normal"],
   },
 ];
 
