@@ -118,8 +118,8 @@ export default function View() {
         {person.outOfActiveList && (
           <Alert color="warning" className="noprint">
             {person?.name} est en dehors de la file active, pour{' '}
-            {person.outOfActiveListReasons.length > 1 ? 'les motifs suivants' : 'le motif suivant'} :{' '}
-            <b>{person.outOfActiveListReasons.join(', ')}</b>{' '}
+            {person.outOfActiveListReasons?.length > 1 ? 'les motifs suivants' : 'le motif suivant'} :{' '}
+            <b>{person.outOfActiveListReasons?.join(', ')}</b>{' '}
             {person.outOfActiveListDate && `le ${formatDateWithFullMonth(person.outOfActiveListDate)}`}
           </Alert>
         )}

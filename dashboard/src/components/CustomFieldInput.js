@@ -6,6 +6,7 @@ import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../services/date';
 import { capture } from '../services/sentry';
+import SelectTeamMultiple from './SelectTeamMultiple';
 
 const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
@@ -16,7 +17,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
     if (['boolean'].includes(field.type)) return `${model}-custom-checkbox-${slugifiedLabel}`;
     if (['yes-no'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
     if (['enum'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
-    if (['multi-choice'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
+    if (['multi-team', 'multi-choice'].includes(field.type)) return `${model}-custom-select-${slugifiedLabel}`;
   }, [field, model]);
 
   try {
@@ -118,6 +119,15 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
               getOptionValue={(i) => i.value}
               getOptionLabel={(i) => i.label}
               isDisabled={disabled}
+            />
+          )}
+          {['multi-teams'].includes(field.type) && (
+            <SelectTeamMultiple
+              onChange={(teamIds) => handleChange({ target: { value: teamIds, name: field.name } })}
+              value={values[field.name]}
+              colored
+              inputId={id}
+              classNamePrefix={id}
             />
           )}
         </FormGroup>
