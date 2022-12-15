@@ -1,52 +1,67 @@
 const customFieldsPersonsSummaryBase = [
-  { name: "user", type: "text", label: "", editable: "forbidden", encrypted: true, importable: false, filterable: false },
-  { name: "name", type: "text", label: "Nom prénom ou Pseudonyme", editable: "forbidden", encrypted: true, importable: true, filterable: true },
-  { name: "otherNames", type: "text", label: "Autres pseudos", editable: "forbidden", encrypted: true, importable: true, filterable: true },
+  /*
+  what's in this array ?
+    // technical fields
+        _id
+        organisation
+        createdAt
+        updatedAt
+    // fields métier that can't disappear or be changed
+        outOfActiveList
+        outOfActiveListDate
+        user
+        name
+        birthdate
+        alertness
+        wanderingAt
+        followedSince
+        assignedTeams
+        documents
+        history
+    // fields that can be partially or fully changed
+        otherNames
+        gender
+        description
+        phone
+        outOfActiveListReasons
+
+  */
+  /* technical fields */
   {
-    name: "gender",
-    type: "enum",
-    label: "Genre",
+    name: "_id",
+    label: "",
     editable: "forbidden",
-    encrypted: true,
-    importable: true,
-    options: ["Aucun", "Homme", "Femme", "Homme transgenre", "Femme transgenre", "Non binaire", "Autre"],
-    filterable: true,
-  },
-  { name: "birthdate", type: "date", label: "Date de naissance", editable: "forbidden", encrypted: true, importable: true, filterable: true },
-  { name: "description", type: "textarea", label: "Description", editable: "forbidden", encrypted: true, importable: true, filterable: true },
-  {
-    name: "alertness",
-    type: "boolean",
-    label: "Personne très vulnérable",
-    editable: "forbidden",
-    encrypted: true,
-    importable: true,
-    filterable: true,
-  },
-  { name: "wanderingAt", type: "date", label: "En rue depuis le", editable: "forbidden", encrypted: true, importable: true, filterable: true },
-  { name: "phone", type: "text", label: "Téléphone", editable: "forbidden", encrypted: true, importable: true, filterable: true },
-  {
-    name: "assignedTeams",
-    type: "multi-choice",
-    label: "Équipes en charge",
-    editable: "forbidden",
-    encrypted: true,
-    importable: true,
+    encrypted: false,
+    importable: false,
     filterable: false,
   },
-  { name: "_id", label: "", editable: "forbidden", encrypted: false, importable: false, filterable: false },
-  { name: "organisation", label: "", editable: "forbidden", encrypted: false, importable: false, filterable: false },
   {
-    name: "followedSince",
-    type: "date",
-    label: "Suivi(e) depuis le / Créé(e) le",
+    name: "organisation",
+    label: "",
     editable: "forbidden",
-    encrypted: true,
-    importable: true,
-    filterable: true,
+    encrypted: false,
+    importable: false,
+    filterable: false,
   },
-  { name: "createdAt", type: "date", label: "", editable: "forbidden", encrypted: false, importable: false, filterable: false },
-  { name: "updatedAt", type: "date", label: "", editable: "forbidden", encrypted: false, importable: false, filterable: false },
+  {
+    name: "createdAt",
+    type: "date",
+    label: "",
+    editable: "forbidden",
+    encrypted: false,
+    importable: false,
+    filterable: false,
+  },
+  {
+    name: "updatedAt",
+    type: "date",
+    label: "",
+    editable: "forbidden",
+    encrypted: false,
+    importable: false,
+    filterable: false,
+  },
+  /* fields métier that can't disappear or be changed */
   {
     name: "outOfActiveList",
     type: "yes-no",
@@ -57,9 +72,134 @@ const customFieldsPersonsSummaryBase = [
     options: ["Oui", "Non"],
     filterable: true,
   },
-  { name: "outOfActiveListDate", type: "date", label: "", editable: "forbidden", encrypted: true, importable: false, filterable: false },
-  { name: "documents", type: "files", label: "Documents", editable: "forbidden", encrypted: true, importable: false, filterable: false },
-  { name: "history", type: "history", label: "Historique", editable: "forbidden", encrypted: true, importable: false, filterable: false },
+  {
+    name: "outOfActiveListDate",
+    type: "date",
+    label: "",
+    editable: "forbidden",
+    encrypted: true,
+    importable: false,
+    filterable: false,
+  },
+  {
+    name: "user",
+    type: "text",
+    label: "",
+    editable: "forbidden",
+    encrypted: true,
+    importable: false,
+    filterable: false,
+  },
+  {
+    name: "name",
+    type: "text",
+    label: "Nom prénom ou Pseudonyme",
+    editable: "forbidden",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
+  {
+    name: "birthdate",
+    type: "date",
+    label: "Date de naissance",
+    editable: "forbidden",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
+  {
+    name: "alertness",
+    type: "boolean",
+    label: "Personne très vulnérable",
+    editable: "forbidden",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
+  {
+    name: "wanderingAt",
+    type: "date",
+    label: "En rue depuis le",
+    editable: "forbidden",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
+  {
+    name: "followedSince",
+    type: "date",
+    label: "Suivi(e) depuis le / Créé(e) le",
+    editable: "forbidden",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
+  {
+    name: "assignedTeams",
+    type: "multi-choice",
+    label: "Équipes en charge",
+    editable: "forbidden",
+    encrypted: true,
+    importable: true,
+    filterable: false,
+  },
+  {
+    name: "documents",
+    type: "files",
+    label: "Documents",
+    editable: "forbidden",
+    encrypted: true,
+    importable: false,
+    filterable: false,
+  },
+  {
+    name: "history",
+    type: "history",
+    label: "Historique",
+    editable: "forbidden",
+    encrypted: true,
+    importable: false,
+    filterable: false,
+  },
+  /* fields that can be partially or fully changed */
+  {
+    name: "otherNames",
+    type: "text",
+    label: "Autres pseudos",
+    editable: "all",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
+  {
+    name: "gender",
+    type: "enum",
+    label: "Genre",
+    editable: "options",
+    encrypted: true,
+    importable: true,
+    options: ["Aucun", "Homme", "Femme", "Homme transgenre", "Femme transgenre", "Non binaire", "Autre"],
+    filterable: true,
+  },
+  {
+    name: "description",
+    type: "textarea",
+    label: "Description",
+    editable: "all",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
+  {
+    name: "phone",
+    type: "text",
+    label: "Téléphone",
+    editable: "all",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
   {
     name: "outOfActiveListReasons",
     type: "multi-choice",
@@ -86,7 +226,6 @@ const customFieldsPersonsSocialBase = [
     name: "personalSituation",
     type: "enum",
     label: "Situation personnelle",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     options: ["Aucune", "Homme isolé", "Femme isolée", "En couple", "Famille", "Famille monoparentale", "Mineur", "Autre"],
@@ -98,7 +237,6 @@ const customFieldsPersonsSocialBase = [
     name: "structureSocial",
     type: "text",
     label: "Structure de suivi social",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     filterable: true,
@@ -109,7 +247,6 @@ const customFieldsPersonsSocialBase = [
     name: "hasAnimal",
     type: "yes-no",
     label: "Avec animaux",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     options: ["Oui", "Non"],
@@ -121,7 +258,6 @@ const customFieldsPersonsSocialBase = [
     name: "address",
     type: "yes-no",
     label: "Hébergement",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     options: ["Oui", "Non"],
@@ -133,7 +269,6 @@ const customFieldsPersonsSocialBase = [
     name: "addressDetail",
     type: "enum",
     label: "Type d'hébergement",
-    editable: "forbidden",
     encrypted: true,
     options: [
       "Logement",
@@ -155,7 +290,6 @@ const customFieldsPersonsSocialBase = [
     name: "nationalitySituation",
     type: "enum",
     label: "Nationalité",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     options: ["Hors UE", "UE", "Française", "Apatride"],
@@ -167,7 +301,6 @@ const customFieldsPersonsSocialBase = [
     name: "employment",
     type: "enum",
     label: "Emploi",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     options: ["DPH", "CDD", "CDDI", "CDI", "Interim", "Bénévolat", "Sans activité", "Étudiant", "Non déclaré", "Autre"],
@@ -179,7 +312,6 @@ const customFieldsPersonsSocialBase = [
     name: "resources",
     type: "multi-choice",
     label: "Ressources",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     options: [
@@ -209,7 +341,6 @@ const customFieldsPersonsSocialBase = [
     name: "reasons",
     type: "multi-choice",
     label: "Motif de la situation en rue",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     options: [
@@ -237,7 +368,6 @@ const customFieldsPersonsMedicalBase = [
     name: "healthInsurances",
     type: "multi-choice",
     label: "Couverture(s) médicale(s)",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     options: ["Aucune", "Régime Général", "PUMa", "AME", "CSS", "Autre"],
@@ -249,7 +379,6 @@ const customFieldsPersonsMedicalBase = [
     name: "structureMedical",
     type: "text",
     label: "Structure de suivi médical",
-    editable: "forbidden",
     encrypted: true,
     importable: true,
     filterable: true,

@@ -26,7 +26,6 @@ const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const TerritoryObservation = require("../models/territoryObservation");
 const { serializeOrganisation } = require("../utils/data-serializer");
-const { defaultFieldsPersons } = require("../utils/custom-fields/person");
 
 const JWT_MAX_AGE = 60 * 60 * 3; // 3 hours in s
 
