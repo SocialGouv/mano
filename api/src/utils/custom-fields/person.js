@@ -35,6 +35,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: false,
     importable: false,
     filterable: false,
+    enabled: true,
   },
   {
     name: "organisation",
@@ -43,6 +44,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: false,
     importable: false,
     filterable: false,
+    enabled: true,
   },
   {
     name: "createdAt",
@@ -52,6 +54,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: false,
     importable: false,
     filterable: false,
+    enabled: true,
   },
   {
     name: "updatedAt",
@@ -61,6 +64,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: false,
     importable: false,
     filterable: false,
+    enabled: true,
   },
   /* fields métier that can't disappear or be changed */
   // including fields that don't appear in the edit person form...
@@ -73,6 +77,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: false,
     filterable: false,
+    enabled: true,
   },
   {
     name: "documents",
@@ -83,6 +88,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: false,
     filterable: false,
+    enabled: true,
   },
   {
     name: "history",
@@ -93,6 +99,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: false,
     filterable: false,
+    enabled: true,
   },
   {
     name: "outOfActiveList",
@@ -103,6 +110,7 @@ const customFieldsPersonsSummaryBase = [
     importable: false,
     options: ["Oui", "Non"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "outOfActiveListDate",
@@ -113,6 +121,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: false,
     filterable: false,
+    enabled: true,
   },
   {
     name: "outOfActiveListReasons",
@@ -132,6 +141,7 @@ const customFieldsPersonsSummaryBase = [
     showInStats: true,
     enabled: true,
     editable: "options",
+    enabled: true,
   },
   // and fields that appear in the edit person form...
   {
@@ -142,6 +152,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: true,
+    enabled: true,
   },
   {
     name: "otherNames",
@@ -151,6 +162,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: true,
+    enabled: true,
   },
   {
     name: "gender",
@@ -161,6 +173,7 @@ const customFieldsPersonsSummaryBase = [
     importable: true,
     options: ["Aucun", "Homme", "Femme", "Homme transgenre", "Femme transgenre", "Non binaire", "Autre"],
     filterable: true,
+    enabled: true,
   },
   {
     name: "birthdate",
@@ -170,6 +183,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: true,
+    enabled: true,
   },
   {
     name: "wanderingAt",
@@ -179,6 +193,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: true,
+    enabled: true,
   },
   {
     name: "followedSince",
@@ -188,6 +203,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: true,
+    enabled: true,
   },
   {
     name: "assignedTeams",
@@ -197,7 +213,8 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: false,
-    columns: 6,
+    colWidth: 6,
+    enabled: true,
   },
   {
     name: "phone",
@@ -207,6 +224,7 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: true,
+    enabled: true,
   },
   {
     name: "alertness",
@@ -216,7 +234,8 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: true,
-    columns: 12,
+    colWidth: 12,
+    enabled: true,
   },
   {
     name: "description",
@@ -226,7 +245,8 @@ const customFieldsPersonsSummaryBase = [
     encrypted: true,
     importable: true,
     filterable: true,
-    columns: 12,
+    colWidth: 12,
+    enabled: true,
   },
 ];
 
