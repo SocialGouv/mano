@@ -1,16 +1,5 @@
-import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
-import SelectAsInput from '../../../components/SelectAsInput';
-import {
-  allowedFieldsInHistorySelector,
-  customFieldsPersonsMedicalSelector,
-  customFieldsPersonsSocialSelector,
-  flattenedPersonFieldsSelector,
-  personsState,
-  usePreparePersonForEncryption,
-} from '../../../recoil/persons';
-import { dateForDatePicker } from '../../../services/date';
-import DatePicker from 'react-datepicker';
-import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
+import { Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
+import { allowedFieldsInHistorySelector, personFieldsSelector, personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
 import { currentTeamState, userState } from '../../../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../../components/CustomFieldInput';
@@ -23,14 +12,14 @@ import useApi from '../../../services/api';
 export default function EditModal({ person, selectedPanel, onClose }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
   const user = useRecoilValue(userState);
-  const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
-  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
   const API = useApi();
   const preparePersonForEncryption = usePreparePersonForEncryption();
-  const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
+  const personFields = useRecoilValue(personFieldsSelector);
+
+  console.log('personFields', personFields);
 
   return (
     <Modal isOpen={true} toggle={() => onClose()} size="lg" backdrop="static">
@@ -92,127 +81,20 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                     </div>
                     {openPanels.includes('main') && (
                       <Row>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="name">Nom prénom ou Pseudonyme</Label>
-                            <Input name="name" id="name" value={values.name || ''} onChange={handleChange} />
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="otherNames">Autres pseudos</Label>
-                            <Input name="otherNames" id="otherNames" value={values.otherNames || ''} onChange={handleChange} />
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <Label htmlFor="person-select-gender">Genre</Label>
-                          <SelectAsInput
-                            options={flattenedPersonFields.find((f) => f.name === 'gender').options}
-                            name="gender"
-                            value={values.gender || ''}
-                            onChange={handleChange}
-                            inputId="person-select-gender"
-                            classNamePrefix="person-select-gender"
-                          />
-                        </Col>
-
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="person-birthdate">Date de naissance</Label>
-                            <div>
-                              <DatePicker
-                                locale="fr"
-                                className="form-control"
-                                selected={dateForDatePicker(values.birthdate)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
-                                dateFormat="dd/MM/yyyy"
-                                id="person-birthdate"
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="person-wanderingAt">En rue depuis le</Label>
-                            <div>
-                              <DatePicker
-                                locale="fr"
-                                className="form-control"
-                                selected={dateForDatePicker(values.wanderingAt)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
-                                dateFormat="dd/MM/yyyy"
-                                id="person-wanderingAt"
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</Label>
-                            <div>
-                              <DatePicker
-                                locale="fr"
-                                className="form-control"
-                                selected={dateForDatePicker(values.followedSince || values.createdAt)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'followedSince' } })}
-                                dateFormat="dd/MM/yyyy"
-                                id="person-followedSince"
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={8}>
-                          <FormGroup>
-                            <Label htmlFor="person-select-assigned-team">Équipe(s) en charge</Label>
-                            <div>
-                              <SelectTeamMultiple
-                                onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'assignedTeams' } })}
-                                value={values.assignedTeams}
-                                colored
-                                inputId="person-select-assigned-team"
-                                classNamePrefix="person-select-assigned-team"
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
-                        <Col md={4}>
-                          <FormGroup>
-                            <Label htmlFor="phone">Téléphone</Label>
-                            <Input name="phone" id="phone" value={values.phone || ''} onChange={handleChange} />
-                          </FormGroup>
-                        </Col>
-                        {!['restricted-access'].includes(user.role) && (
-                          <Col md={12}>
-                            <FormGroup>
-                              <Label htmlFor="description">Description</Label>
-                              <Input
-                                type="textarea"
-                                className="!tw-text-sm"
-                                rows={5}
-                                name="description"
-                                id="description"
-                                value={values.description || ''}
-                                onChange={handleChange}
-                              />
-                            </FormGroup>
-                          </Col>
-                        )}
-                        <Col md={12}>
-                          <FormGroup>
-                            <div style={{ display: 'flex', flexDirection: 'column', marginLeft: 20 }}>
-                              <label htmlFor="person-alertness-checkbox">
-                                Personne très vulnérable, ou ayant besoin d'une attention particulière
-                              </label>
-                              <Input
-                                id="person-alertness-checkbox"
-                                type="checkbox"
-                                name="alertness"
-                                checked={values.alertness}
-                                onChange={() => handleChange({ target: { value: !values.alertness, name: 'alertness' } })}
-                              />
-                            </div>
-                          </FormGroup>
-                        </Col>
+                        {personFields
+                          .find((group) => group.name === 'Résumé')
+                          .fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                          .filter((f) => !f.hiddenInEditPerson)
+                          .map((field) => (
+                            <CustomFieldInput
+                              model="person"
+                              values={values}
+                              handleChange={handleChange}
+                              field={field}
+                              key={field.name}
+                              colWidth={field.columns}
+                            />
+                          ))}
                       </Row>
                     )}
                   </div>
@@ -232,8 +114,9 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </div>
                       {openPanels.includes('social') && (
                         <Row>
-                          {customFieldsPersonsSocial
-                            .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                          {personFields
+                            .find((group) => group.name === 'Informations sociales')
+                            .fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                             .map((field) => (
                               <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                             ))}
@@ -257,8 +140,9 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </div>
                       {openPanels.includes('medical') && (
                         <Row>
-                          {customFieldsPersonsMedical
-                            .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                          {personFields
+                            .find((group) => group.name === 'Informations médicales')
+                            .fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                             .map((field) => (
                               <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
                             ))}
