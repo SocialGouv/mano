@@ -321,19 +321,47 @@ router.put(
     // kept for retro-compatibility only
     if (req.body.hasOwnProperty("services")) updateOrg.services = req.body.services;
     if (req.body.hasOwnProperty("categories")) updateOrg.categories = req.body.categories;
-    if (req.body.hasOwnProperty("fieldsPersonsCustomizableOptions"))
+    if (req.body.hasOwnProperty("fieldsPersonsCustomizableOptions")) {
       updateOrg.fieldsPersonsCustomizableOptions =
         typeof req.body.fieldsPersonsCustomizableOptions === "string"
           ? JSON.parse(req.body.fieldsPersonsCustomizableOptions)
           : req.body.fieldsPersonsCustomizableOptions;
-    if (req.body.hasOwnProperty("customFieldsPersonsSocial"))
+      // this is only for outOfActiveListReasons options anyway
+      const outOfActiveListReasonsOptions = updateOrg.fieldsPersonsCustomizableOptions[0].options;
+      updateOrg.customFieldsPersons = organisation.customFieldsPersons.map((group) => {
+        if (group.name !== "Résumé") return group;
+        return {
+          ...group,
+          fields: group.fields.map((field) =>
+            field.name === "outOfActiveListReasons" ? { ...field, options: outOfActiveListReasonsOptions } : field
+          ),
+        };
+      });
+    }
+    if (req.body.hasOwnProperty("customFieldsPersonsSocial")) {
       updateOrg.customFieldsPersonsSocial =
         typeof req.body.customFieldsPersonsSocial === "string" ? JSON.parse(req.body.customFieldsPersonsSocial) : req.body.customFieldsPersonsSocial;
-    if (req.body.hasOwnProperty("customFieldsPersonsMedical"))
+      updateOrg.customFieldsPersons = organisation.customFieldsPersons.map((group) => {
+        if (group.name !== "Informations sociales") return group;
+        return {
+          ...group,
+          fields: updateOrg.customFieldsPersonsSocial,
+        };
+      });
+    }
+    if (req.body.hasOwnProperty("customFieldsPersonsMedical")) {
       updateOrg.customFieldsPersonsMedical =
         typeof req.body.customFieldsPersonsMedical === "string"
           ? JSON.parse(req.body.customFieldsPersonsMedical)
           : req.body.customFieldsPersonsMedical;
+      updateOrg.customFieldsPersons = organisation.customFieldsPersons.map((group) => {
+        if (group.name !== "Informations médicales") return group;
+        return {
+          ...group,
+          fields: updateOrg.customFieldsPersonsMedical,
+        };
+      });
+    }
 
     await organisation.update(updateOrg);
 
