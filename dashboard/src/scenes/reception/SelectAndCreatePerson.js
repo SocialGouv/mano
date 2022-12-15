@@ -209,12 +209,7 @@ const Person = ({ person }) => {
         <div className="person-name">
           {person.outOfActiveList ? <b style={{ color: theme.black25 }}>Sortie de file active : {person.name}</b> : <b>{person.name}</b>}
           {person.birthdate ? <small className="text-muted"> - {formatBirthDate(person.birthdate)}</small> : null}
-          {!!person.alertness && (
-            <ExclamationMarkButton
-              aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
-              title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
-            />
-          )}
+          {!!person.alertness && <ExclamationMarkButton aria-label="Personne très vulnérable" title="Personne très vulnérable" />}
         </div>
         <ButtonCustom
           onClick={(e) => {

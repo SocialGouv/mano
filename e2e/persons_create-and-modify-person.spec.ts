@@ -53,7 +53,7 @@ test("Create and modify a person", async ({ page }) => {
   await clickOnEmptyReactSelect(page, "person-custom-select-situation-personnelle", "Famille");
   await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("aucune");
-  await page.locator(".person-custom-select-animals__value-container").click();
+  await page.locator(".person-custom-select-avec-animaux__value-container").click();
   await page.getByText("Oui", { exact: true }).click();
   await page.locator(".person-custom-select-hebergement__value-container").click();
   await page.locator(".person-custom-select-hebergement__menu").getByText("Oui", { exact: true }).click();
