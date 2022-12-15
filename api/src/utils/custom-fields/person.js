@@ -228,17 +228,6 @@ const customFieldsPersonsSummaryBase = [
     enabled: true,
   },
   {
-    name: "alertness",
-    type: "boolean",
-    label: "Personne très vulnérable",
-    editable: "forbidden",
-    encrypted: true,
-    importable: true,
-    filterable: true,
-    colWidth: 12,
-    enabled: true,
-  },
-  {
     name: "description",
     type: "textarea",
     label: "Description",
@@ -249,6 +238,17 @@ const customFieldsPersonsSummaryBase = [
     colWidth: 12,
     enabled: true,
     roles: ["admin", "normal"],
+  },
+  {
+    name: "alertness",
+    type: "boolean",
+    label: "Personne très vulnérable",
+    editable: "forbidden",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+    colWidth: 12,
+    enabled: true,
   },
 ];
 
