@@ -1,3 +1,10 @@
+## [1.189.1](https://github.com/SocialGouv/mano/compare/v1.189.0...v1.189.1) (2022-12-15)
+
+
+### Bug Fixes
+
+* **dashboard:** custom field on consulation MANO-64 ([78943ba](https://github.com/SocialGouv/mano/commit/78943baf658bb95dfc75b40f8003cf987632df85))
+
 # [1.189.0](https://github.com/SocialGouv/mano/compare/v1.188.0...v1.189.0) (2022-12-14)
 
 
