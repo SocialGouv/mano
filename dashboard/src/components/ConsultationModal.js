@@ -178,7 +178,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
                     model="person"
                     values={data}
                     handleChange={(e) => {
-                      setData({ ...data, [e.currentTarget.name]: e.currentTarget.value });
+                      setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
                     }}
                     field={field}
                     key={field.name}
