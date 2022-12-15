@@ -138,10 +138,10 @@ const customFieldsPersonsSummaryBase = [
       "Reconduite à la frontière",
       "Autre",
     ],
+    hiddenInEditPerson: true,
     showInStats: true,
     enabled: true,
     editable: "options",
-    enabled: true,
   },
   // and fields that appear in the edit person form...
   {
@@ -207,7 +207,7 @@ const customFieldsPersonsSummaryBase = [
   },
   {
     name: "assignedTeams",
-    type: "multi-choice",
+    type: "multi-teams",
     label: "Équipes en charge",
     editable: "forbidden",
     encrypted: true,
