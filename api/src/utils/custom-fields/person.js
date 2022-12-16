@@ -143,6 +143,7 @@ const customFieldsPersonsSummaryBase = [
     enabled: true,
     encrypted: true,
     editable: "options",
+    showInStats: true,
   },
   // and fields that appear in the edit person form...
   {
@@ -175,6 +176,7 @@ const customFieldsPersonsSummaryBase = [
     options: ["Aucun", "Homme", "Femme", "Homme transgenre", "Femme transgenre", "Non binaire", "Autre"],
     filterable: true,
     enabled: true,
+    showInStats: true,
   },
   {
     name: "birthdate",
@@ -263,6 +265,7 @@ const customFieldsPersonsSocialBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
   {
     name: "structureSocial",
@@ -327,6 +330,7 @@ const customFieldsPersonsSocialBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
   {
     name: "employment",
@@ -367,6 +371,7 @@ const customFieldsPersonsSocialBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
   {
     name: "reasons",
@@ -391,6 +396,7 @@ const customFieldsPersonsSocialBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
 ];
 
@@ -405,6 +411,7 @@ const customFieldsPersonsMedicalBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
   {
     name: "structureMedical",
