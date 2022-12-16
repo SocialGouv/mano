@@ -508,75 +508,9 @@ const Stats = () => {
             <BlockCreatedAt persons={personsForStats} />
             <BlockWanderingAt persons={personsForStats} />
           </Row>
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Nationalité"
-            field="nationalitySituation"
-            data={getPieData(personsForStats, 'nationalitySituation', {
-              options: flattenedPersonFields.find((f) => f.name === 'nationalitySituation').options,
-            })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Genre"
-            field="gender"
-            data={getPieData(personsForStats, 'gender', { options: flattenedPersonFields.find((f) => f.name === 'gender').options })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Situation personnelle"
-            field="personalSituation"
-            data={getPieData(personsForStats, 'personalSituation', {
-              options: flattenedPersonFields.find((f) => f.name === 'personalSituation').options,
-            })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Motif de la situation de rue"
-            field="reasons"
-            data={getPieData(personsForStats, 'reasons', { options: flattenedPersonFields.find((f) => f.name === 'reasons').options })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Ressources des personnes suivies"
-            field="resources"
-            data={getPieData(personsForStats, 'resources', { options: flattenedPersonFields.find((f) => f.name === 'resources').options })}
-          />
           <AgeRangeBar persons={personsForStats} />
           <StatsCreatedAtRangeBar persons={personsForStats} />
           <StatsWanderingAtRangeBar persons={personsForStats} />
-          <CustomResponsivePie onAddFilter={addFilter} title="Type d'hébergement" data={getAdressPieData(personsForStats)} />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Couverture médicale des personnes"
-            field="healthInsurances"
-            data={getPieData(personsForStats, 'healthInsurances', {
-              options: flattenedPersonFields.find((f) => f.name === 'healthInsurances').options,
-            })}
-          />
-          <CustomResponsivePie onAddFilter={addFilter} title="Avec animaux" data={getPieData(personsForStats, 'hasAnimal')} />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Personnes très vulnérables"
-            field="alertness"
-            data={getPieData(personsForStats, 'alertness', { isBoolean: true })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Sortie de file active"
-            field="outOfActiveList"
-            data={getPieData(persons, 'outOfActiveList', { isBoolean: true })}
-          />
-          <CustomResponsivePie
-            onAddFilter={addFilter}
-            title="Raison de sortie de file active"
-            field="outOfActiveListReasons"
-            data={getPieData(
-              persons.filter((p) => !!p.outOfActiveList),
-              'outOfActiveListReasons',
-              { options: flattenedPersonFields.find((f) => f.name === 'outOfActiveListReasons').options }
-            )}
-          />
           <CustomFieldsStats data={personsForStats} customFields={flattenedPersonFields} />
           <CustomFieldsStats data={personsForStats} customFields={customFieldsMedicalFile} />
         </TabPane>
