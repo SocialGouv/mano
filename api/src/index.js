@@ -85,6 +85,7 @@ app.use("/public", require("./controllers/public"));
 app.use("/encrypt", require("./controllers/encrypt"));
 app.use("/category", require("./controllers/category"));
 app.use("/service", require("./controllers/service"));
+app.use("/custom-field", require("./controllers/custom-field"));
 app.use("/migration", require("./controllers/migration"));
 app.use("/merge", require("./controllers/merge"));
 app.use("/consultation", require("./controllers/consultation"));
