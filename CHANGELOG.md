@@ -1,3 +1,10 @@
+# [1.192.0](https://github.com/SocialGouv/mano/compare/v1.191.0...v1.192.0) (2022-12-16)
+
+
+### Features
+
+* **app:** add consult from floating button ([#1092](https://github.com/SocialGouv/mano/issues/1092)) ([84489cf](https://github.com/SocialGouv/mano/commit/84489cfd80cbe044bef6769e2979cedcdfd9f92b))
+
 # [1.191.0](https://github.com/SocialGouv/mano/compare/v1.190.0...v1.191.0) (2022-12-16)
 
 
