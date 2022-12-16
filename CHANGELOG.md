@@ -1,3 +1,10 @@
+## [1.189.5](https://github.com/SocialGouv/mano/compare/v1.189.4...v1.189.5) (2022-12-16)
+
+
+### Bug Fixes
+
+* **dashboard:** sort consultations ([#1090](https://github.com/SocialGouv/mano/issues/1090)) ([e9ed101](https://github.com/SocialGouv/mano/commit/e9ed101dee3a9c658615038cd42a424bf7163edb))
+
 ## [1.189.4](https://github.com/SocialGouv/mano/compare/v1.189.3...v1.189.4) (2022-12-15)
 
 
