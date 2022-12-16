@@ -179,7 +179,7 @@ router.get(
       return next(error);
     }
     const { withCounters } = req.query;
-    const data = await Organisation.findAll();
+    const data = await Organisation.findAll({ where: { _id: { [Op.ne]: "00000000-5f5a-89e2-2e60-88fa20cc50be" } } });
     if (withCounters !== "true") return res.status(200).send({ ok: true, data });
 
     const countQuery = {
@@ -194,6 +194,10 @@ router.get(
     const comments = (await Comment.findAll(countQuery)).map((item) => item.toJSON());
     const passages = (await Passage.findAll(countQuery)).map((item) => item.toJSON());
     const rencontres = (await Rencontre.findAll(countQuery)).map((item) => item.toJSON());
+    const consultations = (await Consultation.findAll(countQuery)).map((item) => item.toJSON());
+    const observations = (await TerritoryObservation.findAll(countQuery)).map((item) => item.toJSON());
+    const treatments = (await Treatment.findAll(countQuery)).map((item) => item.toJSON());
+    const users = (await User.findAll(countQuery)).map((item) => item.toJSON());
 
     return res.status(200).send({
       ok: true,
@@ -210,6 +214,15 @@ router.get(
             reports: reports.find((r) => r.organisation === org._id) ? Number(reports.find((r) => r.organisation === org._id).countByOrg) : 0,
             comments: comments.find((r) => r.organisation === org._id) ? Number(comments.find((r) => r.organisation === org._id).countByOrg) : 0,
             passages: passages.find((r) => r.organisation === org._id) ? Number(passages.find((r) => r.organisation === org._id).countByOrg) : 0,
+            treatments: treatments.find((r) => r.organisation === org._id)
+              ? Number(treatments.find((r) => r.organisation === org._id).countByOrg)
+              : 0,
+            observations: observations.find((r) => r.organisation === org._id)
+              ? Number(observations.find((r) => r.organisation === org._id).countByOrg)
+              : 0,
+            consultations: consultations.find((r) => r.organisation === org._id)
+              ? Number(consultations.find((r) => r.organisation === org._id).countByOrg)
+              : 0,
             rencontres: rencontres.find((r) => r.organisation === org._id)
               ? Number(rencontres.find((r) => r.organisation === org._id).countByOrg)
               : 0,
@@ -217,6 +230,7 @@ router.get(
           return {
             ...org,
             counters,
+            users: users.find((r) => r.organisation === org._id) ? Number(users.find((r) => r.organisation === org._id).countByOrg) : 0,
             countersTotal: Object.keys(counters).reduce((total, key) => total + (counters[key] || 0), 0),
           };
         }),

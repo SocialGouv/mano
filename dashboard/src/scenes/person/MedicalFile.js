@@ -72,7 +72,8 @@ export function MedicalFile({ person }) {
       (allConsultations || [])
         .filter((c) => c.person === person._id)
         .filter((c) => !consultationStatuses.length || consultationStatuses.includes(c.status))
-        .filter((c) => !consultationTypes.length || consultationTypes.includes(c.type)),
+        .filter((c) => !consultationTypes.length || consultationTypes.includes(c.type))
+        .sort((a, b) => new Date(b.completedAt || b.dueAt) - new Date(a.completedAt || a.dueAt)),
     [allConsultations, consultationStatuses, consultationTypes, person._id]
   );
 

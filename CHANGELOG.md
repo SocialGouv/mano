@@ -1,3 +1,22 @@
+# [1.190.0](https://github.com/SocialGouv/mano/compare/v1.189.5...v1.190.0) (2022-12-16)
+
+
+### Bug Fixes
+
+* sorting items when loading ([#1082](https://github.com/SocialGouv/mano/issues/1082)) ([e756c61](https://github.com/SocialGouv/mano/commit/e756c61d4961d16518ccadd32ff4a193582aa392))
+
+
+### Features
+
+* can rename multi choice fields ([#1080](https://github.com/SocialGouv/mano/issues/1080)) ([3106e20](https://github.com/SocialGouv/mano/commit/3106e2049ee14a76770779bf746cfd0db481b4ad))
+
+## [1.189.5](https://github.com/SocialGouv/mano/compare/v1.189.4...v1.189.5) (2022-12-16)
+
+
+### Bug Fixes
+
+* **dashboard:** sort consultations ([#1090](https://github.com/SocialGouv/mano/issues/1090)) ([e9ed101](https://github.com/SocialGouv/mano/commit/e9ed101dee3a9c658615038cd42a424bf7163edb))
+
 ## [1.189.4](https://github.com/SocialGouv/mano/compare/v1.189.3...v1.189.4) (2022-12-15)
 
 

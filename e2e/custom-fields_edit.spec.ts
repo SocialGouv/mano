@@ -54,6 +54,7 @@ test("test", async ({ page }) => {
   await expect(page.locator(".type--is-disabled")).toBeVisible();
   await page.getByLabel("Nom").fill("Champ utilisé et modifié");
   await page.getByRole("button", { name: "Enregistrer" }).click();
+  await page.getByText("Mise à jour !").click();
   await expect(page.getByText("choix 1, choix 2, choix 3")).toBeVisible();
   await expect(page.getByRole("cell", { name: "Champ utilisé et modifié" })).toBeVisible();
 

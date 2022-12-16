@@ -282,10 +282,7 @@ export default function DataLoader() {
       setPassages(() => {
         const mergedItems = mergeItems(passages, res.decryptedData);
         if (res.hasMore) return mergedItems;
-        if (mergedItems.length > rencontres.length) {
-          return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-        }
-        return mergedItems;
+        return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
       });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
@@ -296,10 +293,7 @@ export default function DataLoader() {
       setRencontres(() => {
         const mergedItems = mergeItems(rencontres, res.decryptedData);
         if (res.hasMore) return mergedItems;
-        if (mergedItems.length > rencontres.length) {
-          return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-        }
-        return mergedItems;
+        return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
       });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
@@ -318,8 +312,7 @@ export default function DataLoader() {
       setTerritories(() => {
         const mergedItems = mergeItems(territories, res.decryptedData);
         if (res.hasMore) return mergedItems;
-        if (mergedItems.length > territories.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        return mergedItems;
+        return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
@@ -330,8 +323,7 @@ export default function DataLoader() {
       setPlaces(() => {
         const mergedItems = mergeItems(places, res.decryptedData);
         if (res.hasMore) return mergedItems;
-        if (mergedItems.length > places.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        return mergedItems;
+        return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
@@ -342,8 +334,7 @@ export default function DataLoader() {
       setRelsPersonPlace(() => {
         const mergedItems = mergeItems(relsPersonPlace, res.decryptedData);
         if (res.hasMore) return mergedItems;
-        if (mergedItems.length > relsPersonPlace.length) return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
-        return mergedItems;
+        return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
@@ -354,10 +345,7 @@ export default function DataLoader() {
       setTerritoryObservations(() => {
         const mergedItems = mergeItems(territoryObservations, res.decryptedData);
         if (res.hasMore) return mergedItems;
-        if (mergedItems.length > territoryObservations.length) {
-          return mergedItems.sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
-        }
-        return mergedItems;
+        return mergedItems.sort((a, b) => new Date(b.observedAt || b.createdAt) - new Date(a.observedAt || a.createdAt));
       });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
@@ -368,10 +356,7 @@ export default function DataLoader() {
       setComments(() => {
         const mergedItems = mergeItems(comments, res.decryptedData);
         if (res.hasMore) return mergedItems;
-        if (mergedItems.length > comments.length) {
-          return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-        }
-        return mergedItems;
+        return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
       });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
