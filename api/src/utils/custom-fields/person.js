@@ -251,6 +251,7 @@ const customFieldsPersonsSummaryBase = [
     filterable: true,
     colWidth: 12,
     enabled: true,
+    showInStats: true,
   },
 ];
 
@@ -287,6 +288,7 @@ const customFieldsPersonsSocialBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
   {
     name: "address",
@@ -298,6 +300,7 @@ const customFieldsPersonsSocialBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
   {
     name: "addressDetail",
@@ -319,6 +322,7 @@ const customFieldsPersonsSocialBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
   {
     name: "nationalitySituation",
@@ -342,6 +346,7 @@ const customFieldsPersonsSocialBase = [
     filterable: true,
     enabled: true,
     editable: "all",
+    showInStats: true,
   },
   {
     name: "resources",
