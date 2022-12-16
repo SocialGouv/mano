@@ -59,7 +59,7 @@ async function createUsersAndOrgas() {
         '{Café,Douche,Repas,Kit,"Don chaussures","Distribution seringue"}',
         true,
         '{"Ma première collab"}',
-        '[{"name": "outOfActiveListmotif-de-la-situation-en-rue", "type": "multi-choice", "label": "Motif(s) de sortie de file active", "enabled": true, "options": ["Relai vers autre structure", "Hébergée", "Décès", "Incarcération", "Départ vers autre région", "Perdu de vue", "Hospitalisation", "Reconduite à la frontière"], "showInStats": true}]'
+        '[{"name": "outOfActiveListReasons", "type": "multi-choice", "label": "Motif(s) de sortie de file active", "enabled": true, "options": ["Relai vers autre structure", "Hébergée", "Décès", "Incarcération", "Départ vers autre région", "Perdu de vue", "Hospitalisation", "Reconduite à la frontière"], "showInStats": true}]'
       );`,
       [orgId, date, `Orga Test - ${i}`]
     );
