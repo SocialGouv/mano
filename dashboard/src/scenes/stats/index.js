@@ -5,7 +5,7 @@ import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'rea
 import { useRecoilValue } from 'recoil';
 import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
-import { filterPersonsBaseSelector, personFieldsSelector, flattenedPersonFieldsSelector } from '../../recoil/persons';
+import { filterPersonsBaseSelector, flattenedPersonFieldsSelector } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
 import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
@@ -69,7 +69,6 @@ const Stats = () => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const flattenedPersonFields = useRecoilValue(flattenedPersonFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
-  const personFields = useRecoilValue(personFieldsSelector);
   const territories = useRecoilValue(territoriesState);
   const allCategories = useRecoilValue(flattenedCategoriesSelector);
   const groupsCategories = useRecoilValue(actionsCategoriesSelector);
@@ -86,10 +85,6 @@ const Stats = () => {
   const [selectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
-
-  const addFilter = ({ field, value }) => {
-    setFilterPersons((filters) => [...filters, { field, value }]);
-  };
 
   const filterByTeam = useCallback(
     (elements, key) => {
@@ -668,30 +663,6 @@ const getPieData = (source, key, { options = null, isBoolean = false, debug = fa
   return Object.keys(data)
     .map((key) => ({ id: key, label: key, value: data[key] }))
     .filter((d) => d.value > 0);
-};
-
-const getAdressPieData = (data) => {
-  data = data.reduce(
-    (newData, person) => {
-      if (!person.address) {
-        newData['Non renseigné']++;
-        return newData;
-      }
-      if (person.address === 'Non') {
-        newData.Non++;
-        return newData;
-      }
-      if (!person.addressDetail) {
-        newData['Oui (Autre)']++;
-        return newData;
-      }
-      if (!newData[person.addressDetail]) newData[person.addressDetail] = 0;
-      newData[person.addressDetail]++;
-      return newData;
-    },
-    { 'Oui (Autre)': 0, Non: 0, 'Non renseigné': 0 }
-  );
-  return Object.keys(data).map((key) => ({ id: key, label: key, value: data[key] }));
 };
 
 const AgeRangeBar = ({ persons }) => {
