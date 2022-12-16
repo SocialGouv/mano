@@ -520,7 +520,7 @@ const Stats = () => {
             onAddFilter={addFilter}
             title="Genre"
             field="gender"
-            data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
+            data={getPieData(personsForStats, 'gender', { options: flattenedPersonFields.find((f) => f.name === 'gender').options })}
           />
           <CustomResponsivePie
             onAddFilter={addFilter}
@@ -588,13 +588,13 @@ const Stats = () => {
             data={getPieData(
               passages.filter((p) => !!p.gender),
               'gender',
-              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
+              { options: [...flattenedPersonFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
             )}
           />
           <CustomResponsivePie
             title="Nombre de personnes différentes passées (passages anonymes exclus)"
             data={getPieData(personsInPassagesOfPeriod, 'gender', {
-              options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'],
+              options: [...flattenedPersonFields.find((f) => f.name === 'gender').options, 'Non précisé'],
             })}
           />
           <CustomResponsivePie
@@ -602,7 +602,7 @@ const Stats = () => {
             data={getPieData(
               personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
               'gender',
-              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
+              { options: [...flattenedPersonFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
             )}
           />
         </TabPane>
@@ -614,13 +614,13 @@ const Stats = () => {
             data={getPieData(
               rencontres.filter((p) => !!p.gender),
               'gender',
-              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
+              { options: [...flattenedPersonFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
             )}
           />
           <CustomResponsivePie
             title="Nombre de personnes différentes rencontrées"
             data={getPieData(personsInRencontresOfPeriod, 'gender', {
-              options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'],
+              options: [...flattenedPersonFields.find((f) => f.name === 'gender').options, 'Non précisé'],
             })}
           />
           <CustomResponsivePie
@@ -628,7 +628,7 @@ const Stats = () => {
             data={getPieData(
               personsInRencontresOfPeriod.filter((personId) => !personsInRencontresBeforePeriod.includes(personId)),
               'gender',
-              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
+              { options: [...flattenedPersonFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
             )}
           />
         </TabPane>
