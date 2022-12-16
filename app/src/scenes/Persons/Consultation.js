@@ -22,6 +22,7 @@ import ButtonsContainer from '../../components/ButtonsContainer';
 import ButtonDelete from '../../components/ButtonDelete';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { dayjsInstance } from '../../services/dateDayjs';
+import InputFromSearchList from '../../components/InputFromSearchList';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -33,7 +34,7 @@ const Consultation = ({ navigation, route }) => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
-  const personDB = route?.params?.personDB;
+  const person = route?.params?.personDB || route?.params?.person;
   const consultationDB = route?.params?.consultationDB;
   const isNew = !consultationDB?._id;
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
@@ -54,14 +55,14 @@ const Consultation = ({ navigation, route }) => {
         type: consult.type || '',
         status: consult.status || TODO,
         dueAt: consult.dueAt || null,
-        person: consult.person || personDB?._id,
+        person: consult.person || person?._id,
         completedAt: consult.completedAt || null,
         onlyVisibleBy: consult.onlyVisibleBy || [],
         user: consult.user || user._id,
         organisation: consult.organisation || organisation._id,
       };
     },
-    [organisation?._id, organisation.consultations, personDB?._id, user?._id]
+    [organisation?._id, organisation.consultations, person?._id, user?._id]
   );
 
   const [posting, setPosting] = useState(false);
@@ -72,24 +73,33 @@ const Consultation = ({ navigation, route }) => {
   const onChange = (keyValue) => setConsultation((c) => ({ ...c, ...keyValue }));
 
   const backRequestHandledRef = useRef(null);
-  const handleBeforeRemove = (e) => {
-    if (backRequestHandledRef.current === true) return;
-    e.preventDefault();
-    onGoBackRequested();
-  };
-
   useEffect(() => {
+    const handleBeforeRemove = (e) => {
+      if (backRequestHandledRef.current) return;
+      e.preventDefault();
+      onGoBackRequested();
+    };
+
+    const handleFocus = () => {
+      const newPerson = route?.params?.person;
+      if (newPerson) {
+        setConsultation((c) => ({ ...c, person: newPerson?._id }));
+      }
+    };
+    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
     const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
     return () => {
+      focusListenerUnsubscribe();
       beforeRemoveListenerUnsbscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [navigation, route?.params?.person]);
 
   const onSaveConsultationRequest = async () => {
     if (!consultation.status) return Alert.alert('Veuillez indiquer un status');
     if (!consultation.dueAt) return Alert.alert('Veuillez indiquer une date');
     if (!consultation.type) return Alert.alert('Veuillez indiquer un type');
+    if (!consultation.person) return Alert.alert('Veuillez ajouter une personne');
     Keyboard.dismiss();
     setPosting(true);
     if ([DONE, CANCEL].includes(consultation.status)) {
@@ -183,15 +193,22 @@ const Consultation = ({ navigation, route }) => {
     ]);
   };
 
+  const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'Consultation' });
+
   return (
     <SceneContainer testID="consultation-form">
       <ScreenTitle
-        title={`${isNew ? 'Nouvelle consultation pour' : `Modifier la consultation ${consultationDB?.name} de`} ${personDB?.name}`}
+        title={`${isNew ? `Nouvelle consultation${person?.name ? ' pour' : ''}` : `Modifier la consultation ${consultation?.name} de`} ${
+          person?.name
+        }`}
         onBack={onGoBackRequested}
         testID="consultation"
       />
       <ScrollContainer keyboardShouldPersistTaps="handled">
         <View>
+          {!!isNew && !route?.params?.personDB && (
+            <InputFromSearchList label="Personne concernée" value={person?.name || '-- Aucune --'} onSearchRequest={onSearchPerson} />
+          )}
           <InputLabelled
             label="Nom (facultatif)"
             value={consultation.name}
@@ -221,7 +238,7 @@ const Consultation = ({ navigation, route }) => {
             })}
           <Label label="Document(s)" />
           <DocumentsManager
-            personDB={personDB}
+            personDB={person}
             onAddDocument={(doc) => onChange({ documents: [...(consultation.documents || []), doc] })}
             onDelete={(doc) => onChange({ documents: consultation.documents.filter((d) => d.file.filename !== doc.file.filename) })}
             documents={consultation.documents}

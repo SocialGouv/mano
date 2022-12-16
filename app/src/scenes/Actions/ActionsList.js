@@ -14,15 +14,18 @@ import { useNavigation, useRoute } from '@react-navigation/native';
 import { refreshTriggerState, loadingState, loaderFullScreenState } from '../../components/Loader';
 import Button from '../../components/Button';
 import ConsultationRow from '../../components/ConsultationRow';
+import { connectActionSheet } from '@expo/react-native-action-sheet';
+import { userState } from '../../recoil/auth';
 
 const keyExtractor = (action) => action._id;
 
 const limitSteps = 100;
 
-const ActionsList = () => {
+const ActionsList = ({ showActionSheetWithOptions }) => {
   const navigation = useNavigation();
   const loading = useRecoilValue(loadingState);
   const fullScreen = useRecoilValue(loaderFullScreenState);
+  const user = useRecoilValue(userState);
 
   const status = useRoute().params.status;
   const [limit, setLimit] = useState(limitSteps);
@@ -37,7 +40,27 @@ const ActionsList = () => {
     setRefreshTrigger({ status: true, options: { showFullScreen: false, initialLoad: false } });
   }, [setRefreshTrigger]);
 
-  const onCreateAction = useCallback(() => navigation.navigate('NewActionForm', { fromRoute: 'ActionsList' }), [navigation]);
+  const onPressFloatingButton = async () => {
+    if (!user.healthcareProfessional) {
+      navigation.navigate('NewActionForm', { fromRoute: 'ActionsList' });
+      return;
+    }
+    const options = ['Ajouter une action', 'Ajouter une consultation'];
+    showActionSheetWithOptions(
+      {
+        options,
+        cancelButtonIndex: options.length - 1,
+      },
+      async (buttonIndex) => {
+        if (options[buttonIndex] === 'Ajouter une action') {
+          navigation.push('NewActionForm', { fromRoute: 'ActionsList' });
+        }
+        if (user.healthcareProfessional && options[buttonIndex] === 'Ajouter une consultation') {
+          navigation.push('Consultation', { fromRoute: 'ActionsList' });
+        }
+      }
+    );
+  };
 
   const FlatListFooterComponent = useMemo(() => {
     if ([TODO].includes(status)) return !actionsByStatus.length ? null : ListNoMoreActions;
@@ -100,7 +123,7 @@ const ActionsList = () => {
         onEndReachedThreshold={0.3}
         ListFooterComponent={FlatListFooterComponent}
       />
-      <FloatAddButton onPress={onCreateAction} />
+      <FloatAddButton onPress={onPressFloatingButton} />
     </>
   );
 };
@@ -113,4 +136,4 @@ const SectionHeaderStyled = styled(MyText)`
   background-color: #fff;
 `;
 
-export default ActionsList;
+export default connectActionSheet(ActionsList);
