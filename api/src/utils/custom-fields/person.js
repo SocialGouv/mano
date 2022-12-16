@@ -140,7 +140,6 @@ const customFieldsPersonsSummaryBase = [
       "Autre",
     ],
     hiddenInEditPerson: true,
-    showInStats: true,
     enabled: true,
     encrypted: true,
     editable: "options",
