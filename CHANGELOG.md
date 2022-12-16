@@ -1,3 +1,15 @@
+# [1.191.0](https://github.com/SocialGouv/mano/compare/v1.190.0...v1.191.0) (2022-12-16)
+
+
+### Bug Fixes
+
+* **app,dashboard:** fix group loading ([#1091](https://github.com/SocialGouv/mano/issues/1091)) ([d0d11ab](https://github.com/SocialGouv/mano/commit/d0d11ab53831a4c6c8cebad6b6c3ef1079426f24))
+
+
+### Features
+
+* more data for superadmin ([#1093](https://github.com/SocialGouv/mano/issues/1093)) ([0859a95](https://github.com/SocialGouv/mano/commit/0859a952ac5826ebea169ed9ea9c55c35d1892dc))
+
 # [1.190.0](https://github.com/SocialGouv/mano/compare/v1.189.5...v1.190.0) (2022-12-16)
 
 
