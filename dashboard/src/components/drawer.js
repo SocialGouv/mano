@@ -2,6 +2,7 @@ import React from 'react';
 import { NavLink } from 'react-router-dom';
 import styled from 'styled-components';
 import packageInfo from '../../package.json';
+import openNewWindow from '../assets/icons/open-in-new-window.svg';
 
 import { theme } from '../config';
 
@@ -79,6 +80,11 @@ const Drawer = () => {
               <NavLink to="/structure" activeClassName="active">
                 Structures
               </NavLink>
+            </li>
+            <li>
+              <a href="https://soliguide.fr/" target="_blank" rel="noreferrer">
+                Soliguide <OpenNewWindowIcon />
+              </a>
             </li>
             <hr />
           </>
@@ -175,5 +181,15 @@ const Footer = styled.p`
   flex-direction: column;
   justify-content: space-between;
   color: ${theme.main};
+`;
+
+const OpenNewWindowIcon = styled.div`
+  color: currentColor;
+  background-image: url(${openNewWindow});
+  background-size: contain;
+  display: inline-block;
+  width: 0.5rem;
+  height: 0.5rem;
+  margin-left: 0.25rem;
 `;
 export default Drawer;

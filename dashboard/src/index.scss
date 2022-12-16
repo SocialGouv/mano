@@ -35,7 +35,8 @@
 }
 
 /* inspired from https://tailwindui.com/components/application-ui/forms/input-groups#component-2607d970262ada86428f063c72b1e7bd */
-input.tailwindui {
+input.tailwindui,
+textarea.tailwindui {
   @apply tw-relative tw-mt-1 tw-block tw-w-full tw-appearance-none tw-rounded-md tw-border tw-border-gray-300 tw-py-2 tw-px-2 tw-text-base tw-shadow-sm focus:tw-border-indigo-500 focus:tw-ring-indigo-500 sm:tw-text-sm;
 }
 label.tailwindui {
