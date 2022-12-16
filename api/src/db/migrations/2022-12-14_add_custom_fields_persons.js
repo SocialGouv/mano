@@ -8,6 +8,9 @@ const {
   defaultFieldsPersons,
 } = require("../../utils/custom-fields/person");
 
+const customFieldsPersonsSocialBaseNames = customFieldsPersonsSocialBase.map((f) => f.name);
+const customFieldsPersonsMedicalBaseNames = customFieldsPersonsMedicalBase.map((f) => f.name);
+
 module.exports = async () => {
   try {
     await sequelize.query(`
@@ -20,8 +23,20 @@ module.exports = async () => {
       organisation.set({
         customFieldsPersons: [
           { name: "Résumé", fields: customFieldsPersonsSummaryBase },
-          { name: "Informations sociales", fields: [...customFieldsPersonsSocialBase, ...(organisation.customFieldsPersonsSocial || [])] },
-          { name: "Informations médicales", fields: [...customFieldsPersonsMedicalBase, ...(organisation.customFieldsPersonsMedical || [])] },
+          {
+            name: "Informations sociales",
+            fields: [
+              ...customFieldsPersonsSocialBase,
+              ...(organisation.customFieldsPersonsSocial || []).filter((field) => !customFieldsPersonsSocialBaseNames.includes(field.name)),
+            ],
+          },
+          {
+            name: "Informations médicales",
+            fields: [
+              ...customFieldsPersonsMedicalBase,
+              ...(organisation.customFieldsPersonsMedical || []).filter((field) => !customFieldsPersonsMedicalBaseNames.includes(field.name)),
+            ],
+          },
         ],
         migrationLastUpdateAt: new Date(),
         migrations: [...(organisation.migrations || []), "custom-fields-persons-setup"],
