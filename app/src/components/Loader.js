@@ -172,6 +172,24 @@ const Loader = () => {
       if (refreshedPersons) setPersons(refreshedPersons.map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt })).sort(sortByName));
     }
     /*
+    Get groups
+    */
+    if (initialLoad || response.data.groups) {
+      setLoading('Chargement des familles');
+      const refreshedGroups = await getData({
+        collectionName: 'group',
+        data: groups,
+        isInitialization: initialLoad,
+        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
+        lastRefresh,
+        setBatchData: (newGroups) => {
+          setGroups((oldGroups) => (initialLoad ? [...oldGroups, ...newGroups] : mergeItems(oldGroups, newGroups)));
+        },
+        API,
+      });
+      if (refreshedGroups) setGroups(refreshedGroups);
+    }
+    /*
     Get consultations
     */
     if (medicalDataResponse.data.consultations || initialLoad) {
@@ -246,24 +264,7 @@ const Loader = () => {
       });
       if (refreshedActions) setActions(refreshedActions);
     }
-    /*
-    Get groups
-    */
-    if (initialLoad || response.data.groups) {
-      setLoading('Chargement des familles');
-      const refreshedGroups = await getData({
-        collectionName: 'group',
-        data: groups,
-        isInitialization: initialLoad,
-        setProgress: (batch) => setProgress((p) => (p * total + batch) / total),
-        lastRefresh,
-        setBatchData: (newGroups) => {
-          setGroups((oldGroups) => (initialLoad ? [...oldGroups, ...newGroups] : mergeItems(oldGroups, newGroups)));
-        },
-        API,
-      });
-      if (refreshedGroups) setGroups(refreshedGroups);
-    }
+
     /*
     Switch to not full screen
     */

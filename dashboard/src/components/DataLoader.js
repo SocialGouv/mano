@@ -142,6 +142,7 @@ export default function DataLoader() {
               stats.groups;
 
             if (stats.persons) newList.push('person');
+            if (stats.groups) newList.push('group');
             if (['admin', 'normal'].includes(user.role)) {
               if (stats.consultations) newList.push('consultation');
               if (stats.treatments) newList.push('treatment');
@@ -156,7 +157,6 @@ export default function DataLoader() {
             if (stats.relsPersonPlace) newList.push('relsPersonPlace');
             if (stats.territoryObservations) newList.push('territoryObservation');
             if (stats.comments) newList.push('comment');
-            if (stats.groups) newList.push('group');
 
             // In case this is not the initial load, we don't have to load from cache again.
             if (!initialLoad) {
@@ -168,6 +168,8 @@ export default function DataLoader() {
             Promise.resolve()
               .then(() => getCacheItemDefaultValue('person', []))
               .then((persons) => setPersons([...persons]))
+              .then(() => getCacheItemDefaultValue('group', []))
+              .then((groups) => setGroups([...groups]))
               .then(() => getCacheItemDefaultValue('report', []))
               .then((reports) => setReports([...reports]))
               .then(() => getCacheItemDefaultValue('passage', []))
@@ -186,8 +188,6 @@ export default function DataLoader() {
               .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
               .then(() => getCacheItemDefaultValue('comment', []))
               .then((comments) => setComments([...comments]))
-              .then(() => getCacheItemDefaultValue('group', []))
-              .then((groups) => setGroups([...groups]))
               .then(() => startLoader(newList, itemsCount));
           });
         });
