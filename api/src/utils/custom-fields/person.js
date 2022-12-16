@@ -111,6 +111,7 @@ const customFieldsPersonsSummaryBase = [
     options: ["Oui", "Non"],
     filterable: true,
     enabled: true,
+    showInStats: true,
   },
   {
     name: "outOfActiveListDate",
