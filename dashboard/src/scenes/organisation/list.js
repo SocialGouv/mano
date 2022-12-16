@@ -7,7 +7,6 @@ import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 
 import Loading from '../../components/loading';
-import CreateWrapper from '../../components/createWrapper';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
@@ -46,9 +45,10 @@ const List = () => {
   }, [sortBy, sortOrder]);
 
   if (!organisations?.length) return <Loading />;
+
   return (
     <>
-      <Create onChange={() => setRefresh(true)} />
+      <Create total={organisations?.length} onChange={() => setRefresh(true)} />
       <Table
         data={organisations}
         key={updateKey}
@@ -64,6 +64,18 @@ const List = () => {
             sortBy,
           },
           {
+            title: 'Utilisateurs',
+            dataKey: 'users',
+            sortableKey: 'users',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: (o) => {
+              return <span>Utilisateurs: {o.users || 0}</span>;
+            },
+          },
+          {
             title: 'Compteurs',
             dataKey: 'counters',
             sortableKey: 'countersTotal',
@@ -76,29 +88,33 @@ const List = () => {
                 <StyledCounters total={o.countersTotal}>
                   <span>Personnes: {o.counters.persons || 0}</span>
                   <br />
+                  <span>Familles: {o.counters.groups || 0}</span>
+                  <br />
                   <span>Actions: {o.counters.actions || 0}</span>
+                  <br />
+                  <span>Passages: {o.counters.passages || 0}</span>
+                  <br />
+                  <span>Rencontres: {o.counters.rencontres || 0}</span>
                   <br />
                   <span>Territoires: {o.counters.territories || 0}</span>
                   <br />
+                  <span>Observations: {o.counters.observations || 0}</span>
+                  <br />
                   <span>Comptes-rendus: {o.counters.reports || 0}</span>
+                  <br />
+                  <span>Collaborations: {o.counters.collaborations || 0}</span>
                   <br />
                   <span>Commentaires: {o.counters.comments || 0}</span>
                   <br />
+                  <span>Consultations: {o.counters.consultations || 0}</span>
+                  <br />
+                  <span>Traitements: {o.counters.treatments || 0}</span>
                 </StyledCounters>
               );
             },
           },
           {
-            title: 'Chiffrement activé',
-            dataKey: 'encryptionEnabled',
-            onSortOrder: setSortOrder,
-            onSortBy: setSortBy,
-            sortOrder,
-            sortBy,
-            render: (o) => (o.encryptionEnabled ? <input type="checkbox" checked disabled /> : null),
-          },
-          {
-            title: 'Dernière encryption',
+            title: 'Dernier chiffrement',
             dataKey: 'encryptionLastUpdateAt',
             sortBy,
             sortOrder,
@@ -148,17 +164,22 @@ const List = () => {
 const StyledCounters = styled.p`
   ${(p) => p.total < 10 && 'opacity: 0.5;'}
   ${(p) => p.total === 0 && 'opacity: 0.1;'}
-  ${(p) => p.total > 200 && 'font-weight: 600;'}
-  ${(p) => p.total > 1000 && 'font-weight: 800;'}
+  ${(p) => p.total > 200 && 'font-weight: 500;'}
+  ${(p) => p.total > 2000 && 'font-weight: 600;'}
+  ${(p) => p.total > 5000 && 'font-weight: 700;'}
+  ${(p) => p.total > 10000 && 'font-weight: 800;'}
 `;
 
-const Create = ({ onChange }) => {
+const Create = ({ onChange, total }) => {
   const [open, setOpen] = useState(false);
   const API = useApi();
 
   return (
-    <CreateWrapper style={{ marginTop: '1rem' }}>
-      <ButtonCustom onClick={() => setOpen(true)} color="primary" title="Créer une nouvelle organisation" />
+    <>
+      <div className="tw-mb-10 tw-mt-4 tw-flex tw-w-full tw-justify-between">
+        <h2 className="tw-text-2xl">Organisations utilisant Mano ({total})</h2>
+        <ButtonCustom onClick={() => setOpen(true)} color="primary" title="Créer une nouvelle organisation" />
+      </div>
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Créer une nouvelle organisation et un administrateur</ModalHeader>
         <ModalBody>
@@ -192,7 +213,7 @@ const Create = ({ onChange }) => {
                     <FormGroup>
                       <Label htmlFor="orgName">Nom</Label>
                       <Input name="orgName" id="orgName" value={values.orgName} onChange={handleChange} />
-                      {touched.orgName && errors.orgName && <Error>{errors.orgName}</Error>}
+                      {touched.orgName && errors.orgName && <span className="tw-text-xs tw-text-red-500">{errors.orgName}</span>}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -202,14 +223,14 @@ const Create = ({ onChange }) => {
                     <FormGroup>
                       <Label htmlFor="name">Nom de l'administrateur</Label>
                       <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                      {touched.name && errors.name && <Error>{errors.name}</Error>}
+                      {touched.name && errors.name && <span className="tw-text-xs tw-text-red-500">{errors.name}</span>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="email">Email de l'administrateur</Label>
                       <Input name="email" id="email" value={values.email} onChange={handleChange} />
-                      {touched.email && errors.email && <Error>{errors.email}</Error>}
+                      {touched.email && errors.email && <span className="tw-text-xs tw-text-red-500">{errors.email}</span>}
                     </FormGroup>
                   </Col>
                 </Row>
@@ -219,12 +240,7 @@ const Create = ({ onChange }) => {
           </Formik>
         </ModalBody>
       </Modal>
-    </CreateWrapper>
+    </>
   );
 };
-const Error = styled.span`
-  color: red;
-  font-size: 11px;
-`;
-
 export default List;
