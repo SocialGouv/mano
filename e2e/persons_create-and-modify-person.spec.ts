@@ -42,7 +42,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Date de naissance").press("Enter");
   await page.getByLabel("En rue depuis le").fill("10/10/2022");
   await page.getByLabel("En rue depuis le").press("Enter");
-  await page.getByLabel("Personne très vulnérable").check();
+  await page.getByLabel("Personne très vulnérable, ou ayant besoin d'une attention particulière").check();
   await page.getByLabel("Téléphone").click();
 
   await page.getByLabel("Téléphone").fill("0123456789");

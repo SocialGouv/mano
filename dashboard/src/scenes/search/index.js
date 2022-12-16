@@ -256,7 +256,13 @@ const Persons = ({ search, onUpdateResults }) => {
             {
               title: 'Vigilance',
               dataKey: 'alertness',
-              render: (p) => (p.alertness ? <ExclamationMarkButton aria-label="Personne très vulnérable" title="Personne très vulnérable" /> : null),
+              render: (p) =>
+                p.alertness ? (
+                  <ExclamationMarkButton
+                    aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                    title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                  />
+                ) : null,
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
             { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },

@@ -260,7 +260,12 @@ const List = () => {
             title: 'Vigilance',
             dataKey: 'alertness',
             render: (p) => {
-              return p.alertness ? <ExclamationMarkButton aria-label="Personne très vulnérable" title="Personne très vulnérable" /> : null;
+              return p.alertness ? (
+                <ExclamationMarkButton
+                  aria-label="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                  title="Personne très vulnérable, ou ayant besoin d'une attention particulière"
+                />
+              ) : null;
             },
           },
           { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams person={person} /> },
