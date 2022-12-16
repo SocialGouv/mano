@@ -41,7 +41,10 @@ router.get(
       return next(error);
     }
     const search = req.query.search;
-    let query = { order: [["createdAt", "ASC"]] };
+    const query = {
+      where: { organisation: req.user.organisation },
+      order: [["createdAt", "DESC"]],
+    };
     if (search && search.length) {
       const terms = search
         .split(" ")
@@ -76,7 +79,7 @@ router.get(
       return next(error);
     }
     const _id = req.params._id;
-    const data = await Structure.findOne({ where: { _id } });
+    const data = await Structure.findOne({ where: { _id, organisation: req.user.organisation } });
     if (!data) return res.status(404).send({ ok: false, error: "Not Found" });
     return res.status(200).send({ ok: true, data });
   })
@@ -115,7 +118,7 @@ router.put(
     if (req.body.hasOwnProperty("postcode")) updatedStructure.postcode = req.body.postcode;
     if (req.body.hasOwnProperty("adresse")) updatedStructure.adresse = req.body.adresse;
     if (req.body.hasOwnProperty("phone")) updatedStructure.phone = req.body.phone;
-    const [count, array] = await Structure.update(updatedStructure, { where: { _id }, returning: true });
+    const [count, array] = await Structure.update(updatedStructure, { where: { _id, organisation: req.user.organisation }, returning: true });
     if (!count) return res.status(404).send({ ok: false, error: "Not Found" });
     const data = array[0];
     return res.status(200).send({ ok: true, data });
@@ -137,7 +140,7 @@ router.delete(
       return next(error);
     }
     const _id = req.params._id;
-    await Structure.destroy({ where: { _id } });
+    await Structure.destroy({ where: { _id, organisation: req.user.organisation } });
     res.status(200).send({ ok: true });
   })
 );
