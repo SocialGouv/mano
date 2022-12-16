@@ -242,7 +242,7 @@ const customFieldsPersonsSummaryBase = [
   {
     name: "alertness",
     type: "boolean",
-    label: "Personne très vulnérable",
+    label: "Personne très vulnérable, ou ayant besoin d'une attention particulière",
     editable: "forbidden",
     encrypted: true,
     importable: true,

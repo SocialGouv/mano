@@ -14,7 +14,14 @@ const personFields = [
   },
   { name: "birthdate", type: "date", label: "Date de naissance", encrypted: true, importable: true, filterable: true },
   { name: "description", type: "textarea", label: "Description", encrypted: true, importable: true, filterable: true },
-  { name: "alertness", type: "boolean", label: "Personne très vulnérable", encrypted: true, importable: true, filterable: true },
+  {
+    name: "alertness",
+    type: "boolean",
+    label: "Personne très vulnérable, ou ayant besoin d'une attention particulière",
+    encrypted: true,
+    importable: true,
+    filterable: true,
+  },
   { name: "wanderingAt", type: "date", label: "En rue depuis le", encrypted: true, importable: true, filterable: true },
   {
     name: "personalSituation",
