@@ -142,6 +142,7 @@ export default function DataLoader() {
               stats.groups;
 
             if (stats.persons) newList.push('person');
+            if (stats.groups) newList.push('group');
             if (['admin', 'normal'].includes(user.role)) {
               if (stats.consultations) newList.push('consultation');
               if (stats.treatments) newList.push('treatment');
@@ -156,7 +157,6 @@ export default function DataLoader() {
             if (stats.relsPersonPlace) newList.push('relsPersonPlace');
             if (stats.territoryObservations) newList.push('territoryObservation');
             if (stats.comments) newList.push('comment');
-            if (stats.groups) newList.push('group');
 
             // In case this is not the initial load, we don't have to load from cache again.
             if (!initialLoad) {
@@ -168,6 +168,8 @@ export default function DataLoader() {
             Promise.resolve()
               .then(() => getCacheItemDefaultValue('person', []))
               .then((persons) => setPersons([...persons]))
+              .then(() => getCacheItemDefaultValue('group', []))
+              .then((groups) => setGroups([...groups]))
               .then(() => getCacheItemDefaultValue('report', []))
               .then((reports) => setReports([...reports]))
               .then(() => getCacheItemDefaultValue('passage', []))
@@ -186,8 +188,6 @@ export default function DataLoader() {
               .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
               .then(() => getCacheItemDefaultValue('comment', []))
               .then((comments) => setComments([...comments]))
-              .then(() => getCacheItemDefaultValue('group', []))
-              .then((groups) => setGroups([...groups]))
               .then(() => startLoader(newList, itemsCount));
           });
         });
@@ -223,6 +223,20 @@ export default function DataLoader() {
               .map((p) => ({ ...p, followedSince: p.followedSince || p.createdAt }))
               .sort((p1, p2) => (p1.name || '').localeCompare(p2.name || ''))
       );
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
+    } else if (current === 'group') {
+      setLoadingText('Chargement des familles');
+      const res = await API.get({ path: '/group', query });
+      if (!res.data) return resetLoaderOnError();
+      setGroups(() => {
+        const mergedItems = mergeItems(groups, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > groups.length) {
+          return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+        return mergedItems;
+      });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
     } else if (current === 'consultation') {
@@ -343,17 +357,6 @@ export default function DataLoader() {
         const mergedItems = mergeItems(comments, res.decryptedData);
         if (res.hasMore) return mergedItems;
         return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'group') {
-      setLoadingText('Chargement des familles');
-      const res = await API.get({ path: '/group', query });
-      if (!res.data) return resetLoaderOnError();
-      setGroups(() => {
-        const mergedItems = mergeItems(groups, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
       });
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
