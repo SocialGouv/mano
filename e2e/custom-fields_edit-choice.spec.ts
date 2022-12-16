@@ -160,7 +160,7 @@ test("test", async ({ page }) => {
     await page.getByPlaceholder("Relai vers autre structure").fill("Relai chez moi");
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toBe(
-        `Voulez-vous vraiment renommer "Relai vers autre structure" en "Relai chez moi", et mettre-à-jour tous les éléments qui ont actuellement "Relai vers autre structure" en "Relai chez moi" ? Cette opération est irréversible.`
+        `Voulez-vous vraiment renommer "Relai vers autre structure" en "Relai chez moi", et mettre à jour tous les éléments qui ont actuellement "Relai vers autre structure" en "Relai chez moi" ? Cette opération est irréversible.`
       );
       dialog.accept();
     });
@@ -172,7 +172,7 @@ test("test", async ({ page }) => {
     await page.getByPlaceholder("CDI merde je me suis trompé").fill("CDI seulement");
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toBe(
-        `Voulez-vous vraiment renommer "CDI merde je me suis trompé" en "CDI seulement", et mettre-à-jour tous les éléments qui ont actuellement "CDI merde je me suis trompé" en "CDI seulement" ? Cette opération est irréversible.`
+        `Voulez-vous vraiment renommer "CDI merde je me suis trompé" en "CDI seulement", et mettre à jour tous les éléments qui ont actuellement "CDI merde je me suis trompé" en "CDI seulement" ? Cette opération est irréversible.`
       );
       dialog.accept();
     });
@@ -184,7 +184,7 @@ test("test", async ({ page }) => {
     await page.getByPlaceholder("Pétard merde je me suis trompé").fill("Pétard seulement");
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toBe(
-        `Voulez-vous vraiment renommer "Pétard merde je me suis trompé" en "Pétard seulement", et mettre-à-jour tous les éléments qui ont actuellement "Pétard merde je me suis trompé" en "Pétard seulement" ? Cette opération est irréversible.`
+        `Voulez-vous vraiment renommer "Pétard merde je me suis trompé" en "Pétard seulement", et mettre à jour tous les éléments qui ont actuellement "Pétard merde je me suis trompé" en "Pétard seulement" ? Cette opération est irréversible.`
       );
       dialog.accept();
     });
@@ -197,7 +197,7 @@ test("test", async ({ page }) => {
     await page.getByPlaceholder("Colonne vertébrale merde je me suis trompé").fill("Colonne vertébrale seulement");
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toBe(
-        `Voulez-vous vraiment renommer "Colonne vertébrale merde je me suis trompé" en "Colonne vertébrale seulement", et mettre-à-jour tous les éléments qui ont actuellement "Colonne vertébrale merde je me suis trompé" en "Colonne vertébrale seulement" ? Cette opération est irréversible.`
+        `Voulez-vous vraiment renommer "Colonne vertébrale merde je me suis trompé" en "Colonne vertébrale seulement", et mettre à jour tous les éléments qui ont actuellement "Colonne vertébrale merde je me suis trompé" en "Colonne vertébrale seulement" ? Cette opération est irréversible.`
       );
       dialog.accept();
     });
@@ -213,7 +213,7 @@ test("test", async ({ page }) => {
     await page.getByPlaceholder("un peu").fill("Un peu");
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toBe(
-        `Voulez-vous vraiment renommer "un peu" en "Un peu", et mettre-à-jour tous les éléments qui ont actuellement "un peu" en "Un peu" ? Cette opération est irréversible.`
+        `Voulez-vous vraiment renommer "un peu" en "Un peu", et mettre à jour tous les éléments qui ont actuellement "un peu" en "Un peu" ? Cette opération est irréversible.`
       );
       dialog.accept();
     });
@@ -225,7 +225,7 @@ test("test", async ({ page }) => {
     await page.getByPlaceholder("Gros").fill("Petit");
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toBe(
-        `Voulez-vous vraiment renommer "Gros" en "Petit", et mettre-à-jour tous les éléments qui ont actuellement "Gros" en "Petit" ? Cette opération est irréversible.`
+        `Voulez-vous vraiment renommer "Gros" en "Petit", et mettre à jour tous les éléments qui ont actuellement "Gros" en "Petit" ? Cette opération est irréversible.`
       );
       dialog.accept();
     });
@@ -238,7 +238,7 @@ test("test", async ({ page }) => {
     await page.getByPlaceholder("Très beaucoup").fill("Plein");
     page.once("dialog", (dialog) => {
       expect(dialog.message()).toBe(
-        `Voulez-vous vraiment renommer "Très beaucoup" en "Plein", et mettre-à-jour tous les éléments qui ont actuellement "Très beaucoup" en "Plein" ? Cette opération est irréversible.`
+        `Voulez-vous vraiment renommer "Très beaucoup" en "Plein", et mettre à jour tous les éléments qui ont actuellement "Très beaucoup" en "Plein" ? Cette opération est irréversible.`
       );
       dialog.accept();
     });
