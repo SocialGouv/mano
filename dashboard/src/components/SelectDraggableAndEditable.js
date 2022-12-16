@@ -118,7 +118,7 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
 
               if (
                 window.confirm(
-                  `Voulez-vous vraiment renommer "${editingChoice}" en "${newChoice}", et mettre-à-jour tous les éléments qui ont actuellement "${editingChoice}" en "${newChoice}" ? Cette opération est irréversible.`
+                  `Voulez-vous vraiment renommer "${editingChoice}" en "${newChoice}", et mettre à jour tous les éléments qui ont actuellement "${editingChoice}" en "${newChoice}" ? Cette opération est irréversible.`
                 )
               ) {
                 onEditChoice({ newChoice, oldChoice: editingChoice });
