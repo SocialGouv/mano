@@ -225,6 +225,20 @@ export default function DataLoader() {
       );
       handleMore(res.hasMore);
       setProgressBuffer(res.data.length);
+    } else if (current === 'group') {
+      setLoadingText('Chargement des familles');
+      const res = await API.get({ path: '/group', query });
+      if (!res.data) return resetLoaderOnError();
+      setGroups(() => {
+        const mergedItems = mergeItems(groups, res.decryptedData);
+        if (res.hasMore) return mergedItems;
+        if (mergedItems.length > groups.length) {
+          return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+        }
+        return mergedItems;
+      });
+      handleMore(res.hasMore);
+      setProgressBuffer(res.data.length);
     } else if (current === 'consultation') {
       setLoadingText('Chargement des consultations');
       const res = await API.get({ path: '/consultation', query: { ...query, after: initialLoad ? 0 : lastLoad } });
@@ -356,20 +370,6 @@ export default function DataLoader() {
         if (res.hasMore) return mergedItems;
         if (mergedItems.length > comments.length) {
           return mergedItems.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-        }
-        return mergedItems;
-      });
-      handleMore(res.hasMore);
-      setProgressBuffer(res.data.length);
-    } else if (current === 'group') {
-      setLoadingText('Chargement des familles');
-      const res = await API.get({ path: '/group', query });
-      if (!res.data) return resetLoaderOnError();
-      setGroups(() => {
-        const mergedItems = mergeItems(groups, res.decryptedData);
-        if (res.hasMore) return mergedItems;
-        if (mergedItems.length > groups.length) {
-          return mergedItems.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
         }
         return mergedItems;
       });
