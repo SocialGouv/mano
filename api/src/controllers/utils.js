@@ -14,7 +14,22 @@ router.get("/check-auth", passport.authenticate("user", { session: false }), asy
 // so the mobile app can send a notification to the user.
 // See: app/src/scenes/Login/Login.js
 router.get("/version", async (req, res) => {
-  res.status(200).send({ ok: true, data: MOBILE_APP_VERSION });
+  if (req.headers.version === MOBILE_APP_VERSION) {
+    return res.status(200).send({ ok: true });
+  }
+  res.status(200).send({
+    ok: false,
+    data: MOBILE_APP_VERSION,
+    inAppMessage: [
+      `La nouvelle version ${MOBILE_APP_VERSION} de Mano est disponible !`,
+      `Vous avez la version ${req.headers.version} actuellement sur votre téléphone`,
+      [
+        { text: "Télécharger", link: "https://mano-app.fabrique.social.gouv.fr/download" },
+        { text: "Plus tard", style: "cancel" },
+      ],
+      { cancelable: true },
+    ],
+  });
 });
 
 module.exports = router;

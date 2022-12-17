@@ -15,7 +15,7 @@ import { MyText } from '../../components/MyText';
 import InputLabelled from '../../components/InputLabelled';
 import EyeIcon from '../../icons/EyeIcon';
 import Title, { SubTitle } from '../../components/Title';
-import { DEVMODE_ENCRYPTION_KEY, DEVMODE_PASSWORD, MANO_DOWNLOAD_URL, VERSION } from '../../config';
+import { DEVMODE_ENCRYPTION_KEY, DEVMODE_PASSWORD, VERSION } from '../../config';
 import { useSetRecoilState } from 'recoil';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
 import { clearCache, appCurrentCacheKey } from '../../services/dataManagement';
@@ -50,17 +50,20 @@ const Login = ({ navigation }) => {
     const initTimeout = setTimeout(async () => {
       // check version
       const response = await API.get({ path: '/version' });
-      if (response.ok && VERSION !== response.data) {
+      if (!response.ok) {
         RNBootSplash.hide({ fade: true });
-        Alert.alert(
-          `La nouvelle version ${response.data} de Mano est disponible !`,
-          `Vous avez la version ${VERSION} actuellement sur votre téléphone`,
-          [
-            { text: 'Télécharger', onPress: () => Linking.openURL(MANO_DOWNLOAD_URL) },
-            { text: 'Plus tard', style: 'cancel' },
-          ],
-          { cancelable: true }
-        );
+        const [title, subTitle, actions = [], options = {}] = response.inAppMessage;
+        if (!actions || !actions.length) return Alert.alert(title, subTitle);
+        const actionsWithNavigation = actions.map((action) => {
+          if (action.link) {
+            action.onPress = () => {
+              Linking.openURL(action.link);
+              if (action.event) logEvent(action.event, action.eventProps || {});
+            };
+          }
+          return action;
+        });
+        Alert.alert(title, subTitle, actionsWithNavigation, options);
         return;
       }
       // check token
