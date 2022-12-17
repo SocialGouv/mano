@@ -24,6 +24,7 @@ import {
   getUserAgent,
   isTablet,
 } from 'react-native-device-info';
+import { Alert, Linking } from 'react-native';
 const RNFS = require('react-native-fs');
 class ApiService {
   getUrl = (path, query = {}) => {
@@ -89,10 +90,19 @@ class ApiService {
         const res = await response.json();
         if (!response.ok && this.handleApiError) this.handleApiError(res);
         if (res?.message && res.message === 'Veuillez mettre à jour votre application!') {
-          if (this.handleNewVersion) {
-            this.handleNewVersion(res.message);
-            return res;
-          }
+          const [title, subTitle, actions = [], options = {}] = res.inAppMessage;
+          if (!actions || !actions.length) return Alert.alert(title, subTitle);
+          const actionsWithNavigation = actions.map((action) => {
+            if (action.link) {
+              action.onPress = () => {
+                Linking.openURL(action.link);
+                if (action.event) logEvent(action.event, action.eventProps || {});
+              };
+            }
+            return action;
+          });
+          Alert.alert(title, subTitle, actionsWithNavigation, options);
+          return res;
         }
         if (!!res.data && Array.isArray(res.data)) {
           const decryptedData = await Promise.all(res.data.map((item) => this.decryptDBItem(item, { debug, path })));
