@@ -42,6 +42,15 @@ label.tailwindui {
   @apply tw-mb-2 tw-block tw-text-gray-700;
 }
 
+.input-focus-helper {
+  outline: 1px dashed #eee !important;
+  min-width: 50px !important;
+}
+.input-focus-helper:focus,
+.input-focus-helper:active {
+  outline: auto !important;
+}
+
 /* reset */
 
 * {

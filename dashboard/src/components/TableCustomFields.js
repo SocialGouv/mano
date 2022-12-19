@@ -321,7 +321,6 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
           <div className="tw-basis-1/2 tw-p-4">
             {!!['enum', 'multi-choice'].includes(field.type) && (
               <>
-                {' '}
                 <label htmlFor="options" className="form-text tailwindui">
                   Choix
                 </label>
@@ -329,7 +328,24 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
                   inputId="options"
                   name="options"
                   classNamePrefix="options"
-                  onEditChoice={({ oldChoice, newChoice }) => onEditChoice({ oldChoice, newChoice, field })}
+                  onEditChoice={({ oldChoice, newChoice, options }) => {
+                    if (isNewField) {
+                      setField({ ...field, options: options.map((v) => v.value).map((option) => (option === oldChoice ? newChoice : option)) });
+                      return;
+                    }
+                    const choiceIsUsed = !!data.find((p) => p[field?.name] && p[field?.name].includes(oldChoice));
+                    if (!choiceIsUsed) {
+                      setField({ ...field, options: options.map((v) => v.value).map((option) => (option === oldChoice ? newChoice : option)) });
+                      return;
+                    }
+                    if (
+                      window.confirm(
+                        `Voulez-vous vraiment renommer "${oldChoice}" en "${newChoice}", et mettre à jour tous les éléments qui ont actuellement "${oldChoice}" en "${newChoice}" ? Cette opération est irréversible.`
+                      )
+                    ) {
+                      onEditChoice({ oldChoice, newChoice, field });
+                    }
+                  }}
                   creatable
                   options={[...(editingField?.options || field?.options || [])]
                     .sort((c1, c2) => c1?.localeCompare(c2))

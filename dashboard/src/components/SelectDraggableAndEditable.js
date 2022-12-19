@@ -4,7 +4,7 @@ import SortableJS from 'sortablejs';
 import SelectCustom from './SelectCustom';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 
-const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditChoice, editChoiceWarning, ...props }) => {
+const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditChoice, editChoiceWarning, options, ...props }) => {
   const [editingChoice, setEditingChoice] = useState('');
   const [newChoice, setNewChoice] = useState('');
 
@@ -28,12 +28,15 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
       group: classNamePrefix,
       onEnd: onDragAndDrop,
     });
-  }, [props.options, props.value, onDragAndDrop, classNamePrefix]);
+  }, [options, props.value, onDragAndDrop, classNamePrefix]);
 
   return (
     <>
       <SelectCustom
         components={{
+          Input: (myProps) => {
+            return <components.Input {...myProps} inputClassName="input-focus-helper" />;
+          },
           MultiValueLabel: (props) => {
             return (
               <>
@@ -64,6 +67,7 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
         classNamePrefix={classNamePrefix}
         onChange={onChange}
         value={value}
+        options={options}
         {...props}
         isMulti
       />
@@ -111,20 +115,13 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
                 setNewChoice('');
                 return;
               }
-              if (props.options.map((option) => option.label).includes(newChoice)) {
+              if (options.map((option) => option.label).includes(newChoice)) {
                 alert('Ce choix existe déjà');
                 return;
               }
-
-              if (
-                window.confirm(
-                  `Voulez-vous vraiment renommer "${editingChoice}" en "${newChoice}", et mettre à jour tous les éléments qui ont actuellement "${editingChoice}" en "${newChoice}" ? Cette opération est irréversible.`
-                )
-              ) {
-                onEditChoice({ newChoice, oldChoice: editingChoice });
-                setEditingChoice('');
-                setNewChoice('');
-              }
+              onEditChoice({ newChoice, oldChoice: editingChoice, options });
+              setEditingChoice('');
+              setNewChoice('');
             }}>
             Enregistrer
           </button>
