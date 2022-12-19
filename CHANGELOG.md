@@ -1,3 +1,10 @@
+## [1.192.3](https://github.com/SocialGouv/mano/compare/v1.192.2...v1.192.3) (2022-12-19)
+
+
+### Bug Fixes
+
+* passages in reception ([a08023f](https://github.com/SocialGouv/mano/commit/a08023f949ecf82b2d2343a8d84f688fc1e67412))
+
 ## [1.192.2](https://github.com/SocialGouv/mano/compare/v1.192.1...v1.192.2) (2022-12-19)
 
 
