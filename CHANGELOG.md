@@ -1,3 +1,10 @@
+## [1.192.5](https://github.com/SocialGouv/mano/compare/v1.192.4...v1.192.5) (2022-12-19)
+
+
+### Bug Fixes
+
+* **dashboard:** upload doc in consultation ([#1099](https://github.com/SocialGouv/mano/issues/1099)) ([75f98d9](https://github.com/SocialGouv/mano/commit/75f98d93be84af9b2bf97616061c217c1cd49bb4))
+
 ## [1.192.4](https://github.com/SocialGouv/mano/compare/v1.192.3...v1.192.4) (2022-12-19)
 
 
