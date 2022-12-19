@@ -7,10 +7,8 @@ import ScreenTitle from '../../components/ScreenTitle';
 import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import API from '../../services/api';
-import { getCityFromPostCode } from '../../services/postCode';
 import ButtonsContainer from '../../components/ButtonsContainer';
 import colors from '../../utils/colors';
-import ButtonDelete from '../../components/ButtonDelete';
 import Label from '../../components/Label';
 import Tags from '../../components/Tags';
 import Spacer from '../../components/Spacer';
@@ -71,12 +69,6 @@ const Structure = ({ navigation, route }) => {
 
   const setPostCode = async (postcode) => {
     setStructure((s) => ({ ...s, postcode }));
-    if (postcode.length === 5) {
-      const response = await getCityFromPostCode(postcode);
-      if (response.ok) {
-        setStructure((s) => ({ ...s, city: response.city }));
-      }
-    }
   };
 
   const setPhone = (phone) => {

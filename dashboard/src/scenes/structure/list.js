@@ -10,7 +10,6 @@ import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import SelectCustom from '../../components/SelectCustom';
-import { getCityFromPostCode } from '../../services/postCode';
 
 const List = () => {
   const [structures, setStructures] = useState([]);
@@ -119,16 +118,6 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
   const [disabled, setDisabled] = useState(false);
 
   const onChange = (e) => setStructure({ ...structure, [e.target.name]: e.target.value });
-  const onChangePostCode = async (e) => {
-    onChange(e);
-    const postcode = e.target.value;
-    if (postcode.length === 5) {
-      const response = await getCityFromPostCode(postcode);
-      if (response.ok) {
-        setStructure((s) => ({ ...s, city: response.city }));
-      }
-    }
-  };
   const onSubmit = async (e) => {
     e.preventDefault();
     setDisabled(true);
@@ -186,7 +175,7 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
               <label className="tailwindui" htmlFor="postcode">
                 Code postal
               </label>
-              <input type="text" className="tailwindui" name="postcode" id="postcode" value={structure?.postcode || ''} onChange={onChangePostCode} />
+              <input type="text" className="tailwindui" name="postcode" id="postcode" value={structure?.postcode || ''} onChange={onChange} />
             </div>
             <div className="tw-flex tw-basis-1/2 tw-flex-col tw-py-2 tw-px-4">
               <label className="tailwindui" htmlFor="city">
