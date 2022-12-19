@@ -17,6 +17,7 @@ import SelectStatus from './SelectStatus';
 import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
+import { personsObjectSelector } from '../recoil/selectors';
 
 export default function ConsultationModal({ onClose, person, consultation }) {
   const organisation = useRecoilValue(organisationState);
@@ -27,6 +28,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const API = useApi();
   const isNewConsultation = !consultation;
+  const persons = useRecoilValue(personsObjectSelector);
   const initialState = useMemo(
     () =>
       consultation || {
@@ -46,9 +48,14 @@ export default function ConsultationModal({ onClose, person, consultation }) {
   );
   const [data, setData] = useState(initialState);
 
+  person = person || persons[data.person];
+
   async function handleSubmit() {
     if (!data.type) {
       return toast.error('Veuillez choisir un type de consultation');
+    }
+    if (!person?._id) {
+      return toast.error('Veuillez sélectionner une personne suivie');
     }
     if ([DONE, CANCEL].includes(data.status)) {
       data.completedAt = data.completedAt || new Date();
@@ -257,10 +264,10 @@ export default function ConsultationModal({ onClose, person, consultation }) {
             )}
           </div>
           <hr />
-          {data.person && (
+          {!!person?._id && (
             <Documents
               title="Documents"
-              person={data.person}
+              person={person}
               documents={data.documents || []}
               onAdd={async (docResponse) => {
                 const { data: file, encryptedEntityKey } = docResponse;
@@ -274,7 +281,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
                       encryptedEntityKey,
                       createdAt: new Date(),
                       createdBy: user._id,
-                      downloadPath: `/person/${data.person._id}/document/${file.filename}`,
+                      downloadPath: `/person/${person._id}/document/${file.filename}`,
                       file,
                     },
                   ],
