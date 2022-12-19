@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useMemo, useState, useRef, useEffect } from 'react';
 import { Col, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
@@ -126,6 +126,9 @@ const Reception = () => {
   const history = useHistory();
   const location = useLocation();
   const reportCreatedRef = useRef(!!todaysReport?._id);
+  useEffect(() => {
+    reportCreatedRef.current = !!todaysReport?._id;
+  }, [todaysReport?._id]);
 
   const [selectedPersons, setSelectedPersons] = useState(() => {
     const params = new URLSearchParams(location.search)?.get('persons')?.split(',');
@@ -290,7 +293,7 @@ const Reception = () => {
               {passages.length} passage{passages.length > 1 ? 's' : ''}
             </h5>
             <ButtonCustom onClick={onAddAnonymousPassage} color="primary" icon={plusIcon} title="Passage anonyme" id="add-anonymous-passage" />
-            {!!todaysReport?._id && (
+            {!!passages.length && (
               <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <ButtonCustom
                   onClick={() => history.push(`/report/${todaysReport?.date}?tab=passages`)}
