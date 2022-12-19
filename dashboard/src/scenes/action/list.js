@@ -352,7 +352,7 @@ const List = () => {
                 dataKey: 'team',
                 render: (a) => (
                   <div className="px-2 tw-flex-shrink-0">
-                    <TagTeam teamId={a?.team} />
+                    {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
                   </div>
                 ),
               },

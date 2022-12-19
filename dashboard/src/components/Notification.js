@@ -22,7 +22,16 @@ export default function Notification() {
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
   const actionsFiltered = useMemo(
-    () => actions.filter((action) => action.team === currentTeam?._id && action.status === TODO && action.urgent).sort((a, b) => a.dueAt - b.dueAt),
+    () =>
+      actions
+        .filter((action) => {
+          return (
+            (Array.isArray(action.teams) ? action.teams.includes(currentTeam?._id) : action.team === currentTeam?._id) &&
+            action.status === TODO &&
+            action.urgent
+          );
+        })
+        .sort((a, b) => a.dueAt - b.dueAt),
     [actions, currentTeam?._id]
   );
 

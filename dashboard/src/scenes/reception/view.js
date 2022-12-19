@@ -36,7 +36,7 @@ export const actionsForCurrentTeamSelector = selector({
   get: ({ get }) => {
     const actions = get(actionsState);
     const currentTeam = get(currentTeamState);
-    return actions.filter((a) => a.team === currentTeam?._id);
+    return actions.filter((a) => (Array.isArray(a.teams) ? a.teams.includes(currentTeam._id) : a.team === currentTeam._id));
   },
 });
 

@@ -251,7 +251,7 @@ const ActionView = () => {
                     <Label htmlFor="team">Sous l'équipe</Label>
                     <SelectTeam
                       teams={user.role === 'admin' ? teams : user.teams}
-                      teamId={values.team}
+                      teamId={Array.isArray(values.teams) ? values.teams[0] : values.team}
                       inputId="team"
                       onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
                     />
