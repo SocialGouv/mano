@@ -1,3 +1,10 @@
+## [1.192.2](https://github.com/SocialGouv/mano/compare/v1.192.1...v1.192.2) (2022-12-19)
+
+
+### Bug Fixes
+
+* **dashboard:** default viewAllOrganisationData for stats ([de95013](https://github.com/SocialGouv/mano/commit/de9501354a2c0b655148fb47468feca49caf7fb9))
+
 ## [1.192.1](https://github.com/SocialGouv/mano/compare/v1.192.0...v1.192.1) (2022-12-17)
 
 
