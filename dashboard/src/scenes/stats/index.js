@@ -366,7 +366,7 @@ const Stats = () => {
           <HeaderTitle style={{ fontWeight: '400', width: '260px' }}>
             <span>Statistiques {viewAllOrganisationData ? <>globales</> : <>{selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"}</>}</span>
           </HeaderTitle>
-          <div style={{ marginLeft: '1rem' }}>
+          <div className="tw-ml-4">
             <SelectTeamMultiple
               onChange={(teamsId) => {
                 setSelectedTeams(teams.filter((t) => teamsId.includes(t._id)));
@@ -376,11 +376,13 @@ const Stats = () => {
               isDisabled={viewAllOrganisationData}
             />
             {teams.length > 1 && (
-              <label htmlFor="viewAllOrganisationData" style={{ fontSize: '14px' }}>
+              <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm">
                 <input
                   id="viewAllOrganisationData"
                   type="checkbox"
-                  style={{ marginRight: '0.5rem' }}
+                  className="tw-mr-2.5"
+                  checked={viewAllOrganisationData}
+                  value={viewAllOrganisationData}
                   onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
                 />
                 Statistiques de toute l'organisation

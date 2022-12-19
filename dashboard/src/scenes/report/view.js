@@ -405,7 +405,7 @@ const View = () => {
                 {viewAllOrganisationData ? <>de toutes les équipes</> : <>{selectedTeamIds.length > 1 ? 'des équipes' : "de l'équipe"}</>}
               </span>
             </HeaderTitle>
-            <div style={{ marginLeft: '1rem' }}>
+            <div className="tw-ml-4">
               <SelectTeamMultiple
                 inputId="report-select-teams"
                 classNamePrefix="report-select-teams"
@@ -419,11 +419,11 @@ const View = () => {
                 isDisabled={viewAllOrganisationData}
               />
               {teams.length > 1 && (
-                <label htmlFor="viewAllOrganisationData" style={{ fontSize: '14px' }}>
+                <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm">
                   <input
                     id="viewAllOrganisationData"
                     type="checkbox"
-                    style={{ marginRight: '0.5rem' }}
+                    className="tw-mr-2.5"
                     onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
                     checked={viewAllOrganisationData}
                   />

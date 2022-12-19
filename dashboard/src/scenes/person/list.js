@@ -192,12 +192,12 @@ const List = () => {
             }}
           />
         </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
-          <label htmlFor="viewAllOrganisationData" style={{ marginLeft: '270px' }}>
+        <Col md={12} className="tw-flex tw-items-center">
+          <label htmlFor="viewAllOrganisationData" className="tw-ml-72">
             <input
               type="checkbox"
               id="viewAllOrganisationData"
-              style={{ marginRight: 10 }}
+              className="tw-mr-2.5"
               checked={viewAllOrganisationData}
               value={viewAllOrganisationData}
               onChange={() => setViewAllOrganisationData(!viewAllOrganisationData)}
@@ -205,11 +205,11 @@ const List = () => {
             Afficher les personnes de toute l'organisation
           </label>
         </Col>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center' }}>
-          <label htmlFor="alertness" style={{ marginLeft: '270px' }}>
+        <Col md={12} className="tw-flex tw-items-center">
+          <label htmlFor="alertness" className="tw-ml-72">
             <input
               type="checkbox"
-              style={{ marginRight: 10 }}
+              className="tw-mr-2.5"
               id="alertness"
               checked={alertness}
               value={alertness}

@@ -236,7 +236,7 @@ const List = () => {
               isDisabled={viewAllOrganisationData}
             />
             {teams.length > 1 && (
-              <label htmlFor="viewAllOrganisationData" className="tw-text-sm">
+              <label htmlFor="viewAllOrganisationData" className="tw-flex tw-items-center tw-text-sm">
                 <input
                   id="viewAllOrganisationData"
                   type="checkbox"
