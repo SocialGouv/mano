@@ -66,18 +66,24 @@ const Table = ({
         <tr>
           {columns.map((column) => {
             const { onSortBy, onSortOrder, sortBy, sortOrder, sortableKey, dataKey } = column;
-            const onNameClick = () => onSortBy(sortableKey || dataKey);
+            const onNameClick = () => {
+              if (sortBy === sortableKey || sortBy === dataKey) {
+                onSortOrder(sortOrder === 'ASC' ? 'DESC' : 'ASC');
+                return;
+              }
+              onSortBy(sortableKey || dataKey);
+            };
             return (
               <td
                 onClick={!!onSortBy ? onNameClick : null}
-                className={`column-header ${column.left && 'align-left'} ${!!onSortBy && 'clickable'}`}
+                className={`tw-px-0 ${column.left ? 'tw-text-left' : 'tw-text-center'} ${!!onSortBy ? 'tw-cursor-pointer' : 'tw-cursor-default'}`}
                 style={column.style || {}}
                 key={String(dataKey) + String(column.title)}>
                 <span>{column.title}</span>
                 {(sortBy === sortableKey || sortBy === dataKey) && (
                   <>
-                    {sortOrder === 'ASC' && <span onClick={() => onSortOrder('DESC')}>{`\u00A0\u2193`}</span>}
-                    {sortOrder === 'DESC' && <span onClick={() => onSortOrder('ASC')}>{`\u00A0\u2191`}</span>}
+                    {sortOrder === 'ASC' && <span className="tw-mx-4" onClick={() => onSortOrder('DESC')}>{`\u00A0\u2193`}</span>}
+                    {sortOrder === 'DESC' && <span className="tw-mx-4" onClick={() => onSortOrder('ASC')}>{`\u00A0\u2191`}</span>}
                   </>
                 )}
               </td>
@@ -180,20 +186,6 @@ const TableWrapper = styled.table`
     &.not-small {
       min-width: 100px;
     }
-  }
-
-  .column-header {
-    text-align: center;
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .align-left {
-    text-align: left;
-  }
-
-  .clickable {
-    cursor: pointer;
   }
 
   .table-cell {
