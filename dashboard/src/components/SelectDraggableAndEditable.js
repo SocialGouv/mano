@@ -34,6 +34,9 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
     <>
       <SelectCustom
         components={{
+          Input: (myProps) => {
+            return <components.Input {...myProps} inputClassName="input-focus-helper" />;
+          },
           MultiValueLabel: (props) => {
             return (
               <>
