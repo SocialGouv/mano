@@ -1,3 +1,10 @@
+## [1.192.4](https://github.com/SocialGouv/mano/compare/v1.192.3...v1.192.4) (2022-12-19)
+
+
+### Bug Fixes
+
+* custom fields edit no data ([#1096](https://github.com/SocialGouv/mano/issues/1096)) ([e4e2376](https://github.com/SocialGouv/mano/commit/e4e2376d47346dcdf72c8dad3f453645eeed43e5))
+
 ## [1.192.3](https://github.com/SocialGouv/mano/compare/v1.192.2...v1.192.3) (2022-12-19)
 
 
