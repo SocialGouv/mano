@@ -50,6 +50,9 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
     if (!data.type) {
       return toast.error('Veuillez choisir un type de consultation');
     }
+    if (!data.person) {
+      return toast.error('Veuillez sélectionner une personne suivie');
+    }
     if ([DONE, CANCEL].includes(data.status)) {
       data.completedAt = data.completedAt || new Date();
     } else {
