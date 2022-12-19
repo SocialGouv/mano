@@ -44,7 +44,7 @@ const ActionRow = ({ onActionPress, onPseudoPress, showStatus, action, withTeamN
           )}
           <Name bold>{name}</Name>
         </View>
-        {!!withTeamName && <TeamsTags teams={[action.team]} />}
+        {!!withTeamName && <TeamsTags teams={Array.isArray(action.teams) ? action.teams : [action.team]} />}
         {showStatus ? (
           <StatusContainer>
             <Status color={colors.app[status === DONE ? 'color' : 'secondary']}>{status}</Status>
