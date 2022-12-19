@@ -261,7 +261,7 @@ const Reception = () => {
                 onClose={() => {
                   setShowConsultationModal(false);
                 }}
-                person={selectedPersons?.[0]}
+                personId={selectedPersons?.[0]._id}
               />
             )}
           </>

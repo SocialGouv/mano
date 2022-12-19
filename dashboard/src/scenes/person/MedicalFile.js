@@ -576,7 +576,7 @@ export function MedicalFile({ person }) {
       <Documents
         title={<Title id="all-medical-documents">Tous les documents médicaux</Title>}
         documents={allMedicalDocuments}
-        person={person}
+        personId={person._id}
         onRowClick={(document) => {
           if (document.type === 'treatment') loadTreatment(document.treatment);
           if (document.type === 'consultation') {
@@ -781,7 +781,7 @@ export function MedicalFile({ person }) {
                   <Col md={12}>
                     <Documents
                       title="Documents"
-                      person={person}
+                      personId={person._id}
                       documents={values.documents || []}
                       onAdd={async (docResponse) => {
                         const { data: file, encryptedEntityKey } = docResponse;
@@ -833,7 +833,7 @@ export function MedicalFile({ person }) {
             setCurrentConsultationId(null);
             setShowConsultationModal(false);
           }}
-          person={person}
+          personId={person._id}
         />
       )}
     </>

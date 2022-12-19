@@ -18,7 +18,7 @@ import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
 
-export default function ConsultationModal({ onClose, person, consultation }) {
+export default function ConsultationModal({ onClose, personId, consultation }) {
   const organisation = useRecoilValue(organisationState);
   const team = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
@@ -37,12 +37,12 @@ export default function ConsultationModal({ onClose, person, consultation }) {
         type: '',
         status: TODO,
         user: user._id,
-        person: person?._id || null,
+        person: personId || null,
         organisation: organisation._id,
         onlyVisibleBy: [],
         createdAt: new Date(),
       },
-    [organisation._id, person?._id, user._id, consultation]
+    [organisation._id, personId, user._id, consultation]
   );
   const [data, setData] = useState(initialState);
 
@@ -128,7 +128,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
             handleSubmit();
           }}>
           <div>
-            {!person && (
+            {!personId && (
               <SelectPerson
                 value={data.person}
                 onChange={(e) => {
@@ -260,7 +260,7 @@ export default function ConsultationModal({ onClose, person, consultation }) {
           {data.person && (
             <Documents
               title="Documents"
-              person={data.person}
+              personId={data.person}
               documents={data.documents || []}
               onAdd={async (docResponse) => {
                 const { data: file, encryptedEntityKey } = docResponse;
