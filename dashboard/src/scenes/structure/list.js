@@ -116,12 +116,18 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
   const structureRef = React.useRef(initStructure);
   const [structure, setStructure] = useState(initStructure);
   const [disabled, setDisabled] = useState(false);
+  const onResetAndClose = () => {
+    structureRef.current = initStructure;
+    setStructure(initStructure);
+    onClose();
+  };
 
   const onChange = (e) => setStructure({ ...structure, [e.target.name]: e.target.value });
   const onSubmit = async (e) => {
     e.preventDefault();
     setDisabled(true);
     try {
+      if (!structure.name) throw new Error('Le nom de la structure est obligatoire');
       const isNew = !initStructure?._id;
       const res = !isNew
         ? await API.put({ path: `/structure/${initStructure._id}`, body: structure })
@@ -130,10 +136,11 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
       if (!res.ok) return;
       toast.success(!isNew ? 'Structure mise à jour !' : 'Structure créée !');
       onSuccess();
-      onClose();
+      onResetAndClose();
     } catch (errorCreatingStructure) {
       toast.error(errorCreatingStructure.message);
     }
+    setDisabled(false);
   };
 
   const onDeleteStructure = async () => {
@@ -142,14 +149,14 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
       if (!res.ok) return;
       toast.success('Structure supprimée !');
       onSuccess();
-      onClose();
+      onResetAndClose();
     }
   };
 
   return (
     <div className="tw-flex tw-w-full tw-justify-end">
       <ButtonCustom onClick={onOpen} color="primary" title="Créer une nouvelle structure" padding="12px 24px" />
-      <ModalContainer open={open} onClose={onClose} size="full">
+      <ModalContainer open={open} onClose={onResetAndClose} size="full">
         <ModalHeader title="Créer une structure" />
         <ModalBody>
           <form id="create-structure-form" className="tw-flex tw-w-full tw-flex-row tw-flex-wrap" onSubmit={onSubmit}>

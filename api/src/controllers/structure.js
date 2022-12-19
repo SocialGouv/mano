@@ -77,14 +77,13 @@ router.get(
         .map((e) => e.trim())
         .filter((e) => e)
         .map((e) => `%${e}%`);
-      query.where = {
-        name: {
-          [Op.iLike]: {
-            [Op.any]: terms,
-          },
+      query.where.name = {
+        [Op.iLike]: {
+          [Op.any]: terms,
         },
       };
     }
+
     const data = await Structure.findAll(query);
     return res.status(200).send({ ok: true, data });
   })
