@@ -134,7 +134,7 @@ function ActionsOfDay({ actions }) {
               )}
             </div>
           )}
-          <TagTeam teamId={action.team} />
+          {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
           <div>
             <ActionOrConsultationName item={action} />
           </div>

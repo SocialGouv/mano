@@ -133,14 +133,16 @@ const View = () => {
   const actionsCallback = useCallback(
     (status) =>
       allActions
-        .filter((a) => !!selectedTeamsObject[a.team])
+        .filter((a) => (Array.isArray(a.teams) ? a.teams.some((teamId) => !!selectedTeamsObject[teamId]) : !!selectedTeamsObject[a.team]))
         .filter((a) => a.status === status)
         .filter((a) => {
-          const currentTeam = selectedTeamsObject[a.team];
+          const isNightSession = Array.isArray(a.teams)
+            ? a.teams.every((teamId) => selectedTeamsObject[teamId]?.nightSession)
+            : selectedTeamsObject[a.team]?.nightSession;
           return getIsDayWithinHoursOffsetOfPeriod(
             a.completedAt,
             { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
+            isNightSession ? 12 : 0
           );
         }),
     [allActions, selectedTeamsObject, dateString]
@@ -151,21 +153,25 @@ const View = () => {
   const actionsCreatedAt = useMemo(
     () =>
       allActions
-        .filter((a) => !!selectedTeamsObject[a.team])
+        .filter((a) => (Array.isArray(a.teams) ? a.teams.some((teamId) => !!selectedTeamsObject[teamId]) : !!selectedTeamsObject[a.team]))
         .filter((a) => {
-          const currentTeam = selectedTeamsObject[a.team];
+          const isNightSession = Array.isArray(a.teams)
+            ? a.teams.every((teamId) => selectedTeamsObject[teamId]?.nightSession)
+            : selectedTeamsObject[a.team]?.nightSession;
           return getIsDayWithinHoursOffsetOfPeriod(
             a.createdAt,
             { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
+            isNightSession ? 12 : 0
           );
         })
         .filter((a) => {
-          const currentTeam = selectedTeamsObject[a.team];
+          const isNightSession = Array.isArray(a.teams)
+            ? a.teams.every((teamId) => selectedTeamsObject[teamId]?.nightSession)
+            : selectedTeamsObject[a.team]?.nightSession;
           return !getIsDayWithinHoursOffsetOfPeriod(
             a.completedAt,
             { referenceStartDay: dateString, referenceEndDay: dateString },
-            currentTeam?.nightSession ? 12 : 0
+            isNightSession ? 12 : 0
           );
         }),
     [allActions, dateString, selectedTeamsObject]
@@ -877,9 +883,9 @@ const ActionCompletedAt = ({ date, status, actions }) => {
             {
               title: 'Équipe en charge',
               dataKey: 'team',
-              render: (action) => (
+              render: (a) => (
                 <div className="px-2 tw-flex-shrink-0">
-                  <TagTeam teamId={action?.team} />
+                  {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
                 </div>
               ),
             },
@@ -947,7 +953,7 @@ const ActionCreatedAt = ({ date, actions }) => {
             {
               title: 'Équipe en charge',
               dataKey: 'team',
-              render: (action) => <TagTeam teamId={action?.team} />,
+              render: (a) => (Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />),
             },
           ]}
         />
