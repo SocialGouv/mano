@@ -1,3 +1,10 @@
+# [1.196.0](https://github.com/SocialGouv/mano/compare/v1.195.1...v1.196.0) (2022-12-20)
+
+
+### Features
+
+* **app:** retro-compatibility action teams ([#1101](https://github.com/SocialGouv/mano/issues/1101)) ([f060237](https://github.com/SocialGouv/mano/commit/f060237aa4eeb4b3d560f8e4a53c1ca3f6dc113c))
+
 ## [1.195.1](https://github.com/SocialGouv/mano/compare/v1.195.0...v1.195.1) (2022-12-20)
 
 
