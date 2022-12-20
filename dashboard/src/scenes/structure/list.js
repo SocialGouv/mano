@@ -219,9 +219,11 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
           <button type="button" name="cancel" className="button-cancel" onClick={onClose}>
             Annuler
           </button>
-          <button type="button" className="button-destructive" onClick={onDeleteStructure}>
-            Supprimer
-          </button>
+          {Boolean(initStructure?._id) && (
+            <button type="button" className="button-destructive" onClick={onDeleteStructure}>
+              Supprimer
+            </button>
+          )}
           <button
             type="submit"
             disabled={disabled || JSON.stringify(structureRef.current) === JSON.stringify(structure)}
