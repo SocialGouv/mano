@@ -1,7 +1,7 @@
 import { useLocation, useParams } from 'react-router-dom';
 import { Alert } from 'reactstrap';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import Places from '../../components/Places';
+import Places from './Places';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
@@ -68,7 +68,7 @@ export default function View() {
                 <button
                   onClick={() => setCurrentTab('Lieux fréquentés')}
                   className={currentTab === 'Lieux fréquentés' ? 'active nav-link' : 'btn-link nav-link'}>
-                  Lieux fréquentés
+                  Lieux fréquentés ({person.relsPersonPlace?.length || 0})
                 </button>
               </li>
               <li role="presentation" className="nav-item">
@@ -127,7 +127,7 @@ export default function View() {
         {!['restricted-access'].includes(user.role) && (
           <>
             {currentTab === 'Dossier Médical' && user.healthcareProfessional && <MedicalFile person={person} />}
-            {currentTab === 'Lieux fréquentés' && <Places personId={person?._id} />}
+            {currentTab === 'Lieux fréquentés' && <Places person={person} />}
             {currentTab === 'Historique' && <History person={person} />}
             {currentTab === 'Liens familiaux' && <PersonFamily person={person} />}
           </>

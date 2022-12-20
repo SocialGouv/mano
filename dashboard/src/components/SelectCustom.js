@@ -11,7 +11,10 @@ const SelectCustom = ({ creatable, ...props }) => {
       styles={filterStyles}
       placeholder="-- Choisir --"
       noOptionsMessage={() => 'Aucun résultat'}
-      formatCreateLabel={(inputValue) => `Ajouter "${inputValue}"`}
+      formatCreateLabel={(inputValue) => {
+        console.log(inputValue);
+        return `Ajouter "${inputValue}"`;
+      }}
       theme={(defaultTheme) => ({
         ...defaultTheme,
         colors: {
