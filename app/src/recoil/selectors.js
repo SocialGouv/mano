@@ -141,6 +141,7 @@ export const itemsGroupedByPersonSelector = selector({
       personsObject[comment.person].comments.push(comment);
       if (!!comment.group) {
         const group = personsObject[comment.person].group;
+        if (!group) continue;
         for (const person of group.persons) {
           if (!personsObject[person]) continue;
           if (person === comment.person) continue;
