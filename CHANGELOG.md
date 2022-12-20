@@ -1,3 +1,10 @@
+# [1.194.0](https://github.com/SocialGouv/mano/compare/v1.193.0...v1.194.0) (2022-12-20)
+
+
+### Features
+
+* structures by org - structures in dashboard ([#1094](https://github.com/SocialGouv/mano/issues/1094)) ([bac1020](https://github.com/SocialGouv/mano/commit/bac10205e5621bff0763912c0db0dbe5c064182a))
+
 # [1.193.0](https://github.com/SocialGouv/mano/compare/v1.192.5...v1.193.0) (2022-12-19)
 
 
