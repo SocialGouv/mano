@@ -13,7 +13,13 @@ const SelectDraggableAndEditable = ({ onChange, classNamePrefix, value, onEditCh
     const items = grid.querySelectorAll(`.${classNamePrefix}__multi-value__label`);
     const newValue = [];
     for (const item of items) {
-      newValue.push(value.find((_item) => _item.label === item.innerText));
+      // If fromValue is undefined, it means that the item is a new one.
+      const fromValue = value.find((_item) => _item.label === item.innerText);
+      if (fromValue) {
+        newValue.push(fromValue);
+      } else {
+        newValue.push({ label: item.innerText, value: item.innerText });
+      }
     }
     onChange(newValue);
   }, [classNamePrefix, onChange, value]);
