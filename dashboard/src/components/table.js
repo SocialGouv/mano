@@ -54,7 +54,7 @@ const Table = ({
     );
   }
   return (
-    <TableWrapper className={className} withPointer={Boolean(onRowClick)} isSortable={isSortable}>
+    <TableWrapper className={className}>
       <thead>
         {!!title && (
           <tr>
@@ -76,7 +76,7 @@ const Table = ({
             return (
               <td
                 onClick={!!onSortBy ? onNameClick : null}
-                className={`tw-px-0 ${column.left ? 'tw-text-left' : 'tw-text-center'} ${!!onSortBy ? 'tw-cursor-pointer' : 'tw-cursor-default'}`}
+                className={!!onSortBy ? 'tw-cursor-pointer' : 'tw-cursor-default'}
                 style={column.style || {}}
                 key={String(dataKey) + String(column.title)}>
                 <span>{column.title}</span>
@@ -101,10 +101,16 @@ const Table = ({
                 key={item[rowKey] || item._id}
                 data-key={item[rowKey] || item._id}
                 data-test-id={item[dataTestId] || item[rowKey] || item._id}
-                style={{
-                  ...(item.style || {}),
-                  cursor: rowDisabled(item) ? 'not-allowed' : 'pointer',
-                }}>
+                className={[
+                  rowDisabled(item)
+                    ? 'tw-cursor-not-allowed'
+                    : isSortable
+                    ? 'tw-cursor-move'
+                    : Boolean(onRowClick)
+                    ? 'tw-cursor-pointer'
+                    : 'tw-cursor-auto',
+                ].join(' ')}
+                style={item.style || {}}>
                 {columns.map((column) => {
                   return (
                     <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
@@ -140,15 +146,7 @@ const TableWrapper = styled.table`
 
   tr {
     height: 3.5rem;
-    ${(props) => !props.withPointer && 'cursor: auto;'}
   }
-  ${(props) =>
-    props.isSortable &&
-    `
-  tbody > tr {
-    cursor: move;
-  }
-  `}
 
   tbody > tr:nth-child(odd) {
     background-color: ${theme.black05};
@@ -180,10 +178,9 @@ const TableWrapper = styled.table`
 
   tbody td {
     padding: 0.25rem 0.5rem;
+    font-size: 14px;
   }
   td {
-    font-size: 14px;
-    text-align: left;
     &.small {
       min-width: 50px;
     }
