@@ -1,3 +1,10 @@
+## [1.194.1](https://github.com/SocialGouv/mano/compare/v1.194.0...v1.194.1) (2022-12-20)
+
+
+### Bug Fixes
+
+* **dashboard:** reorder new options ([#1104](https://github.com/SocialGouv/mano/issues/1104)) ([1103bf2](https://github.com/SocialGouv/mano/commit/1103bf24097f4a2bd22788c8f8f0b43bfa200e82))
+
 # [1.194.0](https://github.com/SocialGouv/mano/compare/v1.193.0...v1.194.0) (2022-12-20)
 
 
