@@ -22,7 +22,7 @@ test("Structures", async ({ page }) => {
   await page.getByLabel("Téléphone").fill("1123456789");
   await page.getByLabel("Adresse (numéro et rue)").fill("1 rue du chemin");
   await page.getByLabel("Code postal").fill("75002");
-  await expect(page.getByLabel("Ville")).toHaveValue("PARIS 02");
+  await page.getByLabel("Ville").fill("Paris");
   await page.getByLabel("Description").fill("joli bébé");
   await page.locator(".categories__input-container").click();
   await page.locator("#categories").fill("infirmerie");
@@ -47,7 +47,6 @@ test("Structures", async ({ page }) => {
   await page.getByLabel("Téléphone").fill("112345678910");
   await page.getByLabel("Adresse (numéro et rue)").fill("1 rue du chemin vert");
   await page.getByLabel("Code postal").fill("75003");
-  await expect(page.getByLabel("Ville")).toHaveValue("PARIS 03");
   await page.getByLabel("Description").fill("joli bébé dort");
   await page.locator(".categories__input-container").click();
   await page.locator("#categories").fill("piscine");
