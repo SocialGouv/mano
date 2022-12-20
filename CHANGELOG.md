@@ -1,3 +1,10 @@
+# [1.195.0](https://github.com/SocialGouv/mano/compare/v1.194.2...v1.195.0) (2022-12-20)
+
+
+### Features
+
+* sort list of persons ([#1103](https://github.com/SocialGouv/mano/issues/1103)) ([4e47d38](https://github.com/SocialGouv/mano/commit/4e47d3800bbb7985c00cc214130750ee1bf245a8))
+
 ## [1.194.2](https://github.com/SocialGouv/mano/compare/v1.194.1...v1.194.2) (2022-12-20)
 
 
