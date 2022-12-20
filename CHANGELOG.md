@@ -1,3 +1,10 @@
+## [1.196.1](https://github.com/SocialGouv/mano/compare/v1.196.0...v1.196.1) (2022-12-20)
+
+
+### Bug Fixes
+
+* table designs ([#1108](https://github.com/SocialGouv/mano/issues/1108)) ([183f5cf](https://github.com/SocialGouv/mano/commit/183f5cfa5dcdfbc3e98216c524ddcf134b15b7e6))
+
 # [1.196.0](https://github.com/SocialGouv/mano/compare/v1.195.1...v1.196.0) (2022-12-20)
 
 
