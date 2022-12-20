@@ -118,6 +118,8 @@ const List = () => {
   const [search, setSearch] = useSearchParamState('search', '');
   const [alertness, setFilterAlertness] = useLocalStorage('person-alertness', false);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('person-allOrg', false);
+  const [sortBy, setSortBy] = useLocalStorage('person-sortBy', 'name');
+  const [sortOrder, setSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
   const [filterTeams, setFilterTeams] = useLocalStorage('person-teams', []);
   const [filters, setFilters] = useLocalStorage('person-filters', []);
   const [page, setPage] = useSearchParamState('page', 0);
@@ -125,10 +127,51 @@ const List = () => {
 
   const personsFilteredBySearch = useRecoilValue(personsFilteredBySearchSelector({ search, filterTeams, filters, alertness }));
 
+  const personsSorted = useMemo(() => {
+    const sorted = [...personsFilteredBySearch];
+    sorted.sort((a, b) => {
+      if (sortBy === 'name') {
+        return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+      }
+      if (sortBy === 'formattedBirthDate') {
+        if (!a.birthdate && !b.birthdate) return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        if (!a.birthdate) return sortOrder === 'ASC' ? 1 : -1;
+        if (!b.birthdate) return sortOrder === 'DESC' ? 1 : -1;
+        return sortOrder === 'ASC' ? new Date(b.birthdate) - new Date(a.birthdate) : new Date(a.birthdate) - new Date(b.birthdate);
+      }
+      if (sortBy === 'alertness') {
+        if (a.alertness === b.alertness) {
+          // if both have same alertness, sort by name
+          return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        }
+        if (!a.alertness) return sortOrder === 'ASC' ? 1 : -1;
+        if (!b.alertness) return sortOrder === 'DESC' ? 1 : -1;
+        return 0;
+      }
+      if (sortBy === 'group') {
+        if (!!a.group === !!b.group) {
+          // if both have group, sort by name
+          return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        }
+        if (!a.group) return sortOrder === 'ASC' ? 1 : -1;
+        if (!b.group) return sortOrder === 'DESC' ? 1 : -1;
+        return 0;
+      }
+      if (sortBy === 'followedSince') {
+        if (!a.followedSince && !b.followedSince) return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+        if (!a.followedSince) return sortOrder === 'ASC' ? 1 : -1;
+        if (!b.followedSince) return sortOrder === 'DESC' ? 1 : -1;
+        return sortOrder === 'ASC' ? new Date(b.followedSince) - new Date(a.followedSince) : new Date(a.followedSince) - new Date(b.followedSince);
+      }
+      return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
+    });
+    return sorted;
+  }, [personsFilteredBySearch, sortBy, sortOrder]);
+
   const data = useMemo(() => {
-    return personsFilteredBySearch.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  }, [personsFilteredBySearch, page]);
-  const total = useMemo(() => personsFilteredBySearch.length, [personsFilteredBySearch]);
+    return personsSorted.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
+  }, [personsSorted, page]);
+  const total = useMemo(() => personsSorted.length, [personsSorted]);
 
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
@@ -229,6 +272,10 @@ const List = () => {
             title: '',
             dataKey: 'group',
             small: true,
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
             render: (person) => {
               if (!person.group) return null;
               return (
@@ -243,6 +290,10 @@ const List = () => {
           {
             title: 'Nom',
             dataKey: 'name',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
             render: (p) => {
               if (p.outOfActiveList)
                 return (
@@ -256,7 +307,11 @@ const List = () => {
           },
           {
             title: 'Date de naissance',
-            dataKey: '_id',
+            dataKey: 'formattedBirthDate',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
             render: (p) => {
               if (!p.birthdate) return '';
               else if (p.outOfActiveList) return <i style={{ color: theme.black50 }}>{p.formattedBirthDate}</i>;
@@ -270,6 +325,10 @@ const List = () => {
           {
             title: 'Vigilance',
             dataKey: 'alertness',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
             render: (p) => {
               return p.alertness ? (
                 <ExclamationMarkButton
@@ -279,10 +338,18 @@ const List = () => {
               ) : null;
             },
           },
-          { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams person={person} /> },
+          {
+            title: 'Équipe(s) en charge',
+            dataKey: 'assignedTeams',
+            render: (person) => <Teams person={person} />,
+          },
           {
             title: 'Suivi(e) depuis le',
             dataKey: 'followedSince',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
             render: (p) => {
               if (p.outOfActiveList)
                 return <div style={{ color: theme.black50 }}>{formatDateWithFullMonth(p.followedSince || p.createdAt || '')}</div>;
