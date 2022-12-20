@@ -1,48 +1,56 @@
-import React, { useState } from 'react';
-import { selector, useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
+import React, { useEffect, useState } from 'react';
+import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import ButtonCustom from '../../components/ButtonCustom';
 import UserName from '../../components/UserName';
 import { userState } from '../../recoil/auth';
 import { dayjsInstance } from '../../services/date';
 import useApi from '../../services/api';
-import SelectPerson from '../../components/SelectPerson';
 import { useDataLoader } from '../../components/DataLoader';
 import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from '../../components/tailwind/Modal';
-import { personsState } from '../../recoil/persons';
 import SelectCustom from '../../components/SelectCustom';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import SelectUser from '../../components/SelectUser';
 import { toast } from 'react-toastify';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
+import QuestionMarkButton from '../../components/QuestionMarkButton';
+import { capture } from '../../services/sentry';
 
 const PersonPlaces = ({ person }) => {
   const user = useRecoilValue(userState);
-  const [newRelationModalOpen, setNewRelationModalOpen] = useState(false);
+  const places = useRecoilValue(placesState);
+  const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
+
+  const [relPersonPlaceModal, setRelPersonPlaceModal] = useState(null);
   const [placeToEdit, setPlaceToEdit] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+  const [helpModal, setHelpModal] = useState(false);
   const { refresh } = useDataLoader();
   const API = useApi();
 
-  const onEditRelation = async (e) => {
-    // e.preventDefault();
+  const onDeleteRelPersonPlace = async (relPersonPlace) => {
+    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce lieu fréquenté ?')) return;
+    setDeleting(true);
+    const response = await API.delete({ path: `/relPersonPlace/${relPersonPlace?._id}` });
+    setDeleting(false);
+    if (!response.ok) return toast.error(response.error);
+    setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace?._id));
   };
-
-  const onDeleteRelation = async (relation) => {};
 
   return (
     <>
       <div className="tw-my-10 tw-flex tw-items-center tw-gap-2">
-        <h3 className="tw-mb-0 tw-text-xl tw-font-extrabold">
-          Lieux fréquentés {person.relsPersonPlace?.length ? `(${person.relsPersonPlace?.length})` : ''}
+        <h3 className="tw-mb-0 tw-flex tw-items-center tw-gap-5 tw-text-xl tw-font-extrabold">
+          Lieux fréquentés {person.relsPersonPlace?.length ? `(${person.relsPersonPlace?.length})` : ''}{' '}
+          <QuestionMarkButton onClick={() => setHelpModal(true)} />
         </h3>
         <ButtonCustom
           title="Ajouter un lieu"
           className="tw-ml-auto"
           onClick={() => {
             refresh(); // just refresh to make sure we have the latest data
-            setNewRelationModalOpen(true);
+            setRelPersonPlaceModal({ place: null, user: user._id });
           }}
         />
-        <NewRelPersonPlace open={newRelationModalOpen} setOpen={setNewRelationModalOpen} person={person} />
       </div>
       {!person.relsPersonPlace?.length ? (
         <div className="tw-py-10 tw-text-center tw-text-gray-300">
@@ -62,22 +70,42 @@ const PersonPlaces = ({ person }) => {
             </tr>
           </thead>
           <tbody className="small">
-            {person.relsPersonPlace?.map((_relation) => {
-              const { place: placeId, createdAt, user } = _relation;
-              const place = person.places.find((p) => p._id === placeId);
+            {person.relsPersonPlace?.map((relPersonPlace) => {
+              const { place: placeId, createdAt, user } = relPersonPlace;
+              const place = places.find((p) => p._id === placeId);
               return (
-                <tr key={JSON.stringify(_relation)}>
-                  <td>{place.name}</td>
+                <tr key={JSON.stringify(relPersonPlace)} className="tw-cursor-default">
+                  <td className="tw-group" data-test-id={place?.name}>
+                    {place.name}
+                    <button
+                      aria-label={`Modifier le nom du lieu ${place?.name}`}
+                      title={`Modifier le nom du lieu ${place?.name}`}
+                      className="noprint tw-invisible tw-z-50 tw-ml-4 tw-cursor-pointer tw-p-0 tw-text-sm tw-text-main hover:tw-underline group-hover:tw-visible"
+                      onClick={() => setPlaceToEdit(place)}
+                      type="button">
+                      Modifier le nom du lieu
+                    </button>
+                  </td>
                   <td width="15%">
                     <UserName id={user} />
                   </td>
                   <td width="15%">{dayjsInstance(createdAt).format('DD/MM/YYYY HH:mm')}</td>
                   <td width="15%">
                     <div className="tw-flex tw-flex-col tw-items-center tw-gap-2">
-                      <button type="button" className="button-classic" onClick={() => setPlaceToEdit(_relation)}>
+                      <button
+                        aria-label={`Modifier le lieu fréquenté ${place?.name}`}
+                        title={`Modifier le lieu fréquenté ${place?.name}`}
+                        type="button"
+                        className="button-classic"
+                        onClick={() => setRelPersonPlaceModal(relPersonPlace)}>
                         Modifier
                       </button>
-                      <button type="button" className="button-destructive" onClick={() => onDeleteRelation(_relation)}>
+                      <button
+                        aria-label={`Supprimer le lieu fréquenté ${place?.name}`}
+                        disabled={deleting}
+                        type="button"
+                        className="button-destructive"
+                        onClick={() => onDeleteRelPersonPlace(relPersonPlace)}>
                         Supprimer
                       </button>
                     </div>
@@ -86,39 +114,45 @@ const PersonPlaces = ({ person }) => {
               );
             })}
           </tbody>
-          <EditRelation
-            open={!!placeToEdit}
-            setOpen={setPlaceToEdit}
-            onEditRelation={onEditRelation}
-            onDeleteRelation={onDeleteRelation}
-            person={person}
-            placeToEdit={placeToEdit}
-          />
         </table>
       )}
+      <EditRelPersonPlaceModal open={!!placeToEdit} setOpen={setPlaceToEdit} placeToEdit={placeToEdit} />
+      <RelPersonPlaceModal
+        open={!!relPersonPlaceModal}
+        setOpen={setRelPersonPlaceModal}
+        person={person}
+        relPersonPlaceModal={relPersonPlaceModal}
+        setPlaceToEdit={setPlaceToEdit}
+      />
+      <HelpModal open={!!helpModal} setOpen={setHelpModal} />
     </>
   );
 };
 
-const NewRelPersonPlace = ({ open, setOpen, person, onEditPlace }) => {
+const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPlaceToEdit }) => {
   const [places, setPlaces] = useRecoilState(placesState);
   const setRelsPersonPlace = useSetRecoilState(relsPersonPlaceState);
   const me = useRecoilValue(userState);
-  const [place, setPlace] = useState(null);
-  const [userId, setUserId] = useState(me._id);
-  const [posting, setPosting] = useState(false);
+  const [placeId, setPlaceId] = useState(relPersonPlaceModal?.place);
+  const [userId, setUserId] = useState(relPersonPlaceModal?.user ?? me._id);
+  const [posting, setUpdating] = useState(false);
   const API = useApi();
   const { refresh } = useDataLoader();
 
+  useEffect(() => {
+    setPlaceId(relPersonPlaceModal?.place);
+    setUserId(relPersonPlaceModal?.user ?? me._id);
+  }, [me._id, relPersonPlaceModal]);
+
   const onCreatePlace = async (name) => {
-    if (!name) return;
+    if (!name?.length) return toast.error('Le nom du lieu est obligatoire');
     if (places.find((p) => p.name?.toLocaleLowerCase() === name?.toLocaleLowerCase())) {
       toast.error('Ce lieu existe déjà');
       return;
     }
-    setPosting(true);
+    setUpdating(true);
     const response = await API.post({ path: '/place', body: preparePlaceForEncryption({ name }) });
-    setPosting(false);
+    setUpdating(false);
     if (response.error) {
       toast.error(response.error);
       return;
@@ -128,35 +162,48 @@ const NewRelPersonPlace = ({ open, setOpen, person, onEditPlace }) => {
         p1?.name?.toLocaleLowerCase().localeCompare(p2.name?.toLocaleLowerCase(), 'fr', { ignorPunctuation: true, sensitivity: 'base' })
       )
     );
+    setPlaceId(response.decryptedData._id);
   };
 
-  const onEditPlaceRequest = async (e) => {
+  const onEditPlace = async (e) => {
     e.stopPropagation();
-    console.log('edit bebe');
+    setPlaceToEdit(places.find((p) => p._id === placeId));
   };
 
-  const onAddRelPersonPlace = async (e) => {
+  const onSaveRelPersonPlace = async (e) => {
     e.preventDefault();
-    setPosting(true);
-    const response = await API.post({
-      path: '/relPersonPlace',
-      body: prepareRelPersonPlaceForEncryption({ place: place._id, person: person._id, user: userId }),
-    });
-    setPosting(false);
+    setUpdating(true);
+    const isNew = !relPersonPlaceModal?._id;
+    const response = isNew
+      ? await API.post({
+          path: '/relPersonPlace',
+          body: prepareRelPersonPlaceForEncryption({ place: placeId, person: person._id, user: userId }),
+        })
+      : await API.put({
+          path: `/relPersonPlace/${relPersonPlaceModal._id}`,
+          body: prepareRelPersonPlaceForEncryption({ place: placeId, person: person._id, user: userId }),
+        });
+
+    setUpdating(false);
     if (response.error) {
       toast.error(response.error);
       return;
     }
-    setRelsPersonPlace((relsPersonPlace) => [response.decryptedData, ...relsPersonPlace]);
+    toast.success(`Le lieu a été ${isNew ? 'ajouté' : 'modifié'}`);
+    if (isNew) {
+      setRelsPersonPlace((relsPersonPlace) => [response.decryptedData, ...relsPersonPlace]);
+    } else {
+      setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.map((r) => (r._id === relPersonPlaceModal._id ? response.decryptedData : r)));
+    }
     refresh();
-    setOpen(false);
+    setOpen(null);
   };
 
   return (
     <ModalContainer open={open}>
       <ModalHeader title="Ajouter un lieu fréquenté" />
       <ModalBody>
-        <form id="new-rel-person-place" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4" onSubmit={onAddRelPersonPlace}>
+        <form id="new-rel-person-place" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4" onSubmit={onSaveRelPersonPlace}>
           <div>
             <label htmlFor="place" className="form-text tailwindui">
               Lieu
@@ -164,10 +211,10 @@ const NewRelPersonPlace = ({ open, setOpen, person, onEditPlace }) => {
             <SelectCustom
               options={places}
               name="place"
-              onChange={setPlace}
+              onChange={(place) => setPlaceId(place._id)}
               isClearable={false}
               isDisabled={posting}
-              value={place}
+              value={places.find((p) => p._id === placeId)}
               creatable
               onCreateOption={onCreatePlace}
               getOptionValue={(i) => i._id}
@@ -185,10 +232,10 @@ const NewRelPersonPlace = ({ open, setOpen, person, onEditPlace }) => {
                       aria-label={`Modifier le nom du lieu ${place?.name}`}
                       title={`Modifier le nom du lieu ${place?.name}`}
                       className="noprint tw-z-50 tw-ml-4 tw-cursor-pointer tw-p-0 tw-text-sm tw-text-main hover:tw-underline"
-                      onMouseUp={onEditPlaceRequest}
+                      onMouseUp={onEditPlace}
                       // onTouchEnd required to work on tablet
                       // see https://github.com/JedWatson/react-select/issues/3117#issuecomment-1286232693 for similar issue
-                      onTouchEnd={onEditPlaceRequest}
+                      onTouchEnd={onEditPlace}
                       type="button">
                       Modifier le nom du lieu
                     </button>
@@ -208,7 +255,7 @@ const NewRelPersonPlace = ({ open, setOpen, person, onEditPlace }) => {
         </form>
       </ModalBody>
       <ModalFooter>
-        <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(false)}>
+        <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(null)}>
           Annuler
         </button>
         <button type="submit" className="button-submit" form="new-rel-person-place">
@@ -219,36 +266,83 @@ const NewRelPersonPlace = ({ open, setOpen, person, onEditPlace }) => {
   );
 };
 
-const EditRelation = ({ open, setOpen, onEditRelation, onDeleteRelation, placeToEdit }) => {
-  const persons = useRecoilValue(personsState);
-  const personId1 = placeToEdit?.persons[0];
-  const personId2 = placeToEdit?.persons[1];
+const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
+  const [places, setPlaces] = useRecoilState(placesState);
+  const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
+
+  const [updating, setUpdating] = useState(false);
+  const API = useApi();
+  const { refresh } = useDataLoader();
+  const [name, setName] = useState(placeToEdit?.name);
+
+  useEffect(() => {
+    setName(placeToEdit?.name);
+  }, [placeToEdit]);
+
+  const onEditPlace = async (e) => {
+    e.preventDefault();
+    if (!name?.length) return toast.error('Le nom du lieu est obligatoire');
+    if (places.filter((p) => p._id !== placeToEdit._id).find((p) => p.name?.toLocaleLowerCase() === name?.toLocaleLowerCase())) {
+      toast.error('Ce lieu existe déjà');
+      return;
+    }
+    setUpdating(true);
+    const response = await API.put({
+      path: `/place/${placeToEdit._id}`,
+      body: preparePlaceForEncryption({ ...placeToEdit, name }),
+    });
+    setUpdating(false);
+    if (response.error) {
+      toast.error(response.error);
+      return;
+    }
+    toast.success(`Le nom du lieu a été modifié`);
+    setPlaces((places) => places.map((p) => (p._id === placeToEdit._id ? response.decryptedData : p)));
+    refresh();
+    setOpen(null);
+  };
+
+  const onDelete = async () => {
+    if (
+      !window.confirm(
+        `Voulez-vous vraiment supprimer le lieu "${placeToEdit.name}" ? Cette action est irréversible et entrainera la suppression de tous les lieux fréquentés associés.`
+      )
+    ) {
+      return;
+    }
+    setUpdating(true);
+    const response = await API.delete({ path: `/place/${placeToEdit._id}` });
+    setUpdating(false);
+    if (response.error) {
+      toast.error(response.error);
+      return;
+    }
+    setPlaces((places) => places.filter((p) => p._id !== placeToEdit._id));
+    for (let relPersonPlace of relsPersonPlace.filter((rel) => rel.place === placeToEdit._id)) {
+      await API.delete({ path: `/relPersonPlace/${relPersonPlace._id}` });
+    }
+    setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel.place !== placeToEdit._id));
+    toast.success('Lieu supprimé !');
+    refresh();
+    setOpen(null);
+  };
 
   return (
     <ModalContainer open={open}>
-      <ModalHeader
-        title={`Éditer le lien familial entre ${persons.find((p) => p._id === personId1)?.name} et ${persons.find((p) => p._id === personId2)?.name}`}
-      />
+      <ModalHeader title="Éditer le nom du lieu" />
       <ModalBody>
-        <form
-          key={JSON.stringify(placeToEdit)}
-          id="edit-family-relation"
-          className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8"
-          onSubmit={onEditRelation}>
-          <input type="hidden" name="_id" defaultValue={placeToEdit?._id} />
-          <input type="hidden" name="personId1" defaultValue={placeToEdit?.persons[0]} />
-          <input type="hidden" name="personId2" defaultValue={placeToEdit?.persons[1]} />
+        <form id="edit-place-name" className="tw-flex tw-w-full tw-flex-col tw-gap-4 tw-px-8 tw-py-4" onSubmit={onEditPlace}>
           <div>
-            <label htmlFor="description" className="form-text tailwindui">
-              Relation/commentaire
+            <label htmlFor="place" className="form-text tailwindui">
+              Nouveau nom
             </label>
             <input
-              className="form-text tailwindui"
-              id="description"
-              name="description"
               type="text"
-              placeholder="Père/fille, mère/fils..."
-              defaultValue={placeToEdit?.description}
+              id="place"
+              className="tailwindui"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder={placeToEdit?.name}
             />
           </div>
         </form>
@@ -257,11 +351,106 @@ const EditRelation = ({ open, setOpen, onEditRelation, onDeleteRelation, placeTo
         <button type="button" name="cancel" className="button-cancel" onClick={() => setOpen(null)}>
           Annuler
         </button>
-        <button type="button" className="button-destructive" onClick={() => onDeleteRelation(placeToEdit)}>
+        <button type="button" className="button-destructive" onClick={onDelete}>
           Supprimer
         </button>
-        <button type="submit" className="button-submit" form="edit-family-relation">
+        <button type="submit" className="button-submit" form="edit-place-name" disabled={updating}>
           Enregistrer
+        </button>
+      </ModalFooter>
+    </ModalContainer>
+  );
+};
+
+const HelpModal = ({ open, setOpen }) => {
+  const user = useRecoilValue(userState);
+
+  useEffect(() => {
+    if (!window.localStorage.getItem('lieux-fréquentés-help-modal-seen')) {
+      setOpen(true);
+    }
+    if (!open) {
+      window.localStorage.setItem('lieux-fréquentés-help-modal-seen', true);
+    }
+  }, [open, setOpen]);
+  return (
+    <ModalContainer open={open} size="3xl">
+      <ModalHeader title="Aide" />
+      <ModalBody>
+        <div className="tw-flex tw-flex-col tw-gap-4  tw-px-8 tw-py-4">
+          <h4>Fonctionnement actuel des Lieux Fréquentés</h4>
+          <p>
+            Un lieu peut être fréquenté par{' '}
+            <em>
+              <b> plusieurs personnes différentes.</b>
+            </em>
+            <br />
+            Ainsi, la liste de lieux disponibles n'est pas propre à une personne, mais est <em>commune à l'organisation</em>.
+            <br />
+            <br />
+            La liste des "Lieux fréquentés" ci-dessous est la liste des lieux fréquentés{' '}
+            <em>
+              <b>par cette personne.</b>
+            </em>
+            <br />
+            Ainsi, pour le moment, une personne peut fréquenter <em>plusieurs fois le même lieu.</em>
+          </p>
+          <h4>Évolution possible des Lieux Fréquentés</h4>
+          <p>
+            Depuis l'apparition de la fonction Rencontre, le fonctionnement des lieux fréquentés pourrait être amené à évoluer :
+            <ul className="tw-list-disc">
+              <li>Une Rencontre pourrait avoir un champ Lieu associé</li>
+              <li>
+                La liste ci-dessous pourrait alors devenir la liste des lieux fréquentés <em>uniques</em> de cette personne
+              </li>
+            </ul>
+          </p>
+          <p>Si vous approuvez un tel changement, ou si vous désapprouvez, vous pouvez nous le notifier en cliquant sur les boutons ci-dessous.</p>
+          <div className="tw-flex tw-justify-center tw-gap-4">
+            <button
+              type="button"
+              className="button-destructive tw-inline-flex tw-flex-1 tw-items-center"
+              onClick={() => {
+                capture('Changement fonctionnement lieu refusé', { user });
+                toast.success('Merci pour votre retour !');
+                setOpen(false);
+              }}>
+              Non, ne changez rien !
+            </button>
+            <button
+              type="button"
+              name="cancel"
+              className="button-cancel tw-inline-flex tw-flex-1 tw-items-center"
+              onClick={() => {
+                capture('Nouvelle idée fonctionnement lieu', { user });
+                toast.success('Merci pour votre retour, nous vous contacterons très bientôt !');
+                setOpen(false);
+              }}>
+              J'ai une autre idée, contactez-moi
+            </button>
+            <button
+              type="button"
+              className="button-submit tw-inline-flex tw-flex-1 tw-items-center"
+              onClick={() => {
+                capture('Changement fonctionnement lieu approuvé', { user });
+                toast.success('Merci pour votre retour !');
+                setOpen(false);
+              }}>
+              Je veux le nouveau fonctionnement !
+            </button>
+          </div>
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <button
+          type="button"
+          name="cancel"
+          className="button-cancel"
+          onClick={() => {
+            capture('Ne veux pas donner son avis sur les lieux', { user });
+            setOpen(null);
+          }}>
+          Fermer
         </button>
       </ModalFooter>
     </ModalContainer>
