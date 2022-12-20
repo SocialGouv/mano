@@ -1,3 +1,10 @@
+## [1.194.2](https://github.com/SocialGouv/mano/compare/v1.194.1...v1.194.2) (2022-12-20)
+
+
+### Bug Fixes
+
+* **dashboard,app:** comment with no more group ([#1105](https://github.com/SocialGouv/mano/issues/1105)) ([c8e43a5](https://github.com/SocialGouv/mano/commit/c8e43a59954a561b97cd4849eb252c4f454fc889))
+
 ## [1.194.1](https://github.com/SocialGouv/mano/compare/v1.194.0...v1.194.1) (2022-12-20)
 
 
