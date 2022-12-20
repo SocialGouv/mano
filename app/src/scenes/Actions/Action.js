@@ -49,6 +49,7 @@ const castToAction = (action) => {
     completedAt: action.completedAt || null,
     entityKey: action.entityKey || '',
     team: action.team || null,
+    teams: action.teams || undefined,
     structure: action.structure || null,
   };
 };
