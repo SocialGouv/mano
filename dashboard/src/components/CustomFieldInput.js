@@ -104,7 +104,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
           )}
           {!!['multi-choice'].includes(field.type) && (
             <SelectCustom
-              options={field.options.map((o) => ({ value: o, label: o }))}
+              options={(field.options || []).map((o) => ({ value: o, label: o }))}
               name={field.name}
               onChange={(values) => {
                 handleChange({ currentTarget: { value: values.map((o) => o.value), name: field.name } });
