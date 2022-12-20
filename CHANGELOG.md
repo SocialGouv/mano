@@ -1,3 +1,10 @@
+## [1.195.1](https://github.com/SocialGouv/mano/compare/v1.195.0...v1.195.1) (2022-12-20)
+
+
+### Bug Fixes
+
+* **dashboard:** multi choice ([19bead7](https://github.com/SocialGouv/mano/commit/19bead7be6c1cc32f8f80c38e4ae8631755c75d5))
+
 # [1.195.0](https://github.com/SocialGouv/mano/compare/v1.194.2...v1.195.0) (2022-12-20)
 
 
