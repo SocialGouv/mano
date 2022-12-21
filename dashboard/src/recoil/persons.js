@@ -127,3 +127,44 @@ export const usePreparePersonForEncryption = () => {
   };
   return preparePersonForEncryption;
 };
+
+const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+
+export const sortPersons = (sortBy, sortOrder) => (a, b) => {
+  if (sortBy === 'createdAt') {
+    return sortOrder === 'ASC' ? new Date(b.createdAt) - new Date(a.createdAt) : new Date(a.createdAt) - new Date(b.createdAt);
+  }
+  if (sortBy === 'formattedBirthDate') {
+    if (!a.birthdate && !b.birthdate) return defaultSort(a, b, sortOrder);
+    if (!a.birthdate) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.birthdate) return sortOrder === 'DESC' ? 1 : -1;
+    return sortOrder === 'ASC' ? new Date(b.birthdate) - new Date(a.birthdate) : new Date(a.birthdate) - new Date(b.birthdate);
+  }
+  if (sortBy === 'alertness') {
+    if (a.alertness === b.alertness) return defaultSort(a, b, sortOrder);
+    if (!a.alertness) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.alertness) return sortOrder === 'DESC' ? 1 : -1;
+    return 0;
+  }
+  if (sortBy === 'group') {
+    if (!!a.group === !!b.group) return defaultSort(a, b, sortOrder);
+    if (!a.group) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.group) return sortOrder === 'DESC' ? 1 : -1;
+    return 0;
+  }
+  if (sortBy === 'user') {
+    if (!a.userPopulated && !b.userPopulated) return defaultSort(a, b, sortOrder);
+    if (!a.userPopulated) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.userPopulated) return sortOrder === 'ASC' ? -1 : 1;
+    return sortOrder === 'ASC' ? a.userPopulated.name.localeCompare(b.userPopulated.name) : b.userPopulated.name.localeCompare(a.userPopulated.name);
+  }
+  if (sortBy === 'followedSince') {
+    if (!a.followedSince && !b.followedSince) return defaultSort(a, b, sortOrder);
+    if (!a.followedSince) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.followedSince) return sortOrder === 'DESC' ? 1 : -1;
+    return sortOrder === 'ASC' ? new Date(b.followedSince) - new Date(a.followedSince) : new Date(a.followedSince) - new Date(b.followedSince);
+  }
+  // DEFAULT SORTING
+  // (sortBy === 'name')
+  return defaultSort(a, b, sortOrder);
+};

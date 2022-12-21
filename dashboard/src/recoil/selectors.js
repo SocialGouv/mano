@@ -1,4 +1,4 @@
-import { currentTeamState, userState } from './auth';
+import { currentTeamState, userState, usersState } from './auth';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
@@ -14,6 +14,18 @@ import { medicalFileState } from './medicalFiles';
 import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
 import { groupsState } from './groups';
+
+const usersObjectSelector = selector({
+  key: 'usersObjectSelector',
+  get: ({ get }) => {
+    const users = get(usersState);
+    const usersObject = {};
+    for (const user of users) {
+      usersObject[user._id] = { ...user };
+    }
+    return usersObject;
+  },
+});
 
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
@@ -92,8 +104,9 @@ export const itemsGroupedByPersonSelector = selector({
     const persons = get(personsState);
     const personsObject = {};
     const user = get(userState);
+    const usersObject = get(usersObjectSelector);
     for (const person of persons) {
-      personsObject[person._id] = { ...person };
+      personsObject[person._id] = { ...person, userPopulated: usersObject[person.user] };
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);

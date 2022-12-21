@@ -33,7 +33,7 @@ import ActionOrConsultationName from '../../components/ActionOrConsultationName'
 import ReportDescriptionModale from '../../components/ReportDescriptionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { commentsState } from '../../recoil/comments';
-import { personsState } from '../../recoil/persons';
+import { personsState, sortPersons } from '../../recoil/persons';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
@@ -272,6 +272,8 @@ const View = () => {
     [dateString, selectedTeamsObject, territoryObservations]
   );
 
+  const [personSortBy, setPersonSortBy] = useLocalStorage('person-sortBy', 'name');
+  const [personSortOrder, setPersonSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
   const persons = useMemo(
     () =>
       allPersons
@@ -287,8 +289,8 @@ const View = () => {
             currentTeam?.nightSession ? 12 : 0
           );
         })
-        .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
-    [allPersons, selectedTeamsObject, dateString, viewAllOrganisationData]
+        .sort(sortPersons(personSortBy, personSortOrder)),
+    [allPersons, selectedTeamsObject, dateString, viewAllOrganisationData, personSortBy, personSortOrder]
   );
 
   useTitle(`${dayjs(dateString).format('DD-MM-YYYY')} - Compte rendu`);
@@ -357,6 +359,15 @@ const View = () => {
         )}
         <PassagesCreatedAt date={dateString} passages={passages} />
         <RencontresCreatedAt date={dateString} rencontres={rencontres} />
+        <PersonCreatedAt
+          date={dateString}
+          reports={selectedTeamsReports}
+          persons={persons}
+          setSortBy={setPersonSortBy}
+          setSortOrder={setPersonSortOrder}
+          sortBy={personSortBy}
+          sortOrder={personSortOrder}
+        />
         {!['restricted-access'].includes(user.role) && (
           <>
             <TerritoryObservationsCreatedAt date={dateString} observations={observations} />
@@ -625,7 +636,15 @@ const View = () => {
             )}
             {activeTab === 'persons-created' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <PersonCreatedAt date={dateString} reports={selectedTeamsReports} persons={persons} />
+                <PersonCreatedAt
+                  date={dateString}
+                  reports={selectedTeamsReports}
+                  persons={persons}
+                  setSortBy={setPersonSortBy}
+                  setSortOrder={setPersonSortOrder}
+                  sortBy={personSortBy}
+                  sortOrder={personSortOrder}
+                />
               </div>
             )}
             {activeTab === 'consultations' && (
@@ -1402,7 +1421,7 @@ const TerritoryObservationsCreatedAt = ({ date, observations }) => {
   );
 };
 
-const PersonCreatedAt = ({ date, persons }) => {
+const PersonCreatedAt = ({ date, persons, setSortBy, setSortOrder, sortBy, sortOrder }) => {
   const data = persons;
   const history = useHistory();
 
@@ -1426,13 +1445,28 @@ const PersonCreatedAt = ({ date, persons }) => {
             {
               title: 'Heure',
               dataKey: 'createdAt',
-              render: (obs) => <span>{dayjs(obs.createdAt).format('HH:mm')}</span>,
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+              render: (p) => <span>{dayjs(p.createdAt).format('HH:mm')}</span>,
             },
-            { title: 'Personne (nom)', dataKey: 'name' },
+            {
+              title: 'Personne (nom)',
+              dataKey: 'name',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+            },
             {
               title: 'Utilisateur (créateur)',
               dataKey: 'user',
-              render: (obs) => <UserName id={obs.user} />,
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+              render: (p) => <UserName id={p.user} />,
             },
             {
               title: 'Équipe en charge',

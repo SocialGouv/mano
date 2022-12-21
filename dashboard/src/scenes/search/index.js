@@ -15,7 +15,7 @@ import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
 import { organisationState, teamsState } from '../../recoil/auth';
 import { actionsState, CANCEL, DONE } from '../../recoil/actions';
-import { personsState } from '../../recoil/persons';
+import { personsState, sortPersons } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
@@ -194,12 +194,14 @@ const personsWithFormattedBirthDateSelector = selector({
 const personsFilteredBySearchForSearchSelector = selectorFamily({
   key: 'personsFilteredBySearchForSearchSelector',
   get:
-    ({ search }) =>
+    ({ search, sortBy, sortOrder }) =>
     ({ get }) => {
       const persons = get(personsWithFormattedBirthDateSelector);
       const personsPopulated = get(itemsGroupedByPersonSelector);
       if (!search?.length) return [];
-      return filterBySearch(search, persons).map((p) => personsPopulated[p._id]);
+      return filterBySearch(search, persons)
+        .map((p) => personsPopulated[p._id])
+        .sort(sortPersons(sortBy, sortOrder));
     },
 });
 
@@ -208,7 +210,9 @@ const Persons = ({ search, onUpdateResults }) => {
   const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
 
-  const data = useRecoilValue(personsFilteredBySearchForSearchSelector({ search }));
+  const [sortBy, setSortBy] = useLocalStorage('person-sortBy', 'name');
+  const [sortOrder, setSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
+  const data = useRecoilValue(personsFilteredBySearchForSearchSelector({ search, sortBy, sortOrder }));
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -240,6 +244,10 @@ const Persons = ({ search, onUpdateResults }) => {
             {
               title: '',
               dataKey: 'group',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
               small: true,
               render: (person) => {
                 if (!person.group) return null;
@@ -252,10 +260,21 @@ const Persons = ({ search, onUpdateResults }) => {
                 );
               },
             },
-            { title: 'Nom', dataKey: 'name' },
+            {
+              title: 'Nom',
+              dataKey: 'name',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+            },
             {
               title: 'Vigilance',
               dataKey: 'alertness',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
               render: (p) =>
                 p.alertness ? (
                   <ExclamationMarkButton
@@ -265,7 +284,15 @@ const Persons = ({ search, onUpdateResults }) => {
                 ) : null,
             },
             { title: 'Équipe(s) en charge', dataKey: 'assignedTeams', render: (person) => <Teams teams={teams} person={person} /> },
-            { title: 'Suivi(e) depuis le', dataKey: 'followedSince', render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || '') },
+            {
+              title: 'Suivi(e) depuis le',
+              dataKey: 'followedSince',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+              render: (p) => formatDateWithFullMonth(p.followedSince || p.createdAt || ''),
+            },
           ].filter((c) => organisation.groupsEnabled || c.dataKey !== 'group')}
         />
       </StyledBox>
