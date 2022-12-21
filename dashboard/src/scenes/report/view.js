@@ -185,7 +185,7 @@ const View = () => {
         .filter((a) => {
           return getIsDayWithinHoursOffsetOfPeriod(a.completedAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
         })
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } })),
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF99' } })),
     [allConsultations, dateString]
   );
   const consultationsDone = useMemo(() => consultations(DONE), [consultations]);
@@ -197,7 +197,7 @@ const View = () => {
         .filter((a) => {
           return getIsDayWithinHoursOffsetOfPeriod(a.createdAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
         })
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF' } }))
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF99' } }))
         .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)),
     [allConsultations, dateString]
   );
@@ -232,7 +232,7 @@ const View = () => {
         })
         .filter((c) => c.action || c.person)
         .map((a) => {
-          if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+          if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca99' } };
           return a;
         })
         .sort((a, b) => new Date(a.date || a.createdAt) - new Date(b.date || b.createdAt)),
@@ -838,7 +838,7 @@ const ActionCompletedAt = ({ date, status, actions }) => {
             date
           )}`}
           noData={`Pas d'action ${status === CANCEL ? 'annulée' : 'faite'} ce jour`}
-          data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
+          data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a))}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
           dataTestId="name"
@@ -912,7 +912,7 @@ const ActionCreatedAt = ({ date, actions }) => {
           className="Table"
           title={`Action${moreThanOne ? 's' : ''} créée${moreThanOne ? 's' : ''} le ${formatDateWithFullMonth(date)}`}
           noData="Pas d'action créée ce jour"
-          data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a))}
+          data={data.map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a))}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
           dataTestId="name"
