@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
-import { selector, selectorFamily, useRecoilValue } from 'recoil';
+import { selectorFamily, useRecoilValue } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
@@ -14,15 +14,15 @@ import SelectCustom from '../../components/SelectCustom';
 import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import PersonName from '../../components/PersonName';
 import { formatTime } from '../../services/date';
-import { CANCEL, DONE, mappedIdsToLabels, TODO } from '../../recoil/actions';
+import { CANCEL, DONE, mappedIdsToLabels, sortActionsOrConsultations, TODO } from '../../recoil/actions';
 import { currentTeamState, teamsState, organisationState, userState } from '../../recoil/auth';
-import { itemsGroupedByActionSelector, personsWithPlacesSelector } from '../../recoil/selectors';
+import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import ConsultationButton from '../../components/ConsultationButton';
-import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
+import { disableConsultationRow } from '../../recoil/consultations';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
@@ -33,15 +33,6 @@ import TagTeam from '../../components/TagTeam';
 import ConsultationModal from '../../components/ConsultationModal';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
-
-const arrayOfitemsGroupedByActionSelector = selector({
-  key: 'arrayOfitemsGroupedByActionSelector',
-  get: ({ get }) => {
-    const itemsGroupedByAction = get(itemsGroupedByActionSelector);
-    const itemsGroupedByActionArray = Object.values(itemsGroupedByAction);
-    return itemsGroupedByActionArray;
-  },
-});
 
 const actionsByTeamAndStatusSelector = selectorFamily({
   key: 'actionsByTeamAndStatusSelector',
@@ -59,29 +50,6 @@ const actionsByTeamAndStatusSelector = selectorFamily({
     },
 });
 
-const itemsGroupedByConsultationSelector = selector({
-  key: 'itemsGroupedByConsultationSelector',
-  get: ({ get }) => {
-    const consultations = get(consultationsState);
-    const personsWithPlacesObject = get(personsWithPlacesSelector);
-
-    const consultationObject = {};
-    for (const consultation of consultations) {
-      consultationObject[consultation._id] = { ...consultation, personPopulated: personsWithPlacesObject[consultation.person] };
-    }
-    return consultationObject;
-  },
-});
-
-const arrayOfitemsGroupedByConsultationSelector = selector({
-  key: 'arrayOfitemsGroupedByConsultationSelector',
-  get: ({ get }) => {
-    const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
-    const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
-    return itemsGroupedByConsultationArray;
-  },
-});
-
 const consultationsByStatusSelector = selectorFamily({
   key: 'consultationsByStatusSelector',
   get:
@@ -96,18 +64,18 @@ const consultationsByStatusSelector = selectorFamily({
 const dataFilteredBySearchSelector = selectorFamily({
   key: 'dataFilteredBySearchSelector',
   get:
-    ({ search, statuses, categories, teamIds, viewAllOrganisationData }) =>
+    ({ search, statuses, categories, teamIds, viewAllOrganisationData, sortBy, sortOrder }) =>
     ({ get }) => {
       const actions = get(actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewAllOrganisationData }));
       // When we filter by category, we don't want to see all consultations.
       const consultations = categories?.length ? [] : get(consultationsByStatusSelector({ statuses }));
       if (!search) {
-        const dataFitered = [...actions, ...consultations].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt));
+        const dataFitered = [...actions, ...consultations].sort(sortActionsOrConsultations(sortBy, sortOrder));
         return dataFitered;
       }
       const actionsFiltered = filterBySearch(search, actions);
       const consultationsFiltered = filterBySearch(search, consultations);
-      const dataFitered = [...actionsFiltered, ...consultationsFiltered].sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt));
+      const dataFitered = [...actionsFiltered, ...consultationsFiltered].sort(sortActionsOrConsultations(sortBy, sortOrder));
       return dataFitered;
     },
 });
@@ -136,9 +104,11 @@ const List = () => {
 
   const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useLocalStorage('action-showAs', showAsOptions[0]); // calendar, list
+  const [sortBy, setSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
+  const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
 
   const dataConsolidated = useRecoilValue(
-    dataFilteredBySearchSelector({ search, statuses, categories, teamIds: selectedTeamIds, viewAllOrganisationData })
+    dataFilteredBySearchSelector({ search, statuses, categories, teamIds: selectedTeamIds, viewAllOrganisationData, sortBy, sortOrder })
   );
   const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
 
@@ -307,6 +277,10 @@ const List = () => {
                 title: '',
                 dataKey: 'urgentOrGroupOrConsultation',
                 small: true,
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 render: (actionOrConsult) => {
                   return (
                     <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
@@ -324,6 +298,10 @@ const List = () => {
               {
                 title: 'Date',
                 dataKey: 'dueAt' || '_id',
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 render: (action) => {
                   return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
                 },
@@ -338,15 +316,31 @@ const List = () => {
               },
               {
                 title: 'Nom',
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 dataKey: 'name',
                 render: (action) => <ActionOrConsultationName item={action} />,
               },
               {
                 title: 'Personne suivie',
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
                 dataKey: 'person',
                 render: (action) => <PersonName item={action} />,
               },
-              { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+              {
+                title: 'Statut',
+                onSortOrder: setSortOrder,
+                onSortBy: setSortBy,
+                sortBy,
+                sortOrder,
+                dataKey: 'status',
+                render: (action) => <ActionStatus status={action.status} />,
+              },
               {
                 title: 'Équipe en charge',
                 dataKey: 'team',

@@ -1,4 +1,4 @@
-import { currentTeamState, userState } from './auth';
+import { currentTeamState, userState, usersState } from './auth';
 import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
@@ -14,6 +14,18 @@ import { medicalFileState } from './medicalFiles';
 import { treatmentsState } from './treatments';
 import { rencontresState } from './rencontres';
 import { groupsState } from './groups';
+
+const usersObjectSelector = selector({
+  key: 'usersObjectSelector',
+  get: ({ get }) => {
+    const users = get(usersState);
+    const usersObject = {};
+    for (const user of users) {
+      usersObject[user._id] = { ...user };
+    }
+    return usersObject;
+  },
+});
 
 export const currentTeamReportsSelector = selector({
   key: 'currentTeamReportsSelector',
@@ -218,20 +230,6 @@ export const personsWithMedicalFileMergedSelector = selector({
     }));
   },
 });
-export const itemsGroupedByActionSelector = selector({
-  key: 'itemsGroupedByActionSelector',
-  get: ({ get }) => {
-    const actionsWithCommentsObject = get(actionsWithCommentsSelector);
-    const personsWithPlacesObject = get(personsWithPlacesSelector);
-
-    const actionsObject = {};
-    for (const actionId of Object.keys(actionsWithCommentsObject)) {
-      const action = actionsWithCommentsObject[actionId];
-      actionsObject[actionId] = { ...action, personPopulated: personsWithPlacesObject[action.person] };
-    }
-    return actionsObject;
-  },
-});
 
 export const personsWithPlacesSelector = selector({
   key: 'personsWithPlacesSelector',
@@ -252,6 +250,63 @@ export const personsWithPlacesSelector = selector({
       personsObject[relPersonPlace.person].places[place._id] = place.name;
     }
     return personsObject;
+  },
+});
+
+export const itemsGroupedByActionSelector = selector({
+  key: 'itemsGroupedByActionSelector',
+  get: ({ get }) => {
+    const actionsWithCommentsObject = get(actionsWithCommentsSelector);
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+    const usersObject = get(usersObjectSelector);
+
+    const actionsObject = {};
+    for (const actionId of Object.keys(actionsWithCommentsObject)) {
+      const action = actionsWithCommentsObject[actionId];
+      actionsObject[actionId] = {
+        ...action,
+        personPopulated: personsWithPlacesObject[action.person],
+        userPopulated: action.user ? usersObject[action.user] : null,
+      };
+    }
+    return actionsObject;
+  },
+});
+
+export const arrayOfitemsGroupedByActionSelector = selector({
+  key: 'arrayOfitemsGroupedByActionSelector',
+  get: ({ get }) => {
+    const itemsGroupedByAction = get(itemsGroupedByActionSelector);
+    const itemsGroupedByActionArray = Object.values(itemsGroupedByAction);
+    return itemsGroupedByActionArray;
+  },
+});
+
+export const itemsGroupedByConsultationSelector = selector({
+  key: 'itemsGroupedByConsultationSelector',
+  get: ({ get }) => {
+    const consultations = get(consultationsState);
+    const personsWithPlacesObject = get(personsWithPlacesSelector);
+    const usersObject = get(usersObjectSelector);
+
+    const consultationObject = {};
+    for (const consultation of consultations) {
+      consultationObject[consultation._id] = {
+        ...consultation,
+        personPopulated: personsWithPlacesObject[consultation.person],
+        userPopulated: consultation.user ? usersObject[consultation.user] : null,
+      };
+    }
+    return consultationObject;
+  },
+});
+
+export const arrayOfitemsGroupedByConsultationSelector = selector({
+  key: 'arrayOfitemsGroupedByConsultationSelector',
+  get: ({ get }) => {
+    const itemsGroupedByConsultation = get(itemsGroupedByConsultationSelector);
+    const itemsGroupedByConsultationArray = Object.values(itemsGroupedByConsultation);
+    return itemsGroupedByConsultationArray;
   },
 });
 
