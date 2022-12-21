@@ -58,7 +58,18 @@ const getDataForPeriod = (
     )
   );
 };
-const tabs = ['Général', 'Accueil', 'Actions', 'Personnes suivies', 'Passages', 'Rencontres', 'Observations', 'Comptes-rendus', 'Consultations'];
+const tabs = [
+  'Général',
+  'Accueil',
+  'Actions',
+  'Personnes suivies',
+  'Passages',
+  'Rencontres',
+  'Observations',
+  'Comptes-rendus',
+  'Consultations',
+  'Dossiers médicaux',
+];
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -85,7 +96,10 @@ const Stats = () => {
 
   const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
   const [activeTab, setActiveTab] = useLocalStorage('stats-tab', 0);
-  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', [
+  const [filterPersonsNotMedical, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', [
+    { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
+  ]);
+  const [filterMedicalFiles, setFilterMedicalFiles] = useLocalStorage('stats-filterMedicalFiles-defaultEverybody', [
     { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
   ]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
@@ -93,11 +107,12 @@ const Stats = () => {
   const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
   const [selectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
 
-  useTitle(`${tabs[activeTab]} - Statistiques`);
+  const filterPersons = useMemo(
+    () => (activeTab === tabs.findIndex((tab) => tab === 'Dossiers médicaux') ? filterPersonsNotMedical : filterMedicalFiles),
+    [activeTab, filterPersonsNotMedical, filterMedicalFiles]
+  );
 
-  const addFilter = ({ field, value }) => {
-    setFilterPersons((filters) => [...filters, { field, value }]);
-  };
+  useTitle(`${tabs[activeTab]} - Statistiques`);
 
   const filterByTeam = useCallback(
     (elements, key) => {
@@ -342,7 +357,10 @@ const Stats = () => {
 
   const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);
   // Add enabled custom fields in filters.
-  const filterPersonsWithAllFields = [
+  const filterPersonsWithAllFields = (withMedicalWiles = false) => [
+    ...(withMedicalWiles ? customFieldsMedicalFile : [])
+      .filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id))
+      .map((a) => ({ field: a.name, ...a })),
     ...filterPersonsBase.map((f) =>
       f.field !== 'outOfActiveList'
         ? f
@@ -354,7 +372,6 @@ const Stats = () => {
     ),
     ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
-    ...customFieldsMedicalFile.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
   ];
 
   if (isLoading) return <Loading />;
@@ -404,7 +421,7 @@ const Stats = () => {
       </Row>
       <Nav tabs style={{ marginBottom: 20 }}>
         {tabs
-          .filter((e) => user.healthcareProfessional || e !== 'Consultations')
+          .filter((e) => user.healthcareProfessional || ['Consultations', 'Dossiers médicaux'].includes(e))
           .map((tabCaption, index) => {
             if (!organisation.receptionEnabled && index === 1) return null;
             return (
@@ -513,7 +530,7 @@ const Stats = () => {
         </TabPane>
         <TabPane tabId={3}>
           <Title>Statistiques des personnes suivies</Title>
-          <Filters base={filterPersonsWithAllFields} filters={filterPersons} onChange={setFilterPersons} />
+          <Filters base={filterPersonsWithAllFields()} filters={filterPersons} onChange={setFilterPersons} />
           <Row>
             <Block data={personsForStats} title="Nombre de personnes créées" />
             <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
@@ -521,7 +538,6 @@ const Stats = () => {
             <BlockWanderingAt persons={personsForStats} />
           </Row>
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Nationalité"
             field="nationalitySituation"
             data={getPieData(personsForStats, 'nationalitySituation', {
@@ -529,25 +545,21 @@ const Stats = () => {
             })}
           />
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Genre"
             field="gender"
             data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
           />
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Situation personnelle"
             field="personalSituation"
             data={getPieData(personsForStats, 'personalSituation', { options: personFields.find((f) => f.name === 'personalSituation').options })}
           />
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Motif de la situation de rue"
             field="reasons"
             data={getPieData(personsForStats, 'reasons', { options: personFields.find((f) => f.name === 'reasons').options })}
           />
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Ressources des personnes suivies"
             field="resources"
             data={getPieData(personsForStats, 'resources', { options: personFields.find((f) => f.name === 'resources').options })}
@@ -555,28 +567,24 @@ const Stats = () => {
           <AgeRangeBar persons={personsForStats} />
           <StatsCreatedAtRangeBar persons={personsForStats} />
           <StatsWanderingAtRangeBar persons={personsForStats} />
-          <CustomResponsivePie onAddFilter={addFilter} title="Type d'hébergement" data={getAdressPieData(personsForStats)} />
+          <CustomResponsivePie title="Type d'hébergement" data={getAdressPieData(personsForStats)} />
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Couverture médicale des personnes"
             field="healthInsurances"
             data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
           />
-          <CustomResponsivePie onAddFilter={addFilter} title="Avec animaux" data={getPieData(personsForStats, 'hasAnimal')} />
+          <CustomResponsivePie title="Avec animaux" data={getPieData(personsForStats, 'hasAnimal')} />
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Personnes très vulnérables"
             field="alertness"
             data={getPieData(personsForStats, 'alertness', { isBoolean: true })}
           />
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Sortie de file active"
             field="outOfActiveList"
             data={getPieData(persons, 'outOfActiveList', { isBoolean: true })}
           />
           <CustomResponsivePie
-            onAddFilter={addFilter}
             title="Raison de sortie de file active"
             field="outOfActiveListReasons"
             data={getPieData(
@@ -587,7 +595,6 @@ const Stats = () => {
           />
           <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsMedical} />
           <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsSocial} />
-          <CustomFieldsStats data={personsForStats} customFields={customFieldsMedicalFile} />
         </TabPane>
         <TabPane tabId={4}>
           <Title>Statistiques des passages</Title>
@@ -681,24 +688,42 @@ const Stats = () => {
           />
         </TabPane>
         {user.healthcareProfessional && (
-          <TabPane tabId={8}>
-            <Title>Statistiques des consultations</Title>
-            <Row style={{ marginBottom: '20px' }}>
-              <Col md={4} />
-              <Block data={consultations} title="Nombre de consultations" />
-              <Col md={4} />
-            </Row>
-            <CustomResponsivePie title="Consultations par type" data={getPieData(consultations, 'type')} />
-            <CustomResponsivePie title="Consultations par statut" data={getPieData(consultations, 'status')} />
-            {organisation.consultations.map((c) => {
-              return (
-                <div key={c.name}>
-                  <h4 style={{ color: '#444', fontSize: '20px', margin: '2rem 0' }}>Statistiques des consultations de type « {c.name} »</h4>
-                  <CustomFieldsStats data={consultations.filter((d) => d.type === c.name)} customFields={c.fields} />
-                </div>
-              );
-            })}
-          </TabPane>
+          <>
+            <TabPane tabId={8}>
+              <Title>Statistiques des consultations</Title>
+              <Row style={{ marginBottom: '20px' }}>
+                <Col md={4} />
+                <Block data={consultations} title="Nombre de consultations" />
+                <Col md={4} />
+              </Row>
+              <CustomResponsivePie title="Consultations par type" data={getPieData(consultations, 'type')} />
+              <CustomResponsivePie title="Consultations par statut" data={getPieData(consultations, 'status')} />
+              {organisation.consultations.map((c) => {
+                return (
+                  <div key={c.name}>
+                    <h4 style={{ color: '#444', fontSize: '20px', margin: '2rem 0' }}>Statistiques des consultations de type « {c.name} »</h4>
+                    <CustomFieldsStats data={consultations.filter((d) => d.type === c.name)} customFields={c.fields} />
+                  </div>
+                );
+              })}
+            </TabPane>
+            <TabPane tabId={9}>
+              <Title>Statistiques des dossiers médicaux</Title>
+              <Filters base={filterPersonsWithAllFields(true)} filters={filterMedicalFiles} onChange={setFilterMedicalFiles} />
+              <AgeRangeBar persons={personsForStats} />
+              <CustomResponsivePie
+                title="Genre"
+                field="gender"
+                data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
+              />
+              <CustomResponsivePie
+                title="Couverture médicale des personnes"
+                field="healthInsurances"
+                data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
+              />
+              <CustomFieldsStats data={personsForStats} customFields={customFieldsMedicalFile} />
+            </TabPane>
+          </>
         )}
       </TabContent>
     </>
