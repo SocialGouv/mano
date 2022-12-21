@@ -5,13 +5,14 @@ import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
+import { useLocalStorage } from 'react-use';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
 import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from '../../recoil/territory';
+import { territoryTypes, territoriesState, prepareTerritoryForEncryption, sortTerritories } from '../../recoil/territory';
 import SelectCustom from '../../components/SelectCustom';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
@@ -33,15 +34,17 @@ const List = () => {
 
   const territories = useRecoilValue(territoriesState);
   const territoryObservations = useRecoilValue(onlyFilledObservationsTerritories);
+  const [sortBy, setSortBy] = useLocalStorage('territory-sortBy', 'name');
+  const [sortOrder, setSortOrder] = useLocalStorage('territory-sortOrder', 'ASC');
 
   const filteredTerritories = useMemo(() => {
-    if (!search.length) return territories;
+    if (!search.length) return [...territories].sort(sortTerritories(sortBy, sortOrder));
     const territoriesIdsByTerritoriesSearch = filterBySearch(search, territories).map((t) => t._id);
     const territoriesIdsFilteredByObsSearch = filterBySearch(search, territoryObservations).map((obs) => obs.territory);
 
     const territoriesIdsFilterBySearch = [...new Set([...territoriesIdsByTerritoriesSearch, ...territoriesIdsFilteredByObsSearch])];
-    return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id));
-  }, [territoryObservations, territories, search]);
+    return territories.filter((t) => territoriesIdsFilterBySearch.includes(t._id)).sort(sortTerritories(sortBy, sortOrder));
+  }, [territoryObservations, territories, search, sortBy, sortOrder]);
 
   const limit = 20;
   const data = useMemo(
@@ -79,10 +82,40 @@ const List = () => {
         rowKey={'_id'}
         onRowClick={(territory) => history.push(`/territory/${territory._id}`)}
         columns={[
-          { title: 'Nom', dataKey: 'name' },
-          { title: 'Types', dataKey: 'types', render: ({ types }) => (types ? types.join(', ') : '') },
-          { title: 'Périmètre', dataKey: 'perimeter' },
-          { title: 'Créé le', dataKey: 'createdAt', render: (territory) => formatDateWithFullMonth(territory.createdAt || '') },
+          {
+            title: 'Nom',
+            dataKey: 'name',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+          },
+          {
+            title: 'Types',
+            dataKey: 'types',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: ({ types }) => (types ? types.join(', ') : ''),
+          },
+          {
+            title: 'Périmètre',
+            dataKey: 'perimeter',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+          },
+          {
+            title: 'Créé le',
+            dataKey: 'createdAt',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: (territory) => formatDateWithFullMonth(territory.createdAt || ''),
+          },
         ]}
       />
       <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />

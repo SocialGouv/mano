@@ -39,3 +39,29 @@ export const territoryTypes = [
   'Rassemblement communautaire',
   'Historique',
 ];
+
+const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+
+export const sortTerritories = (sortBy, sortOrder) => (a, b) => {
+  if (sortBy === 'types') {
+    if (!a.types?.length && !b.types?.length) return defaultSort(a, b, sortOrder);
+    if (!a.types?.length) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.types?.length) return sortOrder === 'ASC' ? -1 : 1;
+    const aTypes = a.types.join(' ');
+    const bTypes = b.types.join(' ');
+    return sortOrder === 'ASC' ? aTypes.localeCompare(bTypes) : bTypes.localeCompare(aTypes);
+  }
+  if (sortBy === 'perimeter') {
+    if (!a.perimeter?.length && !b.perimeter?.length) return defaultSort(a, b, sortOrder);
+    if (!a.perimeter?.length) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.perimeter?.length) return sortOrder === 'ASC' ? -1 : 1;
+    return sortOrder === 'ASC' ? a.perimeter.localeCompare(b.perimeter) : b.perimeter.localeCompare(a.perimeter);
+  }
+  if (sortBy === 'createdAt') {
+    if (a.createdAt > b.createdAt) return sortOrder === 'ASC' ? 1 : -1;
+    if (a.createdAt < b.createdAt) return sortOrder === 'ASC' ? -1 : 1;
+    return defaultSort(a, b, sortOrder);
+  }
+  // default sort: name
+  return defaultSort(a, b, sortOrder);
+};
