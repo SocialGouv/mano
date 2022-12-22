@@ -26,9 +26,12 @@ const Container = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  /* width: 120px; */
   margin: 0;
   padding: 0;
+  color: #444;
+  background-color: #ffffffcc;
+  border: 1px solid #999;
+  max-width: 85px;
   > span {
     width: 100px;
     display: block;
