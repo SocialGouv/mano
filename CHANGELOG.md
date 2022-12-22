@@ -1,3 +1,10 @@
+# [1.197.0](https://github.com/SocialGouv/mano/compare/v1.196.1...v1.197.0) (2022-12-22)
+
+
+### Features
+
+* show familles in stats ([#1102](https://github.com/SocialGouv/mano/issues/1102)) ([d0a7478](https://github.com/SocialGouv/mano/commit/d0a747877a1df6ca5ad7b132ec70d8558aa50aa8))
+
 ## [1.196.1](https://github.com/SocialGouv/mano/compare/v1.196.0...v1.196.1) (2022-12-20)
 
 
