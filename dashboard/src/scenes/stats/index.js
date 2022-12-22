@@ -436,27 +436,9 @@ const Stats = () => {
         <TabPane tabId={0}>
           <h3 className="tw-my-5 tw-text-xl">Statistiques générales</h3>
           <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <div className="tw-basis-1/6" />
             <Block data={personsForStats} title="Nombre de personnes créées" />
             <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
-          </div>
-          <hr />
-          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <div className="tw-basis-1/6" />
-            <BlockGroup groups={groupsForPersons(personsForStats)} title="Nombre de familles dans lesquelles se trouvent des personnes créées" />
-            <BlockGroup
-              groups={groupsForPersons(personsUpdatedForStats)}
-              title="Nombre de familles dans lesquelles se trouvent des personnes suivies"
-            />
-          </div>
-          <hr />
-          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <div className="tw-basis-1/6" />
-            <Block data={passages.length} title="Nombre de passages" />
             <Block data={rencontres.length} title="Nombre de rencontres" />
-          </div>
-          <hr />
-          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
             <Block data={actions} title="Nombre d'actions" />
             <Block data={numberOfActionsPerPerson} title="Nombre d'actions par personne" />
             <Block data={numberOfActionsPerPersonConcernedByActions} title="Nombre d'actions par personne concernée par au moins une action" />
@@ -465,9 +447,9 @@ const Stats = () => {
         {!!organisation.receptionEnabled && (
           <TabPane tabId={1}>
             <h3 className="tw-my-5 tw-text-xl">Statistiques de l'accueil</h3>
-            <Row>
+            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
               <Block data={passages.length} title="Nombre de passages" />
-            </Row>
+            </div>
             <CustomResponsivePie
               title="Services"
               data={organisation.services?.map((service) => {
@@ -549,15 +531,10 @@ const Stats = () => {
           <h3 className="tw-my-5 tw-text-xl">Statistiques des personnes suivies</h3>
           <Filters base={filterPersonsWithAllFields} filters={filterPersons} onChange={setFilterPersons} />
           <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <div className="tw-basis-1/6" />
             <Block data={personsForStats} title="Nombre de personnes créées" />
             <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
-            <div className="tw-basis-1/6" />
-            <div className="tw-basis-1/6" />
             <BlockCreatedAt persons={personsForStats} />
             <BlockWanderingAt persons={personsForStats} />
-            <div className="tw-basis-1/6" />
-            <div className="tw-basis-1/6" />
             <BlockGroup groups={groupsForPersons(personsForStats)} title="Nombre de familles dans lesquelles se trouvent des personnes créées" />
             <BlockGroup
               groups={groupsForPersons(personsUpdatedForStats)}
@@ -958,7 +935,7 @@ const StatsWanderingAtRangeBar = ({ persons }) => {
 };
 
 const Block = ({ data, title = 'Nombre de personnes suivies' }) => (
-  <div className="tw-basis-1/3 tw-px-4 tw-py-2">
+  <div className="tw-px-4 tw-py-2 md:tw-basis-1/2 lg:tw-basis-1/3">
     <Card title={title} count={Array.isArray(data) ? String(data.length) : data} />
   </div>
 );
@@ -987,7 +964,7 @@ const BlockDateWithTime = ({ data, field }) => {
 const BlockCreatedAt = ({ persons }) => {
   if (persons.length === 0) {
     return (
-      <div className="tw-basis-1/3 tw-px-4 tw-py-2">
+      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
         <Card title="Temps de suivi moyen" count={'-'} />
       </div>
     );
@@ -998,7 +975,7 @@ const BlockCreatedAt = ({ persons }) => {
   const [count, unit] = getDuration(durationFromNowToAverage);
 
   return (
-    <div className="tw-basis-1/3 tw-px-4 tw-py-2">
+    <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
       <Card title="Temps de suivi moyen" unit={unit} count={count} />
     </div>
   );
@@ -1008,7 +985,7 @@ const BlockWanderingAt = ({ persons }) => {
   persons = persons.filter((p) => Boolean(p.wanderingAt));
   if (!persons.length) {
     return (
-      <div className="tw-basis-1/3 tw-px-4 tw-py-2">
+      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
         <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={'N/A'} count={0} />
       </div>
     );
@@ -1018,7 +995,7 @@ const BlockWanderingAt = ({ persons }) => {
   const [count, unit] = getDuration(durationFromNowToAverage);
 
   return (
-    <div className="tw-basis-1/3 tw-px-4 tw-py-2">
+    <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
       <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={unit} count={count} />
     </div>
   );
@@ -1053,12 +1030,16 @@ const BlockTotal = ({ title, unit, data, field }) => {
 const BlockGroup = ({ title, groups }) => {
   try {
     if (!groups.length) {
-      return <Card title={title} count={0} />;
+      return (
+        <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
+          <Card title={title} count={0} />
+        </div>
+      );
     }
 
     const avg = groups.reduce((total, group) => total + group.relations.length, 0) / groups.length;
     return (
-      <div className="tw-basis-1/3 tw-px-4 tw-py-2">
+      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
         <Card
           title={title}
           count={groups.length}
