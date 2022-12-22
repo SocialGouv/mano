@@ -355,7 +355,7 @@ const StyledComment = styled.div`
       margin-top: 0;
       margin-bottom: 0;
     }
-    ${(props) => props.urgent && 'background-color: #fecaca;'}
+    ${(props) => props.urgent && 'background-color: #fecaca99;'}
   }
   .time {
     font-size: 10px;

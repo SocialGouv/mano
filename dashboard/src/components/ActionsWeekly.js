@@ -116,7 +116,7 @@ function ActionsOfDay({ actions }) {
             }
           }}
           className={[
-            Boolean(action.isConsultation) ? 'tw-bg-[#DDF4FF]' : Boolean(action.urgent) ? 'tw-bg-[#fecaca]' : 'tw-bg-[#fafafa]',
+            Boolean(action.isConsultation) ? 'tw-bg-[#DDF4FF99]' : Boolean(action.urgent) ? 'tw-bg-[#fecaca99]' : 'tw-bg-[#fafafa]',
             'tw-flex tw-cursor-pointer tw-flex-col tw-gap-2 tw-rounded-sm tw-border tw-border-gray-300 tw-p-1 tw-text-xs',
           ].join(' ')}>
           {(Boolean(action.isConsultation) || Boolean(action.urgent)) && (

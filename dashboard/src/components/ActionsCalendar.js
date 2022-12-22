@@ -61,8 +61,8 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
       className="Table"
       noData={`Pas d'action à faire le ${formatDateTimeWithNameOfDay(date)}`}
       data={actions.map((a) => {
-        if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
-        if (a.isConsultation) return { ...a, style: { backgroundColor: '#DDF4FF' } };
+        if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca99' } };
+        if (a.isConsultation) return { ...a, style: { backgroundColor: '#DDF4FF99' } };
         return a;
       })}
       onRowClick={(actionOrConsultation) => {

@@ -289,8 +289,8 @@ const List = () => {
         <>
           <Table
             data={dataConsolidatedPaginated.map((a) => {
-              if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
-              if (a.isConsultation) return { ...a, style: { backgroundColor: '#DDF4FF' } };
+              if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca99' } };
+              if (a.isConsultation) return { ...a, style: { backgroundColor: '#DDF4FF99' } };
               return a;
             })}
             rowKey={'_id'}

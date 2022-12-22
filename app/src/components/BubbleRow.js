@@ -37,7 +37,7 @@ const BubbleRow = ({ onMorePress, caption, date, user, metaCaption, urgent, grou
 );
 
 const Container = styled.View`
-  background-color: ${(props) => (props.urgent ? '#fecaca' : '#f4f5f8')};
+  background-color: ${(props) => (props.urgent ? '#fecaca99' : '#f4f5f8')};
   border-radius: 16px;
   flex-direction: row;
   align-items: center;
