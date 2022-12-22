@@ -9,6 +9,7 @@ import ScreenTitle from '../../components/ScreenTitle';
 import FoldersNavigator from './FoldersNavigator';
 import Tabs from '../../components/Tabs';
 import colors from '../../utils/colors';
+import { useFocusEffect } from '@react-navigation/native';
 import {
   customFieldsPersonsMedicalSelector,
   customFieldsPersonsSocialSelector,
@@ -111,17 +112,18 @@ const Person = ({ route, navigation }) => {
       onGoBackRequested();
     };
 
-    const handleFocus = () => {
-      setPerson(castToPerson(personDB));
-    };
-    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
     const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
     return () => {
-      focusListenerUnsubscribe();
       beforeRemoveListenerUnsbscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation, route?.params?.person]);
+
+  useFocusEffect(
+    useCallback(() => {
+      setPerson(castToPerson(personDB));
+    }, [personDB])
+  );
 
   const onEdit = () => setEditable((e) => !e);
 
