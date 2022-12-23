@@ -98,9 +98,9 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
               saveInURLParams
             );
           };
-          const onChangeValue = ({ value }) => {
+          const onChangeValue = (newValue) => {
             onChange(
-              filters.map((_filter, i) => (i === index ? { field: filter.field, value, type: filter.type } : _filter)),
+              filters.map((f, i) => (i === index ? { field: filter.field, value: newValue, type: filter.type } : f)),
               saveInURLParams
             );
           };
@@ -207,7 +207,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
       value={value ? { label: value, value } : null}
       getOptionLabel={(f) => f.label}
       getOptionValue={(f) => f.value}
-      onChange={onChangeValue}
+      onChange={(f) => onChangeValue(f.value)}
       isClearable={!value}
     />
   );
