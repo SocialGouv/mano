@@ -1,3 +1,10 @@
+## [1.200.3](https://github.com/SocialGouv/mano/compare/v1.200.2...v1.200.3) (2022-12-23)
+
+
+### Bug Fixes
+
+* fix consultation deletion ([#1124](https://github.com/SocialGouv/mano/issues/1124)) ([d1a3b13](https://github.com/SocialGouv/mano/commit/d1a3b13ff2bc904f80b54cd2615f6f643d470ed6))
+
 ## [1.200.2](https://github.com/SocialGouv/mano/compare/v1.200.1...v1.200.2) (2022-12-23)
 
 
