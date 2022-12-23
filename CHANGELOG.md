@@ -1,3 +1,10 @@
+# [1.200.0](https://github.com/SocialGouv/mano/compare/v1.199.0...v1.200.0) (2022-12-23)
+
+
+### Features
+
+* **dashboard:** sort users and teams ([#1112](https://github.com/SocialGouv/mano/issues/1112)) ([2c24278](https://github.com/SocialGouv/mano/commit/2c24278a4b1635309c3af4765b5fb0cd2e6f1b18))
+
 # [1.199.0](https://github.com/SocialGouv/mano/compare/v1.198.0...v1.199.0) (2022-12-23)
 
 
