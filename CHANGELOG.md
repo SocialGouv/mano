@@ -1,3 +1,10 @@
+## [1.200.1](https://github.com/SocialGouv/mano/compare/v1.200.0...v1.200.1) (2022-12-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jsonwebtoken to v9 [security] ([#1118](https://github.com/SocialGouv/mano/issues/1118)) ([9aaf60c](https://github.com/SocialGouv/mano/commit/9aaf60cdef73bab8c76011b62eb0b4bc4d8dfc2e))
+
 # [1.200.0](https://github.com/SocialGouv/mano/compare/v1.199.0...v1.200.0) (2022-12-23)
 
 
