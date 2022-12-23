@@ -1,3 +1,10 @@
+## [1.197.2](https://github.com/SocialGouv/mano/compare/v1.197.1...v1.197.2) (2022-12-23)
+
+
+### Bug Fixes
+
+* sort actions and consultations in dashboard ([#1110](https://github.com/SocialGouv/mano/issues/1110)) ([16fa1ca](https://github.com/SocialGouv/mano/commit/16fa1caf3a6994ed0025529e82788f1956d440b6))
+
 ## [1.197.1](https://github.com/SocialGouv/mano/compare/v1.197.0...v1.197.1) (2022-12-22)
 
 
