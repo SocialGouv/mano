@@ -14,7 +14,7 @@ import UserName from '../../components/UserName';
 import Search from '../../components/search';
 import TagTeam from '../../components/TagTeam';
 import { organisationState, teamsState } from '../../recoil/auth';
-import { actionsState, CANCEL, DONE } from '../../recoil/actions';
+import { actionsState, CANCEL, DONE, sortActionsOrConsultations } from '../../recoil/actions';
 import { personsState, sortPersons } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { territoriesState } from '../../recoil/territory';
@@ -102,11 +102,13 @@ const Actions = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const actions = useRecoilValue(actionsState);
   const organisation = useRecoilValue(organisationState);
+  const [sortBy, setSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
+  const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
 
   const data = useMemo(() => {
     if (!search?.length) return [];
-    return filterBySearch(search, actions);
-  }, [search, actions]);
+    return filterBySearch(search, actions).sort(sortActionsOrConsultations(sortBy, sortOrder));
+  }, [search, actions, sortBy, sortOrder]);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -122,9 +124,12 @@ const Actions = ({ search, onUpdateResults }) => {
       <StyledBox>
         <Table
           className="Table"
+          data={data.map((a) => {
+            if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
+            return a;
+          })}
           title={`Action${moreThanOne ? 's' : ''} (${data.length})`}
           noData="Pas d'action"
-          data={data}
           onRowClick={(action) => history.push(`/action/${action._id}`)}
           rowKey="_id"
           columns={[
@@ -132,6 +137,10 @@ const Actions = ({ search, onUpdateResults }) => {
               title: '',
               dataKey: 'urgentOrGroupOrConsultation',
               small: true,
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (actionOrConsult) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
@@ -149,6 +158,10 @@ const Actions = ({ search, onUpdateResults }) => {
             {
               title: 'Date',
               dataKey: 'dueAt',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (a) => <DateBloc date={[DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt} />,
             },
             {
@@ -159,9 +172,32 @@ const Actions = ({ search, onUpdateResults }) => {
                 return formatTime(action.dueAt);
               },
             },
-            { title: 'Nom', dataKey: 'name' },
-            { title: 'Personne suivie', dataKey: 'person', render: (action) => <PersonName item={action} /> },
-            { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            {
+              title: 'Nom',
+              dataKey: 'name',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+            },
+            {
+              title: 'Personne suivie',
+              dataKey: 'person',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              render: (action) => <PersonName item={action} />,
+            },
+            {
+              title: 'Statut',
+              dataKey: 'status',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              render: (action) => <ActionStatus status={action.status} />,
+            },
             {
               title: 'Équipe en charge',
               dataKey: 'team',

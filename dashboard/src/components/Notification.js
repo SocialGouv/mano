@@ -5,7 +5,7 @@ import { Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import styled from 'styled-components';
 import { theme } from '../config';
-import { actionsState, CANCEL, DONE, TODO } from '../recoil/actions';
+import { actionsState, CANCEL, DONE, sortActionsOrConsultations, TODO } from '../recoil/actions';
 import { currentTeamState } from '../recoil/auth';
 import { commentsState } from '../recoil/comments';
 import { personsState } from '../recoil/persons';
@@ -14,6 +14,7 @@ import ButtonCustom from './ButtonCustom';
 import DateBloc from './DateBloc';
 import Table from './table';
 import UserName from './UserName';
+import { useLocalStorage } from 'react-use';
 
 export default function Notification() {
   const [showModal, setShowModal] = useState(false);
@@ -21,6 +22,10 @@ export default function Notification() {
   const persons = useRecoilValue(personsState);
   const actions = useRecoilValue(actionsState);
   const comments = useRecoilValue(commentsState);
+
+  const [actionsSortBy, setActionsSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
+  const [actionsSortOrder, setActionsSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
+
   const actionsFiltered = useMemo(
     () =>
       actions
@@ -31,8 +36,8 @@ export default function Notification() {
             action.urgent
           );
         })
-        .sort((a, b) => a.dueAt - b.dueAt),
-    [actions, currentTeam?._id]
+        .sort(sortActionsOrConsultations(actionsSortBy, actionsSortOrder)),
+    [actions, currentTeam?._id, actionsSortBy, actionsSortOrder]
   );
 
   const commentsFiltered = useMemo(
@@ -83,7 +88,14 @@ export default function Notification() {
       </div>
       <StyledModal isOpen={showModal} toggle={() => setShowModal(false)} size="lg">
         <div>
-          <Actions setShowModal={setShowModal} actions={actionsFiltered} />
+          <Actions
+            setShowModal={setShowModal}
+            actions={actionsFiltered}
+            setSortOrder={setActionsSortOrder}
+            setSortBy={setActionsSortBy}
+            sortBy={actionsSortBy}
+            sortOrder={actionsSortOrder}
+          />
           <Comments setShowModal={setShowModal} comments={commentsFiltered} />
           <ButtonCustom style={{ margin: '1rem auto' }} title="OK, merci" onClick={() => setShowModal(false)} />
         </div>
@@ -92,7 +104,7 @@ export default function Notification() {
   );
 }
 
-const Actions = ({ setShowModal, actions }) => {
+const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortOrder }) => {
   const history = useHistory();
   const persons = useRecoilValue(personsState);
   if (!actions.length) return null;
@@ -110,7 +122,11 @@ const Actions = ({ setShowModal, actions }) => {
           columns={[
             {
               title: 'Date',
-              dataKey: 'dueAt' || '_id',
+              dataKey: 'dueAt',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (action) => {
                 return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
               },
@@ -123,10 +139,14 @@ const Actions = ({ setShowModal, actions }) => {
                 return formatTime(action.dueAt);
               },
             },
-            { title: 'Nom', dataKey: 'name' },
+            { title: 'Nom', dataKey: 'name', onSortOrder: setSortOrder, onSortBy: setSortBy, sortBy, sortOrder },
             {
               title: 'Personne suivie',
               dataKey: 'person',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (action) => <>{persons.find((p) => p._id === action.person)?.name}</>,
             },
           ]}
@@ -154,14 +174,14 @@ const Comments = ({ setShowModal, comments }) => {
           columns={[
             {
               title: 'Date',
-              dataKey: 'date' || '_id',
+              dataKey: 'date',
               render: (comment) => {
                 return <DateBloc date={comment.date || comment.createdAt} />;
               },
             },
             {
               title: 'Heure',
-              dataKey: 'date',
+              dataKey: '_id',
               render: (comment) => <span>{dayjs(comment.date || comment.createdAt).format('HH:mm')}</span>,
             },
             {

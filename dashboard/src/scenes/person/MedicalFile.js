@@ -19,9 +19,9 @@ import ActionStatus from '../../components/ActionStatus';
 import SelectCustom from '../../components/SelectCustom';
 import CustomFieldDisplay from '../../components/CustomFieldDisplay';
 import DateBloc from '../../components/DateBloc';
-import { mappedIdsToLabels, DONE, CANCEL } from '../../recoil/actions';
+import { mappedIdsToLabels, DONE, CANCEL, sortActionsOrConsultations } from '../../recoil/actions';
 import Documents from '../../components/Documents';
-import { consultationsState } from '../../recoil/consultations';
+import { arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import { prepareTreatmentForEncryption, treatmentsState } from '../../recoil/treatments';
 import { medicalFileState, prepareMedicalFileForEncryption, customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { modalConfirmState } from '../../components/ModalConfirm';
@@ -32,7 +32,7 @@ import ConsultationModal from '../../components/ConsultationModal';
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
   const organisation = useRecoilValue(organisationState);
-  const [allConsultations, setAllConsultations] = useRecoilState(consultationsState);
+  const [allConsultations, setAllConsultations] = useRecoilState(arrayOfitemsGroupedByConsultationSelector);
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
@@ -44,6 +44,8 @@ export function MedicalFile({ person }) {
 
   const [consultationTypes, setConsultationTypes] = useLocalStorage('consultation-types', []);
   const [consultationStatuses, setConsultationStatuses] = useLocalStorage('consultation-statuses', []);
+  const [consultationsSortBy, setConsultationsSortBy] = useLocalStorage('consultations-sortBy', 'dueAt');
+  const [consultationsSortOrder, setConsultationsSortOrder] = useLocalStorage('consultations-sortOrder', 'ASC');
 
   const [showAddTreatment, setShowAddTreatment] = useState(false);
   const [currentTreatment, setCurrentTreatment] = useState(null);
@@ -73,8 +75,8 @@ export function MedicalFile({ person }) {
         .filter((c) => c.person === person._id)
         .filter((c) => !consultationStatuses.length || consultationStatuses.includes(c.status))
         .filter((c) => !consultationTypes.length || consultationTypes.includes(c.type))
-        .sort((a, b) => new Date(b.completedAt || b.dueAt) - new Date(a.completedAt || a.dueAt)),
-    [allConsultations, consultationStatuses, consultationTypes, person._id]
+        .sort(sortActionsOrConsultations(consultationsSortBy, consultationsSortOrder)),
+    [allConsultations, consultationStatuses, consultationTypes, person._id, consultationsSortBy, consultationsSortOrder]
   );
 
   const treatments = useMemo(() => (allTreatments || []).filter((t) => t.person === person._id), [allTreatments, person._id]);
@@ -473,6 +475,8 @@ export function MedicalFile({ person }) {
             'organisation',
             'isConsultation',
             'withTime',
+            'personPopulated',
+            'userPopulated',
           ];
           return (
             <div key={c._id} style={{ marginBottom: '2rem' }}>
@@ -520,29 +524,45 @@ export function MedicalFile({ person }) {
         columns={[
           {
             title: 'Date',
-            dataKey: 'dueAt-day',
+            dataKey: 'dueAt',
+            onSortOrder: setConsultationsSortOrder,
+            onSortBy: setConsultationsSortBy,
+            sortBy: consultationsSortBy,
+            sortOrder: consultationsSortOrder,
             render: (e) => {
               return <DateBloc date={[DONE, CANCEL].includes(e.status) ? e.completedAt : e.dueAt} />;
             },
           },
           {
             title: 'Heure',
-            dataKey: 'dueAt-hour',
+            dataKey: 'time',
             render: (e) => formatTime(e.dueAt),
           },
           {
             title: 'Nom',
             dataKey: 'name',
+            onSortOrder: setConsultationsSortOrder,
+            onSortBy: setConsultationsSortBy,
+            sortBy: consultationsSortBy,
+            sortOrder: consultationsSortOrder,
             render: (e) => <ActionOrConsultationName item={e} />,
           },
           {
             title: 'Créé par',
             dataKey: 'user',
+            onSortOrder: setConsultationsSortOrder,
+            onSortBy: setConsultationsSortBy,
+            sortBy: consultationsSortBy,
+            sortOrder: consultationsSortOrder,
             render: (e) => (e.user ? users.find((u) => u._id === e.user)?.name : ''),
           },
           {
             title: 'Documents',
             dataKey: 'documents',
+            onSortOrder: setConsultationsSortOrder,
+            onSortBy: setConsultationsSortBy,
+            sortBy: consultationsSortBy,
+            sortOrder: consultationsSortOrder,
             render: (e) => e.documents?.length,
           },
           {
