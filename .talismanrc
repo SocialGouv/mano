@@ -1,11 +1,13 @@
 fileignoreconfig:
-  - filename: app/ios/Podfile.lock
-    checksum: c4ed271af1f3323221d4e3466338fc90431f8806d1be727ae5718668c3b40134
-  - filename: app/yarn.lock
-    checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
-  - filename: api/yarn.lock
-    checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
-  - filename: dashboard/yarn.lock
-    checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
+- filename: api/yarn.lock
+  checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
+- filename: app/ios/Podfile.lock
+  checksum: c4ed271af1f3323221d4e3466338fc90431f8806d1be727ae5718668c3b40134
+- filename: app/yarn.lock
+  checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
+- filename: dashboard/yarn.lock
+  checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
+- filename: yarn.lock
+  checksum: de5b3642462919a44188de7d368f7a54e71a995d237bffd180b90f75f6291b64
 threshold: high
 version: "1.0"
