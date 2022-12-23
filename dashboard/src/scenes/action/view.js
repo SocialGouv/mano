@@ -30,6 +30,7 @@ import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDat
 import { itemsGroupedByActionSelector } from '../../recoil/selectors';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import { groupsState } from '../../recoil/groups';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 
 const actionByIdSelector = selectorFamily({
   key: 'actionByIdSelector',
@@ -126,6 +127,7 @@ const ActionView = () => {
         initialValues={action}
         enableReinitialize
         onSubmit={async (body) => {
+          if (!body.teams?.length) return toast.error('Une action doit être associée à au moins une équipe.');
           const statusChanged = body.status && action.status !== body.status;
           if (statusChanged) {
             if ([DONE, CANCEL].includes(body.status)) {
@@ -136,6 +138,7 @@ const ActionView = () => {
               body.completedAt = null;
             }
           }
+          delete body.team;
           const actionResponse = await API.put({
             path: `/action/${body._id}`,
             body: prepareActionForEncryption(body),
@@ -249,11 +252,12 @@ const ActionView = () => {
                   </FormGroup>
                   <FormGroup>
                     <Label htmlFor="team">Sous l'équipe</Label>
-                    <SelectTeam
-                      teams={user.role === 'admin' ? teams : user.teams}
-                      teamId={Array.isArray(values.teams) ? values.teams[0] : values.team}
+                    <SelectTeamMultiple
+                      onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
+                      value={Array.isArray(values.teams) ? values.teams : [values.team]}
+                      colored
                       inputId="team"
-                      onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                      classNamePrefix="person-select-assigned-team"
                     />
                   </FormGroup>
                   <FormGroup>

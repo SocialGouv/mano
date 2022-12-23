@@ -19,6 +19,7 @@ import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import ActionsCategorySelect from './tailwind/ActionsCategorySelect';
 import { groupsState } from '../recoil/groups';
 import { ModalBody, ModalContainer, ModalHeader } from './tailwind/Modal';
+import SelectTeamMultiple from './SelectTeamMultiple';
 
 const CreateActionModal = ({ person = null, persons = null, isMulti = false, completedAt = null, dueAt, open = false, setOpen = () => {} }) => {
   const teams = useRecoilValue(teamsState);
@@ -54,7 +55,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
           initialValues={{
             name: '',
             person: isMulti ? persons : person,
-            team: null,
+            teams: [],
             dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
             withTime: false,
             status: !!completedAt ? DONE : TODO,
@@ -68,7 +69,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
           }}
           onSubmit={async (values, actions) => {
             if (!values.name) return toast.error('Le nom est obligatoire');
-            if (!values.team) return toast.error("L'équipe est obligatoire");
+            if (!values.teams?.length) return toast.error('Une action doit être associée à au moins une équipe');
             if (!isMulti && !values.person) return toast.error('La personne suivie est obligatoire');
             if (isMulti && !values.person?.length) return toast.error('Une personne suivie est obligatoire');
             if (!values.dueAt) return toast.error("La date d'échéance est obligatoire");
@@ -216,11 +217,12 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                     </FormGroup>
                     <FormGroup>
                       <Label htmlFor="team">Sous l'équipe</Label>
-                      <SelectTeam
-                        teams={user.role === 'admin' ? teams : user.teams}
-                        teamId={values.team}
+                      <SelectTeamMultiple
+                        onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
+                        value={Array.isArray(values.teams) ? values.teams : [values.team]}
+                        colored
                         inputId="create-action-team-select"
-                        onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                        // classNamePrefix="person-select-assigned-team"
                       />
                     </FormGroup>
                     <FormGroup>
