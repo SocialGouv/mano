@@ -729,7 +729,7 @@ const Stats = () => {
               })}
             </TabPane>
             <TabPane tabId={9}>
-              <Title>Statistiques des dossiers médicaux</Title>
+              <h3 className="tw-my-5 tw-text-xl">Statistiques des dossiers médicaux</h3>
               <Filters base={filterPersonsWithAllFields(true)} filters={filterMedicalFiles} onChange={setFilterMedicalFiles} />
               <AgeRangeBar persons={personsForStats} />
               <CustomResponsivePie
