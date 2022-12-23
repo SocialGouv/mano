@@ -67,7 +67,7 @@ test("Familles", async ({ page }) => {
     await page.getByText("Le lien familial a été ajouté").click();
 
     await expect(page.getByRole("cell", { name: `${person1Name} et ${person2Name}` })).toBeVisible();
-    await expect(page.getByRole("cell", { name: "rel" })).toBeVisible();
+    await expect(page.getByRole("cell", { name: "rel", exact: true })).toBeVisible();
     await expect(page.getByRole("cell", { name: "User Admin Test - 1" })).toBeVisible();
   });
 

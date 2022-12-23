@@ -12,14 +12,14 @@ test("test", async ({ page }) => {
   await page.getByRole("link", { name: "Organisation" }).click();
   await page.getByRole("button", { name: "Chiffrement" }).click();
   await page.getByRole("button", { name: "Changer la clé de chiffrement" }).click();
-  await page.getByRole("textbox", { name: "Clé de chiffrement" }).click();
-  await page.getByRole("textbox", { name: "Clé de chiffrement" }).fill("erreur");
+  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).click();
+  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).fill("erreur");
   await page.getByLabel("Confirmez la clé de chiffrement").click();
   await page.getByLabel("Confirmez la clé de chiffrement").fill("raté");
   await page.locator("data-test-id=encryption-modal").getByRole("button", { name: "Changer la clé de chiffrement" }).click();
   await page.getByText("Les clés ne sont pas identiques").click();
-  await page.getByRole("textbox", { name: "Clé de chiffrement" }).click();
-  await page.getByRole("textbox", { name: "Clé de chiffrement" }).fill("nouvelle");
+  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).click();
+  await page.getByRole("textbox", { name: "Clé de chiffrement", exact: true }).fill("nouvelle");
   await page.getByLabel("Confirmez la clé de chiffrement").click();
   await page.getByLabel("Confirmez la clé de chiffrement").fill("nouvelle");
   await page.locator("data-test-id=encryption-modal").getByRole("button", { name: "Changer la clé de chiffrement" }).click();
@@ -27,7 +27,7 @@ test("test", async ({ page }) => {
   await page.locator("data-test-id=encryption-modal").getByRole("button", { name: "Close" }).click();
 
   await page.getByRole("button", { name: "User Admin Test - 8" }).click();
-  await page.getByRole("menuitem", { name: "Se déconnecter" }).click();
+  await page.getByRole("menuitem", { name: "Se déconnecter", exact: true }).click();
 
   await expect(page).toHaveURL("http://localhost:8090/auth");
   await page.getByLabel("Email").click();
