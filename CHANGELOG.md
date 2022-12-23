@@ -1,3 +1,10 @@
+# [1.198.0](https://github.com/SocialGouv/mano/compare/v1.197.2...v1.198.0) (2022-12-23)
+
+
+### Features
+
+* **dashboard:** sort territories ([#1113](https://github.com/SocialGouv/mano/issues/1113)) ([f2bee23](https://github.com/SocialGouv/mano/commit/f2bee238d597bbe1daaabd48f966ee4f8fb466db))
+
 ## [1.197.2](https://github.com/SocialGouv/mano/compare/v1.197.1...v1.197.2) (2022-12-23)
 
 
