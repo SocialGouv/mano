@@ -21,7 +21,7 @@ import Table from '../../components/table';
 import CreateActionModal from '../../components/CreateActionModal';
 import Observation from '../territory-observations/view';
 import dayjs from 'dayjs';
-import { actionsState, CANCEL, DONE } from '../../recoil/actions';
+import { CANCEL, DONE, sortActionsOrConsultations } from '../../recoil/actions';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { capture } from '../../services/sentry';
 import UserName from '../../components/UserName';
@@ -47,7 +47,7 @@ import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButt
 import useTitle from '../../services/useTitle';
 import { theme } from '../../config';
 import ConsultationButton from '../../components/ConsultationButton';
-import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
+import { disableConsultationRow } from '../../recoil/consultations';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { lastLoadState, mergeItems, useDataLoader } from '../../components/DataLoader';
 import Rencontre from '../../components/Rencontre';
@@ -56,6 +56,7 @@ import TagTeam from '../../components/TagTeam';
 import ReceptionService from '../../components/ReceptionService';
 import { useLocalStorage } from 'react-use';
 import useSearchParamState from '../../services/useSearchParamState';
+import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 
 const getPeriodTitle = (date, nightSession) => {
   if (!nightSession) return `Journée du ${formatDateWithFullMonth(date)}`;
@@ -129,7 +130,10 @@ const View = () => {
     [allPassages, dateString, selectedTeamsObject]
   );
 
-  const allActions = useRecoilValue(actionsState);
+  const allActions = useRecoilValue(arrayOfitemsGroupedByActionSelector);
+  const [actionsSortBy, setActionsSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
+  const [actionsSortOrder, setActionsSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
+
   const actionsCallback = useCallback(
     (status) =>
       allActions
@@ -144,8 +148,9 @@ const View = () => {
             { referenceStartDay: dateString, referenceEndDay: dateString },
             isNightSession ? 12 : 0
           );
-        }),
-    [allActions, selectedTeamsObject, dateString]
+        })
+        .sort(sortActionsOrConsultations(actionsSortBy, actionsSortOrder)),
+    [allActions, selectedTeamsObject, dateString, actionsSortBy, actionsSortOrder]
   );
   const actionsDone = useMemo(() => actionsCallback(DONE), [actionsCallback]);
   const actionsCancel = useMemo(() => actionsCallback(CANCEL), [actionsCallback]);
@@ -173,11 +178,15 @@ const View = () => {
             { referenceStartDay: dateString, referenceEndDay: dateString },
             isNightSession ? 12 : 0
           );
-        }),
-    [allActions, dateString, selectedTeamsObject]
+        })
+        .sort(sortActionsOrConsultations(actionsSortBy, actionsSortOrder)),
+    [allActions, dateString, selectedTeamsObject, actionsSortBy, actionsSortOrder]
   );
 
-  const allConsultations = useRecoilValue(consultationsState);
+  const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
+  const [consultationsSortBy, setConsultationsSortBy] = useLocalStorage('consultations-sortBy', 'dueAt');
+  const [consultationsSortOrder, setConsultationsSortOrder] = useLocalStorage('consultations-sortOrder', 'ASC');
+
   const consultations = useCallback(
     (status) =>
       allConsultations
@@ -185,8 +194,9 @@ const View = () => {
         .filter((a) => {
           return getIsDayWithinHoursOffsetOfPeriod(a.completedAt, { referenceStartDay: dateString, referenceEndDay: dateString }, 0);
         })
-        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF99' } })),
-    [allConsultations, dateString]
+        .map((a) => ({ ...a, style: { backgroundColor: '#DDF4FF99' } }))
+        .sort(sortActionsOrConsultations(consultationsSortBy, consultationsSortOrder)),
+    [allConsultations, dateString, consultationsSortBy, consultationsSortOrder]
   );
   const consultationsDone = useMemo(() => consultations(DONE), [consultations]);
   const consultationsCancel = useMemo(() => consultations(CANCEL), [consultations]);
@@ -349,9 +359,32 @@ const View = () => {
         )}
         {!['restricted-access'].includes(user.role) && (
           <>
-            <ActionCompletedAt date={dateString} status={DONE} actions={actionsDone} />
-            <ActionCreatedAt date={dateString} actions={actionsCreatedAt} />
-            <ActionCompletedAt date={dateString} status={CANCEL} actions={actionsCancel} />
+            <ActionCompletedAt
+              date={dateString}
+              status={DONE}
+              actions={actionsDone}
+              setSortOrder={setActionsSortOrder}
+              setSortBy={setActionsSortBy}
+              sortBy={actionsSortBy}
+              sortOrder={actionsSortOrder}
+            />
+            <ActionCreatedAt
+              date={dateString}
+              actions={actionsCreatedAt}
+              setSortOrder={setActionsSortOrder}
+              setSortBy={setActionsSortBy}
+              sortBy={actionsSortBy}
+              sortOrder={actionsSortOrder}
+            />
+            <ActionCompletedAt
+              date={dateString}
+              status={CANCEL}
+              actions={actionsCancel}
+              setSortOrder={setActionsSortOrder}
+              setSortBy={setActionsSortBy}
+              sortBy={actionsSortBy}
+              sortOrder={actionsSortOrder}
+            />
             <CommentCreatedAt date={dateString} comments={comments} />
           </>
         )}
@@ -360,9 +393,37 @@ const View = () => {
         {!['restricted-access'].includes(user.role) && (
           <>
             <TerritoryObservationsCreatedAt date={dateString} observations={observations} />
-            {!!user.healthcareProfessional && <Consultations date={dateString} consultations={consultationsDone} />}
-            {!!user.healthcareProfessional && <ConsultationsCreatedAt date={dateString} consultations={consultationsCreatedAt} />}
-            {!!user.healthcareProfessional && <Consultations date={dateString} status={CANCEL} consultations={consultationsCancel} />}
+            {!!user.healthcareProfessional && (
+              <Consultations
+                date={dateString}
+                consultations={consultationsDone}
+                setSortOrder={setConsultationsSortOrder}
+                setSortBy={setConsultationsSortBy}
+                sortBy={consultationsSortBy}
+                sortOrder={consultationsSortOrder}
+              />
+            )}
+            {!!user.healthcareProfessional && (
+              <ConsultationsCreatedAt
+                date={dateString}
+                consultations={consultationsCreatedAt}
+                setSortOrder={setConsultationsSortOrder}
+                setSortBy={setConsultationsSortBy}
+                sortBy={consultationsSortBy}
+                sortOrder={consultationsSortOrder}
+              />
+            )}
+            {!!user.healthcareProfessional && (
+              <Consultations
+                date={dateString}
+                status={CANCEL}
+                consultations={consultationsCancel}
+                setSortOrder={setConsultationsSortOrder}
+                setSortBy={setConsultationsSortBy}
+                sortBy={consultationsSortBy}
+                sortOrder={consultationsSortOrder}
+              />
+            )}
           </>
         )}
       </div>
@@ -590,17 +651,40 @@ const View = () => {
             )}
             {activeTab === 'action-completed' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <ActionCompletedAt date={dateString} status={DONE} actions={actionsDone} />
+                <ActionCompletedAt
+                  date={dateString}
+                  status={DONE}
+                  actions={actionsDone}
+                  setSortOrder={setActionsSortOrder}
+                  setSortBy={setActionsSortBy}
+                  sortBy={actionsSortBy}
+                  sortOrder={actionsSortOrder}
+                />
               </div>
             )}
             {activeTab === 'action-created' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <ActionCreatedAt date={dateString} actions={actionsCreatedAt} />
+                <ActionCreatedAt
+                  date={dateString}
+                  actions={actionsCreatedAt}
+                  setSortOrder={setActionsSortOrder}
+                  setSortBy={setActionsSortBy}
+                  sortBy={actionsSortBy}
+                  sortOrder={actionsSortOrder}
+                />
               </div>
             )}
             {activeTab === 'action-cancelled' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <ActionCompletedAt date={dateString} status={CANCEL} actions={actionsCancel} />
+                <ActionCompletedAt
+                  date={dateString}
+                  status={CANCEL}
+                  actions={actionsCancel}
+                  setSortOrder={setActionsSortOrder}
+                  setSortBy={setActionsSortBy}
+                  sortBy={actionsSortBy}
+                  sortOrder={actionsSortOrder}
+                />
               </div>
             )}
             {activeTab === 'comment-created' && (
@@ -630,17 +714,40 @@ const View = () => {
             )}
             {activeTab === 'consultations' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <Consultations date={dateString} status={DONE} consultations={consultationsDone} />
+                <Consultations
+                  date={dateString}
+                  status={DONE}
+                  consultations={consultationsDone}
+                  setSortOrder={setConsultationsSortOrder}
+                  setSortBy={setConsultationsSortBy}
+                  sortBy={consultationsSortBy}
+                  sortOrder={consultationsSortOrder}
+                />
               </div>
             )}
             {activeTab === 'consultations-created' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <ConsultationsCreatedAt date={dateString} consultations={consultationsCreatedAt} />
+                <ConsultationsCreatedAt
+                  date={dateString}
+                  consultations={consultationsCreatedAt}
+                  setSortOrder={setConsultationsSortOrder}
+                  setSortBy={setConsultationsSortBy}
+                  sortBy={consultationsSortBy}
+                  sortOrder={consultationsSortOrder}
+                />
               </div>
             )}
             {activeTab === 'consultations-cancelled' && (
               <div style={{ overflow: 'auto', width: '100%', minHeight: '100%' }}>
-                <Consultations date={dateString} status={CANCEL} consultations={consultationsCancel} />
+                <Consultations
+                  date={dateString}
+                  status={CANCEL}
+                  consultations={consultationsCancel}
+                  setSortOrder={setConsultationsSortOrder}
+                  setSortBy={setConsultationsSortBy}
+                  sortBy={consultationsSortBy}
+                  sortOrder={consultationsSortOrder}
+                />
               </div>
             )}
           </div>
@@ -802,7 +909,7 @@ const ServicesWrapper = styled.div`
   }
 `;
 
-const ActionCompletedAt = ({ date, status, actions }) => {
+const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sortBy, sortOrder }) => {
   const data = actions;
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
@@ -845,8 +952,12 @@ const ActionCompletedAt = ({ date, status, actions }) => {
           columns={[
             {
               title: '',
-              dataKey: 'urgent',
+              dataKey: 'urgentOrGroupOrConsultation',
               small: true,
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (action) => {
                 return (
                   <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
@@ -863,6 +974,10 @@ const ActionCompletedAt = ({ date, status, actions }) => {
             {
               title: status === CANCEL ? 'Annulée le' : 'Faite le',
               dataKey: 'completedAt',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (action) => <DateBloc date={action.completedAt} />,
             },
             {
@@ -873,13 +988,33 @@ const ActionCompletedAt = ({ date, status, actions }) => {
                 return formatTime(action.dueAt);
               },
             },
-            { title: 'Nom', dataKey: 'name', render: (action) => <ActionOrConsultationName item={action} /> },
+            {
+              title: 'Nom',
+              dataKey: 'name',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              render: (action) => <ActionOrConsultationName item={action} />,
+            },
             {
               title: 'Personne suivie',
               dataKey: 'person',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (action) => <PersonName item={action} />,
             },
-            { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            {
+              title: 'Statut',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              dataKey: 'status',
+              render: (action) => <ActionStatus status={action.status} />,
+            },
             {
               title: 'Équipe en charge',
               dataKey: 'team',
@@ -897,7 +1032,7 @@ const ActionCompletedAt = ({ date, status, actions }) => {
   );
 };
 
-const ActionCreatedAt = ({ date, actions }) => {
+const ActionCreatedAt = ({ date, actions, setSortOrder, setSortBy, sortBy, sortOrder }) => {
   const data = actions;
   const history = useHistory();
   const organisation = useRecoilValue(organisationState);
@@ -919,7 +1054,11 @@ const ActionCreatedAt = ({ date, actions }) => {
           columns={[
             {
               title: '',
-              dataKey: 'urgent',
+              dataKey: 'urgentOrGroupOrConsultation',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               small: true,
               render: (action) => {
                 return (
@@ -934,7 +1073,15 @@ const ActionCreatedAt = ({ date, actions }) => {
                 );
               },
             },
-            { title: 'À faire le ', dataKey: 'dueAt', render: (d) => <DateBloc date={d.dueAt} /> },
+            {
+              title: 'À faire le ',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              dataKey: 'dueAt',
+              render: (d) => <DateBloc date={d.dueAt} />,
+            },
             {
               title: 'Heure',
               dataKey: '_id',
@@ -943,13 +1090,33 @@ const ActionCreatedAt = ({ date, actions }) => {
                 return formatTime(action.dueAt);
               },
             },
-            { title: 'Nom', dataKey: 'name', render: (action) => <ActionOrConsultationName item={action} /> },
+            {
+              title: 'Nom',
+              dataKey: 'name',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              render: (action) => <ActionOrConsultationName item={action} />,
+            },
             {
               title: 'Personne suivie',
               dataKey: 'person',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (action) => <PersonName item={action} />,
             },
-            { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+            {
+              title: 'Statut',
+              dataKey: 'status',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              render: (action) => <ActionStatus status={action.status} />,
+            },
             {
               title: 'Équipe en charge',
               dataKey: 'team',
@@ -963,7 +1130,7 @@ const ActionCreatedAt = ({ date, actions }) => {
   );
 };
 
-const Consultations = ({ date, status, consultations }) => {
+const Consultations = ({ date, status, consultations, setSortOrder, setSortBy, sortBy, sortOrder }) => {
   const data = consultations;
   const user = useRecoilValue(userState);
   const history = useHistory();
@@ -994,7 +1161,15 @@ const Consultations = ({ date, status, consultations }) => {
               small: true,
               render: () => <ConsultationButton />,
             },
-            { title: 'À faire le ', dataKey: 'date', render: (d) => <DateBloc date={d.dueAt} /> },
+            {
+              title: 'À faire le ',
+              dataKey: 'dueAt',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              render: (d) => <DateBloc date={d.dueAt} />,
+            },
             {
               title: 'Heure',
               dataKey: '_id',
@@ -1004,14 +1179,30 @@ const Consultations = ({ date, status, consultations }) => {
             {
               title: 'Nom',
               dataKey: 'name',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (consultation) => <ActionOrConsultationName item={consultation} />,
             },
             {
               title: 'Personne suivie',
               dataKey: 'person',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
               render: (consultation) => <PersonName item={consultation} />,
             },
-            { title: 'Statut', dataKey: 'status', render: (consultation) => <ActionStatus status={consultation.status} /> },
+            {
+              title: 'Statut',
+              dataKey: 'status',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortBy,
+              sortOrder,
+              render: (consultation) => <ActionStatus status={consultation.status} />,
+            },
           ]}
         />
       </StyledBox>

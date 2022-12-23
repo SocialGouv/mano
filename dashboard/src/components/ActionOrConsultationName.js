@@ -2,12 +2,7 @@ import React from 'react';
 import { userState } from '../recoil/auth';
 import { useRecoilValue } from 'recoil';
 import { disableConsultationRow } from '../recoil/consultations';
-
-const getName = (item) => {
-  if (item.name) return item.name;
-  if (item.isConsultation) return `Consultation ${item.type}`;
-  return 'Action'; // should never happen
-};
+import { getName } from '../recoil/actions';
 
 export default function ActionOrConsultationName({ item }) {
   const me = useRecoilValue(userState);
