@@ -38,6 +38,6 @@ export const filteredPersonActionsSelector = selectorFamily({
       }
       return [...actionsToSet]
         .sort((p1, p2) => ((p1.completedAt || p1.dueAt) > (p2.completedAt || p2.dueAt) ? -1 : 1))
-        .map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca' } } : a));
+        .map((a) => (a.urgent ? { ...a, style: { backgroundColor: '#fecaca99' } } : a));
     },
 });

@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo } from 'react';
-import styled from 'styled-components';
 import { useLocalStorage } from 'react-use';
 import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
@@ -32,6 +31,8 @@ import { consultationsState } from '../../recoil/consultations';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
+import { groupsState } from '../../recoil/groups';
+import { capture } from '../../services/sentry';
 
 const getDataForPeriod = (
   data,
@@ -83,6 +84,7 @@ const Stats = () => {
   const allObservations = useRecoilValue(territoryObservationsState);
   const allPassages = useRecoilValue(passagesState);
   const allRencontres = useRecoilValue(rencontresState);
+  const allGroups = useRecoilValue(groupsState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const customFieldsPersonsSocial = useRecoilValue(customFieldsPersonsSocialSelector);
@@ -119,6 +121,19 @@ const Stats = () => {
       return elements.filter((e) => viewAllOrganisationData || selectedTeams.some((f) => (e[key] || []).includes(f._id)));
     },
     [selectedTeams, viewAllOrganisationData]
+  );
+
+  const groupsForPersons = useCallback(
+    (persons) => {
+      const groupIds = persons.reduce((setOfGroupIds, person) => {
+        if (person.group) {
+          setOfGroupIds.add(person.group._id);
+        }
+        return setOfGroupIds;
+      }, new Set());
+      return allGroups.filter((group) => groupIds.has(group._id));
+    },
+    [allGroups]
   );
 
   const persons = useMemo(
@@ -322,6 +337,7 @@ const Stats = () => {
       ),
     [allRencontres, filterByTeam, period, selectedTeams, viewAllOrganisationData, allPersons]
   );
+
   const personsInRencontresBeforePeriod = useMemo(() => {
     if (!period?.startDate) return [];
     const rencontresIds = rencontres.map((p) => p._id);
@@ -435,22 +451,22 @@ const Stats = () => {
       </Nav>
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0}>
-          <Title>Statistiques générales</Title>
-          <Row style={{ marginBottom: '20px' }}>
+          <h3 className="tw-my-5 tw-text-xl">Statistiques générales</h3>
+          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
             <Block data={personsForStats} title="Nombre de personnes créées" />
             <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
+            <Block data={rencontres.length} title="Nombre de rencontres" />
             <Block data={actions} title="Nombre d'actions" />
             <Block data={numberOfActionsPerPerson} title="Nombre d'actions par personne" />
             <Block data={numberOfActionsPerPersonConcernedByActions} title="Nombre d'actions par personne concernée par au moins une action" />
-            <Block data={rencontres.length} title="Nombre de rencontres" />
-          </Row>
+          </div>
         </TabPane>
         {!!organisation.receptionEnabled && (
           <TabPane tabId={1}>
-            <Title>Statistiques de l'accueil</Title>
-            <Row>
+            <h3 className="tw-my-5 tw-text-xl">Statistiques de l'accueil</h3>
+            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
               <Block data={passages.length} title="Nombre de passages" />
-            </Row>
+            </div>
             <CustomResponsivePie
               title="Services"
               data={organisation.services?.map((service) => {
@@ -464,7 +480,7 @@ const Stats = () => {
           </TabPane>
         )}
         <TabPane tabId={2}>
-          <Title>Statistiques des actions</Title>
+          <h3 className="tw-my-5 tw-text-xl">Statistiques des actions</h3>
           <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
             <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
               Filtrer par statut :
@@ -529,14 +545,19 @@ const Stats = () => {
           />
         </TabPane>
         <TabPane tabId={3}>
-          <Title>Statistiques des personnes suivies</Title>
+          <h3 className="tw-my-5 tw-text-xl">Statistiques des personnes suivies</h3>
           <Filters base={filterPersonsWithAllFields()} filters={filterPersons} onChange={setFilterPersons} />
-          <Row>
+          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
             <Block data={personsForStats} title="Nombre de personnes créées" />
             <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
             <BlockCreatedAt persons={personsForStats} />
             <BlockWanderingAt persons={personsForStats} />
-          </Row>
+            <BlockGroup groups={groupsForPersons(personsForStats)} title="Nombre de familles dans lesquelles se trouvent des personnes créées" />
+            <BlockGroup
+              groups={groupsForPersons(personsUpdatedForStats)}
+              title="Nombre de familles dans lesquelles se trouvent des personnes suivies"
+            />
+          </div>
           <CustomResponsivePie
             title="Nationalité"
             field="nationalitySituation"
@@ -597,7 +618,7 @@ const Stats = () => {
           <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsSocial} />
         </TabPane>
         <TabPane tabId={4}>
-          <Title>Statistiques des passages</Title>
+          <h3 className="tw-my-5 tw-text-xl">Statistiques des passages</h3>
           <CustomResponsivePie title="Nombre de passages" data={getPieData(passages, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
           <CustomResponsivePie
             title="Répartition des passages non-anonymes"
@@ -623,7 +644,7 @@ const Stats = () => {
           />
         </TabPane>
         <TabPane tabId={5}>
-          <Title>Statistiques des rencontres</Title>
+          <h3 className="tw-my-5 tw-text-xl">Statistiques des rencontres</h3>
           <CustomResponsivePie title="Nombre de rencontres" data={getPieData(rencontres, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
           <CustomResponsivePie
             title="Répartition des rencontres"
@@ -649,7 +670,7 @@ const Stats = () => {
           />
         </TabPane>
         <TabPane tabId={6}>
-          <Title>Statistiques des observations de territoire</Title>
+          <h3 className="tw-my-5 tw-text-xl">Statistiques des observations de territoire</h3>
           <div style={{ marginBottom: '2rem' }}>
             <Label htmlFor="filter-territory">Filter par territoire</Label>
             <SelectCustom
@@ -681,7 +702,7 @@ const Stats = () => {
           </Row>
         </TabPane>
         <TabPane tabId={7}>
-          <Title>Statistiques des comptes-rendus</Title>
+          <h3 className="tw-my-5 tw-text-xl">Statistiques des comptes-rendus</h3>
           <CustomResponsivePie
             title="Répartition des comptes-rendus par collaboration"
             data={getPieData(reports, 'collaborations', { options: organisation.collaborations || [] })}
@@ -690,7 +711,7 @@ const Stats = () => {
         {user.healthcareProfessional && (
           <>
             <TabPane tabId={8}>
-              <Title>Statistiques des consultations</Title>
+              <h3 className="tw-my-5 tw-text-xl">Statistiques des consultations</h3>
               <Row style={{ marginBottom: '20px' }}>
                 <Col md={4} />
                 <Block data={consultations} title="Nombre de consultations" />
@@ -939,9 +960,9 @@ const StatsWanderingAtRangeBar = ({ persons }) => {
 };
 
 const Block = ({ data, title = 'Nombre de personnes suivies' }) => (
-  <Col md={4} style={{ marginBottom: 20 }}>
+  <div className="tw-px-4 tw-py-2 md:tw-basis-1/2 lg:tw-basis-1/3">
     <Card title={title} count={Array.isArray(data) ? String(data.length) : data} />
-  </Col>
+  </div>
 );
 
 const getDuration = (timestampFromNow) => {
@@ -968,9 +989,9 @@ const BlockDateWithTime = ({ data, field }) => {
 const BlockCreatedAt = ({ persons }) => {
   if (persons.length === 0) {
     return (
-      <Col md={4} style={{ marginBottom: 20 }}>
+      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
         <Card title="Temps de suivi moyen" count={'-'} />
-      </Col>
+      </div>
     );
   }
   const averageFollowedSince =
@@ -979,9 +1000,9 @@ const BlockCreatedAt = ({ persons }) => {
   const [count, unit] = getDuration(durationFromNowToAverage);
 
   return (
-    <Col md={4} style={{ marginBottom: 20 }}>
+    <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
       <Card title="Temps de suivi moyen" unit={unit} count={count} />
-    </Col>
+    </div>
   );
 };
 
@@ -989,9 +1010,9 @@ const BlockWanderingAt = ({ persons }) => {
   persons = persons.filter((p) => Boolean(p.wanderingAt));
   if (!persons.length) {
     return (
-      <Col md={4} style={{ marginBottom: 20 }}>
+      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
         <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={'N/A'} count={0} />
-      </Col>
+      </div>
     );
   }
   const averageWanderingAt = persons.reduce((total, person) => total + Date.parse(person.wanderingAt), 0) / (persons.length || 1);
@@ -999,9 +1020,9 @@ const BlockWanderingAt = ({ persons }) => {
   const [count, unit] = getDuration(durationFromNowToAverage);
 
   return (
-    <Col md={4} style={{ marginBottom: 20 }}>
+    <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
       <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={unit} count={count} />
-    </Col>
+    </div>
   );
 };
 
@@ -1026,7 +1047,37 @@ const BlockTotal = ({ title, unit, data, field }) => {
       />
     );
   } catch (errorBlockTotal) {
-    console.log('error block total', errorBlockTotal, { title, unit, data, field });
+    capture('error block total', errorBlockTotal, { title, unit, data, field });
+  }
+  return null;
+};
+
+const BlockGroup = ({ title, groups }) => {
+  try {
+    if (!groups.length) {
+      return (
+        <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
+          <Card title={title} count={0} />
+        </div>
+      );
+    }
+
+    const avg = groups.reduce((total, group) => total + group.relations.length, 0) / groups.length;
+    return (
+      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
+        <Card
+          title={title}
+          count={groups.length}
+          children={
+            <span className="font-weight-normal">
+              Moyenne de relations par famille: <strong>{avg}</strong>
+            </span>
+          }
+        />
+      </div>
+    );
+  } catch (errorBlockTotal) {
+    capture('error block total', errorBlockTotal, { title, groups });
   }
   return null;
 };
@@ -1085,11 +1136,5 @@ function CustomFieldsStats({ customFields, data, additionalCols = [], dataTestId
     </>
   );
 }
-
-const Title = styled.h3`
-  margin-top: 20px;
-  margin-bottom: 20px;
-  font-size: 20px;
-`;
 
 export default Stats;

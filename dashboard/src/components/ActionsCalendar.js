@@ -11,8 +11,9 @@ import ConsultationButton from './ConsultationButton';
 import { organisationState, userState } from '../recoil/auth';
 import { disableConsultationRow } from '../recoil/consultations';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
-import { CANCEL, DONE } from '../recoil/actions';
+import { CANCEL, DONE, sortActionsOrConsultations } from '../recoil/actions';
 import TagTeam from './TagTeam';
+import { useLocalStorage } from 'react-use';
 
 const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie', 'Créée le', 'Statut', 'Équipe en charge'] }) => {
   const history = useHistory();
@@ -22,6 +23,8 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
   const [theDayBeforeActions, setTheDayBeforeActions] = useState([]);
   const [theDayAfterActions, setTheDayAfterActions] = useState([]);
   const [theCurrentDayActions, setTheCurrentDayActions] = useState([]);
+  const [sortBy, setSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
+  const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
 
   const [currentDate, setCurrentDate] = useState(() => {
     const savedDate = new URLSearchParams(location.search)?.get('calendarDate');
@@ -34,13 +37,21 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
     if (!currentDate) return;
     const filteredActions = actions.filter((a) => a.completedAt || a.dueAt);
     setTheDayBeforeActions(
-      filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, subtractOneDay(currentDate)))
+      filteredActions
+        .filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, subtractOneDay(currentDate)))
+        .sort(sortActionsOrConsultations(sortBy, sortOrder))
     );
     setTheDayAfterActions(
-      filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, addOneDay(currentDate)))
+      filteredActions
+        .filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, addOneDay(currentDate)))
+        .sort(sortActionsOrConsultations(sortBy, sortOrder))
     );
-    setTheCurrentDayActions(filteredActions.filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, currentDate)));
-  }, [actions, currentDate]);
+    setTheCurrentDayActions(
+      filteredActions
+        .filter((a) => isOnSameDay([DONE, CANCEL].includes(a.status) ? a.completedAt : a.dueAt, currentDate))
+        .sort(sortActionsOrConsultations(sortBy, sortOrder))
+    );
+  }, [actions, currentDate, sortBy, sortOrder]);
 
   useEffect(() => {
     const searchParams = new URLSearchParams(location.search);
@@ -61,8 +72,8 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
       className="Table"
       noData={`Pas d'action à faire le ${formatDateTimeWithNameOfDay(date)}`}
       data={actions.map((a) => {
-        if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca' } };
-        if (a.isConsultation) return { ...a, style: { backgroundColor: '#DDF4FF' } };
+        if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca99' } };
+        if (a.isConsultation) return { ...a, style: { backgroundColor: '#DDF4FF99' } };
         return a;
       })}
       onRowClick={(actionOrConsultation) => {
@@ -80,6 +91,10 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           title: '',
           dataKey: 'urgentOrGroupOrConsultation',
           small: true,
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
           render: (actionOrConsult) => {
             return (
               <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
@@ -97,6 +112,10 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
         {
           title: 'Heure',
           dataKey: 'dueAt',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
           small: true,
           render: (action) => {
             if (!action.dueAt || !action.withTime) return null;
@@ -105,15 +124,31 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
         },
         {
           title: ['restricted-access'].includes(user.role) ? null : 'Nom',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
           dataKey: 'name',
           render: (action) => <ActionOrConsultationName item={action} />,
         },
         {
           title: 'Personne suivie',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
           dataKey: 'person',
           render: (action) => <PersonName item={action} />,
         },
-        { title: 'Statut', dataKey: 'status', render: (action) => <ActionStatus status={action.status} /> },
+        {
+          title: 'Statut',
+          onSortOrder: setSortOrder,
+          onSortBy: setSortBy,
+          sortBy,
+          sortOrder,
+          dataKey: 'status',
+          render: (action) => <ActionStatus status={action.status} />,
+        },
         {
           title: 'Équipe en charge',
           dataKey: 'team',
