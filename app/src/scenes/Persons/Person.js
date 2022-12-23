@@ -111,12 +111,10 @@ const Person = ({ route, navigation }) => {
       e.preventDefault();
       onGoBackRequested();
     };
-
     const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
     return () => {
       beforeRemoveListenerUnsbscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [navigation, route?.params?.person]);
 
   useFocusEffect(

@@ -23,6 +23,7 @@ import ButtonDelete from '../../components/ButtonDelete';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { dayjsInstance } from '../../services/dateDayjs';
 import InputFromSearchList from '../../components/InputFromSearchList';
+import { useFocusEffect } from '@react-navigation/native';
 
 const cleanValue = (value) => {
   if (typeof value === 'string') return (value || '').trim();
@@ -80,20 +81,20 @@ const Consultation = ({ navigation, route }) => {
       onGoBackRequested();
     };
 
-    const handleFocus = () => {
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      beforeRemoveListenerUnsbscribe();
+    };
+  }, [navigation]);
+
+  useFocusEffect(
+    useCallback(() => {
       const newPerson = route?.params?.person;
       if (newPerson) {
         setConsultation((c) => ({ ...c, person: newPerson?._id }));
       }
-    };
-    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
-    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
-    return () => {
-      focusListenerUnsubscribe();
-      beforeRemoveListenerUnsbscribe();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation, route?.params?.person]);
+    }, [route?.params?.person])
+  );
 
   const onSaveConsultationRequest = async () => {
     if (!consultation.status) return Alert.alert('Veuillez indiquer un status');
