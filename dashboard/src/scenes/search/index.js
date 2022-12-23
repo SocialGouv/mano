@@ -17,7 +17,7 @@ import { organisationState, teamsState } from '../../recoil/auth';
 import { actionsState, CANCEL, DONE, sortActionsOrConsultations } from '../../recoil/actions';
 import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
-import { territoriesState } from '../../recoil/territory';
+import { sortTerritories, territoriesState } from '../../recoil/territory';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
 import { itemsGroupedByPersonSelector, onlyFilledObservationsTerritories, personsObjectSelector } from '../../recoil/selectors';
 import PersonName from '../../components/PersonName';
@@ -481,11 +481,13 @@ const Comments = ({ search, onUpdateResults }) => {
 const Territories = ({ search, onUpdateResults }) => {
   const history = useHistory();
   const territories = useRecoilValue(territoriesState);
+  const [sortBy, setSortBy] = useLocalStorage('territory-sortBy', 'name');
+  const [sortOrder, setSortOrder] = useLocalStorage('territory-sortOrder', 'ASC');
 
   const data = useMemo(() => {
     if (!search?.length) return [];
-    return filterBySearch(search, territories);
-  }, [search, territories]);
+    return filterBySearch(search, territories).sort(sortTerritories(sortBy, sortOrder));
+  }, [search, territories, sortBy, sortOrder]);
 
   useEffect(() => {
     onUpdateResults(data.length);
@@ -506,10 +508,40 @@ const Territories = ({ search, onUpdateResults }) => {
           onRowClick={(territory) => history.push(`/territory/${territory._id}`)}
           rowKey="_id"
           columns={[
-            { title: 'Nom', dataKey: 'name' },
-            { title: 'Types', dataKey: 'types', render: ({ types }) => (types ? types.join(', ') : '') },
-            { title: 'Périmètre', dataKey: 'perimeter' },
-            { title: 'Créé le', dataKey: 'createdAt', render: (territory) => formatDateWithFullMonth(territory.createdAt || '') },
+            {
+              title: 'Nom',
+              dataKey: 'name',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+            },
+            {
+              title: 'Types',
+              dataKey: 'types',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+              render: ({ types }) => (types ? types.join(', ') : ''),
+            },
+            {
+              title: 'Périmètre',
+              dataKey: 'perimeter',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+            },
+            {
+              title: 'Créé le',
+              dataKey: 'createdAt',
+              onSortOrder: setSortOrder,
+              onSortBy: setSortBy,
+              sortOrder,
+              sortBy,
+              render: (territory) => formatDateWithFullMonth(territory.createdAt || ''),
+            },
           ]}
         />
       </StyledBox>
