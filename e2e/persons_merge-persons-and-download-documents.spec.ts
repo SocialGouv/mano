@@ -53,7 +53,7 @@ test("Merge persons", async ({ page }) => {
       await dialog.accept();
     });
 
-    await page.getByRole("button", { name: "Fusionner" }).click();
+    await page.getByRole("button", { name: "Fusionner", exact: true }).click();
     await page.getByText("Fusion réussie !").click();
 
     await expect(page.locator(`data-test-id=${person1DocumentLink}`)).toBeVisible();

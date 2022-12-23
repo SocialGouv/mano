@@ -74,7 +74,7 @@ test("test territories", async ({ page }) => {
 
   // Disconnect/reconnect
   await page.getByRole("button", { name: "User Admin Test - 9" }).click();
-  await page.getByRole("menuitem", { name: "Se déconnecter" }).click();
+  await page.getByRole("menuitem", { name: "Se déconnecter", exact: true }).click();
   await page.getByLabel("Email").click();
   await page.getByLabel("Email").fill("admin9@example.org");
   await page.getByLabel("Email").press("Enter");

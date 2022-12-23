@@ -349,7 +349,7 @@ test("test restricted accesses", async ({ page }) => {
       await dialog.accept();
     });
 
-    await page.getByRole("button", { name: "Fusionner" }).click();
+    await page.getByRole("button", { name: "Fusionner", exact: true }).click();
     await page.getByText("Fusion réussie !").click();
   });
 

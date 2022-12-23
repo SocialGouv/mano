@@ -64,7 +64,7 @@ test("merging normal user with health data", async ({ page }) => {
   await test.step("setup different string medical field for two people", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
-    await page.getByRole("cell", { name: "1" }).click();
+    await page.getByRole("cell", { name: "1", exact: true }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
     await page.getByLabel("Numéro de sécurité sociale").fill("123");
     await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
@@ -72,7 +72,7 @@ test("merging normal user with health data", async ({ page }) => {
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
-    await page.getByRole("cell", { name: "2" }).click();
+    await page.getByRole("cell", { name: "2", exact: true }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
     await page.getByLabel("Numéro de sécurité sociale").fill("456");
     await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
@@ -82,7 +82,7 @@ test("merging normal user with health data", async ({ page }) => {
   await test.step("setup array medical field for one person", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
-    await page.getByRole("cell", { name: "3" }).click();
+    await page.getByRole("cell", { name: "3", exact: true }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
     await clickOnEmptyReactSelect(page, "person-custom-select-multi-champ", "choix 1");
     await changeReactSelectValue(page, "person-custom-select-multi-champ", "choix 2");
@@ -93,7 +93,7 @@ test("merging normal user with health data", async ({ page }) => {
   await test.step("try to merge as health professional", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
-    await page.getByRole("cell", { name: "1" }).click();
+    await page.getByRole("cell", { name: "1", exact: true }).click();
     await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
     await clickOnEmptyReactSelect(page, "person-to-merge-with-select", "2");
     await expect(page.locator(".person-to-merge-with-select__value-container")).toHaveText("2");
@@ -106,7 +106,7 @@ test("merging normal user with health data", async ({ page }) => {
   await test.step("login as normal user and try to merge", async () => {
     await page.getByRole("button", { name: "User Admin Test - 1" }).click();
 
-    await page.getByRole("menuitem", { name: "Se déconnecter" }).click();
+    await page.getByRole("menuitem", { name: "Se déconnecter", exact: true }).click();
     await expect(page).toHaveURL("http://localhost:8090/auth");
     await page.getByLabel("Email").fill("normal1@example.org");
     await page.getByLabel("Mot de passe").fill("secret");
@@ -119,7 +119,7 @@ test("merging normal user with health data", async ({ page }) => {
   await test.step("merge two people with string medical field different should be forbidden", async () => {
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
-    await page.getByRole("cell", { name: "1" }).click();
+    await page.getByRole("cell", { name: "1", exact: true }).click();
     await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
     const forbiddenMergeListener = async (dialog) => {
       expect(dialog.message()).toBe(
@@ -142,7 +142,7 @@ test("merging normal user with health data", async ({ page }) => {
       await dialog.accept();
     };
     page.on("dialog", mergeListener);
-    await page.getByRole("button", { name: "Fusionner" }).click();
+    await page.getByRole("button", { name: "Fusionner", exact: true }).click();
     await page.getByText("Fusion réussie !").click();
     page.off("dialog", mergeListener);
   });
@@ -150,7 +150,7 @@ test("merging normal user with health data", async ({ page }) => {
   await test.step("login as health professional and try to merge", async () => {
     await page.getByRole("button", { name: "User Normal Test - 1" }).click();
 
-    await page.getByRole("menuitem", { name: "Se déconnecter" }).click();
+    await page.getByRole("menuitem", { name: "Se déconnecter", exact: true }).click();
     await expect(page).toHaveURL("http://localhost:8090/auth");
     await page.getByLabel("Email").fill("admin1@example.org");
     await page.getByLabel("Mot de passe").fill("secret");
@@ -161,7 +161,7 @@ test("merging normal user with health data", async ({ page }) => {
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
-    await page.getByRole("cell", { name: "1" }).click();
+    await page.getByRole("cell", { name: "1", exact: true }).click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
     await expect(page.getByLabel("Numéro de sécurité sociale")).toHaveValue("123");
     await expect(page.locator("div.person-custom-select-multi-champ__value-container")).toHaveText("choix 1choix 2");
@@ -174,7 +174,7 @@ test("merging normal user with health data", async ({ page }) => {
     await clickOnEmptyReactSelect(page, "person-to-merge-with-select", "2");
     await expect(page.locator(".person-to-merge-with-select__value-container")).toHaveText("2");
     await page.locator('input[name="numeroSecuriteSociale"]').fill("456");
-    await page.getByRole("button", { name: "Fusionner" }).click();
+    await page.getByRole("button", { name: "Fusionner", exact: true }).click();
     await page.getByText("Fusion réussie !").click();
     await page.getByRole("button", { name: "Dossier Médical" }).click();
     await expect(page.getByLabel("Numéro de sécurité sociale")).toHaveValue("456");

@@ -42,7 +42,7 @@ test("Cross teams report", async ({ page }) => {
 
     await page.getByLabel("Nom").fill(team1Name);
 
-    await page.getByRole("button", { name: "Créer" }).click();
+    await page.getByRole("button", { name: "Créer", exact: true }).click();
     await page.locator(".Toastify__close-button").last().click();
 
     await page.getByRole("button", { name: "Créer une nouvelle équipe" }).click();
@@ -54,7 +54,7 @@ test("Cross teams report", async ({ page }) => {
 
     // await page.getByLabel("Oui").check(); // night shift
 
-    await page.getByRole("button", { name: "Créer" }).click();
+    await page.getByRole("button", { name: "Créer", exact: true }).click();
     await page.locator(".Toastify__close-button").last().click();
   });
 

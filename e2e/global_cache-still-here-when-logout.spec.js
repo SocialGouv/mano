@@ -62,7 +62,7 @@ test("Person creation", async ({ page }) => {
   });
 
   await page.getByRole("button", { name: "User Admin Test - 5" }).click();
-  await page.getByRole("menuitem", { name: "Se déconnecter" }).click();
+  await page.getByRole("menuitem", { name: "Se déconnecter", exact: true }).click();
   await expect(page).toHaveURL("http://localhost:8090/auth");
 
   await page.getByLabel("Email").fill("admin5@example.org");
