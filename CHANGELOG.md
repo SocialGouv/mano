@@ -1,3 +1,10 @@
+## [1.200.4](https://github.com/SocialGouv/mano/compare/v1.200.3...v1.200.4) (2022-12-23)
+
+
+### Bug Fixes
+
+* **dashboard:** fix filters when selecting other than react-select ([#1128](https://github.com/SocialGouv/mano/issues/1128)) ([a36ba22](https://github.com/SocialGouv/mano/commit/a36ba225ebfa1796e6c753269637d152633babd3))
+
 ## [1.200.3](https://github.com/SocialGouv/mano/compare/v1.200.2...v1.200.3) (2022-12-23)
 
 
