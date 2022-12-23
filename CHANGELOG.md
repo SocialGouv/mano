@@ -1,3 +1,10 @@
+## [1.200.2](https://github.com/SocialGouv/mano/compare/v1.200.1...v1.200.2) (2022-12-23)
+
+
+### Bug Fixes
+
+* **app:** focus on app ([#1122](https://github.com/SocialGouv/mano/issues/1122)) ([3de06ac](https://github.com/SocialGouv/mano/commit/3de06acc671e1325cf0bfba9f8647faff84bcec1))
+
 ## [1.200.1](https://github.com/SocialGouv/mano/compare/v1.200.0...v1.200.1) (2022-12-23)
 
 
