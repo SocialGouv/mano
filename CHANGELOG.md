@@ -1,3 +1,16 @@
+# [1.199.0](https://github.com/SocialGouv/mano/compare/v1.198.0...v1.199.0) (2022-12-23)
+
+
+### Bug Fixes
+
+* **api:** find or create report ([#1116](https://github.com/SocialGouv/mano/issues/1116)) ([54bbd5b](https://github.com/SocialGouv/mano/commit/54bbd5bb4f045f7e32aa61560625279d734a20ee))
+* **app:** person considered modified and losing previous info on focus ([#1121](https://github.com/SocialGouv/mano/issues/1121)) ([943b68a](https://github.com/SocialGouv/mano/commit/943b68ac5cd59bf3c5c8066b8976bfa6e91ca74c))
+
+
+### Features
+
+* **dashboard:** sort all persons ([#1111](https://github.com/SocialGouv/mano/issues/1111)) ([dd501e9](https://github.com/SocialGouv/mano/commit/dd501e97416605f8e2cd74169e7daf621ba04bf0))
+
 # [1.198.0](https://github.com/SocialGouv/mano/compare/v1.197.2...v1.198.0) (2022-12-23)
 
 
