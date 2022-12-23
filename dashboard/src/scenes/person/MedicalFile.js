@@ -28,11 +28,13 @@ import { modalConfirmState } from '../../components/ModalConfirm';
 import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import { useLocalStorage } from 'react-use';
 import ConsultationModal from '../../components/ConsultationModal';
+import { consultationsState } from '../../recoil/consultations';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
   const organisation = useRecoilValue(organisationState);
-  const [allConsultations, setAllConsultations] = useRecoilState(arrayOfitemsGroupedByConsultationSelector);
+  const setAllConsultations = useSetRecoilState(consultationsState);
+  const allConsultations = useRecoilValue(arrayOfitemsGroupedByConsultationSelector);
   const [allTreatments, setAllTreatments] = useRecoilState(treatmentsState);
   const [allMedicalFiles, setAllMedicalFiles] = useRecoilState(medicalFileState);
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
