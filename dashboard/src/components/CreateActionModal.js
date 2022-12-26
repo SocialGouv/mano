@@ -10,7 +10,6 @@ import { organisationState, teamsState, userState } from '../recoil/auth';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
 import useApi from '../services/api';
 
-import SelectTeam from './SelectTeam';
 import SelectPerson from './SelectPerson';
 import ButtonCustom from './ButtonCustom';
 import SelectStatus from './SelectStatus';
@@ -55,7 +54,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
           initialValues={{
             name: '',
             person: isMulti ? persons : person,
-            teams: [],
+            teams: teams.length === 1 ? [teams[0]._id] : [],
             dueAt: dueAt || (!!completedAt ? new Date(completedAt) : new Date()),
             withTime: false,
             status: !!completedAt ? DONE : TODO,
@@ -75,7 +74,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
             if (!values.dueAt) return toast.error("La date d'échéance est obligatoire");
             const body = {
               name: values.name,
-              team: values.team,
+              teams: values.teams,
               dueAt: values.dueAt,
               completedAt: values.completedAt,
               withTime: values.withTime,

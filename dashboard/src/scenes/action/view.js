@@ -16,7 +16,6 @@ import Comments from '../../components/Comments';
 import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
-import SelectTeam from '../../components/SelectTeam';
 
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
@@ -80,13 +79,13 @@ const ActionView = () => {
   };
 
   const onDuplicate = async () => {
-    const { name, person, dueAt, withTime, description, categories, urgent } = action;
+    const { name, person, dueAt, withTime, description, categories, urgent, teams } = action;
     const response = await API.post({
       path: '/action',
       body: prepareActionForEncryption({
         name,
         person,
-        team: currentTeam._id,
+        teams,
         user: user._id,
         dueAt,
         withTime,
