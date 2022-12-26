@@ -1,3 +1,10 @@
+## [1.201.1](https://github.com/SocialGouv/mano/compare/v1.201.0...v1.201.1) (2022-12-26)
+
+
+### Bug Fixes
+
+* **dashboard:** fix stats display ([e183e78](https://github.com/SocialGouv/mano/commit/e183e7801ebde64f793ce0c27eed4e00681439d1))
+
 # [1.201.0](https://github.com/SocialGouv/mano/compare/v1.200.5...v1.201.0) (2022-12-26)
 
 
