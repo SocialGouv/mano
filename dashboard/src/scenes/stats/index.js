@@ -437,7 +437,7 @@ const Stats = () => {
       </Row>
       <Nav tabs style={{ marginBottom: 20 }}>
         {tabs
-          .filter((e) => user.healthcareProfessional || ['Consultations', 'Dossiers médicaux'].includes(e))
+          .filter((e) => user.healthcareProfessional || !['Consultations', 'Dossiers médicaux'].includes(e))
           .map((tabCaption, index) => {
             if (!organisation.receptionEnabled && index === 1) return null;
             return (
