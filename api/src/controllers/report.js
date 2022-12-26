@@ -73,35 +73,11 @@ router.post(
       return next(error);
     }
 
-    if (req.body.date && req.body.team) {
-      const existingReport = await Report.findOne({
-        where: { organisation: req.user.organisation, team: req.body.team, date: req.body.date },
-      });
-      if (!!existingReport) {
-        return res.status(200).send({
-          ok: true,
-          data: {
-            _id: existingReport._id,
-            encrypted: existingReport.encrypted,
-            encryptedEntityKey: existingReport.encryptedEntityKey,
-            organisation: existingReport.organisation,
-            team: existingReport.team,
-            date: existingReport.date,
-            createdAt: existingReport.createdAt,
-            updatedAt: existingReport.updatedAt,
-            deletedAt: existingReport.deletedAt,
-          },
-        });
-      }
-    }
-
-    const data = await Report.create(
-      {
-        organisation: req.user.organisation,
+    const [data, _created] = await Report.findOrCreate({
+      where: { organisation: req.user.organisation, team: req.body.team, date: req.body.date },
+      defaults: {
         encrypted: req.body.encrypted,
         encryptedEntityKey: req.body.encryptedEntityKey,
-        team: req.body.team,
-        date: req.body.date,
         debug: {
           version: req.headers.version,
           user: req.user._id,
@@ -110,8 +86,9 @@ router.post(
           function: req.headers["debug-report-function"],
         },
       },
-      { returning: true }
-    );
+      returning: true,
+    });
+
     return res.status(200).send({
       ok: true,
       data: {

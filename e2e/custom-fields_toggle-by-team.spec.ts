@@ -38,7 +38,7 @@ test("Create custom fields filtered by team", async ({ page }) => {
 
   await page.getByLabel("Non").check();
 
-  await page.getByRole("button", { name: "Créer" }).click();
+  await page.getByRole("button", { name: "Créer", exact: true }).click();
   await page.locator(".Toastify__close-button").last().click();
 
   /*

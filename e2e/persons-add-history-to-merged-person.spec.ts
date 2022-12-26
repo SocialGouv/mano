@@ -74,7 +74,7 @@ test("Add history to merged person", async ({ page }) => {
 
   page.once("dialog", (dialog) => dialog.accept());
 
-  await page.getByRole("button", { name: "Fusionner" }).click();
+  await page.getByRole("button", { name: "Fusionner", exact: true }).click();
 
   await page.locator(".Toastify__close-button").last().click();
   await page.getByRole("button", { name: "Historique" }).click();

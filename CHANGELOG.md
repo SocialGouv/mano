@@ -1,3 +1,58 @@
+## [1.200.4](https://github.com/SocialGouv/mano/compare/v1.200.3...v1.200.4) (2022-12-23)
+
+
+### Bug Fixes
+
+* **dashboard:** fix filters when selecting other than react-select ([#1128](https://github.com/SocialGouv/mano/issues/1128)) ([a36ba22](https://github.com/SocialGouv/mano/commit/a36ba225ebfa1796e6c753269637d152633babd3))
+
+## [1.200.3](https://github.com/SocialGouv/mano/compare/v1.200.2...v1.200.3) (2022-12-23)
+
+
+### Bug Fixes
+
+* fix consultation deletion ([#1124](https://github.com/SocialGouv/mano/issues/1124)) ([d1a3b13](https://github.com/SocialGouv/mano/commit/d1a3b13ff2bc904f80b54cd2615f6f643d470ed6))
+
+## [1.200.2](https://github.com/SocialGouv/mano/compare/v1.200.1...v1.200.2) (2022-12-23)
+
+
+### Bug Fixes
+
+* **app:** focus on app ([#1122](https://github.com/SocialGouv/mano/issues/1122)) ([3de06ac](https://github.com/SocialGouv/mano/commit/3de06acc671e1325cf0bfba9f8647faff84bcec1))
+
+## [1.200.1](https://github.com/SocialGouv/mano/compare/v1.200.0...v1.200.1) (2022-12-23)
+
+
+### Bug Fixes
+
+* **deps:** update dependency jsonwebtoken to v9 [security] ([#1118](https://github.com/SocialGouv/mano/issues/1118)) ([9aaf60c](https://github.com/SocialGouv/mano/commit/9aaf60cdef73bab8c76011b62eb0b4bc4d8dfc2e))
+
+# [1.200.0](https://github.com/SocialGouv/mano/compare/v1.199.0...v1.200.0) (2022-12-23)
+
+
+### Features
+
+* **dashboard:** sort users and teams ([#1112](https://github.com/SocialGouv/mano/issues/1112)) ([2c24278](https://github.com/SocialGouv/mano/commit/2c24278a4b1635309c3af4765b5fb0cd2e6f1b18))
+
+# [1.199.0](https://github.com/SocialGouv/mano/compare/v1.198.0...v1.199.0) (2022-12-23)
+
+
+### Bug Fixes
+
+* **api:** find or create report ([#1116](https://github.com/SocialGouv/mano/issues/1116)) ([54bbd5b](https://github.com/SocialGouv/mano/commit/54bbd5bb4f045f7e32aa61560625279d734a20ee))
+* **app:** person considered modified and losing previous info on focus ([#1121](https://github.com/SocialGouv/mano/issues/1121)) ([943b68a](https://github.com/SocialGouv/mano/commit/943b68ac5cd59bf3c5c8066b8976bfa6e91ca74c))
+
+
+### Features
+
+* **dashboard:** sort all persons ([#1111](https://github.com/SocialGouv/mano/issues/1111)) ([dd501e9](https://github.com/SocialGouv/mano/commit/dd501e97416605f8e2cd74169e7daf621ba04bf0))
+
+# [1.198.0](https://github.com/SocialGouv/mano/compare/v1.197.2...v1.198.0) (2022-12-23)
+
+
+### Features
+
+* **dashboard:** sort territories ([#1113](https://github.com/SocialGouv/mano/issues/1113)) ([f2bee23](https://github.com/SocialGouv/mano/commit/f2bee238d597bbe1daaabd48f966ee4f8fb466db))
+
 ## [1.197.2](https://github.com/SocialGouv/mano/compare/v1.197.1...v1.197.2) (2022-12-23)
 
 

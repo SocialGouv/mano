@@ -1,6 +1,6 @@
 {
   "name": "api_mano",
-  "version": "1.197.2",
+  "version": "1.200.4",
   "mobileAppVersion": "2.29.0",
   "description": "",
   "main": "index.js",
@@ -37,7 +37,7 @@
     "zod": "^3.13.4"
   },
   "devDependencies": {
-    "@types/jsonwebtoken": "^8.5.6",
+    "@types/jsonwebtoken": "^9.0.0",
     "cross-env": "^7.0.3",
     "nodemon": "^2.0.15"
   }

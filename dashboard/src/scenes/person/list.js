@@ -14,6 +14,7 @@ import {
   customFieldsPersonsSocialSelector,
   fieldsPersonsCustomizableOptionsSelector,
   filterPersonsBaseSelector,
+  sortPersons,
 } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
@@ -129,42 +130,7 @@ const List = () => {
 
   const personsSorted = useMemo(() => {
     const sorted = [...personsFilteredBySearch];
-    sorted.sort((a, b) => {
-      if (sortBy === 'name') {
-        return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-      }
-      if (sortBy === 'formattedBirthDate') {
-        if (!a.birthdate && !b.birthdate) return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-        if (!a.birthdate) return sortOrder === 'ASC' ? 1 : -1;
-        if (!b.birthdate) return sortOrder === 'DESC' ? 1 : -1;
-        return sortOrder === 'ASC' ? new Date(b.birthdate) - new Date(a.birthdate) : new Date(a.birthdate) - new Date(b.birthdate);
-      }
-      if (sortBy === 'alertness') {
-        if (a.alertness === b.alertness) {
-          // if both have same alertness, sort by name
-          return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-        }
-        if (!a.alertness) return sortOrder === 'ASC' ? 1 : -1;
-        if (!b.alertness) return sortOrder === 'DESC' ? 1 : -1;
-        return 0;
-      }
-      if (sortBy === 'group') {
-        if (!!a.group === !!b.group) {
-          // if both have group, sort by name
-          return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-        }
-        if (!a.group) return sortOrder === 'ASC' ? 1 : -1;
-        if (!b.group) return sortOrder === 'DESC' ? 1 : -1;
-        return 0;
-      }
-      if (sortBy === 'followedSince') {
-        if (!a.followedSince && !b.followedSince) return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-        if (!a.followedSince) return sortOrder === 'ASC' ? 1 : -1;
-        if (!b.followedSince) return sortOrder === 'DESC' ? 1 : -1;
-        return sortOrder === 'ASC' ? new Date(b.followedSince) - new Date(a.followedSince) : new Date(a.followedSince) - new Date(b.followedSince);
-      }
-      return sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name);
-    });
+    sorted.sort(sortPersons(sortBy, sortOrder));
     return sorted;
   }, [personsFilteredBySearch, sortBy, sortOrder]);
 

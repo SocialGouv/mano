@@ -6,7 +6,7 @@
   "author": "Raphaël Huchet <raphael.huchet@beta.gouv.fr>, Arnaud Ambroselli <arnaud@ambroselli.io>",
   "license": "MIT",
   "devDependencies": {
-    "@playwright/test": "^1.27.1",
+    "@playwright/test": "^1.29.1",
     "husky": "^8.0.1",
     "is-ci": "^3.0.1",
     "node-talisman": "^1.29.3"

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Alert, View } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -21,6 +21,7 @@ import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { dayjsInstance } from '../../services/dateDayjs';
 import { groupsState } from '../../recoil/groups';
+import { useFocusEffect } from '@react-navigation/native';
 
 const NewActionForm = ({ route, navigation }) => {
   const setActions = useSetRecoilState(actionsState);
@@ -41,28 +42,26 @@ const NewActionForm = ({ route, navigation }) => {
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const backRequestHandledRef = useRef(null);
-
   useEffect(() => {
     const handleBeforeRemove = (e) => {
       if (backRequestHandledRef.current) return;
       e.preventDefault();
       onGoBackRequested();
     };
+    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
+    return () => {
+      beforeRemoveListenerUnsbscribe();
+    };
+  }, [navigation]);
 
-    const handleFocus = () => {
+  useFocusEffect(
+    useCallback(() => {
       const newPerson = route?.params?.person;
       if (newPerson) {
         setActionPersons((actionPersons) => [...actionPersons.filter((p) => p._id !== newPerson._id), newPerson]);
       }
-    };
-    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
-    const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
-    return () => {
-      focusListenerUnsubscribe();
-      beforeRemoveListenerUnsbscribe();
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [navigation, route?.params?.person]);
+    }, [route?.params?.person])
+  );
 
   const onSearchPerson = () => navigation.push('PersonsSearch', { fromRoute: 'NewActionForm' });
 

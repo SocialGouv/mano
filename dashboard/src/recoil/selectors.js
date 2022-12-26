@@ -104,8 +104,9 @@ export const itemsGroupedByPersonSelector = selector({
     const persons = get(personsState);
     const personsObject = {};
     const user = get(userState);
+    const usersObject = get(usersObjectSelector);
     for (const person of persons) {
-      personsObject[person._id] = { ...person };
+      personsObject[person._id] = { ...person, userPopulated: usersObject[person.user] };
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);

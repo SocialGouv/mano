@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState, useCallback } from 'react';
 import { Alert } from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import styled from 'styled-components';
@@ -32,6 +32,7 @@ import CheckboxLabelled from '../../components/CheckboxLabelled';
 import useCreateReportAtDateIfNotExist from '../../utils/useCreateReportAtDateIfNotExist';
 import { dayjsInstance } from '../../services/dateDayjs';
 import { groupsState } from '../../recoil/groups';
+import { useFocusEffect } from '@react-navigation/native';
 
 const castToAction = (action) => {
   if (!action) action = {};
@@ -168,22 +169,20 @@ const Action = ({ navigation, route }) => {
     e.preventDefault();
     onGoBackRequested();
   };
-
-  const handleFocus = () => {
-    if (route.params?.person) {
-      setAction((a) => ({ ...a, person: route.params.person?._id }));
-    }
-  };
-
   useEffect(() => {
-    const focusListenerUnsubscribe = navigation.addListener('focus', handleFocus);
     const beforeRemoveListenerUnsbscribe = navigation.addListener('beforeRemove', handleBeforeRemove);
     return () => {
-      focusListenerUnsubscribe();
       beforeRemoveListenerUnsbscribe();
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [route?.params?.person]);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.person) {
+        setAction((a) => ({ ...a, person: route.params.person?._id }));
+      }
+    }, [route?.params?.person])
+  );
 
   const updateAction = async (action) => {
     if (!action.name.trim()) {

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Col, FormGroup, Input, Modal, ModalBody, ModalHeader, Row, Label } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -17,40 +17,92 @@ import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import SelectRole from '../../components/SelectRole';
+import { useLocalStorage } from 'react-use';
+
+const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+
+const sortUsers = (sortBy, sortOrder) => (a, b) => {
+  if (sortBy === 'email') {
+    return sortOrder === 'ASC' ? a.email.localeCompare(b.email) : b.email.localeCompare(a.email);
+  }
+  if (sortBy === 'role') {
+    if (a.role === b.role) return defaultSort(a, b, sortOrder);
+    return sortOrder === 'ASC' ? a.role.localeCompare(b.role) : b.role.localeCompare(a.role);
+  }
+  if (sortBy === 'createdAt') {
+    if (a.createdAt > b.createdAt) return sortOrder === 'ASC' ? 1 : -1;
+    if (a.createdAt < b.createdAt) return sortOrder === 'ASC' ? -1 : 1;
+    return defaultSort(a, b, sortOrder);
+  }
+  if (sortBy === 'lastLoginAt') {
+    if (!a.lastLoginAt && !b.lastLoginAt) return defaultSort(a, b, sortOrder);
+    if (!a.lastLoginAt) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.lastLoginAt) return sortOrder === 'ASC' ? -1 : 1;
+    if (a.lastLoginAt > b.lastLoginAt) return sortOrder === 'ASC' ? 1 : -1;
+    if (a.lastLoginAt < b.lastLoginAt) return sortOrder === 'ASC' ? -1 : 1;
+    return defaultSort(a, b, sortOrder);
+  }
+  // default sort: name
+  return defaultSort(a, b, sortOrder);
+};
 
 const List = () => {
-  const [users, setUsers] = useState(null);
+  const [users, setUsers] = useState([]);
   const history = useHistory();
-  const [refresh, setRefresh] = useState(false);
+  const [refresh, setRefresh] = useState(true);
   const user = useRecoilValue(userState);
   useTitle('Utilisateurs');
   const API = useApi();
+  const [sortBy, setSortBy] = useLocalStorage('users-sortBy', 'createdAt');
+  const [sortOrder, setSortOrder] = useLocalStorage('users-sortOrder', 'ASC');
 
   const getUsers = async () => {
-    const { data } = await API.get({ path: '/user' });
-    setUsers(data);
+    const response = await API.get({ path: '/user' });
+    if (response.error) return toast.error(response.error);
+    setUsers(response.data);
+    setRefresh(false);
   };
+
+  const data = useMemo(() => users.sort(sortUsers(sortBy, sortOrder)), [users, sortBy, sortOrder]);
 
   useEffect(() => {
     getUsers();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [refresh]);
 
-  if (!users) return <Loading />;
+  if (!!refresh) return <Loading />;
   return (
     <>
       <SmallHeader title="Utilisateurs" />
       {['superadmin', 'admin'].includes(user.role) && <Create onChange={() => setRefresh(true)} />}
       <Table
-        data={users}
+        data={data}
         rowKey={'_id'}
         onRowClick={(user) => history.push(`/user/${user._id}`)}
         columns={[
-          { title: 'Nom', dataKey: 'name' },
-          { title: 'Email', dataKey: 'email' },
+          {
+            title: 'Nom',
+            dataKey: 'name',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+          },
+          {
+            title: 'Email',
+            dataKey: 'email',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+          },
           {
             title: 'Rôle',
             dataKey: 'role',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
             render: (user) => {
               return (
                 <>
@@ -61,7 +113,7 @@ const List = () => {
             },
           },
           {
-            title: 'Equipe',
+            title: 'Équipes',
             dataKey: 'teams',
             render: (user) => {
               return (
@@ -73,8 +125,24 @@ const List = () => {
               );
             },
           },
-          { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
-          { title: 'Dernière connection le', dataKey: 'lastLoginAt', render: (i) => (i.lastLoginAt ? formatDateWithFullMonth(i.lastLoginAt) : null) },
+          {
+            title: 'Créé le',
+            dataKey: 'createdAt',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: (i) => formatDateWithFullMonth(i.createdAt),
+          },
+          {
+            title: 'Dernière connection le',
+            dataKey: 'lastLoginAt',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: (i) => (i.lastLoginAt ? formatDateWithFullMonth(i.lastLoginAt) : null),
+          },
         ]}
       />
     </>

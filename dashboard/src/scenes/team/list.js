@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { Formik } from 'formik';
@@ -15,23 +15,60 @@ import useApi from '../../services/api';
 import OnboardingEndModal from '../../components/OnboardingEndModal';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
+import { useLocalStorage } from 'react-use';
+
+const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
+
+const sortTeams = (sortBy, sortOrder) => (a, b) => {
+  if (sortBy === 'createdAt') {
+    if (a.createdAt > b.createdAt) return sortOrder === 'ASC' ? 1 : -1;
+    if (a.createdAt < b.createdAt) return sortOrder === 'ASC' ? -1 : 1;
+    return defaultSort(a, b, sortOrder);
+  }
+  if (sortBy === 'nightSession') {
+    if (a.nightSession && !b.nightSession) return sortOrder === 'ASC' ? 1 : -1;
+    if (!a.nightSession && b.nightSession) return sortOrder === 'ASC' ? -1 : 1;
+    return defaultSort(a, b, sortOrder);
+  }
+  // default sort: name
+  return defaultSort(a, b, sortOrder);
+};
 
 const List = () => {
   const teams = useRecoilValue(teamsState);
   const history = useHistory();
   useTitle('Équipes');
+  const [sortBy, setSortBy] = useLocalStorage('users-sortBy', 'name');
+  const [sortOrder, setSortOrder] = useLocalStorage('users-sortOrder', 'ASC');
+
+  const data = useMemo(() => [...teams].sort(sortTeams(sortBy, sortOrder)), [teams, sortBy, sortOrder]);
 
   return (
     <>
       <SmallHeader title="Équipes" />
       <Create />
       <Table
-        data={teams}
+        data={data}
         onRowClick={(i) => history.push(`/team/${i._id}`)}
         rowKey={'_id'}
         columns={[
-          { title: 'Nom', dataKey: 'name' },
-          { title: 'Créée le', dataKey: 'createdAt', render: (i) => formatDateWithFullMonth(i.createdAt) },
+          {
+            title: 'Nom',
+            dataKey: 'name',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+          },
+          {
+            title: 'Créée le',
+            dataKey: 'createdAt',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: (i) => formatDateWithFullMonth(i.createdAt),
+          },
           {
             title: (
               <>
@@ -40,6 +77,10 @@ const List = () => {
               </>
             ),
             dataKey: 'nightSession',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
             render: (i) => (i.nightSession ? '🌒' : '☀️'),
           },
         ]}
