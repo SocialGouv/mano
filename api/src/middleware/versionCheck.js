@@ -1,5 +1,3 @@
-const { MOBILE_APP_VERSION } = require("../config");
-
 const MINIMUM_MOBILE_APP_VERSION = [2, 29, 0];
 
 module.exports = ({ headers: { version, platform } }, res, next) => {
