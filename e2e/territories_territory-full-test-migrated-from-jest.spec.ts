@@ -50,7 +50,6 @@ test("test territories", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un champ" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("Mon nouveau champ de territoire");
-  await page.getByText("Voir dans les statistiques").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
   await page.getByRole("link", { name: "Territoires" }).click();
