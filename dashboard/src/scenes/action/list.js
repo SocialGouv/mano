@@ -42,7 +42,9 @@ const actionsByTeamAndStatusSelector = selectorFamily({
       const actions = get(arrayOfitemsGroupedByActionSelector);
       const actionsByTeamAndStatus = actions.filter(
         (action) =>
-          (viewAllOrganisationData || !teamIds.length || teamIds.includes(action.team)) &&
+          (viewAllOrganisationData ||
+            !teamIds.length ||
+            (Array.isArray(action.teams) ? teamIds.some((t) => action.teams.includes(t)) : teamIds.includes(action.team))) &&
           (!statuses.length || statuses.includes(action.status)) &&
           (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
       );
