@@ -256,7 +256,7 @@ const ActionView = () => {
                       value={Array.isArray(values.teams) ? values.teams : [values.team]}
                       colored
                       inputId="team"
-                      classNamePrefix="person-select-assigned-team"
+                      classNamePrefix="team"
                     />
                   </FormGroup>
                   <FormGroup>

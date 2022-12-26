@@ -221,7 +221,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                         value={Array.isArray(values.teams) ? values.teams : [values.team]}
                         colored
                         inputId="create-action-team-select"
-                        // classNamePrefix="person-select-assigned-team"
+                        classNamePrefix="create-action-team-select"
                       />
                     </FormGroup>
                     <FormGroup>
