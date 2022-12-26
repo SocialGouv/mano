@@ -1,3 +1,10 @@
+## [1.200.5](https://github.com/SocialGouv/mano/compare/v1.200.4...v1.200.5) (2022-12-26)
+
+
+### Bug Fixes
+
+* **dashboard:** split medical file in stats ([#1115](https://github.com/SocialGouv/mano/issues/1115)) ([25ff15c](https://github.com/SocialGouv/mano/commit/25ff15ce1cdd9b806c9a26a1782e47284eb85e0b))
+
 ## [1.200.4](https://github.com/SocialGouv/mano/compare/v1.200.3...v1.200.4) (2022-12-23)
 
 
