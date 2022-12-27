@@ -14,6 +14,7 @@ const { looseUuidRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
+const Action = require("../models/action");
 
 router.put(
   "/:migrationName",
@@ -145,6 +146,28 @@ router.put(
             });
           }
           await organisation.save({ transaction: tx });
+        }
+        if (req.params.migrationName === "action-with-multiple-team") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.actionsToUpdate);
+          } catch (e) {
+            const error = new Error(`Invalid request in action-with-multiple-team migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.actionsToUpdate) {
+            const action = await Action.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (action) {
+              action.set({ encrypted, encryptedEntityKey });
+              await action.save();
+            }
+          }
         }
 
         organisation.set({
