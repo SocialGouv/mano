@@ -118,6 +118,16 @@ const Drawer = () => {
             </li>
           </>
         )}
+        <a
+          target="_blank"
+          rel="noreferrer"
+          href="https://docs.google.com/forms/d/e/1FAIpQLScnizjlH0dCJ-wa-xeiZJcmemrKqiDkDo5linLwtCUjwr3uzg/viewform?usp=sf_link"
+          className="tw-relative !tw-mt-4 tw-cursor-pointer tw-rounded-md tw-border-black !tw-bg-main !tw-text-white hover:!tw-opacity-100">
+          <div className="tw-absolute -tw-top-2 -tw-left-2 tw-text-2xl">👋</div>
+          <div className="tw-px-2 tw-py-4 tw-text-center tw-text-xs tw-font-semibold">
+            Hep&nbsp;! Auriez-vous une minute à nous accorder pour améliorer Mano&nbsp;?
+          </div>
+        </a>
       </Nav>
       <Footer>
         <span>Version: {packageInfo.version}</span>
