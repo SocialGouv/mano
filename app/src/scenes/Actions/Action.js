@@ -49,8 +49,7 @@ const castToAction = (action) => {
     group: action.group || false,
     completedAt: action.completedAt || null,
     entityKey: action.entityKey || '',
-    team: action.team || null,
-    teams: action.teams || undefined,
+    teams: action.teams || (action.team ? [action.team] : undefined),
     structure: action.structure || null,
   };
 };
@@ -205,6 +204,7 @@ const Action = ({ navigation, route }) => {
           action.completedAt = null;
         }
       }
+      delete action.team;
       const response = await API.put({
         path: `/action/${oldAction._id}`,
         body: prepareActionForEncryption(action),
@@ -239,7 +239,13 @@ const Action = ({ navigation, route }) => {
     setUpdating(true);
     if (isMultipleActions) {
       for (const a of multipleActions) {
-        const response = await updateAction(Object.assign({}, castToAction(action), { _id: a._id, person: a.person, team: currentTeam._id }));
+        const response = await updateAction(
+          Object.assign({}, castToAction(action), {
+            _id: a._id,
+            person: a.person,
+            teams: Array.isArray(a.teams) && a.teams.length ? a.teams : [a.team],
+          })
+        );
         if (!response.ok) {
           Alert.alert(response.error);
           setUpdating(false);
@@ -250,7 +256,12 @@ const Action = ({ navigation, route }) => {
       return;
     }
     const actionCancelled = actionDB.status !== CANCEL && action.status === CANCEL;
-    const response = await updateAction(Object.assign({}, castToAction(action), { _id: actionDB?._id, team: currentTeam._id }));
+    const response = await updateAction(
+      Object.assign({}, castToAction(action), {
+        _id: actionDB._id,
+        teams: Array.isArray(actionDB.teams) && actionDB.teams.length ? actionDB.teams : [actionDB.team],
+      })
+    );
     setUpdating(false);
     if (!response.ok) {
       if (response.error) {
@@ -284,7 +295,7 @@ const Action = ({ navigation, route }) => {
       body: prepareActionForEncryption({
         name,
         person,
-        team: currentTeam._id,
+        teams: [currentTeam._id],
         user: user._id,
         dueAt,
         withTime,
