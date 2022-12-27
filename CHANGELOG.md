@@ -1,3 +1,10 @@
+## [1.201.2](https://github.com/SocialGouv/mano/compare/v1.201.1...v1.201.2) (2022-12-27)
+
+
+### Bug Fixes
+
+* **dashboard:** permanent field bug when changing list (visibility) ([#1131](https://github.com/SocialGouv/mano/issues/1131)) ([f4e32e2](https://github.com/SocialGouv/mano/commit/f4e32e2cb6f8223c140738fe23cb35a77420303a))
+
 ## [1.201.1](https://github.com/SocialGouv/mano/compare/v1.201.0...v1.201.1) (2022-12-26)
 
 
