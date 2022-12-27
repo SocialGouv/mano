@@ -126,7 +126,7 @@ const Stats = () => {
   const filterActionsByTeam = useCallback(
     (elements) => {
       if (viewAllOrganisationData) return elements;
-      return elements.filter((e) => selectedTeams.some((f) => (e.teams?.length ? e.teams.includes(f._id) : e.team._id === f._id)));
+      return elements.filter((e) => selectedTeams.some((f) => (e.teams?.length ? e.teams.includes(f._id) : e.team === f._id)));
     },
     [selectedTeams, viewAllOrganisationData]
   );
