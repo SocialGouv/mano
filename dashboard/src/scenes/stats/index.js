@@ -123,6 +123,14 @@ const Stats = () => {
     [selectedTeams, viewAllOrganisationData]
   );
 
+  const filterActionsByTeam = useCallback(
+    (elements) => {
+      if (viewAllOrganisationData) return elements;
+      return elements.filter((e) => selectedTeams.some((f) => (e.teams?.length ? e.teams.includes(f._id) : e.team._id === f._id)));
+    },
+    [selectedTeams, viewAllOrganisationData]
+  );
+
   const groupsForPersons = useCallback(
     (persons) => {
       const groupIds = persons.reduce((setOfGroupIds, person) => {
@@ -212,11 +220,11 @@ const Stats = () => {
 
   const actions = useMemo(
     () =>
-      getDataForPeriod(filterByTeam(allActions, 'team'), period, selectedTeams, viewAllOrganisationData, {
+      getDataForPeriod(filterActionsByTeam(allActions), period, selectedTeams, viewAllOrganisationData, {
         field: 'completedAt',
         backupField: 'dueAt',
       }),
-    [allActions, filterByTeam, period, selectedTeams, viewAllOrganisationData]
+    [allActions, filterActionsByTeam, period, selectedTeams, viewAllOrganisationData]
   );
 
   const actionsFilteredByStatus = useMemo(
