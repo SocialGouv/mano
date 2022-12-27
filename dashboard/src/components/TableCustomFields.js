@@ -257,7 +257,7 @@ const newField = () => ({
   type: 'text',
   enabled: true,
   required: false,
-  showInStats: false,
+  showInStats: true,
 });
 
 const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField, onEditChoice, onlyOptionsEditable }) => {
@@ -274,8 +274,6 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
       label: formData.get('label'),
       type: formData.get('type'),
       options: formData.getAll('options'),
-      showInStats: formData.get('showInStats') === 'on',
-      enabled: formData.get('enabled') === 'on',
     };
     onSaveField(editedField);
   };
@@ -355,36 +353,6 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
                 />
               </>
             )}
-          </div>
-          <div className="tw-basis-1/2 tw-p-4">
-            <label htmlFor="enabled" className="tw-items-center">
-              <input
-                id="enabled"
-                type="checkbox"
-                disabled={onlyOptionsEditable}
-                name="enabled"
-                className="tw-mr-2"
-                checked={field.enabled}
-                onChange={(e) => setField({ ...field, enabled: e.target.checked })}
-              />
-              Activé
-            </label>
-            {onlyOptionsEditable && <input type="hidden" name="enabled" value={field.enabled} />}
-          </div>
-          <div className="tw-basis-1/2 tw-p-4">
-            <label htmlFor="showInStats" className="tw-items-center">
-              <input
-                id="showInStats"
-                type="checkbox"
-                disabled={onlyOptionsEditable}
-                name="showInStats"
-                className="tw-mr-2"
-                checked={field.showInStats}
-                onChange={(e) => setField({ ...field, showInStats: e.target.checked })}
-              />
-              Voir dans les statistiques
-            </label>
-            {onlyOptionsEditable && <input type="hidden" name="showInStats" value={field.showInStats} />}
           </div>
         </form>
       </ModalBody>
