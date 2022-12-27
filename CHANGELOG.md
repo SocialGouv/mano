@@ -1,3 +1,10 @@
+# [1.202.0](https://github.com/SocialGouv/mano/compare/v1.201.2...v1.202.0) (2022-12-27)
+
+
+### Features
+
+* **dashboard:** link to form improve mano ([#1135](https://github.com/SocialGouv/mano/issues/1135)) ([3dbc2e0](https://github.com/SocialGouv/mano/commit/3dbc2e03e233f5de678ca28d47b5ee3ef2c3cfde))
+
 ## [1.201.2](https://github.com/SocialGouv/mano/compare/v1.201.1...v1.201.2) (2022-12-27)
 
 
