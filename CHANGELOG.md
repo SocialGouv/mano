@@ -1,3 +1,10 @@
+## [1.202.1](https://github.com/SocialGouv/mano/compare/v1.202.0...v1.202.1) (2022-12-27)
+
+
+### Bug Fixes
+
+* **dashboard:** teams and team for stats ([#1137](https://github.com/SocialGouv/mano/issues/1137)) ([ccff5df](https://github.com/SocialGouv/mano/commit/ccff5df0ccb299816aaf5f25a56e14c6484694e3))
+
 # [1.202.0](https://github.com/SocialGouv/mano/compare/v1.201.2...v1.202.0) (2022-12-27)
 
 
