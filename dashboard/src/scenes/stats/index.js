@@ -19,7 +19,6 @@ import Card from '../../components/Card';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { actionsCategoriesSelector, actionsState, DONE, flattenedCategoriesSelector, mappedIdsToLabels } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
-import ExportData from '../data-import-export/ExportData';
 import SelectCustom from '../../components/SelectCustom';
 import { territoriesState } from '../../recoil/territory';
 import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
@@ -33,6 +32,7 @@ import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
 import { groupsState } from '../../recoil/groups';
 import { capture } from '../../services/sentry';
+import ExportFormattedData from '../data-import-export/ExportFormattedData';
 
 const getDataForPeriod = (
   data,
@@ -439,7 +439,11 @@ const Stats = () => {
         {['admin'].includes(user.role) && (
           <Col md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
             <RefreshButton />
-            <ExportData />
+            <ExportFormattedData
+              personCreated={personsForStats}
+              personUpdated={personsUpdatedForStats}
+              actions={actionsWithDetailedGroupAndCategories}
+            />
           </Col>
         )}
       </Row>
