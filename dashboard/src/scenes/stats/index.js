@@ -436,16 +436,14 @@ const Stats = () => {
         <Col md={4} style={{ flexShrink: 0, minWidth: '15rem', padding: 0 }}>
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
         </Col>
-        {['admin'].includes(user.role) && (
-          <Col md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
-            <RefreshButton />
-            <ExportFormattedData
-              personCreated={personsForStats}
-              personUpdated={personsUpdatedForStats}
-              actions={actionsWithDetailedGroupAndCategories}
-            />
-          </Col>
-        )}
+        <Col md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+          <RefreshButton />
+          <ExportFormattedData
+            personCreated={personsForStats}
+            personUpdated={personsUpdatedForStats}
+            actions={actionsWithDetailedGroupAndCategories}
+          />
+        </Col>
       </Row>
       <Nav tabs style={{ marginBottom: 20 }}>
         {tabs
