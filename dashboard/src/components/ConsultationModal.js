@@ -277,7 +277,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                       encryptedEntityKey,
                       createdAt: new Date(),
                       createdBy: user._id,
-                      downloadPath: `/person/${data.person._id}/document/${file.filename}`,
+                      downloadPath: `/person/${data.person}/document/${file.filename}`,
                       file,
                     },
                   ],
