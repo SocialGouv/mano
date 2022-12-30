@@ -1,14 +1,31 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useDebounce } from 'react-use';
 import styled from 'styled-components';
 import { theme } from '../config';
+import useApi from '../services/api';
 
-const IncrementorSmall = ({ service, count, onChange, dataTestId = null, disabled = false }) => {
+const IncrementorSmall = ({ service, team, date, count: initialValue, onUpdated, dataTestId, disabled = false }) => {
+  const [value, setValue] = useState(initialValue);
+  const API = useApi();
+
+  useEffect(() => setValue(initialValue), [initialValue]);
+
+  useDebounce(
+    function updateServiceInDatabase() {
+      if (value === initialValue || disabled) return;
+      API.post({ path: `/service/team/${team}/date/${date}`, body: { count: value, service } }).then((res) => {
+        if (res.ok) onUpdated(res.data.count);
+      });
+    },
+    process.env.REACT_APP_TEST === 'true' ? 0 : 1000,
+    [value]
+  );
   return (
     <IncrementorSmallWrapper className="incrementor-small">
       <p id={`${service}-title`} className="service-name">
         {service}
       </p>
-      <ButtonRemoveAdd aria-label="moins" disabled={disabled || count === 0} onClick={() => onChange(count - 1)} id={`${service}-remove`}>
+      <ButtonRemoveAdd aria-label="moins" disabled={disabled || value === 0} onClick={() => setValue(value - 1)} id={`${service}-remove`}>
         -
       </ButtonRemoveAdd>
       <LocalCount
@@ -17,11 +34,11 @@ const IncrementorSmall = ({ service, count, onChange, dataTestId = null, disable
         id={`${service}-count`}
         data-test-id={dataTestId || `${service}-count`}
         type="number"
-        value={count}
+        value={value}
         disabled={disabled}
-        onChange={(e) => onChange(Number(e.currentTarget.value))}
+        onChange={(e) => setValue(Number(e.currentTarget.value))}
       />
-      <ButtonRemoveAdd aria-label="plus" onClick={() => onChange(count + 1)} id={`${service}-add`} disabled={disabled}>
+      <ButtonRemoveAdd aria-label="plus" onClick={() => setValue(value + 1)} id={`${service}-add`} disabled={disabled}>
         +
       </ButtonRemoveAdd>
     </IncrementorSmallWrapper>

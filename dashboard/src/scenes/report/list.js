@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { useHistory, useLocation } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
@@ -12,9 +12,12 @@ import { dayjsInstance } from '../../services/date';
 import { selectedTeamsReportsSelector } from '../../recoil/selectors';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useLocalStorage } from 'react-use';
+import useApi from '../../services/api';
+import { toast } from 'react-toastify';
 
 const List = () => {
   useTitle('Comptes rendus');
+  const API = useApi();
   useDataLoader({ refreshOnMount: true });
 
   const currentTeam = useRecoilValue(currentTeamState);
@@ -46,6 +49,24 @@ const List = () => {
     }
     return days;
   }, [firstDayToShow, lastDayToShow]);
+
+  const [servicesCountByDay, setServicesCountByDay] = useState({});
+  useEffect(
+    function fetchServicesStats() {
+      API.get({ path: `/service/team/${(viewAllOrganisationData ? allTeamIds : selectedTeamIds).join(',')}/month-stats/${startOfMonth}` }).then(
+        (res) => {
+          if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
+          const servicesCountByDay = {};
+          for (const d of res.data) {
+            servicesCountByDay[dayjsInstance(d.date).format('YYYY-MM-DD')] = d.count;
+          }
+          setServicesCountByDay(servicesCountByDay);
+        }
+      );
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [allTeamIds, selectedTeamIds, startOfMonth, viewAllOrganisationData]
+  );
 
   return (
     <>
@@ -125,10 +146,11 @@ const List = () => {
               const isOutOfMonth = !day.isSame(dayjsInstance(startOfMonth), 'month');
               const dateString = day.format('YYYY-MM-DD');
               const report = reports.find((rep) => rep.date === dateString);
+              const hasServices = servicesCountByDay[dateString] > 0;
               return (
                 <DayButton aria-label={dateString} key={dateString} isOutOfMonth={isOutOfMonth} onClick={() => onReportClick(dateString)}>
                   <DayContent isToday={isToday}>{isOutOfMonth && process.env.REACT_APP_TEST === 'true' ? '' : day.format('D')}</DayContent>
-                  {!!report && <Dot data-test-id={`report-dot-${dateString}`} />}
+                  {(Boolean(report) || Boolean(hasServices)) && <Dot data-test-id={`report-dot-${dateString}`} />}
                 </DayButton>
               );
             })}

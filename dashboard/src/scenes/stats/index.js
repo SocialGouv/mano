@@ -454,7 +454,14 @@ const Stats = () => {
             numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
           />
         )}
-        {!!organisation.receptionEnabled && activeTab === 'Accueil' && <ReceptionStats reportsServices={reportsServices} passages={passages} />}
+        {!!organisation.receptionEnabled && activeTab === 'Accueil' && (
+          <ReceptionStats
+            reportsServices={reportsServices}
+            passages={passages}
+            period={period}
+            teamsId={viewAllOrganisationData ? teams.map((e) => e?._id) : selectedTeams.map((e) => e?._id)}
+          />
+        )}
         {activeTab === 'Actions' && (
           <ActionsStats
             setActionsStatuses={setActionsStatuses}

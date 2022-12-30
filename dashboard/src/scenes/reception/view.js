@@ -109,6 +109,7 @@ const Reception = () => {
   const [status, setStatus] = useState(TODO);
   const actionsByStatus = useRecoilValue(actionsByStatusSelector({ status }));
   const consultationsByStatus = useRecoilValue(consultationsByStatusSelector({ status }));
+  const [services, setServices] = useState(null);
   const [todaysPassagesOpen, setTodaysPassagesOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
@@ -309,10 +310,11 @@ const Reception = () => {
             <h5 className="services-title">Services</h5>
             <div className="services-incrementators">
               <ReceptionService
-                parentComponent="reception"
+                services={services}
+                onUpdateServices={setServices}
+                team={currentTeam}
                 report={todaysReport}
                 dateString={startOfToday().format('YYYY-MM-DD')}
-                team={currentTeam}
               />
             </div>
           </ServicesWrapper>
