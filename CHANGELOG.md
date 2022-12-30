@@ -1,3 +1,10 @@
+## [1.202.3](https://github.com/SocialGouv/mano/compare/v1.202.2...v1.202.3) (2022-12-30)
+
+
+### Bug Fixes
+
+* filters did not work for personnes suivies after split medical file in stats ([#1142](https://github.com/SocialGouv/mano/issues/1142)) ([696b291](https://github.com/SocialGouv/mano/commit/696b291d092a423f9955a32a1aaa8ef9cb4eaa88))
+
 ## [1.202.2](https://github.com/SocialGouv/mano/compare/v1.202.1...v1.202.2) (2022-12-30)
 
 
