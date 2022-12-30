@@ -1,3 +1,10 @@
+## [1.202.2](https://github.com/SocialGouv/mano/compare/v1.202.1...v1.202.2) (2022-12-30)
+
+
+### Bug Fixes
+
+* **dashboard:** error when downloading or deleting a document on a new consultation ([80b21d7](https://github.com/SocialGouv/mano/commit/80b21d71bd1670835205565cf0887fa10d3a8c70))
+
 ## [1.202.1](https://github.com/SocialGouv/mano/compare/v1.202.0...v1.202.1) (2022-12-27)
 
 
