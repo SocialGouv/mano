@@ -98,21 +98,13 @@ const Stats = () => {
 
   const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
   const [activeTab, setActiveTab] = useLocalStorage('stats-tab', 0);
-  const [filterPersonsNotMedical, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', [
-    { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
-  ]);
-  const [filterMedicalFiles, setFilterMedicalFiles] = useLocalStorage('stats-filterMedicalFiles-defaultEverybody', [
+  const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', [
     { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
   ]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
   const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
   const [selectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
-
-  const filterPersons = useMemo(
-    () => (activeTab === tabs.findIndex((tab) => tab === 'Dossiers médicaux') ? filterPersonsNotMedical : filterMedicalFiles),
-    [activeTab, filterPersonsNotMedical, filterMedicalFiles]
-  );
 
   useTitle(`${tabs[activeTab]} - Statistiques`);
 
@@ -399,6 +391,7 @@ const Stats = () => {
   ];
 
   if (isLoading) return <Loading />;
+  console.log(filterPersons);
 
   return (
     <>
@@ -738,7 +731,7 @@ const Stats = () => {
             </TabPane>
             <TabPane tabId={9}>
               <h3 className="tw-my-5 tw-text-xl">Statistiques des dossiers médicaux</h3>
-              <Filters base={filterPersonsWithAllFields(true)} filters={filterMedicalFiles} onChange={setFilterMedicalFiles} />
+              <Filters base={filterPersonsWithAllFields(true)} filters={filterPersons} onChange={setFilterPersons} />
               <AgeRangeBar persons={personsForStats} />
               <CustomResponsivePie
                 title="Genre"
