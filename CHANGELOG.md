@@ -1,3 +1,10 @@
+## [1.202.4](https://github.com/SocialGouv/mano/compare/v1.202.3...v1.202.4) (2023-01-02)
+
+
+### Bug Fixes
+
+* **dashboard:** categories withMostUsed ([3ba6493](https://github.com/SocialGouv/mano/commit/3ba6493299e073f55a787cd073760b1c82c3c19f))
+
 ## [1.202.3](https://github.com/SocialGouv/mano/compare/v1.202.2...v1.202.3) (2022-12-30)
 
 
