@@ -193,6 +193,7 @@ const ActionView = () => {
                       id="categories"
                       label="Catégories"
                       onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                      withMostUsed
                     />
                   </FormGroup>
                   <FormGroup>

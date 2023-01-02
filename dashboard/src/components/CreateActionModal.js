@@ -159,6 +159,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                         id="categories"
                         label="Catégories"
                         onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                        withMostUsed
                       />
                     </FormGroup>
                     <FormGroup>
