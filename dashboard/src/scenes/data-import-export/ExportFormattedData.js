@@ -13,44 +13,44 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
   const persons = useRecoilValue(personsState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
 
-  function transformPerson(e) {
+  function transformPerson(person) {
     return {
-      id: e._id,
+      id: person._id,
       ...personFieldsIncludingCustomFields
-        .filter((e) => !['_id', 'organisation', 'user', 'createdAt', 'updatedAt', 'documents', 'history'].includes(e.name))
-        .reduce((acc, f) => {
-          if (f.name === 'assignedTeams') {
-            acc[f.label] = (e[f.name] || []).map((t) => teams.find((e) => e._id === t)?.name)?.join(', ');
-          } else if (['date', 'date-with-time'].includes(f.type))
-            acc[f.label || f.name] = e[f.name] ? dayjsInstance(e[f.name]).format('YYYY-MM-DD') : '';
-          else if (['boolean', 'yes-no'].includes(f.type)) acc[f.label || f.name] = e[f.name] ? 'Oui' : 'Non';
-          else acc[f.label || f.name] = e[f.name];
-          return acc;
+        .filter((person) => !['_id', 'organisation', 'user', 'createdAt', 'updatedAt', 'documents', 'history'].includes(person.name))
+        .reduce((fields, field) => {
+          if (field.name === 'assignedTeams') {
+            fields[field.label] = (person[field.name] || []).map((t) => teams.find((person) => person._id === t)?.name)?.join(', ');
+          } else if (['date', 'date-with-time'].includes(field.type))
+            fields[field.label || field.name] = person[field.name] ? dayjsInstance(person[field.name]).format('YYYY-MM-DD') : '';
+          else if (['boolean', 'yes-no'].includes(field.type)) fields[field.label || field.name] = person[field.name] ? 'Oui' : 'Non';
+          else fields[field.label || field.name] = person[field.name];
+          return fields;
         }, {}),
-      'Créé par': users.find((u) => u._id === e.user)?.name,
-      'Créé le': dayjsInstance(e.createdAt).format('YYYY-MM-DD'),
-      'Mis à jour le': dayjsInstance(e.updatedAt).format('YYYY-MM-DD'),
+      'Créé par': users.find((u) => u._id === person.user)?.name,
+      'Créé le': dayjsInstance(person.createdAt).format('YYYY-MM-DD'),
+      'Mis à jour le': dayjsInstance(person.updatedAt).format('YYYY-MM-DD'),
     };
   }
 
-  function transformAction(e) {
+  function transformAction(action) {
     return {
-      id: e._id,
-      Nom: e.name,
-      Description: e.description,
-      Catégories: (e.categories || []).join(', '),
-      'Personne suivie': persons.find((p) => p._id === e.person)?.name,
-      Groupe: e.group,
-      Structure: e.structure,
-      'Avec heure': e.withTime ? 'Oui' : 'Non',
-      Équipe: e.teams?.length ? e.teams.map((t) => teams.find((e) => e._id === t)?.name).join(', ') : e.team,
-      Urgent: e.urgent ? 'Oui' : 'Non',
-      Statut: e.status,
-      'Complétée le': e.completedAt ? dayjsInstance(e.completedAt).format('YYYY-MM-DD') : '',
-      'À faire le': e.dueAt ? dayjsInstance(e.dueAt).format(e.withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD') : '',
-      'Créé par': users.find((u) => u._id === e.user)?.name,
-      'Créé le': dayjsInstance(e.createdAt).format('YYYY-MM-DD'),
-      'Mis à jour le': dayjsInstance(e.updatedAt).format('YYYY-MM-DD'),
+      id: action._id,
+      Nom: action.name,
+      Description: action.description,
+      Catégories: (action.categories || []).join(', '),
+      'Personne suivie': persons.find((p) => p._id === action.person)?.name,
+      Groupe: action.group,
+      Structure: action.structure,
+      'Avec heure': action.withTime ? 'Oui' : 'Non',
+      Équipe: action.teams?.length ? action.teams.map((t) => teams.find((action) => action._id === t)?.name).join(', ') : action.team,
+      Urgent: action.urgent ? 'Oui' : 'Non',
+      Statut: action.status,
+      'Complétée le': action.completedAt ? dayjsInstance(action.completedAt).format('YYYY-MM-DD') : '',
+      'À faire le': action.dueAt ? dayjsInstance(action.dueAt).format(action.withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD') : '',
+      'Créé par': users.find((u) => u._id === action.user)?.name,
+      'Créé le': dayjsInstance(action.createdAt).format('YYYY-MM-DD'),
+      'Mis à jour le': dayjsInstance(action.updatedAt).format('YYYY-MM-DD'),
     };
   }
 
@@ -85,28 +85,19 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
             <MenuItem
               text="Personnes suivies"
               onClick={() => {
-                exportXlsx(
-                  'Personnes suivies',
-                  personUpdated.map((e) => transformPerson(e))
-                );
+                exportXlsx('Personnes suivies', personUpdated.map(transformPerson));
               }}
             />
             <MenuItem
               text="Personnes créées"
               onClick={() => {
-                exportXlsx(
-                  'Personnes créées',
-                  personCreated.map((e) => transformPerson(e))
-                );
+                exportXlsx('Personnes créées', personCreated.map(transformPerson));
               }}
             />
             <MenuItem
               text="Actions"
               onClick={() => {
-                exportXlsx(
-                  'Actions',
-                  actions.map((e) => transformAction(e))
-                );
+                exportXlsx('Actions', actions.map(transformAction));
               }}
             />
           </div>
