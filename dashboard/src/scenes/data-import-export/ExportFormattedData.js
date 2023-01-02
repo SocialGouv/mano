@@ -17,7 +17,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
     return {
       id: e._id,
       ...personFieldsIncludingCustomFields
-        .filter((e) => !['_id', 'organisation', 'user', 'createdAt', 'updatedAt', 'documents', 'historic'].includes(e.name))
+        .filter((e) => !['_id', 'organisation', 'user', 'createdAt', 'updatedAt', 'documents', 'history'].includes(e.name))
         .reduce((acc, f) => {
           if (f.name === 'assignedTeams') {
             acc[f.label] = (e[f.name] || []).map((t) => teams.find((e) => e._id === t)?.name)?.join(', ');
