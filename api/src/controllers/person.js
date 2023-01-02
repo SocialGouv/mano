@@ -89,7 +89,7 @@ router.get(
     const dir = personDocumentBasedir(req.user.organisation, req.params.id);
     const file = path.join(dir, req.params.filename);
     if (!fs.existsSync(file)) {
-      res.status(404).send({ ok: false, message: "File not found" });
+      res.status(404).send({ ok: false, error: "Désolé, le fichier n'est plus disponible." });
     } else {
       res.sendFile(file);
     }
@@ -116,7 +116,8 @@ router.delete(
     const dir = personDocumentBasedir(req.user.organisation, req.params.id);
     const file = path.join(dir, req.params.filename);
     if (!fs.existsSync(file)) {
-      res.status(404).send({ ok: false, message: "File not found" });
+      // if it is not found, it might not be deleted but it's lst in the database, so we return ok.
+      res.send({ ok: true });
     } else {
       fs.unlinkSync(file);
       res.send({ ok: true });
