@@ -8,12 +8,12 @@ const showBoolean = (value) => {
   return 'Oui';
 };
 
-const CustomFieldDisplay = ({ field, value }) => {
+const CustomFieldDisplay = ({ type, value }) => {
   return (
     <>
-      {!!['text', 'number'].includes(field.type) && value}
-      {!!['textarea'].includes(field.type) && (
-        <p style={{ paddingLeft: 30 }}>
+      {!!['text', 'number'].includes(type) && value}
+      {!!['textarea'].includes(type) && (
+        <p className="tw-pl-8">
           {value?.split?.('\n')?.map((sentence, index) => (
             <React.Fragment key={sentence + index}>
               {sentence}
@@ -22,12 +22,23 @@ const CustomFieldDisplay = ({ field, value }) => {
           ))}
         </p>
       )}
-      {!!['date-with-time'].includes(field.type) && !!value && formatDateTimeWithNameOfDay(value)}
-      {!!['date'].includes(field.type) && !!value && formatDateWithNameOfDay(value)}
-      {!!['boolean'].includes(field.type) && showBoolean(value)}
-      {!!['yes-no'].includes(field.type) && value}
-      {!!['enum'].includes(field.type) && value}
-      {!!['multi-choice'].includes(field.type) && (Array.isArray(value) ? value.join(', ') : String(value || ''))}
+      {!!['date-with-time'].includes(type) && !!value && formatDateTimeWithNameOfDay(value)}
+      {!!['date'].includes(type) && !!value && formatDateWithNameOfDay(value)}
+      {!!['boolean'].includes(type) && showBoolean(value)}
+      {!!['yes-no'].includes(type) && value}
+      {!!['enum'].includes(type) && value}
+      {!!['multi-choice'].includes(type) &&
+        (Array.isArray(value) ? (
+          <ul className="tw-list-disc tw-pl-4">
+            {value.map((v) => (
+              <li key={v}>
+                <span className="tw-overflow-ellipsis tw-break-words">{v || '-'}</span>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p className="tw-overflow-ellipsis tw-break-words">{String(value || '-')}</p>
+        ))}
     </>
   );
 };

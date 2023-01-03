@@ -4,6 +4,7 @@ import { customFieldsPersonsMedicalSelector } from '../../../recoil/persons';
 import { currentTeamState } from '../../../recoil/auth';
 import { useMemo, useState } from 'react';
 import EditModal from './EditModal';
+import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 
 export default function InfosMedicales({ person }) {
   const [editModal, setEditModal] = useState(false);
@@ -36,7 +37,7 @@ export default function InfosMedicales({ person }) {
         </Col>
         {customFields.map((field, i) => (
           <Col key={field.label + i} md={4}>
-            <InfoMedicaleLine label={field.label} value={person[field.name]} />
+            <InfoMedicaleLine type={field.type} label={field.label} value={person[field.name]} />
           </Col>
         ))}
       </Row>
@@ -44,22 +45,12 @@ export default function InfosMedicales({ person }) {
   );
 }
 
-function InfoMedicaleLine({ label, value }) {
+function InfoMedicaleLine({ label, value, type = 'text' }) {
   return (
     <div className="my-2">
       <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{label}</div>
       <div>
-        {Array.isArray(value) ? (
-          <ul className="tw-list-disc">
-            {value.map((v) => (
-              <li key={v}>
-                <span className="tw-overflow-ellipsis tw-break-words">{v || '-'}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="tw-overflow-ellipsis tw-break-words">{value || '-'}</p>
-        )}
+        <CustomFieldDisplay type={type} value={value} />
       </div>
     </div>
   );

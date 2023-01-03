@@ -312,7 +312,7 @@ export function MedicalFile({ person }) {
                     <div key={key}>
                       {field.label}&nbsp;:{' '}
                       <b>
-                        <CustomFieldDisplay key={key} field={field} value={value} />
+                        <CustomFieldDisplay key={key} type={field.type} value={value} />
                       </b>
                     </div>
                   );
@@ -505,7 +505,7 @@ export function MedicalFile({ person }) {
                     <div key={key}>
                       {field.label}&nbsp;:{' '}
                       <b>
-                        <CustomFieldDisplay key={key} field={field} value={value} />
+                        <CustomFieldDisplay key={key} type={field.type} value={value} />
                       </b>
                     </div>
                   );

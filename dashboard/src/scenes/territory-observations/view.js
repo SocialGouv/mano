@@ -39,7 +39,7 @@ const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
             const { name, label } = field;
             return (
               <Item key={name} fieldIsEmpty={fieldIsEmpty(obs[name])}>
-                {label}: <CustomFieldDisplay field={field} value={obs[field.name]} />
+                {label}: <CustomFieldDisplay type={field.type} value={obs[field.name]} />
               </Item>
             );
           })}
