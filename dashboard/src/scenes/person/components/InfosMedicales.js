@@ -30,7 +30,7 @@ export default function InfosMedicales({ person }) {
       </div>
       <Row>
         <Col md={4}>
-          <InfoMedicaleLine label="Couverture médicale" value={person.healthInsurances} />
+          <InfoMedicaleLine label="Couverture médicale" value={person.healthInsurances} type="multi-choice" />
         </Col>
         <Col md={4}>
           <InfoMedicaleLine label="Structure de suivi médical" value={person.structureMedical} />

@@ -39,7 +39,14 @@ const View = ({ obs, onDelete, onClick, noBorder, noTeams }) => {
             const { name, label } = field;
             return (
               <Item key={name} fieldIsEmpty={fieldIsEmpty(obs[name])}>
-                {label}: <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                {label}:{' '}
+                {!!['textarea'].includes(field.type) ? (
+                  <div className="tw-pl-8">
+                    <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                  </div>
+                ) : (
+                  <CustomFieldDisplay type={field.type} value={obs[field.name]} />
+                )}
               </Item>
             );
           })}

@@ -11,9 +11,9 @@ const showBoolean = (value) => {
 const CustomFieldDisplay = ({ type, value }) => {
   return (
     <>
-      {!!['text', 'number'].includes(type) && <p>{value}</p>}
+      {!!['text', 'number'].includes(type) && <span>{value}</span>}
       {!!['textarea'].includes(type) && (
-        <p className="tw-pl-8">
+        <p className="tw-mb-0">
           {value?.split?.('\n')?.map((sentence, index) => (
             <React.Fragment key={sentence + index}>
               {sentence}
@@ -22,11 +22,11 @@ const CustomFieldDisplay = ({ type, value }) => {
           ))}
         </p>
       )}
-      {!!['date-with-time'].includes(type) && !!value && <p>{formatDateTimeWithNameOfDay(value)}</p>}
-      {!!['date'].includes(type) && !!value && <p>{formatDateWithNameOfDay(value)}</p>}
-      {!!['boolean'].includes(type) && <p>{showBoolean(value)}</p>}
-      {!!['yes-no'].includes(type) && <p>{value}</p>}
-      {!!['enum'].includes(type) && <p>{value}</p>}
+      {!!['date-with-time'].includes(type) && !!value && <span>{formatDateTimeWithNameOfDay(value)}</span>}
+      {!!['date'].includes(type) && !!value && <span>{formatDateWithNameOfDay(value)}</span>}
+      {!!['boolean'].includes(type) && <span>{showBoolean(value)}</span>}
+      {!!['yes-no'].includes(type) && <span>{value}</span>}
+      {!!['enum'].includes(type) && <span>{value}</span>}
       {!!['multi-choice'].includes(type) &&
         (Array.isArray(value) ? (
           <ul className="tw-list-disc tw-pl-4">
