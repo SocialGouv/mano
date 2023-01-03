@@ -153,7 +153,7 @@ const ActionsCalendar = ({ actions, columns = ['Heure', 'Nom', 'Personne suivie'
           title: 'Équipe(s) en charge',
           dataKey: 'team',
           render: (a) => (
-            <div className="px-2 tw-flex-shrink-0">
+            <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
               {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
             </div>
           ),
