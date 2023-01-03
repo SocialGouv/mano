@@ -448,6 +448,8 @@ const StyledModal = styled(Modal)`
     width: 100%;
     flex-grow: 1;
     padding: auto;
+    font-size: 16px;
+    font-family: Helvetica;
   }
 
   .form-group {
