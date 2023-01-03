@@ -1,5 +1,6 @@
 const { defaultMedicalFileCustomFields } = require("./custom-fields/medicalFile");
 const { fieldsPersonsCustomizableOptions, defaultMedicalCustomFields, personFields } = require("./custom-fields/person");
+const { defaultTerritoryEncryptedFields } = require("./custom-fields/territory");
 
 function serializeOrganisation(organisation) {
   return {
@@ -38,6 +39,7 @@ function serializeOrganisation(organisation) {
     customFieldsObs: organisation.customFieldsObs,
     /* fixed fields persons */
     personFields: personFields,
+    territoryFields: defaultTerritoryEncryptedFields,
     /* custom fields persons: fields with customizavble options only */
     fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions || fieldsPersonsCustomizableOptions,
     /* custom fields persons */

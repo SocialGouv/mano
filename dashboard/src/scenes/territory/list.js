@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Col, Button as LinkButton, FormGroup, Row, Modal, ModalBody, ModalHeader, Input, Label } from 'reactstrap';
+import { Col, Button as LinkButton, Row, Modal, ModalBody, ModalHeader } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import styled from 'styled-components';
 import { toast } from 'react-toastify';
@@ -12,8 +12,7 @@ import Loading from '../../components/loading';
 import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import { territoryTypes, territoriesState, prepareTerritoryForEncryption, sortTerritories } from '../../recoil/territory';
-import SelectCustom from '../../components/SelectCustom';
+import { territoriesState, sortTerritories, usePrepareTerritoryForEncryption, territoryEncryptedFieldsSelector } from '../../recoil/territory';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { formatDateWithFullMonth } from '../../services/date';
@@ -22,6 +21,7 @@ import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
+import CustomFieldInput from '../../components/CustomFieldInput';
 
 const List = () => {
   const organisation = useRecoilValue(organisationState);
@@ -131,6 +131,8 @@ const CreateTerritory = () => {
   const API = useApi();
   const setTerritories = useSetRecoilState(territoriesState);
   const { refresh, isLoading } = useDataLoader();
+  const prepareTerritoryForEncryption = usePrepareTerritoryForEncryption();
+  const territoryFields = useRecoilValue(territoryEncryptedFieldsSelector);
 
   return (
     <CreateStyle>
@@ -165,35 +167,27 @@ const CreateTerritory = () => {
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
               <React.Fragment>
                 <Row>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="name">Nom</Label>
-                      <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="territory-select-types">Types</Label>
-                      <SelectCustom
-                        options={territoryTypes.map((_option) => ({ value: _option, label: _option }))}
-                        name="types"
-                        onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'types' } })}
-                        isClearable={false}
-                        isMulti
-                        value={values.types?.map((_option) => ({ value: _option, label: _option })) || []}
-                        getOptionValue={(i) => i.value}
-                        getOptionLabel={(i) => i.label}
-                        inputId="territory-select-types"
-                        classNamePrefix="territory-select-types"
+                  <CustomFieldInput
+                    field={{ type: 'text', label: 'Nom', name: 'name' }}
+                    colWidth={6}
+                    model="territory"
+                    name="name"
+                    values={values}
+                    handleChange={handleChange}
+                  />
+                  {territoryFields
+                    .filter((f) => !['name', 'user'].includes(f.name))
+                    .map((field) => (
+                      <CustomFieldInput
+                        key={field.name}
+                        field={field}
+                        colWidth={6}
+                        model="territory"
+                        name={field.name}
+                        values={values}
+                        handleChange={handleChange}
                       />
-                    </FormGroup>
-                  </Col>
-                  <Col md={6}>
-                    <FormGroup>
-                      <Label htmlFor="perimeter">Périmètre</Label>
-                      <Input name="perimeter" id="perimeter" value={values.perimeter} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
+                    ))}
                 </Row>
                 <br />
                 <ButtonCustom disabled={isSubmitting} onClick={handleSubmit} title="Sauvegarder" />

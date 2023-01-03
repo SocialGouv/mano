@@ -1,5 +1,6 @@
 import { setCacheItem } from '../services/dataManagement';
-import { atom } from 'recoil';
+import { atom, selector, useRecoilValue } from 'recoil';
+import { organisationState } from './auth';
 
 const collectionName = 'territory';
 export const territoriesState = atom({
@@ -8,37 +9,33 @@ export const territoriesState = atom({
   effects: [({ onSet }) => onSet(async (newValue) => setCacheItem(collectionName, newValue))],
 });
 
-const encryptedFields = ['name', 'perimeter', 'types', 'user'];
+export const territoryEncryptedFieldsSelector = selector({
+  key: 'territoryEncryptedFieldsSelector',
+  get: ({ get }) => {
+    const organisation = get(organisationState);
+    return organisation.territoryFields;
+  },
+});
 
-export const prepareTerritoryForEncryption = (territory) => {
-  const decrypted = {};
-  for (let field of encryptedFields) {
-    decrypted[field] = territory[field];
-  }
-  return {
-    _id: territory._id,
-    createdAt: territory.createdAt,
-    updatedAt: territory.updatedAt,
-    organisation: territory.organisation,
+export const usePrepareTerritoryForEncryption = () => {
+  const encryptedFields = useRecoilValue(territoryEncryptedFieldsSelector);
 
-    decrypted,
-    entityKey: territory.entityKey,
+  return (territory) => {
+    const decrypted = {};
+    for (let field of encryptedFields) {
+      decrypted[field.name] = territory[field.name];
+    }
+    return {
+      _id: territory._id,
+      createdAt: territory.createdAt,
+      updatedAt: territory.updatedAt,
+      organisation: territory.organisation,
+
+      decrypted,
+      entityKey: territory.entityKey,
+    };
   };
 };
-
-export const territoryTypes = [
-  'Lieu de conso',
-  'Lieu de deal',
-  'Carrefour de passage',
-  'Campement',
-  'Lieu de vie',
-  'Prostitution',
-  'Errance',
-  'Mendicité',
-  'Loisir',
-  'Rassemblement communautaire',
-  'Historique',
-];
 
 const defaultSort = (a, b, sortOrder) => (sortOrder === 'ASC' ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name));
 

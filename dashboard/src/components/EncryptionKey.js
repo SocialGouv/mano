@@ -14,7 +14,7 @@ import { actionsState, prepareActionForEncryption } from '../recoil/actions';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../recoil/territoryObservations';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
-import { prepareTerritoryForEncryption, territoriesState } from '../recoil/territory';
+import { territoriesState, usePrepareTerritoryForEncryption } from '../recoil/territory';
 import { placesState, preparePlaceForEncryption } from '../recoil/places';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../recoil/relPersonPlace';
 import { encryptVerificationKey } from '../services/encryption';
@@ -56,6 +56,8 @@ const EncryptionKey = ({ isMain }) => {
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
+  const prepareTerritoryForEncryption = usePrepareTerritoryForEncryption();
+
   const places = useRecoilValue(placesState);
   const relsPersonPlace = useRecoilValue(relsPersonPlaceState);
   const reports = useRecoilValue(reportsState);

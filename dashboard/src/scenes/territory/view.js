@@ -1,5 +1,5 @@
 import React from 'react';
-import { Row, Col, FormGroup, Input, Label } from 'reactstrap';
+import { Row } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
@@ -9,21 +9,23 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 
 import Observations from '../territory-observations/list';
-import SelectCustom from '../../components/SelectCustom';
-import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from '../../recoil/territory';
-import { useRecoilState } from 'recoil';
+import { territoriesState, territoryEncryptedFieldsSelector, usePrepareTerritoryForEncryption } from '../../recoil/territory';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import useApi from '../../services/api';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
+import CustomFieldInput from '../../components/CustomFieldInput';
 
 const View = () => {
   const { id } = useParams();
   const history = useHistory();
+  const territoryFields = useRecoilValue(territoryEncryptedFieldsSelector);
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territory = territories.find((t) => t._id === id);
   const API = useApi();
+  const prepareTerritoryForEncryption = usePrepareTerritoryForEncryption();
 
   useTitle(`${territory?.name} - Territoire`);
 
@@ -54,37 +56,27 @@ const View = () => {
           return (
             <React.Fragment>
               <Row>
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="name">Nom</Label>
-                    <Input name="name" id="name" value={values.name} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="territory-select-types">Types</Label>
-                    <SelectCustom
-                      options={territoryTypes.map((_option) => ({ value: _option, label: _option }))}
-                      name="types"
-                      onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'types' } })}
-                      isClearable={false}
-                      isMulti
-                      value={values.types?.map((_option) => ({ value: _option, label: _option })) || []}
-                      getOptionValue={(i) => i.value}
-                      getOptionLabel={(i) => i.label}
-                      inputId="territory-select-types"
-                      classNamePrefix="territory-select-types"
+                <CustomFieldInput
+                  field={{ type: 'text', label: 'Nom', name: 'name' }}
+                  colWidth={6}
+                  model="territory"
+                  name="name"
+                  values={values}
+                  handleChange={handleChange}
+                />
+                {territoryFields
+                  .filter((f) => !['name', 'user'].includes(f.name))
+                  .map((field) => (
+                    <CustomFieldInput
+                      key={field.name}
+                      field={field}
+                      colWidth={6}
+                      model="territory"
+                      name={field.name}
+                      values={values}
+                      handleChange={handleChange}
                     />
-                  </FormGroup>
-                </Col>
-
-                <Col md={6}>
-                  <FormGroup>
-                    <Label htmlFor="perimeter">Périmètre</Label>
-                    <Input name="perimeter" id="perimeter" value={values.perimeter} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
+                  ))}
               </Row>
               <div style={{ display: 'flex', justifyContent: 'flex-end', gap: '1rem' }}>
                 <DeleteButtonAndConfirmModal

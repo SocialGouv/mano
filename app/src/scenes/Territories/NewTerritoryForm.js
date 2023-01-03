@@ -4,14 +4,16 @@ import { useSetRecoilState } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
-import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import API from '../../services/api';
-import { prepareTerritoryForEncryption, territoriesState } from '../../recoil/territory';
+import { territoriesState, territoryEncryptedFieldsSelector, usePrepareTerritoryForEncryption } from '../../recoil/territory';
+import CustomFieldInput from '../../components/CustomFieldInput';
 
 const NewTerritoryForm = ({ navigation, route }) => {
   const [name, setName] = useState('');
   const [posting, setPosting] = useState(false);
+  const prepareTerritoryForEncryption = usePrepareTerritoryForEncryption();
+  const territoryFields = useRecoilValue(territoryEncryptedFieldsSelector);
 
   const setTerritories = useSetRecoilState(territoriesState);
 
@@ -82,7 +84,17 @@ const NewTerritoryForm = ({ navigation, route }) => {
     <SceneContainer testID="new-territory-form">
       <ScreenTitle title="Nouveau territoire" onBack={onGoBackRequested} />
       <ScrollContainer>
-        <InputLabelled label="Nom" onChangeText={setName} value={name} placeholder="Station Stalingrad" testID="new-territory-name" />
+        <CustomFieldInput
+          label="Nom"
+          field={{
+            type: 'text',
+            name: 'name',
+            required: true,
+          }}
+          value={name}
+          handleChange={setName}
+          editable
+        />
         <Button caption="Créer" disabled={!isReadyToSave} onPress={onCreateTerritory} loading={posting} testID="new-territory-create" />
       </ScrollContainer>
     </SceneContainer>

@@ -3,30 +3,22 @@ import { Alert, View } from 'react-native';
 import ScrollContainer from '../../components/ScrollContainer';
 import SceneContainer from '../../components/SceneContainer';
 import ScreenTitle from '../../components/ScreenTitle';
-import InputLabelled from '../../components/InputLabelled';
 import Button from '../../components/Button';
 import API from '../../services/api';
 import ButtonsContainer from '../../components/ButtonsContainer';
-import TerritoryMultiCheckBoxes from '../../components/MultiCheckBoxes/TerritoryMultiCheckBoxes';
 import SubList from '../../components/SubList';
 import TerritoryObservationRow from './TerritoryObservationRow';
-import { useRecoilState } from 'recoil';
-import { prepareTerritoryForEncryption, territoriesState } from '../../recoil/territory';
+import { useRecoilState, useRecoilValue } from 'recoil';
+import { territoriesState, territoryEncryptedFieldsSelector, usePrepareTerritoryForEncryption } from '../../recoil/territory';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
-
-const castToTerritory = (territory = {}) => ({
-  name: territory.name?.trim() || '',
-  types: territory.types || [],
-  perimeter: territory.perimeter?.trim() || '',
-  entityKey: territory.entityKey || '',
-});
+import CustomFieldInput from '../../components/CustomFieldInput';
 
 const Territory = ({ route, navigation }) => {
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [territoryDB, setTerritoryDB] = useState(() => territories.find((territory) => territory._id === route.params?.territory?._id));
 
-  const [territory, setTerritory] = useState(castToTerritory(route?.params?.territory));
+  const [territory, setTerritory] = useState(route?.params?.territory);
   const [allTerritoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territoryObservations = useMemo(() => {
     return allTerritoryObservations
@@ -36,6 +28,8 @@ const Territory = ({ route, navigation }) => {
 
   const [updating, setUpdating] = useState(false);
   const [editable, setEditable] = useState(route?.params?.editable || false);
+  const prepareTerritoryForEncryption = usePrepareTerritoryForEncryption();
+  const territoryFields = useRecoilValue(territoryEncryptedFieldsSelector);
 
   const onBack = () => {
     backRequestHandledRef.current = true;
@@ -63,7 +57,7 @@ const Territory = ({ route, navigation }) => {
     setUpdating(true);
     const response = await API.put({
       path: `/territory/${territoryDB._id}`,
-      body: prepareTerritoryForEncryption(castToTerritory(territory)),
+      body: prepareTerritoryForEncryption(territory),
     });
     if (response.error) {
       setUpdating(false);
@@ -102,8 +96,10 @@ const Territory = ({ route, navigation }) => {
   };
 
   const isUpdateDisabled = useMemo(() => {
-    const newTerritory = { ...territoryDB, ...castToTerritory(territory) };
-    if (JSON.stringify(castToTerritory(territoryDB)) !== JSON.stringify(castToTerritory(newTerritory))) return false;
+    const newTerritory = { ...territoryDB, ...territory };
+    for (const fieldName of Object.keys(territoryFields)) {
+      if (JSON.stringify(newTerritory[fieldName]) !== JSON.stringify(territoryDB[fieldName])) return false;
+    }
     return true;
   }, [territoryDB, territory]);
 
@@ -135,12 +131,10 @@ const Territory = ({ route, navigation }) => {
     ]);
   };
 
-  const { name, types, perimeter } = territory;
-
   return (
     <SceneContainer>
       <ScreenTitle
-        title={name}
+        title={territory.name}
         onBack={onGoBackRequested}
         onEdit={!editable ? onEdit : null}
         onSave={!editable || isUpdateDisabled ? null : onUpdateTerritory}
@@ -150,23 +144,30 @@ const Territory = ({ route, navigation }) => {
       <ScrollContainer testID="territory">
         <View>
           {!!editable && (
-            <InputLabelled
+            <CustomFieldInput
               label="Nom"
-              onChangeText={(name) => setTerritory((t) => ({ ...t, name }))}
-              value={name}
-              placeholder="Nom"
-              textContentType="organizationName"
-              editable={editable}
+              field={{
+                type: 'text',
+                name: 'name',
+                required: true,
+              }}
+              value={territory.name}
+              handleChange={(name) => setTerritory((t) => ({ ...t, name }))}
+              editable
             />
           )}
-          <TerritoryMultiCheckBoxes values={types} onChange={(types) => setTerritory((t) => ({ ...t, types }))} editable={editable} />
-          <InputLabelled
-            label="Perimètre"
-            onChangeText={(perimeter) => setTerritory((t) => ({ ...t, perimeter }))}
-            value={perimeter}
-            placeholder="De la rue XXX à la rue XXX"
-            editable={editable}
-          />
+          {territoryFields
+            .filter((f) => !['name', 'user'].includes(f.name))
+            .map((field) => (
+              <CustomFieldInput
+                key={field.name}
+                label={field.label}
+                field={field}
+                value={territory[field.name]}
+                handleChange={(newValue) => setTerritory((t) => ({ ...t, [field.name]: newValue }))}
+                editable={editable}
+              />
+            ))}
           <ButtonsContainer>
             <DeleteButtonAndConfirmModal
               title={`Voulez-vous vraiment supprimer ${territoryDB?.name} ?`}
