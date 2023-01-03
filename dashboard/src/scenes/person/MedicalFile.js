@@ -9,7 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
 import { personsState, usePreparePersonForEncryption, personFieldsSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
-import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -116,6 +116,8 @@ export function MedicalFile({ person }) {
 
   return (
     <>
+      <h1 className="printonly">Dossier médical de {person?.name}</h1>
+      <small className="printonly">extrait le {dayjsInstance().format('ddd DD MM YYYY')}</small>
       <TitleWithButtonsContainer>
         <Title>Informations générales</Title>
         <ButtonsFloatingRight>
@@ -131,132 +133,174 @@ export function MedicalFile({ person }) {
           />
         </ButtonsFloatingRight>
       </TitleWithButtonsContainer>
-      <Formik
-        enableReinitialize
-        initialValues={person}
-        onSubmit={async (body) => {
-          const response = await API.put({
-            path: `/person/${person._id}`,
-            body: preparePersonForEncryption({ ...person, ...body }),
-          });
-          if (!response.ok) return;
-          setPersons((persons) =>
-            persons.map((p) => {
-              if (p._id === person._id) return response.decryptedData;
-              return p;
-            })
-          );
-          toast.success('Mise à jour effectuée !');
-        }}>
-        {({ values, handleChange, handleSubmit, isSubmitting }) => {
-          return (
-            <React.Fragment>
-              <Row>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="person-birthdate">Date de naissance</Label>
-                    <div>
-                      <DatePicker
-                        locale="fr"
-                        className="form-control"
-                        selected={dateForDatePicker(values.birthdate)}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
-                        dateFormat="dd/MM/yyyy"
-                        id="person-birthdate"
-                      />
-                    </div>
-                  </FormGroup>
-                </Col>
-                <Col md={4}>
-                  <Label htmlFor="person-select-gender">Genre</Label>
-                  <SelectAsInput
-                    options={personFields.find((f) => f.name === 'gender').options}
-                    name="gender"
-                    value={values.gender || ''}
-                    onChange={handleChange}
-                    inputId="person-select-gender"
-                    classNamePrefix="person-select-gender"
+      <div className="printonly">
+        <div>
+          Date de naissance&nbsp;:{' '}
+          <b>
+            <CustomFieldDisplay field={{ type: 'date' }} value={person.birthdate} />
+          </b>
+        </div>
+        <div>
+          Genre&nbsp;:{' '}
+          <b>
+            <CustomFieldDisplay field={{ type: 'text' }} value={person.gender} />
+          </b>
+        </div>
+        <div>
+          Structure de suivi médical&nbsp;:{' '}
+          <b>
+            <CustomFieldDisplay field={{ type: 'text' }} value={person.structureMedical} />
+          </b>
+        </div>
+        <div>
+          Couverture(s) médicale(s)&nbsp;:{' '}
+          <b>
+            <CustomFieldDisplay field={{ type: 'multi-choice' }} value={person.healthInsurances} />
+          </b>
+        </div>
+      </div>
+      <div className="noprint">
+        <Formik
+          enableReinitialize
+          initialValues={person}
+          onSubmit={async (body) => {
+            const response = await API.put({
+              path: `/person/${person._id}`,
+              body: preparePersonForEncryption({ ...person, ...body }),
+            });
+            if (!response.ok) return;
+            setPersons((persons) =>
+              persons.map((p) => {
+                if (p._id === person._id) return response.decryptedData;
+                return p;
+              })
+            );
+            toast.success('Mise à jour effectuée !');
+          }}>
+          {({ values, handleChange, handleSubmit, isSubmitting }) => {
+            return (
+              <React.Fragment>
+                <Row>
+                  <Col md={4}>
+                    <FormGroup>
+                      <Label htmlFor="person-birthdate">Date de naissance</Label>
+                      <div>
+                        <DatePicker
+                          locale="fr"
+                          className="form-control"
+                          selected={dateForDatePicker(values.birthdate)}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
+                          dateFormat="dd/MM/yyyy"
+                          id="person-birthdate"
+                        />
+                      </div>
+                    </FormGroup>
+                  </Col>
+                  <Col md={4}>
+                    <Label htmlFor="person-select-gender">Genre</Label>
+                    <SelectAsInput
+                      options={personFields.find((f) => f.name === 'gender').options}
+                      name="gender"
+                      value={values.gender || ''}
+                      onChange={handleChange}
+                      inputId="person-select-gender"
+                      classNamePrefix="person-select-gender"
+                    />
+                  </Col>
+                  <Col md={4}>
+                    <FormGroup>
+                      <Label htmlFor="structureMedical">Structure de suivi médical</Label>
+                      <Input name="structureMedical" id="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+                  <Col md={4}>
+                    <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
+                    <SelectCustom
+                      options={personFields.find((f) => f.name === 'healthInsurances').options.map((_option) => ({ value: _option, label: _option }))}
+                      value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
+                      getOptionValue={(i) => i.value}
+                      getOptionLabel={(i) => i.label}
+                      onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
+                      name="healthInsurances"
+                      isClearable={false}
+                      isMulti
+                      inputId="person-select-healthInsurances"
+                      classNamePrefix="person-select-healthInsurances"
+                      placeholder={' -- Choisir -- '}
+                    />
+                  </Col>
+                </Row>
+                <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                  <ButtonCustom
+                    title={'Mettre à jour'}
+                    disabled={JSON.stringify(person) === JSON.stringify(values)}
+                    loading={isSubmitting}
+                    onClick={handleSubmit}
                   />
-                </Col>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="structureMedical">Structure de suivi médical</Label>
-                    <Input name="structureMedical" id="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={4}>
-                  <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
-                  <SelectCustom
-                    options={personFields.find((f) => f.name === 'healthInsurances').options.map((_option) => ({ value: _option, label: _option }))}
-                    value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
-                    getOptionValue={(i) => i.value}
-                    getOptionLabel={(i) => i.label}
-                    onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
-                    name="healthInsurances"
-                    isClearable={false}
-                    isMulti
-                    inputId="person-select-healthInsurances"
-                    classNamePrefix="person-select-healthInsurances"
-                    placeholder={' -- Choisir -- '}
-                  />
-                </Col>
-              </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                <ButtonCustom
-                  title={'Mettre à jour'}
-                  disabled={JSON.stringify(person) === JSON.stringify(values)}
-                  loading={isSubmitting}
-                  onClick={handleSubmit}
-                />
-              </div>
-            </React.Fragment>
-          );
-        }}
-      </Formik>
+                </div>
+              </React.Fragment>
+            );
+          }}
+        </Formik>
+      </div>
       {!!medicalFile && !!customFieldsMedicalFile.filter((f) => f.enabled || f.enabledTeams?.includes(team._id)).length && (
         <>
           <TitleWithButtonsContainer>
             <Title>Dossier médical</Title>
           </TitleWithButtonsContainer>
-          <Formik
-            enableReinitialize
-            initialValues={medicalFile}
-            onSubmit={async (body) => {
-              const response = await API.put({
-                path: `/medical-file/${medicalFile._id}`,
-                body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...body }),
-              });
-              if (!response.ok) return;
-              setAllMedicalFiles((medicalFiles) =>
-                medicalFiles.map((m) => {
-                  if (m._id === medicalFile._id) return response.decryptedData;
-                  return m;
-                })
-              );
-              toast.success('Mise à jour effectuée !');
-            }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => {
+          <div className="printonly">
+            {customFieldsMedicalFile.map((field) => {
               return (
-                <React.Fragment>
-                  <Row>
-                    {customFieldsMedicalFile
-                      .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                      .map((field) => (
-                        <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                      ))}
-                  </Row>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                    <ButtonCustom
-                      title={'Mettre à jour'}
-                      disabled={JSON.stringify(medicalFile) === JSON.stringify(values)}
-                      loading={isSubmitting}
-                      onClick={handleSubmit}
-                    />
-                  </div>
-                </React.Fragment>
+                <div key={field.name}>
+                  {field.label}&nbsp;:{' '}
+                  <b>
+                    <CustomFieldDisplay field={field} value={medicalFile[field.name]} />
+                  </b>
+                </div>
               );
-            }}
-          </Formik>
+            })}
+          </div>
+          <div className="noprint">
+            <Formik
+              enableReinitialize
+              initialValues={medicalFile}
+              onSubmit={async (body) => {
+                const response = await API.put({
+                  path: `/medical-file/${medicalFile._id}`,
+                  body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...body }),
+                });
+                if (!response.ok) return;
+                setAllMedicalFiles((medicalFiles) =>
+                  medicalFiles.map((m) => {
+                    if (m._id === medicalFile._id) return response.decryptedData;
+                    return m;
+                  })
+                );
+                toast.success('Mise à jour effectuée !');
+              }}>
+              {({ values, handleChange, handleSubmit, isSubmitting }) => {
+                return (
+                  <React.Fragment>
+                    <Row>
+                      {customFieldsMedicalFile
+                        .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                        .map((field) => (
+                          <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                        ))}
+                    </Row>
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
+                      <ButtonCustom
+                        title={'Mettre à jour'}
+                        disabled={JSON.stringify(medicalFile) === JSON.stringify(values)}
+                        loading={isSubmitting}
+                        onClick={handleSubmit}
+                      />
+                    </div>
+                  </React.Fragment>
+                );
+              }}
+            </Formik>
+          </div>
         </>
       )}
       <hr />
@@ -595,79 +639,81 @@ export function MedicalFile({ person }) {
         ]}
         noData="Aucune consultation enregistrée"
       />
-      <Documents
-        title={<Title id="all-medical-documents">Tous les documents médicaux</Title>}
-        documents={allMedicalDocuments}
-        personId={person._id}
-        onRowClick={(document) => {
-          if (document.type === 'treatment') loadTreatment(document.treatment);
-          if (document.type === 'consultation') {
-            setConsultation(document.consultation);
-            setShowConsultationModal(true);
-          }
-          return null;
-        }}
-        additionalColumns={[
-          {
-            title: 'Type',
-            render: (doc) => {
-              if (doc.type === 'treatment') return 'Traitement';
-              if (doc.type === 'consultation') return 'Consultation';
-              return '';
+      <div className="noprint">
+        <Documents
+          title={<Title id="all-medical-documents">Tous les documents médicaux</Title>}
+          documents={allMedicalDocuments}
+          personId={person._id}
+          onRowClick={(document) => {
+            if (document.type === 'treatment') loadTreatment(document.treatment);
+            if (document.type === 'consultation') {
+              setConsultation(document.consultation);
+              setShowConsultationModal(true);
+            }
+            return null;
+          }}
+          additionalColumns={[
+            {
+              title: 'Type',
+              render: (doc) => {
+                if (doc.type === 'treatment') return 'Traitement';
+                if (doc.type === 'consultation') return 'Consultation';
+                return '';
+              },
             },
-          },
-        ]}
-        conditionForDelete={(doc) => !doc.type}
-        onAdd={async (docResponse) => {
-          const { data: file, encryptedEntityKey } = docResponse;
-          const medicalFileResponse = await API.put({
-            path: `/medical-file/${medicalFile._id}`,
-            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
-              ...medicalFile,
-              documents: [
-                ...(medicalFile.documents || []),
-                {
-                  _id: file.filename,
-                  name: file.originalname,
-                  encryptedEntityKey,
-                  createdAt: new Date(),
-                  createdBy: user._id,
-                  downloadPath: `/person/${person._id}/document/${file.filename}`,
-                  file,
-                },
-              ],
-            }),
-          });
-          if (medicalFileResponse.ok) {
-            const newMedicalFile = medicalFileResponse.decryptedData;
-            setAllMedicalFiles((allMedicalFiles) =>
-              allMedicalFiles.map((m) => {
-                if (m._id === medicalFile._id) return newMedicalFile;
-                return m;
-              })
-            );
-          }
-        }}
-        onDelete={async (document) => {
-          const medicalFileResponse = await API.put({
-            path: `/medical-file/${medicalFile._id}`,
-            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
-              ...medicalFile,
-              documents: medicalFile.documents.filter((d) => d._id !== document._id),
-            }),
-          });
-          if (medicalFileResponse.ok) {
-            const newMedicalFile = medicalFileResponse.decryptedData;
-            setAllMedicalFiles((allMedicalFiles) =>
-              allMedicalFiles.map((m) => {
-                if (m._id === medicalFile._id) return newMedicalFile;
-                return m;
-              })
-            );
-          }
-        }}
-      />
-      <div style={{ height: '50vh' }} className="noprint" />
+          ]}
+          conditionForDelete={(doc) => !doc.type}
+          onAdd={async (docResponse) => {
+            const { data: file, encryptedEntityKey } = docResponse;
+            const medicalFileResponse = await API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                ...medicalFile,
+                documents: [
+                  ...(medicalFile.documents || []),
+                  {
+                    _id: file.filename,
+                    name: file.originalname,
+                    encryptedEntityKey,
+                    createdAt: new Date(),
+                    createdBy: user._id,
+                    downloadPath: `/person/${person._id}/document/${file.filename}`,
+                    file,
+                  },
+                ],
+              }),
+            });
+            if (medicalFileResponse.ok) {
+              const newMedicalFile = medicalFileResponse.decryptedData;
+              setAllMedicalFiles((allMedicalFiles) =>
+                allMedicalFiles.map((m) => {
+                  if (m._id === medicalFile._id) return newMedicalFile;
+                  return m;
+                })
+              );
+            }
+          }}
+          onDelete={async (document) => {
+            const medicalFileResponse = await API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                ...medicalFile,
+                documents: medicalFile.documents.filter((d) => d._id !== document._id),
+              }),
+            });
+            if (medicalFileResponse.ok) {
+              const newMedicalFile = medicalFileResponse.decryptedData;
+              setAllMedicalFiles((allMedicalFiles) =>
+                allMedicalFiles.map((m) => {
+                  if (m._id === medicalFile._id) return newMedicalFile;
+                  return m;
+                })
+              );
+            }
+          }}
+        />
+      </div>
+      <div className="noprint tw-h-[50vh]" />
       <Modal isOpen={showAddTreatment} toggle={resetCurrentTreatment} size="lg" backdrop="static">
         <Formik
           enableReinitialize
