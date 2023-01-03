@@ -97,8 +97,8 @@ const Territory = ({ route, navigation }) => {
 
   const isUpdateDisabled = useMemo(() => {
     const newTerritory = { ...territoryDB, ...territory };
-    for (const fieldName of Object.keys(territoryFields)) {
-      if (JSON.stringify(newTerritory[fieldName]) !== JSON.stringify(territoryDB[fieldName])) return false;
+    for (const field of territoryFields) {
+      if (JSON.stringify(newTerritory[field.name]) !== JSON.stringify(territoryDB[field.name])) return false;
     }
     return true;
   }, [territoryDB, territory]);
