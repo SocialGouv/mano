@@ -212,7 +212,7 @@ const Reception = () => {
       <SmallHeader
         title={
           <span data-test-id="reception-title">
-            Accueil du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
+            blablabla du <b>{formatDateWithNameOfDay(now())}</b> de l'équipe {currentTeam?.nightSession ? 'de nuit ' : ''}
             <b>{currentTeam?.name || ''}</b>
           </span>
         }
