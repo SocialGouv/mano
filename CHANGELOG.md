@@ -1,3 +1,10 @@
+## [1.203.1](https://github.com/SocialGouv/mano/compare/v1.203.0...v1.203.1) (2023-01-03)
+
+
+### Bug Fixes
+
+* **api:** handle file not found ([#1144](https://github.com/SocialGouv/mano/issues/1144)) ([ddde297](https://github.com/SocialGouv/mano/commit/ddde29759b3bda2fd95a2b8fdb2beb7c3076361e))
+
 # [1.203.0](https://github.com/SocialGouv/mano/compare/v1.202.4...v1.203.0) (2023-01-03)
 
 
