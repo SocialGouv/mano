@@ -17,7 +17,7 @@ import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
 
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
@@ -43,7 +43,6 @@ const actionByIdSelector = selectorFamily({
 
 const ActionView = () => {
   const { actionId } = useParams();
-  const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
