@@ -215,7 +215,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                       </div>
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor="team">Sous l'équipe</Label>
+                      <Label htmlFor="team">Équipe(s)</Label>
                       <SelectTeamMultiple
                         onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
                         value={Array.isArray(values.teams) ? values.teams : [values.team]}

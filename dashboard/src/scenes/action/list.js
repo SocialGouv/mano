@@ -344,7 +344,7 @@ const List = () => {
                 render: (action) => <ActionStatus status={action.status} />,
               },
               {
-                title: 'Équipe en charge',
+                title: 'Équipe(s) en charge',
                 dataKey: 'team',
                 render: (a) => (
                   <div className="px-2 tw-flex-shrink-0">
