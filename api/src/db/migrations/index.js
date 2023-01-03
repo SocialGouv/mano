@@ -24,4 +24,5 @@
   await require("./2022-11-29_add_grouped_services")();
   await require("./2022-11-29_add_reports_columns")();
   await require("./2022-12-12-debug_report")();
+  await require("./2022-12-27_add-unique-constraint-on-report")();
 })();
