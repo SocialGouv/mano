@@ -1,3 +1,10 @@
+# [1.203.0](https://github.com/SocialGouv/mano/compare/v1.202.4...v1.203.0) (2023-01-03)
+
+
+### Features
+
+* **dashboard:** download from stats ([#1139](https://github.com/SocialGouv/mano/issues/1139)) ([448bf23](https://github.com/SocialGouv/mano/commit/448bf2326e23099c67c98170c9fffa9011fa4180))
+
 ## [1.202.4](https://github.com/SocialGouv/mano/compare/v1.202.3...v1.202.4) (2023-01-02)
 
 
