@@ -116,7 +116,7 @@ router.delete(
     const dir = personDocumentBasedir(req.user.organisation, req.params.id);
     const file = path.join(dir, req.params.filename);
     if (!fs.existsSync(file)) {
-      // if it is not found, it might not be deleted but it's lst in the database, so we return ok.
+      // if it is not found, it might not be deleted but it's still in the database, so we return ok.
       res.send({ ok: true });
     } else {
       fs.unlinkSync(file);
