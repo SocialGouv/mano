@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useLocalStorage } from 'react-use';
-import { Col, Label, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
+import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
@@ -13,13 +13,10 @@ import {
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
 import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
-import { CustomResponsiveBar, CustomResponsivePie } from '../../components/charts';
-import Filters, { filterData } from '../../components/Filters';
-import Card from '../../components/Card';
+import { filterData } from '../../components/Filters';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import { actionsCategoriesSelector, actionsState, DONE, flattenedCategoriesSelector, mappedIdsToLabels } from '../../recoil/actions';
+import { actionsCategoriesSelector, actionsState, DONE, flattenedCategoriesSelector } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
-import SelectCustom from '../../components/SelectCustom';
 import { territoriesState } from '../../recoil/territory';
 import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import { useDataLoader } from '../../components/DataLoader';
@@ -31,8 +28,17 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
 import { groupsState } from '../../recoil/groups';
-import { capture } from '../../services/sentry';
 import ExportFormattedData from '../data-import-export/ExportFormattedData';
+import GeneralStats from './1_General';
+import ReceptionStats from './2_Reception';
+import ActionsStats from './3_Actions';
+import PersonStats from './4_Persons';
+import PassagesStats from './5_Passages';
+import RencontresStats from './6_Rencontres';
+import ObservationsStats from './7_Observations';
+import ReportsStats from './8_Reports';
+import ConsultationsStats from './9_Consultations';
+import MedicalFilesStats from './10_MedicalFiles';
 
 const getDataForPeriod = (
   data,
@@ -391,7 +397,6 @@ const Stats = () => {
   ];
 
   if (isLoading) return <Loading />;
-  console.log(filterPersons);
 
   return (
     <>
@@ -454,298 +459,90 @@ const Stats = () => {
       </Nav>
       <TabContent activeTab={activeTab}>
         <TabPane tabId={0}>
-          <h3 className="tw-my-5 tw-text-xl">Statistiques générales</h3>
-          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <Block data={personsForStats} title="Nombre de personnes créées" />
-            <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
-            <Block data={rencontres.length} title="Nombre de rencontres" />
-            <Block data={actions} title="Nombre d'actions" />
-            <Block data={numberOfActionsPerPerson} title="Nombre d'actions par personne" />
-            <Block data={numberOfActionsPerPersonConcernedByActions} title="Nombre d'actions par personne concernée par au moins une action" />
-          </div>
+          <GeneralStats
+            personsForStats={personsForStats}
+            personsUpdatedForStats={personsUpdatedForStats}
+            rencontres={rencontres}
+            actions={actions}
+            numberOfActionsPerPerson={numberOfActionsPerPerson}
+            numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
+          />
         </TabPane>
         {!!organisation.receptionEnabled && (
           <TabPane tabId={1}>
-            <h3 className="tw-my-5 tw-text-xl">Statistiques de l'accueil</h3>
-            <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-              <Block data={passages.length} title="Nombre de passages" />
-            </div>
-            <CustomResponsivePie
-              title="Services"
-              data={organisation.services?.map((service) => {
-                return {
-                  id: service,
-                  label: service,
-                  value: reportsServices.reduce((serviceNumber, rep) => (rep?.[service] || 0) + serviceNumber, 0),
-                };
-              })}
-            />
+            <ReceptionStats reportsServices={reportsServices} passages={passages} />
           </TabPane>
         )}
         <TabPane tabId={2}>
-          <h3 className="tw-my-5 tw-text-xl">Statistiques des actions</h3>
-          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-            <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-              Filtrer par statut :
-            </label>
-            <div style={{ width: 500 }}>
-              <SelectCustom
-                inputId="action-select-status-filter"
-                options={mappedIdsToLabels}
-                getOptionValue={(s) => s._id}
-                getOptionLabel={(s) => s.name}
-                name="action-status"
-                onChange={(s) => setActionsStatuses(s.map((s) => s._id))}
-                isClearable
-                isMulti
-                value={mappedIdsToLabels.filter((s) => actionsStatuses.includes(s._id))}
-              />
-            </div>
-          </Col>
-          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-            <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-              Filtrer par groupe de catégories :
-            </label>
-            <div style={{ basis: 500, flexGrow: 1 }}>
-              <SelectCustom
-                value={actionsCategoriesGroups?.map((_option) => ({ value: _option, label: _option })) || []}
-                options={groupsCategories.map((group) => group.groupTitle).map((_option) => ({ value: _option, label: _option }))}
-                getOptionValue={(s) => s.value}
-                getOptionLabel={(s) => s.label}
-                onChange={(groups) => setActionsCategoriesGroups(groups.map((s) => s.value))}
-                name="action-category-group"
-                inputId="action-select-group-category-filter"
-                isClearable
-                isMulti
-              />
-            </div>
-          </Col>
-          <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-            <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
-              Filtrer par catégorie:
-            </label>
-            <div style={{ basis: 500, flexGrow: 1 }}>
-              <SelectCustom
-                options={filterableActionsCategories.map((_option) => ({ value: _option, label: _option }))}
-                value={actionsCategories?.map((_option) => ({ value: _option, label: _option })) || []}
-                getOptionValue={(s) => s.value}
-                getOptionLabel={(s) => s.label}
-                onChange={(categories) => setActionsCategories(categories.map((s) => s.value))}
-                inputId="action-select-category-filter"
-                name="action-category"
-                isClearable
-                isMulti
-              />
-            </div>
-          </Col>
-          <CustomResponsivePie
-            title="Répartition des actions par groupe"
-            data={getPieData(actionsWithDetailedGroupAndCategories, 'group', { options: groupsCategories.map((group) => group.groupTitle) })}
-          />
-          <CustomResponsivePie
-            title="Répartition des actions par catégorie"
-            data={getPieData(actionsWithDetailedGroupAndCategories, 'category', { options: allCategories })}
+          <ActionsStats
+            setActionsStatuses={setActionsStatuses}
+            actionsStatuses={actionsStatuses}
+            setActionsCategories={setActionsCategories}
+            actionsCategories={actionsCategories}
+            setActionsCategoriesGroups={setActionsCategoriesGroups}
+            actionsCategoriesGroups={actionsCategoriesGroups}
+            groupsCategories={groupsCategories}
+            filterableActionsCategories={filterableActionsCategories}
+            actionsWithDetailedGroupAndCategories={actionsWithDetailedGroupAndCategories}
+            allCategories={allCategories}
           />
         </TabPane>
         <TabPane tabId={3}>
-          <h3 className="tw-my-5 tw-text-xl">Statistiques des personnes suivies</h3>
-          <Filters base={filterPersonsWithAllFields()} filters={filterPersons} onChange={setFilterPersons} />
-          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-            <Block data={personsForStats} title="Nombre de personnes créées" />
-            <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
-            <BlockCreatedAt persons={personsForStats} />
-            <BlockWanderingAt persons={personsForStats} />
-            <BlockGroup groups={groupsForPersons(personsForStats)} title="Nombre de familles dans lesquelles se trouvent des personnes créées" />
-            <BlockGroup
-              groups={groupsForPersons(personsUpdatedForStats)}
-              title="Nombre de familles dans lesquelles se trouvent des personnes suivies"
-            />
-          </div>
-          <CustomResponsivePie
-            title="Nationalité"
-            field="nationalitySituation"
-            data={getPieData(personsForStats, 'nationalitySituation', {
-              options: personFields.find((f) => f.name === 'nationalitySituation').options,
-            })}
+          <PersonStats
+            filterBase={filterPersonsWithAllFields()}
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
+            personsForStats={personsForStats}
+            personsUpdatedForStats={personsUpdatedForStats}
+            groupsForPersons={groupsForPersons}
+            personFields={personFields}
+            persons={persons}
+            fieldsPersonsCustomizableOptions={fieldsPersonsCustomizableOptions}
+            customFieldsPersonsMedical={customFieldsPersonsMedical}
+            customFieldsPersonsSocial={customFieldsPersonsSocial}
           />
-          <CustomResponsivePie
-            title="Genre"
-            field="gender"
-            data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
-          />
-          <CustomResponsivePie
-            title="Situation personnelle"
-            field="personalSituation"
-            data={getPieData(personsForStats, 'personalSituation', { options: personFields.find((f) => f.name === 'personalSituation').options })}
-          />
-          <CustomResponsivePie
-            title="Motif de la situation de rue"
-            field="reasons"
-            data={getPieData(personsForStats, 'reasons', { options: personFields.find((f) => f.name === 'reasons').options })}
-          />
-          <CustomResponsivePie
-            title="Ressources des personnes suivies"
-            field="resources"
-            data={getPieData(personsForStats, 'resources', { options: personFields.find((f) => f.name === 'resources').options })}
-          />
-          <AgeRangeBar persons={personsForStats} />
-          <StatsCreatedAtRangeBar persons={personsForStats} />
-          <StatsWanderingAtRangeBar persons={personsForStats} />
-          <CustomResponsivePie title="Type d'hébergement" data={getAdressPieData(personsForStats)} />
-          <CustomResponsivePie
-            title="Couverture médicale des personnes"
-            field="healthInsurances"
-            data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
-          />
-          <CustomResponsivePie title="Avec animaux" data={getPieData(personsForStats, 'hasAnimal')} />
-          <CustomResponsivePie
-            title="Personnes très vulnérables"
-            field="alertness"
-            data={getPieData(personsForStats, 'alertness', { isBoolean: true })}
-          />
-          <CustomResponsivePie
-            title="Sortie de file active"
-            field="outOfActiveList"
-            data={getPieData(persons, 'outOfActiveList', { isBoolean: true })}
-          />
-          <CustomResponsivePie
-            title="Raison de sortie de file active"
-            field="outOfActiveListReasons"
-            data={getPieData(
-              persons.filter((p) => !!p.outOfActiveList),
-              'outOfActiveListReasons',
-              { options: fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReasons').options }
-            )}
-          />
-          <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsMedical} />
-          <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsSocial} />
         </TabPane>
         <TabPane tabId={4}>
-          <h3 className="tw-my-5 tw-text-xl">Statistiques des passages</h3>
-          <CustomResponsivePie title="Nombre de passages" data={getPieData(passages, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
-          <CustomResponsivePie
-            title="Répartition des passages non-anonymes"
-            data={getPieData(
-              passages.filter((p) => !!p.gender),
-              'gender',
-              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
-            )}
-          />
-          <CustomResponsivePie
-            title="Nombre de personnes différentes passées (passages anonymes exclus)"
-            data={getPieData(personsInPassagesOfPeriod, 'gender', {
-              options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'],
-            })}
-          />
-          <CustomResponsivePie
-            title="Nombre de nouvelles personnes passées (passages anonymes exclus)"
-            data={getPieData(
-              personsInPassagesOfPeriod.filter((personId) => !personsInPassagesBeforePeriod.includes(personId)),
-              'gender',
-              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
-            )}
+          <PassagesStats
+            passages={passages}
+            personFields={personFields}
+            personsInPassagesOfPeriod={personsInPassagesOfPeriod}
+            personsInPassagesBeforePeriod={personsInPassagesBeforePeriod}
           />
         </TabPane>
         <TabPane tabId={5}>
-          <h3 className="tw-my-5 tw-text-xl">Statistiques des rencontres</h3>
-          <CustomResponsivePie title="Nombre de rencontres" data={getPieData(rencontres, 'type', { options: ['Anonyme', 'Non-anonyme'] })} />
-          <CustomResponsivePie
-            title="Répartition des rencontres"
-            data={getPieData(
-              rencontres.filter((p) => !!p.gender),
-              'gender',
-              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
-            )}
-          />
-          <CustomResponsivePie
-            title="Nombre de personnes différentes rencontrées"
-            data={getPieData(personsInRencontresOfPeriod, 'gender', {
-              options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'],
-            })}
-          />
-          <CustomResponsivePie
-            title="Nombre de nouvelles personnes rencontrées"
-            data={getPieData(
-              personsInRencontresOfPeriod.filter((personId) => !personsInRencontresBeforePeriod.includes(personId)),
-              'gender',
-              { options: [...personFields.find((f) => f.name === 'gender').options, 'Non précisé'] }
-            )}
+          <RencontresStats
+            rencontres={rencontres}
+            personFields={personFields}
+            personsInRencontresOfPeriod={personsInRencontresOfPeriod}
+            personsInRencontresBeforePeriod={personsInRencontresBeforePeriod}
           />
         </TabPane>
         <TabPane tabId={6}>
-          <h3 className="tw-my-5 tw-text-xl">Statistiques des observations de territoire</h3>
-          <div style={{ marginBottom: '2rem' }}>
-            <Label htmlFor="filter-territory">Filter par territoire</Label>
-            <SelectCustom
-              isMulti
-              options={territories}
-              name="place"
-              placeholder="Tous les territoires"
-              onChange={(t) => {
-                setSelectedTerritories(t);
-              }}
-              isClearable={true}
-              inputId="filter-territory"
-              getOptionValue={(i) => i._id}
-              getOptionLabel={(i) => i.name}
-            />
-          </div>
-          <Row>
-            <CustomFieldsStats
-              data={observations}
-              customFields={customFieldsObs}
-              dataTestId="number-observations"
-              additionalCols={[
-                {
-                  title: "Nombre d'observation de territoire",
-                  value: observations.length,
-                },
-              ]}
-            />
-          </Row>
+          <ObservationsStats
+            territories={territories}
+            setSelectedTerritories={setSelectedTerritories}
+            observations={observations}
+            customFieldsObs={customFieldsObs}
+          />
         </TabPane>
         <TabPane tabId={7}>
-          <h3 className="tw-my-5 tw-text-xl">Statistiques des comptes-rendus</h3>
-          <CustomResponsivePie
-            title="Répartition des comptes-rendus par collaboration"
-            data={getPieData(reports, 'collaborations', { options: organisation.collaborations || [] })}
-          />
+          <ReportsStats reports={reports} />
         </TabPane>
         {user.healthcareProfessional && (
           <>
             <TabPane tabId={8}>
-              <h3 className="tw-my-5 tw-text-xl">Statistiques des consultations</h3>
-              <Row style={{ marginBottom: '20px' }}>
-                <Col md={4} />
-                <Block data={consultations} title="Nombre de consultations" />
-                <Col md={4} />
-              </Row>
-              <CustomResponsivePie title="Consultations par type" data={getPieData(consultations, 'type')} />
-              <CustomResponsivePie title="Consultations par statut" data={getPieData(consultations, 'status')} />
-              {organisation.consultations.map((c) => {
-                return (
-                  <div key={c.name}>
-                    <h4 style={{ color: '#444', fontSize: '20px', margin: '2rem 0' }}>Statistiques des consultations de type « {c.name} »</h4>
-                    <CustomFieldsStats data={consultations.filter((d) => d.type === c.name)} customFields={c.fields} />
-                  </div>
-                );
-              })}
+              <ConsultationsStats consultations={consultations} />
             </TabPane>
             <TabPane tabId={9}>
-              <h3 className="tw-my-5 tw-text-xl">Statistiques des dossiers médicaux</h3>
-              <Filters base={filterPersonsWithAllFields(true)} filters={filterPersons} onChange={setFilterPersons} />
-              <AgeRangeBar persons={personsForStats} />
-              <CustomResponsivePie
-                title="Genre"
-                field="gender"
-                data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
+              <MedicalFilesStats
+                filterBase={filterPersonsWithAllFields(true)}
+                filterPersons={filterPersons}
+                setFilterPersons={setFilterPersons}
+                personsForStats={personsForStats}
+                customFieldsMedicalFile={customFieldsMedicalFile}
+                personFields={personFields}
               />
-              <CustomResponsivePie
-                title="Couverture médicale des personnes"
-                field="healthInsurances"
-                data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
-              />
-              <CustomFieldsStats data={personsForStats} customFields={customFieldsMedicalFile} />
             </TabPane>
           </>
         )}
@@ -753,391 +550,5 @@ const Stats = () => {
     </>
   );
 };
-
-const getPieData = (source, key, { options = null, isBoolean = false, debug = false } = {}) => {
-  const data = source.reduce(
-    (newData, item) => {
-      if (isBoolean) {
-        newData[Boolean(item[key]) ? 'Oui' : 'Non']++;
-        return newData;
-      }
-      if (!item[key] || !item[key].length || item[key].includes('Choisissez') || item[key].includes('Choisir')) {
-        newData['Non renseigné']++;
-        return newData;
-      }
-      if (options && options.length) {
-        let hasMatched = false;
-        for (let option of [...options, 'Uniquement']) {
-          if (typeof item[key] === 'string' ? item[key] === option : item[key].includes(option)) {
-            if (!newData[option]) newData[option] = 0;
-            newData[option]++;
-            hasMatched = true;
-          }
-        }
-        if (!hasMatched) {
-          if (typeof item[key] === 'string') {
-            const unregisteredOption = item[key];
-            if (!newData[unregisteredOption]) newData[unregisteredOption] = 0;
-            newData[unregisteredOption]++;
-          }
-        }
-        return newData;
-      }
-      if (!newData[item[key]]) newData[item[key]] = 0;
-      newData[item[key]]++;
-      return newData;
-    },
-    { 'Non renseigné': 0, Oui: 0, Non: 0 }
-  );
-  return Object.keys(data)
-    .map((key) => ({ id: key, label: key, value: data[key] }))
-    .filter((d) => d.value > 0);
-};
-
-const getAdressPieData = (data) => {
-  data = data.reduce(
-    (newData, person) => {
-      if (!person.address) {
-        newData['Non renseigné']++;
-        return newData;
-      }
-      if (person.address === 'Non') {
-        newData.Non++;
-        return newData;
-      }
-      if (!person.addressDetail) {
-        newData['Oui (Autre)']++;
-        return newData;
-      }
-      if (!newData[person.addressDetail]) newData[person.addressDetail] = 0;
-      newData[person.addressDetail]++;
-      return newData;
-    },
-    { 'Oui (Autre)': 0, Non: 0, 'Non renseigné': 0 }
-  );
-  return Object.keys(data).map((key) => ({ id: key, label: key, value: data[key] }));
-};
-
-const AgeRangeBar = ({ persons }) => {
-  const categories = ['0 - 2', '3 - 17', '18 - 24', '25 - 44', '45 - 59', '60+'];
-
-  let data = persons.reduce((newData, person) => {
-    if (!person.birthdate || !person.birthdate.length) {
-      newData['Non renseigné']++;
-      return newData;
-    }
-    const parsedDate = Date.parse(person.birthdate);
-    const fromNowInYear = (Date.now() - parsedDate) / 1000 / 60 / 60 / 24 / 365.25;
-    if (fromNowInYear < 2) {
-      newData['0 - 2']++;
-      return newData;
-    }
-    if (fromNowInYear < 18) {
-      newData['3 - 17']++;
-      return newData;
-    }
-    if (fromNowInYear < 25) {
-      newData['18 - 24']++;
-      return newData;
-    }
-    if (fromNowInYear < 45) {
-      newData['25 - 44']++;
-      return newData;
-    }
-    if (fromNowInYear < 60) {
-      newData['45 - 59']++;
-      return newData;
-    }
-    newData['60+']++;
-    return newData;
-  }, initCategories(categories));
-
-  data = Object.keys(data)
-    .filter((key) => data[key] > 0)
-    .map((key) => ({ name: key, [key]: data[key] }));
-
-  return (
-    <CustomResponsiveBar title="Tranche d'âges" categories={categories} data={data} axisTitleX="Tranche d'âge" axisTitleY="Nombre de personnes" />
-  );
-};
-
-const initCategories = (categories) => {
-  const objCategories = {};
-  for (const cat of categories) {
-    objCategories[cat] = 0;
-  }
-  return objCategories;
-};
-
-const StatsCreatedAtRangeBar = ({ persons }) => {
-  const categories = ['0-6 mois', '6-12 mois', '1-2 ans', '2-5 ans', '+ 5 ans'];
-
-  let data = persons.reduce((newData, person) => {
-    if (!person.followedSince || !person.createdAt || !person.createdAt.length) {
-      return newData;
-      // newData["Non renseigné"]++;
-    }
-    const parsedDate = Date.parse(person.followedSince || person.createdAt);
-    const fromNowInMonths = (Date.now() - parsedDate) / 1000 / 60 / 60 / 24 / (365.25 / 12);
-    if (fromNowInMonths < 6) {
-      newData['0-6 mois']++;
-      return newData;
-    }
-    if (fromNowInMonths < 12) {
-      newData['6-12 mois']++;
-      return newData;
-    }
-    if (fromNowInMonths < 24) {
-      newData['1-2 ans']++;
-      return newData;
-    }
-    if (fromNowInMonths < 60) {
-      newData['2-5 ans']++;
-      return newData;
-    }
-    newData['+ 5 ans']++;
-    return newData;
-  }, initCategories(categories));
-
-  data = Object.keys(data)
-    .filter((key) => data[key] > 0)
-    .map((key) => ({ name: key, [key]: data[key] }));
-
-  return (
-    <CustomResponsiveBar
-      title="Temps de suivi (par tranche)"
-      categories={categories}
-      data={data}
-      axisTitleX="Temps de suivi"
-      axisTitleY="Nombre de personnes"
-    />
-  );
-};
-
-const StatsWanderingAtRangeBar = ({ persons }) => {
-  const categories = ['0-6 mois', '6-12 mois', '1-2 ans', '2-5 ans', '5-10 ans', '+ 10 ans'];
-
-  let data = persons.reduce((newData, person) => {
-    if (!person.wanderingAt || !person.wanderingAt.length) {
-      return newData;
-    }
-    const parsedDate = Date.parse(person.wanderingAt);
-    const fromNowInMonths = (Date.now() - parsedDate) / 1000 / 60 / 60 / 24 / (365.25 / 12);
-    if (fromNowInMonths < 6) {
-      newData['0-6 mois']++;
-      return newData;
-    }
-    if (fromNowInMonths < 12) {
-      newData['6-12 mois']++;
-      return newData;
-    }
-    if (fromNowInMonths < 24) {
-      newData['1-2 ans']++;
-      return newData;
-    }
-    if (fromNowInMonths < 60) {
-      newData['2-5 ans']++;
-      return newData;
-    }
-    if (fromNowInMonths < 120) {
-      newData['5-10 ans']++;
-      return newData;
-    }
-    newData['+ 10 ans']++;
-    return newData;
-  }, initCategories(categories));
-
-  data = Object.keys(data)
-    .filter((key) => data[key] > 0)
-    .map((key) => ({ name: key, [key]: data[key] }));
-
-  return (
-    <CustomResponsiveBar
-      title="Temps d'errance (par tranche)"
-      categories={categories}
-      data={data}
-      axisTitleX="Temps d'errance"
-      axisTitleY="Nombre de personnes"
-    />
-  );
-};
-
-const Block = ({ data, title = 'Nombre de personnes suivies' }) => (
-  <div className="tw-px-4 tw-py-2 md:tw-basis-1/2 lg:tw-basis-1/3">
-    <Card title={title} count={Array.isArray(data) ? String(data.length) : data} />
-  </div>
-);
-
-const getDuration = (timestampFromNow) => {
-  const inDays = Math.round(timestampFromNow / 1000 / 60 / 60 / 24);
-  if (inDays < 90) return [inDays, 'jours'];
-  const inMonths = inDays / (365 / 12);
-  if (inMonths < 24) return [Math.round(inMonths), 'mois'];
-  const inYears = inDays / 365.25;
-  return [Math.round(inYears), 'années'];
-};
-
-const BlockDateWithTime = ({ data, field }) => {
-  if (!data.filter((item) => Boolean(item[field.name])).length) return null;
-
-  const averageField =
-    data.filter((item) => Boolean(item[field.name])).reduce((total, item) => total + Date.parse(item[field.name]), 0) / (data.length || 1);
-
-  const durationFromNowToAverage = Date.now() - averageField;
-  const [count, unit] = getDuration(durationFromNowToAverage);
-
-  return <Card title={field.label + ' (moyenne)'} unit={unit} count={count} />;
-};
-
-const BlockCreatedAt = ({ persons }) => {
-  if (persons.length === 0) {
-    return (
-      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-        <Card title="Temps de suivi moyen" count={'-'} />
-      </div>
-    );
-  }
-  const averageFollowedSince =
-    persons.reduce((total, person) => total + Date.parse(person.followedSince || person.createdAt), 0) / (persons.length || 1);
-  const durationFromNowToAverage = Date.now() - averageFollowedSince;
-  const [count, unit] = getDuration(durationFromNowToAverage);
-
-  return (
-    <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-      <Card title="Temps de suivi moyen" unit={unit} count={count} />
-    </div>
-  );
-};
-
-const BlockWanderingAt = ({ persons }) => {
-  persons = persons.filter((p) => Boolean(p.wanderingAt));
-  if (!persons.length) {
-    return (
-      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-        <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={'N/A'} count={0} />
-      </div>
-    );
-  }
-  const averageWanderingAt = persons.reduce((total, person) => total + Date.parse(person.wanderingAt), 0) / (persons.length || 1);
-  const durationFromNowToAverage = Date.now() - averageWanderingAt;
-  const [count, unit] = getDuration(durationFromNowToAverage);
-
-  return (
-    <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-      <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={unit} count={count} />
-    </div>
-  );
-};
-
-const BlockTotal = ({ title, unit, data, field }) => {
-  try {
-    if (!data.length) {
-      return <Card title={title} unit={unit} count={0} />;
-    }
-    const dataWithOnlyNumbers = data.filter((item) => Boolean(item[field])).filter((e) => !isNaN(Number(e[field])));
-    const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);
-    const avg = Math.round((total / data.length) * 100) / 100;
-    return (
-      <Card
-        title={title}
-        unit={unit}
-        count={total}
-        children={
-          <span className="font-weight-normal">
-            Moyenne: <strong>{avg}</strong>
-          </span>
-        }
-      />
-    );
-  } catch (errorBlockTotal) {
-    capture('error block total', errorBlockTotal, { title, unit, data, field });
-  }
-  return null;
-};
-
-const BlockGroup = ({ title, groups }) => {
-  try {
-    if (!groups.length) {
-      return (
-        <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-          <Card title={title} count={0} />
-        </div>
-      );
-    }
-
-    const avg = groups.reduce((total, group) => total + group.relations.length, 0) / groups.length;
-    return (
-      <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-        <Card
-          title={title}
-          count={groups.length}
-          children={
-            <span className="font-weight-normal">
-              Moyenne de relations par famille: <strong>{avg}</strong>
-            </span>
-          }
-        />
-      </div>
-    );
-  } catch (errorBlockTotal) {
-    capture('error block total', errorBlockTotal, { title, groups });
-  }
-  return null;
-};
-
-function CustomFieldsStats({ customFields, data, additionalCols = [], dataTestId = '' }) {
-  const team = useRecoilValue(currentTeamState);
-  function getColsSize(totalCols) {
-    if (totalCols === 1) return 12;
-    if (totalCols === 2) return 6;
-    if (totalCols % 4 === 0) return 3;
-    return 4;
-  }
-
-  const customFieldsInStats = customFields
-    .filter((f) => f)
-    .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-    .filter((f) => f.showInStats);
-
-  const customFieldsNumber = customFieldsInStats.filter((field) => ['number'].includes(field.type));
-  const customFieldsDate = customFieldsInStats.filter((field) => ['date', 'date-with-time'].includes(field.type));
-  const customFieldsResponsivePie = customFieldsInStats.filter((field) => ['boolean', 'yes-no', 'enum', 'multi-choice'].includes(field.type));
-
-  const totalCols = customFieldsNumber.length + customFieldsDate.length + additionalCols.length;
-
-  const colSize = getColsSize(totalCols);
-
-  return (
-    <>
-      {totalCols > 0 && (
-        <Row>
-          {additionalCols.map((col) => (
-            <Col md={colSize} style={{ marginBottom: 20 }} key={col.title}>
-              {/* TODO: fix alignment. */}
-              <Card title={col.title} count={col.value} children={<div></div>} dataTestId={dataTestId} />
-            </Col>
-          ))}
-          {customFieldsNumber.map((field) => (
-            <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
-              <BlockTotal title={field.label} data={data} field={field.name} />
-            </Col>
-          ))}
-          {customFieldsDate.map((field) => (
-            <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
-              <BlockDateWithTime data={data} field={field} />
-            </Col>
-          ))}
-        </Row>
-      )}
-      {customFieldsResponsivePie.map((field) => (
-        <CustomResponsivePie
-          title={field.label}
-          key={field.name}
-          data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
-        />
-      ))}
-    </>
-  );
-}
 
 export default Stats;

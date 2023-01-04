@@ -2,16 +2,16 @@ import React from 'react';
 import styled from 'styled-components';
 import { ResponsivePie } from '@nivo/pie';
 
-import { theme } from '../config';
+import { theme } from '../../config';
 import { Col, Row } from 'reactstrap';
 import { ResponsiveBar } from '@nivo/bar';
 
-export const CustomResponsivePie = ({ data = [], title, onAddFilter, field }) => {
+export const CustomResponsivePie = ({ data = [], title, onItemClick }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const onClick = ({ id }) => {
-    if (!onAddFilter) return;
-    onAddFilter({ value: id, field });
+    if (!onItemClick) return;
+    onItemClick(id);
   };
 
   return (
@@ -25,7 +25,7 @@ export const CustomResponsivePie = ({ data = [], title, onAddFilter, field }) =>
             {[...data]
               .sort((a, b) => (a.value < b.value ? 1 : -1))
               .map(({ key, label, value }) => (
-                <tr key={key + label + value}>
+                <tr key={key + label + value} onClick={() => onClick({ id: label })}>
                   <td>{label}</td>
                   <td>{value}</td>
                   {total ? <td>{`${Math.round((value / total) * 1000) / 10}%`}</td> : <></>}
