@@ -1,3 +1,10 @@
+## [1.203.3](https://github.com/SocialGouv/mano/compare/v1.203.2...v1.203.3) (2023-01-04)
+
+
+### Bug Fixes
+
+* new error for excel import ([c42e61c](https://github.com/SocialGouv/mano/commit/c42e61c6aa55a48efc81b9e99146001acafb052b))
+
 ## [1.203.2](https://github.com/SocialGouv/mano/compare/v1.203.1...v1.203.2) (2023-01-04)
 
 
