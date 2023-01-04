@@ -1,3 +1,10 @@
+## [1.203.2](https://github.com/SocialGouv/mano/compare/v1.203.1...v1.203.2) (2023-01-04)
+
+
+### Bug Fixes
+
+* encryption of groups ! ([#1152](https://github.com/SocialGouv/mano/issues/1152)) ([08fe91f](https://github.com/SocialGouv/mano/commit/08fe91f8b5269d2fe51fd61a2f246bc4fa070529))
+
 ## [1.203.1](https://github.com/SocialGouv/mano/compare/v1.203.0...v1.203.1) (2023-01-03)
 
 
