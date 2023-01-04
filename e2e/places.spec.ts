@@ -28,14 +28,14 @@ test("Lieux fréquentés", async ({ page }) => {
 
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
   await page.locator(".place__input-container").click();
-  await page.getByLabel("Lieu").fill("gare");
+  await page.getByLabel("Lieu", { exact: true }).fill("gare");
   await page.getByText(/Créer\s+"gare"/).click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Le lieu a été ajouté").click();
   await expect(page.locator("data-test-id=gare")).toBeVisible();
 
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
-  await page.getByLabel("Lieu").fill("parking");
+  await page.getByLabel("Lieu", { exact: true }).fill("parking");
   await page.getByText(/Créer\s+"parking"/).click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Le lieu a été ajouté").click();
@@ -76,7 +76,7 @@ test("Lieux fréquentés", async ({ page }) => {
   await page.getByText("Le nom du lieu a été modifié").click();
 
   await page.getByRole("button", { name: "Ajouter un lieu" }).click();
-  await page.getByLabel("Lieu").fill("faux lieu");
+  await page.getByLabel("Lieu", { exact: true }).fill("faux lieu");
   await page.getByText(/Créer\s+"faux\s+lieu"/).click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Le lieu a été ajouté").click();
