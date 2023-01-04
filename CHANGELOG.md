@@ -1,3 +1,10 @@
+# [1.204.0](https://github.com/SocialGouv/mano/compare/v1.203.3...v1.204.0) (2023-01-04)
+
+
+### Features
+
+* Change MergeTwoPersons font ([#1151](https://github.com/SocialGouv/mano/issues/1151)) ([86bb8cf](https://github.com/SocialGouv/mano/commit/86bb8cf949f8f3c07c21bc6ef2ffee3c24aa642a))
+
 ## [1.203.3](https://github.com/SocialGouv/mano/compare/v1.203.2...v1.203.3) (2023-01-04)
 
 
