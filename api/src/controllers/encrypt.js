@@ -5,6 +5,7 @@ const { z } = require("zod");
 const { catchErrors } = require("../errors");
 const Organisation = require("../models/organisation");
 const Person = require("../models/person");
+const Group = require("../models/group");
 const Place = require("../models/place");
 const RelPersonPlace = require("../models/relPersonPlace");
 const Action = require("../models/action");
@@ -43,12 +44,13 @@ router.post(
       "treatments",
       "medicalFiles",
       "persons",
+      "groups",
       "comments",
+      "passages",
+      "rencontres",
       "territories",
       "observations",
       "places",
-      "passages",
-      "rencontres",
       "reports",
       "relsPersonPlace",
     ];
@@ -93,6 +95,7 @@ router.post(
           treatments = [],
           medicalFiles = [],
           persons = [],
+          groups = [],
           comments = [],
           passages = [],
           rencontres = [],
@@ -111,6 +114,10 @@ router.post(
 
         for (let { encrypted, encryptedEntityKey, _id } of persons) {
           await Person.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
+        }
+
+        for (let { encrypted, encryptedEntityKey, _id } of groups) {
+          await Group.update({ encrypted, encryptedEntityKey }, { where: { _id }, transaction: tx });
         }
 
         for (let { encrypted, encryptedEntityKey, _id } of actions) {
