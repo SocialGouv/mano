@@ -71,11 +71,11 @@ const Drawer = () => {
         {['admin', 'normal'].includes(role) && (
           <>
             <hr />
-            <li>
+            {/* <li>
               <NavLink to="/place" activeClassName="active">
                 Lieux fréquentés
               </NavLink>
-            </li>
+            </li> */}
             <li>
               <NavLink to="/structure" activeClassName="active">
                 Structures

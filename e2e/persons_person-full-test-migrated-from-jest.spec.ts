@@ -177,7 +177,9 @@ test("test", async ({ page }) => {
 
   await page.locator('small:has-text("Médicale")').click();
   await page.getByRole("button", { name: "Annuler" }).click();
-  await page.getByRole("button", { name: "Lieux fréquentés" }).click();
+  await page.getByRole("button", { name: "Lieux fréquentés (0)" }).click();
+  await page.getByRole("button", { name: "Fermer" }).click();
+
   await page.getByRole("button", { name: "Historique" }).click();
   await page.locator('[data-test-id="Autres pseudos\\: \\"\\" ➔ \\"test pseudo\\""]').click();
   await page.getByText("Retour").click();
