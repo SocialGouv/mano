@@ -1,3 +1,10 @@
+# [1.205.0](https://github.com/SocialGouv/mano/compare/v1.204.1...v1.205.0) (2023-01-05)
+
+
+### Features
+
+* update places in dashboard to be more usable ([#1107](https://github.com/SocialGouv/mano/issues/1107)) ([b64a20f](https://github.com/SocialGouv/mano/commit/b64a20f761f669330380fce85e5103c54a019970))
+
 ## [1.204.1](https://github.com/SocialGouv/mano/compare/v1.204.0...v1.204.1) (2023-01-05)
 
 
