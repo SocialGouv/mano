@@ -39,7 +39,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick }) => {
           </tbody>
         </table>
       </div>
-      <div className="tw-h-[30vw] tw-max-w-[66%] tw-basis-2/3 tw-font-bold">
+      <div className={['tw-h-[30vw] tw-max-w-[66%] tw-basis-2/3 tw-font-bold', !!onClick ? '[&_path]:tw-cursor-pointer' : ''].join(' ')}>
         <ResponsivePie
           data={total ? data : []}
           sortByValue

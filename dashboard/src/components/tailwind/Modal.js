@@ -22,6 +22,7 @@ const ModalContainer = ({
   // setOpen,
   className = '',
   onAfterEnter = () => null,
+  onAfterLeave = () => null,
   onBeforeLeave = () => null,
   size = 'lg', // lg, xl, 3xl, full
 }) => {
@@ -61,7 +62,8 @@ const ModalContainer = ({
                   backgroundRef?.current?.scrollTo(0, 0);
                   onAfterEnter();
                 }}
-                beforeLeave={onBeforeLeave}>
+                beforeLeave={onBeforeLeave}
+                afterLeave={onAfterLeave}>
                 <Dialog.Panel
                   className={[
                     'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full ',
