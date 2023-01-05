@@ -1,3 +1,10 @@
+## [1.204.1](https://github.com/SocialGouv/mano/compare/v1.204.0...v1.204.1) (2023-01-05)
+
+
+### Bug Fixes
+
+* print medical file ([#1146](https://github.com/SocialGouv/mano/issues/1146)) ([078e34d](https://github.com/SocialGouv/mano/commit/078e34dfaab081ff7cc1dd5cf6372e6d26079c57))
+
 # [1.204.0](https://github.com/SocialGouv/mano/compare/v1.203.3...v1.204.0) (2023-01-04)
 
 
