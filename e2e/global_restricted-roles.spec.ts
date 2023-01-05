@@ -103,7 +103,7 @@ test("test restricted accesses", async ({ page }) => {
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).toBeVisible();
@@ -157,7 +157,7 @@ test("test restricted accesses", async ({ page }) => {
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
@@ -211,7 +211,7 @@ test("test restricted accesses", async ({ page }) => {
 
     // await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    // await expect(page.getByText("Régime Général")).toBeVisible();
+    // await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
@@ -265,7 +265,7 @@ test("test restricted accesses", async ({ page }) => {
 
     // await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    // await expect(page.getByText("Régime Général")).toBeVisible();
+    // await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
@@ -318,7 +318,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("button", { name: "Historique" })).toBeVisible();
     // await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    // await expect(page.getByText("Régime Général")).toBeVisible();
+    // await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     // await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
@@ -378,7 +378,7 @@ test("test restricted accesses", async ({ page }) => {
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).toBeVisible();
@@ -414,7 +414,7 @@ test("test restricted accesses", async ({ page }) => {
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
 
-    await expect(page.getByText("Régime Général")).toBeVisible();
+    await expect(page.getByText("Régime Général").nth(1)).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();

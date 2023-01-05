@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { FormGroup, Input, Label, Row, Col, Modal, ModalHeader, ModalBody } from 'reactstrap';
 import { Formik } from 'formik';
-import styled from 'styled-components';
 import { toast } from 'react-toastify';
 import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
@@ -9,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
 import { personsState, usePreparePersonForEncryption, personFieldsSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
-import { dateForDatePicker, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
 import useApi from '../../services/api';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -116,9 +115,11 @@ export function MedicalFile({ person }) {
 
   return (
     <>
-      <TitleWithButtonsContainer>
-        <Title>Informations générales</Title>
-        <ButtonsFloatingRight>
+      <h1 className="printonly">Dossier médical de {person?.name}</h1>
+      <small className="printonly">extrait le {dayjsInstance().format('ddd DD MM YYYY')}</small>
+      <div className="tw-mx-0 tw-mt-8 tw-mb-5 tw-flex tw-items-center">
+        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Informations générales</h2>
+        <div className="tw-flex tw-flex-1 tw-justify-end">
           <ButtonCustom
             icon={false}
             disabled={false}
@@ -129,140 +130,182 @@ export function MedicalFile({ person }) {
             title={'📋\u00A0\u00A0Imprimer le dossier PDF'}
             padding="12px 24px"
           />
-        </ButtonsFloatingRight>
-      </TitleWithButtonsContainer>
-      <Formik
-        enableReinitialize
-        initialValues={person}
-        onSubmit={async (body) => {
-          const response = await API.put({
-            path: `/person/${person._id}`,
-            body: preparePersonForEncryption({ ...person, ...body }),
-          });
-          if (!response.ok) return;
-          setPersons((persons) =>
-            persons.map((p) => {
-              if (p._id === person._id) return response.decryptedData;
-              return p;
-            })
-          );
-          toast.success('Mise à jour effectuée !');
-        }}>
-        {({ values, handleChange, handleSubmit, isSubmitting }) => {
-          return (
-            <React.Fragment>
-              <Row>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="person-birthdate">Date de naissance</Label>
-                    <div>
-                      <DatePicker
-                        locale="fr"
-                        className="form-control"
-                        selected={dateForDatePicker(values.birthdate)}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
-                        dateFormat="dd/MM/yyyy"
-                        id="person-birthdate"
-                      />
-                    </div>
-                  </FormGroup>
-                </Col>
-                <Col md={4}>
-                  <Label htmlFor="person-select-gender">Genre</Label>
-                  <SelectAsInput
-                    options={personFields.find((f) => f.name === 'gender').options}
-                    name="gender"
-                    value={values.gender || ''}
-                    onChange={handleChange}
-                    inputId="person-select-gender"
-                    classNamePrefix="person-select-gender"
+        </div>
+      </div>
+      <div className="printonly">
+        <div>
+          Date de naissance&nbsp;:{' '}
+          <b>
+            <CustomFieldDisplay field={{ type: 'date' }} value={person.birthdate} />
+          </b>
+        </div>
+        <div>
+          Genre&nbsp;:{' '}
+          <b>
+            <CustomFieldDisplay field={{ type: 'text' }} value={person.gender} />
+          </b>
+        </div>
+        <div>
+          Structure de suivi médical&nbsp;:{' '}
+          <b>
+            <CustomFieldDisplay field={{ type: 'text' }} value={person.structureMedical} />
+          </b>
+        </div>
+        <div>
+          Couverture(s) médicale(s)&nbsp;:{' '}
+          <b>
+            <CustomFieldDisplay field={{ type: 'multi-choice' }} value={person.healthInsurances} />
+          </b>
+        </div>
+      </div>
+      <div className="noprint">
+        <Formik
+          enableReinitialize
+          initialValues={person}
+          onSubmit={async (body) => {
+            const response = await API.put({
+              path: `/person/${person._id}`,
+              body: preparePersonForEncryption({ ...person, ...body }),
+            });
+            if (!response.ok) return;
+            setPersons((persons) =>
+              persons.map((p) => {
+                if (p._id === person._id) return response.decryptedData;
+                return p;
+              })
+            );
+            toast.success('Mise à jour effectuée !');
+          }}>
+          {({ values, handleChange, handleSubmit, isSubmitting }) => {
+            return (
+              <React.Fragment>
+                <Row>
+                  <Col md={4}>
+                    <FormGroup>
+                      <Label htmlFor="person-birthdate">Date de naissance</Label>
+                      <div>
+                        <DatePicker
+                          locale="fr"
+                          className="form-control"
+                          selected={dateForDatePicker(values.birthdate)}
+                          onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
+                          dateFormat="dd/MM/yyyy"
+                          id="person-birthdate"
+                        />
+                      </div>
+                    </FormGroup>
+                  </Col>
+                  <Col md={4}>
+                    <Label htmlFor="person-select-gender">Genre</Label>
+                    <SelectAsInput
+                      options={personFields.find((f) => f.name === 'gender').options}
+                      name="gender"
+                      value={values.gender || ''}
+                      onChange={handleChange}
+                      inputId="person-select-gender"
+                      classNamePrefix="person-select-gender"
+                    />
+                  </Col>
+                  <Col md={4}>
+                    <FormGroup>
+                      <Label htmlFor="structureMedical">Structure de suivi médical</Label>
+                      <Input name="structureMedical" id="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
+                    </FormGroup>
+                  </Col>
+                  <Col md={4}>
+                    <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
+                    <SelectCustom
+                      options={personFields.find((f) => f.name === 'healthInsurances').options.map((_option) => ({ value: _option, label: _option }))}
+                      value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
+                      getOptionValue={(i) => i.value}
+                      getOptionLabel={(i) => i.label}
+                      onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
+                      name="healthInsurances"
+                      isClearable={false}
+                      isMulti
+                      inputId="person-select-healthInsurances"
+                      classNamePrefix="person-select-healthInsurances"
+                      placeholder={' -- Choisir -- '}
+                    />
+                  </Col>
+                </Row>
+                <div className="tw-mb-10 tw-flex tw-justify-end">
+                  <ButtonCustom
+                    title={'Mettre à jour'}
+                    disabled={JSON.stringify(person) === JSON.stringify(values)}
+                    loading={isSubmitting}
+                    onClick={handleSubmit}
                   />
-                </Col>
-                <Col md={4}>
-                  <FormGroup>
-                    <Label htmlFor="structureMedical">Structure de suivi médical</Label>
-                    <Input name="structureMedical" id="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
-                  </FormGroup>
-                </Col>
-                <Col md={4}>
-                  <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
-                  <SelectCustom
-                    options={personFields.find((f) => f.name === 'healthInsurances').options.map((_option) => ({ value: _option, label: _option }))}
-                    value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
-                    getOptionValue={(i) => i.value}
-                    getOptionLabel={(i) => i.label}
-                    onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
-                    name="healthInsurances"
-                    isClearable={false}
-                    isMulti
-                    inputId="person-select-healthInsurances"
-                    classNamePrefix="person-select-healthInsurances"
-                    placeholder={' -- Choisir -- '}
-                  />
-                </Col>
-              </Row>
-              <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                <ButtonCustom
-                  title={'Mettre à jour'}
-                  disabled={JSON.stringify(person) === JSON.stringify(values)}
-                  loading={isSubmitting}
-                  onClick={handleSubmit}
-                />
-              </div>
-            </React.Fragment>
-          );
-        }}
-      </Formik>
+                </div>
+              </React.Fragment>
+            );
+          }}
+        </Formik>
+      </div>
       {!!medicalFile && !!customFieldsMedicalFile.filter((f) => f.enabled || f.enabledTeams?.includes(team._id)).length && (
         <>
-          <TitleWithButtonsContainer>
-            <Title>Dossier médical</Title>
-          </TitleWithButtonsContainer>
-          <Formik
-            enableReinitialize
-            initialValues={medicalFile}
-            onSubmit={async (body) => {
-              const response = await API.put({
-                path: `/medical-file/${medicalFile._id}`,
-                body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...body }),
-              });
-              if (!response.ok) return;
-              setAllMedicalFiles((medicalFiles) =>
-                medicalFiles.map((m) => {
-                  if (m._id === medicalFile._id) return response.decryptedData;
-                  return m;
-                })
-              );
-              toast.success('Mise à jour effectuée !');
-            }}>
-            {({ values, handleChange, handleSubmit, isSubmitting }) => {
+          <div className="tw-mx-0 tw-mt-8 tw-mb-5 tw-flex tw-items-center">
+            <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Dossier médical</h2>
+          </div>
+          <div className="printonly">
+            {customFieldsMedicalFile.map((field) => {
               return (
-                <React.Fragment>
-                  <Row>
-                    {customFieldsMedicalFile
-                      .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                      .map((field) => (
-                        <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
-                      ))}
-                  </Row>
-                  <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: 40 }}>
-                    <ButtonCustom
-                      title={'Mettre à jour'}
-                      disabled={JSON.stringify(medicalFile) === JSON.stringify(values)}
-                      loading={isSubmitting}
-                      onClick={handleSubmit}
-                    />
-                  </div>
-                </React.Fragment>
+                <div key={field.name}>
+                  {field.label}&nbsp;:{' '}
+                  <b>
+                    <CustomFieldDisplay field={field} value={medicalFile[field.name]} />
+                  </b>
+                </div>
               );
-            }}
-          </Formik>
+            })}
+          </div>
+          <div className="noprint">
+            <Formik
+              enableReinitialize
+              initialValues={medicalFile}
+              onSubmit={async (body) => {
+                const response = await API.put({
+                  path: `/medical-file/${medicalFile._id}`,
+                  body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({ ...medicalFile, ...body }),
+                });
+                if (!response.ok) return;
+                setAllMedicalFiles((medicalFiles) =>
+                  medicalFiles.map((m) => {
+                    if (m._id === medicalFile._id) return response.decryptedData;
+                    return m;
+                  })
+                );
+                toast.success('Mise à jour effectuée !');
+              }}>
+              {({ values, handleChange, handleSubmit, isSubmitting }) => {
+                return (
+                  <React.Fragment>
+                    <Row>
+                      {customFieldsMedicalFile
+                        .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+                        .map((field) => (
+                          <CustomFieldInput model="person" values={values} handleChange={handleChange} field={field} key={field.name} />
+                        ))}
+                    </Row>
+                    <div className="tw-mb-10 tw-flex tw-justify-end">
+                      <ButtonCustom
+                        title={'Mettre à jour'}
+                        disabled={JSON.stringify(medicalFile) === JSON.stringify(values)}
+                        loading={isSubmitting}
+                        onClick={handleSubmit}
+                      />
+                    </div>
+                  </React.Fragment>
+                );
+              }}
+            </Formik>
+          </div>
         </>
       )}
-      <hr />
-      <TitleWithButtonsContainer>
-        <Title style={{ marginTop: '2rem' }}>Traitement en cours</Title>
-        <ButtonsFloatingRight>
+      <hr className="tw-my-8" />
+      <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
+        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Traitement en cours</h2>
+        <div className="tw-flex tw-flex-1 tw-justify-end">
           <ButtonCustom
             icon={false}
             disabled={false}
@@ -286,13 +329,13 @@ export function MedicalFile({ person }) {
             title={'💊\u00A0\u00A0Ajouter un traitement'}
             padding="12px 24px"
           />
-        </ButtonsFloatingRight>
-      </TitleWithButtonsContainer>
+        </div>
+      </div>
       <div className="printonly">
         {(treatments || []).map((c) => {
           const hiddenKeys = ['_id', 'name', 'documents', 'encryptedEntityKey', 'entityKey', 'updatedAt', 'createdAt', 'person', 'organisation'];
           return (
-            <div key={c._id} style={{ marginBottom: '2rem' }}>
+            <div key={c._id} className="tw-mb-8">
               <h4>{c.name}</h4>
               {Object.entries(c)
                 .filter(([key, value]) => value && !hiddenKeys.includes(key))
@@ -362,13 +405,13 @@ export function MedicalFile({ person }) {
             render: (e) => {
               if (!!e.endDate) {
                 return (
-                  <p style={{ fontSize: '12px', margin: 0 }}>
+                  <p className="tw-m-0 tw-text-xs">
                     Du {formatDateWithFullMonth(e.startDate)}
                     <br /> au {formatDateWithFullMonth(e.endDate)}
                   </p>
                 );
               }
-              return <p style={{ fontSize: '12px', margin: 0 }}>À partir du {formatDateWithFullMonth(e.startDate)}</p>;
+              return <p className="tw-m-0 tw-text-xs">À partir du {formatDateWithFullMonth(e.startDate)}</p>;
             },
           },
           {
@@ -385,7 +428,7 @@ export function MedicalFile({ person }) {
             title: 'Action',
             render: (treatment) => (
               <ButtonCustom
-                style={{ margin: 'auto' }}
+                className="tw-m-auto"
                 icon={false}
                 disabled={false}
                 onClick={async (e) => {
@@ -404,9 +447,9 @@ export function MedicalFile({ person }) {
         ]}
         noData="Aucun traitement en cours"
       />
-      <TitleWithButtonsContainer>
-        <Title style={{ marginTop: '2rem' }}>Historique des consultations</Title>
-        <ButtonsFloatingRight>
+      <div className="tw-mx-0 tw-mt-16 tw-mb-5 tw-flex tw-items-center">
+        <h2 className="tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Historique des consultations</h2>
+        <div className="tw-flex tw-flex-1 tw-justify-end">
           <ButtonCustom
             icon={false}
             disabled={false}
@@ -420,15 +463,15 @@ export function MedicalFile({ person }) {
             title={'🩺\u00A0\u00A0Ajouter une consultation'}
             padding="12px 24px"
           />
-        </ButtonsFloatingRight>
-      </TitleWithButtonsContainer>
+        </div>
+      </div>
       {!!consultations.length && (
-        <Row className="noprint" style={{ marginBottom: 40, borderBottom: '1px solid #ddd' }}>
-          <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-            <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-categories-filter">
+        <Row className="noprint -tw-mx-4 tw-mb-10 tw-flex tw-flex-wrap tw-border-b tw-border-zinc-300">
+          <Col md={12} lg={6} className="tw-mb-5 tw-flex tw-items-center">
+            <Label className="tw-mr-2.5 tw-w-40 tw-shrink-0" htmlFor="action-select-categories-filter">
               Filtrer par catégorie&nbsp;:
             </Label>
-            <div style={{ width: '100%' }}>
+            <div className="tw-w-full">
               <SelectCustom
                 inputId="consultations-select-type-filter"
                 options={organisation.consultations.map((e) => ({ _id: e.name, name: e.name }))}
@@ -442,11 +485,11 @@ export function MedicalFile({ person }) {
               />
             </div>
           </Col>
-          <Col md={12} lg={6} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-            <Label style={{ marginRight: 10, width: 155, flexShrink: 0 }} htmlFor="action-select-status-filter">
+          <Col md={12} lg={6} className="tw-mb-5 tw-flex tw-items-center">
+            <Label className="tw-mr-2.5 tw-w-40 tw-shrink-0" htmlFor="action-select-status-filter">
               Filtrer par statut&nbsp;:
             </Label>
-            <div style={{ width: '100%' }}>
+            <div className="tw-w-full">
               <SelectCustom
                 inputId="consultations-select-status-filter"
                 options={mappedIdsToLabels}
@@ -481,7 +524,7 @@ export function MedicalFile({ person }) {
             'userPopulated',
           ];
           return (
-            <div key={c._id} style={{ marginBottom: '2rem' }}>
+            <div key={c._id} className="tw-mb-8">
               <h4>{c.name}</h4>
               {Object.entries(c)
                 .filter(([key, value]) => value && !hiddenKeys.includes(key))
@@ -576,7 +619,7 @@ export function MedicalFile({ person }) {
             title: 'Action',
             render: (consultation) => (
               <ButtonCustom
-                style={{ margin: 'auto' }}
+                className="tw-m-auto"
                 icon={false}
                 disabled={false}
                 onClick={async (e) => {
@@ -595,79 +638,85 @@ export function MedicalFile({ person }) {
         ]}
         noData="Aucune consultation enregistrée"
       />
-      <Documents
-        title={<Title id="all-medical-documents">Tous les documents médicaux</Title>}
-        documents={allMedicalDocuments}
-        personId={person._id}
-        onRowClick={(document) => {
-          if (document.type === 'treatment') loadTreatment(document.treatment);
-          if (document.type === 'consultation') {
-            setConsultation(document.consultation);
-            setShowConsultationModal(true);
+      <div className="noprint">
+        <Documents
+          title={
+            <h2 className="tw-mt-16 tw-flex tw-justify-between tw-text-xl tw-font-extrabold" id="all-medical-documents">
+              Tous les documents médicaux
+            </h2>
           }
-          return null;
-        }}
-        additionalColumns={[
-          {
-            title: 'Type',
-            render: (doc) => {
-              if (doc.type === 'treatment') return 'Traitement';
-              if (doc.type === 'consultation') return 'Consultation';
-              return '';
+          documents={allMedicalDocuments}
+          personId={person._id}
+          onRowClick={(document) => {
+            if (document.type === 'treatment') loadTreatment(document.treatment);
+            if (document.type === 'consultation') {
+              setConsultation(document.consultation);
+              setShowConsultationModal(true);
+            }
+            return null;
+          }}
+          additionalColumns={[
+            {
+              title: 'Type',
+              render: (doc) => {
+                if (doc.type === 'treatment') return 'Traitement';
+                if (doc.type === 'consultation') return 'Consultation';
+                return '';
+              },
             },
-          },
-        ]}
-        conditionForDelete={(doc) => !doc.type}
-        onAdd={async (docResponse) => {
-          const { data: file, encryptedEntityKey } = docResponse;
-          const medicalFileResponse = await API.put({
-            path: `/medical-file/${medicalFile._id}`,
-            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
-              ...medicalFile,
-              documents: [
-                ...(medicalFile.documents || []),
-                {
-                  _id: file.filename,
-                  name: file.originalname,
-                  encryptedEntityKey,
-                  createdAt: new Date(),
-                  createdBy: user._id,
-                  downloadPath: `/person/${person._id}/document/${file.filename}`,
-                  file,
-                },
-              ],
-            }),
-          });
-          if (medicalFileResponse.ok) {
-            const newMedicalFile = medicalFileResponse.decryptedData;
-            setAllMedicalFiles((allMedicalFiles) =>
-              allMedicalFiles.map((m) => {
-                if (m._id === medicalFile._id) return newMedicalFile;
-                return m;
-              })
-            );
-          }
-        }}
-        onDelete={async (document) => {
-          const medicalFileResponse = await API.put({
-            path: `/medical-file/${medicalFile._id}`,
-            body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
-              ...medicalFile,
-              documents: medicalFile.documents.filter((d) => d._id !== document._id),
-            }),
-          });
-          if (medicalFileResponse.ok) {
-            const newMedicalFile = medicalFileResponse.decryptedData;
-            setAllMedicalFiles((allMedicalFiles) =>
-              allMedicalFiles.map((m) => {
-                if (m._id === medicalFile._id) return newMedicalFile;
-                return m;
-              })
-            );
-          }
-        }}
-      />
-      <div style={{ height: '50vh' }} className="noprint" />
+          ]}
+          conditionForDelete={(doc) => !doc.type}
+          onAdd={async (docResponse) => {
+            const { data: file, encryptedEntityKey } = docResponse;
+            const medicalFileResponse = await API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                ...medicalFile,
+                documents: [
+                  ...(medicalFile.documents || []),
+                  {
+                    _id: file.filename,
+                    name: file.originalname,
+                    encryptedEntityKey,
+                    createdAt: new Date(),
+                    createdBy: user._id,
+                    downloadPath: `/person/${person._id}/document/${file.filename}`,
+                    file,
+                  },
+                ],
+              }),
+            });
+            if (medicalFileResponse.ok) {
+              const newMedicalFile = medicalFileResponse.decryptedData;
+              setAllMedicalFiles((allMedicalFiles) =>
+                allMedicalFiles.map((m) => {
+                  if (m._id === medicalFile._id) return newMedicalFile;
+                  return m;
+                })
+              );
+            }
+          }}
+          onDelete={async (document) => {
+            const medicalFileResponse = await API.put({
+              path: `/medical-file/${medicalFile._id}`,
+              body: prepareMedicalFileForEncryption(customFieldsMedicalFile)({
+                ...medicalFile,
+                documents: medicalFile.documents.filter((d) => d._id !== document._id),
+              }),
+            });
+            if (medicalFileResponse.ok) {
+              const newMedicalFile = medicalFileResponse.decryptedData;
+              setAllMedicalFiles((allMedicalFiles) =>
+                allMedicalFiles.map((m) => {
+                  if (m._id === medicalFile._id) return newMedicalFile;
+                  return m;
+                })
+              );
+            }
+          }}
+        />
+      </div>
+      <div className="noprint tw-h-[50vh]" />
       <Modal isOpen={showAddTreatment} toggle={resetCurrentTreatment} size="lg" backdrop="static">
         <Formik
           enableReinitialize
@@ -744,28 +793,28 @@ export function MedicalFile({ person }) {
                     <FormGroup>
                       <Label htmlFor="medicine-name">Nom</Label>
                       <Input placeholder="Amoxicilline" name="name" id="medicine-name" value={values.name} onChange={handleChange} />
-                      {touched.name && errors.name && <Error>{errors.name}</Error>}
+                      {touched.name && errors.name && <span className="tw-text-xs tw-text-red-500">{errors.name}</span>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="dosage">Dosage</Label>
                       <Input placeholder="1mg" name="dosage" id="dosage" value={values.dosage} onChange={handleChange} />
-                      {touched.dosage && errors.dosage && <Error>{errors.dosage}</Error>}
+                      {touched.dosage && errors.dosage && <span className="tw-text-xs tw-text-red-500">{errors.dosage}</span>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="frequency">Fréquence</Label>
                       <Input placeholder="1 fois par jour" name="frequency" id="frequency" value={values.frequency} onChange={handleChange} />
-                      {touched.frequency && errors.frequency && <Error>{errors.frequency}</Error>}
+                      {touched.frequency && errors.frequency && <span className="tw-text-xs tw-text-red-500">{errors.frequency}</span>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
                     <FormGroup>
                       <Label htmlFor="indication">Indication</Label>
                       <Input placeholder="Angine" name="indication" id="indication" value={values.indication} onChange={handleChange} />
-                      {touched.indication && errors.indication && <Error>{errors.indication}</Error>}
+                      {touched.indication && errors.indication && <span className="tw-text-xs tw-text-red-500">{errors.indication}</span>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -781,7 +830,7 @@ export function MedicalFile({ person }) {
                           dateFormat={'dd/MM/yyyy'}
                         />
                       </div>
-                      {touched.startDate && errors.startDate && <Error>{errors.startDate}</Error>}
+                      {touched.startDate && errors.startDate && <span className="tw-text-xs tw-text-red-500">{errors.startDate}</span>}
                     </FormGroup>
                   </Col>
                   <Col md={6}>
@@ -797,7 +846,7 @@ export function MedicalFile({ person }) {
                           dateFormat={'dd/MM/yyyy'}
                         />
                       </div>
-                      {touched.endDate && errors.endDate && <Error>{errors.endDate}</Error>}
+                      {touched.endDate && errors.endDate && <span className="tw-text-xs tw-text-red-500">{errors.endDate}</span>}
                     </FormGroup>
                   </Col>
                   <Col md={12}>
@@ -861,34 +910,3 @@ export function MedicalFile({ person }) {
     </>
   );
 }
-
-const Title = styled.h2`
-  font-size: 20px;
-  font-weight: 800;
-  display: flex;
-  justify-content: space-between;
-  span {
-    margin-bottom: 20px;
-    font-size: 16px;
-    font-weight: 400;
-    font-style: italic;
-    display: block;
-  }
-`;
-
-const ButtonsFloatingRight = styled.div`
-  flex: 1;
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const TitleWithButtonsContainer = styled.div`
-  display: flex;
-  align-items: center;
-  margin: 30px 0 20px;
-`;
-
-const Error = styled.span`
-  color: red;
-  font-size: 11px;
-`;
