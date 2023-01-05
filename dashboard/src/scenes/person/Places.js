@@ -36,8 +36,9 @@ const PersonPlaces = ({ person }) => {
   };
 
   const sameMultiplePlaces = useMemo(() => {
-    const places = person.relsPersonPlace?.map((relPersonPlace) => relPersonPlace.place);
-    return places.length !== new Set(places).size;
+    const personPlaces = person.relsPersonPlace?.map((relPersonPlace) => relPersonPlace.place);
+    if (!personPlaces?.length) return false;
+    return personPlaces.length !== new Set(personPlaces).size;
   }, [person.relsPersonPlace]);
 
   return (
