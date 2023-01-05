@@ -1,5 +1,4 @@
 import React from 'react';
-import { Col } from 'reactstrap';
 import { CustomResponsivePie } from './charts';
 import { mappedIdsToLabels } from '../../recoil/actions';
 import SelectCustom from '../../components/SelectCustom';
@@ -20,11 +19,11 @@ const ActionsStats = ({
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des actions</h3>
-      <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-        <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+      <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
+        <label htmlFor="filter-by-status" className="tw-mx-5 tw-w-64 tw-shrink-0">
           Filtrer par statut :
         </label>
-        <div style={{ width: 500 }}>
+        <div className="tw-basis-[500px]">
           <SelectCustom
             inputId="action-select-status-filter"
             options={mappedIdsToLabels}
@@ -37,12 +36,12 @@ const ActionsStats = ({
             value={mappedIdsToLabels.filter((s) => actionsStatuses.includes(s._id))}
           />
         </div>
-      </Col>
-      <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-        <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+      </div>
+      <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
+        <label htmlFor="filter-by-status" className="tw-mx-5 tw-w-64 tw-shrink-0">
           Filtrer par groupe de catégories :
         </label>
-        <div style={{ basis: 500, flexGrow: 1 }}>
+        <div className="tw-basis-[500px]">
           <SelectCustom
             value={actionsCategoriesGroups?.map((_option) => ({ value: _option, label: _option })) || []}
             options={groupsCategories.map((group) => group.groupTitle).map((_option) => ({ value: _option, label: _option }))}
@@ -55,12 +54,12 @@ const ActionsStats = ({
             isMulti
           />
         </div>
-      </Col>
-      <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-        <label htmlFor="filter-by-status" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+      </div>
+      <div className="tw-mb-5 tw-flex tw-basis-full tw-items-center">
+        <label htmlFor="filter-by-status" className="tw-mx-5 tw-w-64 tw-shrink-0">
           Filtrer par catégorie:
         </label>
-        <div style={{ basis: 500, flexGrow: 1 }}>
+        <div className="tw-basis-[500px]">
           <SelectCustom
             options={filterableActionsCategories.map((_option) => ({ value: _option, label: _option }))}
             value={actionsCategories?.map((_option) => ({ value: _option, label: _option })) || []}
@@ -73,7 +72,7 @@ const ActionsStats = ({
             isMulti
           />
         </div>
-      </Col>
+      </div>
       <CustomResponsivePie
         title="Répartition des actions par groupe"
         data={getPieData(actionsWithDetailedGroupAndCategories, 'group', { options: groupsCategories.map((group) => group.groupTitle) })}

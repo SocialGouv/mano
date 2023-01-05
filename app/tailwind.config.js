@@ -6,9 +6,9 @@ module.exports = {
     extend: {
       colors: {
         main: '#008e7f', // higher contrast
-        main75: '#52a9b4',
-        main50: '#98c3d8',
-        main25: '#d4deee',
+        main75: '#49c3a6',
+        main50: '#94c7bf',
+        main25: '#c7e1dd',
         black: '#1D2021',
         black75: '#3b3b3b',
         black50: '#777777',

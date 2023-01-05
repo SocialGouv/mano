@@ -1,19 +1,19 @@
 import { useRecoilValue } from 'recoil';
 import { currentTeamState } from '../../recoil/auth';
-import { Col, Row } from 'reactstrap';
 import { CustomResponsivePie } from './charts';
 import { BlockDateWithTime, BlockTotal } from './Blocks';
 import Card from '../../components/Card';
 import { getPieData } from './utils';
 
+function getColsSize(totalCols) {
+  if (totalCols === 1) return 'full';
+  if (totalCols === 2) return '1/2';
+  if (totalCols % 4 === 0) return '1/3';
+  return '1/4';
+}
+
 const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = '' }) => {
   const team = useRecoilValue(currentTeamState);
-  function getColsSize(totalCols) {
-    if (totalCols === 1) return 12;
-    if (totalCols === 2) return 6;
-    if (totalCols % 4 === 0) return 3;
-    return 4;
-  }
 
   const customFieldsInStats = customFields
     .filter((f) => f)
@@ -31,24 +31,28 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
   return (
     <>
       {totalCols > 0 && (
-        <Row>
-          {additionalCols.map((col) => (
-            <Col md={colSize} style={{ marginBottom: 20 }} key={col.title}>
-              {/* TODO: fix alignment. */}
-              <Card title={col.title} count={col.value} children={<div></div>} dataTestId={dataTestId} />
-            </Col>
-          ))}
-          {customFieldsNumber.map((field) => (
-            <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
-              <BlockTotal title={field.label} data={data} field={field.name} />
-            </Col>
-          ))}
-          {customFieldsDate.map((field) => (
-            <Col md={colSize} style={{ marginBottom: '20px' }} key={field.name}>
-              <BlockDateWithTime data={data} field={field} />
-            </Col>
-          ))}
-        </Row>
+        <>
+          {/* tailwind doesn't comile dynamic classes, so we need to declare them */}
+          <div className="tw-hidden tw-basis-1/4 tw-basis-1/2 tw-basis-1/3 tw-basis-full" />
+          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+            {additionalCols.map((col) => (
+              <div className={`tw-px-4 tw-py-2 tw-basis-${colSize}`} key={col.title}>
+                {/* TODO: fix alignment. */}
+                <Card title={col.title} count={col.value} children={<div></div>} dataTestId={dataTestId} />
+              </div>
+            ))}
+            {customFieldsNumber.map((field) => (
+              <div className={`tw-px-4 tw-py-2 tw-basis-${colSize}`} key={field.name}>
+                <BlockTotal title={field.label} data={data} field={field.name} />
+              </div>
+            ))}
+            {customFieldsDate.map((field) => (
+              <div className={`tw-px-4 tw-py-2 tw-basis-${colSize}`} key={field.name}>
+                <BlockDateWithTime data={data} field={field} />
+              </div>
+            ))}
+          </div>
+        </>
       )}
       {customFieldsResponsivePie.map((field) => (
         <CustomResponsivePie

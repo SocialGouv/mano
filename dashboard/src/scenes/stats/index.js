@@ -1,9 +1,6 @@
 import React, { useCallback, useMemo } from 'react';
 import { useLocalStorage } from 'react-use';
-import { Col, Nav, NavItem, NavLink, Row, TabContent, TabPane } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
-import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
-import Loading from '../../components/loading';
 import {
   customFieldsPersonsSocialSelector,
   customFieldsPersonsMedicalSelector,
@@ -12,59 +9,36 @@ import {
   personFieldsSelector,
 } from '../../recoil/persons';
 import { customFieldsObsSelector, territoryObservationsState } from '../../recoil/territoryObservations';
-import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
-import { filterData } from '../../components/Filters';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
 import { actionsCategoriesSelector, actionsState, DONE, flattenedCategoriesSelector } from '../../recoil/actions';
 import { reportsState } from '../../recoil/reports';
 import { territoriesState } from '../../recoil/territory';
-import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
-import { useDataLoader } from '../../components/DataLoader';
 import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
-import useTitle from '../../services/useTitle';
 import { consultationsState } from '../../recoil/consultations';
-import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
 import { groupsState } from '../../recoil/groups';
+import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
+import useTitle from '../../services/useTitle';
+import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
+import { useDataLoader } from '../../components/DataLoader';
+import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
+import Loading from '../../components/loading';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import ExportFormattedData from '../data-import-export/ExportFormattedData';
-import GeneralStats from './1_General';
-import ReceptionStats from './2_Reception';
-import ActionsStats from './3_Actions';
-import PersonStats from './4_Persons';
-import PassagesStats from './5_Passages';
-import RencontresStats from './6_Rencontres';
-import ObservationsStats from './7_Observations';
-import ReportsStats from './8_Reports';
-import ConsultationsStats from './9_Consultations';
-import MedicalFilesStats from './10_MedicalFiles';
+import { getDataForPeriod } from './utils';
+import GeneralStats from './General';
+import ReceptionStats from './Reception';
+import ActionsStats from './Actions';
+import PersonStats from './Persons';
+import PassagesStats from './Passages';
+import RencontresStats from './Rencontres';
+import ObservationsStats from './Observations';
+import ReportsStats from './Reports';
+import ConsultationsStats from './Consultations';
+import MedicalFilesStats from './MedicalFiles';
 
-const getDataForPeriod = (
-  data,
-  { startDate, endDate },
-  selectedTeams,
-  viewAllOrganisationData,
-  { filters = [], field = 'createdAt', backupField = 'createdAt' } = {},
-  callback = null
-) => {
-  if (!!filters?.filter((f) => Boolean(f?.value)).length) data = filterData(data, filters);
-  if (!startDate || !endDate) {
-    return data;
-  }
-  const offsetHours = Boolean(viewAllOrganisationData) || selectedTeams.every((e) => !e.nightSession) ? 0 : 12;
-
-  if (callback) {
-    return callback(data, offsetHours);
-  }
-  return data.filter((item) =>
-    getIsDayWithinHoursOffsetOfPeriod(
-      item[field] || item[backupField] || item.createdAt,
-      { referenceStartDay: startDate, referenceEndDay: endDate },
-      offsetHours
-    )
-  );
-};
 const tabs = [
   'Général',
   'Accueil',
@@ -77,6 +51,7 @@ const tabs = [
   'Consultations',
   'Dossiers médicaux',
 ];
+
 const Stats = () => {
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
@@ -103,7 +78,7 @@ const Stats = () => {
   const { isLoading } = useDataLoader({ refreshOnMount: true });
 
   const [selectedTerritories, setSelectedTerritories] = useLocalStorage('stats-territories', []);
-  const [activeTab, setActiveTab] = useLocalStorage('stats-tab', 0);
+  const [activeTab, setActiveTab] = useLocalStorage('stats-tabCaption', 'Général');
   const [filterPersons, setFilterPersons] = useLocalStorage('stats-filterPersons-defaultEverybody', [
     { field: 'outOfActiveList', value: "Oui et non (c'est-à-dire tout le monde)", type: 'multi-choice' },
   ]);
@@ -112,7 +87,7 @@ const Stats = () => {
   const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
   const [selectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
 
-  useTitle(`${tabs[activeTab]} - Statistiques`);
+  useTitle(`${activeTab} - Statistiques`);
 
   const filterByTeam = useCallback(
     (elements, key) => {
@@ -400,9 +375,9 @@ const Stats = () => {
 
   return (
     <>
-      <HeaderStyled style={{ padding: '16px 0' }}>
-        <div style={{ display: 'flex', flexGrow: '1' }}>
-          <HeaderTitle style={{ fontWeight: '400', width: '260px' }}>
+      <HeaderStyled className="!tw-py-4 tw-px-0">
+        <div className="tw-flex tw-grow">
+          <HeaderTitle className="tw-w-64 tw-font-normal">
             <span>Statistiques {viewAllOrganisationData ? <>globales</> : <>{selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"}</>}</span>
           </HeaderTitle>
           <div className="tw-ml-4">
@@ -430,35 +405,42 @@ const Stats = () => {
           </div>
         </div>
       </HeaderStyled>
-      <Row className="date-picker-container" style={{ marginBottom: '20px', alignItems: 'center', flexWrap: 'wrap' }}>
-        <Col md={4} style={{ flexShrink: 0, minWidth: '15rem', padding: 0 }}>
+      <div className="date-picker-container tw-mb-5 tw-flex tw-flex-wrap tw-items-center">
+        <div className="tw-min-w-[15rem] tw-shrink-0 tw-basis-1/3 tw-p-0">
           <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
-        </Col>
-        <Col md={8} style={{ display: 'flex', justifyContent: 'flex-end' }}>
+        </div>
+        <div className="tw-flex tw-basis-2/3 tw-justify-end">
           <RefreshButton />
           <ExportFormattedData
             personCreated={personsForStats}
             personUpdated={personsUpdatedForStats}
             actions={actionsWithDetailedGroupAndCategories}
           />
-        </Col>
-      </Row>
-      <Nav tabs style={{ marginBottom: 20 }}>
+        </div>
+      </div>
+      <ul className="tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
         {tabs
           .filter((e) => user.healthcareProfessional || !['Consultations', 'Dossiers médicaux'].includes(e))
           .map((tabCaption, index) => {
-            if (!organisation.receptionEnabled && index === 1) return null;
+            if (!organisation.receptionEnabled && tabCaption === 'Accueil') return null;
             return (
-              <NavItem key={index} style={{ cursor: 'pointer' }}>
-                <NavLink key={index} className={`${activeTab === index && 'active'}`} onClick={() => setActiveTab(index)}>
+              <li key={index} className="tw-cursor-pointer">
+                <button
+                  key={tabCaption}
+                  className={[
+                    '-tw-mb-px tw-block tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
+                    activeTab !== tabCaption && 'tw-text-main75',
+                    activeTab === tabCaption && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
+                  ].join(' ')}
+                  onClick={() => setActiveTab(tabCaption)}>
                   {tabCaption}
-                </NavLink>
-              </NavItem>
+                </button>
+              </li>
             );
           })}
-      </Nav>
-      <TabContent activeTab={activeTab}>
-        <TabPane tabId={0}>
+      </ul>
+      <div>
+        {activeTab === 'Général' && (
           <GeneralStats
             personsForStats={personsForStats}
             personsUpdatedForStats={personsUpdatedForStats}
@@ -467,13 +449,9 @@ const Stats = () => {
             numberOfActionsPerPerson={numberOfActionsPerPerson}
             numberOfActionsPerPersonConcernedByActions={numberOfActionsPerPersonConcernedByActions}
           />
-        </TabPane>
-        {!!organisation.receptionEnabled && (
-          <TabPane tabId={1}>
-            <ReceptionStats reportsServices={reportsServices} passages={passages} />
-          </TabPane>
         )}
-        <TabPane tabId={2}>
+        {!!organisation.receptionEnabled && activeTab === 'Accueil' && <ReceptionStats reportsServices={reportsServices} passages={passages} />}
+        {activeTab === 'Actions' && (
           <ActionsStats
             setActionsStatuses={setActionsStatuses}
             actionsStatuses={actionsStatuses}
@@ -486,8 +464,8 @@ const Stats = () => {
             actionsWithDetailedGroupAndCategories={actionsWithDetailedGroupAndCategories}
             allCategories={allCategories}
           />
-        </TabPane>
-        <TabPane tabId={3}>
+        )}
+        {activeTab === 'Personnes suivies' && (
           <PersonStats
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
@@ -501,40 +479,36 @@ const Stats = () => {
             customFieldsPersonsMedical={customFieldsPersonsMedical}
             customFieldsPersonsSocial={customFieldsPersonsSocial}
           />
-        </TabPane>
-        <TabPane tabId={4}>
+        )}
+        {activeTab === 'Passages' && (
           <PassagesStats
             passages={passages}
             personFields={personFields}
             personsInPassagesOfPeriod={personsInPassagesOfPeriod}
             personsInPassagesBeforePeriod={personsInPassagesBeforePeriod}
           />
-        </TabPane>
-        <TabPane tabId={5}>
+        )}
+        {activeTab === 'Rencontres' && (
           <RencontresStats
             rencontres={rencontres}
             personFields={personFields}
             personsInRencontresOfPeriod={personsInRencontresOfPeriod}
             personsInRencontresBeforePeriod={personsInRencontresBeforePeriod}
           />
-        </TabPane>
-        <TabPane tabId={6}>
+        )}
+        {activeTab === 'Observations' && (
           <ObservationsStats
             territories={territories}
             setSelectedTerritories={setSelectedTerritories}
             observations={observations}
             customFieldsObs={customFieldsObs}
           />
-        </TabPane>
-        <TabPane tabId={7}>
-          <ReportsStats reports={reports} />
-        </TabPane>
+        )}
+        {activeTab === 'Comptes-rendus' && <ReportsStats reports={reports} />}
         {user.healthcareProfessional && (
           <>
-            <TabPane tabId={8}>
-              <ConsultationsStats consultations={consultations} />
-            </TabPane>
-            <TabPane tabId={9}>
+            {activeTab === 'Consultations' && <ConsultationsStats consultations={consultations} />}
+            {activeTab === 'Dossiers médicaux' && (
               <MedicalFilesStats
                 filterBase={filterPersonsWithAllFields(true)}
                 filterPersons={filterPersons}
@@ -543,10 +517,10 @@ const Stats = () => {
                 customFieldsMedicalFile={customFieldsMedicalFile}
                 personFields={personFields}
               />
-            </TabPane>
+            )}
           </>
         )}
-      </TabContent>
+      </div>
     </>
   );
 };

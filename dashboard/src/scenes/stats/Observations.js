@@ -1,5 +1,4 @@
 import React from 'react';
-import { Label, Row } from 'reactstrap';
 import SelectCustom from '../../components/SelectCustom';
 import CustomFieldsStats from './CustomFieldsStats';
 
@@ -7,8 +6,8 @@ const ObservationsStats = ({ territories, setSelectedTerritories, observations, 
   return (
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques des observations de territoire</h3>
-      <div className="tw-mb-8">
-        <Label htmlFor="filter-territory">Filter par territoire</Label>
+      <div className="tw-mx-5 tw-mb-8">
+        <label htmlFor="filter-territory">Filter par territoire</label>
         <SelectCustom
           isMulti
           options={territories}
@@ -23,19 +22,17 @@ const ObservationsStats = ({ territories, setSelectedTerritories, observations, 
           getOptionLabel={(i) => i.name}
         />
       </div>
-      <Row>
-        <CustomFieldsStats
-          data={observations}
-          customFields={customFieldsObs}
-          dataTestId="number-observations"
-          additionalCols={[
-            {
-              title: "Nombre d'observation de territoire",
-              value: observations.length,
-            },
-          ]}
-        />
-      </Row>
+      <CustomFieldsStats
+        data={observations}
+        customFields={customFieldsObs}
+        dataTestId="number-observations"
+        additionalCols={[
+          {
+            title: "Nombre d'observations de territoire",
+            value: observations.length,
+          },
+        ]}
+      />
     </>
   );
 };
