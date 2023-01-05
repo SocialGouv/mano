@@ -67,8 +67,8 @@ test("test territories", async ({ page }) => {
   // Stats
   await page.getByRole("link", { name: "Statistiques" }).click();
   await expect(page).toHaveURL("http://localhost:8090/stats");
-  await page.locator('a:has-text("Observations")').click();
-  await page.getByText("Nombre d'observation de territoire").click();
+  await page.locator('button:has-text("Observations")').click();
+  await page.getByText("Nombre d'observations de territoire").click();
   await expect(page.locator("data-test-id=number-observations-2")).toBeVisible();
 
   // Disconnect/reconnect
