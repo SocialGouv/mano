@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useRecoilState, useRecoilValue, useSetRecoilState } from 'recoil';
 import ButtonCustom from '../../components/ButtonCustom';
 import UserName from '../../components/UserName';
@@ -13,7 +13,6 @@ import SelectUser from '../../components/SelectUser';
 import { toast } from 'react-toastify';
 import { prepareRelPersonPlaceForEncryption, relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import QuestionMarkButton from '../../components/QuestionMarkButton';
-import { capture } from '../../services/sentry';
 
 const PersonPlaces = ({ person }) => {
   const user = useRecoilValue(userState);
@@ -35,6 +34,11 @@ const PersonPlaces = ({ person }) => {
     if (!response.ok) return toast.error(response.error);
     setRelsPersonPlace((relsPersonPlace) => relsPersonPlace.filter((rel) => rel._id !== relPersonPlace?._id));
   };
+
+  const sameMultiplePlaces = useMemo(() => {
+    const places = person.relsPersonPlace?.map((relPersonPlace) => relPersonPlace.place);
+    return places.length !== new Set(places).size;
+  }, [person.relsPersonPlace]);
 
   return (
     <>
@@ -124,7 +128,7 @@ const PersonPlaces = ({ person }) => {
         relPersonPlaceModal={relPersonPlaceModal}
         setPlaceToEdit={setPlaceToEdit}
       />
-      <HelpModal open={!!helpModal} setOpen={setHelpModal} />
+      <HelpModal open={!!helpModal} setOpen={setHelpModal} sameMultiplePlaces={sameMultiplePlaces} />
     </>
   );
 };
@@ -172,6 +176,10 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
 
   const onSaveRelPersonPlace = async (e) => {
     e.preventDefault();
+    if (person.relsPersonPlace?.find((rpp) => rpp.place === placeId)) {
+      toast.error('Ce lieu est déjà enregistré pour cette personne');
+      return;
+    }
     setUpdating(true);
     const isNew = !relPersonPlaceModal?._id;
     const response = isNew
@@ -362,9 +370,7 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
   );
 };
 
-const HelpModal = ({ open, setOpen }) => {
-  const user = useRecoilValue(userState);
-
+const HelpModal = ({ open, setOpen, sameMultiplePlaces }) => {
   useEffect(() => {
     if (!window.localStorage.getItem('lieux-fréquentés-help-modal-seen')) {
       setOpen(true);
@@ -378,67 +384,22 @@ const HelpModal = ({ open, setOpen }) => {
       <ModalHeader title="Aide" />
       <ModalBody>
         <div className="tw-flex tw-flex-col tw-gap-4  tw-px-8 tw-py-4">
-          <h4>Fonctionnement actuel des Lieux Fréquentés</h4>
+          <h4>Fonctionnement des Lieux Fréquentés</h4>
           <p>
-            Un lieu peut être fréquenté par{' '}
-            <em>
-              <b> plusieurs personnes différentes.</b>
-            </em>
-            <br />
-            Ainsi, la liste de lieux disponibles n'est pas propre à une personne, mais est <em>commune à l'organisation</em>.
+            Un lieu peut être fréquenté par <b> plusieurs personnes différentes.</b>
             <br />
             <br />
-            La liste des "Lieux fréquentés" ci-dessous est la liste des lieux fréquentés{' '}
-            <em>
-              <b>par cette personne.</b>
-            </em>
+            Ainsi, la liste de lieux disponibles n'est pas propre à une personne, mais est <b>commune à l'organisation</b>.
             <br />
-            Ainsi, pour le moment, une personne peut fréquenter <em>plusieurs fois le même lieu.</em>
+            <br />
+            La liste des "Lieux fréquentés" ci-dessous est la liste des lieux <b>uniques fréquentés par cette personne.</b>
           </p>
-          <h4>Évolution possible des Lieux Fréquentés</h4>
-          <p>
-            Depuis l'apparition de la fonction Rencontre, le fonctionnement des lieux fréquentés pourrait être amené à évoluer :
-            <ul className="tw-list-disc">
-              <li>Une Rencontre pourrait avoir un champ Lieu associé</li>
-              <li>
-                La liste ci-dessous pourrait alors devenir la liste des lieux fréquentés <em>uniques</em> de cette personne
-              </li>
-            </ul>
-          </p>
-          <p>Si vous approuvez un tel changement, ou si vous désapprouvez, vous pouvez nous le notifier en cliquant sur les boutons ci-dessous.</p>
-          <div className="tw-flex tw-justify-center tw-gap-4">
-            <button
-              type="button"
-              className="button-destructive tw-inline-flex tw-flex-1 tw-items-center"
-              onClick={() => {
-                capture('Changement fonctionnement lieu refusé', { user });
-                toast.success('Merci pour votre retour !');
-                setOpen(false);
-              }}>
-              Non, ne changez rien !
-            </button>
-            <button
-              type="button"
-              name="cancel"
-              className="button-cancel tw-inline-flex tw-flex-1 tw-items-center"
-              onClick={() => {
-                capture('Nouvelle idée fonctionnement lieu', { user });
-                toast.success('Merci pour votre retour, nous vous contacterons très bientôt !');
-                setOpen(false);
-              }}>
-              J'ai une autre idée, contactez-moi
-            </button>
-            <button
-              type="button"
-              className="button-submit tw-inline-flex tw-flex-1 tw-items-center"
-              onClick={() => {
-                capture('Changement fonctionnement lieu approuvé', { user });
-                toast.success('Merci pour votre retour !');
-                setOpen(false);
-              }}>
-              Je veux le nouveau fonctionnement !
-            </button>
-          </div>
+          {!!sameMultiplePlaces && (
+            <small>
+              Le fonctionnement des lieux a changé depuis début 2023. Nous n'avons pas voulu supprimer vos données déjà créées, c'est pourquoi cette
+              personne a plusieurs fois le même lieu. Mais il est désormais impossible de rajouter plusieurs lieux identiques pour une même personne.
+            </small>
+          )}
         </div>
       </ModalBody>
       <ModalFooter>
@@ -447,7 +408,6 @@ const HelpModal = ({ open, setOpen }) => {
           name="cancel"
           className="button-cancel"
           onClick={() => {
-            capture('Ne veux pas donner son avis sur les lieux', { user });
             setOpen(null);
           }}>
           Fermer
