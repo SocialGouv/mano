@@ -1,17 +1,10 @@
 import React, { useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
 import { CustomResponsivePie } from './charts';
-import { CANCEL, DONE, mappedIdsToLabels } from '../../recoil/actions';
+import { mappedIdsToLabels } from '../../recoil/actions';
 import SelectCustom from '../../components/SelectCustom';
 import { getPieData } from './utils';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
-import ActionOrConsultationName from '../../components/ActionOrConsultationName';
-import TagTeam from '../../components/TagTeam';
-import ActionStatus from '../../components/ActionStatus';
-import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
-import { useRecoilValue } from 'recoil';
-import { organisationState, userState } from '../../recoil/auth';
-import { formatDateWithNameOfDay, formatTime } from '../../services/date';
+import ActionsSortableList from '../../components/ActionsSortableList';
 
 const ActionsStats = ({
   setActionsStatuses,
@@ -142,7 +135,7 @@ const ActionsStats = ({
           setCategorySlice(null);
         }}
         data={filteredActionsBySlice}
-        title={`Actions ${groupSlice !== null ? `du groupe ${groupSlice}` : ''}${categorySlice !== null ? `de la catégorie ${groupSlice}` : ''} (${
+        title={`Actions ${groupSlice !== null ? `du groupe ${groupSlice}` : ''}${categorySlice !== null ? `de la catégorie ${categorySlice}` : ''} (${
           filteredActionsBySlice.length
         })`}
       />
@@ -151,60 +144,13 @@ const ActionsStats = ({
 };
 
 const SelectedActionsModal = ({ open, onClose, data, title, onAfterLeave }) => {
-  const history = useHistory();
-  const user = useRecoilValue(userState);
-  const organisation = useRecoilValue(organisationState);
   return (
-    <ModalContainer open={open} size="3xl" onClose={onClose} onAfterLeave={onAfterLeave}>
+    <ModalContainer open={open} size="full" onClose={onClose} onAfterLeave={onAfterLeave}>
       <ModalHeader title={title} />
       <ModalBody>
-        <table className="table table-striped">
-          <tbody className="small">
-            {data.map((action, i) => {
-              const date = formatDateWithNameOfDay([DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt);
-              const time = action.withTime && action.dueAt ? ` ${formatTime(action.dueAt)}` : '';
-              return (
-                <tr key={action._id}>
-                  <td>
-                    <div
-                      className={['restricted-access'].includes(user.role) ? 'tw-cursor-not-allowed tw-py-2' : 'tw-cursor-pointer tw-py-2'}
-                      onClick={() => {
-                        if (['restricted-access'].includes(user.role)) return;
-                        history.push(`/action/${action._id}`);
-                      }}>
-                      <div className="tw-flex">
-                        <div className="tw-flex-1">
-                          {action.urgent ? <ExclamationMarkButton /> : null} {`${date}${time}`}
-                        </div>
-                        <div>
-                          <ActionStatus status={action.status} />
-                        </div>
-                      </div>
-                      <div className="tw-mt-2 tw-flex">
-                        <div className="tw-flex tw-flex-1 tw-flex-row tw-items-center">
-                          {!['restricted-access'].includes(user.role) && (
-                            <>
-                              {!!organisation.groupsEnabled && !!action.group && (
-                                <span className="tw-mr-2 tw-text-xl" aria-label="Action familiale" title="Action familiale">
-                                  👪
-                                </span>
-                              )}
-                              <ActionOrConsultationName item={action} />
-                              {action._id}
-                            </>
-                          )}
-                        </div>
-                        <div>
-                          {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
-                        </div>
-                      </div>
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+        <div className="tw-p-4">
+          <ActionsSortableList data={data} limit={20} />
+        </div>
       </ModalBody>
       <ModalFooter>
         <button

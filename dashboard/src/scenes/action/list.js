@@ -1,36 +1,25 @@
-import React, { useMemo, useState } from 'react';
-import { useHistory } from 'react-router-dom';
+import React, { useState } from 'react';
 import { selectorFamily, useRecoilValue } from 'recoil';
 import CreateActionModal from '../../components/CreateActionModal';
 import { SmallHeader } from '../../components/header';
-import Page from '../../components/pagination';
-import Table from '../../components/table';
-import ActionStatus from '../../components/ActionStatus';
-import DateBloc from '../../components/DateBloc';
 import Search from '../../components/search';
 import ActionsCalendar from '../../components/ActionsCalendar';
 import ActionsWeekly from '../../components/ActionsWeekly';
 import SelectCustom from '../../components/SelectCustom';
-import ActionOrConsultationName from '../../components/ActionOrConsultationName';
-import PersonName from '../../components/PersonName';
-import { formatTime } from '../../services/date';
-import { CANCEL, DONE, mappedIdsToLabels, sortActionsOrConsultations, TODO } from '../../recoil/actions';
-import { currentTeamState, teamsState, organisationState, userState } from '../../recoil/auth';
+import { mappedIdsToLabels, TODO } from '../../recoil/actions';
+import { currentTeamState, teamsState, userState } from '../../recoil/auth';
 import { arrayOfitemsGroupedByActionSelector, arrayOfitemsGroupedByConsultationSelector } from '../../recoil/selectors';
 import { filterBySearch } from '../search/utils';
-import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
-import ConsultationButton from '../../components/ConsultationButton';
-import { disableConsultationRow } from '../../recoil/consultations';
 import ButtonCustom from '../../components/ButtonCustom';
 import agendaIcon from '../../assets/icons/agenda-icon.svg';
 import { useDataLoader } from '../../components/DataLoader';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import { useLocalStorage } from 'react-use';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
-import TagTeam from '../../components/TagTeam';
 import ConsultationModal from '../../components/ConsultationModal';
+import ActionsSortableList from '../../components/ActionsSortableList';
 
 const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 
@@ -82,30 +71,24 @@ const consultationsByStatusSelector = selectorFamily({
 const dataFilteredBySearchSelector = selectorFamily({
   key: 'dataFilteredBySearchSelector',
   get:
-    ({ search, statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory, sortBy, sortOrder }) =>
+    ({ search, statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory }) =>
     ({ get }) => {
       const actions = get(actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory }));
       // When we filter by category, we don't want to see all consultations.
       const consultations = categories?.length ? [] : get(consultationsByStatusSelector({ statuses }));
       if (!search) {
-        const dataFitered = [...actions, ...consultations].sort(sortActionsOrConsultations(sortBy, sortOrder));
-        return dataFitered;
+        return [...actions, ...consultations];
       }
       const actionsFiltered = filterBySearch(search, actions);
       const consultationsFiltered = filterBySearch(search, consultations);
-      const dataFitered = [...actionsFiltered, ...consultationsFiltered].sort(sortActionsOrConsultations(sortBy, sortOrder));
-      return dataFitered;
+      return [...actionsFiltered, ...consultationsFiltered];
     },
 });
 
-const limit = 20;
-
 const List = () => {
   useTitle('Agenda');
-  const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-  const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
 
   const { isLoading, refresh } = useDataLoader();
@@ -114,7 +97,7 @@ const List = () => {
   const [showConsultationModal, setShowConsultationModal] = useState(false);
 
   const [search, setSearch] = useSearchParamState('search', '');
-  const [page, setPage] = useSearchParamState('page', 0, { resetToDefaultIfTheFollowingValueChange: currentTeam?._id });
+
   const [categories, setCategories] = useLocalStorage('action-categories', []);
   const [statuses, setStatuses] = useLocalStorage('action-statuses', [TODO]);
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('action-teams', [currentTeam._id]);
@@ -123,25 +106,9 @@ const List = () => {
 
   const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useLocalStorage('action-showAs', showAsOptions[0]); // calendar, list
-  const [sortBy, setSortBy] = useLocalStorage('actions-consultations-sortBy', 'dueAt');
-  const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
-
   const dataConsolidated = useRecoilValue(
-    dataFilteredBySearchSelector({
-      search,
-      statuses,
-      categories,
-      teamIds: selectedTeamIds,
-      viewAllOrganisationData,
-      actionsWithNoCategory,
-      sortBy,
-      sortOrder,
-    })
+    dataFilteredBySearchSelector({ search, statuses, categories, teamIds: selectedTeamIds, viewAllOrganisationData, actionsWithNoCategory })
   );
-
-  const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
-
-  const total = dataConsolidated.length;
 
   return (
     <>
@@ -301,102 +268,7 @@ const List = () => {
       )}
       {showAs === showAsOptions[1] && (
         <>
-          <Table
-            data={dataConsolidatedPaginated.map((a) => {
-              if (a.urgent) return { ...a, style: { backgroundColor: '#fecaca99' } };
-              if (a.isConsultation) return { ...a, style: { backgroundColor: '#DDF4FF99' } };
-              return a;
-            })}
-            rowKey={'_id'}
-            onRowClick={(actionOrConsultation) => {
-              if (actionOrConsultation.isConsultation) {
-                history.push(`/person/${actionOrConsultation.person}?tab=Dossier+Médical&consultationId=${actionOrConsultation._id}`);
-              } else {
-                history.push(`/action/${actionOrConsultation._id}`);
-              }
-            }}
-            rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
-            columns={[
-              {
-                title: '',
-                dataKey: 'urgentOrGroupOrConsultation',
-                small: true,
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortBy,
-                sortOrder,
-                render: (actionOrConsult) => {
-                  return (
-                    <div className="tw-flex tw-items-center tw-justify-center tw-gap-1">
-                      {!!actionOrConsult.urgent && <ExclamationMarkButton />}
-                      {!!organisation.groupsEnabled && !!actionOrConsult.group && (
-                        <span className="tw-text-3xl" aria-label="Action familiale" title="Action familiale">
-                          👪
-                        </span>
-                      )}
-                      {!!actionOrConsult.isConsultation && <ConsultationButton />}
-                    </div>
-                  );
-                },
-              },
-              {
-                title: 'Date',
-                dataKey: 'dueAt' || '_id',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortBy,
-                sortOrder,
-                render: (action) => {
-                  return <DateBloc date={[DONE, CANCEL].includes(action.status) ? action.completedAt : action.dueAt} />;
-                },
-              },
-              {
-                title: 'Heure',
-                dataKey: '_id',
-                render: (action) => {
-                  if (!action.dueAt || !action.withTime) return null;
-                  return formatTime(action.dueAt);
-                },
-              },
-              {
-                title: 'Nom',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortBy,
-                sortOrder,
-                dataKey: 'name',
-                render: (action) => <ActionOrConsultationName item={action} />,
-              },
-              {
-                title: 'Personne suivie',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortBy,
-                sortOrder,
-                dataKey: 'person',
-                render: (action) => <PersonName item={action} />,
-              },
-              {
-                title: 'Statut',
-                onSortOrder: setSortOrder,
-                onSortBy: setSortBy,
-                sortBy,
-                sortOrder,
-                dataKey: 'status',
-                render: (action) => <ActionStatus status={action.status} />,
-              },
-              {
-                title: 'Équipe(s) en charge',
-                dataKey: 'team',
-                render: (a) => (
-                  <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
-                    {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
-                  </div>
-                ),
-              },
-            ]}
-          />
-          <Page page={page} limit={limit} total={total} onChange={({ page }) => setPage(page, true)} />
+          <ActionsSortableList data={dataConsolidated} limit={20} />
         </>
       )}
       <CreateActionModal dueAt={actionDate} open={modalOpen} setOpen={(value) => setModalOpen(value)} disabled={!currentTeam} isMulti refreshable />
