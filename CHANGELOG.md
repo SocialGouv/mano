@@ -1,3 +1,10 @@
+## [1.207.2](https://github.com/SocialGouv/mano/compare/v1.207.1...v1.207.2) (2023-01-06)
+
+
+### Bug Fixes
+
+* **dashboard:** allow filter by no category ([#1160](https://github.com/SocialGouv/mano/issues/1160)) ([d1d2189](https://github.com/SocialGouv/mano/commit/d1d21895e4743583b45dc0cfb4c142cf6a5ee287))
+
 ## [1.207.1](https://github.com/SocialGouv/mano/compare/v1.207.0...v1.207.1) (2023-01-06)
 
 
