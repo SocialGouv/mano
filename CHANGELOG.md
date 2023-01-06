@@ -1,3 +1,15 @@
+# [1.207.0](https://github.com/SocialGouv/mano/compare/v1.206.0...v1.207.0) (2023-01-06)
+
+
+### Bug Fixes
+
+* patch app version ([96e1f79](https://github.com/SocialGouv/mano/commit/96e1f794d89c8d4b4e691f648b5451df4d2af7e3))
+
+
+### Features
+
+* **dashboard:** create action for multiple team (retrocompatible) ([#1127](https://github.com/SocialGouv/mano/issues/1127)) ([79429b1](https://github.com/SocialGouv/mano/commit/79429b1c5100110171f5b094a85793b1caf5a64b))
+
 # [1.206.0](https://github.com/SocialGouv/mano/compare/v1.205.2...v1.206.0) (2023-01-06)
 
 
