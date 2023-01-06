@@ -32,11 +32,17 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
             <Input
               disabled={disabled}
               name={field.name}
-              type={field.type}
               required={field.required}
               value={values[field.name] || ''}
               onChange={handleChange}
               id={id}
+              // input type=number doesn't show leading 0, so you can't explicitely tell that the input's value is 0
+              // that's why for type number we need this hack
+              // the only con is that there is nomore arrows to increase/decrease the value
+              // https://stackoverflow.com/a/54463605/5225096
+              type="text"
+              inputmode={field.type === 'number' ? 'numeric' : undefined}
+              pattern={field.type === 'number' ? '[-+]?[0-9]*[.,]?[0-9]+' : undefined}
             />
           )}
           {!!['textarea'].includes(field.type) && (
