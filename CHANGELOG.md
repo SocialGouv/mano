@@ -1,3 +1,10 @@
+# [1.206.0](https://github.com/SocialGouv/mano/compare/v1.205.2...v1.206.0) (2023-01-06)
+
+
+### Features
+
+* **app:** create action for multiple team (retrocompatible) ([#1134](https://github.com/SocialGouv/mano/issues/1134)) ([d66708d](https://github.com/SocialGouv/mano/commit/d66708dec8cc7cdefc203041cd4f9acdbda412d2))
+
 ## [1.205.2](https://github.com/SocialGouv/mano/compare/v1.205.1...v1.205.2) (2023-01-06)
 
 
