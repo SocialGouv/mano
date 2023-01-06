@@ -4,6 +4,7 @@ import { useRecoilValue } from 'recoil';
 import packageInfo from '../../package.json';
 import { organisationState, teamsState, userState } from '../recoil/auth';
 import OpenNewWindowIcon from './OpenNewWindowIcon';
+import SessionCountDownLimiter from './SessionCountDownLimiter';
 
 const Drawer = () => {
   const user = useRecoilValue(userState);
@@ -135,7 +136,7 @@ const Drawer = () => {
       <p className="tw-mt-auto tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
         <span>Version: {packageInfo.version}</span>
         <span>Accessibilité: partielle</span>
-        <span className="tw-mt-4 tw-text-red-500">Temps de session: 3h</span>
+        <SessionCountDownLimiter />
       </p>
     </nav>
   );

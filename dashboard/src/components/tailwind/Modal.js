@@ -22,8 +22,10 @@ const ModalContainer = ({
   // setOpen,
   className = '',
   onAfterEnter = () => null,
+  onAfterLeave = () => null,
   onBeforeLeave = () => null,
   size = 'lg', // lg, xl, 3xl, full
+  blurryBackground = false,
 }) => {
   const backgroundRef = useRef(null);
 
@@ -44,7 +46,7 @@ const ModalContainer = ({
             leave="tw-ease-in tw-duration-200"
             leaveFrom="tw-opacity-100"
             leaveTo="tw-opacity-0">
-            <div className="tw-fixed tw-inset-0 tw-bg-gray-500 tw-bg-opacity-75 tw-transition-opacity" />
+            <div className={['tw-fixed tw-inset-0 tw-bg-black/70 tw-transition-opacity ', blurryBackground ? 'tw-backdrop-blur-xl' : ''].join(' ')} />
           </Transition.Child>
 
           <div className="tw-fixed tw-inset-0 tw-z-10 tw-overflow-y-auto" ref={backgroundRef}>
@@ -61,7 +63,8 @@ const ModalContainer = ({
                   backgroundRef?.current?.scrollTo(0, 0);
                   onAfterEnter();
                 }}
-                beforeLeave={onBeforeLeave}>
+                beforeLeave={onBeforeLeave}
+                afterLeave={onAfterLeave}>
                 <Dialog.Panel
                   className={[
                     'tw-relative tw-flex tw-max-h-[90vh] tw-transform tw-flex-col tw-rounded-lg tw-bg-white tw-text-left tw-shadow-xl tw-transition-all sm:tw-my-8 sm:tw-w-full ',
