@@ -1,3 +1,10 @@
+## [1.205.2](https://github.com/SocialGouv/mano/compare/v1.205.1...v1.205.2) (2023-01-06)
+
+
+### Bug Fixes
+
+* **app:** save only one place per person in app ([#1158](https://github.com/SocialGouv/mano/issues/1158)) ([3be2c30](https://github.com/SocialGouv/mano/commit/3be2c308866996043b4a6987aa5daeb29e8a2411))
+
 ## [1.205.1](https://github.com/SocialGouv/mano/compare/v1.205.0...v1.205.1) (2023-01-06)
 
 
