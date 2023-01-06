@@ -93,7 +93,8 @@ test("Cross teams report", async ({ page }) => {
 
     await page.getByLabel("Nom de l'action").fill(person1action);
 
-    await clickOnEmptyReactSelect(page, "create-action-team-select", team1Name);
+    await changeReactSelectValue(page, "create-action-team-select", team1Name);
+    //  await clickOnEmptyReactSelect(page, "create-action-team-select", team1Name);
 
     await clickOnEmptyReactSelect(page, "create-action-person-select", person1Name);
 

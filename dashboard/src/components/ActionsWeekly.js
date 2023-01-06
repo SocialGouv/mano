@@ -134,7 +134,9 @@ function ActionsOfDay({ actions }) {
               )}
             </div>
           )}
-          {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
+          <div className="tw-flex tw-flex-col tw-gap-px">
+            {Array.isArray(action?.teams) ? action.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={action?.team} />}
+          </div>
           <div>
             <ActionOrConsultationName item={action} />
           </div>

@@ -330,7 +330,7 @@ const List = () => {
 };
 
 const Teams = ({ person: { _id, assignedTeams } }) => (
-  <div key={_id} className="tw-grid tw-gap-1">
+  <div key={_id} className="tw-grid tw-gap-px">
     {assignedTeams?.map((teamId) => (
       <TagTeam key={teamId} teamId={teamId} />
     ))}

@@ -16,9 +16,8 @@ import Comments from '../../components/Comments';
 import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
-import SelectTeam from '../../components/SelectTeam';
 
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
@@ -30,6 +29,7 @@ import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDat
 import { itemsGroupedByActionSelector } from '../../recoil/selectors';
 import ActionsCategorySelect from '../../components/tailwind/ActionsCategorySelect';
 import { groupsState } from '../../recoil/groups';
+import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 
 const actionByIdSelector = selectorFamily({
   key: 'actionByIdSelector',
@@ -43,7 +43,6 @@ const actionByIdSelector = selectorFamily({
 
 const ActionView = () => {
   const { actionId } = useParams();
-  const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -79,13 +78,13 @@ const ActionView = () => {
   };
 
   const onDuplicate = async () => {
-    const { name, person, dueAt, withTime, description, categories, urgent } = action;
+    const { name, person, dueAt, withTime, description, categories, urgent, teams } = action;
     const response = await API.post({
       path: '/action',
       body: prepareActionForEncryption({
         name,
         person,
-        team: currentTeam._id,
+        teams,
         user: user._id,
         dueAt,
         withTime,
@@ -126,6 +125,7 @@ const ActionView = () => {
         initialValues={action}
         enableReinitialize
         onSubmit={async (body) => {
+          if (!body.teams?.length) return toast.error('Une action doit être associée à au moins une équipe.');
           const statusChanged = body.status && action.status !== body.status;
           if (statusChanged) {
             if ([DONE, CANCEL].includes(body.status)) {
@@ -136,6 +136,7 @@ const ActionView = () => {
               body.completedAt = null;
             }
           }
+          delete body.team;
           const actionResponse = await API.put({
             path: `/action/${body._id}`,
             body: prepareActionForEncryption(body),
@@ -249,12 +250,13 @@ const ActionView = () => {
                     </div>
                   </FormGroup>
                   <FormGroup>
-                    <Label htmlFor="team">Sous l'équipe</Label>
-                    <SelectTeam
-                      teams={user.role === 'admin' ? teams : user.teams}
-                      teamId={Array.isArray(values.teams) ? values.teams[0] : values.team}
+                    <Label htmlFor="team">Équipe(s) en charge</Label>
+                    <SelectTeamMultiple
+                      onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
+                      value={Array.isArray(values.teams) ? values.teams : [values.team]}
+                      colored
                       inputId="team"
-                      onChange={(team) => handleChange({ target: { value: team._id, name: 'team' } })}
+                      classNamePrefix="team"
                     />
                   </FormGroup>
                   <FormGroup>

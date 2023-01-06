@@ -13,7 +13,7 @@ export default function ActionOrConsultationName({ item }) {
       <div>
         {item.categories?.map((category) => (
           <span
-            className="tw-whitespace-no-wrap tw-my-0 tw-mx-0.5 tw-inline-block tw-rounded tw-bg-main75 tw-py-0.5 tw-px-1 tw-text-center tw-align-baseline tw-text-[10.5px] tw-font-bold tw-leading-none tw-text-white"
+            className="tw-whitespace-no-wrap tw-my-px tw-mx-0.5 tw-inline-block tw-rounded tw-bg-main75 tw-py-0.5 tw-px-1 tw-text-center tw-align-baseline tw-text-[10.5px] tw-font-bold tw-leading-none tw-text-white"
             color="info"
             key={category}
             data-test-id={item.name + category}>

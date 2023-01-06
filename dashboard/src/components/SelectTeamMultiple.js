@@ -5,6 +5,7 @@ import SelectCustom from './SelectCustom';
 
 const SelectTeamMultiple = ({ onChange, value: teamIds = [], inputId, classNamePrefix, isDisabled = false }) => {
   const teams = useRecoilValue(teamsState);
+
   return (
     <SelectCustom
       name="name"
