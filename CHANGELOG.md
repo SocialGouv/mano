@@ -1,3 +1,10 @@
+## [1.205.1](https://github.com/SocialGouv/mano/compare/v1.205.0...v1.205.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* **api:** add unique constraint to avoid duplicate reports ([#1133](https://github.com/SocialGouv/mano/issues/1133)) ([7f31275](https://github.com/SocialGouv/mano/commit/7f31275dfa0a4e7616fe968f911f2d8489c82b9b))
+
 # [1.205.0](https://github.com/SocialGouv/mano/compare/v1.204.1...v1.205.0) (2023-01-05)
 
 
