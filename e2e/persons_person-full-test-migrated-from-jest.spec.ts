@@ -82,7 +82,7 @@ test("test", async ({ page }) => {
   await page.getByText("Oui").first().click();
   await page.getByText("Hors UE").click();
   await page.getByText("Chez un tiers").click();
-  await page.getByText("Oui").nth(1).click();
+  await page.getByText("Oui", { exact: true }).nth(1).click();
   await page.getByText("CDI").click();
   await page.getByText("ARE").click();
   await page.getByText("Départ du pays d'origine").click();
