@@ -42,7 +42,7 @@ const allGroupsWithGroupForAllCategories = selector({
   },
 });
 
-const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) => {
+const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed, isDisabled }) => {
   const [open, setOpen] = useState(false);
   const [modalIsOpened, setModalIsOpened] = useState(false);
   const allGroups = useRecoilValue(allGroupsWithGroupForAllCategories);
@@ -112,7 +112,10 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
       )}
       <div
         id={id}
-        className="tw-flex tw-max-h-16 tw-flex-wrap tw-items-center tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300 tw-px-2.5 tw-py-1"
+        className={[
+          'tw-flex tw-max-h-16 tw-flex-wrap tw-items-center tw-gap-2 tw-overflow-y-auto tw-rounded tw-border tw-border-gray-300 tw-px-2.5 tw-py-1',
+          isDisabled ? 'tw-pointer-events-none tw-cursor-not-allowed tw-bg-gray-100' : '',
+        ].join(' ')}
         onClick={() => setOpen(true)}
         ref={categories1Ref}>
         {selected.map((category, i) => (
@@ -181,7 +184,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
               placeholder="Recherchez..."
             />
           </div>
-          <div className="tw-mx-4 tw-mt-8 tw-flex tw-basis-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300">
+          <div className="tw-mx-4 tw-mt-8 tw-flex tw-h-[50vh] tw-basis-full tw-overflow-hidden tw-rounded tw-border tw-border-gray-300">
             <div className="tw-flex tw-basis-1/3 tw-flex-col tw-justify-start tw-border-gray-300">
               <span className="tw-border-b tw-border-gray-300 tw-py-2 tw-px-4 tw-text-left tw-font-semibold">Groupes</span>
               <div className="tw-flex tw-flex-col tw-overflow-y-auto">
@@ -199,7 +202,7 @@ const ActionsCategorySelect = ({ label, values, onChange, id, withMostUsed }) =>
                 ))}
               </div>
             </div>
-            <div className="tw-flex tw-h-[50vh] tw-basis-2/3 tw-flex-col tw-justify-start tw-border-l tw-border-gray-300">
+            <div className="tw-flex tw-basis-2/3 tw-flex-col tw-justify-start tw-border-l tw-border-gray-300">
               <span className="tw-border-b tw-border-gray-300 tw-py-2 tw-px-4 tw-text-left tw-font-semibold">Catégories</span>
               <div className="tw-flex tw-flex-col tw-overflow-y-auto">
                 {groups

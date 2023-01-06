@@ -208,7 +208,7 @@ const Stats = () => {
   const [actionsCategories, setActionsCategories] = useLocalStorage('stats-categories', []);
 
   const filterableActionsCategories = useMemo(() => {
-    if (!actionsCategoriesGroups.length) return allCategories;
+    if (!actionsCategoriesGroups.length) return ['-- Aucune --', ...allCategories];
     return groupsCategories
       .filter((group) => actionsCategoriesGroups.includes(group.groupTitle))
       .reduce((filteredCats, group) => [...filteredCats, ...group.categories], []);
@@ -232,7 +232,11 @@ const Stats = () => {
           return actionsDetailed;
         }, [])
         .filter((a) => !actionsCategoriesGroups.length || actionsCategoriesGroups.includes(a.group))
-        .filter((a) => !actionsCategories.length || actionsCategories.includes(a.category)),
+        .filter((a) => {
+          if (!actionsCategories.length) return true;
+          if (actionsCategories.length === 1 && actionsCategories[0] === '-- Aucune --') return !a.categories?.length;
+          return actionsCategories.includes(a.category);
+        }),
     [actionsFilteredByStatus, groupsCategories, actionsCategoriesGroups, actionsCategories]
   );
 

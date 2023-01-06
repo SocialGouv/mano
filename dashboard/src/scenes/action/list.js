@@ -37,17 +37,33 @@ const showAsOptions = ['Calendrier', 'Liste', 'Hebdomadaire'];
 const actionsByTeamAndStatusSelector = selectorFamily({
   key: 'actionsByTeamAndStatusSelector',
   get:
-    ({ statuses, categories, teamIds, viewAllOrganisationData }) =>
+    ({ statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory }) =>
     ({ get }) => {
       const actions = get(arrayOfitemsGroupedByActionSelector);
-      const actionsByTeamAndStatus = actions.filter(
-        (action) =>
-          (viewAllOrganisationData ||
-            !teamIds.length ||
-            (Array.isArray(action.teams) ? teamIds.some((t) => action.teams.includes(t)) : teamIds.includes(action.team))) &&
-          (!statuses.length || statuses.includes(action.status)) &&
-          (!categories.length || categories.some((c) => (c === '-- Aucune --' ? action.categories.length === 0 : action.categories?.includes(c))))
-      );
+
+      const actionsByTeamAndStatus = actions.filter((action) => {
+        if (!viewAllOrganisationData) {
+          if (teamIds.length) {
+            if (Array.isArray(action.teams)) {
+              if (!teamIds.some((t) => action.teams.includes(t))) return false;
+            } else {
+              if (!teamIds.includes(action.team)) return false;
+            }
+          }
+        }
+        if (statuses.length) {
+          if (!statuses.includes(action.status)) return false;
+        }
+        if (actionsWithNoCategory) {
+          if (action.categories?.length) return false;
+        }
+        if (categories.length) {
+          if (!categories.some((c) => action.categories?.includes(c))) {
+            return false;
+          }
+        }
+        return true;
+      });
       return actionsByTeamAndStatus;
     },
 });
@@ -66,9 +82,9 @@ const consultationsByStatusSelector = selectorFamily({
 const dataFilteredBySearchSelector = selectorFamily({
   key: 'dataFilteredBySearchSelector',
   get:
-    ({ search, statuses, categories, teamIds, viewAllOrganisationData, sortBy, sortOrder }) =>
+    ({ search, statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory, sortBy, sortOrder }) =>
     ({ get }) => {
-      const actions = get(actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewAllOrganisationData }));
+      const actions = get(actionsByTeamAndStatusSelector({ statuses, categories, teamIds, viewAllOrganisationData, actionsWithNoCategory }));
       // When we filter by category, we don't want to see all consultations.
       const consultations = categories?.length ? [] : get(consultationsByStatusSelector({ statuses }));
       if (!search) {
@@ -103,6 +119,7 @@ const List = () => {
   const [statuses, setStatuses] = useLocalStorage('action-statuses', [TODO]);
   const [selectedTeamIds, setSelectedTeamIds] = useLocalStorage('action-teams', [currentTeam._id]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('action-allOrg', false);
+  const [actionsWithNoCategory, setActionsWithNoCategory] = useLocalStorage('action-noCategory', false);
 
   const [actionDate, setActionDate] = useState(new Date());
   const [showAs, setShowAs] = useLocalStorage('action-showAs', showAsOptions[0]); // calendar, list
@@ -110,8 +127,18 @@ const List = () => {
   const [sortOrder, setSortOrder] = useLocalStorage('actions-consultations-sortOrder', 'ASC');
 
   const dataConsolidated = useRecoilValue(
-    dataFilteredBySearchSelector({ search, statuses, categories, teamIds: selectedTeamIds, viewAllOrganisationData, sortBy, sortOrder })
+    dataFilteredBySearchSelector({
+      search,
+      statuses,
+      categories,
+      teamIds: selectedTeamIds,
+      viewAllOrganisationData,
+      actionsWithNoCategory,
+      sortBy,
+      sortOrder,
+    })
   );
+
   const dataConsolidatedPaginated = useMemo(() => dataConsolidated.slice(page * limit, (page + 1) * limit), [dataConsolidated, page]);
 
   const total = dataConsolidated.length;
@@ -193,8 +220,23 @@ const List = () => {
         <div className="tw-mb-5 tw-flex tw-basis-1/3 tw-flex-col tw-items-start tw-px-2">
           <label htmlFor="action-select-categories-filter">Filtrer par catégorie&nbsp;:</label>
           <div className="tw-w-full">
-            <ActionsCategorySelect id="action-select-categories-filter" onChange={(c) => setCategories(c)} values={categories} />
+            <ActionsCategorySelect
+              id="action-select-categories-filter"
+              onChange={(c) => setCategories(c)}
+              values={categories}
+              isDisabled={!!actionsWithNoCategory}
+            />
           </div>
+          <label htmlFor="actionsWithNoCategory" className="tw-flex tw-items-center tw-text-sm">
+            <input
+              id="actionsWithNoCategory"
+              type="checkbox"
+              className="tw-mr-2"
+              checked={actionsWithNoCategory}
+              onChange={() => setActionsWithNoCategory(!actionsWithNoCategory)}
+            />
+            Actions sans catégorie
+          </label>
         </div>
         <div className="tw-mb-5 tw-flex tw-basis-1/3 tw-flex-col tw-items-start tw-px-2">
           <label htmlFor="action-select-categories-filter">Filtrer par équipe&nbsp;:</label>
