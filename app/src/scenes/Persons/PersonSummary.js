@@ -40,8 +40,6 @@ const PersonSummary = ({
   onDelete,
   onBack,
 }) => {
-  const onAddPlaceRequest = () => navigation.push('NewPersonPlaceForm', { person: personDB, fromRoute: 'Person' });
-
   const onCommentUpdate = (comment) => {
     navigation.navigate('PersonComment', {
       ...comment,
@@ -79,7 +77,8 @@ const PersonSummary = ({
   };
 
   const populatedPersons = useRecoilValue(itemsGroupedByPersonSelector);
-  const { actions, comments, rencontres, relsPersonPlace } = useMemo(() => populatedPersons[personDB?._id] || {}, [populatedPersons, personDB._id]);
+  const populatedPerson = useMemo(() => populatedPersons[personDB?._id] || {}, [populatedPersons, personDB._id]);
+  const { actions, comments, rencontres, relsPersonPlace } = populatedPerson;
 
   const sortedActions = useMemo(() => [...(actions || [])].sort((p1, p2) => (p1.dueAt > p2.dueAt ? -1 : 1)), [actions]);
 
@@ -89,6 +88,7 @@ const PersonSummary = ({
     const placesId = relsPersonPlace.map((rel) => rel.place);
     return allPlaces.filter((pl) => placesId.includes(pl._id));
   }, [allPlaces, relsPersonPlace]);
+  const onAddPlaceRequest = () => navigation.push('NewPersonPlaceForm', { person: populatedPerson, fromRoute: 'Person' });
 
   const teams = useRecoilValue(teamsState);
 
