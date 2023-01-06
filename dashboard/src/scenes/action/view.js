@@ -125,7 +125,6 @@ const ActionView = () => {
         initialValues={action}
         enableReinitialize
         onSubmit={async (body) => {
-          console.log(body);
           body.teams = Array.isArray(body.teams) ? body.teams : [body.team];
           if (!body.teams?.length) return toast.error('Une action doit être associée à au moins une équipe.');
           const statusChanged = body.status && action.status !== body.status;
