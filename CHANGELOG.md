@@ -1,3 +1,10 @@
+## [1.207.3](https://github.com/SocialGouv/mano/compare/v1.207.2...v1.207.3) (2023-01-06)
+
+
+### Bug Fixes
+
+* prepare null item for search ([99ed457](https://github.com/SocialGouv/mano/commit/99ed457941388c6ec8669be86bcd90320c728642))
+
 ## [1.207.2](https://github.com/SocialGouv/mano/compare/v1.207.1...v1.207.2) (2023-01-06)
 
 
