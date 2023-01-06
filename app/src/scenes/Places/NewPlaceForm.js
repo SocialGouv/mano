@@ -57,12 +57,15 @@ const NewPlaceForm = ({ route, navigation }) => {
     }
     if (response.ok) {
       setPlaces((places) => [response.decryptedData, ...places].sort(sortByName));
-
       onSubmit(response.decryptedData);
     }
   };
 
   const onSubmit = async (place) => {
+    if (person.relsPersonPlace?.find((rpp) => rpp.place === place._id)) {
+      Alert.alert('Ce lieu est déjà enregistré pour cette personne');
+      return;
+    }
     setPosting(true);
 
     const response = await API.post({
@@ -87,10 +90,7 @@ const NewPlaceForm = ({ route, navigation }) => {
     setTimeout(() => setPosting(false), 250);
   };
 
-  const isReadyToSave = () => {
-    if (!name || !name.length || !name.trim().length) return false;
-    return true;
-  };
+  const isReadyToSave = !!name?.trim()?.length;
 
   const onGoBackRequested = () => {
     if (!isReadyToSave) return onBack();
