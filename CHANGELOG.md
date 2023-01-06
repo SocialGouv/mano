@@ -1,3 +1,10 @@
+## [1.207.1](https://github.com/SocialGouv/mano/compare/v1.207.0...v1.207.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* **dashboard:** update action teams bug ([#1163](https://github.com/SocialGouv/mano/issues/1163)) ([4d10748](https://github.com/SocialGouv/mano/commit/4d107486c8f63dfc1dc3afd709e83519f098138d))
+
 # [1.207.0](https://github.com/SocialGouv/mano/compare/v1.206.0...v1.207.0) (2023-01-06)
 
 
