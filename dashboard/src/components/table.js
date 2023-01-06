@@ -73,7 +73,7 @@ const Table = ({
             };
             return (
               <td
-                className={!!onSortBy ? 'tw-cursor-pointer' : 'tw-cursor-default'}
+                className={[column.className || '', !!onSortBy ? 'tw-cursor-pointer' : 'tw-cursor-default'].join(' ')}
                 style={column.style || {}}
                 key={String(dataKey) + String(column.title)}>
                 <button aria-label="Changer l'ordre de tri" type="button" onClick={!!onSortBy ? onNameClick : null}>
@@ -119,7 +119,7 @@ const Table = ({
                 style={item.style || {}}>
                 {columns.map((column) => {
                   return (
-                    <td className={`table-cell ${!!column.small ? 'small' : 'not-small'}`} key={item[rowKey] + column.dataKey}>
+                    <td className={([column.className || ''].join(' '), !!column.small ? 'small' : 'not-small')} key={item[rowKey] + column.dataKey}>
                       {column.render ? column.render(item) : item[column.dataKey] || nullDisplay}
                     </td>
                   );
