@@ -34,7 +34,17 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
               name={field.name}
               required={field.required}
               value={values[field.name] || ''}
-              onChange={handleChange}
+              onChange={(e) => {
+                if (field.type === 'text') return handleChange(e);
+                if (field.type === 'number') {
+                  e.persist();
+                  // test the current value to have positive numbers or decimal only
+                  const regex = /^[0-9]*\.?[0-9]*$/;
+                  if (!regex.test(e.target.value)) return;
+                  if (!e.target.value?.endsWith('.')) e.target.value = Number(e.target.value);
+                  handleChange(e);
+                }
+              }}
               id={id}
               // input type=number doesn't show leading 0, so you can't explicitely tell that the input's value is 0
               // that's why for type number we need this hack
@@ -42,7 +52,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
               // https://stackoverflow.com/a/54463605/5225096
               type="text"
               inputmode={field.type === 'number' ? 'numeric' : undefined}
-              pattern={field.type === 'number' ? '[-+]?[0-9]*[.,]?[0-9]+' : undefined}
+              pattern={field.type === 'number' ? '/^[0-9]*.?[0-9]*$/' : undefined}
             />
           )}
           {!!['textarea'].includes(field.type) && (
