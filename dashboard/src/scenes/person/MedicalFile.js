@@ -136,25 +136,25 @@ export function MedicalFile({ person }) {
         <div>
           Date de naissance&nbsp;:{' '}
           <b>
-            <CustomFieldDisplay field={{ type: 'date' }} value={person.birthdate} />
+            <CustomFieldDisplay type="date" value={person.birthdate} />
           </b>
         </div>
         <div>
           Genre&nbsp;:{' '}
           <b>
-            <CustomFieldDisplay field={{ type: 'text' }} value={person.gender} />
+            <CustomFieldDisplay type="text" value={person.gender} />
           </b>
         </div>
         <div>
           Structure de suivi médical&nbsp;:{' '}
           <b>
-            <CustomFieldDisplay field={{ type: 'text' }} value={person.structureMedical} />
+            <CustomFieldDisplay type="text" value={person.structureMedical} />
           </b>
         </div>
         <div>
           Couverture(s) médicale(s)&nbsp;:{' '}
           <b>
-            <CustomFieldDisplay field={{ type: 'multi-choice' }} value={person.healthInsurances} />
+            <CustomFieldDisplay type="multi-choice" value={person.healthInsurances} />
           </b>
         </div>
       </div>
@@ -253,7 +253,7 @@ export function MedicalFile({ person }) {
                 <div key={field.name}>
                   {field.label}&nbsp;:{' '}
                   <b>
-                    <CustomFieldDisplay field={field} value={medicalFile[field.name]} />
+                    <CustomFieldDisplay type={field.type} value={medicalFile[field.name]} />
                   </b>
                 </div>
               );
