@@ -78,7 +78,7 @@ test("test", async ({ page }) => {
   await page.getByText("Téléphone : 010203040506").click();
   await page.getByText("(test pseudo)").click();
   await page.getByText(personName).click();
-  await page.locator('p:has-text("social")').click();
+  await page.locator('span:has-text("social")').click();
   await page.getByText("Oui").first().click();
   await page.getByText("Hors UE").click();
   await page.getByText("Chez un tiers").click();
