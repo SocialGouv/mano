@@ -14,8 +14,6 @@ dayjs.extend(duration);
 
 const maxSession = 3 * 3600;
 const warnBeforeEndOfSession = 60;
-// const maxSession = 10;
-// const warnBeforeEndOfSession = 2;
 
 const SessionCountDownLimiter = () => {
   const [sessionSeconds, setSessionSeconds] = useState(0);
