@@ -1,3 +1,10 @@
+## [1.207.5](https://github.com/SocialGouv/mano/compare/v1.207.4...v1.207.5) (2023-01-09)
+
+
+### Bug Fixes
+
+* CustomFieldDisplay for person ([#1145](https://github.com/SocialGouv/mano/issues/1145)) ([109ead1](https://github.com/SocialGouv/mano/commit/109ead18e4def35260220f7526e7e59ce32eb6b2))
+
 ## [1.207.4](https://github.com/SocialGouv/mano/compare/v1.207.3...v1.207.4) (2023-01-09)
 
 
