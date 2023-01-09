@@ -1,3 +1,10 @@
+## [1.207.7](https://github.com/SocialGouv/mano/compare/v1.207.6...v1.207.7) (2023-01-09)
+
+
+### Bug Fixes
+
+* **dashboard:** allow 0 in input type=number ([#1159](https://github.com/SocialGouv/mano/issues/1159)) ([91d5c0b](https://github.com/SocialGouv/mano/commit/91d5c0bef99bda1c87d0f63d8a3328447bad9fd8))
+
 ## [1.207.6](https://github.com/SocialGouv/mano/compare/v1.207.5...v1.207.6) (2023-01-09)
 
 
