@@ -1,3 +1,10 @@
+## [1.207.6](https://github.com/SocialGouv/mano/compare/v1.207.5...v1.207.6) (2023-01-09)
+
+
+### Bug Fixes
+
+* custom field display type for printonly medical file fields ([d9f0711](https://github.com/SocialGouv/mano/commit/d9f0711c5681f2e4e61d705f930f14aa47987540))
+
 ## [1.207.5](https://github.com/SocialGouv/mano/compare/v1.207.4...v1.207.5) (2023-01-09)
 
 
