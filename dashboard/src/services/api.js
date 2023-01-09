@@ -48,6 +48,12 @@ export const encryptItem =
       if (!item.entityKey) item.entityKey = await generateEntityKey();
       const { encryptedContent, encryptedEntityKey } = await encrypt(JSON.stringify(item.decrypted), item.entityKey, hashedOrgEncryptionKey);
 
+      // why do we decryptDBItem ? without await ?
+      // because we just want to make sure the encryption is working
+      // if it's not working, the decryptDBItem will fail and we will capture the error
+      // NOTE: sonarcloud is complaining that not putting `await` is a bug
+      // but we don't need to wait for it to finish because it's only for debug
+      // TODO: remove when debug is done
       try {
         decryptDBItem({ encryptedContent, encryptedEntityKey }, hashedOrgEncryptionKey);
       } catch (e) {
