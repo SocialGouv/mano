@@ -39,6 +39,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
                 if (field.type === 'number') {
                   e.persist();
                   // test the current value to have positive numbers or decimal only
+                  if (!e.target.value?.length) return handleChange(e);
                   const regex = /^[0-9]*\.?[0-9]*$/;
                   if (!regex.test(e.target.value)) return;
                   if (!e.target.value?.endsWith('.')) e.target.value = Number(e.target.value);
