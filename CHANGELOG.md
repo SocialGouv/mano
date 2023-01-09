@@ -1,3 +1,10 @@
+## [1.207.4](https://github.com/SocialGouv/mano/compare/v1.207.3...v1.207.4) (2023-01-09)
+
+
+### Bug Fixes
+
+* scrollbar on modal ([#1155](https://github.com/SocialGouv/mano/issues/1155)) ([6dc0ef9](https://github.com/SocialGouv/mano/commit/6dc0ef949506a07dabb97c37d2fc3ef6990972a2))
+
 ## [1.207.3](https://github.com/SocialGouv/mano/compare/v1.207.2...v1.207.3) (2023-01-06)
 
 
