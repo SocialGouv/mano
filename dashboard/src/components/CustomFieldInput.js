@@ -53,7 +53,6 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
               // https://stackoverflow.com/a/54463605/5225096
               type="text"
               inputmode={field.type === 'number' ? 'numeric' : undefined}
-              pattern={field.type === 'number' ? '/^[0-9]*.?[0-9]*$/' : undefined}
             />
           )}
           {!!['textarea'].includes(field.type) && (
