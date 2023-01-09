@@ -1,3 +1,10 @@
+## [1.207.8](https://github.com/SocialGouv/mano/compare/v1.207.7...v1.207.8) (2023-01-09)
+
+
+### Bug Fixes
+
+* remove buggy pattern from input type number ([c2be3ec](https://github.com/SocialGouv/mano/commit/c2be3ecb61da5f5bfa6d26e681403a2149751e54))
+
 ## [1.207.7](https://github.com/SocialGouv/mano/compare/v1.207.6...v1.207.7) (2023-01-09)
 
 
