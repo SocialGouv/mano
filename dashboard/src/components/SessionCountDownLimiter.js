@@ -6,21 +6,25 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/
 import PasswordInput from './PasswordInput';
 import validator from 'validator';
 import { useRecoilValue } from 'recoil';
-import { organisationState } from '../recoil/auth';
-import { setOrgEncryptionKey } from '../services/api';
+import { organisationState, sessionInitialDateTimestamp } from '../recoil/auth';
+import useApi, { setOrgEncryptionKey } from '../services/api';
 
 dayjs.extend(utc);
 dayjs.extend(duration);
 
-const maxSession = 3 * 3600;
-const warnBeforeEndOfSession = 60;
+const maxSession = 3 * 60 * 60; // 3 hours in s
+const warnBeforeEndOfSession = 60; // 1 minute in s
+
+const maxCookieAge = 60 * 60 * 13; // 13 hours in s, setup in /api/src/controllers/user.js
 
 const SessionCountDownLimiter = () => {
   const [reloadModalOpen, setReloadModalOpen] = useState(false);
+  const API = useApi();
 
   const sessionStart = useRef(Date.now());
   const [sessionSeconds, setSessionSeconds] = useState(Math.floor((Date.now() - sessionStart.current) / 1000));
   const stopwatchInterval = useRef(null);
+  const sessionInitialTimestamp = useRecoilValue(sessionInitialDateTimestamp);
 
   useEffect(() => {
     stopwatchInterval.current = setInterval(() => {
@@ -39,6 +43,13 @@ const SessionCountDownLimiter = () => {
   date.setSeconds(remainingSession);
   const timeString = date.toISOString().substring(11, 19);
 
+  const cookieSession = Math.floor((Date.now() - sessionInitialTimestamp) / 1000);
+  const remainingTimeBeforeDeconnection = maxCookieAge - cookieSession;
+
+  if (remainingTimeBeforeDeconnection < 1) {
+    API.logout();
+  }
+
   return (
     <>
       <span className={['tw-mt-4', remainingSession < warnBeforeEndOfSession ? 'tw-font-bold tw-text-red-500' : ''].join(' ')}>
@@ -52,6 +63,13 @@ const SessionCountDownLimiter = () => {
         ].join(' ')}>
         Verrouiller/Recharger
       </button>
+      {remainingTimeBeforeDeconnection <= 60 && (
+        <div className="tw-fixed tw-bottom-0 tw-left-0 tw-right-0 tw-z-50 tw-mt-4 tw-flex tw-justify-center tw-bg-white tw-p-10">
+          <p className="tw-mx-auto tw-mb-0 tw-text-xl tw-font-bold tw-text-red-500">
+            Vous allez être déconnecté dans {remainingTimeBeforeDeconnection} secondes
+          </p>
+        </div>
+      )}
       <ReloadModal
         open={reloadModalOpen}
         onSuccess={() => {
