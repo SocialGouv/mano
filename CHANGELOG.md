@@ -1,3 +1,10 @@
+## [1.208.5](https://github.com/SocialGouv/mano/compare/v1.208.4...v1.208.5) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** setup filters for checkbox ([eb43833](https://github.com/SocialGouv/mano/commit/eb43833318ee99b766fc9733e851c4877cbc8cdd))
+
 ## [1.208.4](https://github.com/SocialGouv/mano/compare/v1.208.3...v1.208.4) (2023-01-10)
 
 
