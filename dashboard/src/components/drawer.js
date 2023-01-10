@@ -18,8 +18,34 @@ const Drawer = () => {
   const onboardingForTeams = !teams.length;
   const role = user.role;
 
+  //   const Sidebar = styled.nav`
+  //   max-width: 210px;
+  //   flex-basis: 210px;
+  //   padding: 18px;
+  //   display: flex;
+  //   flex-direction: column;
+  //   justify-content: space-between;
+  //   overflow-y: auto;
+  //   border-right: 1px solid rgba(0, 0, 0, 0.1);
+
+  //   ${(p) =>
+  //     p.isOnboarding &&
+  //     `
+  //     li:not(#show-on-onboarding) {
+  //       opacity: 0.2;
+  //       pointer-events: none;
+  //     }
+  //   `}
+  // `;
   return (
-    <Sidebar className="noprint" isOnboarding={onboardingForEncryption || onboardingForTeams} title="Navigation principale">
+    <nav
+      className={[
+        'noprint tw-flex tw-max-w-max tw-shrink-0 tw-basis-52 tw-flex-col tw-justify-between tw-overflow-y-auto tw-border-r tw-border-black tw-border-opacity-10 tw-bg-white tw-p-4',
+        onboardingForEncryption || onboardingForTeams
+          ? '[&_li:not(#show-on-onboarding)]:tw-pointer-events-none [&_li:not(#show-on-onboarding)]:tw-opacity-20'
+          : '',
+      ].join(' ')}
+      title="Navigation principale">
       <Nav>
         {['admin', 'normal'].includes(role) && (
           <>
@@ -133,7 +159,7 @@ const Drawer = () => {
         <span>Version: {packageInfo.version}</span>
         <span>Accessibilité: partielle</span>
       </Footer>
-    </Sidebar>
+    </nav>
   );
 };
 
