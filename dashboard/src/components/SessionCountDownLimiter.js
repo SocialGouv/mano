@@ -16,15 +16,16 @@ const maxSession = 3 * 3600;
 const warnBeforeEndOfSession = 60;
 
 const SessionCountDownLimiter = () => {
-  const [sessionSeconds, setSessionSeconds] = useState(0);
   const [reloadModalOpen, setReloadModalOpen] = useState(false);
 
+  const sessionStart = useRef(Date.now());
+  const [sessionSeconds, setSessionSeconds] = useState(Math.floor((Date.now() - sessionStart.current) / 1000));
   const stopwatchInterval = useRef(null);
 
   useEffect(() => {
     stopwatchInterval.current = setInterval(() => {
       if (sessionSeconds < maxSession) {
-        setSessionSeconds(() => sessionSeconds + 1);
+        setSessionSeconds(() => Math.floor((Date.now() - sessionStart.current) / 1000));
       } else {
         setReloadModalOpen(true);
         clearInterval(stopwatchInterval.current);
@@ -54,6 +55,7 @@ const SessionCountDownLimiter = () => {
       <ReloadModal
         open={reloadModalOpen}
         onSuccess={() => {
+          sessionStart.current = Date.now();
           setSessionSeconds(0);
           setReloadModalOpen(false);
         }}
