@@ -1,4 +1,5 @@
 import { useRecoilState, useSetRecoilState } from 'recoil';
+import { prepareActionForEncryption } from '../recoil/actions';
 import { organisationState } from '../recoil/auth';
 import { usePreparePersonForEncryption } from '../recoil/persons';
 import { prepareReportForEncryption } from '../recoil/reports';
@@ -149,6 +150,27 @@ export default function useDataMigrator() {
         const response = await API.put({
           path: `/migration/update-outOfActiveListReason-and-healthInsurances-to-multi-choice`,
           body: { personsToUpdate: encryptedPersonsToMigrate },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
+      if (!organisation.migrations?.includes('action-with-multiple-team')) {
+        setLoadingText(LOADING_TEXT);
+        const res = await API.get({
+          path: '/action',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const actionsToUpdate = (res.decryptedData || []).map((a) => {
+          const { team, ...action } = a;
+          return { ...action, teams: action.teams?.length ? action.teams : [team] };
+        });
+        const encryptedActionsToMigrate = await Promise.all(actionsToUpdate.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+        const response = await API.put({
+          path: `/migration/action-with-multiple-team`,
+          body: { actionsToUpdate: encryptedActionsToMigrate },
           query: { migrationLastUpdateAt },
         });
         if (response.ok) {
