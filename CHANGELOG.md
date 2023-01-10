@@ -1,3 +1,10 @@
+## [1.208.6](https://github.com/SocialGouv/mano/compare/v1.208.5...v1.208.6) (2023-01-10)
+
+
+### Bug Fixes
+
+* debug dashboard getFilterValuesByField ([a386cb0](https://github.com/SocialGouv/mano/commit/a386cb004e723d22a3315a14f9c1d8dd3d7028b2))
+
 ## [1.208.5](https://github.com/SocialGouv/mano/compare/v1.208.4...v1.208.5) (2023-01-10)
 
 
