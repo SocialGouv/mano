@@ -16,6 +16,11 @@ export const filterData = (data, filters) => {
             if (itemValue === filter.value) return item;
             return null;
           }
+          if (['boolean'].includes(filter.type)) {
+            if (filter.value === 'Oui' && !!itemValue) return item;
+            if (filter.value === 'Non' && !itemValue) return item;
+            return null;
+          }
           if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
           if (typeof itemValue === 'boolean') {
             return itemValue === (filter.value === 'Oui') ? item : null;
@@ -67,7 +72,8 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   function getFilterValuesByField(field, base) {
     if (!field) return [];
     const current = base.find((filter) => filter.field === field);
-    if (current.type === 'yes-no') return ['Oui', 'Non', 'Non renseigné'];
+    if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
+    if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
     if (current?.field === 'outOfActiveList') return current.options;
     if (current?.options?.length) return [...current?.options, 'Non renseigné'];
     return ['Non renseigné'];
