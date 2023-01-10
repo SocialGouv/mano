@@ -12,12 +12,12 @@ const ReceptionStats = ({ passages, reportsServices, period, teamsId }) => {
   const organisation = useRecoilValue(organisationState);
   const [servicesFormDatabase, setServicesFormDatabase] = useState(null);
   const API = useApi();
-  const startDate = useMemo(() => dayjsInstance(period.startDate).format('YYYY-MM-DD'), [period.startDate]);
-  const endDate = useMemo(() => dayjsInstance(period.endDate).format('YYYY-MM-DD'), [period.endDate]);
+  const startDate = useMemo(() => (period.startDate ? dayjsInstance(period.startDate).format('YYYY-MM-DD') : null), [period.startDate]);
+  const endDate = useMemo(() => (period.endDate ? dayjsInstance(period.endDate).format('YYYY-MM-DD') : null), [period.endDate]);
 
   useEffect(
     function fetchServicesStats() {
-      API.get({ path: `/service/team/${teamsId.join(',')}/from/${startDate}/to/${endDate}` }).then((res) => {
+      API.get({ path: `/service/team/${teamsId.join(',')}/stats`, query: { from: startDate, to: endDate } }).then((res) => {
         if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
         setServicesFormDatabase(res.data.reduce((acc, service) => ({ ...acc, [service.service]: Number(service.count) }), {}));
       });
