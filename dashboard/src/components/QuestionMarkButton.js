@@ -1,27 +1,15 @@
 import React from 'react';
-import styled from 'styled-components';
-import { theme } from '../config';
 
-export default function QuestionMarkButton({ ...props }) {
-  return <QuestionMarkButtonDiv {...props}>?</QuestionMarkButtonDiv>;
+export default function QuestionMarkButton({ className = '', ...props }) {
+  return (
+    <button
+      type="button"
+      className={[
+        className,
+        'tw-ml-1 tw-inline-flex tw-h-5 tw-w-5 tw-items-center tw-justify-center tw-rounded-full tw-border tw-border-main tw-bg-white tw-text-xs tw-font-bold tw-text-main tw-shadow-none tw-transition-colors hover:tw-bg-main hover:tw-text-white',
+      ].join(' ')}
+      {...props}>
+      ?
+    </button>
+  );
 }
-
-const QuestionMarkButtonDiv = styled.button`
-  width: 20px;
-  height: 20px;
-  border-radius: 20px;
-  margin-left: 5px;
-  box-shadow: none;
-  border: 1px solid ${theme.main};
-  color: ${theme.main};
-  font-size: 12px;
-  font-weight: bold;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #fff;
-  &:hover {
-    background-color: ${theme.main};
-    color: #fff;
-  }
-`;

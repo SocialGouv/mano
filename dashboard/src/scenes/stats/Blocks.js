@@ -3,13 +3,13 @@ import { getDuration } from './utils';
 import { capture } from '../../services/sentry';
 import Card from '../../components/Card';
 
-export const Block = ({ data, title = 'Nombre de personnes suivies' }) => (
+export const Block = ({ data, title = 'Nombre de personnes suivies', help }) => (
   <div className="tw-px-4 tw-py-2 md:tw-basis-1/2 lg:tw-basis-1/3">
-    <Card title={title} count={Array.isArray(data) ? String(data.length) : data} />
+    <Card title={title} count={Array.isArray(data) ? String(data.length) : data} help={help} />
   </div>
 );
 
-export const BlockDateWithTime = ({ data, field }) => {
+export const BlockDateWithTime = ({ data, field, help }) => {
   if (!data.filter((item) => Boolean(item[field.name])).length) return null;
 
   const averageField =
@@ -18,7 +18,7 @@ export const BlockDateWithTime = ({ data, field }) => {
   const durationFromNowToAverage = Date.now() - averageField;
   const [count, unit] = getDuration(durationFromNowToAverage);
 
-  return <Card title={field.label + ' (moyenne)'} unit={unit} count={count} />;
+  return <Card title={field.label + ' (moyenne)'} unit={unit} count={count} help={help} />;
 };
 
 export const BlockTotal = ({ title, unit, data, field }) => {
