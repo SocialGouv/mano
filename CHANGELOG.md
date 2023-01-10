@@ -1,3 +1,10 @@
+## [1.208.4](https://github.com/SocialGouv/mano/compare/v1.208.3...v1.208.4) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** persons list assignedTeams filter ([#1171](https://github.com/SocialGouv/mano/issues/1171)) ([2c856bf](https://github.com/SocialGouv/mano/commit/2c856bfde6e94812340629c4705a0f5f9de0355f))
+
 ## [1.208.3](https://github.com/SocialGouv/mano/compare/v1.208.2...v1.208.3) (2023-01-10)
 
 
