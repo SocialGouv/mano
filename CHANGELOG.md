@@ -1,3 +1,10 @@
+## [1.208.1](https://github.com/SocialGouv/mano/compare/v1.208.0...v1.208.1) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** dueAt compulsory for consultation ([#1161](https://github.com/SocialGouv/mano/issues/1161)) ([c9b506d](https://github.com/SocialGouv/mano/commit/c9b506d4b4298d07116e535d8b328a3f46b64cc6))
+
 # [1.208.0](https://github.com/SocialGouv/mano/compare/v1.207.8...v1.208.0) (2023-01-10)
 
 
