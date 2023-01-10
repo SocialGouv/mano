@@ -1,3 +1,10 @@
+## [1.208.2](https://github.com/SocialGouv/mano/compare/v1.208.1...v1.208.2) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** can filter stats with outOfActiveListReasons ([121d41d](https://github.com/SocialGouv/mano/commit/121d41d0447ec43ea122f76ccda67ddde324b5fc))
+
 ## [1.208.1](https://github.com/SocialGouv/mano/compare/v1.208.0...v1.208.1) (2023-01-10)
 
 
