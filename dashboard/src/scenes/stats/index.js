@@ -142,7 +142,7 @@ const Stats = () => {
             const params = [{ referenceStartDay: period.startDate, referenceEndDay: period.endDate }, offsetHours];
             if (!item) return false;
             return (
-              getIsDayWithinHoursOffsetOfPeriod(item.createdAt, ...params) ||
+              getIsDayWithinHoursOffsetOfPeriod(item.followedSince, ...params) ||
               getIsDayWithinHoursOffsetOfPeriod(item.updatedAt, ...params) ||
               item.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
               item.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
