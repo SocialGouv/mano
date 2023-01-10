@@ -1,3 +1,10 @@
+# [1.208.0](https://github.com/SocialGouv/mano/compare/v1.207.8...v1.208.0) (2023-01-10)
+
+
+### Features
+
+* **api:** migrate all actions in database with multiple teams ([#1136](https://github.com/SocialGouv/mano/issues/1136)) ([841a5e4](https://github.com/SocialGouv/mano/commit/841a5e4cad804245156245b9879282be5fd46744))
+
 ## [1.207.8](https://github.com/SocialGouv/mano/compare/v1.207.7...v1.207.8) (2023-01-09)
 
 
