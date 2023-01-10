@@ -17,6 +17,8 @@ const STORAGE_DIRECTORY = process.env.STORAGE_DIRECTORY;
 const X_TIPIMAIL_APIUSER = process.env.X_TIPIMAIL_APIUSER || "";
 const X_TIPIMAIL_APIKEY = process.env.X_TIPIMAIL_APIKEY || "";
 
+const MINIMUM_DASHBOARD_VERSION = "1.0.0";
+
 module.exports = {
   PORT,
   ENVIRONMENT,
@@ -32,4 +34,5 @@ module.exports = {
   X_TIPIMAIL_APIUSER,
   X_TIPIMAIL_APIKEY,
   STORAGE_DIRECTORY,
+  MINIMUM_DASHBOARD_VERSION,
 };

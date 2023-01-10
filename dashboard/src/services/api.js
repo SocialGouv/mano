@@ -8,7 +8,7 @@ import { HOST, SCHEME } from '../config';
 import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
-import { apiVersionState } from '../recoil/apiVersion';
+import { apiVersionState, minimumDashboardVersionState } from '../recoil/version';
 const fetch = fetchRetry(window.fetch);
 
 const getUrl = (path, query = {}) => {
@@ -128,6 +128,7 @@ const useApi = () => {
   const organisation = useRecoilValue(organisationState);
   const setRecoilResetKey = useSetRecoilState(recoilResetKeyState);
   const setApiVersion = useSetRecoilState(apiVersionState);
+  const setMinimumDashboardVersion = useSetRecoilState(minimumDashboardVersionState);
   const history = useHistory();
 
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
@@ -245,6 +246,9 @@ const useApi = () => {
       const response = await fetch(url, options);
       if (response.headers.has('x-api-version')) {
         setApiVersion(response.headers.get('x-api-version'));
+      }
+      if (response.headers.has('x-minimum-dashboard-version')) {
+        setMinimumDashboardVersion(response.headers.get('x-minimum-dashboard-version'));
       }
 
       if (!response.ok && response.status === 401) {

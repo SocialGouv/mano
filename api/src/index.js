@@ -6,7 +6,7 @@ const helmet = require("helmet");
 const cookieParser = require("cookie-parser");
 const logger = require("morgan");
 
-const { PORT, VERSION } = require("./config");
+const { PORT, VERSION, MINIMUM_DASHBOARD_VERSION } = require("./config");
 const errors = require("./errors");
 
 const versionCheck = require("./middleware/versionCheck");
@@ -57,8 +57,9 @@ app.use(cookieParser());
 // Add header with API version to compare with client.
 app.use((_req, res, next) => {
   res.header("X-API-VERSION", VERSION);
+  res.header("X-MINIMUM-DASHBOARD-VERSION", MINIMUM_DASHBOARD_VERSION);
   // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
-  res.header("Access-Control-Expose-Headers", "X-API-VERSION");
+  res.header("Access-Control-Expose-Headers", "X-API-VERSION, X-MINIMUM-DASHBOARD-VERSION");
   next();
 });
 
