@@ -1,3 +1,10 @@
+## [1.208.7](https://github.com/SocialGouv/mano/compare/v1.208.6...v1.208.7) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** clean filters when field deleted ([#1174](https://github.com/SocialGouv/mano/issues/1174)) ([f6dcc8d](https://github.com/SocialGouv/mano/commit/f6dcc8de4346c48e3ff3aab0ece6e7b6cee8a14a))
+
 ## [1.208.6](https://github.com/SocialGouv/mano/compare/v1.208.5...v1.208.6) (2023-01-10)
 
 
