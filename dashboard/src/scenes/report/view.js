@@ -488,7 +488,6 @@ const View = () => {
                 inputId="report-select-teams"
                 classNamePrefix="report-select-teams"
                 onChange={(teamIds) => {
-                  console.log({ teamIds });
                   setSelectedTeamIds(teamIds);
                 }}
                 value={selectedTeamIds}
