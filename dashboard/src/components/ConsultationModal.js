@@ -51,7 +51,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
       return toast.error('Veuillez choisir un type de consultation');
     }
     if (!data.dueAt) {
-      return toast.error('Vous préciser une date prévue');
+      return toast.error('Vous devez préciser une date prévue');
     }
     if (!data.person) {
       return toast.error('Veuillez sélectionner une personne suivie');
