@@ -4,7 +4,6 @@ import { Col, Row, Input } from 'reactstrap';
 import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dayjsInstance, isOnSameDay } from '../services/date';
-import { capture } from '../services/sentry';
 
 export const filterData = (data, filters) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) {
@@ -70,19 +69,21 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   const onAddFilter = () => onChange([...filters, {}], saveInURLParams);
   const filterFields = base.filter((_filter) => _filter.field !== 'alertness').map((f) => ({ label: f.label, field: f.field, type: f.type }));
 
-  function getFilterValuesByField(field, base) {
-    try {
-      if (!field) return [];
-      const current = base.find((filter) => filter.field === field);
-      if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
-      if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
-      if (current?.field === 'outOfActiveList') return current.options;
-      if (current?.options?.length) return [...current?.options, 'Non renseigné'];
-      return ['Non renseigné'];
-    } catch (e) {
-      capture(e, { extra: { field, base } });
+  function getFilterValuesByField(field, base, index) {
+    if (!field) return [];
+    const current = base.find((filter) => filter.field === field);
+    if (!current) {
+      onChange(
+        filters.filter((_f, i) => i !== index),
+        saveInURLParams
+      );
+      return [];
     }
-    return [];
+    if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
+    if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
+    if (current?.field === 'outOfActiveList') return current.options;
+    if (current?.options?.length) return [...current?.options, 'Non renseigné'];
+    return ['Non renseigné'];
   }
 
   return (
@@ -102,7 +103,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
         </Row>
         {filters.map((filter, index) => {
           // filter: field, value, type
-          const filterValues = getFilterValuesByField(filter.field, base);
+          const filterValues = getFilterValuesByField(filter.field, base, index);
 
           const onChangeField = (newField) => {
             onChange(
@@ -168,7 +169,9 @@ const dateOptions = [
 const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
   const [dateComparator, setDateComparator] = React.useState(null);
   if (!field) return <></>;
-  const { type, field: name } = base.find((filter) => filter.field === field);
+  const current = base.find((filter) => filter.field === field);
+  if (!current) return <></>;
+  const { type, field: name } = current;
 
   if (['text', 'number', 'textarea'].includes(type)) {
     return (
