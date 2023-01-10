@@ -4,6 +4,7 @@ import { Col, Row, Input } from 'reactstrap';
 import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dayjsInstance, isOnSameDay } from '../services/date';
+import { capture } from '../services/sentry';
 
 export const filterData = (data, filters) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) {
@@ -70,13 +71,18 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   const filterFields = base.filter((_filter) => _filter.field !== 'alertness').map((f) => ({ label: f.label, field: f.field, type: f.type }));
 
   function getFilterValuesByField(field, base) {
-    if (!field) return [];
-    const current = base.find((filter) => filter.field === field);
-    if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
-    if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
-    if (current?.field === 'outOfActiveList') return current.options;
-    if (current?.options?.length) return [...current?.options, 'Non renseigné'];
-    return ['Non renseigné'];
+    try {
+      if (!field) return [];
+      const current = base.find((filter) => filter.field === field);
+      if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
+      if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
+      if (current?.field === 'outOfActiveList') return current.options;
+      if (current?.options?.length) return [...current?.options, 'Non renseigné'];
+      return ['Non renseigné'];
+    } catch (e) {
+      capture(e, { extra: { field, base } });
+    }
+    return [];
   }
 
   return (
