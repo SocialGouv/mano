@@ -3,7 +3,6 @@ import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { ButtonDropdown, DropdownToggle, DropdownMenu, DropdownItem } from 'reactstrap';
 import logo from '../assets/logo-green.png';
-import openNewWindow from '../assets/icons/open-in-new-window.svg';
 
 import SelectTeam from './SelectTeam';
 
@@ -18,6 +17,7 @@ import { useRecoilState, useRecoilValue } from 'recoil';
 import Notification from './Notification';
 import { toast } from 'react-toastify';
 import { useDataLoader } from './DataLoader';
+import OpenNewWindowIcon from './OpenNewWindowIcon';
 
 const TopBar = () => {
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -195,17 +195,6 @@ const Burger = styled.div`
     background-color: #fff;
     display: block;
   }
-`;
-
-const OpenNewWindowIcon = styled.div`
-  color: currentColor;
-  opacity: 0.4;
-  background-image: url(${openNewWindow});
-  background-size: contain;
-  display: inline-block;
-  width: 15px;
-  height: 15px;
-  margin-left: 15px;
 `;
 
 export default TopBar;

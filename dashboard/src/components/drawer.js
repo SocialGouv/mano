@@ -1,13 +1,9 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import styled from 'styled-components';
-import packageInfo from '../../package.json';
-import openNewWindow from '../assets/icons/open-in-new-window.svg';
-
-import { theme } from '../config';
-
-import { organisationState, teamsState, userState } from '../recoil/auth';
 import { useRecoilValue } from 'recoil';
+import packageInfo from '../../package.json';
+import { organisationState, teamsState, userState } from '../recoil/auth';
+import OpenNewWindowIcon from './OpenNewWindowIcon';
 
 const Drawer = () => {
   const user = useRecoilValue(userState);
@@ -18,35 +14,16 @@ const Drawer = () => {
   const onboardingForTeams = !teams.length;
   const role = user.role;
 
-  //   const Sidebar = styled.nav`
-  //   max-width: 210px;
-  //   flex-basis: 210px;
-  //   padding: 18px;
-  //   display: flex;
-  //   flex-direction: column;
-  //   justify-content: space-between;
-  //   overflow-y: auto;
-  //   border-right: 1px solid rgba(0, 0, 0, 0.1);
+  const isOnboarding = onboardingForEncryption || onboardingForTeams;
 
-  //   ${(p) =>
-  //     p.isOnboarding &&
-  //     `
-  //     li:not(#show-on-onboarding) {
-  //       opacity: 0.2;
-  //       pointer-events: none;
-  //     }
-  //   `}
-  // `;
   return (
     <nav
       className={[
         'noprint tw-flex tw-max-w-max tw-shrink-0 tw-basis-52 tw-flex-col tw-justify-between tw-overflow-y-auto tw-border-r tw-border-black tw-border-opacity-10 tw-bg-white tw-p-4',
-        onboardingForEncryption || onboardingForTeams
-          ? '[&_li:not(#show-on-onboarding)]:tw-pointer-events-none [&_li:not(#show-on-onboarding)]:tw-opacity-20'
-          : '',
+        isOnboarding ? '[&_li:not(#show-on-onboarding)]:tw-pointer-events-none [&_li:not(#show-on-onboarding)]:tw-opacity-20' : '',
       ].join(' ')}
       title="Navigation principale">
-      <Nav>
+      <div className="[&_li]:tw-list-none [&_a]:tw-my-0.5 [&_a]:tw-block [&_a]:tw-rounded-lg [&_a]:tw-py-0.5 [&_a]:tw-text-sm [&_a]:tw-font-semibold [&_a]:tw-text-black75 [&_a:active]:tw-text-main [&_a:hover]:tw-text-main">
         {['admin', 'normal'].includes(role) && (
           <>
             <li>
@@ -154,78 +131,13 @@ const Drawer = () => {
             Hep&nbsp;! Auriez-vous une minute à nous accorder pour améliorer Mano&nbsp;?
           </div>
         </a>
-      </Nav>
-      <Footer>
+      </div>
+      <p className="tw-mt-auto tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
         <span>Version: {packageInfo.version}</span>
         <span>Accessibilité: partielle</span>
-      </Footer>
+      </p>
     </nav>
   );
 };
 
-const Sidebar = styled.nav`
-  background-color: ${theme.white};
-  flex-shrink: 0;
-  max-width: 210px;
-  flex-basis: 210px;
-  padding: 18px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow-y: auto;
-  border-right: 1px solid rgba(0, 0, 0, 0.1);
-
-  ${(p) =>
-    p.isOnboarding &&
-    `
-    li:not(#show-on-onboarding) {
-      opacity: 0.2;
-      pointer-events: none;
-    }
-  `}
-`;
-
-const Nav = styled.div`
-  a {
-    text-decoration: none;
-    padding: 0px;
-    display: block;
-    border-radius: 8px;
-    color: ${theme.black75};
-    font-style: normal;
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 24px;
-    margin: 2px 0;
-  }
-  a.active,
-  a:hover {
-    background-color: ${theme.mainLight};
-    color: ${theme.main};
-  }
-  a:hover {
-    opacity: 0.6;
-  }
-  li {
-    list-style-type: none;
-  }
-`;
-const Footer = styled.p`
-  margin-top: auto;
-  font-size: 0.65rem;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  color: ${theme.main};
-`;
-
-const OpenNewWindowIcon = styled.div`
-  color: currentColor;
-  background-image: url(${openNewWindow});
-  background-size: contain;
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-left: 0.25rem;
-`;
 export default Drawer;
