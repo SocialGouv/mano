@@ -1,3 +1,10 @@
+## [1.208.3](https://github.com/SocialGouv/mano/compare/v1.208.2...v1.208.3) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** use person followedSince instread of createdAt for filtering ([aac443d](https://github.com/SocialGouv/mano/commit/aac443d3465ee4965e52eb5d555e0cfe2f49d663))
+
 ## [1.208.2](https://github.com/SocialGouv/mano/compare/v1.208.1...v1.208.2) (2023-01-10)
 
 
