@@ -92,6 +92,53 @@ router.get(
   })
 );
 
+router.put(
+  "/:_id",
+  passport.authenticate("user", { session: false }),
+  validateUser(["admin", "normal"]),
+  validateEncryptionAndMigrations,
+  catchErrors(async (req, res, next) => {
+    try {
+      z.object({
+        params: z.object({
+          _id: z.string().regex(looseUuidRegex),
+        }),
+        body: z.object({
+          encrypted: z.string(),
+          encryptedEntityKey: z.string(),
+        }),
+      }).parse(req);
+    } catch (e) {
+      const error = new Error(`Invalid request in relPersonPlace put: ${e}`);
+      error.status = 400;
+      return next(error);
+    }
+    const query = { where: { _id: req.params._id, organisation: req.user.organisation } };
+    const relPersonPlace = await RelPersonPlace.findOne(query);
+    if (!relPersonPlace) return res.status(404).send({ ok: false, error: "Not found" });
+
+    const { encrypted, encryptedEntityKey } = req.body;
+    relPersonPlace.set({
+      encrypted: encrypted,
+      encryptedEntityKey: encryptedEntityKey,
+    });
+    await relPersonPlace.save();
+
+    return res.status(200).send({
+      ok: true,
+      data: {
+        _id: relPersonPlace._id,
+        encrypted: relPersonPlace.encrypted,
+        encryptedEntityKey: relPersonPlace.encryptedEntityKey,
+        organisation: relPersonPlace.organisation,
+        createdAt: relPersonPlace.createdAt,
+        updatedAt: relPersonPlace.updatedAt,
+        deletedAt: relPersonPlace.deletedAt,
+      },
+    });
+  })
+);
+
 router.delete(
   "/:_id",
   passport.authenticate("user", { session: false }),

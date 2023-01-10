@@ -110,7 +110,7 @@ const ImportData = () => {
         if (Object.keys(person).length) {
           person.description = `Données importées le ${formatDateWithFullMonth(now())}\n${person.description || ''}`;
           if (!person.name) {
-            toast.error(`La colonne "${nameField.label}" ne doit pas être vide`, `Vérifiez la ligne ${i} du fichier.`, { timeOut: 5000 });
+            toast.error(`La colonne "${nameField.label}" ne doit pas être vide, vérifiez la ligne ${i} du fichier.`);
             setReloadKey((k) => k + 1);
             return;
           }

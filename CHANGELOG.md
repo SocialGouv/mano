@@ -1,3 +1,197 @@
+## [1.207.8](https://github.com/SocialGouv/mano/compare/v1.207.7...v1.207.8) (2023-01-09)
+
+
+### Bug Fixes
+
+* remove buggy pattern from input type number ([c2be3ec](https://github.com/SocialGouv/mano/commit/c2be3ecb61da5f5bfa6d26e681403a2149751e54))
+
+## [1.207.7](https://github.com/SocialGouv/mano/compare/v1.207.6...v1.207.7) (2023-01-09)
+
+
+### Bug Fixes
+
+* **dashboard:** allow 0 in input type=number ([#1159](https://github.com/SocialGouv/mano/issues/1159)) ([91d5c0b](https://github.com/SocialGouv/mano/commit/91d5c0bef99bda1c87d0f63d8a3328447bad9fd8))
+
+## [1.207.6](https://github.com/SocialGouv/mano/compare/v1.207.5...v1.207.6) (2023-01-09)
+
+
+### Bug Fixes
+
+* custom field display type for printonly medical file fields ([d9f0711](https://github.com/SocialGouv/mano/commit/d9f0711c5681f2e4e61d705f930f14aa47987540))
+
+## [1.207.5](https://github.com/SocialGouv/mano/compare/v1.207.4...v1.207.5) (2023-01-09)
+
+
+### Bug Fixes
+
+* CustomFieldDisplay for person ([#1145](https://github.com/SocialGouv/mano/issues/1145)) ([109ead1](https://github.com/SocialGouv/mano/commit/109ead18e4def35260220f7526e7e59ce32eb6b2))
+
+## [1.207.4](https://github.com/SocialGouv/mano/compare/v1.207.3...v1.207.4) (2023-01-09)
+
+
+### Bug Fixes
+
+* scrollbar on modal ([#1155](https://github.com/SocialGouv/mano/issues/1155)) ([6dc0ef9](https://github.com/SocialGouv/mano/commit/6dc0ef949506a07dabb97c37d2fc3ef6990972a2))
+
+## [1.207.3](https://github.com/SocialGouv/mano/compare/v1.207.2...v1.207.3) (2023-01-06)
+
+
+### Bug Fixes
+
+* prepare null item for search ([99ed457](https://github.com/SocialGouv/mano/commit/99ed457941388c6ec8669be86bcd90320c728642))
+
+## [1.207.2](https://github.com/SocialGouv/mano/compare/v1.207.1...v1.207.2) (2023-01-06)
+
+
+### Bug Fixes
+
+* **dashboard:** allow filter by no category ([#1160](https://github.com/SocialGouv/mano/issues/1160)) ([d1d2189](https://github.com/SocialGouv/mano/commit/d1d21895e4743583b45dc0cfb4c142cf6a5ee287))
+
+## [1.207.1](https://github.com/SocialGouv/mano/compare/v1.207.0...v1.207.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* **dashboard:** update action teams bug ([#1163](https://github.com/SocialGouv/mano/issues/1163)) ([4d10748](https://github.com/SocialGouv/mano/commit/4d107486c8f63dfc1dc3afd709e83519f098138d))
+
+# [1.207.0](https://github.com/SocialGouv/mano/compare/v1.206.0...v1.207.0) (2023-01-06)
+
+
+### Bug Fixes
+
+* patch app version ([96e1f79](https://github.com/SocialGouv/mano/commit/96e1f794d89c8d4b4e691f648b5451df4d2af7e3))
+
+
+### Features
+
+* **dashboard:** create action for multiple team (retrocompatible) ([#1127](https://github.com/SocialGouv/mano/issues/1127)) ([79429b1](https://github.com/SocialGouv/mano/commit/79429b1c5100110171f5b094a85793b1caf5a64b))
+
+# [1.206.0](https://github.com/SocialGouv/mano/compare/v1.205.2...v1.206.0) (2023-01-06)
+
+
+### Features
+
+* **app:** create action for multiple team (retrocompatible) ([#1134](https://github.com/SocialGouv/mano/issues/1134)) ([d66708d](https://github.com/SocialGouv/mano/commit/d66708dec8cc7cdefc203041cd4f9acdbda412d2))
+
+## [1.205.2](https://github.com/SocialGouv/mano/compare/v1.205.1...v1.205.2) (2023-01-06)
+
+
+### Bug Fixes
+
+* **app:** save only one place per person in app ([#1158](https://github.com/SocialGouv/mano/issues/1158)) ([3be2c30](https://github.com/SocialGouv/mano/commit/3be2c308866996043b4a6987aa5daeb29e8a2411))
+
+## [1.205.1](https://github.com/SocialGouv/mano/compare/v1.205.0...v1.205.1) (2023-01-06)
+
+
+### Bug Fixes
+
+* **api:** add unique constraint to avoid duplicate reports ([#1133](https://github.com/SocialGouv/mano/issues/1133)) ([7f31275](https://github.com/SocialGouv/mano/commit/7f31275dfa0a4e7616fe968f911f2d8489c82b9b))
+
+# [1.205.0](https://github.com/SocialGouv/mano/compare/v1.204.1...v1.205.0) (2023-01-05)
+
+
+### Features
+
+* update places in dashboard to be more usable ([#1107](https://github.com/SocialGouv/mano/issues/1107)) ([b64a20f](https://github.com/SocialGouv/mano/commit/b64a20f761f669330380fce85e5103c54a019970))
+
+## [1.204.1](https://github.com/SocialGouv/mano/compare/v1.204.0...v1.204.1) (2023-01-05)
+
+
+### Bug Fixes
+
+* print medical file ([#1146](https://github.com/SocialGouv/mano/issues/1146)) ([078e34d](https://github.com/SocialGouv/mano/commit/078e34dfaab081ff7cc1dd5cf6372e6d26079c57))
+
+# [1.204.0](https://github.com/SocialGouv/mano/compare/v1.203.3...v1.204.0) (2023-01-04)
+
+
+### Features
+
+* Change MergeTwoPersons font ([#1151](https://github.com/SocialGouv/mano/issues/1151)) ([86bb8cf](https://github.com/SocialGouv/mano/commit/86bb8cf949f8f3c07c21bc6ef2ffee3c24aa642a))
+
+## [1.203.3](https://github.com/SocialGouv/mano/compare/v1.203.2...v1.203.3) (2023-01-04)
+
+
+### Bug Fixes
+
+* new error for excel import ([c42e61c](https://github.com/SocialGouv/mano/commit/c42e61c6aa55a48efc81b9e99146001acafb052b))
+
+## [1.203.2](https://github.com/SocialGouv/mano/compare/v1.203.1...v1.203.2) (2023-01-04)
+
+
+### Bug Fixes
+
+* encryption of groups ! ([#1152](https://github.com/SocialGouv/mano/issues/1152)) ([08fe91f](https://github.com/SocialGouv/mano/commit/08fe91f8b5269d2fe51fd61a2f246bc4fa070529))
+
+## [1.203.1](https://github.com/SocialGouv/mano/compare/v1.203.0...v1.203.1) (2023-01-03)
+
+
+### Bug Fixes
+
+* **api:** handle file not found ([#1144](https://github.com/SocialGouv/mano/issues/1144)) ([ddde297](https://github.com/SocialGouv/mano/commit/ddde29759b3bda2fd95a2b8fdb2beb7c3076361e))
+
+# [1.203.0](https://github.com/SocialGouv/mano/compare/v1.202.4...v1.203.0) (2023-01-03)
+
+
+### Features
+
+* **dashboard:** download from stats ([#1139](https://github.com/SocialGouv/mano/issues/1139)) ([448bf23](https://github.com/SocialGouv/mano/commit/448bf2326e23099c67c98170c9fffa9011fa4180))
+
+## [1.202.4](https://github.com/SocialGouv/mano/compare/v1.202.3...v1.202.4) (2023-01-02)
+
+
+### Bug Fixes
+
+* **dashboard:** categories withMostUsed ([3ba6493](https://github.com/SocialGouv/mano/commit/3ba6493299e073f55a787cd073760b1c82c3c19f))
+
+## [1.202.3](https://github.com/SocialGouv/mano/compare/v1.202.2...v1.202.3) (2022-12-30)
+
+
+### Bug Fixes
+
+* filters did not work for personnes suivies after split medical file in stats ([#1142](https://github.com/SocialGouv/mano/issues/1142)) ([696b291](https://github.com/SocialGouv/mano/commit/696b291d092a423f9955a32a1aaa8ef9cb4eaa88))
+
+## [1.202.2](https://github.com/SocialGouv/mano/compare/v1.202.1...v1.202.2) (2022-12-30)
+
+
+### Bug Fixes
+
+* **dashboard:** error when downloading or deleting a document on a new consultation ([80b21d7](https://github.com/SocialGouv/mano/commit/80b21d71bd1670835205565cf0887fa10d3a8c70))
+
+## [1.202.1](https://github.com/SocialGouv/mano/compare/v1.202.0...v1.202.1) (2022-12-27)
+
+
+### Bug Fixes
+
+* **dashboard:** teams and team for stats ([#1137](https://github.com/SocialGouv/mano/issues/1137)) ([ccff5df](https://github.com/SocialGouv/mano/commit/ccff5df0ccb299816aaf5f25a56e14c6484694e3))
+
+# [1.202.0](https://github.com/SocialGouv/mano/compare/v1.201.2...v1.202.0) (2022-12-27)
+
+
+### Features
+
+* **dashboard:** link to form improve mano ([#1135](https://github.com/SocialGouv/mano/issues/1135)) ([3dbc2e0](https://github.com/SocialGouv/mano/commit/3dbc2e03e233f5de678ca28d47b5ee3ef2c3cfde))
+
+## [1.201.2](https://github.com/SocialGouv/mano/compare/v1.201.1...v1.201.2) (2022-12-27)
+
+
+### Bug Fixes
+
+* **dashboard:** permanent field bug when changing list (visibility) ([#1131](https://github.com/SocialGouv/mano/issues/1131)) ([f4e32e2](https://github.com/SocialGouv/mano/commit/f4e32e2cb6f8223c140738fe23cb35a77420303a))
+
+## [1.201.1](https://github.com/SocialGouv/mano/compare/v1.201.0...v1.201.1) (2022-12-26)
+
+
+### Bug Fixes
+
+* **dashboard:** fix stats display ([e183e78](https://github.com/SocialGouv/mano/commit/e183e7801ebde64f793ce0c27eed4e00681439d1))
+
+# [1.201.0](https://github.com/SocialGouv/mano/compare/v1.200.5...v1.201.0) (2022-12-26)
+
+
+### Features
+
+* **app:** release 2.29.1 ([#1132](https://github.com/SocialGouv/mano/issues/1132)) ([89f85c9](https://github.com/SocialGouv/mano/commit/89f85c98ff14b692f8eeb1ec8ed8a9f879d5870c))
+
 ## [1.200.5](https://github.com/SocialGouv/mano/compare/v1.200.4...v1.200.5) (2022-12-26)
 
 

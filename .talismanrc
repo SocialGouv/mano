@@ -5,6 +5,8 @@ fileignoreconfig:
   checksum: c4ed271af1f3323221d4e3466338fc90431f8806d1be727ae5718668c3b40134
 - filename: app/yarn.lock
   checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
+- filename: dashboard/src/components/drawer.js
+  checksum: fb4bb430f0756b68a9be72fc54e29bfbcd8a22a5a87661fd9cc033f4632dd254
 - filename: dashboard/yarn.lock
   checksum: 322b61343eb3804fad4090ba0c31f95b0f1e396cbc26f46246e0cffb41530c2e
 - filename: yarn.lock

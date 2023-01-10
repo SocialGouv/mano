@@ -99,8 +99,8 @@ test("test", async ({ page }) => {
     await page.getByRole("button", { name: "Mettre à jour" }).nth(1).click();
     await page.getByText("Mise à jour effectuée !").click();
 
-    await expect(page.getByText("Colonne vertébrale merde je me suis trompé")).toBeVisible();
-    await expect(page.getByText("Jambe")).toBeVisible();
+    await expect(page.getByText("Colonne vertébrale merde je me suis trompé").nth(1)).toBeVisible();
+    await expect(page.getByText("Jambe").nth(1)).toBeVisible();
 
     await page.getByRole("button", { name: "🩺 Ajouter une consultation" }).click();
     await clickOnEmptyReactSelect(page, "consultation-modal-type", "Médicale");
@@ -257,7 +257,7 @@ test("test", async ({ page }) => {
     await expect(page.getByText("Relai chez moi")).toBeVisible();
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
-    await expect(page.getByText("Colonne vertébrale seulement")).toBeVisible();
+    await expect(page.getByText("Colonne vertébrale seulement").nth(1)).toBeVisible();
 
     await page.getByText("Consultation Médicale").click();
     await expect(page.locator(".person-custom-select-poils-au-nez__single-value")).toHaveText("Un peu");

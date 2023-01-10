@@ -140,7 +140,7 @@ const personFields = [
     options: ["Oui", "Non"],
     filterable: true,
   },
-  { name: "outOfActiveListDate", type: "date", label: "", encrypted: true, importable: false, filterable: false },
+  { name: "outOfActiveListDate", type: "date", label: "Date de sortie de file active", encrypted: true, importable: false, filterable: false },
   { name: "documents", type: "files", label: "Documents", encrypted: true, importable: false, filterable: false },
   { name: "history", type: "history", label: "Historique", encrypted: true, importable: false, filterable: false },
 ];

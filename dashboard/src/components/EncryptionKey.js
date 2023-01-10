@@ -26,6 +26,7 @@ import { consultationsState, prepareConsultationForEncryption } from '../recoil/
 import { prepareTreatmentForEncryption, treatmentsState } from '../recoil/treatments';
 import { customFieldsMedicalFileSelector, medicalFileState, prepareMedicalFileForEncryption } from '../recoil/medicalFiles';
 import { useDataLoader } from './DataLoader';
+import { groupsState, prepareGroupForEncryption } from '../recoil/groups';
 
 const EncryptionKey = ({ isMain }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
@@ -44,6 +45,7 @@ const EncryptionKey = ({ isMain }) => {
   const user = useRecoilValue(userState);
 
   const persons = useRecoilValue(personsState);
+  const groups = useRecoilValue(groupsState);
   const actions = useRecoilValue(actionsState);
   const consultations = useRecoilValue(consultationsState);
   const treatments = useRecoilValue(treatmentsState);
@@ -71,6 +73,7 @@ const EncryptionKey = ({ isMain }) => {
 
   const totalToEncrypt =
     persons.length +
+    groups.length +
     actions.length +
     consultations.length +
     treatments.length +
@@ -99,6 +102,7 @@ const EncryptionKey = ({ isMain }) => {
       setEncryptingStatus('Chiffrement des données...');
       const encryptedVerificationKey = await encryptVerificationKey(hashedOrgEncryptionKey);
       const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+      const encryptedGroups = await Promise.all(groups.map(prepareGroupForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
 
       const encryptedActions = await Promise.all(actions.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
       const encryptedConsultations = await Promise.all(
@@ -133,6 +137,7 @@ const EncryptionKey = ({ isMain }) => {
         path: '/encrypt',
         body: {
           persons: encryptedPersons,
+          groups: encryptedGroups,
           actions: encryptedActions,
           consultations: encryptedConsultations,
           treatments: encryptedTreatments,

@@ -9,7 +9,7 @@ export const isFreeFieldAddressDetail = (addressDetail, addressDetailsFields) =>
 };
 
 const computeValue = (value, editable, addressDetailsFields) => {
-  if (!value.length) return addressDetails[0];
+  if (!value.length) return addressDetailsFields[0];
   if (!editable) return value;
   if (addressDetailsFields.includes(value)) return value;
   return 'Autre';

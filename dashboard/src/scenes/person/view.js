@@ -1,7 +1,7 @@
 import { useLocation, useParams } from 'react-router-dom';
 import { Alert } from 'reactstrap';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import Places from '../../components/Places';
+import Places from './Places';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
 import useApi from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
@@ -47,7 +47,7 @@ export default function View() {
         <div>
           <BackButton />
         </div>
-        <div className="tw-flex tw-flex-1">
+        <div className="noprint tw-flex tw-flex-1">
           {!['restricted-access'].includes(user.role) && (
             <ul className="nav nav-tabs tw-m-auto">
               <li role="presentation" className="nav-item">
@@ -68,7 +68,7 @@ export default function View() {
                 <button
                   onClick={() => setCurrentTab('Lieux fréquentés')}
                   className={currentTab === 'Lieux fréquentés' ? 'active nav-link' : 'btn-link nav-link'}>
-                  Lieux fréquentés
+                  Lieux fréquentés ({person.relsPersonPlace?.length || 0})
                 </button>
               </li>
               <li role="presentation" className="nav-item">
@@ -88,7 +88,7 @@ export default function View() {
             </ul>
           )}
         </div>
-        <div>
+        <div className="noprint">
           <UserName
             id={person.user}
             wrapper={() => 'Créée par '}
@@ -127,7 +127,7 @@ export default function View() {
         {!['restricted-access'].includes(user.role) && (
           <>
             {currentTab === 'Dossier Médical' && user.healthcareProfessional && <MedicalFile person={person} />}
-            {currentTab === 'Lieux fréquentés' && <Places personId={person?._id} />}
+            {currentTab === 'Lieux fréquentés' && <Places person={person} />}
             {currentTab === 'Historique' && <History person={person} />}
             {currentTab === 'Liens familiaux' && <PersonFamily person={person} />}
           </>

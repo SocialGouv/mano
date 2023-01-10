@@ -98,6 +98,7 @@ const Documents = ({
               return (
                 <>
                   <ButtonCustom
+                    type="button"
                     color="primary"
                     title="Télécharger"
                     style={{ margin: '0 auto' }}
@@ -123,6 +124,7 @@ const Documents = ({
                   />
                   {!!canDelete && (
                     <ButtonCustom
+                      type="button"
                       color="danger"
                       title="Supprimer"
                       style={{ margin: '0.5rem auto 0' }}

@@ -17,7 +17,7 @@ import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
 
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
@@ -43,7 +43,6 @@ const actionByIdSelector = selectorFamily({
 
 const ActionView = () => {
   const { actionId } = useParams();
-  const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);
@@ -126,6 +125,7 @@ const ActionView = () => {
         initialValues={action}
         enableReinitialize
         onSubmit={async (body) => {
+          body.teams = Array.isArray(body.teams) ? body.teams : [body.team];
           if (!body.teams?.length) return toast.error('Une action doit être associée à au moins une équipe.');
           const statusChanged = body.status && action.status !== body.status;
           if (statusChanged) {
@@ -195,6 +195,7 @@ const ActionView = () => {
                       id="categories"
                       label="Catégories"
                       onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                      withMostUsed
                     />
                   </FormGroup>
                   <FormGroup>
@@ -250,7 +251,7 @@ const ActionView = () => {
                     </div>
                   </FormGroup>
                   <FormGroup>
-                    <Label htmlFor="team">Sous l'équipe</Label>
+                    <Label htmlFor="team">Équipe(s) en charge</Label>
                     <SelectTeamMultiple
                       onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
                       value={Array.isArray(values.teams) ? values.teams : [values.team]}

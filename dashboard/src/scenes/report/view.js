@@ -1035,10 +1035,10 @@ const ActionCompletedAt = ({ date, status, actions, setSortOrder, setSortBy, sor
               render: (action) => <ActionStatus status={action.status} />,
             },
             {
-              title: 'Équipe en charge',
+              title: 'Équipe(s) en charge',
               dataKey: 'team',
               render: (a) => (
-                <div className="px-2 tw-flex-shrink-0">
+                <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
                   {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
                 </div>
               ),
@@ -1137,9 +1137,13 @@ const ActionCreatedAt = ({ date, actions, setSortOrder, setSortBy, sortBy, sortO
               render: (action) => <ActionStatus status={action.status} />,
             },
             {
-              title: 'Équipe en charge',
+              title: 'Équipe(s) en charge',
               dataKey: 'team',
-              render: (a) => (Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />),
+              render: (a) => (
+                <div className="px-2 tw-flex tw-flex-shrink-0 tw-flex-col tw-gap-px">
+                  {Array.isArray(a?.teams) ? a.teams.map((e) => <TagTeam key={e} teamId={e} />) : <TagTeam teamId={a?.team} />}
+                </div>
+              ),
             },
           ]}
         />

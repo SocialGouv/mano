@@ -75,7 +75,7 @@ const NewActionForm = ({ route, navigation }) => {
         body: prepareActionForEncryption({
           name,
           person: person._id,
-          team: currentTeam._id,
+          teams: [currentTeam._id],
           dueAt,
           withTime,
           urgent,

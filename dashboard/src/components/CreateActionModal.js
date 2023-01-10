@@ -159,6 +159,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                         id="categories"
                         label="Catégories"
                         onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
+                        withMostUsed
                       />
                     </FormGroup>
                     <FormGroup>
@@ -215,7 +216,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                       </div>
                     </FormGroup>
                     <FormGroup>
-                      <Label htmlFor="team">Sous l'équipe</Label>
+                      <Label htmlFor="team">Équipe(s) en charge</Label>
                       <SelectTeamMultiple
                         onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
                         value={Array.isArray(values.teams) ? values.teams : [values.team]}

@@ -19,7 +19,7 @@ export default function Summary({ person }) {
         <div className="tw-col-span-3">
           <InfosMain person={person} />
         </div>
-        <div className="tw-relative tw-col-span-5 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
+        <div className="tw-col-span-5 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">
           <Actions person={person} />
         </div>
         <div className="tw-col-span-4 tw-h-0 tw-min-h-full tw-overflow-auto tw-rounded-lg tw-border tw-border-zinc-200 tw-shadow">

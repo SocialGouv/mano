@@ -4,6 +4,7 @@ import { customFieldsPersonsSocialSelector } from '../../../recoil/persons';
 import { currentTeamState } from '../../../recoil/auth';
 import { useMemo, useState } from 'react';
 import EditModal from './EditModal';
+import CustomFieldDisplay from '../../../components/CustomFieldDisplay';
 
 export default function InfosSociales({ person }) {
   const [editModal, setEditModal] = useState(false);
@@ -52,14 +53,14 @@ export default function InfosSociales({ person }) {
           <InfoSocialeLine label="Emploi" value={person.employment} />
         </Col>
         <Col md={4}>
-          <InfoSocialeLine label="Resources" value={(person.resources || []).join(', ')} />
+          <InfoSocialeLine label="Resources" value={person.resources || []} type="multi-choice" />
         </Col>
         <Col md={4}>
-          <InfoSocialeLine label="Motif de la situation en rue" value={(person.reasons || []).join(', ')} />
+          <InfoSocialeLine label="Motif de la situation en rue" value={person.reasons || []} type="multi-choice" />
         </Col>
         {customFields.map((field, i) => (
           <Col key={field.label + i} md={4}>
-            <InfoSocialeLine label={field.label} value={person[field.name]} />
+            <InfoSocialeLine type={field.type} label={field.label} value={person[field.name]} />
           </Col>
         ))}
       </Row>
@@ -67,22 +68,12 @@ export default function InfosSociales({ person }) {
   );
 }
 
-function InfoSocialeLine({ label, value }) {
+function InfoSocialeLine({ label, value, type = 'text' }) {
   return (
     <div className="my-2">
       <div className="tw-text-sm tw-font-semibold tw-text-gray-600">{label}</div>
       <div>
-        {Array.isArray(value) ? (
-          <ul className="tw-list-disc">
-            {value.map((v) => (
-              <li key={v}>
-                <span className="tw-overflow-ellipsis tw-break-words">{v || '-'}</span>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="tw-overflow-ellipsis tw-break-words">{value || '-'}</p>
-        )}
+        <CustomFieldDisplay type={type} value={value} />
       </div>
     </div>
   );

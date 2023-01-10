@@ -13,6 +13,7 @@ const isObject = (variable) => typeof variable === 'object' && variable !== null
 
 const prepareItemForSearch = (item) => {
   if (typeof item === 'string') return item;
+  if (!item) return '';
   const itemClean = {};
   for (let key of Object.keys(item)) {
     if (excludeFields.has(key)) continue;

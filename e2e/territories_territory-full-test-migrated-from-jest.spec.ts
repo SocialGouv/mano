@@ -50,7 +50,6 @@ test("test territories", async ({ page }) => {
   await page.getByRole("button", { name: "Ajouter un champ" }).click();
   await page.getByLabel("Nom").click();
   await page.getByLabel("Nom").fill("Mon nouveau champ de territoire");
-  await page.getByText("Voir dans les statistiques").click();
   await page.getByRole("button", { name: "Enregistrer" }).click();
   await page.getByText("Mise à jour !").click();
   await page.getByRole("link", { name: "Territoires" }).click();
@@ -68,8 +67,8 @@ test("test territories", async ({ page }) => {
   // Stats
   await page.getByRole("link", { name: "Statistiques" }).click();
   await expect(page).toHaveURL("http://localhost:8090/stats");
-  await page.locator('a:has-text("Observations")').click();
-  await page.getByText("Nombre d'observation de territoire").click();
+  await page.locator('button:has-text("Observations")').click();
+  await page.getByText("Nombre d'observations de territoire").click();
   await expect(page.locator("data-test-id=number-observations-2")).toBeVisible();
 
   // Disconnect/reconnect
