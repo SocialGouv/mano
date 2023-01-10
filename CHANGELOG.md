@@ -1,3 +1,10 @@
+# [1.209.0](https://github.com/SocialGouv/mano/compare/v1.208.7...v1.209.0) (2023-01-10)
+
+
+### Features
+
+* **dashboard:** minimum version message ([#1175](https://github.com/SocialGouv/mano/issues/1175)) ([307fc0d](https://github.com/SocialGouv/mano/commit/307fc0d9ccc8bd9a888c87fcd6167479b4bc9a25))
+
 ## [1.208.7](https://github.com/SocialGouv/mano/compare/v1.208.6...v1.208.7) (2023-01-10)
 
 
