@@ -1,3 +1,10 @@
+## [1.211.2](https://github.com/SocialGouv/mano/compare/v1.211.1...v1.211.2) (2023-01-11)
+
+
+### Bug Fixes
+
+* **dashboard:** field label changed for onlyOptionsEditable ([f4a34f7](https://github.com/SocialGouv/mano/commit/f4a34f739f5f7c4d6179884a0d44209b523e37ab))
+
 ## [1.211.1](https://github.com/SocialGouv/mano/compare/v1.211.0...v1.211.1) (2023-01-11)
 
 
