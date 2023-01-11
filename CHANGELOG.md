@@ -1,3 +1,10 @@
+# [1.211.0](https://github.com/SocialGouv/mano/compare/v1.210.0...v1.211.0) (2023-01-11)
+
+
+### Features
+
+* right button position create territory ([#1178](https://github.com/SocialGouv/mano/issues/1178)) ([0abb52e](https://github.com/SocialGouv/mano/commit/0abb52e9d1a1df2e413f8dbd192965e8764edfbc))
+
 # [1.210.0](https://github.com/SocialGouv/mano/compare/v1.209.3...v1.210.0) (2023-01-11)
 
 
