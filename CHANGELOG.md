@@ -1,3 +1,10 @@
+## [1.209.2](https://github.com/SocialGouv/mano/compare/v1.209.1...v1.209.2) (2023-01-11)
+
+
+### Bug Fixes
+
+* can filter by outOfActiveListDate ([abc1d8b](https://github.com/SocialGouv/mano/commit/abc1d8bd82146a116d2b09221ed0afd10869f376))
+
 ## [1.209.1](https://github.com/SocialGouv/mano/compare/v1.209.0...v1.209.1) (2023-01-11)
 
 
