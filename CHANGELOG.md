@@ -1,3 +1,10 @@
+# [1.213.0](https://github.com/SocialGouv/mano/compare/v1.212.0...v1.213.0) (2023-01-11)
+
+
+### Features
+
+* **dashboard:** right button position create user ([#1180](https://github.com/SocialGouv/mano/issues/1180)) ([6e2cdc0](https://github.com/SocialGouv/mano/commit/6e2cdc02eb4f02fcdc32266834a709c79681ff23))
+
 # [1.212.0](https://github.com/SocialGouv/mano/compare/v1.211.2...v1.212.0) (2023-01-11)
 
 
