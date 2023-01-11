@@ -89,11 +89,11 @@ const CreatePerson = ({ refreshable }) => {
                 </Row>
                 <br />
                 <div className="tw-mt-4 tw-flex tw-justify-end">
-                <ButtonCustom
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  disabled={!!isSubmitting || !values.name?.trim()?.length}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
+                  <ButtonCustom
+                    onClick={() => !isSubmitting && handleSubmit()}
+                    disabled={!!isSubmitting || !values.name?.trim()?.length}
+                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                  />
                 </div>
               </React.Fragment>
             )}
