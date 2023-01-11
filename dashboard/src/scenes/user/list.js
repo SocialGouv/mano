@@ -245,8 +245,8 @@ const Create = ({ onChange }) => {
                   </Col>
                 </Row>
                 <br />
-                <Row>
-                  <Col md={6}>
+                <Row >
+                  <Col className="tw-mt-4 tw-flex tw-justify-end">
                     <ButtonCustom title="Sauvegarder" loading={isSubmitting} onClick={handleSubmit} />
                   </Col>
                 </Row>
