@@ -1,3 +1,10 @@
+## [1.211.1](https://github.com/SocialGouv/mano/compare/v1.211.0...v1.211.1) (2023-01-11)
+
+
+### Bug Fixes
+
+* prevent save duplicated reports in cache ([#1176](https://github.com/SocialGouv/mano/issues/1176)) ([6b41ef6](https://github.com/SocialGouv/mano/commit/6b41ef6086bd1ca44b8431475162d3a8af48eaef))
+
 # [1.211.0](https://github.com/SocialGouv/mano/compare/v1.210.0...v1.211.0) (2023-01-11)
 
 
