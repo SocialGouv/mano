@@ -1,3 +1,10 @@
+# [1.212.0](https://github.com/SocialGouv/mano/compare/v1.211.2...v1.212.0) (2023-01-11)
+
+
+### Features
+
+* **dashboard:** uncheck urgent stuff easily ([#1162](https://github.com/SocialGouv/mano/issues/1162)) ([a78ee6f](https://github.com/SocialGouv/mano/commit/a78ee6fa4baf15e18b213c81b57ffd921e54d798))
+
 ## [1.211.2](https://github.com/SocialGouv/mano/compare/v1.211.1...v1.211.2) (2023-01-11)
 
 
