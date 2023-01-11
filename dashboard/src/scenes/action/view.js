@@ -1,5 +1,4 @@
 import React from 'react';
-import { FormGroup, Input, Label } from 'reactstrap';
 import { useParams, useHistory } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Formik } from 'formik';
@@ -13,7 +12,6 @@ import Loading from '../../components/loading';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import Comments from '../../components/Comments';
-import styled from 'styled-components';
 import UserName from '../../components/UserName';
 import SelectStatus from '../../components/SelectStatus';
 
@@ -117,10 +115,10 @@ const ActionView = () => {
   return (
     <>
       <SmallHeaderWithBackButton refreshButton />
-      <Title>
+      <h2 className="tw-mb-5 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">
         {`${action?.name}`}
-        <UserName id={action.user} wrapper={(name) => ` (créée par ${name})`} />
-      </Title>
+        <UserName className="tw-block tw-text-base tw-font-normal tw-italic" id={action.user} wrapper={(name) => ` (créée par ${name})`} />
+      </h2>
       <Formik
         initialValues={action}
         enableReinitialize
@@ -182,14 +180,20 @@ const ActionView = () => {
             <>
               <div className="tw-flex tw-flex-row">
                 <div className="tw-flex tw-flex-[2] tw-basis-2/3 tw-flex-col">
-                  <FormGroup>
-                    <Label htmlFor="name">Nom</Label>
-                    <Input name="name" id="name" type="textarea" value={values.name} onChange={handleChange} />
-                  </FormGroup>
-                  <FormGroup>
+                  <div className="tw-mb-4">
+                    <label htmlFor="name">Nom</label>
+                    <textarea
+                      className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
+                      name="name"
+                      id="name"
+                      value={values.name}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <div className="tw-mb-4">
                     <SelectPerson value={values.person} onChange={handleChange} />
-                  </FormGroup>
-                  <FormGroup>
+                  </div>
+                  <div className="tw-mb-4">
                     <ActionsCategorySelect
                       values={values.categories}
                       id="categories"
@@ -197,14 +201,20 @@ const ActionView = () => {
                       onChange={(v) => handleChange({ currentTarget: { value: v, name: 'categories' } })}
                       withMostUsed
                     />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label htmlFor="description">Description</Label>
-                    <Input type="textarea" name="description" id="description" value={values.description} onChange={handleChange} />
-                  </FormGroup>
+                  </div>
+                  <div className="tw-mb-4">
+                    <label htmlFor="description">Description</label>
+                    <textarea
+                      className="tw-block tw-w-full tw-rounded tw-border tw-border-gray-300 tw-py-1.5 tw-px-3 tw-text-base tw-transition-all"
+                      name="description"
+                      id="description"
+                      value={values.description}
+                      onChange={handleChange}
+                    />
+                  </div>
                   {!!canToggleGroupCheck && (
-                    <FormGroup>
-                      <Label htmlFor="create-action-for-group">
+                    <div className="tw-mb-4">
+                      <label htmlFor="create-action-for-group">
                         <input
                           type="checkbox"
                           className="tw-mr-2"
@@ -215,16 +225,16 @@ const ActionView = () => {
                         />
                         Action familiale <br />
                         <small className="text-muted">Cette action sera à effectuer pour toute la famille</small>
-                      </Label>
-                    </FormGroup>
+                      </label>
+                    </div>
                   )}
                 </div>
                 <div className="tw-flex tw-shrink-0 tw-flex-col tw-px-4">
                   <hr className="tw-m-0 tw-w-px tw-shrink-0 tw-basis-full tw-border tw-bg-gray-300" />
                 </div>
                 <div className="tw-flex tw-flex-[1] tw-basis-1/3 tw-flex-col">
-                  <FormGroup>
-                    <Label htmlFor="dueAt">À faire le</Label>
+                  <div className="tw-mb-4">
+                    <label htmlFor="dueAt">À faire le</label>
                     <div>
                       <DatePicker
                         id="dueAt"
@@ -249,9 +259,9 @@ const ActionView = () => {
                       />
                       <label htmlFor="withTime">Montrer l'heure</label>
                     </div>
-                  </FormGroup>
-                  <FormGroup>
-                    <Label htmlFor="team">Équipe(s) en charge</Label>
+                  </div>
+                  <div className="tw-mb-4">
+                    <label htmlFor="team">Équipe(s) en charge</label>
                     <SelectTeamMultiple
                       onChange={(teamIds) => handleChange({ target: { value: teamIds, name: 'teams' } })}
                       value={Array.isArray(values.teams) ? values.teams : [values.team]}
@@ -259,9 +269,9 @@ const ActionView = () => {
                       inputId="team"
                       classNamePrefix="team"
                     />
-                  </FormGroup>
-                  <FormGroup>
-                    <Label htmlFor="create-action-urgent">
+                  </div>
+                  <div className="tw-mb-4">
+                    <label htmlFor="create-action-urgent">
                       <input
                         type="checkbox"
                         id="create-action-urgent"
@@ -274,10 +284,10 @@ const ActionView = () => {
                       />
                       Action prioritaire <br />
                       <small className="text-muted">Cette action sera mise en avant par rapport aux autres</small>
-                    </Label>
-                  </FormGroup>
-                  <FormGroup>
-                    <Label htmlFor="update-action-select-status">Statut</Label>
+                    </label>
+                  </div>
+                  <div className="tw-mb-4">
+                    <label htmlFor="update-action-select-status">Statut</label>
                     <SelectStatus
                       name="status"
                       value={values.status || ''}
@@ -285,11 +295,11 @@ const ActionView = () => {
                       inputId="update-action-select-status"
                       classNamePrefix="update-action-select-status"
                     />
-                  </FormGroup>
+                  </div>
                   {[DONE, CANCEL].includes(values.status) && (
-                    <FormGroup>
-                      {values.status === DONE && <Label htmlFor="completedAt">Faite le</Label>}
-                      {values.status === CANCEL && <Label htmlFor="completedAt">Annulée le</Label>}
+                    <div className="tw-mb-4">
+                      {values.status === DONE && <label htmlFor="completedAt">Faite le</label>}
+                      {values.status === CANCEL && <label htmlFor="completedAt">Annulée le</label>}
                       <div>
                         <DatePicker
                           id="completedAt"
@@ -302,7 +312,7 @@ const ActionView = () => {
                           showTimeInput
                         />
                       </div>
-                    </FormGroup>
+                    </div>
                   )}
                 </div>
               </div>
@@ -323,19 +333,5 @@ const ActionView = () => {
     </>
   );
 };
-
-const Title = styled.h2`
-  font-size: 20px;
-  font-weight: 800;
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 20px;
-  span {
-    font-size: 16px;
-    font-weight: 400;
-    font-style: italic;
-    display: block;
-  }
-`;
 
 export default ActionView;
