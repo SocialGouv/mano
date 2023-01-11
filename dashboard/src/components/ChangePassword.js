@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { FormGroup, Input, Label } from 'reactstrap';
+import { FormGroup, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 
@@ -92,7 +92,6 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
               <FormGroup>
                 <Label htmlFor="password">Mot de passe</Label>
                 <PasswordInput
-                  InputComponent={Input}
                   value={values.password}
                   name="password"
                   id="password"
@@ -105,7 +104,6 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
             <FormGroup>
               <Label htmlFor="newPassword">Nouveau mot de passe</Label>
               <PasswordInput
-                InputComponent={Input}
                 name="newPassword"
                 id="newPassword"
                 value={values.newPassword}
@@ -127,7 +125,6 @@ const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
             <FormGroup>
               <Label htmlFor="verifyPassword">Confirmez le nouveau mot de passe</Label>
               <PasswordInput
-                InputComponent={Input}
                 value={values.verifyPassword}
                 name="verifyPassword"
                 id="verifyPassword"

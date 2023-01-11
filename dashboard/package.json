@@ -58,7 +58,7 @@
     "prettier-plugin-tailwindcss": "^0.2.0",
     "react-scripts": "5.0.1",
     "stream": "npm:stream-browserify",
-    "tailwindcss": "^3.2.1"
+    "tailwindcss": "^3.2.4"
   },
   "scripts": {
     "dev": "react-scripts start -FAST_REFRESH=true",

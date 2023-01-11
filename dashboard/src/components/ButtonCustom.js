@@ -19,7 +19,7 @@ const ButtonCustom = ({
 }) => {
   return (
     <ButtonWrapper
-      className={['noprint', className].join(' ')}
+      className={[className, 'noprint'].join(' ')}
       onClick={onClick}
       color={color}
       style={style}
