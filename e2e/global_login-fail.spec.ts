@@ -35,11 +35,15 @@ test("Try to login and fail", async ({ page }) => {
   await page.getByText("Réinitialiser le mot de passe").click();
 
   await page.getByRole("button", { name: "Envoyez un lien" }).click();
-  await page.getByText("Invalid email address").click();
+  await page.getByText("Adresse email invalide").click();
 
   await page.getByLabel("Email").click();
   await page.getByLabel("Email").fill("test@example.org");
 
   await page.getByRole("button", { name: "Envoyez un lien" }).click();
-  await page.getByRole("alert").getByText("Envoyé").click();
+  await expect(
+    page.getByText(
+      "Si l'adresse de courriel que vous avez saisie correspond effectivement à un compte utilisateur(rice) MANO, alors un lien pour réinitialiser le mot de passe de ce compte a été envoyé à l'instant à cette adresse."
+    )
+  ).toBeVisible();
 });
