@@ -1,3 +1,10 @@
+## [1.209.3](https://github.com/SocialGouv/mano/compare/v1.209.2...v1.209.3) (2023-01-11)
+
+
+### Bug Fixes
+
+* **dashboard:** navigate with tabs in dashboard search ([#1167](https://github.com/SocialGouv/mano/issues/1167)) ([2286c30](https://github.com/SocialGouv/mano/commit/2286c301617a658b355aa70d77cd0df9c3f9c1ef))
+
 ## [1.209.2](https://github.com/SocialGouv/mano/compare/v1.209.1...v1.209.2) (2023-01-11)
 
 
