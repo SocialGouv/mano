@@ -21,16 +21,16 @@ export const filterData = (data, filters) => {
             if (filter.value === 'Non' && !itemValue) return item;
             return null;
           }
-          if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
-          if (typeof itemValue === 'boolean') {
-            return itemValue === (filter.value === 'Oui') ? item : null;
-          }
-
           if (['date-with-time', 'date'].includes(filter.type)) {
             const { date, dateComparator } = filter.value;
+            if (dateComparator === 'unfilled') return !itemValue || [null, undefined].includes(itemValue) ? item : null;
             if (dateComparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
             if (dateComparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
             if (dateComparator === 'equals') return isOnSameDay(itemValue, date) ? item : null;
+          }
+          if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
+          if (typeof itemValue === 'boolean') {
+            return itemValue === (filter.value === 'Oui') ? item : null;
           }
 
           if (typeof itemValue === 'string') {
@@ -164,6 +164,10 @@ const dateOptions = [
     label: 'Date exacte',
     value: 'equals',
   },
+  {
+    label: 'Non renseigné',
+    value: 'unfilled',
+  },
 ];
 
 const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
@@ -190,7 +194,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
   if (['date-with-time', 'date'].includes(type)) {
     return (
       <Row>
-        <Col sm={6}>
+        <Col sm={value?.dateComparator !== 'unfilled' ? 6 : 12}>
           <SelectCustom
             options={dateOptions}
             value={dateOptions.find((opt) => opt.value === value?.dateComparator)}
@@ -202,16 +206,18 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
             }}
           />
         </Col>
-        <Col sm={6}>
-          <DatePicker
-            locale="fr"
-            dateFormat="dd/MM/yyyy"
-            className="form-control"
-            name={name}
-            selected={value?.date ? new Date(value?.date) : null}
-            onChange={(date) => onChangeValue({ date, dateComparator })}
-          />
-        </Col>
+        {value?.dateComparator !== 'unfilled' && (
+          <Col sm={6}>
+            <DatePicker
+              locale="fr"
+              dateFormat="dd/MM/yyyy"
+              className="form-control"
+              name={name}
+              selected={value?.date ? new Date(value?.date) : null}
+              onChange={(date) => onChangeValue({ date, dateComparator })}
+            />
+          </Col>
+        )}
       </Row>
     );
   }
