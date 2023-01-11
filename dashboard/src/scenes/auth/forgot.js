@@ -1,12 +1,7 @@
 import React, { useState } from 'react';
-import { FormGroup } from 'reactstrap';
-import { Formik, Field } from 'formik';
-import classnames from 'classnames';
 import validator from 'validator';
 import { toast } from 'react-toastify';
-import styled from 'styled-components';
-
-import { theme } from '../../config';
+import packageInfo from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import useApi from '../../services/api';
 
@@ -14,138 +9,89 @@ const View = () => {
   const [done, setDone] = useState(false);
   const API = useApi();
 
-  const validateEmail = (value) => {
-    if (!validator.isEmail(value)) {
-      return 'Invalid email address';
+  const [resetForm, setResetForm] = useState({
+    email: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showErrors, setShowErrors] = useState(false);
+  const [resetFormErrors, setResetFormErrors] = useState({
+    email: '',
+  });
+
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      const emailError = !validator.isEmail(resetForm.email) ? 'Adresse email invalide' : '';
+      if (emailError) {
+        setShowErrors(true);
+        setResetFormErrors({ email: emailError });
+        return;
+      }
+      setIsSubmitting(true);
+      const response = await API.post({
+        path: '/user/forgot_password',
+        body: resetForm,
+      });
+      setIsSubmitting(false);
+      if (response.ok) setDone(true);
+    } catch (errorPasswordReset) {
+      toast.error(errorPasswordReset);
     }
+  };
+
+  const handleChange = (e) => {
+    setShowErrors(false);
+    setResetForm((form) => ({ ...form, [e.target.name]: e.target.value }));
   };
 
   if (done) {
     return (
-      <AuthWrapper>
-        <Title>Réinitialiser le mot de passe</Title>
-        <HowReset>
-          Si l'adresse de courriel que vous avez saisie correspond effectivement à un compte utilisateur.rice MANO, alors un lien pour réinitialiser
+      <div className="tw-mx-10 tw-my-20 tw-w-full tw-max-w-lg tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-px-7 tw-pt-10 tw-pb-2 tw-text-black tw-shadow-[0_0_20px_0_rgba(0,0,0,0.2)]">
+        <h1 className="tw-mb-6 tw-text-center tw-text-3xl tw-font-bold">Réinitialiser le mot de passe</h1>
+        <p className="tw-mb-8 tw-px-8 tw-text-center  tw-text-base tw-text-black50">
+          Si l'adresse de courriel que vous avez saisie correspond effectivement à un compte utilisateur(rice) MANO, alors un lien pour réinitialiser
           le mot de passe de ce compte a été envoyé à l'instant à cette adresse.
-        </HowReset>
-      </AuthWrapper>
+        </p>
+        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs">Version: {packageInfo.version}</p>
+      </div>
     );
   }
 
   return (
-    <AuthWrapper>
-      <Title>Réinitialiser le mot de passe</Title>
-      <HowReset>Entrez votre email ci-dessous pour recevoir le lien de réinitialisation du mot de passe.</HowReset>
-      <Formik
-        initialValues={{ email: '' }}
-        onSubmit={async (body, actions) => {
-          try {
-            const response = await API.post({
-              path: '/user/forgot_password',
-              body,
-            });
-            actions.setSubmitting(false);
-            if (response.ok) toast.success('Envoyé');
-            setDone(true);
-          } catch (errorPasswordReset) {
-            toast.error(errorPasswordReset);
-          }
-        }}>
-        {({ values, errors, isSubmitting, handleChange, handleSubmit }) => {
-          return (
-            <form onSubmit={handleSubmit}>
-              <StyledFormGroup>
-                <div>
-                  <InputField
-                    validate={validateEmail}
-                    className={classnames({ 'has-error': errors.email })}
-                    name="email"
-                    type="email"
-                    id="email"
-                    value={values.email}
-                    onChange={handleChange}
-                  />
-                  <label htmlFor="email">Email</label>
-                </div>
-                <p style={{ fontSize: 12, color: 'rgb(253, 49, 49)' }}>{errors.email}</p>
-              </StyledFormGroup>
-              <Submit type="submit" color="success" loading={isSubmitting} title="Envoyez un lien" />
-            </form>
-          );
-        }}
-      </Formik>
-    </AuthWrapper>
+    <div className="tw-mx-10 tw-my-20 tw-w-full tw-max-w-lg tw-overflow-y-auto tw-overflow-x-hidden tw-rounded-lg tw-bg-white tw-px-7 tw-pt-10 tw-pb-2 tw-text-black tw-shadow-[0_0_20px_0_rgba(0,0,0,0.2)]">
+      <h1 className="tw-mb-6 tw-text-center tw-text-3xl tw-font-bold">Réinitialiser le mot de passe</h1>
+      <p className="tw-mb-8 tw-px-8 tw-text-center  tw-text-base tw-text-black50">
+        Entrez votre email ci-dessous pour recevoir le lien de réinitialisation du mot de passe.
+      </p>
+      <form onSubmit={handleSubmit} method="POST">
+        <div className="tw-mb-6">
+          <div className="tw-flex tw-flex-col-reverse">
+            <input
+              name="email"
+              type="email"
+              id="email"
+              className="tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-black tw-outline-main tw-transition-all"
+              autoComplete="email"
+              placeholder="Cliquez ici pour entrer votre email"
+              value={resetForm.email}
+              onChange={handleChange}
+            />
+            <label htmlFor="email">Email </label>
+          </div>
+          {!!showErrors && <p className="tw-text-xs tw-text-red-500">{resetFormErrors.email}</p>}
+        </div>
+        <ButtonCustom
+          loading={isSubmitting}
+          type="submit"
+          color="primary"
+          title="Envoyez un lien"
+          onClick={handleSubmit}
+          className="tw-m-auto !tw-mt-8 !tw-w-56 tw-font-[Helvetica] !tw-text-base tw-font-medium"
+        />
+        <p className="tw-mx-auto tw-mt-5 tw-mb-0 tw-block tw-text-center tw-text-xs">Version: {packageInfo.version}</p>
+      </form>
+    </div>
   );
 };
-
-const AuthWrapper = styled.div`
-  max-width: 500px;
-  width: calc(100% - 40px);
-  padding: 40px 30px 30px;
-  border-radius: 0.5em;
-  background-color: #fff;
-  font-family: Nista, Helvetica;
-  color: #252b2f;
-  margin: 5em auto;
-  overflow: hidden;
-  -webkit-box-shadow: 0 0 1.25rem 0 rgba(0, 0, 0, 0.2);
-  box-shadow: 0 0 1.25rem 0 rgba(0, 0, 0, 0.2);
-`;
-
-const Title = styled.div`
-  font-family: Helvetica;
-  text-align: center;
-  font-size: 32px;
-  font-weight: 600;
-  margin-bottom: 15px;
-`;
-
-const HowReset = styled.div`
-  font-size: 16px;
-  text-align: center;
-  margin-bottom: 30px;
-  padding: 0 30px;
-  color: #555;
-`;
-
-const Submit = styled(ButtonCustom)`
-  font-family: Helvetica;
-  width: 220px;
-  border-radius: 30px;
-  margin: auto;
-  font-size: 16px;
-  padding: 8px;
-  min-height: 42px;
-`;
-
-const InputField = styled(Field)`
-  background-color: transparent;
-  outline: 0;
-  display: block;
-  width: 100%;
-  padding: 0.625rem;
-  margin-bottom: 0.375rem;
-  border-radius: 4px;
-  border: 1px solid #a7b0b7;
-  color: #252b2f;
-  -webkit-transition: border 0.2s ease;
-  transition: border 0.2s ease;
-  line-height: 1.2;
-  &:focus {
-    outline: none;
-    border: 1px solid ${theme.main}CC;
-    & + label {
-      color: ${theme.main}CC;
-    }
-  }
-`;
-
-const StyledFormGroup = styled(FormGroup)`
-  margin-bottom: 25px;
-  div {
-    display: flex;
-    flex-direction: column-reverse;
-  }
-`;
 
 export default View;

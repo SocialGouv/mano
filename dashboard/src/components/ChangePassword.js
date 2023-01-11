@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
-import { FormGroup, Label } from 'reactstrap';
-import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 
 import ButtonCustom from './ButtonCustom';
@@ -54,98 +51,112 @@ const codesToHints = {
   NO_SPECIAL: 'au moins un caractère spécial',
 };
 
-const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword }) => {
+const ChangePassword = ({ onSubmit, onFinished, withCurrentPassword, centerButton }) => {
   const [showPassword, setShowPassword] = useState(false);
+  const [changePasswordForm, setChangePasswordForm] = useState({
+    password: '',
+    newPassword: '',
+    verifyPassword: '',
+  });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleChange = (e) => {
+    setChangePasswordForm({ ...changePasswordForm, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    try {
+      e.preventDefault();
+      if (checkErrorPassword(changePasswordForm.newPassword.trim())) {
+        return toast.error(codesToErrors[checkErrorPassword(changePasswordForm.newPassword)]);
+      }
+      if (changePasswordForm.newPassword.trim() !== changePasswordForm.verifyPassword.trim()) {
+        return toast.error('Les mots de passe ne sont pas identiques !');
+      }
+      onFinished({
+        body: {
+          newPassword: changePasswordForm.newPassword.trim(),
+          verifyPassword: changePasswordForm.verifyPassword.trim(),
+          password: changePasswordForm.password.trim(),
+        },
+      });
+      const res = await onSubmit(changePasswordForm);
+      setIsSubmitting(false);
+      if (res.ok) {
+        toast.success('Mot de passe mis à jour!');
+        onFinished(true);
+      }
+    } catch (errorUpdatePassword) {
+      console.log('error in updating password', errorUpdatePassword);
+      toast.error(errorUpdatePassword);
+    }
+  };
+
   return (
-    <Formik
-      initialValues={{ password: '', newPassword: '', verifyPassword: '' }}
-      onSubmit={async (body, actions) => {
-        try {
-          if (checkErrorPassword(body.newPassword.trim())) {
-            return toast.error(codesToErrors[checkErrorPassword(body.newPassword)]);
-          }
-          if (body.newPassword.trim() !== body.verifyPassword.trim()) {
-            return toast.error('Les mots de passe ne sont pas identiques !');
-          }
-          onFinished({
-            body: {
-              newPassword: body.newPassword.trim(),
-              verifyPassword: body.verifyPassword.trim(),
-              password: body.password.trim(),
-            },
-          });
-          const res = await onSubmit(body);
-          actions.setSubmitting(false);
-          if (res.ok) {
-            toast.success('Mot de passe mis à jour!');
-            onFinished(true);
-          }
-        } catch (errorUpdatePassword) {
-          console.log('error in updating password', errorUpdatePassword);
-          toast.error(errorUpdatePassword);
-        }
-      }}>
-      {({ values, isSubmitting, handleChange, handleSubmit }) => {
-        return (
-          <div autoComplete="off">
-            {!!withCurrentPassword && (
-              <FormGroup>
-                <Label htmlFor="password">Mot de passe</Label>
-                <PasswordInput
-                  value={values.password}
-                  name="password"
-                  id="password"
-                  onChange={handleChange}
-                  showPassword={showPassword}
-                  setShowPassword={setShowPassword}
-                />
-              </FormGroup>
-            )}
-            <FormGroup>
-              <Label htmlFor="newPassword">Nouveau mot de passe</Label>
-              <PasswordInput
-                name="newPassword"
-                id="newPassword"
-                value={values.newPassword}
-                onChange={handleChange}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-              />
-              {Object.keys(codesToHints).map((check, index, array) => {
-                let caption = codesToHints[check];
-                if (index === 0) caption = caption?.capitalize();
-                if (index !== array.length - 1) caption = `${caption}, `;
-                return (
-                  <PasswordHint key={caption} disabled={!checks[check](values.newPassword)}>
-                    {caption}
-                  </PasswordHint>
-                );
-              })}
-            </FormGroup>
-            <FormGroup>
-              <Label htmlFor="verifyPassword">Confirmez le nouveau mot de passe</Label>
-              <PasswordInput
-                value={values.verifyPassword}
-                name="verifyPassword"
-                id="verifyPassword"
-                onChange={handleChange}
-                showPassword={showPassword}
-                setShowPassword={setShowPassword}
-              />
-            </FormGroup>
-            <ButtonCustom title="Mettre à jour" type="submit" disabled={isSubmitting} onClick={handleSubmit} />
+    <form method="POST" onSubmit={handleSubmit}>
+      <div autoComplete="off">
+        {!!withCurrentPassword && (
+          <div className="tw-mb-4">
+            <label htmlFor="password">Mot de passe</label>
+            <PasswordInput
+              value={changePasswordForm.password}
+              className="tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-black tw-outline-main tw-transition-all"
+              name="password"
+              id="password"
+              onChange={handleChange}
+              showPassword={showPassword}
+              setShowPassword={setShowPassword}
+            />
           </div>
-        );
-      }}
-    </Formik>
+        )}
+        <div className="tw-mb-4">
+          <label htmlFor="newPassword">Nouveau mot de passe</label>
+          <PasswordInput
+            name="newPassword"
+            id="newPassword"
+            className="tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-black tw-outline-main tw-transition-all"
+            value={changePasswordForm.newPassword}
+            onChange={handleChange}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+          />
+          {Object.keys(codesToHints).map((check, index, array) => {
+            let caption = codesToHints[check];
+            if (index === 0) caption = caption?.capitalize();
+            if (index !== array.length - 1) caption = `${caption}, `;
+            return (
+              <span
+                className={['tw-self-center tw-text-center tw-text-xs', !checks[check](changePasswordForm.newPassword) ? 'tw-opacity-30' : ''].join(
+                  ' '
+                )}
+                key={caption}>
+                {caption}
+              </span>
+            );
+          })}
+        </div>
+        <div className="tw-mb-4">
+          <label htmlFor="verifyPassword">Confirmez le nouveau mot de passe</label>
+          <PasswordInput
+            value={changePasswordForm.verifyPassword}
+            className="tw-mb-1.5 tw-block tw-w-full tw-rounded tw-border tw-border-main75 tw-bg-transparent tw-p-2.5 tw-text-black tw-outline-main tw-transition-all"
+            name="verifyPassword"
+            id="verifyPassword"
+            onChange={handleChange}
+            showPassword={showPassword}
+            setShowPassword={setShowPassword}
+          />
+        </div>
+        <ButtonCustom
+          title="Mettre à jour"
+          type="submit"
+          disabled={isSubmitting}
+          onClick={handleSubmit}
+          className={['tw-mt-10', centerButton ? 'tw-mx-auto' : 'tw-ml-auto'].join(' ')}
+        />
+      </div>
+    </form>
   );
 };
-
-const PasswordHint = styled.span`
-  font-size: 11px;
-  align-self: center;
-  text-align: center;
-  ${(props) => props.disabled && 'opacity: 0.3;'}
-`;
 
 export default ChangePassword;
