@@ -56,6 +56,89 @@ label.tailwindui {
   outline: auto !important;
 }
 
+/* table selego */
+
+table.table-selego {
+  width: 100%;
+  padding: 16px;
+  background: #fff;
+  -fs-table-paginate: paginate;
+
+  thead {
+    display: table-header-group;
+  }
+
+  thead tr {
+    height: 2.5rem;
+  }
+
+  tbody {
+    box-shadow: 0 4px 8px rgba(29, 32, 33, 0.05);
+  }
+
+  tr {
+    height: 3.5rem;
+  }
+
+  tbody > tr:nth-child(odd) {
+    background-color: #f7f9fa;
+  }
+
+  tbody > tr:hover {
+    background-color: #b9b9b9;
+  }
+
+  thead td {
+    color: #008e7f;
+    text-align: left;
+    padding: 0.5rem 0.5rem;
+  }
+
+  thead td,
+  thead td * {
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+  }
+
+  thead .title {
+    caption-side: top;
+    font-weight: bold;
+    font-size: 24px;
+    line-height: 32px;
+    padding: 20px 0 10px 0;
+    width: 100%;
+    color: #1d2021;
+    text-transform: none;
+  }
+
+  tbody td {
+    padding: 0.25rem 0.5rem;
+    font-size: 14px;
+  }
+  td {
+    &.small {
+      min-width: 50px;
+    }
+    /* if not this class, there is a bug ! try it */
+    &.not-small {
+      min-width: 100px;
+    }
+    &:not(:last-of-type) {
+      border-right: 1px solid #dddddd55;
+    }
+  }
+
+  tbody > tr:last-child {
+    td:first-child {
+      border-bottom-left-radius: 10px;
+    }
+    td:last-child {
+      border-bottom-right-radius: 10px;
+    }
+  }
+}
+
 /* reset */
 
 * {
