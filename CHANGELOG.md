@@ -1,3 +1,10 @@
+# [1.210.0](https://github.com/SocialGouv/mano/compare/v1.209.3...v1.210.0) (2023-01-11)
+
+
+### Features
+
+* right button position CreatePerson ([#1168](https://github.com/SocialGouv/mano/issues/1168)) ([f18659e](https://github.com/SocialGouv/mano/commit/f18659e803efafb7200127b3142cb123851cdd4b))
+
 ## [1.209.3](https://github.com/SocialGouv/mano/compare/v1.209.2...v1.209.3) (2023-01-11)
 
 
