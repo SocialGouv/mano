@@ -1,3 +1,10 @@
+## [1.209.1](https://github.com/SocialGouv/mano/compare/v1.209.0...v1.209.1) (2023-01-11)
+
+
+### Bug Fixes
+
+* force data refresh dashboard ([3b58dc9](https://github.com/SocialGouv/mano/commit/3b58dc987fe76e1dd9e0224b39e42ef0a69ee3f7))
+
 # [1.209.0](https://github.com/SocialGouv/mano/compare/v1.208.7...v1.209.0) (2023-01-10)
 
 
