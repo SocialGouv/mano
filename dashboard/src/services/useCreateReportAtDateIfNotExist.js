@@ -33,7 +33,7 @@ const useCreateReportAtDateIfNotExist = () => {
       },
     });
     if (!res.ok) return;
-    setReports((reports) => [res.decryptedData, ...reports]);
+    setReports((reports) => [res.decryptedData, ...reports.filter((_report) => _report._id !== res.decryptedData._id)]);
     return res.decryptedData;
   };
 };
