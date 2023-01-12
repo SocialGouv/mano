@@ -1,3 +1,10 @@
+# [1.215.0](https://github.com/SocialGouv/mano/compare/v1.214.4...v1.215.0) (2023-01-12)
+
+
+### Features
+
+* **dashboard:** delete user in export stat ([#1184](https://github.com/SocialGouv/mano/issues/1184)) ([f90118a](https://github.com/SocialGouv/mano/commit/f90118a4f9465565ce5037190665c2ae1cfc5aac))
+
 ## [1.214.4](https://github.com/SocialGouv/mano/compare/v1.214.3...v1.214.4) (2023-01-12)
 
 
