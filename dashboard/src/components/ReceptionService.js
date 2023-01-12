@@ -24,7 +24,7 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
         }, {});
         const mergedServices = Object.fromEntries(
           // We need a sum of all keys from legacy and database services.
-          organisation.services.map((key) => [key, (servicesFromLegacyReport[key] || 0) + (servicesFromDatabase[key] || 0)])
+          (organisation.services || []).map((key) => [key, (servicesFromLegacyReport[key] || 0) + (servicesFromDatabase[key] || 0)])
         );
         setServices(mergedServices);
       });
