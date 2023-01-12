@@ -4,11 +4,10 @@ import { useRecoilValue } from 'recoil';
 import { personFieldsIncludingCustomFieldsSelector, personsState } from '../../recoil/persons';
 import { utils, writeFile } from 'xlsx';
 import { dayjsInstance } from '../../services/date';
-import { teamsState, usersState } from '../../recoil/auth';
+import { teamsState} from '../../recoil/auth';
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
 export default function ExportFormattedData({ personCreated, personUpdated, actions }) {
-  const users = useRecoilValue(usersState);
   const teams = useRecoilValue(teamsState);
   const persons = useRecoilValue(personsState);
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
@@ -27,7 +26,6 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
           else fields[field.label || field.name] = person[field.name];
           return fields;
         }, {}),
-      'Créé par': users.find((u) => u._id === person.user)?.name,
       'Créé le': dayjsInstance(person.createdAt).format('YYYY-MM-DD'),
       'Mis à jour le': dayjsInstance(person.updatedAt).format('YYYY-MM-DD'),
     };
@@ -48,7 +46,6 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
       Statut: action.status,
       'Complétée le': action.completedAt ? dayjsInstance(action.completedAt).format('YYYY-MM-DD') : '',
       'À faire le': action.dueAt ? dayjsInstance(action.dueAt).format(action.withTime ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD') : '',
-      'Créé par': users.find((u) => u._id === action.user)?.name,
       'Créé le': dayjsInstance(action.createdAt).format('YYYY-MM-DD'),
       'Mis à jour le': dayjsInstance(action.updatedAt).format('YYYY-MM-DD'),
     };
