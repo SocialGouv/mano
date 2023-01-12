@@ -111,8 +111,8 @@ router.get(
         team: z.string(), // uuid separated via comma.
       }).parse(req.params);
       z.object({
-        startDate: z.optional(z.string().regex(dateRegex)),
-        endDate: z.optional(z.string().regex(dateRegex)),
+        from: z.optional(z.string().regex(dateRegex)),
+        to: z.optional(z.string().regex(dateRegex)),
       }).parse(req.query);
     } catch (e) {
       const error = new Error(`Invalid request in service count get monthly stats: ${e}`);
@@ -120,15 +120,16 @@ router.get(
       return next(error);
     }
 
-    const { team, startDate, endDate } = req.params;
+    const { team } = req.params;
+    const { from, to } = req.query;
     const organisation = req.user.organisation;
 
     let servicesCountByDay;
-    if (startDate && endDate) {
+    if (from) {
       servicesCountByDay = await sequelize.query(
-        `select service, sum("count") as "count" from "mano"."Service" s where date_trunc('day', "date") between :startDate and :endDate and team in(:team) and organisation = :organisation group by service`,
+        `select service, sum("count") as "count" from "mano"."Service" s where date_trunc('day', "date") between :from and :to and team in(:team) and organisation = :organisation group by service`,
         {
-          replacements: { startDate, endDate, team: team.includes(",") ? team.split(",") : [team], organisation },
+          replacements: { from, to: to || from, team: team.includes(",") ? team.split(",") : [team], organisation },
           type: sequelize.QueryTypes.SELECT,
         }
       );

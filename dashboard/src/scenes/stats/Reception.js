@@ -16,10 +16,16 @@ const ReceptionStats = ({ passages, reportsServices, period, teamsId }) => {
 
   useEffect(
     function fetchServicesStats() {
-      API.get({ path: `/service/team/${teamsId.join(',')}/stats`, query: { from: startDate, to: endDate } }).then((res) => {
-        if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
-        setServicesFromDatabase(res.data.reduce((acc, service) => ({ ...acc, [service.service]: Number(service.count) }), {}));
-      });
+      if (!teamsId?.length) {
+        setServicesFromDatabase({});
+        return;
+      }
+      API.get({ path: `/service/team/${teamsId.join(',')}/stats`, query: startDate ? { from: startDate, to: endDate || startDate } : {} }).then(
+        (res) => {
+          if (!res.ok) return toast.error("Erreur lors du chargement des statistiques des services de l'accueil");
+          setServicesFromDatabase(res.data.reduce((acc, service) => ({ ...acc, [service.service]: Number(service.count) }), {}));
+        }
+      );
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [teamsId, startDate, endDate]
