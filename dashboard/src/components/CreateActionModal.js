@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
-import { organisationState, teamsState, userState } from '../recoil/auth';
+import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
 import useApi from '../services/api';
 
@@ -24,6 +24,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
   const teams = useRecoilValue(teamsState);
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
+  const currentTeam = useRecoilValue(currentTeamState);
   const setActions = useSetRecoilState(actionsState);
   const groups = useRecoilValue(groupsState);
   const setComments = useSetRecoilState(commentsState);
@@ -122,7 +123,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                 urgent: values.commentUrgent,
                 user: user._id,
                 date: new Date(),
-                team: values.team,
+                team: currentTeam._id,
                 organisation: organisation._id,
               };
               // There can be multiple actions, so we need to save the comment for each action.
