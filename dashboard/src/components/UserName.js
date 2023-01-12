@@ -3,7 +3,7 @@ import { useRecoilValue } from 'recoil';
 import { usersState } from '../recoil/auth';
 import SelectUser from './SelectUser';
 
-const UserName = ({ id, wrapper = (name) => name, canAddUser, handleChange }) => {
+const UserName = ({ id, wrapper = (name) => name, canAddUser, handleChange, className = '' }) => {
   const users = useRecoilValue(usersState);
 
   const user = users.find((u) => u._id === id);
@@ -12,11 +12,11 @@ const UserName = ({ id, wrapper = (name) => name, canAddUser, handleChange }) =>
     if (!canAddUser) return null;
   }
   return (
-    <span style={{ textAlign: 'left' }}>
+    <span className={[className, 'tw-text-left'].join(' ')}>
       {canAddUser ? (
         <>
           {wrapper()}
-          <div style={{ minWidth: 250, fontSize: '1rem', fontWeight: 'normal' }}>
+          <div className="tw-w-64 tw-min-w-max tw-text-base tw-font-normal">
             <SelectUser inputId="user" key={id} value={id} onChange={(userId) => handleChange(userId)} />
           </div>
         </>

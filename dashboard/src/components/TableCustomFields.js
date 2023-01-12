@@ -299,7 +299,7 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
               disabled={onlyOptionsEditable}
               onChange={(e) => setField({ ...field, label: e.target.value })}
             />
-            {onlyOptionsEditable && <input type="hidden" name="label" value={field.type} />}
+            {onlyOptionsEditable && <input type="hidden" name="label" value={field.label} />}
           </div>
           <div className="tw-basis-1/2 tw-p-4">
             <label htmlFor="type" className="form-text tailwindui">

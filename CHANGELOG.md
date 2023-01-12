@@ -1,3 +1,136 @@
+# [1.214.0](https://github.com/SocialGouv/mano/compare/v1.213.0...v1.214.0) (2023-01-12)
+
+
+### Features
+
+* **dashboard:** can filter on unfilled date ([#1179](https://github.com/SocialGouv/mano/issues/1179)) ([5a23b86](https://github.com/SocialGouv/mano/commit/5a23b86ea01447c2e6b643db2583fd8f5420be23))
+
+# [1.213.0](https://github.com/SocialGouv/mano/compare/v1.212.0...v1.213.0) (2023-01-11)
+
+
+### Features
+
+* **dashboard:** right button position create user ([#1180](https://github.com/SocialGouv/mano/issues/1180)) ([6e2cdc0](https://github.com/SocialGouv/mano/commit/6e2cdc02eb4f02fcdc32266834a709c79681ff23))
+
+# [1.212.0](https://github.com/SocialGouv/mano/compare/v1.211.2...v1.212.0) (2023-01-11)
+
+
+### Features
+
+* **dashboard:** uncheck urgent stuff easily ([#1162](https://github.com/SocialGouv/mano/issues/1162)) ([a78ee6f](https://github.com/SocialGouv/mano/commit/a78ee6fa4baf15e18b213c81b57ffd921e54d798))
+
+## [1.211.2](https://github.com/SocialGouv/mano/compare/v1.211.1...v1.211.2) (2023-01-11)
+
+
+### Bug Fixes
+
+* **dashboard:** field label changed for onlyOptionsEditable ([f4a34f7](https://github.com/SocialGouv/mano/commit/f4a34f739f5f7c4d6179884a0d44209b523e37ab))
+
+## [1.211.1](https://github.com/SocialGouv/mano/compare/v1.211.0...v1.211.1) (2023-01-11)
+
+
+### Bug Fixes
+
+* prevent save duplicated reports in cache ([#1176](https://github.com/SocialGouv/mano/issues/1176)) ([6b41ef6](https://github.com/SocialGouv/mano/commit/6b41ef6086bd1ca44b8431475162d3a8af48eaef))
+
+# [1.211.0](https://github.com/SocialGouv/mano/compare/v1.210.0...v1.211.0) (2023-01-11)
+
+
+### Features
+
+* right button position create territory ([#1178](https://github.com/SocialGouv/mano/issues/1178)) ([0abb52e](https://github.com/SocialGouv/mano/commit/0abb52e9d1a1df2e413f8dbd192965e8764edfbc))
+
+# [1.210.0](https://github.com/SocialGouv/mano/compare/v1.209.3...v1.210.0) (2023-01-11)
+
+
+### Features
+
+* right button position CreatePerson ([#1168](https://github.com/SocialGouv/mano/issues/1168)) ([f18659e](https://github.com/SocialGouv/mano/commit/f18659e803efafb7200127b3142cb123851cdd4b))
+
+## [1.209.3](https://github.com/SocialGouv/mano/compare/v1.209.2...v1.209.3) (2023-01-11)
+
+
+### Bug Fixes
+
+* **dashboard:** navigate with tabs in dashboard search ([#1167](https://github.com/SocialGouv/mano/issues/1167)) ([2286c30](https://github.com/SocialGouv/mano/commit/2286c301617a658b355aa70d77cd0df9c3f9c1ef))
+
+## [1.209.2](https://github.com/SocialGouv/mano/compare/v1.209.1...v1.209.2) (2023-01-11)
+
+
+### Bug Fixes
+
+* can filter by outOfActiveListDate ([abc1d8b](https://github.com/SocialGouv/mano/commit/abc1d8bd82146a116d2b09221ed0afd10869f376))
+
+## [1.209.1](https://github.com/SocialGouv/mano/compare/v1.209.0...v1.209.1) (2023-01-11)
+
+
+### Bug Fixes
+
+* force data refresh dashboard ([3b58dc9](https://github.com/SocialGouv/mano/commit/3b58dc987fe76e1dd9e0224b39e42ef0a69ee3f7))
+
+# [1.209.0](https://github.com/SocialGouv/mano/compare/v1.208.7...v1.209.0) (2023-01-10)
+
+
+### Features
+
+* **dashboard:** minimum version message ([#1175](https://github.com/SocialGouv/mano/issues/1175)) ([307fc0d](https://github.com/SocialGouv/mano/commit/307fc0d9ccc8bd9a888c87fcd6167479b4bc9a25))
+
+## [1.208.7](https://github.com/SocialGouv/mano/compare/v1.208.6...v1.208.7) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** clean filters when field deleted ([#1174](https://github.com/SocialGouv/mano/issues/1174)) ([f6dcc8d](https://github.com/SocialGouv/mano/commit/f6dcc8de4346c48e3ff3aab0ece6e7b6cee8a14a))
+
+## [1.208.6](https://github.com/SocialGouv/mano/compare/v1.208.5...v1.208.6) (2023-01-10)
+
+
+### Bug Fixes
+
+* debug dashboard getFilterValuesByField ([a386cb0](https://github.com/SocialGouv/mano/commit/a386cb004e723d22a3315a14f9c1d8dd3d7028b2))
+
+## [1.208.5](https://github.com/SocialGouv/mano/compare/v1.208.4...v1.208.5) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** setup filters for checkbox ([eb43833](https://github.com/SocialGouv/mano/commit/eb43833318ee99b766fc9733e851c4877cbc8cdd))
+
+## [1.208.4](https://github.com/SocialGouv/mano/compare/v1.208.3...v1.208.4) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** persons list assignedTeams filter ([#1171](https://github.com/SocialGouv/mano/issues/1171)) ([2c856bf](https://github.com/SocialGouv/mano/commit/2c856bfde6e94812340629c4705a0f5f9de0355f))
+
+## [1.208.3](https://github.com/SocialGouv/mano/compare/v1.208.2...v1.208.3) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** use person followedSince instread of createdAt for filtering ([aac443d](https://github.com/SocialGouv/mano/commit/aac443d3465ee4965e52eb5d555e0cfe2f49d663))
+
+## [1.208.2](https://github.com/SocialGouv/mano/compare/v1.208.1...v1.208.2) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** can filter stats with outOfActiveListReasons ([121d41d](https://github.com/SocialGouv/mano/commit/121d41d0447ec43ea122f76ccda67ddde324b5fc))
+
+## [1.208.1](https://github.com/SocialGouv/mano/compare/v1.208.0...v1.208.1) (2023-01-10)
+
+
+### Bug Fixes
+
+* **dashboard:** dueAt compulsory for consultation ([#1161](https://github.com/SocialGouv/mano/issues/1161)) ([c9b506d](https://github.com/SocialGouv/mano/commit/c9b506d4b4298d07116e535d8b328a3f46b64cc6))
+
+# [1.208.0](https://github.com/SocialGouv/mano/compare/v1.207.8...v1.208.0) (2023-01-10)
+
+
+### Features
+
+* **api:** migrate all actions in database with multiple teams ([#1136](https://github.com/SocialGouv/mano/issues/1136)) ([841a5e4](https://github.com/SocialGouv/mano/commit/841a5e4cad804245156245b9879282be5fd46744))
+
 ## [1.207.8](https://github.com/SocialGouv/mano/compare/v1.207.7...v1.207.8) (2023-01-09)
 
 

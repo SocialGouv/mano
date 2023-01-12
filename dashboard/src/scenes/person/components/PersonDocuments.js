@@ -156,8 +156,6 @@ function DocumentModal({ document, onClose, person }) {
     [groups, person._id, organisation.groupsEnabled]
   );
 
-  console.log(document);
-
   return (
     <ModalContainer open>
       <ModalHeader title={document.name} />

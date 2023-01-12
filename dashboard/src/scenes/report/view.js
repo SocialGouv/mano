@@ -488,7 +488,6 @@ const View = () => {
                 inputId="report-select-teams"
                 classNamePrefix="report-select-teams"
                 onChange={(teamIds) => {
-                  console.log({ teamIds });
                   setSelectedTeamIds(teamIds);
                 }}
                 value={selectedTeamIds}
@@ -1771,7 +1770,7 @@ const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString
                   if (res.ok) {
                     setReports((reports) =>
                       isNew
-                        ? [res.decryptedData, ...reports]
+                        ? [res.decryptedData, ...reports.filter((_report) => _report._id !== res.decryptedData._id)]
                         : reports.map((a) => {
                             if (a._id === reportAtDate._id) return res.decryptedData;
                             return a;

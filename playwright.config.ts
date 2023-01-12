@@ -56,12 +56,16 @@ const config: PlaywrightTestConfig = {
       },
     },
 
-    {
-      name: "chromium",
-      use: {
-        ...devices["Desktop Chrome"],
-      },
-    },
+    ...(!!process.env.CI
+      ? []
+      : [
+          {
+            name: "chromium",
+            use: {
+              ...devices["Desktop Chrome"],
+            },
+          },
+        ]),
 
     // {
     //   name: "webkit",

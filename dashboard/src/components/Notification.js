@@ -2,12 +2,12 @@ import dayjs from 'dayjs';
 import React, { useMemo, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import { Modal, ModalBody, ModalHeader } from 'reactstrap';
-import { useRecoilValue } from 'recoil';
+import { useRecoilValue, useSetRecoilState } from 'recoil';
 import styled from 'styled-components';
 import { theme } from '../config';
-import { actionsState, CANCEL, DONE, sortActionsOrConsultations, TODO } from '../recoil/actions';
+import { actionsState, CANCEL, DONE, prepareActionForEncryption, sortActionsOrConsultations, TODO } from '../recoil/actions';
 import { currentTeamState } from '../recoil/auth';
-import { commentsState } from '../recoil/comments';
+import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { personsState } from '../recoil/persons';
 import { formatTime } from '../services/date';
 import ButtonCustom from './ButtonCustom';
@@ -15,6 +15,7 @@ import DateBloc from './DateBloc';
 import Table from './table';
 import UserName from './UserName';
 import { useLocalStorage } from 'react-use';
+import useApi from '../services/api';
 
 export default function Notification() {
   const [showModal, setShowModal] = useState(false);
@@ -107,6 +108,8 @@ export default function Notification() {
 const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortOrder }) => {
   const history = useHistory();
   const persons = useRecoilValue(personsState);
+  const setActions = useSetRecoilState(actionsState);
+  const API = useApi();
   if (!actions.length) return null;
   return (
     <>
@@ -149,6 +152,37 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
               sortOrder,
               render: (action) => <>{persons.find((p) => p._id === action.person)?.name}</>,
             },
+            {
+              title: '',
+              dataKey: 'urgent',
+              small: true,
+              className: '!tw-min-w-0 !tw-w-4',
+              render: (action) => {
+                return (
+                  <button
+                    className="button-destructive !tw-ml-0"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const actionResponse = await API.put({
+                        path: `/action/${action._id}`,
+                        body: prepareActionForEncryption({ ...action, urgent: false }),
+                      });
+                      if (actionResponse.ok) {
+                        const newAction = actionResponse.decryptedData;
+                        setActions((actions) =>
+                          actions.map((a) => {
+                            if (a._id === newAction._id) return newAction;
+                            return a;
+                          })
+                        );
+                      }
+                    }}>
+                    Déprioriser
+                  </button>
+                );
+              },
+            },
           ]}
         />
       </ModalBody>
@@ -158,6 +192,8 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
 
 const Comments = ({ setShowModal, comments }) => {
   const history = useHistory();
+  const setComments = useSetRecoilState(commentsState);
+  const API = useApi();
 
   if (!comments.length) return null;
   return (
@@ -228,6 +264,37 @@ const Comments = ({ setShowModal, comments }) => {
                         })
                       : ''}
                   </p>
+                );
+              },
+            },
+            {
+              title: '',
+              dataKey: 'urgent',
+              small: true,
+              className: '!tw-min-w-0 !tw-w-4',
+              render: (comment) => {
+                return (
+                  <button
+                    className="button-destructive !tw-ml-0"
+                    onClick={async (e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const commentResponse = await API.put({
+                        path: `/comment/${comment._id}`,
+                        body: prepareCommentForEncryption({ ...comment, urgent: false }),
+                      });
+                      if (commentResponse.ok) {
+                        const newComment = commentResponse.decryptedData;
+                        setComments((comments) =>
+                          comments.map((a) => {
+                            if (a._id === newComment._id) return newComment;
+                            return a;
+                          })
+                        );
+                      }
+                    }}>
+                    Déprioriser
+                  </button>
                 );
               },
             },
