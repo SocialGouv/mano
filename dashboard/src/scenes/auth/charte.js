@@ -5,8 +5,8 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { userState } from '../../recoil/auth';
 import useApi from '../../services/api';
 import { theme } from '../../config';
-import openNewWindow from '../../assets/icons/open-in-new-window.svg';
 import charte from '../../assets/charte.pdf';
+import OpenNewWindowIcon from '../../components/OpenNewWindowIcon';
 
 const Charte = () => {
   const [loading, setLoading] = useState(false);
@@ -218,17 +218,6 @@ const DownloadLink = styled.a`
   margin-top: 0.75rem;
   margin-bottom: 5rem;
   font-size: 0.75rem;
-`;
-
-const OpenNewWindowIcon = styled.div`
-  color: currentColor;
-  opacity: 0.4;
-  background-image: url(${openNewWindow});
-  background-size: contain;
-  display: inline-block;
-  width: 0.5rem;
-  height: 0.5rem;
-  margin-left: 0.75rem;
 `;
 
 export default Charte;

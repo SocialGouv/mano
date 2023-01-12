@@ -142,7 +142,7 @@ const Stats = () => {
             const params = [{ referenceStartDay: period.startDate, referenceEndDay: period.endDate }, offsetHours];
             if (!item) return false;
             return (
-              getIsDayWithinHoursOffsetOfPeriod(item.createdAt, ...params) ||
+              getIsDayWithinHoursOffsetOfPeriod(item.followedSince, ...params) ||
               getIsDayWithinHoursOffsetOfPeriod(item.updatedAt, ...params) ||
               item.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.createdAt, ...params)) ||
               item.actions?.some((a) => getIsDayWithinHoursOffsetOfPeriod(a.updatedAt, ...params)) ||
@@ -371,6 +371,7 @@ const Stats = () => {
             type: 'multi-choice',
           }
     ),
+    ...fieldsPersonsCustomizableOptions.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsSocial.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
     ...customFieldsPersonsMedical.filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id)).map((a) => ({ field: a.name, ...a })),
   ];

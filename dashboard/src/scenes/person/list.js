@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
@@ -21,7 +21,7 @@ import Filters, { filterData } from '../../components/Filters';
 import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
 import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
 import { theme } from '../../config';
-import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { placesState } from '../../recoil/places';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
@@ -48,30 +48,24 @@ const personsPopulatedWithFormattedBirthDateSelector = selector({
 const personsFilteredSelector = selectorFamily({
   key: 'personsFilteredSelector',
   get:
-    ({ filterTeams, filters, alertness }) =>
+    ({ viewAllOrganisationData, filters, alertness }) =>
     ({ get }) => {
       const personWithBirthDate = get(personsPopulatedWithFormattedBirthDateSelector);
+      const currentTeam = get(currentTeamState);
       let pFiltered = personWithBirthDate;
       if (!!filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);
       if (!!alertness) pFiltered = pFiltered.filter((p) => !!p.alertness);
-      if (filterTeams.length) {
-        pFiltered = pFiltered.filter((p) => {
-          for (let assignedTeam of p.assignedTeams || []) {
-            if (filterTeams.includes(assignedTeam)) return true;
-          }
-          return false;
-        });
-      }
-      return pFiltered;
+      if (!!viewAllOrganisationData) return pFiltered;
+      return pFiltered.filter((p) => p.assignedTeams?.includes(currentTeam._id));
     },
 });
 
 const personsFilteredBySearchSelector = selectorFamily({
   key: 'personsFilteredBySearchSelector',
   get:
-    ({ filterTeams, filters, alertness, search }) =>
+    ({ viewAllOrganisationData, filters, alertness, search }) =>
     ({ get }) => {
-      const personsFiltered = get(personsFilteredSelector({ filterTeams, filters, alertness }));
+      const personsFiltered = get(personsFilteredSelector({ viewAllOrganisationData, filters, alertness }));
 
       if (!search?.length) {
         return personsFiltered;
@@ -118,15 +112,14 @@ const List = () => {
 
   const [search, setSearch] = useSearchParamState('search', '');
   const [alertness, setFilterAlertness] = useLocalStorage('person-alertness', false);
-  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('person-allOrg', false);
+  const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('person-allOrg', true);
   const [sortBy, setSortBy] = useLocalStorage('person-sortBy', 'name');
   const [sortOrder, setSortOrder] = useLocalStorage('person-sortOrder', 'ASC');
-  const [filterTeams, setFilterTeams] = useLocalStorage('person-teams', []);
   const [filters, setFilters] = useLocalStorage('person-filters', []);
   const [page, setPage] = useSearchParamState('page', 0);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const personsFilteredBySearch = useRecoilValue(personsFilteredBySearchSelector({ search, filterTeams, filters, alertness }));
+  const personsFilteredBySearch = useRecoilValue(personsFilteredBySearchSelector({ search, viewAllOrganisationData, filters, alertness }));
 
   const personsSorted = useMemo(() => {
     const sorted = [...personsFilteredBySearch];
@@ -139,22 +132,8 @@ const List = () => {
   }, [personsSorted, page]);
   const total = useMemo(() => personsSorted.length, [personsSorted]);
 
-  const teams = useRecoilValue(teamsState);
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();
-
-  const isMounted = useRef(null);
-  useEffect(() => {
-    // effect on currentTeam/viewAllOrganisationData change
-    // not to be triggered on first render, because it would erase the `page` query param
-    if (isMounted.current) {
-      // its not possible to update two different URLSearchParams very quickly, the second one cancels the first one
-      setPage(0); // internal state
-      setFilterTeams(viewAllOrganisationData ? [] : [teams.find((team) => team._id === currentTeam._id)._id], { sideEffect: ['page', 0] });
-    }
-    isMounted.current = true;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [viewAllOrganisationData, currentTeam, teams]);
 
   if (!personsFilteredBySearch) return <Loading />;
 

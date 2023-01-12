@@ -43,10 +43,37 @@ export default function View() {
 
   return (
     <div>
-      <div className="tw-flex tw-w-full">
+      <div className="tw-flex tw-w-full tw-justify-between">
         <div>
           <BackButton />
         </div>
+        <div className="noprint">
+          <UserName
+            id={person.user}
+            wrapper={() => 'Créée par '}
+            canAddUser
+            handleChange={async (newUser) => {
+              const response = await API.put({
+                path: `/person/${person._id}`,
+                body: preparePersonForEncryption({ ...person, user: newUser }),
+              });
+              if (response.ok) {
+                toast.success('Personne mise à jour (créée par)');
+                const newPerson = response.decryptedData;
+                setPersons((persons) =>
+                  persons.map((p) => {
+                    if (p._id === person._id) return newPerson;
+                    return p;
+                  })
+                );
+              } else {
+                toast.error('Impossible de mettre à jour la personne');
+              }
+            }}
+          />
+        </div>
+      </div>
+      <div className="tw-flex tw-w-full tw-justify-center">
         <div className="noprint tw-flex tw-flex-1">
           {!['restricted-access'].includes(user.role) && (
             <ul className="nav nav-tabs tw-m-auto">
@@ -87,31 +114,6 @@ export default function View() {
               )}
             </ul>
           )}
-        </div>
-        <div className="noprint">
-          <UserName
-            id={person.user}
-            wrapper={() => 'Créée par '}
-            canAddUser
-            handleChange={async (newUser) => {
-              const response = await API.put({
-                path: `/person/${person._id}`,
-                body: preparePersonForEncryption({ ...person, user: newUser }),
-              });
-              if (response.ok) {
-                toast.success('Personne mise à jour (créée par)');
-                const newPerson = response.decryptedData;
-                setPersons((persons) =>
-                  persons.map((p) => {
-                    if (p._id === person._id) return newPerson;
-                    return p;
-                  })
-                );
-              } else {
-                toast.error('Impossible de mettre à jour la personne');
-              }
-            }}
-          />
         </div>
       </div>
       <div className="tw-pt-4">

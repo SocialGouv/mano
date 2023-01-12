@@ -16,16 +16,21 @@ export const filterData = (data, filters) => {
             if (itemValue === filter.value) return item;
             return null;
           }
-          if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
-          if (typeof itemValue === 'boolean') {
-            return itemValue === (filter.value === 'Oui') ? item : null;
+          if (['boolean'].includes(filter.type)) {
+            if (filter.value === 'Oui' && !!itemValue) return item;
+            if (filter.value === 'Non' && !itemValue) return item;
+            return null;
           }
-
           if (['date-with-time', 'date'].includes(filter.type)) {
             const { date, dateComparator } = filter.value;
+            if (dateComparator === 'unfilled') return !itemValue || [null, undefined].includes(itemValue) ? item : null;
             if (dateComparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
             if (dateComparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
             if (dateComparator === 'equals') return isOnSameDay(itemValue, date) ? item : null;
+          }
+          if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
+          if (typeof itemValue === 'boolean') {
+            return itemValue === (filter.value === 'Oui') ? item : null;
           }
 
           if (typeof itemValue === 'string') {
@@ -64,10 +69,18 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   const onAddFilter = () => onChange([...filters, {}], saveInURLParams);
   const filterFields = base.filter((_filter) => _filter.field !== 'alertness').map((f) => ({ label: f.label, field: f.field, type: f.type }));
 
-  function getFilterValuesByField(field, base) {
+  function getFilterValuesByField(field, base, index) {
     if (!field) return [];
     const current = base.find((filter) => filter.field === field);
-    if (current.type === 'yes-no') return ['Oui', 'Non', 'Non renseigné'];
+    if (!current) {
+      onChange(
+        filters.filter((_f, i) => i !== index),
+        saveInURLParams
+      );
+      return [];
+    }
+    if (['yes-no'].includes(current.type)) return ['Oui', 'Non', 'Non renseigné'];
+    if (['boolean'].includes(current.type)) return ['Oui', 'Non'];
     if (current?.field === 'outOfActiveList') return current.options;
     if (current?.options?.length) return [...current?.options, 'Non renseigné'];
     return ['Non renseigné'];
@@ -90,7 +103,7 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
         </Row>
         {filters.map((filter, index) => {
           // filter: field, value, type
-          const filterValues = getFilterValuesByField(filter.field, base);
+          const filterValues = getFilterValuesByField(filter.field, base, index);
 
           const onChangeField = (newField) => {
             onChange(
@@ -151,12 +164,18 @@ const dateOptions = [
     label: 'Date exacte',
     value: 'equals',
   },
+  {
+    label: 'Non renseigné',
+    value: 'unfilled',
+  },
 ];
 
 const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
   const [dateComparator, setDateComparator] = React.useState(null);
   if (!field) return <></>;
-  const { type, field: name } = base.find((filter) => filter.field === field);
+  const current = base.find((filter) => filter.field === field);
+  if (!current) return <></>;
+  const { type, field: name } = current;
 
   if (['text', 'number', 'textarea'].includes(type)) {
     return (
@@ -175,7 +194,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
   if (['date-with-time', 'date'].includes(type)) {
     return (
       <Row>
-        <Col sm={6}>
+        <Col sm={value?.dateComparator !== 'unfilled' ? 6 : 12}>
           <SelectCustom
             options={dateOptions}
             value={dateOptions.find((opt) => opt.value === value?.dateComparator)}
@@ -187,16 +206,18 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
             }}
           />
         </Col>
-        <Col sm={6}>
-          <DatePicker
-            locale="fr"
-            dateFormat="dd/MM/yyyy"
-            className="form-control"
-            name={name}
-            selected={value?.date ? new Date(value?.date) : null}
-            onChange={(date) => onChangeValue({ date, dateComparator })}
-          />
-        </Col>
+        {value?.dateComparator !== 'unfilled' && (
+          <Col sm={6}>
+            <DatePicker
+              locale="fr"
+              dateFormat="dd/MM/yyyy"
+              className="form-control"
+              name={name}
+              selected={value?.date ? new Date(value?.date) : null}
+              onChange={(date) => onChangeValue({ date, dateComparator })}
+            />
+          </Col>
+        )}
       </Row>
     );
   }
