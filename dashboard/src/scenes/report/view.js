@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { Col, Row, FormGroup, Label } from 'reactstrap';
+import { Col, Row, FormGroup, Label, Spinner } from 'reactstrap';
 import styled from 'styled-components';
 import { useHistory, useLocation, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -782,31 +782,76 @@ const View = () => {
   );
 };
 
+const ErrorOnGetServices = () => (
+  <div>
+    <b>Impossible de récupérer les services agrégés pour les rapports sélectionnés.</b>
+    <p>Veuillez contacter l'équipe de mano pour signaler ce problème, en rappelant la date et l'organisation concernées.</p>
+  </div>
+);
+
 const Reception = ({ reports, selectedTeamsObject, dateString }) => {
   const organisation = useRecoilValue(organisationState);
-  const services = useMemo(() => {
-    const reportsServices = reports.map((report) => (report?.services?.length ? JSON.parse(report?.services) : {}));
+  const [show, setShow] = useState([]);
+  // `service` structure is: { `team-id-xxx`: { `service-name`: 1, ... }, ... }
+  const [services, setServices] = useState({});
+  const API = useApi();
 
-    const services = {};
-    for (const service of organisation.services) {
-      services[service] = reportsServices.reduce((total, teamServices) => total + (teamServices?.[service] || 0), 0);
-    }
-    return services;
-  }, [reports, organisation.services]);
-  const [show, toggleShow] = useState(true);
+  useEffect(() => {
+    setShow([reports.length === 1 ? reports[0].team : 'all']);
+  }, [reports]);
+
+  // Sums of services for all reports, to display the total of services for all teams.
+  const serviceSumsForAllReports = useMemo(() => {
+    const servicesValues = Object.values(services);
+    if (!servicesValues.length) return null;
+    return servicesValues.reduce((acc, curr) => {
+      return Object.entries(curr).reduce((innerAcc, [key, value]) => {
+        innerAcc[key] = (innerAcc[key] || 0) + value;
+        return innerAcc;
+      }, acc);
+    }, {});
+  }, [services]);
 
   useEffect(() => {
     window.sessionStorage.setItem(`services-general-${dateString}`, show);
   }, [show, dateString]);
 
-  if (!organisation.receptionEnabled) return null;
-  if (!organisation?.services) return null;
+  useEffect(
+    // Fetch services for all teams.
+    // `services` value contains an object with `team` as key, and an object with `service` as key and `count` as value.
+    // { `team-id-xxx`: { `service-name`: 1, ... }, ... }
+    function initServices() {
+      // Init services for a team. We need to fetch services from legacy report and database and merge them.
+      async function getServicesForTeam(team, report) {
+        const res = await API.get({ path: `/service/team/${team}/date/${dateString}` });
+        if (!res.ok) return toast.error(<ErrorOnGetServices />);
+        const servicesFromLegacyReport = report?.services?.length ? JSON.parse(report?.services) : {};
+        const servicesFromDatabase = res.data.reduce((acc, service) => {
+          acc[service.service] = (servicesFromLegacyReport[service.service] || 0) + service.count;
+          return acc;
+        }, {});
+        const mergedServices = Object.fromEntries(
+          // We need a sum of all keys from legacy and database services.
+          organisation.services.map((key) => [key, (servicesFromLegacyReport[key] || 0) + (servicesFromDatabase[key] || 0)])
+        );
+        return { [team]: mergedServices };
+      }
+      // Apply getServicesForTeam for all teams.
+      Promise.all(reports.map((r) => getServicesForTeam(r.team, r))).then((results) => {
+        setServices(results.reduce((acc, curr) => ({ ...acc, ...curr }), {}));
+      });
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [dateString, reports, organisation.services]
+  );
+
+  if (!organisation.receptionEnabled || !organisation?.services) return null;
 
   return (
     <StyledBox>
       <TabTitle>Services effectués ce jour</TabTitle>
       {reports.length > 1 && (
-        <ServicesWrapper show={show} showForPrint={window.sessionStorage.getItem(`services-general-${dateString}`) === 'true'}>
+        <ServicesWrapper show={show.includes('all')} showForPrint={window.sessionStorage.getItem(`services-general-${dateString}`) === 'true'}>
           <div className="team-name">
             <p>
               Services effectués par toutes les équipes sélectionnées
@@ -815,62 +860,62 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
                 Ces données sont en lecture seule. Pour les modifier, vous devez le faire équipe par équipe (ci-dessous)
               </small>
             </p>
-            <button className="toggle-show" type="button" onClick={() => toggleShow((s) => !s)}>
-              {show ? 'Masquer' : 'Afficher'}
+            <button
+              className="toggle-show"
+              type="button"
+              onClick={() => setShow(show.includes('all') ? show.filter((e) => e === 'all') : [...show, 'all'])}>
+              {show.includes('all') ? 'Masquer' : 'Afficher'}
             </button>
           </div>
           <div className="services-list">
-            {organisation?.services?.map((service) => (
-              <IncrementorSmall
-                dataTestId={`general-${service}-${services[service] || 0}`}
-                key={service}
-                service={service}
-                count={services[service] || 0}
-                disabled
-              />
-            ))}
+            {serviceSumsForAllReports ? (
+              Object.entries(serviceSumsForAllReports).map(([key, value]) => (
+                <IncrementorSmall
+                  dataTestId={`general-${key}-${value || 0}`}
+                  key={`general-${key}-${value || 0}`}
+                  service={key}
+                  count={value || 0}
+                  date={dateString}
+                  disabled
+                />
+              ))
+            ) : (
+              <Spinner />
+            )}
           </div>
         </ServicesWrapper>
       )}
       {reports.map((report) => (
-        <Service
-          report={report}
-          key={report.team}
-          withMultipleTeams={reports.length > 1}
-          team={selectedTeamsObject[report.team]}
-          dateString={dateString}
-        />
+        <ServicesWrapper show={show.includes(report.team)}>
+          {reports.length > 1 && (
+            <div className="team-name">
+              <p>
+                <b>
+                  {selectedTeamsObject[report.team].nightSession ? '🌒' : '☀️ '} {selectedTeamsObject[report.team]?.name || ''}
+                </b>{' '}
+                - {getPeriodTitle(dateString, selectedTeamsObject[report.team]?.nightSession)}
+              </p>
+              <button
+                className="toggle-show"
+                type="button"
+                onClick={() => setShow(show.includes(report.team) ? show.filter((e) => e === report.team) : [...show, report.team])}>
+                {show.includes(report.team) ? 'Masquer' : 'Afficher'}
+              </button>
+            </div>
+          )}
+          <div className="services-list">
+            <ReceptionService
+              services={services[report.team]}
+              onUpdateServices={(updated) => setServices((s) => ({ ...s, [report.team]: updated }))}
+              team={selectedTeamsObject[report.team]}
+              report={report}
+              dateString={dateString}
+              dataTestIdPrefix={`${selectedTeamsObject[report.team].name}-`}
+            />
+          </div>
+        </ServicesWrapper>
       ))}
     </StyledBox>
-  );
-};
-
-const Service = ({ report, team, withMultipleTeams, dateString }) => {
-  const organisation = useRecoilValue(organisationState);
-  const [show, toggleShow] = useState(!withMultipleTeams);
-
-  if (!organisation.receptionEnabled) return null;
-  if (!organisation?.services) return null;
-
-  return (
-    <ServicesWrapper show={show}>
-      {!!withMultipleTeams && (
-        <div className="team-name">
-          <p>
-            <b>
-              {team.nightSession ? '🌒' : '☀️ '} {team?.name || ''}
-            </b>{' '}
-            - {getPeriodTitle(dateString, team?.nightSession)}
-          </p>
-          <button className="toggle-show" type="button" onClick={() => toggleShow((s) => !s)}>
-            {show ? 'Masquer' : 'Afficher'}
-          </button>
-        </div>
-      )}
-      <div className="services-list">
-        <ReceptionService parentComponent="report" team={team} report={report} dateString={dateString} dataTestIdPrefix={`${team.name}-`} />
-      </div>
-    </ServicesWrapper>
   );
 };
 

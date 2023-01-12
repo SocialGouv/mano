@@ -33,6 +33,7 @@ const cryptoHexRegex = /^[A-Fa-f0-9]{16,128}$/;
 const positiveIntegerRegex = /^\d+$/;
 const jwtRegex = /^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
 const headerJwtRegex = /JWT ^[A-Za-z0-9-_=]+\.[A-Za-z0-9-_=]+\.?[A-Za-z0-9-_.+/=]*$/;
+const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 
 const customFieldSchema = z
   .object({
@@ -62,6 +63,7 @@ module.exports = {
   cryptoHexRegex,
   jwtRegex,
   headerJwtRegex,
+  dateRegex,
   customFieldSchema,
   sanitizeAll,
 };

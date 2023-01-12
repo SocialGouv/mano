@@ -27,7 +27,7 @@ test("Cross teams report", async ({ page }) => {
   const team1Collab = nanoid();
   const team2Collab = nanoid();
 
-  await loginWith(page, "admin2@example.org");
+  await loginWith(page, "admin4@example.org");
 
   /*
   Create teams
