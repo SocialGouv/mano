@@ -24,6 +24,7 @@ export default function ExportFormattedData({ personCreated, personUpdated, acti
           } else if (['date', 'date-with-time'].includes(field.type))
             fields[field.label || field.name] = person[field.name] ? dayjsInstance(person[field.name]).format('YYYY-MM-DD') : '';
           else if (['boolean', 'yes-no'].includes(field.type)) fields[field.label || field.name] = person[field.name] ? 'Oui' : 'Non';
+          else if (Array.isArray(person[field.name])) fields[field.label || field.name] = person[field.name].join(', ');
           else fields[field.label || field.name] = person[field.name];
           return fields;
         }, {}),
