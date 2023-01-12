@@ -75,7 +75,7 @@ const ActionCategoriesSettings = () => {
       setOrganisation(res.data);
       refresh();
     }
-  }, [API, actionsGroupedCategories, organisation._id, refresh, setOrganisation]);
+  }, [actionsGroupedCategories, organisation._id, refresh, setOrganisation]);
 
   const gridRef = useRef(null);
   const sortableRef = useRef(null);

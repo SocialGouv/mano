@@ -75,7 +75,7 @@ const ServicesSettings = () => {
       setOrganisation(res.data);
       refresh();
     }
-  }, [API, groupedServices, organisation._id, refresh, setOrganisation]);
+  }, [groupedServices, organisation._id, refresh, setOrganisation]);
 
   const gridRef = useRef(null);
   const sortableRef = useRef(null);

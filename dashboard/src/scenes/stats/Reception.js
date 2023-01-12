@@ -26,7 +26,6 @@ const ReceptionStats = ({ passages, reportsServices, period, teamsId }) => {
         }
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [teamsId, startDate, endDate]
   );
 

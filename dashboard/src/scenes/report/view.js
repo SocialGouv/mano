@@ -840,7 +840,6 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
         setServices(results.reduce((acc, curr) => ({ ...acc, ...curr }), {}));
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dateString, reports, organisation.services]
   );
 
