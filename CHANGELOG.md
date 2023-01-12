@@ -1,3 +1,10 @@
+## [1.214.4](https://github.com/SocialGouv/mano/compare/v1.214.3...v1.214.4) (2023-01-12)
+
+
+### Bug Fixes
+
+* **dashboard:** some organisation do not have services ([dc33f29](https://github.com/SocialGouv/mano/commit/dc33f29cd046913350a06b2f48080268d405d205))
+
 ## [1.214.3](https://github.com/SocialGouv/mano/compare/v1.214.2...v1.214.3) (2023-01-12)
 
 
