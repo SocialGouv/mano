@@ -12,7 +12,7 @@ import Observations from '../territory-observations/list';
 import SelectCustom from '../../components/SelectCustom';
 import { territoryTypes, territoriesState, prepareTerritoryForEncryption } from '../../recoil/territory';
 import { useRecoilState } from 'recoil';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
@@ -23,7 +23,6 @@ const View = () => {
   const [territories, setTerritories] = useRecoilState(territoriesState);
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const territory = territories.find((t) => t._id === id);
-  const API = useApi();
 
   useTitle(`${territory?.name} - Territoire`);
 

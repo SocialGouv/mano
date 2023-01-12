@@ -7,7 +7,7 @@ import Table from '../../components/table';
 import ButtonCustom from '../../components/ButtonCustom';
 
 import Loading from '../../components/loading';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
@@ -23,7 +23,6 @@ const List = () => {
   const [sortOrder, setSortOrder] = useState('DESC');
   const [refresh, setRefresh] = useState(true);
   useTitle('Organisations');
-  const API = useApi();
 
   useEffect(() => {
     (async () => {
@@ -172,7 +171,6 @@ const StyledCounters = styled.p`
 
 const Create = ({ onChange, total }) => {
   const [open, setOpen] = useState(false);
-  const API = useApi();
 
   return (
     <>

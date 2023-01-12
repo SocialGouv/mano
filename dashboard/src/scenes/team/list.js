@@ -11,7 +11,7 @@ import CreateWrapper from '../../components/createWrapper';
 import Table from '../../components/table';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, organisationState, teamsState, userState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import OnboardingEndModal from '../../components/OnboardingEndModal';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
@@ -97,7 +97,7 @@ const Create = () => {
   const organisation = useRecoilValue(organisationState);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const [open, setOpen] = useState(!teams.length);
-  const API = useApi();
+
   const [onboardingEndModalOpen, setOnboardingEndModalOpen] = useState(false);
 
   const onboardingForTeams = !teams.length;

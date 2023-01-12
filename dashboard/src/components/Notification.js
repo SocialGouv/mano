@@ -15,7 +15,7 @@ import DateBloc from './DateBloc';
 import Table from './table';
 import UserName from './UserName';
 import { useLocalStorage } from 'react-use';
-import useApi from '../services/api';
+import API from '../services/api';
 
 export default function Notification() {
   const [showModal, setShowModal] = useState(false);
@@ -109,7 +109,7 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
   const history = useHistory();
   const persons = useRecoilValue(personsState);
   const setActions = useSetRecoilState(actionsState);
-  const API = useApi();
+
   if (!actions.length) return null;
   return (
     <>
@@ -193,7 +193,6 @@ const Actions = ({ setShowModal, actions, setSortOrder, setSortBy, sortBy, sortO
 const Comments = ({ setShowModal, comments }) => {
   const history = useHistory();
   const setComments = useSetRecoilState(commentsState);
-  const API = useApi();
 
   if (!comments.length) return null;
   return (

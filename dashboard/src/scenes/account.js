@@ -9,11 +9,10 @@ import Loading from '../components/loading';
 import ButtonCustom from '../components/ButtonCustom';
 import ChangePassword from '../components/ChangePassword';
 import { userState } from '../recoil/auth';
-import useApi from '../services/api';
+import API from '../services/api';
 
 const Account = () => {
   const [user, setUser] = useRecoilState(userState);
-  const API = useApi();
 
   if (!user) return <Loading />;
 
@@ -67,7 +66,6 @@ const Account = () => {
 
 const LinkToChangePassword = () => {
   const [open, setOpen] = useState(false);
-  const API = useApi();
 
   return (
     <>

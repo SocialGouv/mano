@@ -2,11 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useDebounce } from 'react-use';
 import styled from 'styled-components';
 import { theme } from '../config';
-import useApi from '../services/api';
+import API from '../services/api';
 
 const IncrementorSmall = ({ service, team, date, count: initialValue, onUpdated, dataTestId, disabled = false }) => {
   const [value, setValue] = useState(initialValue);
-  const API = useApi();
 
   useEffect(() => setValue(initialValue), [initialValue]);
 

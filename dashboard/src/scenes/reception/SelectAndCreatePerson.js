@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { selector, useRecoilState, useRecoilValue } from 'recoil';
 import AsyncSelect from 'react-select/async-creatable';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { formatBirthDate, formatCalendarDate } from '../../services/date';
 import { actionsState } from '../../recoil/actions';
 import { passagesState } from '../../recoil/passages';
@@ -64,7 +64,7 @@ const SelectAndCreatePerson = ({ value, onChange, inputId, classNamePrefix }) =>
   const user = useRecoilValue(userState);
   const passages = useRecoilValue(passagesState);
   const rencontres = useRecoilValue(rencontresState);
-  const API = useApi();
+
   const optionsExist = useRef(null);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
   const preparePersonForEncryption = usePreparePersonForEncryption();

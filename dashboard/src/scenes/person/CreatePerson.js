@@ -9,7 +9,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { currentTeamState, userState } from '../../recoil/auth';
 import { personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import { useDataLoader } from '../../components/DataLoader';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
@@ -22,7 +22,7 @@ const CreatePerson = ({ refreshable }) => {
   const history = useHistory();
   const [persons, setPersons] = useRecoilState(personsState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
-  const API = useApi();
+
   const { refresh, isLoading } = useDataLoader();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 

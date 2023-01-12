@@ -12,12 +12,11 @@ import { dayjsInstance } from '../../services/date';
 import { selectedTeamsReportsSelector } from '../../recoil/selectors';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useLocalStorage } from 'react-use';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { toast } from 'react-toastify';
 
 const List = () => {
   useTitle('Comptes rendus');
-  const API = useApi();
   useDataLoader({ refreshOnMount: true });
 
   const currentTeam = useRecoilValue(currentTeamState);

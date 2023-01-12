@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import { organisationState } from '../recoil/auth';
 import { typeOptions } from '../utils';
-import useApi from '../services/api';
+import API from '../services/api';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
 import Table from './table';
@@ -39,7 +39,6 @@ const TableCustomFields = ({
 
   const [tableKey, setTableKey] = useState(0);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const API = useApi();
 
   function onUpdate(fieldToUpdate, fields) {
     setMutableData(mutableData.map((f) => (f.name === fieldToUpdate.name ? { ...f, ...fields } : f)));

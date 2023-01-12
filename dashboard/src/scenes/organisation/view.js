@@ -18,7 +18,7 @@ import {
 import { customFieldsObsSelector, prepareObsForEncryption, territoryObservationsState } from '../../recoil/territoryObservations';
 import TableCustomFields from '../../components/TableCustomFields';
 import { organisationState, userState } from '../../recoil/auth';
-import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
+import API, { encryptItem } from '../../services/api';
 import ExportData from '../data-import-export/ExportData';
 import ImportData from '../data-import-export/ImportData';
 import DownloadExample from '../data-import-export/DownloadExample';
@@ -63,7 +63,6 @@ const View = () => {
   const [refreshErrorKey, setRefreshErrorKey] = useState(0);
   const { refresh } = useDataLoader();
 
-  const API = useApi();
   const [tab, setTab] = useState(!organisation.encryptionEnabled ? 'encryption' : 'infos');
   const scrollContainer = useRef(null);
   useTitle(`Organisation - ${getSettingTitle(tab)}`);
@@ -85,7 +84,7 @@ const View = () => {
           customFields: {
             [customFieldsRow]: fields,
           },
-          persons: await Promise.all(updatedPersons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey))),
+          persons: await Promise.all(updatedPersons.map(preparePersonForEncryption).map(encryptItem)),
         },
       });
       if (response.ok) {
@@ -263,7 +262,7 @@ const View = () => {
                                       customFieldsMedicalFile: fields,
                                     },
                                     medicalFiles: await Promise.all(
-                                      updatedMedicalFiles.map(prepareMedicalFileForEncryption(fields)).map(encryptItem(hashedOrgEncryptionKey))
+                                      updatedMedicalFiles.map(prepareMedicalFileForEncryption(fields)).map(encryptItem)
                                     ),
                                   },
                                 });
@@ -349,9 +348,7 @@ const View = () => {
                                   customFields: {
                                     customFieldsObs: fields,
                                   },
-                                  observations: await Promise.all(
-                                    updatedObservations.map(prepareObsForEncryption(fields)).map(encryptItem(hashedOrgEncryptionKey))
-                                  ),
+                                  observations: await Promise.all(updatedObservations.map(prepareObsForEncryption(fields)).map(encryptItem)),
                                 },
                               });
                               if (response.ok) {
@@ -535,7 +532,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
   const [refreshErrorKey, setRefreshErrorKey] = useState(0);
 
   const { refresh } = useDataLoader();
-  const API = useApi();
+
   const consultationsSortable = useMemo(() => orgConsultations.map((e) => e.name), [orgConsultations]);
   useEffect(() => {
     setOrgConsultations(organisation.consultations);
@@ -583,7 +580,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
                 .filter((consultation) => consultation.type === content)
                 .map((consultation) => ({ ...consultation, type: newContent }))
                 .map(prepareConsultationForEncryption(newConsultations))
-                .map(encryptItem(hashedOrgEncryptionKey))
+                .map(encryptItem)
             );
             const response = await API.put({
               path: '/consultation/model',
@@ -679,7 +676,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
                       consultations: newConsultationsField,
                     },
                     consultations: await Promise.all(
-                      updatedConsultations.map(prepareConsultationForEncryption(newConsultationsField)).map(encryptItem(hashedOrgEncryptionKey))
+                      updatedConsultations.map(prepareConsultationForEncryption(newConsultationsField)).map(encryptItem)
                     ),
                   },
                 });

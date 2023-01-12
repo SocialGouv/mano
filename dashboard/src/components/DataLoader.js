@@ -19,7 +19,7 @@ import { commentsState } from '../recoil/comments';
 import { organisationState, userState } from '../recoil/auth';
 
 import { clearCache, dashboardCurrentCacheKey, getCacheItem, getCacheItemDefaultValue, setCacheItem } from '../services/dataManagement';
-import useApi from '../services/api';
+import API from '../services/api';
 import { RandomPicture, RandomPicturePreloader } from './LoaderRandomPicture';
 import ProgressBar from './LoaderProgressBar';
 import useDataMigrator from './DataMigrator';
@@ -41,7 +41,6 @@ export const lastLoadState = atom({ key: 'lastLoadState', default: null, effects
 export const loadingTextState = atom({ key: 'loadingTextState', default: 'Chargement des données' });
 
 export default function DataLoader() {
-  const API = useApi();
   const [user, setUser] = useRecoilState(userState);
   const { migrateData } = useDataMigrator();
 

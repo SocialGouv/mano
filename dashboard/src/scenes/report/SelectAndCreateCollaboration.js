@@ -3,7 +3,7 @@ import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import SelectCustom from '../../components/SelectCustom';
 import { organisationState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import API from '../../services/api';
 
 const NoOptionsMessage = () => (
   <span style={{ fontSize: 14, textAlign: 'center', color: '#808080', width: '100%', display: 'block' }}>
@@ -13,7 +13,6 @@ const NoOptionsMessage = () => (
 
 const SelectAndCreateCollaboration = ({ values, onChange }) => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const API = useApi();
 
   const onChangeRequest = (newCollabs) => {
     onChange({ currentTarget: { value: newCollabs || [], name: 'collaborations' } });

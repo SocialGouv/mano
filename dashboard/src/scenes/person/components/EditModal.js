@@ -19,7 +19,7 @@ import { useState } from 'react';
 import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import useApi from '../../../services/api';
+import API from '../../../services/api';
 
 export default function EditModal({ person, selectedPanel, onClose }) {
   const [openPanels, setOpenPanels] = useState([selectedPanel]);
@@ -29,7 +29,7 @@ export default function EditModal({ person, selectedPanel, onClose }) {
   const allowedFieldsInHistory = useRecoilValue(allowedFieldsInHistorySelector);
   const team = useRecoilValue(currentTeamState);
   const setPersons = useSetRecoilState(personsState);
-  const API = useApi();
+
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const personFields = useRecoilValue(personFieldsSelector);
 

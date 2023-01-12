@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { RecoilRoot, useRecoilValue } from 'recoil';
+import RecoilNexus from 'recoil-nexus';
 import { Router, Switch, Redirect } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 import * as Sentry from '@sentry/react';
@@ -25,7 +26,7 @@ import Drawer from './components/drawer';
 import Reception from './scenes/reception';
 import Charte from './scenes/auth/charte';
 import { userState } from './recoil/auth';
-import useApi, { recoilResetKeyState, tokenCached } from './services/api';
+import API, { recoilResetKeyState, authTokenState } from './services/api';
 import ScrollToTop from './components/ScrollToTop';
 import TopBar from './components/TopBar';
 import VersionOutdatedAlert from './components/VersionOutdatedAlert';
@@ -80,25 +81,25 @@ if (ENV === 'production') {
 }
 
 const App = ({ resetRecoil }) => {
-  const API = useApi();
-
+  const authToken = useRecoilValue(authTokenState);
   const recoilResetKey = useRecoilValue(recoilResetKeyState);
   useEffect(() => {
-    if (!!recoilResetKey) resetRecoil();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [recoilResetKey]);
-
-  const onWindowFocus = useCallback((e) => {
-    if (tokenCached && e.newState === 'active') API.get({ path: '/check-auth' }); // will force logout if session is expired
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (!!recoilResetKey) {
+      resetRecoil();
+    }
+  }, [recoilResetKey, resetRecoil]);
 
   useEffect(() => {
+    const onWindowFocus = (e) => {
+      if (authToken && e.newState === 'active') {
+        API.get({ path: '/check-auth' }); // will force logout if session is expired
+      }
+    };
     lifecycle.addEventListener('statechange', onWindowFocus);
     return () => {
       lifecycle.removeEventListener('statechange', onWindowFocus);
     };
-  }, [onWindowFocus]);
+  }, [authToken]);
 
   return (
     <div className="main-container">
@@ -163,6 +164,7 @@ export default function ContextedApp() {
   const [recoilKey, setRecoilKey] = useState(0);
   return (
     <RecoilRoot key={recoilKey}>
+      <RecoilNexus />
       <App resetRecoil={() => setRecoilKey((k) => k + 1)} />
     </RecoilRoot>
   );

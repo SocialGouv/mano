@@ -3,7 +3,7 @@ import { prepareActionForEncryption } from '../recoil/actions';
 import { organisationState } from '../recoil/auth';
 import { usePreparePersonForEncryption } from '../recoil/persons';
 import { prepareReportForEncryption } from '../recoil/reports';
-import useApi, { encryptItem, hashedOrgEncryptionKey } from '../services/api';
+import API, { encryptItem } from '../services/api';
 import { dayjsInstance } from '../services/date';
 import { loadingTextState } from './DataLoader';
 
@@ -12,7 +12,6 @@ const LOADING_TEXT = 'Mise à jour des données de votre organisation…';
 export default function useDataMigrator() {
   const setLoadingText = useSetRecoilState(loadingTextState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
-  const API = useApi();
 
   const organisationId = organisation?._id;
 
@@ -37,9 +36,7 @@ export default function useDataMigrator() {
             date: dayjsInstance(report.date).format('YYYY-MM-DD'),
             oldDateSystem: report.date, // just to track if we did bad stuff
           }));
-        const encryptedReportsToMigrate = await Promise.all(
-          reportsToMigrate.map(prepareReportForEncryption).map(encryptItem(hashedOrgEncryptionKey))
-        );
+        const encryptedReportsToMigrate = await Promise.all(reportsToMigrate.map(prepareReportForEncryption).map(encryptItem));
         const response = await API.put({
           path: `/migration/reports-from-real-date-to-date-id`,
           body: { reportsToMigrate: encryptedReportsToMigrate },
@@ -121,9 +118,7 @@ export default function useDataMigrator() {
           return consolidatedReport;
         });
 
-        const encryptedConsolidatedReports = await Promise.all(
-          consolidatedReports.map(prepareReportForEncryption).map(encryptItem(hashedOrgEncryptionKey))
-        );
+        const encryptedConsolidatedReports = await Promise.all(consolidatedReports.map(prepareReportForEncryption).map(encryptItem));
 
         const response = await API.put({
           path: `/migration/clean-duplicated-reports-4`,
@@ -146,7 +141,7 @@ export default function useDataMigrator() {
           outOfActiveListReasons: p.outOfActiveListReason ? [p.outOfActiveListReason] : [],
           healthInsurances: p.healthInsurance ? [p.healthInsurance] : [],
         }));
-        const encryptedPersonsToMigrate = await Promise.all(personsToUpdate.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+        const encryptedPersonsToMigrate = await Promise.all(personsToUpdate.map(preparePersonForEncryption).map(encryptItem));
         const response = await API.put({
           path: `/migration/update-outOfActiveListReason-and-healthInsurances-to-multi-choice`,
           body: { personsToUpdate: encryptedPersonsToMigrate },
@@ -167,7 +162,7 @@ export default function useDataMigrator() {
           const { team, ...action } = a;
           return { ...action, teams: action.teams?.length ? action.teams : [team] };
         });
-        const encryptedActionsToMigrate = await Promise.all(actionsToUpdate.map(prepareActionForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
+        const encryptedActionsToMigrate = await Promise.all(actionsToUpdate.map(prepareActionForEncryption).map(encryptItem));
         const response = await API.put({
           path: `/migration/action-with-multiple-team`,
           body: { actionsToUpdate: encryptedActionsToMigrate },

@@ -9,7 +9,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { personsState, usePreparePersonForEncryption, personFieldsSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectAsInput from '../../components/SelectAsInput';
 import CustomFieldInput from '../../components/CustomFieldInput';
@@ -58,7 +58,6 @@ export function MedicalFile({ person }) {
 
   const user = useRecoilValue(userState);
   const users = useRecoilValue(usersState);
-  const API = useApi();
 
   const loadTreatment = (treatment) => {
     setShowAddTreatment(true);

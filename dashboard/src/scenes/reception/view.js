@@ -16,7 +16,7 @@ import { actionsState, TODO } from '../../recoil/actions';
 import { currentTeamState, userState } from '../../recoil/auth';
 import { personsState } from '../../recoil/persons';
 import { selector, selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import dayjs from 'dayjs';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
 import useTitle from '../../services/useTitle';
@@ -121,7 +121,7 @@ const Reception = () => {
 
   const todaysReport = useRecoilValue(todaysReportSelector);
   const user = useRecoilValue(userState);
-  const API = useApi();
+
   const persons = useRecoilValue(personsState);
 
   const history = useHistory();

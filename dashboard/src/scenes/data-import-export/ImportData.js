@@ -7,7 +7,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { personFieldsIncludingCustomFieldsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import { teamsState, userState } from '../../recoil/auth';
 import { isNullOrUndefined } from '../../utils';
-import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
+import API, { encryptItem } from '../../services/api';
 import { formatDateWithFullMonth, now } from '../../services/date';
 import { sanitizeFieldValueFromExcel } from './importSanitizer';
 
@@ -19,8 +19,6 @@ const ImportData = () => {
   const teams = useRecoilValue(teamsState);
 
   const preparePersonForEncryption = usePreparePersonForEncryption();
-
-  const API = useApi();
 
   const [showImportSummary, setShowImpotSummary] = useState(false);
   const [dataToImport, setDataToImport] = useState([]);
@@ -118,17 +116,8 @@ const ImportData = () => {
         }
       }
 
-      if (hashedOrgEncryptionKey) {
-        const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem(hashedOrgEncryptionKey)));
-        setDataToImport(encryptedPersons);
-      } else {
-        setDataToImport(
-          persons.map(preparePersonForEncryption).map((person) => {
-            delete person.decrypted;
-            return person;
-          })
-        );
-      }
+      const encryptedPersons = await Promise.all(persons.map(preparePersonForEncryption).map(encryptItem));
+      setDataToImport(encryptedPersons);
       setShowImpotSummary(true);
     } catch (e) {
       console.log(e);

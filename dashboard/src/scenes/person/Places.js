@@ -4,7 +4,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import UserName from '../../components/UserName';
 import { userState } from '../../recoil/auth';
 import { dayjsInstance } from '../../services/date';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { useDataLoader } from '../../components/DataLoader';
 import { ModalContainer, ModalHeader, ModalBody, ModalFooter } from '../../components/tailwind/Modal';
 import SelectCustom from '../../components/SelectCustom';
@@ -24,7 +24,6 @@ const PersonPlaces = ({ person }) => {
   const [deleting, setDeleting] = useState(false);
   const [helpModal, setHelpModal] = useState(false);
   const { refresh } = useDataLoader();
-  const API = useApi();
 
   const onDeleteRelPersonPlace = async (relPersonPlace) => {
     if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce lieu fréquenté ?')) return;
@@ -141,7 +140,7 @@ const RelPersonPlaceModal = ({ open, setOpen, person, relPersonPlaceModal, setPl
   const [placeId, setPlaceId] = useState(relPersonPlaceModal?.place);
   const [userId, setUserId] = useState(relPersonPlaceModal?.user ?? me._id);
   const [posting, setUpdating] = useState(false);
-  const API = useApi();
+
   const { refresh } = useDataLoader();
 
   useEffect(() => {
@@ -280,7 +279,7 @@ const EditRelPersonPlaceModal = ({ open, setOpen, placeToEdit }) => {
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
 
   const [updating, setUpdating] = useState(false);
-  const API = useApi();
+
   const { refresh } = useDataLoader();
   const [name, setName] = useState(placeToEdit?.name);
 

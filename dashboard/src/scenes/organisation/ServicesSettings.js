@@ -4,7 +4,7 @@ import SortableJS from 'sortablejs';
 import { useDataLoader } from '../../components/DataLoader';
 import ButtonCustom from '../../components/ButtonCustom';
 import { organisationState } from '../../recoil/auth';
-import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
+import API, { encryptItem } from '../../services/api';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import { toast } from 'react-toastify';
 import { capture } from '../../services/sentry';
@@ -25,7 +25,6 @@ const ServicesSettings = () => {
   const [isDisabled, setIsDisabled] = useState(false);
 
   const { refresh } = useDataLoader();
-  const API = useApi();
 
   const onAddGroup = async (e) => {
     e.preventDefault();
@@ -138,7 +137,6 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
   // const reports = useRecoilValue(reportsState);
   const flattenedServices = useRecoilValue(flattenedServicesSelector);
 
-  const API = useApi();
   const { refresh } = useDataLoader();
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
@@ -319,7 +317,6 @@ const Service = ({ service, groupTitle }) => {
   const reports = useRecoilValue(reportsState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
-  const API = useApi();
   const groupedServices = useRecoilValue(servicesSelector);
   const flattenedServices = useRecoilValue(flattenedServicesSelector);
   const { refresh } = useDataLoader();
@@ -361,7 +358,7 @@ const Service = ({ service, groupTitle }) => {
           };
         })
         .map(prepareReportForEncryption)
-        .map(encryptItem(hashedOrgEncryptionKey))
+        .map(encryptItem)
     );
     const newGroupedServices = groupedServices.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
@@ -408,7 +405,7 @@ const Service = ({ service, groupTitle }) => {
           services: action.services.filter((cat) => cat !== service),
         }))
         .map(prepareReportForEncryption)
-        .map(encryptItem(hashedOrgEncryptionKey))
+        .map(encryptItem)
     );
     */
     const oldOrganisation = organisation;

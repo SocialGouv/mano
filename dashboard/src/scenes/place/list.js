@@ -17,7 +17,7 @@ import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateWithFullMonth } from '../../services/date';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
@@ -107,7 +107,7 @@ const Create = () => {
   const [open, setOpen] = useState(false);
   const currentTeam = useRecoilValue(currentTeamState);
   const setPlaces = useSetRecoilState(placesState);
-  const API = useApi();
+
   const { isLoading, refresh } = useDataLoader();
 
   return (

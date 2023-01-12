@@ -13,7 +13,7 @@ import Table from '../../components/table';
 import CreateWrapper from '../../components/createWrapper';
 import TagTeam from '../../components/TagTeam';
 import { userState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import SelectRole from '../../components/SelectRole';
@@ -52,7 +52,7 @@ const List = () => {
   const [refresh, setRefresh] = useState(true);
   const user = useRecoilValue(userState);
   useTitle('Utilisateurs');
-  const API = useApi();
+
   const [sortBy, setSortBy] = useLocalStorage('users-sortBy', 'createdAt');
   const [sortOrder, setSortOrder] = useLocalStorage('users-sortOrder', 'ASC');
 
@@ -157,7 +157,6 @@ const TeamWrapper = styled.div`
 
 const Create = ({ onChange }) => {
   const [open, setOpen] = useState(false);
-  const API = useApi();
 
   return (
     <CreateWrapper>

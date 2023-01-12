@@ -10,7 +10,7 @@ import Loading from '../../components/loading';
 import ButtonCustom from '../../components/ButtonCustom';
 import NightSessionModale from '../../components/NightSessionModale';
 import { currentTeamState, teamsState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { useRecoilState } from 'recoil';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
@@ -23,8 +23,6 @@ const View = () => {
 
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
   const [teams, setTeams] = useRecoilState(teamsState);
-
-  const API = useApi();
 
   const getTeam = async () => {
     const { data } = await API.get({ path: `/team/${id}` });

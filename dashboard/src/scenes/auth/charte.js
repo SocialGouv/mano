@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { useRecoilState } from 'recoil';
 import ButtonCustom from '../../components/ButtonCustom';
 import { userState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { theme } from '../../config';
 import charte from '../../assets/charte.pdf';
 import OpenNewWindowIcon from '../../components/OpenNewWindowIcon';
@@ -11,7 +11,6 @@ import OpenNewWindowIcon from '../../components/OpenNewWindowIcon';
 const Charte = () => {
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useRecoilState(userState);
-  const API = useApi();
 
   const onSigninValidated = async () => {
     setLoading(true);
