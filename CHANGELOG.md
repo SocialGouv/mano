@@ -1,3 +1,10 @@
+# [1.214.0](https://github.com/SocialGouv/mano/compare/v1.213.0...v1.214.0) (2023-01-12)
+
+
+### Features
+
+* **dashboard:** can filter on unfilled date ([#1179](https://github.com/SocialGouv/mano/issues/1179)) ([5a23b86](https://github.com/SocialGouv/mano/commit/5a23b86ea01447c2e6b643db2583fd8f5420be23))
+
 # [1.213.0](https://github.com/SocialGouv/mano/compare/v1.212.0...v1.213.0) (2023-01-11)
 
 
