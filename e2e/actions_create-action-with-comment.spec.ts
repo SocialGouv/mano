@@ -1,7 +1,13 @@
 import { test, expect } from "@playwright/test";
 import { nanoid } from "nanoid";
 import { populate } from "./scripts/populate-db";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+import "dayjs/locale/fr";
 import { changeReactSelectValue, loginWith } from "./utils";
+
+dayjs.extend(utc);
+dayjs.locale("fr");
 
 test.beforeAll(async () => {
   await populate();
@@ -81,4 +87,9 @@ test("Create action with comments", async ({ page }) => {
   await expect(page).toHaveURL(/http:\/\/localhost:8090\/action\/.*/);
   await page.getByText("Un commentaire pour tout le monde").click();
   await page.getByRole("button", { name: "Sauvegarder" }).click();
+  await page.getByText("Commentaire mis à jour").click();
+
+  await page.getByRole("link", { name: "Comptes rendus" }).click();
+  await page.getByRole("button", { name: dayjs().format("YYYY-MM-DD") }).click();
+  await page.getByText("Commentaires (3)").click();
 });
