@@ -44,9 +44,6 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
-# BUCK
-buck-out/
-\.buckd/
 *.keystore
 !debug.keystore
 
@@ -69,3 +66,6 @@ buck-out/
 
 android/sentry.properties
 ios/sentry.properties
+
+# Temporary files created by Metro to check the health of the file watcher
+63	.metro-health-check*
