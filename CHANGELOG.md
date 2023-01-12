@@ -1,3 +1,10 @@
+## [1.214.2](https://github.com/SocialGouv/mano/compare/v1.214.1...v1.214.2) (2023-01-12)
+
+
+### Bug Fixes
+
+* export array data as string joined with coma for stats export ([8efd542](https://github.com/SocialGouv/mano/commit/8efd5425c4c8bb8f54083ae68dd36155a7ce2626))
+
 ## [1.214.1](https://github.com/SocialGouv/mano/compare/v1.214.0...v1.214.1) (2023-01-12)
 
 
