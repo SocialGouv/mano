@@ -4,7 +4,7 @@ import { useRecoilValue } from 'recoil';
 import { personFieldsIncludingCustomFieldsSelector, personsState } from '../../recoil/persons';
 import { utils, writeFile } from 'xlsx';
 import { dayjsInstance } from '../../services/date';
-import { teamsState} from '../../recoil/auth';
+import { teamsState } from '../../recoil/auth';
 
 // Source: https://tailwindui.com/components/application-ui/elements/dropdowns
 export default function ExportFormattedData({ personCreated, personUpdated, actions }) {
