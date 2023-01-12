@@ -1,3 +1,10 @@
+## [1.214.3](https://github.com/SocialGouv/mano/compare/v1.214.2...v1.214.3) (2023-01-12)
+
+
+### Bug Fixes
+
+* **dashboard:** new service system (retro-compatible) ([#1141](https://github.com/SocialGouv/mano/issues/1141)) ([374aa1b](https://github.com/SocialGouv/mano/commit/374aa1bf923187b91e05b508af2d8afb02dacb34))
+
 ## [1.214.2](https://github.com/SocialGouv/mano/compare/v1.214.1...v1.214.2) (2023-01-12)
 
 
