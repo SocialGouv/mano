@@ -1,3 +1,10 @@
+## [1.214.1](https://github.com/SocialGouv/mano/compare/v1.214.0...v1.214.1) (2023-01-12)
+
+
+### Bug Fixes
+
+* show action comment in reports ([#1182](https://github.com/SocialGouv/mano/issues/1182)) ([a0999b1](https://github.com/SocialGouv/mano/commit/a0999b1aceb179359e16a359c37719044c766c68))
+
 # [1.214.0](https://github.com/SocialGouv/mano/compare/v1.213.0...v1.214.0) (2023-01-12)
 
 
