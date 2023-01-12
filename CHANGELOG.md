@@ -1,3 +1,10 @@
+## [1.215.1](https://github.com/SocialGouv/mano/compare/v1.215.0...v1.215.1) (2023-01-12)
+
+
+### Bug Fixes
+
+* **dashboard:** report main page fails when no team selected ([42c953d](https://github.com/SocialGouv/mano/commit/42c953dbb050cc80a90b60563c120e15abc98c8c))
+
 # [1.215.0](https://github.com/SocialGouv/mano/compare/v1.214.4...v1.215.0) (2023-01-12)
 
 
