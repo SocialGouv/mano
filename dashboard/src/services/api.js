@@ -266,6 +266,7 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
         query,
         method,
         body,
+
         headers,
       },
     });
