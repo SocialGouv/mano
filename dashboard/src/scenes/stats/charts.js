@@ -1,8 +1,9 @@
 import React from 'react';
 import { ResponsivePie } from '@nivo/pie';
 import { ResponsiveBar } from '@nivo/bar';
+import HelpButtonAndModal from '../../components/HelpButtonAndModal';
 
-export const CustomResponsivePie = ({ data = [], title, onItemClick }) => {
+export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => {
   const total = data.reduce((sum, item) => sum + item.value, 0);
 
   const onClick = ({ id }) => {
@@ -12,8 +13,10 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick }) => {
 
   return (
     <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-flex-wrap tw-items-center tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
-      <div className="tw-basis-full">
-        <p className="tw-mx-0 tw-mt-4 tw-mb-12 tw-text-center tw-text-lg tw-font-medium tw-text-black">{title}</p>
+      <div className="tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center ">
+        <p className="tw-m-0 tw-inline-block tw-text-center tw-text-lg tw-font-medium tw-text-black">
+          {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
+        </p>
       </div>
       <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center">
         <table className="tw-w-full tw-border tw-border-zinc-400">
@@ -63,13 +66,15 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick }) => {
   );
 };
 
-export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisTitleY }) => {
+export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisTitleY, help }) => {
   const getItemValue = (item) => Object.values(item)[1];
   const total = data.reduce((sum, item) => sum + getItemValue(item), 0);
   return (
     <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
-      <div className="tw-basis-full">
-        <p className="tw-mx-0 tw-mt-4 tw-mb-12 tw-text-center tw-text-lg tw-font-medium tw-text-black">{title}</p>
+      <div className="tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center">
+        <p className="tw-m-0 tw-inline-block tw-text-center tw-text-lg tw-font-medium tw-text-black">
+          {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
+        </p>
       </div>
       <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center">
         <table className="tw-w-full tw-border tw-border-zinc-400">

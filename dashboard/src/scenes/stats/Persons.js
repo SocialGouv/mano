@@ -29,7 +29,11 @@ const PersonStats = ({
         <Block data={personsForStats} title={`Nombre de ${title}`} help={firstBlockHelp} />
         <BlockCreatedAt persons={personsForStats} />
         <BlockWanderingAt persons={personsForStats} />
-        <BlockGroup groups={groupsForPersons(personsForStats)} title={`Nombre de familles dans lesquelles se trouvent des ${title}`} />
+        <BlockGroup
+          groups={groupsForPersons(personsForStats)}
+          title={`Nombre de familles dans lesquelles se trouvent des ${title}`}
+          help={`Une personne ne peut appartenir qu'à une famille.\n\n`}
+        />
       </div>
       <CustomResponsivePie
         title="Nationalité"
@@ -104,7 +108,12 @@ export const BlockWanderingAt = ({ persons }) => {
 
   return (
     <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-      <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={unit} count={count} />
+      <Card
+        title="Temps d'errance des personnes en&nbsp;moyenne"
+        unit={unit}
+        count={count}
+        help={`Cela veut dire qu'en moyenne, chaque personne considérée est en rue depuis ${count} ${unit}`}
+      />
     </div>
   );
 };
@@ -154,7 +163,12 @@ export const BlockCreatedAt = ({ persons }) => {
 
   return (
     <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-      <Card title="Temps de suivi moyen" unit={unit} count={count} />
+      <Card
+        title="Temps de suivi moyen"
+        unit={unit}
+        count={count}
+        help={`Cela veut dire qu'en moyenne, chaque personne considérée est suivie depuis ${count} ${unit}`}
+      />
     </div>
   );
 };
