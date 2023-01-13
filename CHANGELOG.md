@@ -1,3 +1,10 @@
+# [1.218.0](https://github.com/SocialGouv/mano/compare/v1.217.0...v1.218.0) (2023-01-13)
+
+
+### Features
+
+* show list of actions from stats pie chart ([#1156](https://github.com/SocialGouv/mano/issues/1156)) ([4189075](https://github.com/SocialGouv/mano/commit/4189075502025725515b937237d5a3cf216784e4))
+
 # [1.217.0](https://github.com/SocialGouv/mano/compare/v1.216.0...v1.217.0) (2023-01-13)
 
 
