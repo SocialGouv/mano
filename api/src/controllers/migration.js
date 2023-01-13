@@ -193,8 +193,16 @@ router.put(
             error.status = 400;
             throw error;
           }
-          const result = await Service.bulkCreate(
-            req.body.servicesToSaveInDB.map((service) => ({ ...service, organisation: req.user.organisation }))
+          await Service.bulkCreate(
+            req.body.servicesToSaveInDB.map(
+              (service) => (
+                { ...service, organisation: req.user.organisation },
+                {
+                  transaction: tx,
+                  updateOnDuplicate: ["service", "date", "team", "organisation"],
+                }
+              )
+            )
           );
           for (const { _id, encrypted, encryptedEntityKey } of req.body.reportsToUpdate) {
             const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
