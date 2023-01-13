@@ -20,7 +20,7 @@ import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncrypti
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import useTitle from '../../services/useTitle';
 import { useDataLoader } from '../../components/DataLoader';
 import useCreateReportAtDateIfNotExist from '../../services/useCreateReportAtDateIfNotExist';
@@ -51,7 +51,7 @@ const ActionView = () => {
   const groups = useRecoilValue(groupsState);
 
   const history = useHistory();
-  const API = useApi();
+
   const { refresh } = useDataLoader();
 
   useTitle(`${action?.name} - Action`);

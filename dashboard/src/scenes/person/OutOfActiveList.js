@@ -6,14 +6,14 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import ButtonCustom from '../../components/ButtonCustom';
 import { fieldsPersonsCustomizableOptionsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import DatePicker from 'react-datepicker';
 import { dateForDatePicker } from '../../services/date';
 import SelectCustom from '../../components/SelectCustom';
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
-  const API = useApi();
+
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);

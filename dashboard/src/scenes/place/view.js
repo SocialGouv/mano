@@ -12,7 +12,7 @@ import { personsState } from '../../recoil/persons';
 import { relsPersonPlaceState } from '../../recoil/relPersonPlace';
 import { placesState, preparePlaceForEncryption } from '../../recoil/places';
 import { useRecoilState, useRecoilValue } from 'recoil';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
@@ -22,8 +22,6 @@ const View = () => {
   const [places, setPlaces] = useRecoilState(placesState);
   const [relsPersonPlace, setRelsPersonPlace] = useRecoilState(relsPersonPlaceState);
   const persons = useRecoilValue(personsState);
-
-  const API = useApi();
 
   const place = places.find((p) => p._id === id);
   useTitle(`${place?.name} - Lieu fréquenté`);

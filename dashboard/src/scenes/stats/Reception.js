@@ -3,14 +3,13 @@ import { CustomResponsivePie } from './charts';
 import { Block } from './Blocks';
 import { organisationState } from '../../recoil/auth';
 import { useRecoilValue } from 'recoil';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { toast } from 'react-toastify';
 import { dayjsInstance } from '../../services/date';
 
 const ReceptionStats = ({ passages, reportsServices, period, teamsId }) => {
   const organisation = useRecoilValue(organisationState);
   const [servicesFromDatabase, setServicesFromDatabase] = useState(null);
-  const API = useApi();
   const startDate = useMemo(() => (period.startDate ? dayjsInstance(period.startDate).format('YYYY-MM-DD') : null), [period.startDate]);
   const endDate = useMemo(() => (period.endDate ? dayjsInstance(period.endDate).format('YYYY-MM-DD') : null), [period.endDate]);
 
@@ -27,7 +26,6 @@ const ReceptionStats = ({ passages, reportsServices, period, teamsId }) => {
         }
       );
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [teamsId, startDate, endDate]
   );
 

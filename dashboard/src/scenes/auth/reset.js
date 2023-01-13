@@ -2,11 +2,11 @@ import React, { useState } from 'react';
 import { Redirect, useLocation } from 'react-router-dom';
 import packageInfo from '../../../package.json';
 import ChangePassword from '../../components/ChangePassword';
-import useApi from '../../services/api';
+import API from '../../services/api';
 
 const Reset = () => {
   const [redirect, setRedirect] = useState(false);
-  const API = useApi();
+
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const token = searchParams.get('token');

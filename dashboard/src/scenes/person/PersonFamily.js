@@ -7,7 +7,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import UserName from '../../components/UserName';
 import { userState } from '../../recoil/auth';
 import { dayjsInstance } from '../../services/date';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { groupSelector, groupsState, prepareGroupForEncryption } from '../../recoil/groups';
 import SelectPerson from '../../components/SelectPerson';
 import { useDataLoader } from '../../components/DataLoader';
@@ -23,7 +23,6 @@ const PersonFamily = ({ person }) => {
   const [newRelationModalOpen, setNewRelationModalOpen] = useState(false);
   const [relationToEdit, setRelationToEdit] = useState(null);
   const { refresh } = useDataLoader();
-  const API = useApi();
 
   const onAddFamilyLink = async (e) => {
     e.preventDefault();

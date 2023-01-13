@@ -17,7 +17,7 @@ import SelectCustom from '../../components/SelectCustom';
 import { onlyFilledObservationsTerritories } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { formatDateWithFullMonth } from '../../services/date';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { filterBySearch } from '../search/utils';
 import useTitle from '../../services/useTitle';
 import useSearchParamState from '../../services/useSearchParamState';
@@ -128,7 +128,7 @@ const CreateTerritory = () => {
   const history = useHistory();
   const currentTeam = useRecoilValue(currentTeamState);
   const user = useRecoilValue(userState);
-  const API = useApi();
+
   const setTerritories = useSetRecoilState(territoriesState);
   const { refresh, isLoading } = useDataLoader();
 

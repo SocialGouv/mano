@@ -5,7 +5,7 @@ import Table from '../../components/table';
 import { toast } from 'react-toastify';
 import ButtonCustom from '../../components/ButtonCustom';
 import Search from '../../components/search';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import useTitle from '../../services/useTitle';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
@@ -20,7 +20,6 @@ const List = () => {
   const [currentStructureOpen, setCurrentStructureOpen] = useState(false);
 
   useTitle('Structures');
-  const API = useApi();
 
   const getStructures = async () => {
     const response = await API.get({ path: '/structure', query: { search } });
@@ -112,7 +111,6 @@ const List = () => {
 };
 
 const Structure = ({ structure: initStructure, onSuccess, existingCategories, open, onClose, onOpen }) => {
-  const API = useApi();
   const structureRef = React.useRef(initStructure);
   const [structure, setStructure] = useState(initStructure);
   const [disabled, setDisabled] = useState(false);

@@ -9,7 +9,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { DEFAULT_ORGANISATION_KEY } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
 import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
-import useApi, { setOrgEncryptionKey } from '../../services/api';
+import API, { setOrgEncryptionKey, authTokenState } from '../../services/api';
 import { useDataLoader } from '../../components/DataLoader';
 
 const SignIn = () => {
@@ -27,7 +27,7 @@ const SignIn = () => {
   const [loading, setLoading] = useState(true);
   const [authViaCookie, setAuthViaCookie] = useState(false);
   const { load: runDataLoader, isLoading, resetCache } = useDataLoader();
-  const API = useApi();
+  const setToken = useSetRecoilState(authTokenState);
 
   const [signinForm, setSigninForm] = useState({ email: '', password: '', orgEncryptionKey: DEFAULT_ORGANISATION_KEY || '' });
   const [signinFormErrors, setSigninFormErrors] = useState({ email: '', password: '', orgEncryptionKey: '' });
@@ -106,7 +106,7 @@ const SignIn = () => {
         setShowEncryption(true);
         return setIsSubmitting(false);
       }
-      if (token) API.setToken(token);
+      if (token) setToken(token);
       if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
         await resetCache();
       }

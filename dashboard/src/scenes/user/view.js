@@ -12,7 +12,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import SelectRole from '../../components/SelectRole';
 import { organisationState, userState } from '../../recoil/auth';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import useTitle from '../../services/useTitle';
 import DeleteButtonAndConfirmModal from '../../components/DeleteButtonAndConfirmModal';
 
@@ -22,7 +22,7 @@ const View = () => {
   const history = useHistory();
   const [user, setUser] = useRecoilState(userState);
   const organisation = useRecoilValue(organisationState);
-  const API = useApi();
+
   useTitle(`Utilisateur ${user?.name}`);
 
   const getUserData = useCallback(async () => {

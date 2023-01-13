@@ -1,4 +1,3 @@
-
 import React, { useMemo } from 'react';
 import { Input, Col, Row, FormGroup, Label } from 'reactstrap';
 import { toast } from 'react-toastify';
@@ -11,7 +10,7 @@ import { currentTeamState, organisationState, userState } from '../../../recoil/
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../../recoil/comments';
-import useApi from '../../../services/api';
+import API from '../../../services/api';
 import { groupsState } from '../../../recoil/groups';
 import { ModalBody, ModalContainer, ModalHeader } from '../../../components/tailwind/Modal';
 
@@ -21,7 +20,6 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
   const organisation = useRecoilValue(organisationState);
   const currentTeam = useRecoilValue(currentTeamState);
   const setComments = useSetRecoilState(commentsState);
-  const API = useApi();
 
   const canToggleGroupCheck = useMemo(
     () => !!organisation.groupsEnabled && !!person._id && groups.find((group) => group.persons.includes(person._id)),

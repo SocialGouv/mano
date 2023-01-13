@@ -39,7 +39,7 @@ import { territoriesState } from '../../recoil/territory';
 import PersonName from '../../components/PersonName';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import IncrementorSmall from '../../components/IncrementorSmall';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { passagesState } from '../../recoil/passages';
 import { rencontresState } from '../../recoil/rencontres';
 import Passage from '../../components/Passage';
@@ -97,7 +97,7 @@ const View = () => {
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
   const [activeTab, setActiveTab] = useSearchParamState('tab', ['restricted-access'].includes(user.role) ? 'reception' : 'resume');
-  const API = useApi();
+
   const { refresh, isLoading } = useDataLoader();
 
   const selectedTeamsReports = useMemo(() => {
@@ -794,7 +794,6 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
   const [show, setShow] = useState([]);
   // `service` structure is: { `team-id-xxx`: { `service-name`: 1, ... }, ... }
   const [services, setServices] = useState({});
-  const API = useApi();
 
   useEffect(() => {
     setShow([reports.length === 1 ? reports[0].team : 'all']);
@@ -841,7 +840,6 @@ const Reception = ({ reports, selectedTeamsObject, dateString }) => {
         setServices(results.reduce((acc, curr) => ({ ...acc, ...curr }), {}));
       });
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [dateString, reports, organisation.services]
   );
 
@@ -1727,7 +1725,7 @@ const PersonCreatedAt = ({ date, persons, setSortBy, setSortOrder, sortBy, sortO
 
 const DescriptionAndCollaborations = ({ reports, selectedTeamsObject, dateString }) => {
   const setReports = useSetRecoilState(reportsState);
-  const API = useApi();
+
   const lastLoad = useRecoilValue(lastLoadState);
 
   return (

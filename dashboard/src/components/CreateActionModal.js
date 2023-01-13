@@ -8,7 +8,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
-import useApi from '../services/api';
+import API from '../services/api';
 
 import SelectPerson from './SelectPerson';
 import ButtonCustom from './ButtonCustom';
@@ -28,7 +28,7 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
   const setActions = useSetRecoilState(actionsState);
   const groups = useRecoilValue(groupsState);
   const setComments = useSetRecoilState(commentsState);
-  const API = useApi();
+
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const onAddAction = async (body) => {

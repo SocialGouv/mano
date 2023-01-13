@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { servicesSelector } from '../recoil/reports';
 import { useRecoilValue } from 'recoil';
-import useApi from '../services/api';
+import API from '../services/api';
 import { toast } from 'react-toastify';
 import IncrementorSmall from './IncrementorSmall';
 import { organisationState } from '../recoil/auth';
@@ -10,7 +10,6 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
   const organisation = useRecoilValue(organisationState);
   const groupedServices = useRecoilValue(servicesSelector);
   const [selected, setSelected] = useState(groupedServices[0]?.groupTitle || null);
-  const API = useApi();
 
   useEffect(
     // Init services for a team. We need to fetch services from legacy report and database and merge them.

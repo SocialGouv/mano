@@ -5,7 +5,7 @@ import { useDataLoader } from '../../components/DataLoader';
 import ButtonCustom from '../../components/ButtonCustom';
 import { actionsCategoriesSelector, flattenedCategoriesSelector, actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import { organisationState } from '../../recoil/auth';
-import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
+import API, { encryptItem } from '../../services/api';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from '../../components/tailwind/Modal';
 import { toast } from 'react-toastify';
 import { capture } from '../../services/sentry';
@@ -25,7 +25,6 @@ const ActionCategoriesSettings = () => {
   const [isDisabled, setIsDisabled] = useState(false);
 
   const { refresh } = useDataLoader();
-  const API = useApi();
 
   const onAddGroup = async (e) => {
     e.preventDefault();
@@ -76,7 +75,7 @@ const ActionCategoriesSettings = () => {
       setOrganisation(res.data);
       refresh();
     }
-  }, [API, actionsGroupedCategories, organisation._id, refresh, setOrganisation]);
+  }, [actionsGroupedCategories, organisation._id, refresh, setOrganisation]);
 
   const gridRef = useRef(null);
   const sortableRef = useRef(null);
@@ -139,7 +138,6 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
   const actions = useRecoilValue(actionsState);
   const flattenedCategories = useRecoilValue(flattenedCategoriesSelector);
 
-  const API = useApi();
   const { refresh } = useDataLoader();
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
@@ -206,7 +204,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
           categories: (action.categories || []).map((category) => (categoriesToDelete.includes(category) ? null : category)).filter(Boolean),
         }))
         .map(prepareActionForEncryption)
-        .map(encryptItem(hashedOrgEncryptionKey))
+        .map(encryptItem)
     );
 
     const oldOrganisation = organisation;
@@ -339,7 +337,6 @@ const Category = ({ category, groupTitle }) => {
   const actions = useRecoilValue(actionsState);
   const [organisation, setOrganisation] = useRecoilState(organisationState);
 
-  const API = useApi();
   const actionsGroupedCategories = useRecoilValue(actionsCategoriesSelector);
   const flattenedCategories = useRecoilValue(flattenedCategoriesSelector);
   const { refresh } = useDataLoader();
@@ -362,7 +359,7 @@ const Category = ({ category, groupTitle }) => {
           categories: [...new Set(action.categories.map((cat) => (cat === oldCategory ? newCategory.trim() : cat)))],
         }))
         .map(prepareActionForEncryption)
-        .map(encryptItem(hashedOrgEncryptionKey))
+        .map(encryptItem)
     );
     const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
@@ -408,7 +405,7 @@ const Category = ({ category, groupTitle }) => {
           categories: action.categories.filter((cat) => cat !== category),
         }))
         .map(prepareActionForEncryption)
-        .map(encryptItem(hashedOrgEncryptionKey))
+        .map(encryptItem)
     );
     const oldOrganisation = organisation;
     setOrganisation({ ...organisation, actionsGroupedCategories: newActionsGroupedCategories }); // optimistic UI

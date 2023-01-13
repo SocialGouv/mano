@@ -6,7 +6,7 @@ import { v4 as uuidv4 } from 'uuid';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { consultationsState, defaultConsultationFields, prepareConsultationForEncryption } from '../recoil/consultations';
-import useApi from '../services/api';
+import API from '../services/api';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 import CustomFieldInput from './CustomFieldInput';
@@ -25,7 +25,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
   const setModalConfirmState = useSetRecoilState(modalConfirmState);
   const setAllConsultations = useSetRecoilState(consultationsState);
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
-  const API = useApi();
+
   const isNewConsultation = !consultation;
   const initialState = useMemo(
     () =>

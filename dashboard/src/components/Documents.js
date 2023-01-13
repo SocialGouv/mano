@@ -6,7 +6,7 @@ import ButtonCustom from './ButtonCustom';
 import { formatDateWithFullMonth } from '../services/date';
 import { capture } from '../services/sentry';
 import { toast } from 'react-toastify';
-import useApi from '../services/api';
+import API from '../services/api';
 import { useRecoilValue } from 'recoil';
 import { organisationState, userState } from '../recoil/auth';
 
@@ -21,7 +21,6 @@ const Documents = ({
   conditionForDelete = () => true,
   onRowClick = null,
 }) => {
-  const API = useApi();
   const user = useRecoilValue(userState);
   const organisation = useRecoilValue(organisationState);
 

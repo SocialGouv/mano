@@ -3,7 +3,7 @@ import { Alert } from 'reactstrap';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import Places from './Places';
 import { itemsGroupedByPersonSelector } from '../../recoil/selectors';
-import useApi from '../../services/api';
+import API from '../../services/api';
 import { formatDateWithFullMonth } from '../../services/date';
 import History from './components/History';
 import { MedicalFile } from './MedicalFile';
@@ -30,7 +30,7 @@ const populatedPersonSelector = selectorFamily({
 export default function View() {
   const { personId } = useParams();
   const location = useLocation();
-  const API = useApi();
+
   const organisation = useRecoilValue(organisationState);
   const person = useRecoilValue(populatedPersonSelector({ personId }));
   const personGroup = useRecoilValue(groupSelector({ personId }));

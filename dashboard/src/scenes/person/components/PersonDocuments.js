@@ -6,14 +6,14 @@ import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from '../../../co
 import { organisationState, usersState, userState } from '../../../recoil/auth';
 import { groupsState } from '../../../recoil/groups';
 import { personsState, usePreparePersonForEncryption } from '../../../recoil/persons';
-import useApi from '../../../services/api';
+import API from '../../../services/api';
 import { formatDateTimeWithNameOfDay } from '../../../services/date';
 import { capture } from '../../../services/sentry';
 import { download } from '../../../utils';
 
 const PersonDocuments = ({ person }) => {
   const [documentToEdit, setDocumentToEdit] = useState(null);
-  const API = useApi();
+
   const user = useRecoilValue(userState);
   const setPersons = useSetRecoilState(personsState);
   const [resetFileInputKey, setResetFileInputKey] = useState(0); // to be able to use file input multiple times
@@ -147,7 +147,7 @@ function DocumentModal({ document, onClose, person }) {
   const users = useRecoilValue(usersState);
   const preparePersonForEncryption = usePreparePersonForEncryption();
   const setPersons = useSetRecoilState(personsState);
-  const API = useApi();
+
   const groups = useRecoilValue(groupsState);
   const organisation = useRecoilValue(organisationState);
 

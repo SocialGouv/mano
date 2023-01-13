@@ -9,7 +9,7 @@ import SelectUser from './SelectUser';
 import { teamsState, userState } from '../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker } from '../services/date';
-import useApi from '../services/api';
+import API from '../services/api';
 import { rencontresState, prepareRencontreForEncryption } from '../recoil/rencontres';
 import SelectTeam from './SelectTeam';
 import SelectPerson from './SelectPerson';
@@ -19,7 +19,7 @@ const Rencontre = ({ rencontre, onFinished }) => {
   const user = useRecoilValue(userState);
   const teams = useRecoilValue(teamsState);
   const [open, setOpen] = useState(false);
-  const API = useApi();
+
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const setRencontres = useSetRecoilState(rencontresState);

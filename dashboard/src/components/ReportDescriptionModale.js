@@ -4,13 +4,13 @@ import { Col, FormGroup, Input, Label, Modal, ModalBody, ModalHeader, Row } from
 import ButtonCustom from './ButtonCustom';
 import { Formik } from 'formik';
 import { prepareReportForEncryption, reportsState } from '../recoil/reports';
-import useApi from '../services/api';
+import API from '../services/api';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import { lastLoadState, mergeItems } from './DataLoader';
 
 const ReportDescriptionModale = ({ report }) => {
   const [reports, setReports] = useRecoilState(reportsState);
-  const API = useApi();
+
   const [open, setOpen] = useState(false);
   const lastLoad = useRecoilValue(lastLoadState);
 

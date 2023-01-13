@@ -8,13 +8,12 @@ import Observation from './view';
 import CreateObservation from '../../components/CreateObservation';
 import { territoryObservationsState } from '../../recoil/territoryObservations';
 import { useRecoilState } from 'recoil';
-import useApi from '../../services/api';
+import API from '../../services/api';
 
 const List = ({ territory = {} }) => {
   const [territoryObservations, setTerritoryObservations] = useRecoilState(territoryObservationsState);
   const [observation, setObservation] = useState({});
   const [openObservationModale, setOpenObservationModale] = useState(null);
-  const API = useApi();
 
   const observations = useMemo(() => territoryObservations.filter((obs) => obs.territory === territory._id), [territory._id, territoryObservations]);
 

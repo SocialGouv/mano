@@ -18,7 +18,7 @@ import SelectTeamMultiple from '../../components/SelectTeamMultiple';
 import UserName from '../../components/UserName';
 import Table from '../../components/table';
 import { organisationState, teamsState, userState } from '../../recoil/auth';
-import useApi, { encryptItem, hashedOrgEncryptionKey } from '../../services/api';
+import API, { encryptItem } from '../../services/api';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import { actionsState, prepareActionForEncryption } from '../../recoil/actions';
 import { passagesState, preparePassageForEncryption } from '../../recoil/passages';
@@ -61,7 +61,6 @@ const fieldIsEmpty = (value) => {
 };
 
 const MergeTwoPersons = ({ person }) => {
-  const API = useApi();
   const [open, setOpen] = useState(false);
   const [persons, setPersons] = useRecoilState(personsState);
   const teams = useRecoilValue(teamsState);
@@ -239,12 +238,12 @@ const MergeTwoPersons = ({ person }) => {
                 const mergedActions = actions
                   .filter((a) => a.person === personToMergeAndDelete._id)
                   .map((comment) => prepareActionForEncryption({ ...comment, person: originPerson._id }))
-                  .map(encryptItem(hashedOrgEncryptionKey));
+                  .map(encryptItem);
 
                 const mergedComments = comments
                   .filter((c) => c.person === personToMergeAndDelete._id)
                   .map((comment) => prepareCommentForEncryption({ ...comment, person: originPerson._id }))
-                  .map(encryptItem(hashedOrgEncryptionKey));
+                  .map(encryptItem);
 
                 const mergedRelsPersonPlace = relsPersonPlace
                   .filter((rel) => rel.person === personToMergeAndDelete._id)
@@ -260,12 +259,12 @@ const MergeTwoPersons = ({ person }) => {
                 const mergedPassages = passages
                   .filter((p) => p.person === personToMergeAndDelete._id)
                   .map((passage) => preparePassageForEncryption({ ...passage, person: originPerson._id }))
-                  .map(encryptItem(hashedOrgEncryptionKey));
+                  .map(encryptItem);
 
                 const mergedRencontres = rencontres
                   .filter((r) => r.person === personToMergeAndDelete._id)
                   .map((rencontre) => prepareRencontreForEncryption({ ...rencontre, person: originPerson._id }))
-                  .map(encryptItem(hashedOrgEncryptionKey));
+                  .map(encryptItem);
 
                 const mergedConsultations = consultations
                   .filter((consultation) => consultation.person === personToMergeAndDelete._id)
@@ -314,15 +313,15 @@ const MergeTwoPersons = ({ person }) => {
                 const response = await API.post({
                   path: '/merge/persons',
                   body: {
-                    mergedPerson: await encryptItem(hashedOrgEncryptionKey)(mergedPerson),
-                    mergedActions: await Promise.all(mergedActions.map(encryptItem(hashedOrgEncryptionKey))),
-                    mergedComments: await Promise.all(mergedComments.map(encryptItem(hashedOrgEncryptionKey))),
-                    mergedRelsPersonPlace: await Promise.all(mergedRelsPersonPlace.map(encryptItem(hashedOrgEncryptionKey))),
-                    mergedPassages: await Promise.all(mergedPassages.map(encryptItem(hashedOrgEncryptionKey))),
-                    mergedRencontres: await Promise.all(mergedRencontres.map(encryptItem(hashedOrgEncryptionKey))),
-                    mergedConsultations: await Promise.all(mergedConsultations.map(encryptItem(hashedOrgEncryptionKey))),
-                    mergedTreatments: await Promise.all(mergedTreatments.map(encryptItem(hashedOrgEncryptionKey))),
-                    mergedMedicalFile: mergedMedicalFile ? await encryptItem(hashedOrgEncryptionKey)(mergedMedicalFile) : undefined,
+                    mergedPerson: await encryptItem(mergedPerson),
+                    mergedActions: await Promise.all(mergedActions.map(encryptItem)),
+                    mergedComments: await Promise.all(mergedComments.map(encryptItem)),
+                    mergedRelsPersonPlace: await Promise.all(mergedRelsPersonPlace.map(encryptItem)),
+                    mergedPassages: await Promise.all(mergedPassages.map(encryptItem)),
+                    mergedRencontres: await Promise.all(mergedRencontres.map(encryptItem)),
+                    mergedConsultations: await Promise.all(mergedConsultations.map(encryptItem)),
+                    mergedTreatments: await Promise.all(mergedTreatments.map(encryptItem)),
+                    mergedMedicalFile: mergedMedicalFile ? await encryptItem(mergedMedicalFile) : undefined,
                     personToDeleteId: personToMergeAndDelete._id,
                     medicalFileToDeleteId,
                   },

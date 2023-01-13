@@ -14,7 +14,7 @@ import { currentTeamState, teamsState, userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { dateForDatePicker, dayjsInstance } from '../services/date';
-import useApi from '../services/api';
+import API from '../services/api';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 export const policeSelect = ['Oui', 'Non'];
 export const atmosphereSelect = ['Violences', 'Tensions', 'RAS'];
@@ -32,7 +32,7 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
   const territories = useRecoilValue(territoriesState);
   const customFieldsObs = useRecoilValue(customFieldsObsSelector);
   const setTerritoryObs = useSetRecoilState(territoryObservationsState);
-  const API = useApi();
+
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
 
   const addTerritoryObs = async (obs) => {

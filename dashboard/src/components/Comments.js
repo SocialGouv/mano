@@ -14,7 +14,7 @@ import { currentTeamState, organisationState, userState } from '../recoil/auth';
 import { commentsState, prepareCommentForEncryption } from '../recoil/comments';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
 import { formatDateTimeWithNameOfDay, dateForDatePicker } from '../services/date';
-import useApi from '../services/api';
+import API from '../services/api';
 import ExclamationMarkButton from './tailwind/ExclamationMarkButton';
 import { useDataLoader } from './DataLoader';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
@@ -45,7 +45,7 @@ const Comments = ({ onUpdateResults }) => {
   const { personId, actionId } = useParams();
   const [editingId, setEditing] = useState(null);
   const [clearNewCommentKey, setClearNewCommentKey] = useState(null);
-  const API = useApi();
+
   const setComments = useSetRecoilState(commentsState);
   const user = useRecoilValue(userState);
   const currentTeam = useRecoilValue(currentTeamState);

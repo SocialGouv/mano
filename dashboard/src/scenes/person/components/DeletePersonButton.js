@@ -4,7 +4,7 @@ import { toast } from 'react-toastify';
 import { useRecoilState, useSetRecoilState } from 'recoil';
 import { personsState } from '../../../recoil/persons';
 import { actionsState } from '../../../recoil/actions';
-import useApi from '../../../services/api';
+import API from '../../../services/api';
 import { commentsState } from '../../../recoil/comments';
 import { passagesState } from '../../../recoil/passages';
 import { rencontresState } from '../../../recoil/rencontres';
@@ -16,7 +16,6 @@ import { treatmentsState } from '../../../recoil/treatments';
 import { userState } from '../../../recoil/auth';
 
 const DeletePersonButton = ({ person }) => {
-  const API = useApi();
   const setPersons = useSetRecoilState(personsState);
 
   const [actions, setActions] = useRecoilState(actionsState);
@@ -44,7 +43,9 @@ const DeletePersonButton = ({ person }) => {
             !!consultations.find((c) => c.person === person._id))
         ) {
           if (
-            !window.confirm('Des données médicales sont associées à cette personne. Si vous la supprimez, ces données seront également effacées. Vous n’avez pas accès à ces données médicales car vous n’êtes pas un professionnel de santé. Voulez-vous supprimer cette personne et toutes ses données ?')
+            !window.confirm(
+              'Des données médicales sont associées à cette personne. Si vous la supprimez, ces données seront également effacées. Vous n’avez pas accès à ces données médicales car vous n’êtes pas un professionnel de santé. Voulez-vous supprimer cette personne et toutes ses données ?'
+            )
           )
             return;
         }

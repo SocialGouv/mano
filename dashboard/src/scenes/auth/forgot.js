@@ -3,11 +3,10 @@ import validator from 'validator';
 import { toast } from 'react-toastify';
 import packageInfo from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
-import useApi from '../../services/api';
+import API from '../../services/api';
 
 const View = () => {
   const [done, setDone] = useState(false);
-  const API = useApi();
 
   const [resetForm, setResetForm] = useState({
     email: '',

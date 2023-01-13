@@ -12,7 +12,7 @@ import legal from '../assets/legal.pdf';
 import privacy from '../assets/privacy.pdf';
 import charte from '../assets/charte.pdf';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import useApi from '../services/api';
+import API from '../services/api';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Notification from './Notification';
 import { toast } from 'react-toastify';
@@ -25,7 +25,7 @@ const TopBar = () => {
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
   const [currentTeam, setCurrentTeam] = useRecoilState(currentTeamState);
-  const API = useApi();
+
   const { resetCache } = useDataLoader();
 
   return (
