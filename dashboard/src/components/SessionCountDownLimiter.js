@@ -7,7 +7,7 @@ import PasswordInput from './PasswordInput';
 import validator from 'validator';
 import { useRecoilValue } from 'recoil';
 import { organisationState, sessionInitialDateTimestamp } from '../recoil/auth';
-import useApi, { setOrgEncryptionKey } from '../services/api';
+import API, { setOrgEncryptionKey } from '../services/api';
 
 dayjs.extend(utc);
 dayjs.extend(duration);
@@ -19,7 +19,6 @@ const maxCookieAge = 60 * 60 * 13; // 13 hours in s, setup in /api/src/controlle
 
 const SessionCountDownLimiter = () => {
   const [reloadModalOpen, setReloadModalOpen] = useState(false);
-  const API = useApi();
 
   const sessionStart = useRef(Date.now());
   const [sessionSeconds, setSessionSeconds] = useState(Math.floor((Date.now() - sessionStart.current) / 1000));
