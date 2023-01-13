@@ -33,11 +33,16 @@ const ReceptionStats = ({ passages, reportsServices, period, teamsId }) => {
     <>
       <h3 className="tw-my-5 tw-text-xl">Statistiques de l'accueil</h3>
       <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-        <Block data={passages.length} title="Nombre de passages" />
+        <Block
+          data={passages.length}
+          title="Nombre de passages"
+          help={`Nombre de passages enregistrés dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des passages.`}
+        />
       </div>
       {servicesFromDatabase !== null && (
         <CustomResponsivePie
           title="Services"
+          help={`Services enregistrés dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des services.`}
           data={organisation.services?.map((service) => {
             return {
               id: service,
