@@ -118,6 +118,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
     await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes créées")).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes suivies")).toBeVisible();
     await expect(page.getByRole("list").getByText("Passages")).toBeVisible();
     await expect(page.getByRole("list").getByText("Rencontres")).toBeVisible();
@@ -183,6 +184,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
     await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes créées")).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes suivies")).toBeVisible();
     await expect(page.getByRole("list").getByText("Passages")).toBeVisible();
     await expect(page.getByRole("list").getByText("Rencontres")).toBeVisible();
@@ -243,6 +245,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
     await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes créées")).toBeVisible();
     await expect(page.getByRole("list").getByText("Personnes suivies")).toBeVisible();
     await expect(page.getByRole("list").getByText("Passages")).toBeVisible();
     await expect(page.getByRole("list").getByText("Rencontres")).toBeVisible();

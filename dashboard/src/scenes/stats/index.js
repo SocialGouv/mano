@@ -43,6 +43,7 @@ const tabs = [
   'Général',
   'Accueil',
   'Actions',
+  'Personnes créées',
   'Personnes suivies',
   'Passages',
   'Rencontres',
@@ -477,16 +478,33 @@ const Stats = () => {
             allCategories={allCategories}
           />
         )}
-        {activeTab === 'Personnes suivies' && (
+        {activeTab === 'Personnes créées' && (
           <PersonStats
+            title="personnes créées"
+            firstBlockHelp={`Nombre de personnes dont la date 'Suivi(e) depuis' se situe dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
+            persons={persons}
             personsForStats={personsForStats}
-            personsUpdatedForStats={personsUpdatedForStats}
             groupsForPersons={groupsForPersons}
             personFields={personFields}
+            fieldsPersonsCustomizableOptions={fieldsPersonsCustomizableOptions}
+            customFieldsPersonsMedical={customFieldsPersonsMedical}
+            customFieldsPersonsSocial={customFieldsPersonsSocial}
+          />
+        )}
+        {activeTab === 'Personnes suivies' && (
+          <PersonStats
+            title="personnes suivies"
+            firstBlockHelp={`Nombre de personnes pour lesquelles il s'est passé quelque chose durant la période sélectionnée:\n\ncréation, modification, commentaire, action, rencontre, passage, lieu fréquenté, consultation, traitement.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+            filterBase={filterPersonsWithAllFields()}
+            filterPersons={filterPersons}
+            setFilterPersons={setFilterPersons}
             persons={persons}
+            personsForStats={personsUpdatedForStats}
+            groupsForPersons={groupsForPersons}
+            personFields={personFields}
             fieldsPersonsCustomizableOptions={fieldsPersonsCustomizableOptions}
             customFieldsPersonsMedical={customFieldsPersonsMedical}
             customFieldsPersonsSocial={customFieldsPersonsSocial}
