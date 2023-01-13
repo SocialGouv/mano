@@ -481,7 +481,7 @@ const Stats = () => {
         {activeTab === 'Personnes créées' && (
           <PersonStats
             title="personnes créées"
-            firstBlockHelp={`Nombre de personnes dont la date 'Suivi(e) depuis' se situe dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+            firstBlockHelp={`Nombre de personnes dont la date 'Suivi(e) depuis le / Créé(e) le' se situe dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
