@@ -1,3 +1,10 @@
+# [1.219.0](https://github.com/SocialGouv/mano/compare/v1.218.0...v1.219.0) (2023-01-13)
+
+
+### Features
+
+* split persons stats ([#1189](https://github.com/SocialGouv/mano/issues/1189)) ([b8d6724](https://github.com/SocialGouv/mano/commit/b8d6724abedad4d548c734dfcec4af775b378795))
+
 # [1.218.0](https://github.com/SocialGouv/mano/compare/v1.217.0...v1.218.0) (2023-01-13)
 
 
