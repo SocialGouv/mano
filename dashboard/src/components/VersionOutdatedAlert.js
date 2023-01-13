@@ -1,4 +1,3 @@
-import { Alert } from 'reactstrap';
 import { useRecoilValue } from 'recoil';
 import { compare } from 'compare-versions';
 import { VERSION } from '../config';
@@ -14,18 +13,11 @@ export default function VersionOutdatedAlert() {
 
   if (minimumDashboardVersion > VERSION) {
     return (
-      <Alert
-        style={{
-          position: 'fixed',
-          top: '10px',
-          zIndex: '100',
-        }}
-        color="danger">
+      <div className="tw-fixed tw-top-2.5 tw-z-[100] tw-mb-4 tw-rounded tw-border tw-border-red-200 tw-bg-rose-200 tw-py-3 tw-px-5 tw-text-red-900">
         <b>Important !</b> Votre version du dashboard doit être mise à jour pour continuer à fonctionner.
         <br /> Sauvegardez vos modifications si vous en avez et{' '}
         <a
-          className="alert-link"
-          style={{ textDecoration: 'underline' }}
+          className="tw-font-bold tw-text-stone-800 tw-underline"
           href="/"
           onClick={(e) => {
             e.preventDefault();
@@ -34,22 +26,15 @@ export default function VersionOutdatedAlert() {
           rafraichissez cette page
         </a>
         .
-      </Alert>
+      </div>
     );
   }
 
   return (
-    <Alert
-      style={{
-        position: 'fixed',
-        top: '10px',
-        zIndex: '100',
-      }}
-      color="warning">
+    <div className="tw-fixed tw-top-2.5 tw-z-[100] tw-mb-4 tw-rounded tw-border tw-border-orange-50 tw-bg-amber-100 tw-py-3 tw-px-5 tw-text-orange-900">
       Une nouvelle version du site est disponible.{' '}
       <a
-        className="alert-link"
-        style={{ textDecoration: 'underline' }}
+        className="tw-font-bold tw-text-stone-800 tw-underline"
         href="/"
         onClick={(e) => {
           e.preventDefault();
@@ -58,6 +43,6 @@ export default function VersionOutdatedAlert() {
         Rafraichissez cette page
       </a>{' '}
       pour l'utiliser !
-    </Alert>
+    </div>
   );
 }
