@@ -1,3 +1,10 @@
+# [1.216.0](https://github.com/SocialGouv/mano/compare/v1.215.1...v1.216.0) (2023-01-13)
+
+
+### Features
+
+* **dashboard:** add help for Personnes suivies and Personnes créées in stats ([#1172](https://github.com/SocialGouv/mano/issues/1172)) ([883daac](https://github.com/SocialGouv/mano/commit/883daacbe12cb14c99c3b6e0698f0fadcd7873cc))
+
 ## [1.215.1](https://github.com/SocialGouv/mano/compare/v1.215.0...v1.215.1) (2023-01-12)
 
 
