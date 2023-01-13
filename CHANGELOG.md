@@ -1,3 +1,10 @@
+# [1.217.0](https://github.com/SocialGouv/mano/compare/v1.216.0...v1.217.0) (2023-01-13)
+
+
+### Features
+
+* **dashboard:** ask masterkey after 3 hours session ([#1165](https://github.com/SocialGouv/mano/issues/1165)) ([8d91d60](https://github.com/SocialGouv/mano/commit/8d91d60a75cd6525c4f70a4bf649a002c2d5c61b))
+
 # [1.216.0](https://github.com/SocialGouv/mano/compare/v1.215.1...v1.216.0) (2023-01-13)
 
 
