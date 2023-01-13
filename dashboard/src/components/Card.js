@@ -46,7 +46,7 @@ const HelpModal = ({ open, setOpen, title, help }) => {
             capture(`Pas compris l'aide de: ${title}`);
             setOpen(false);
           }}>
-          Pas compris
+          Je n'ai pas compris
         </button>
         <button
           type="button"
