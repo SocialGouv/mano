@@ -1,107 +1,65 @@
-import React, { useEffect, useRef, useState } from 'react';
-import styled from 'styled-components';
-import { theme } from '../config';
+import React, { useState } from 'react';
+import QuestionMarkButton from './QuestionMarkButton';
+import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
+import { capture } from '../services/sentry';
 
-const Card = ({ title, count, unit, children, onChange, countId, dataTestId }) => {
-  const [localcount, setLocalcount] = useState(count);
-
-  const changeTimeout = useRef(null);
-  const inputRef = useRef(null);
-
-  useEffect(() => {
-    setLocalcount(count);
-  }, [count]);
-
-  const onChangeRequest = async (newCount) => {
-    newCount = Number(parseInt(newCount, 10).toString());
-    setLocalcount(newCount);
-    clearTimeout(changeTimeout.current);
-    changeTimeout.current = setTimeout(() => onChange(newCount), 1000);
-  };
+const Card = ({ title, count, unit, children, countId, dataTestId, help }) => {
+  const [helpOpen, setHelpOpen] = useState(false);
 
   return (
-    <CardWrapper>
-      {!!title && <CardTitle>{title}</CardTitle>}
-      <CardCount withChildren={!!children}>
-        {!!onChange ? (
-          <InputStyled
-            id={countId}
-            type="number"
-            ref={inputRef}
-            value={localcount}
-            onChange={(e) => onChangeRequest(Number(e.currentTarget.value))}
-          />
-        ) : (
+    <>
+      <div className="tw-relative tw-mb-2.5 tw-flex tw-h-full tw-w-full tw-flex-col tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-px-3 tw-pt-6 tw-pb-10 tw-font-bold">
+        {!!title && (
+          <div className="tw-relative">
+            <span className="tw-text-center tw-text-lg tw-font-medium tw-text-black">{title}</span>
+            {!!help && <QuestionMarkButton title={help} aria-label={help} className="noprint tw-ml-5" onClick={() => setHelpOpen(true)} />}
+          </div>
+        )}
+        <div className={['flex tw-items-end tw-text-6xl tw-text-main', !!children ? 'tw-mb-4' : ''].join(' ')}>
           <span data-test-id={`${dataTestId}-${count}`} id={countId}>
             {count}
           </span>
-        )}
-        {!!unit && <Unit>{unit}</Unit>}
-      </CardCount>
-      {children}
-    </CardWrapper>
+          {!!unit && <span className="tw-ml-2.5 tw-text-base">{unit}</span>}
+        </div>
+        {children}
+      </div>
+      {!!help && <HelpModal open={helpOpen} setOpen={setHelpOpen} title={title} help={help} />}
+    </>
   );
 };
 
-const CardWrapper = styled.div`
-  background: ${theme.white};
-  padding: 24px 12px 40px;
-  border-radius: 20px;
-  display: flex;
-  height: 100%;
-  justify-content: space-between;
-  align-items: center;
-  flex-direction: column;
-  font-weight: bold;
-  margin-bottom: 10px;
-  border: 1px solid ${theme.main25};
-  width: 100%;
-`;
-
-const CardTitle = styled.div`
-  font-size: 18px;
-  font-weight: 500;
-  line-height: 24px;
-  text-align: center;
-  color: ${theme.black};
-`;
-
-const fontSize = 56;
-const CardCount = styled.div`
-  font-size: ${fontSize}px;
-  line-height: ${fontSize}px;
-  color: ${theme.main};
-  display: flex;
-  align-items: flex-end;
-  ${(props) => props.withChildren && 'margin-bottom: 15px;'}
-`;
-
-const InputStyled = styled.input`
-  border: none;
-  display: block;
-  width: ${(props) => (`${props.value}`.length * fontSize * 2) / 3}px;
-  font-weight: 600;
-  line-height: 56px;
-  color: ${theme.main};
-  height: 100%;
-  text-align: center;
-
-  &::-webkit-outer-spin-button,
-  &::-webkit-inner-spin-button {
-    /* display: none; <- Crashes Chrome on hover */
-    -webkit-appearance: none;
-    margin: 0; /* <-- Apparently some margin are still there even though it's hidden */
-  }
-
-  &[type='number'] {
-    -moz-appearance: textfield; /* Firefox */
-  }
-`;
-
-const Unit = styled.span`
-  font-size: 15px;
-  margin-left: 10px;
-  line-height: 25px;
-`;
+const HelpModal = ({ open, setOpen, title, help }) => {
+  return (
+    <ModalContainer open={open}>
+      <ModalHeader title={title} />
+      <ModalBody>
+        <div className="tw-flex tw-flex-col tw-gap-4  tw-px-8 tw-py-4">
+          <p className="tw-mb-0" dangerouslySetInnerHTML={{ __html: help.split('\n').join('<br>') }} />
+        </div>
+      </ModalBody>
+      <ModalFooter>
+        <button
+          type="button"
+          name="cancel"
+          className="button-cancel"
+          onClick={() => {
+            capture(`Pas compris l'aide de: ${title}`);
+            setOpen(false);
+          }}>
+          Je n'ai pas compris
+        </button>
+        <button
+          type="button"
+          name="cancel"
+          className="button-submit"
+          onClick={() => {
+            setOpen(false);
+          }}>
+          OK merci !
+        </button>
+      </ModalFooter>
+    </ModalContainer>
+  );
+};
 
 export default Card;

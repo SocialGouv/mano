@@ -25,8 +25,16 @@ const PersonStats = ({
       <h3 className="tw-my-5 tw-text-xl">Statistiques des personnes suivies</h3>
       <Filters base={filterBase} filters={filterPersons} onChange={setFilterPersons} />
       <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-        <Block data={personsForStats} title="Nombre de personnes créées" />
-        <Block data={personsUpdatedForStats} title="Nombre de personnes suivies" />
+        <Block
+          data={personsForStats}
+          title="Nombre de personnes créées"
+          help={`Nombre de personnes dont la date 'Suivi(e) depuis' se situe dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+        />
+        <Block
+          data={personsUpdatedForStats}
+          title="Nombre de personnes suivies"
+          help={`Nombre de personnes pour lesquelles il s'est passé quelque chose durant la période sélectionnée:\n\ncréation, modification, commentaire, action, rencontre, passage, lieu fréquenté, consultation, traitement.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+        />
         <BlockCreatedAt persons={personsForStats} />
         <BlockWanderingAt persons={personsForStats} />
         <BlockGroup groups={groupsForPersons(personsForStats)} title="Nombre de familles dans lesquelles se trouvent des personnes créées" />
