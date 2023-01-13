@@ -10,11 +10,12 @@ const Comment = require("../models/comment");
 const Report = require("../models/report");
 const Person = require("../models/person");
 const validateEncryptionAndMigrations = require("../middleware/validateEncryptionAndMigrations");
-const { looseUuidRegex } = require("../utils");
+const { looseUuidRegex, dateRegex } = require("../utils");
 const { capture } = require("../sentry");
 const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const Action = require("../models/action");
+const Service = require("../models/service");
 
 router.put(
   "/:migrationName",
@@ -166,6 +167,40 @@ router.put(
             if (action) {
               action.set({ encrypted, encryptedEntityKey });
               await action.save();
+            }
+          }
+        }
+
+        if (req.params.migrationName === "services-in-services-table") {
+          try {
+            z.array(
+              z.object({
+                _id: z.string().regex(looseUuidRegex),
+                encrypted: z.string(),
+                encryptedEntityKey: z.string(),
+              })
+            ).parse(req.body.reportsToUpdate);
+            z.array(
+              z.object({
+                team: z.string().regex(looseUuidRegex),
+                date: z.string().regex(dateRegex),
+                service: z.string(),
+                count: z.number(),
+              })
+            ).parse(req.body.servicesToSaveInDB);
+          } catch (e) {
+            const error = new Error(`Invalid request in services-in-services-table migration: ${e}`);
+            error.status = 400;
+            throw error;
+          }
+          const result = await Service.bulkCreate(
+            req.body.servicesToSaveInDB.map((service) => ({ ...service, organisation: req.user.organisation }))
+          );
+          for (const { _id, encrypted, encryptedEntityKey } of req.body.reportsToUpdate) {
+            const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
+            if (report) {
+              report.set({ encrypted, encryptedEntityKey });
+              await report.save();
             }
           }
         }
