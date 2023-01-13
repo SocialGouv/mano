@@ -27,3 +27,8 @@ export const currentTeamState = atom({
   key: 'currentTeamState',
   default: null,
 });
+
+export const sessionInitialDateTimestamp = atom({
+  key: 'sessionInitialDateTimestamp',
+  default: null,
+});

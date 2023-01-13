@@ -8,12 +8,13 @@ import packageInfo from '../../../package.json';
 import ButtonCustom from '../../components/ButtonCustom';
 import { DEFAULT_ORGANISATION_KEY } from '../../config';
 import PasswordInput from '../../components/PasswordInput';
-import { currentTeamState, organisationState, teamsState, usersState, userState } from '../../recoil/auth';
+import { currentTeamState, organisationState, sessionInitialDateTimestamp, teamsState, usersState, userState } from '../../recoil/auth';
 import API, { setOrgEncryptionKey, authTokenState } from '../../services/api';
 import { useDataLoader } from '../../components/DataLoader';
 
 const SignIn = () => {
   const [organisation, setOrganisation] = useRecoilState(organisationState);
+  const setSessionInitialTimestamp = useSetRecoilState(sessionInitialDateTimestamp);
   const setCurrentTeam = useSetRecoilState(currentTeamState);
   const setTeams = useSetRecoilState(teamsState);
   const setUsers = useSetRecoilState(usersState);
@@ -107,6 +108,7 @@ const SignIn = () => {
         return setIsSubmitting(false);
       }
       if (token) setToken(token);
+      setSessionInitialTimestamp(Date.now());
       if (organisation._id !== window.localStorage.getItem('mano-organisationId')) {
         await resetCache();
       }
