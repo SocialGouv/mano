@@ -9,3 +9,8 @@ export const minimumDashboardVersionState = atom({
   key: 'minimumDashboardVersionState',
   default: null,
 });
+
+export const dashboardNewFeaturesState = atom({
+  key: 'dashboardNewFeaturesState',
+  default: '',
+});

@@ -33,6 +33,7 @@ const HOST = getHost();
 const SCHEME = process.env.NODE_ENV === 'development' || process.env.REACT_APP_TEST === 'true' ? process.env.REACT_APP_SCHEME : 'https';
 const ENV = process.env.NODE_ENV || 'production';
 const VERSION = packageInfo.version;
+// const VERSION = process.env.NODE_ENV === 'development' ? '1.215.0' : packageInfo.version;
 const DEFAULT_ORGANISATION_KEY =
   process.env.NODE_ENV === 'development' && process.env.REACT_APP_TEST !== 'true' ? process.env.REACT_APP_DEFAULT_ORGANISATION_KEY : '';
 

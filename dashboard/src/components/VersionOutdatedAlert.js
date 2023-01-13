@@ -1,7 +1,7 @@
 import { useRecoilValue } from 'recoil';
 import { compare } from 'compare-versions';
 import { VERSION } from '../config';
-import { apiVersionState, minimumDashboardVersionState } from '../recoil/version';
+import { apiVersionState, dashboardNewFeaturesState, minimumDashboardVersionState } from '../recoil/version';
 
 export default function VersionOutdatedAlert() {
   const apiVersion = useRecoilValue(apiVersionState);
@@ -26,6 +26,7 @@ export default function VersionOutdatedAlert() {
           rafraichissez cette page
         </a>
         .
+        <NewStuff />
       </div>
     );
   }
@@ -43,6 +44,23 @@ export default function VersionOutdatedAlert() {
         Rafraichissez cette page
       </a>{' '}
       pour l'utiliser !
+      <NewStuff />
     </div>
   );
 }
+
+const NewStuff = () => {
+  const dashboardNewFeatures = useRecoilValue(dashboardNewFeaturesState);
+  if (!!!dashboardNewFeatures?.length) return null;
+  return (
+    <>
+      <br />
+      <b>Nouveautés :</b>
+      <ul className="tw-max-w-2xl tw-list-disc">
+        {dashboardNewFeatures.split('_').map((line, i) => (
+          <li key={i}>{line}</li>
+        ))}
+      </ul>
+    </>
+  );
+};

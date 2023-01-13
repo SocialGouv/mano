@@ -4,11 +4,11 @@ import URI from 'urijs';
 import { toast } from 'react-toastify';
 import fetchRetry from 'fetch-retry';
 import packageInfo from '../../package.json';
-import { HOST, SCHEME } from '../config';
+import { HOST, SCHEME, VERSION } from '../config';
 import { organisationState } from '../recoil/auth';
 import { decrypt, derivedMasterKey, encrypt, generateEntityKey, checkEncryptedVerificationKey, encryptFile, decryptFile } from './encryption';
 import { AppSentry, capture } from './sentry';
-import { apiVersionState, minimumDashboardVersionState } from '../recoil/version';
+import { apiVersionState, minimumDashboardVersionState, dashboardNewFeaturesState } from '../recoil/version';
 const fetch = fetchRetry(window.fetch);
 
 const getUrl = (path, query = {}) => {
@@ -199,7 +199,13 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
       method,
       mode: 'cors',
       credentials: 'include',
-      headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: 'dashboard', version: packageInfo.version },
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+        platform: 'dashboard',
+        version: VERSION,
+      },
     };
 
     if (body) {
@@ -225,6 +231,9 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
     }
     if (response.headers.has('x-minimum-dashboard-version')) {
       setRecoil(minimumDashboardVersionState, response.headers.get('x-minimum-dashboard-version'));
+    }
+    if (response.headers.has('x-dashboard-newfeatures')) {
+      setRecoil(dashboardNewFeaturesState, response.headers.get('x-dashboard-newfeatures'));
     }
 
     if (!response.ok && response.status === 401) {
