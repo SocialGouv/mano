@@ -23,10 +23,10 @@ export const BlockDateWithTime = ({ data, field, help }) => {
 
 const twoDecimals = (number) => Math.round(number * 100) / 100;
 
-export const BlockTotal = ({ title, unit, data, field }) => {
+export const BlockTotal = ({ title, unit, data, field, help }) => {
   try {
     if (!data.length) {
-      return <Card title={title} unit={unit} count={0} />;
+      return <Card title={title} unit={unit} count={0} help={help} />;
     }
     const dataWithOnlyNumbers = data.filter((item) => Boolean(item[field])).filter((e) => !isNaN(Number(e[field])));
     const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);
@@ -36,6 +36,7 @@ export const BlockTotal = ({ title, unit, data, field }) => {
         title={title}
         unit={unit}
         count={twoDecimals(total)}
+        help={help}
         children={
           <span className="font-weight-normal">
             Moyenne: <strong>{twoDecimals(avg)}</strong>

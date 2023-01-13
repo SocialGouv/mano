@@ -24,6 +24,7 @@ export const filterData = (data, filters) => {
           if (['date-with-time', 'date'].includes(filter.type)) {
             const { date, dateComparator } = filter.value;
             if (dateComparator === 'unfilled') return !itemValue || [null, undefined].includes(itemValue) ? item : null;
+            if (!itemValue || [null, undefined].includes(itemValue)) return null;
             if (dateComparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
             if (dateComparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
             if (dateComparator === 'equals') return isOnSameDay(itemValue, date) ? item : null;
@@ -48,7 +49,7 @@ export const filterData = (data, filters) => {
           }
           // type is array
           if (!itemValue.length && filter.value === 'Non renseigné') return item;
-          if (itemValue.includes(filter.value)) {
+          if (itemValue?.includes?.(filter.value)) {
             let newValues = itemValue.filter((value) => value !== filter.value);
             if (!newValues.length) newValues = ['Uniquement'];
             return {
