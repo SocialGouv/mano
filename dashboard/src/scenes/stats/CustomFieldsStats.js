@@ -12,7 +12,7 @@ function getColsSize(totalCols) {
   return '1/4';
 }
 
-const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = '' }) => {
+const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = '', help }) => {
   const team = useRecoilValue(currentTeamState);
 
   const customFieldsInStats = customFields
@@ -38,17 +38,17 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
             {additionalCols.map((col) => (
               <div className={`tw-px-4 tw-py-2 tw-basis-${colSize}`} key={col.title}>
                 {/* TODO: fix alignment. */}
-                <Card title={col.title} count={col.value} children={<div></div>} dataTestId={dataTestId} />
+                <Card title={col.title} count={col.value} children={<div></div>} dataTestId={dataTestId} help={help?.(col.title.capitalize())} />
               </div>
             ))}
             {customFieldsNumber.map((field) => (
               <div className={`tw-px-4 tw-py-2 tw-basis-${colSize}`} key={field.name}>
-                <BlockTotal title={field.label} data={data} field={field.name} />
+                <BlockTotal title={field.label} data={data} field={field.name} help={help?.(field.label.capitalize())} />
               </div>
             ))}
             {customFieldsDate.map((field) => (
               <div className={`tw-px-4 tw-py-2 tw-basis-${colSize}`} key={field.name}>
-                <BlockDateWithTime data={data} field={field} />
+                <BlockDateWithTime data={data} field={field} help={help?.(field.label.capitalize())} />
               </div>
             ))}
           </div>
@@ -57,6 +57,7 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
       {customFieldsResponsivePie.map((field) => (
         <CustomResponsivePie
           title={field.label}
+          help={help?.(field.label.capitalize())}
           key={field.name}
           data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
         />

@@ -21,10 +21,10 @@ export const BlockDateWithTime = ({ data, field, help }) => {
   return <Card title={field.label + ' (moyenne)'} unit={unit} count={count} help={help} />;
 };
 
-export const BlockTotal = ({ title, unit, data, field }) => {
+export const BlockTotal = ({ title, unit, data, field, help }) => {
   try {
     if (!data.length) {
-      return <Card title={title} unit={unit} count={0} />;
+      return <Card title={title} unit={unit} count={0} help={help} />;
     }
     const dataWithOnlyNumbers = data.filter((item) => Boolean(item[field])).filter((e) => !isNaN(Number(e[field])));
     const total = dataWithOnlyNumbers.reduce((total, item) => total + Number(item[field]), 0);
@@ -34,6 +34,7 @@ export const BlockTotal = ({ title, unit, data, field }) => {
         title={title}
         unit={unit}
         count={total}
+        help={help}
         children={
           <span className="font-weight-normal">
             Moyenne: <strong>{avg}</strong>

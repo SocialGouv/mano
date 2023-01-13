@@ -50,7 +50,8 @@ const tabs = [
   'Observations',
   'Comptes-rendus',
   'Consultations',
-  'Dossiers médicaux',
+  'Dossiers médicaux des personnes créées',
+  'Dossiers médicaux des personnes suivies',
 ];
 
 const Stats = () => {
@@ -426,7 +427,11 @@ const Stats = () => {
       </div>
       <ul className="tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
         {tabs
-          .filter((e) => user.healthcareProfessional || !['Consultations', 'Dossiers médicaux'].includes(e))
+          .filter(
+            (e) =>
+              user.healthcareProfessional ||
+              !['Consultations', 'Dossiers médicaux des personnes créées', 'Dossiers médicaux des personnes suivies'].includes(e)
+          )
           .map((tabCaption, index) => {
             if (!organisation.receptionEnabled && tabCaption === 'Accueil') return null;
             return (
@@ -485,11 +490,9 @@ const Stats = () => {
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
-            persons={persons}
             personsForStats={personsForStats}
             groupsForPersons={groupsForPersons}
             personFields={personFields}
-            fieldsPersonsCustomizableOptions={fieldsPersonsCustomizableOptions}
             customFieldsPersonsMedical={customFieldsPersonsMedical}
             customFieldsPersonsSocial={customFieldsPersonsSocial}
           />
@@ -501,11 +504,9 @@ const Stats = () => {
             filterBase={filterPersonsWithAllFields()}
             filterPersons={filterPersons}
             setFilterPersons={setFilterPersons}
-            persons={persons}
             personsForStats={personsUpdatedForStats}
             groupsForPersons={groupsForPersons}
             personFields={personFields}
-            fieldsPersonsCustomizableOptions={fieldsPersonsCustomizableOptions}
             customFieldsPersonsMedical={customFieldsPersonsMedical}
             customFieldsPersonsSocial={customFieldsPersonsSocial}
           />
@@ -538,12 +539,24 @@ const Stats = () => {
         {user.healthcareProfessional && (
           <>
             {activeTab === 'Consultations' && <ConsultationsStats consultations={consultations} />}
-            {activeTab === 'Dossiers médicaux' && (
+            {activeTab === 'Dossiers médicaux des personnes créées' && (
               <MedicalFilesStats
                 filterBase={filterPersonsWithAllFields(true)}
+                title="personnes créées"
                 filterPersons={filterPersons}
                 setFilterPersons={setFilterPersons}
                 personsForStats={personsForStats}
+                customFieldsMedicalFile={customFieldsMedicalFile}
+                personFields={personFields}
+              />
+            )}
+            {activeTab === 'Dossiers médicaux des personnes suivies' && (
+              <MedicalFilesStats
+                filterBase={filterPersonsWithAllFields(true)}
+                filterPersons={filterPersons}
+                title="personnes suivies"
+                setFilterPersons={setFilterPersons}
+                personsForStats={personsUpdatedForStats}
                 customFieldsMedicalFile={customFieldsMedicalFile}
                 personFields={personFields}
               />
