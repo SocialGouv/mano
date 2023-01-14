@@ -1,3 +1,10 @@
+## [1.219.2](https://github.com/SocialGouv/mano/compare/v1.219.1...v1.219.2) (2023-01-14)
+
+
+### Bug Fixes
+
+* debug api stats call to see why its so long ([4d2e3cd](https://github.com/SocialGouv/mano/commit/4d2e3cdc57c2f09bd7fa49f82cc6dc8df42174b2))
+
 ## [1.219.1](https://github.com/SocialGouv/mano/compare/v1.219.0...v1.219.1) (2023-01-14)
 
 
