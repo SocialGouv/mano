@@ -175,9 +175,12 @@ export const deleteFile = async ({ path }) => {
   return response.json();
 };
 
-const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null } = {}) => {
+const execute = async ({ method, path = '', body = null, query = {}, headers = {}, forceMigrationLastUpdate = null, startLoadingDate } = {}) => {
+  if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'inside execute');
   const organisation = getRecoil(organisationState);
+  if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'got organisation');
   const tokenCached = getRecoil(authTokenState);
+  if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'got token cached');
   const { encryptionLastUpdateAt, encryptionEnabled, encryptedVerificationKey, migrationLastUpdateAt } = organisation;
   try {
     // Force logout when one user has been logged in multiple tabs to different organisations.
@@ -201,11 +204,11 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
       credentials: 'include',
       headers: { ...headers, 'Content-Type': 'application/json', Accept: 'application/json', platform: 'dashboard', version: packageInfo.version },
     };
-
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'headers done');
     if (body) {
       options.body = JSON.stringify(await encryptItem(body));
     }
-
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'body done');
     if (['PUT', 'POST', 'DELETE'].includes(method) && enableEncrypt) {
       query = {
         encryptionLastUpdateAt,
@@ -214,18 +217,24 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
         ...query,
       };
     }
-
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'query done');
     options.retries = 10;
     options.retryDelay = 2000;
 
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'url starrt');
     const url = getUrl(path, query);
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'url done');
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'fetch starrt');
     const response = await fetch(url, options);
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'fetch done');
     if (response.headers.has('x-api-version')) {
       setRecoil(apiVersionState, response.headers.get('x-api-version'));
     }
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'x-api-version');
     if (response.headers.has('x-minimum-dashboard-version')) {
       setRecoil(minimumDashboardVersionState, response.headers.get('x-minimum-dashboard-version'));
     }
+    if (startLoadingDate) console.log(Date.now() - startLoadingDate, 'x-minimum-dashboard-version');
 
     if (!response.ok && response.status === 401) {
       if (!['/user/logout', '/user/signin-token'].includes(path)) logout();

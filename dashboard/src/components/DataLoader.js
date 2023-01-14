@@ -125,6 +125,7 @@ export default function DataLoader() {
           console.log(Date.now() - startLoadingDate, 'get stats', loadingText);
           API.get({
             path: '/organisation/stats',
+            startLoadingDate,
             query: {
               organisation: organisationId,
               after: lastLoadValue || 0,
