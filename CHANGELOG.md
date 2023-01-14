@@ -1,3 +1,10 @@
+## [1.219.4](https://github.com/SocialGouv/mano/compare/v1.219.3...v1.219.4) (2023-01-14)
+
+
+### Bug Fixes
+
+* add bugs on /api side only ([8f3832f](https://github.com/SocialGouv/mano/commit/8f3832ff352ec5daf4f62693723634805a11c27a))
+
 ## [1.219.3](https://github.com/SocialGouv/mano/compare/v1.219.2...v1.219.3) (2023-01-14)
 
 
