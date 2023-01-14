@@ -27,8 +27,6 @@ import { groupsState } from '../recoil/groups';
 
 // Update to flush cache.
 
-let startLoadingDate = null;
-
 const cacheEffect = ({ onSet }) => {
   onSet(async (newValue) => {
     await setCacheItem(dashboardCurrentCacheKey, newValue);
@@ -98,34 +96,23 @@ export default function DataLoader() {
     const shouldStop = progress !== null && total !== null && isLoading;
 
     if (shouldStart) {
-      console.log(Date.now() - startLoadingDate, 'shouldStart', loadingText);
       Promise.resolve()
         .then(async () => {
           /*
             Refresh organisation (and user), to get the latest organisation fields
             and the latest user roles
           */
-          console.log(Date.now() - startLoadingDate, 'refresh me', loadingText);
           const userResponse = await API.get({ path: '/user/me' });
-          console.log(Date.now() - startLoadingDate, 'refreshed me', loadingText);
           if (!userResponse.ok) return resetLoaderOnError();
           setOrganisation(userResponse.user.organisation);
           setUser(userResponse.user);
         })
-        .then(() => {
-          console.log(Date.now() - startLoadingDate, 'migrate data', loadingText);
-          return initialLoad ? migrateData() : Promise.resolve();
-        })
-        .then(() => {
-          console.log(Date.now() - startLoadingDate, 'get cache items', loadingText);
-          return getCacheItem(dashboardCurrentCacheKey);
-        })
+        .then(() => (initialLoad ? migrateData() : Promise.resolve()))
+        .then(() => getCacheItem(dashboardCurrentCacheKey))
         .then((lastLoadValue) => {
           setLastLoad(lastLoadValue || 0);
-          console.log(Date.now() - startLoadingDate, 'get stats', loadingText);
           API.get({
             path: '/organisation/stats',
-            startLoadingDate,
             query: {
               organisation: organisationId,
               after: lastLoadValue || 0,
@@ -134,7 +121,6 @@ export default function DataLoader() {
               withAllMedicalData: initialLoad,
             },
           }).then(({ data: stats }) => {
-            console.log(Date.now() - startLoadingDate, 'got stats', loadingText);
             if (!stats) return;
             const newList = [];
             let itemsCount =
@@ -171,70 +157,35 @@ export default function DataLoader() {
             if (stats.territoryObservations) newList.push('territoryObservation');
             if (stats.comments) newList.push('comment');
 
-            console.log(Date.now() - startLoadingDate, 'list pushed', loadingText);
             // In case this is not the initial load, we don't have to load from cache again.
             if (!initialLoad) {
-              console.log(Date.now() - startLoadingDate, 'not init load start loader', loadingText);
               startLoader(newList, itemsCount);
               return;
             }
 
             setLoadingText('Récupération des données dans le cache');
             Promise.resolve()
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue person', loadingText);
-                return getCacheItemDefaultValue('person', []);
-              })
+              .then(() => getCacheItemDefaultValue('person', []))
               .then((persons) => setPersons([...persons]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue group', loadingText);
-                return getCacheItemDefaultValue('group', []);
-              })
+              .then(() => getCacheItemDefaultValue('group', []))
               .then((groups) => setGroups([...groups]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue report', loadingText);
-                return getCacheItemDefaultValue('report', []);
-              })
+              .then(() => getCacheItemDefaultValue('report', []))
               .then((reports) => setReports([...reports]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue passage', loadingText);
-                return getCacheItemDefaultValue('passage', []);
-              })
+              .then(() => getCacheItemDefaultValue('passage', []))
               .then((passages) => setPassages([...passages]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue rencontre', loadingText);
-                return getCacheItemDefaultValue('rencontre', []);
-              })
+              .then(() => getCacheItemDefaultValue('rencontre', []))
               .then((rencontres) => setRencontres([...rencontres]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue action', loadingText);
-                return getCacheItemDefaultValue('action', []);
-              })
+              .then(() => getCacheItemDefaultValue('action', []))
               .then((actions) => setActions([...actions]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue territory', loadingText);
-                return getCacheItemDefaultValue('territory', []);
-              })
+              .then(() => getCacheItemDefaultValue('territory', []))
               .then((territories) => setTerritories([...territories]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue place', loadingText);
-                return getCacheItemDefaultValue('place', []);
-              })
+              .then(() => getCacheItemDefaultValue('place', []))
               .then((places) => setPlaces([...places]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue relPersonPlace', loadingText);
-                return getCacheItemDefaultValue('relPersonPlace', []);
-              })
+              .then(() => getCacheItemDefaultValue('relPersonPlace', []))
               .then((relsPersonPlace) => setRelsPersonPlace([...relsPersonPlace]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue observation', loadingText);
-                return getCacheItemDefaultValue('territory-observation', []);
-              })
+              .then(() => getCacheItemDefaultValue('territory-observation', []))
               .then((territoryObservations) => setTerritoryObservations([...territoryObservations]))
-              .then(() => {
-                console.log(Date.now() - startLoadingDate, 'getCacheItemDefaultValue comment', loadingText);
-                return getCacheItemDefaultValue('comment', []);
-              })
+              .then(() => getCacheItemDefaultValue('comment', []))
               .then((comments) => setComments([...comments]))
               .then(() => startLoader(newList, itemsCount));
           });
@@ -261,10 +212,8 @@ export default function DataLoader() {
     }
 
     if (current === 'person') {
-      console.log(Date.now() - startLoadingDate, 'get persons', loadingText);
       setLoadingText('Chargement des personnes');
       const res = await API.get({ path: '/person', query });
-      console.log(Date.now() - startLoadingDate, 'got persons', loadingText);
       if (!res.data) return resetLoaderOnError();
       setPersons(
         res.hasMore
@@ -426,8 +375,6 @@ export default function DataLoader() {
     setProgressBuffer(null);
     setProgress(null);
     setTotal(null);
-    console.timeEnd('load text');
-    console.log(loadingText);
   }
 
   async function resetLoaderOnError() {
@@ -490,7 +437,6 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setInitialLoad(false);
     setLoaderTrigger(true);
     setLoadingText('Mise à jour des données');
-    startLoadingDate = Date.now();
   }
   function load() {
     setIsLoading(true);
@@ -498,7 +444,6 @@ export function useDataLoader(options = { refreshOnMount: false }) {
     setInitialLoad(true);
     setLoaderTrigger(true);
     setLoadingText('Chargement des données');
-    startLoadingDate = Date.now();
   }
 
   async function resetCache() {
