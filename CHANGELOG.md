@@ -1,3 +1,10 @@
+## [1.219.3](https://github.com/SocialGouv/mano/compare/v1.219.2...v1.219.3) (2023-01-14)
+
+
+### Bug Fixes
+
+* remove all logs ([a2dc504](https://github.com/SocialGouv/mano/commit/a2dc50444db00e5b01d27e4ce12c82eca56a50f5))
+
 ## [1.219.2](https://github.com/SocialGouv/mano/compare/v1.219.1...v1.219.2) (2023-01-14)
 
 
