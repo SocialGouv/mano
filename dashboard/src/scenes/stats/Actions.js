@@ -34,7 +34,10 @@ const ActionsStats = ({
   const filteredActionsBySlice = useMemo(() => {
     if (groupSlice) {
       return actionsDataForGroups.reduce((actions, action) => {
-        if (action.group === groupSlice && !actions.find((a) => a._id === action._id)) {
+        if (groupSlice === 'Non renseigné' && !action.categoryGroup && !actions.find((a) => a._id === action._id)) {
+          return [...actions, action];
+        }
+        if (action.categoryGroup === groupSlice && !actions.find((a) => a._id === action._id)) {
           return [...actions, action];
         }
         return actions;
@@ -42,6 +45,9 @@ const ActionsStats = ({
     }
     if (categorySlice) {
       return actionsWithDetailedGroupAndCategories.reduce((actions, action) => {
+        if (categorySlice === 'Non renseigné' && !action.categories?.length && !actions.find((a) => a._id === action._id)) {
+          return [...actions, action];
+        }
         if (action.categories.includes(categorySlice) && !actions.find((a) => a._id === action._id)) {
           return [...actions, action];
         }
@@ -111,7 +117,7 @@ const ActionsStats = ({
       <CustomResponsivePie
         title="Répartition des actions par groupe"
         help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée une seule fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
-        data={getPieData(actionsDataForGroups, 'group', { options: groupsCategories.map((group) => group.groupTitle) })}
+        data={getPieData(actionsDataForGroups, 'categoryGroup', { options: groupsCategories.map((group) => group.groupTitle) })}
         onItemClick={(newGroupSlice) => {
           setActionsModalOpened(true);
           setGroupSlice(newGroupSlice);
@@ -146,12 +152,14 @@ const ActionsStats = ({
 };
 
 const SelectedActionsModal = ({ open, onClose, data, title, onAfterLeave }) => {
+  console.log(data.filter((d) => !!d.group));
+
   return (
     <ModalContainer open={open} size="full" onClose={onClose} onAfterLeave={onAfterLeave}>
       <ModalHeader title={title} />
       <ModalBody>
         <div className="tw-p-4">
-          <ActionsSortableList data={data} limit={20} />
+          <ActionsSortableList data={data} limit={200} />
         </div>
       </ModalBody>
       <ModalFooter>
