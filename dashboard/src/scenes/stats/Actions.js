@@ -34,7 +34,10 @@ const ActionsStats = ({
   const filteredActionsBySlice = useMemo(() => {
     if (groupSlice) {
       return actionsDataForGroups.reduce((actions, action) => {
-        if (action.group === groupSlice && !actions.find((a) => a._id === action._id)) {
+        if (groupSlice === 'Non renseigné' && !action.categoryGroup && !actions.find((a) => a._id === action._id)) {
+          return [...actions, action];
+        }
+        if (action.categoryGroup === groupSlice && !actions.find((a) => a._id === action._id)) {
           return [...actions, action];
         }
         return actions;
@@ -42,6 +45,9 @@ const ActionsStats = ({
     }
     if (categorySlice) {
       return actionsWithDetailedGroupAndCategories.reduce((actions, action) => {
+        if (categorySlice === 'Non renseigné' && !action.categories?.length && !actions.find((a) => a._id === action._id)) {
+          return [...actions, action];
+        }
         if (action.categories.includes(categorySlice) && !actions.find((a) => a._id === action._id)) {
           return [...actions, action];
         }
@@ -110,7 +116,7 @@ const ActionsStats = ({
       </div>
       <CustomResponsivePie
         title="Répartition des actions par groupe"
-        data={getPieData(actionsDataForGroups, 'group', { options: groupsCategories.map((group) => group.groupTitle) })}
+        data={getPieData(actionsDataForGroups, 'categoryGroup', { options: groupsCategories.map((group) => group.groupTitle) })}
         onItemClick={(newGroupSlice) => {
           setActionsModalOpened(true);
           setGroupSlice(newGroupSlice);
