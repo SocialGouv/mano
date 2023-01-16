@@ -193,17 +193,26 @@ router.put(
             error.status = 400;
             throw error;
           }
-          await Service.bulkCreate(
-            req.body.servicesToSaveInDB.map(
-              (service) => (
-                { ...service, organisation: req.user.organisation },
-                {
-                  transaction: tx,
-                  updateOnDuplicate: ["service", "date", "team", "organisation"],
-                }
-              )
-            )
-          );
+          const servicesToSaveInDB = [...req.body.servicesToSaveInDB];
+
+          // Update services that already exists (when there is both a service and a report for the same date)
+          const servicesInDB = await Service.findAll({
+            where: { organisation: req.user.organisation, date },
+            transaction: tx,
+          });
+          for (const serviceInDB of servicesInDB) {
+            const index = servicesToSaveInDB.findIndex(
+              (service) => service.service === serviceInDB.service && service.date === serviceInDB.date && service.team === serviceInDB.team
+            );
+            if (index !== -1) {
+              const service = servicesToSaveInDB[index];
+              serviceInDB.set({ count: service.count + serviceInDB.count });
+              await serviceInDB.save();
+              servicesToSaveInDB.splice(index, 1);
+            }
+          }
+
+          await Service.bulkCreate(servicesToSaveInDB.map((service) => ({ ...service, organisation: req.user.organisation }, { transaction: tx })));
           for (const { _id, encrypted, encryptedEntityKey } of req.body.reportsToUpdate) {
             const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
             if (report) {
