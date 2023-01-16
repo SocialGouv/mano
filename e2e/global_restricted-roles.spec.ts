@@ -106,6 +106,8 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).toBeVisible();
+    await page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) }).click();
+    await page.getByRole("button", { name: "Annuler" }).click();
 
     await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Comptes rendus" })).toBeVisible();
@@ -172,7 +174,7 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
-
+    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).toBeVisible();
     await expect(page.getByRole("link", { name: "Territoires" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Comptes rendus" })).toBeVisible();
 
@@ -207,6 +209,7 @@ test("test restricted accesses", async ({ page }) => {
     await page.getByRole("link", { name: "Agenda" }).click();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).not.toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
+    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).not.toBeVisible();
 
     await page.getByRole("link", { name: "Personnes suivies" }).click();
     await expect(page).toHaveURL("http://localhost:8090/person");
@@ -356,11 +359,15 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).toBeVisible();
+    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).not.toBeVisible();
+    await page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) }).click();
+    await page.getByRole("button", { name: "Annuler" }).click();
 
     await page.getByRole("link", { name: "Agenda" }).click();
 
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).toBeVisible();
+    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).not.toBeVisible();
   });
 
   await logOut(page, "User Admin Test - 1");
@@ -391,10 +398,12 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${treatment1} 1` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
+    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).toBeVisible();
 
     await page.getByRole("link", { name: "Agenda" }).click();
 
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1} Médicale` }) })).toBeVisible();
     await expect(page.locator("tr", { has: page.getByRole("cell", { name: `${consult1visibleByMe} Médicale` }) })).not.toBeVisible();
+    await expect(page.locator("tr.tw-cursor-not-allowed", { has: page.getByText("Seulement visible parUser Admin Test - 1") })).toBeVisible();
   });
 });
