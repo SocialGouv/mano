@@ -27,7 +27,7 @@ import { modalConfirmState } from '../../components/ModalConfirm';
 import ActionOrConsultationName from '../../components/ActionOrConsultationName';
 import { useLocalStorage } from 'react-use';
 import ConsultationModal from '../../components/ConsultationModal';
-import { consultationsState } from '../../recoil/consultations';
+import { consultationsState, disableConsultationRow } from '../../recoil/consultations';
 
 export function MedicalFile({ person }) {
   const setPersons = useSetRecoilState(personsState);
@@ -560,6 +560,7 @@ export function MedicalFile({ person }) {
         className="noprint"
         data={consultations}
         rowKey={'_id'}
+        rowDisabled={(actionOrConsultation) => disableConsultationRow(actionOrConsultation, user)}
         onRowClick={(item) => {
           setCurrentConsultationId(item._id);
           setConsultation(item);

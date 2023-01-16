@@ -3,10 +3,20 @@ import { userState } from '../recoil/auth';
 import { useRecoilValue } from 'recoil';
 import { disableConsultationRow } from '../recoil/consultations';
 import { getName } from '../recoil/actions';
+import UserName from './UserName';
 
 export default function ActionOrConsultationName({ item }) {
   const me = useRecoilValue(userState);
-  if (disableConsultationRow(item, me)) return <div />;
+  if (!!item.isConsultation && disableConsultationRow(item, me)) {
+    if (!me.healthcareProfessional) return <div />; // a non healthcare professional cannot see the name of a consultation anyway
+    return (
+      <div className="tw-italic tw-opacity-30">
+        Seulement visible par
+        <br />
+        <UserName id={item.user} />
+      </div>
+    );
+  }
   return (
     <>
       <div>{getName(item)}</div>
