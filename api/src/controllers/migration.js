@@ -197,7 +197,7 @@ router.put(
 
           // Update services that already exists (when there is both a service and a report for the same date)
           const servicesInDB = await Service.findAll({
-            where: { organisation: req.user.organisation, date },
+            where: { organisation: req.user.organisation },
             transaction: tx,
           });
           for (const serviceInDB of servicesInDB) {
