@@ -1,3 +1,11 @@
+# [1.220.0](https://github.com/SocialGouv/mano/compare/v1.219.5...v1.220.0) (2023-01-16)
+
+
+### Features
+
+* **dashboard:** right button position exit active queue ([#1199](https://github.com/SocialGouv/mano/issues/1199)) ([34a86a3](https://github.com/SocialGouv/mano/commit/34a86a3e6900b852e0b3fe828a03e6721d200973))
+* **dashboard:** right button position new observation ([#1200](https://github.com/SocialGouv/mano/issues/1200)) ([162f247](https://github.com/SocialGouv/mano/commit/162f247034d2d2d5880b8a67ce4683cb319b8a2e))
+
 ## [1.219.5](https://github.com/SocialGouv/mano/compare/v1.219.4...v1.219.5) (2023-01-16)
 
 
