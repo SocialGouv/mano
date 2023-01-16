@@ -100,11 +100,13 @@ const OutOfActiveList = ({ person }) => {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  disabled={!!isSubmitting}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
+                <div className="tw-mt-4 tw-flex tw-justify-end">
+                  <ButtonCustom
+                    onClick={() => !isSubmitting && handleSubmit()}
+                    disabled={!!isSubmitting}
+                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                  />
+                </div>
               </React.Fragment>
             )}
           </Formik>
