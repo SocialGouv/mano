@@ -47,28 +47,29 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
   const [data, setData] = useState(initialState);
 
   async function handleSubmit() {
-    if (!data.type) {
+    const body = { ...data };
+    if (!body.type) {
       return toast.error('Veuillez choisir un type de consultation');
     }
-    if (!data.dueAt) {
+    if (!body.dueAt) {
       return toast.error('Vous devez préciser une date prévue');
     }
-    if (!data.person) {
+    if (!body.person) {
       return toast.error('Veuillez sélectionner une personne suivie');
     }
-    if ([DONE, CANCEL].includes(data.status)) {
-      data.completedAt = data.completedAt || new Date();
+    if ([DONE, CANCEL].includes(body.status)) {
+      body.completedAt = body.completedAt || new Date();
     } else {
-      data.completedAt = null;
+      body.completedAt = null;
     }
     const consultationResponse = isNewConsultation
       ? await API.post({
           path: '/consultation',
-          body: prepareConsultationForEncryption(organisation.consultations)(data),
+          body: prepareConsultationForEncryption(organisation.consultations)(body),
         })
       : await API.put({
           path: `/consultation/${initialState._id}`,
-          body: prepareConsultationForEncryption(organisation.consultations)(data),
+          body: prepareConsultationForEncryption(organisation.consultations)(body),
         });
     if (!consultationResponse.ok) return onClose();
     const consult = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
@@ -78,7 +79,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
       setAllConsultations((all) =>
         all
           .map((c) => {
-            if (c._id === data._id) return consult;
+            if (c._id === body._id) return consult;
             return c;
           })
           .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
