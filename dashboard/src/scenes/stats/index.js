@@ -224,7 +224,7 @@ const Stats = () => {
               actionsDetailed.push({
                 ...action,
                 category,
-                group: groupsCategories.find((g) => g.categories.includes(category))?.groupTitle ?? 'Autres',
+                categoryGroup: groupsCategories.find((g) => g.categories.includes(category))?.groupTitle ?? 'Autres',
               });
             }
           } else {
