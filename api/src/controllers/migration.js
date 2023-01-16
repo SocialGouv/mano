@@ -16,6 +16,7 @@ const validateUser = require("../middleware/validateUser");
 const { serializeOrganisation } = require("../utils/data-serializer");
 const Action = require("../models/action");
 const Service = require("../models/service");
+const Team = require("../models/team");
 
 router.put(
   "/:migrationName",
@@ -193,7 +194,14 @@ router.put(
             error.status = 400;
             throw error;
           }
-          const servicesToSaveInDB = [...req.body.servicesToSaveInDB];
+
+          // Get all teams (to remove services with a team that doesn't exist anymore)
+          const teams = await Team.findAll({ where: { organisation: req.user.organisation }, transaction: tx });
+
+          // Filter invalid services
+          const servicesToSaveInDB = [...req.body.servicesToSaveInDB].filter(
+            (e) => e.count > 0 && Boolean(e.service) && Boolean(e.date) && Boolean(e.team) && teams.find((t) => t._id === e.team)
+          );
 
           // Update services that already exists (when there is both a service and a report for the same date)
           const servicesInDB = await Service.findAll({
@@ -212,7 +220,11 @@ router.put(
             }
           }
 
-          await Service.bulkCreate(servicesToSaveInDB.map((service) => ({ ...service, organisation: req.user.organisation }, { transaction: tx })));
+          // Create services entries.
+          await Service.bulkCreate(
+            servicesToSaveInDB.map((service) => ({ ...service, organisation: req.user.organisation })),
+            { transaction: tx }
+          );
           for (const { _id, encrypted, encryptedEntityKey } of req.body.reportsToUpdate) {
             const report = await Report.findOne({ where: { _id, organisation: req.user.organisation }, transaction: tx });
             if (report) {
