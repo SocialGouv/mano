@@ -885,12 +885,14 @@ export function MedicalFile({ person }) {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom
-                  type="submit"
-                  disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentTreatment)}
-                  onClick={() => !isSubmitting && handleSubmit()}
-                  title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
-                />
+                <div className="tw-mt-4 tw-flex tw-justify-end">
+                  <ButtonCustom
+                    type="submit"
+                    disabled={isSubmitting || JSON.stringify(values) === JSON.stringify(currentTreatment)}
+                    onClick={() => !isSubmitting && handleSubmit()}
+                    title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
+                  />
+                </div>
               </ModalBody>
             </React.Fragment>
           )}
