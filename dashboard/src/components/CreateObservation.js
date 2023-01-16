@@ -149,7 +149,9 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                   </Col>
                 </Row>
                 <br />
-                <ButtonCustom disabled={isSubmitting} loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} title="Sauvegarder" />
+                <div className="tw-mt-4 tw-flex tw-justify-end">
+                  <ButtonCustom disabled={isSubmitting} loading={isSubmitting} onClick={() => !isSubmitting && handleSubmit()} title="Sauvegarder" />
+                </div>
               </React.Fragment>
             )}
           </Formik>
