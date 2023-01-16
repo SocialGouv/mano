@@ -10,6 +10,7 @@ import { useRecoilValue } from 'recoil';
 import { organisationState } from '../../recoil/auth';
 import GroupRow from './GroupRow';
 import { groupSelector } from '../../recoil/groups';
+import { capture } from '../../services/sentry';
 
 const Group = ({ personDB, navigation }) => {
   const organisation = useRecoilValue(organisationState);
