@@ -1,3 +1,10 @@
+## [1.219.5](https://github.com/SocialGouv/mano/compare/v1.219.4...v1.219.5) (2023-01-16)
+
+
+### Bug Fixes
+
+* can click on action pie slice "Non renseigné" ([#1203](https://github.com/SocialGouv/mano/issues/1203)) ([32b8921](https://github.com/SocialGouv/mano/commit/32b892184d943199584498a3c2b38939c3c9a39f))
+
 ## [1.219.4](https://github.com/SocialGouv/mano/compare/v1.219.3...v1.219.4) (2023-01-14)
 
 
