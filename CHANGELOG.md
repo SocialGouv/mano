@@ -1,3 +1,10 @@
+## [1.220.1](https://github.com/SocialGouv/mano/compare/v1.220.0...v1.220.1) (2023-01-17)
+
+
+### Bug Fixes
+
+* **dashboard:** padding bottom on select team form ([#1192](https://github.com/SocialGouv/mano/issues/1192)) ([9a6333e](https://github.com/SocialGouv/mano/commit/9a6333ee0226defa4cff9f3b847680696370785b))
+
 # [1.220.0](https://github.com/SocialGouv/mano/compare/v1.219.5...v1.220.0) (2023-01-16)
 
 
