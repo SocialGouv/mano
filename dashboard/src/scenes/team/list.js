@@ -110,7 +110,7 @@ const Create = () => {
           {onboardingForTeams ? 'Dernière étape !' : 'Créer une nouvelle équipe'}
         </ModalHeader>
         <ModalBody>
-          <span>Veuillez créer une première équipe avant de commencer à utiliser la plateforme</span>
+          {Boolean(onboardingForTeams) && <span>Veuillez créer une première équipe avant de commencer à utiliser la plateforme</span>}
           <br />
           <br />
           <Formik
