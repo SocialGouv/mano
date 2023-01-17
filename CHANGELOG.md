@@ -1,3 +1,10 @@
+## [1.223.1](https://github.com/SocialGouv/mano/compare/v1.223.0...v1.223.1) (2023-01-17)
+
+
+### Bug Fixes
+
+* **api:** migrate old service system in new table ([#1191](https://github.com/SocialGouv/mano/issues/1191)) ([7a8ae27](https://github.com/SocialGouv/mano/commit/7a8ae27972157b77bd6334353201f0786ae1daac))
+
 # [1.223.0](https://github.com/SocialGouv/mano/compare/v1.222.2...v1.223.0) (2023-01-17)
 
 
