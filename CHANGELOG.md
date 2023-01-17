@@ -1,3 +1,11 @@
+## [1.223.4](https://github.com/SocialGouv/mano/compare/v1.223.3...v1.223.4) (2023-01-17)
+
+
+### Bug Fixes
+
+* ignore report with no date ([#1210](https://github.com/SocialGouv/mano/issues/1210)) ([fafd234](https://github.com/SocialGouv/mano/commit/fafd2341de44320b31593b9d91c00683eda053e1))
+* stats perf ([#1208](https://github.com/SocialGouv/mano/issues/1208)) ([be30a9d](https://github.com/SocialGouv/mano/commit/be30a9d5cfc8d04c66b4c41107c7d6b76c68b2cf))
+
 ## [1.223.3](https://github.com/SocialGouv/mano/compare/v1.223.2...v1.223.3) (2023-01-17)
 
 
