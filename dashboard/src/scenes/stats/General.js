@@ -23,10 +23,26 @@ const GeneralStats = ({
           title="Nombre de personnes suivies"
           help={`Nombre de personnes pour lesquelles il s'est passé quelque chose durant la période sélectionnée:\n\ncréation, modification, commentaire, action, rencontre, passage, lieu fréquenté, consultation, traitement.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
         />
-        <Block data={rencontres.length} title="Nombre de rencontres" />
-        <Block data={actions} title="Nombre d'actions" />
-        <Block data={numberOfActionsPerPerson} title="Nombre d'actions par personne" />
-        <Block data={numberOfActionsPerPersonConcernedByActions} title="Nombre d'actions par personne concernée par au moins une action" />
+        <Block
+          data={rencontres.length}
+          title="Nombre de rencontres"
+          help={`Nombre de rencontres enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des rencontres.`}
+        />
+        <Block
+          data={actions}
+          title="Nombre d'actions"
+          help={`Nombre d'actions enregistrées dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des actions.`}
+        />
+        <Block
+          data={numberOfActionsPerPerson}
+          title="Nombre d'actions par personne"
+          help={`Moyenne d'actions créées par "personne suivie" dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.\n\n<small>On entend par "personnes suivies" les personnes pour lesquelles il s'est passé quelque chose durant la période sélectionnée: création, modification, commentaire, action, rencontre, passage, lieu fréquenté, consultation, traitement.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.</small>`}
+        />
+        <Block
+          data={numberOfActionsPerPersonConcernedByActions}
+          title="Nombre d'actions par personne concernée par au moins une action"
+          help={`Moyenne d'actions créées par "personne suivie" <b>pour lesquelles au moins une action a été créée</b> dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.`}
+        />
       </div>
     </>
   );

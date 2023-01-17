@@ -16,8 +16,6 @@ const PersonStats = ({
   personsForStats,
   groupsForPersons,
   personFields,
-  persons,
-  fieldsPersonsCustomizableOptions,
   customFieldsPersonsMedical,
   customFieldsPersonsSocial,
 }) => {
@@ -37,54 +35,86 @@ const PersonStats = ({
         data={getPieData(personsForStats, 'nationalitySituation', {
           options: personFields.find((f) => f.name === 'nationalitySituation').options,
         })}
+        help={`Nationalité des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
       <CustomResponsivePie
         title="Genre"
         field="gender"
         data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
+        help={`Genre des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
       <CustomResponsivePie
         title="Situation personnelle"
         field="personalSituation"
         data={getPieData(personsForStats, 'personalSituation', { options: personFields.find((f) => f.name === 'personalSituation').options })}
+        help={`Situation personnelle des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
       <CustomResponsivePie
         title="Motif de la situation de rue"
         field="reasons"
         data={getPieData(personsForStats, 'reasons', { options: personFields.find((f) => f.name === 'reasons').options })}
+        help={`Motif de la situation de rue des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
       <CustomResponsivePie
-        title="Ressources des personnes suivies"
+        title="Ressources"
         field="resources"
         data={getPieData(personsForStats, 'resources', { options: personFields.find((f) => f.name === 'resources').options })}
+        help={`Ressources des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
       <AgeRangeBar persons={personsForStats} />
       <StatsCreatedAtRangeBar persons={personsForStats} />
       <StatsWanderingAtRangeBar persons={personsForStats} />
-      <CustomResponsivePie title="Type d'hébergement" data={getAdressPieData(personsForStats)} />
+      <CustomResponsivePie
+        title="Type d'hébergement"
+        data={getAdressPieData(personsForStats)}
+        help={`Type d'hébergement des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+      />
       <CustomResponsivePie
         title="Couverture médicale des personnes"
         field="healthInsurances"
         data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
+        help={`Couverture médicale des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
-      <CustomResponsivePie title="Avec animaux" data={getPieData(personsForStats, 'hasAnimal')} />
+      <CustomResponsivePie
+        title="Avec animaux"
+        data={getPieData(personsForStats, 'hasAnimal')}
+        help={`Répartition des ${title} avec animaux dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+      />
       <CustomResponsivePie
         title="Personnes très vulnérables"
         field="alertness"
         data={getPieData(personsForStats, 'alertness', { isBoolean: true })}
+        help={`${title.capitalize()} vulnérables dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
-      <CustomResponsivePie title="Sortie de file active" field="outOfActiveList" data={getPieData(persons, 'outOfActiveList', { isBoolean: true })} />
+      <CustomResponsivePie
+        title="Sortie de file active"
+        field="outOfActiveList"
+        data={getPieData(personsForStats, 'outOfActiveList', { isBoolean: true })}
+        help={`${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+      />
       <CustomResponsivePie
         title="Raison de sortie de file active"
         field="outOfActiveListReasons"
+        help={`Raisons de sortie de file active des ${title} dans la période définie, sorties de la file active. La date de sortie de la file active n'est pas nécessairement dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
         data={getPieData(
-          persons.filter((p) => !!p.outOfActiveList),
-          'outOfActiveListReasons',
-          { options: fieldsPersonsCustomizableOptions.find((f) => f.name === 'outOfActiveListReasons').options }
+          personsForStats.filter((p) => !!p.outOfActiveList),
+          'outOfActiveListReasons'
         )}
       />
-      <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsMedical} />
-      <CustomFieldsStats data={personsForStats} customFields={customFieldsPersonsSocial} />
+      <CustomFieldsStats
+        data={personsForStats}
+        customFields={customFieldsPersonsMedical}
+        help={(label) =>
+          `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
+        }
+      />
+      <CustomFieldsStats
+        data={personsForStats}
+        customFields={customFieldsPersonsSocial}
+        help={(label) =>
+          `${label.capitalize()} des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`
+        }
+      />
     </>
   );
 };
@@ -104,7 +134,12 @@ export const BlockWanderingAt = ({ persons }) => {
 
   return (
     <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-      <Card title="Temps d'errance des personnes en&nbsp;moyenne" unit={unit} count={count} />
+      <Card
+        title="Temps d'errance des personnes en&nbsp;moyenne"
+        unit={unit}
+        count={count}
+        help={`Cela veut dire qu'en moyenne, chaque personne considérée est en rue depuis ${count} ${unit}`}
+      />
     </div>
   );
 };
@@ -114,7 +149,11 @@ export const BlockGroup = ({ title, groups }) => {
     if (!groups.length) {
       return (
         <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-          <Card title={title} count={0} />
+          <Card
+            title={title}
+            count={0}
+            help={`Une personne ne peut appartenir qu'à une famille. On comptabilise donc le nombre de familles dans lesquelles se trouvent les personnes concernées.\n\nSi plusieurs personnes appartiennent à la même famille, on comptabilisera seulement une seule famille.`}
+          />
         </div>
       );
     }
@@ -125,9 +164,10 @@ export const BlockGroup = ({ title, groups }) => {
         <Card
           title={title}
           count={groups.length}
+          help={`Une personne ne peut appartenir qu'à une famille. On comptabilise donc le nombre de familles dans lesquelles se trouvent les personnes concernées.\n\nSi plusieurs personnes appartiennent à la même famille, on comptabilisera seulement une seule famille.`}
           children={
             <span className="font-weight-normal">
-              Moyenne de relations par famille: <strong>{avg}</strong>
+              Taille moyenne des familles: <strong>{avg}</strong>
             </span>
           }
         />
@@ -154,7 +194,12 @@ export const BlockCreatedAt = ({ persons }) => {
 
   return (
     <div className="tw-basis-1/2 tw-px-4 tw-py-2 lg:tw-basis-1/3">
-      <Card title="Temps de suivi moyen" unit={unit} count={count} />
+      <Card
+        title="Temps de suivi moyen"
+        unit={unit}
+        count={count}
+        help={`Cela veut dire qu'en moyenne, chaque personne considérée est suivie depuis ${count} ${unit}`}
+      />
     </div>
   );
 };
@@ -206,7 +251,14 @@ export const AgeRangeBar = ({ persons }) => {
     .map((key) => ({ name: key, [key]: data[key] }));
 
   return (
-    <CustomResponsiveBar title="Tranche d'âges" categories={categories} data={data} axisTitleX="Tranche d'âge" axisTitleY="Nombre de personnes" />
+    <CustomResponsiveBar
+      title="Tranche d'âges"
+      categories={categories}
+      data={data}
+      axisTitleX="Tranche d'âge"
+      axisTitleY="Nombre de personnes"
+      help={`Répartition des âges des personnes concernées, dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
+    />
   );
 };
 
@@ -251,6 +303,7 @@ const StatsCreatedAtRangeBar = ({ persons }) => {
       data={data}
       axisTitleX="Temps de suivi"
       axisTitleY="Nombre de personnes"
+      help={`Répartition des temps de suivi des personnes concernées, dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
     />
   );
 };
@@ -299,6 +352,7 @@ const StatsWanderingAtRangeBar = ({ persons }) => {
       data={data}
       axisTitleX="Temps d'errance"
       axisTitleY="Nombre de personnes"
+      help={`Répartition des temps d'errance des personnes concernées, dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
     />
   );
 };

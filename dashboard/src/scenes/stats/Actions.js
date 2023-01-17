@@ -116,6 +116,7 @@ const ActionsStats = ({
       </div>
       <CustomResponsivePie
         title="Répartition des actions par groupe"
+        help={`Si une action a plusieurs catégories appartenant à plusieurs groupes, elle est comptabilisée dans chaque groupe.\n\nSi une action a plusieurs catégories appartenant au même groupe, elle est comptabilisée une seule fois dans ce groupe.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
         data={getPieData(actionsDataForGroups, 'categoryGroup', { options: groupsCategories.map((group) => group.groupTitle) })}
         onItemClick={(newGroupSlice) => {
           setActionsModalOpened(true);
@@ -124,6 +125,7 @@ const ActionsStats = ({
       />
       <CustomResponsivePie
         title="Répartition des actions par catégorie"
+        help={`Si une action a plusieurs catégories, elle est comptabilisée dans chaque catégorie.\n\nAinsi, le total affiché peut être supérieur au nombre total d'actions.`}
         data={getPieData(actionsWithDetailedGroupAndCategories, 'category', { options: allCategories })}
         field="category"
         onItemClick={(newCategorySlice) => {

@@ -118,14 +118,15 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
     await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Personnes créées")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Personnes suivies")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes créées", { exact: true })).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes suivies", { exact: true })).toBeVisible();
     await expect(page.getByRole("list").getByText("Passages")).toBeVisible();
     await expect(page.getByRole("list").getByText("Rencontres")).toBeVisible();
     await expect(page.getByRole("list").getByText("Observations")).toBeVisible();
     await expect(page.getByRole("list").getByText("Comptes-rendus")).toBeVisible();
     await expect(page.getByRole("list").getByText("Consultations")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Dossiers médicaux")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Dossiers médicaux des personnes suivies", { exact: true })).toBeVisible();
+    await expect(page.getByRole("list").getByText("Dossiers médicaux des personnes créées", { exact: true })).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Organisation" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Équipes" })).toBeVisible();
@@ -184,14 +185,15 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
     await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Personnes créées")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Personnes suivies")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes créées", { exact: true })).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes suivies", { exact: true })).toBeVisible();
     await expect(page.getByRole("list").getByText("Passages")).toBeVisible();
     await expect(page.getByRole("list").getByText("Rencontres")).toBeVisible();
     await expect(page.getByRole("list").getByText("Observations")).toBeVisible();
     await expect(page.getByRole("list").getByText("Comptes-rendus")).toBeVisible();
     await expect(page.getByRole("list").getByText("Consultations")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Dossiers médicaux")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Dossiers médicaux des personnes suivies", { exact: true })).toBeVisible();
+    await expect(page.getByRole("list").getByText("Dossiers médicaux des personnes créées", { exact: true })).toBeVisible();
 
     await expect(page.getByRole("link", { name: "Organisation" })).not.toBeVisible();
     await expect(page.getByRole("link", { name: "Équipes" })).not.toBeVisible();
@@ -245,14 +247,15 @@ test("test restricted accesses", async ({ page }) => {
     await expect(page.getByRole("list").getByText("Général")).toBeVisible();
     await expect(page.getByRole("list").getByText("Accueil")).toBeVisible();
     await expect(page.getByRole("list").getByText("Actions")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Personnes créées")).toBeVisible();
-    await expect(page.getByRole("list").getByText("Personnes suivies")).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes créées", { exact: true })).toBeVisible();
+    await expect(page.getByRole("list").getByText("Personnes suivies", { exact: true })).toBeVisible();
     await expect(page.getByRole("list").getByText("Passages")).toBeVisible();
     await expect(page.getByRole("list").getByText("Rencontres")).toBeVisible();
     await expect(page.getByRole("list").getByText("Observations")).toBeVisible();
     await expect(page.getByRole("list").getByText("Comptes-rendus")).toBeVisible();
     await expect(page.getByRole("list").getByText("Consultations")).not.toBeVisible();
-    await expect(page.getByRole("list").getByText("Dossiers médicaux")).not.toBeVisible();
+    await expect(page.getByRole("list").getByText("Dossiers médicaux des personnes suivies", { exact: true })).not.toBeVisible();
+    await expect(page.getByRole("list").getByText("Dossiers médicaux des personnes créées", { exact: true })).not.toBeVisible();
 
     await expect(page.getByRole("link", { name: "Organisation" })).not.toBeVisible();
     await expect(page.getByRole("link", { name: "Équipes" })).not.toBeVisible();

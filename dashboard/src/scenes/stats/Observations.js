@@ -32,6 +32,7 @@ const ObservationsStats = ({ territories, setSelectedTerritories, observations, 
             value: observations.length,
           },
         ]}
+        help={(label) => `${label.capitalize()} des observations des territoires sélectionnés, dans la période définie.`}
       />
     </>
   );
