@@ -26,4 +26,5 @@
   await require("./2022-12-12-debug_report")();
   await require("./2022-12-27_add-unique-constraint-on-report")();
   await require("./2022-12-30_new-table-service")();
+  await require("./2023-01-16_add-index-everywhere")();
 })();
