@@ -1,3 +1,10 @@
+# [1.222.0](https://github.com/SocialGouv/mano/compare/v1.221.0...v1.222.0) (2023-01-17)
+
+
+### Features
+
+* **dashboard:** right button position new team ([#1197](https://github.com/SocialGouv/mano/issues/1197)) ([350bf42](https://github.com/SocialGouv/mano/commit/350bf4248624ab0180431c4e4d958a41e69de5ad))
+
 # [1.221.0](https://github.com/SocialGouv/mano/compare/v1.220.2...v1.221.0) (2023-01-17)
 
 
