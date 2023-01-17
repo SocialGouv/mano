@@ -36,12 +36,12 @@ const GeneralStats = ({
         <Block
           data={numberOfActionsPerPerson}
           title="Nombre d'actions par personne"
-          help={`Moyenne d'actions créées par "personne suivies" dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.\n\n<small>On entend par "personnes suivies" les personnes pour lesquelles il s'est passé quelque chose durant la période sélectionnée: création, modification, commentaire, action, rencontre, passage, lieu fréquenté, consultation, traitement.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.</small>`}
+          help={`Moyenne d'actions créées par "personne suivie" dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.\n\n<small>On entend par "personnes suivies" les personnes pour lesquelles il s'est passé quelque chose durant la période sélectionnée: création, modification, commentaire, action, rencontre, passage, lieu fréquenté, consultation, traitement.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.</small>`}
         />
         <Block
           data={numberOfActionsPerPersonConcernedByActions}
           title="Nombre d'actions par personne concernée par au moins une action"
-          help={`Moyenne d'actions créées par "personne suivies" <b>pour lesquelles au moins une action a été créée</b> dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.`}
+          help={`Moyenne d'actions créées par "personne suivie" <b>pour lesquelles au moins une action a été créée</b> dans la période définie.\n\nSi aucune période n'est définie, on considère la totalité des actions par rapport à la totalité des personnes.`}
         />
       </div>
     </>
