@@ -34,11 +34,21 @@ const HelpModal = ({ open, setOpen, title, help }) => {
             capture(`Pas compris l'aide de: ${title}`);
             setOpen(false);
           }}>
+          Fermer
+        </button>
+        <button
+          type="button"
+          name="not-understood"
+          className="button-destructive"
+          onClick={() => {
+            capture(`Pas compris l'aide de: ${title}`);
+            setOpen(false);
+          }}>
           Je n'ai pas compris
         </button>
         <button
           type="button"
-          name="cancel"
+          name="ok"
           className="button-submit"
           onClick={() => {
             setOpen(false);
