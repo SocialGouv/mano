@@ -169,7 +169,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                 onChange={(e) => {
                   setData({ ...data, type: e.currentTarget.value });
                 }}
-                placeholder="-- Choisissez le type de consultation --"
+                placeholder="-- Type de consultation --"
                 options={organisation.consultations.map((e) => e.name)}
               />
             </div>
