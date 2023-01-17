@@ -16,7 +16,6 @@ import SelectStatus from './SelectStatus';
 import { toast } from 'react-toastify';
 import { ModalContainer, ModalBody, ModalFooter, ModalHeader } from './tailwind/Modal';
 import SelectPerson from './SelectPerson';
-import UserName from './UserName';
 
 export default function ConsultationModal({ onClose, personId, consultation }) {
   const organisation = useRecoilValue(organisationState);
@@ -95,8 +94,6 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
     return onClose();
   }
 
-  const onlyVisibleBySomeoneElseThanMe = data.onlyVisibleBy?.length && !data.onlyVisibleBy?.includes(user._id);
-
   return (
     <ModalContainer
       open={true}
@@ -148,72 +145,67 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
               />
             )}
           </div>
-          {!onlyVisibleBySomeoneElseThanMe && (
-            <>
-              <div className="-tw-mx-4 tw-flex tw-flex-wrap">
-                <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
-                  <label htmlFor="create-consultation-name">Nom (facultatif)</label>
-                  <input
-                    className="form-text tailwindui"
-                    id="create-consultation-name"
-                    name="name"
-                    value={data.name}
-                    onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
-                  />
-                </div>
-                <div className="tw-basis-1/2 tw-p-4">
-                  <label htmlFor="type" className="form-text tailwindui">
-                    Type
-                  </label>
-                  <SelectAsInput
-                    id="type"
-                    name="type"
-                    inputId="consultation-modal-type"
-                    classNamePrefix="consultation-modal-type"
-                    value={data.type}
-                    onChange={(e) => {
-                      setData({ ...data, type: e.currentTarget.value });
+          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
+              <label htmlFor="create-consultation-name">Nom (facultatif)</label>
+              <input
+                className="form-text tailwindui"
+                id="create-consultation-name"
+                name="name"
+                value={data.name}
+                onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
+              />
+            </div>
+            <div className="tw-basis-1/2 tw-p-4">
+              <label htmlFor="type" className="form-text tailwindui">
+                Type
+              </label>
+              <SelectAsInput
+                id="type"
+                name="type"
+                inputId="consultation-modal-type"
+                classNamePrefix="consultation-modal-type"
+                value={data.type}
+                onChange={(e) => {
+                  setData({ ...data, type: e.currentTarget.value });
+                }}
+                placeholder="-- Choisissez le type de consultation --"
+                options={organisation.consultations.map((e) => e.name)}
+              />
+            </div>
+            {organisation.consultations
+              .find((e) => e.name === data.type)
+              ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
+              .map((field) => {
+                return (
+                  <CustomFieldInput
+                    colWidth={6}
+                    model="person"
+                    values={data}
+                    handleChange={(e) => {
+                      setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
                     }}
-                    placeholder="-- Choisissez le type de consultation --"
-                    options={organisation.consultations.map((e) => e.name)}
+                    field={field}
+                    key={field.name}
                   />
-                </div>
-                {organisation.consultations
-                  .find((e) => e.name === data.type)
-                  ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
-                  .map((field) => {
-                    return (
-                      <CustomFieldInput
-                        colWidth={6}
-                        model="person"
-                        values={data}
-                        handleChange={(e) => {
-                          setData({ ...data, [(e.currentTarget || e.target).name]: (e.currentTarget || e.target).value });
-                        }}
-                        field={field}
-                        key={field.name}
-                      />
-                    );
-                  })}
-              </div>
-              <hr />
-            </>
-          )}
+                );
+              })}
+          </div>
+          <hr />
           <div>
             <div>
-              <label htmlFor="create-consultation-onlyme" className={onlyVisibleBySomeoneElseThanMe ? 'tw-italic tw-opacity-30' : ''}>
+              <label htmlFor="create-consultation-onlyme">
                 <input
                   type="checkbox"
                   id="create-consultation-onlyme"
                   style={{ marginRight: '0.5rem' }}
                   name="onlyVisibleByCreator"
                   checked={data.onlyVisibleBy?.includes(user._id)}
-                  disabled={onlyVisibleBySomeoneElseThanMe}
                   onChange={() => {
                     setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
                   }}
                 />
-                Seulement visible par {onlyVisibleBySomeoneElseThanMe ? <UserName id={data.user} /> : 'moi'}
+                Seulement visible par moi
               </label>
             </div>
           </div>
