@@ -272,9 +272,12 @@ const formatData = (data) => {
       return { ...section, data: [...section.data, action] };
     });
   }, sections);
-
   return dataInSections.reduce((actions, section) => {
-    return [...actions, { type: 'title', title: section.title, _id: section.title }, ...section.data];
+    return [
+      ...actions,
+      { type: 'title', title: section.title, _id: section.title },
+      ...section.data.sort((a, b) => dayjs(a.dueAt).diff(dayjs(b.dueAt))),
+    ];
   }, []);
 };
 
@@ -368,7 +371,7 @@ export const actionsByStatusSelector = selectorFamily({
       }
       if (status === TODO) {
         const actions = get(actionsTodoSelector);
-        return [...actions].sort((a, b) => dayjs(a.dueAt).diff(dayjs(b.dueAt)));
+        return actions;
       }
       if (status === CANCEL) {
         const actions = get(actionsCanceledSelectorSliced({ limit }));
