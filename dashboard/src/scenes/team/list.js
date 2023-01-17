@@ -186,7 +186,7 @@ const Create = () => {
                   </Row>
                   <br />
                   <Row>
-                    <Col md={3}>
+                    <Col className="tw-mt-4 tw-flex tw-justify-end">
                       <ButtonCustom id="create-team" title="Créer" loading={isSubmitting} onClick={handleSubmit} />
                     </Col>
                   </Row>
