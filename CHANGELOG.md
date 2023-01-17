@@ -1,3 +1,10 @@
+# [1.223.0](https://github.com/SocialGouv/mano/compare/v1.222.2...v1.223.0) (2023-01-17)
+
+
+### Features
+
+* **dashboard:** right button position new treatment ([#1198](https://github.com/SocialGouv/mano/issues/1198)) ([bacc327](https://github.com/SocialGouv/mano/commit/bacc327eec97992fca4347716d0a128016e17709))
+
 ## [1.222.2](https://github.com/SocialGouv/mano/compare/v1.222.1...v1.222.2) (2023-01-17)
 
 
