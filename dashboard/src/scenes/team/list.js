@@ -110,9 +110,12 @@ const Create = () => {
           {onboardingForTeams ? 'Dernière étape !' : 'Créer une nouvelle équipe'}
         </ModalHeader>
         <ModalBody>
-          {Boolean(onboardingForTeams) && <span>Veuillez créer une première équipe avant de commencer à utiliser la plateforme</span>}
-          <br />
-          <br />
+          {Boolean(onboardingForTeams) && (
+            <span>
+              Veuillez créer une première équipe avant de commencer à utiliser la plateforme <br />
+              <br />
+            </span>
+          )}
           <Formik
             initialValues={{ name: '' }}
             onSubmit={async (values, actions) => {
