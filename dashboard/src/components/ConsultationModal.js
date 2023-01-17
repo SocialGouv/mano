@@ -1,6 +1,5 @@
 import { useState, useMemo } from 'react';
 import ReactDatePicker from 'react-datepicker';
-import { Row } from 'reactstrap';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import { CANCEL, DONE, TODO } from '../recoil/actions';
@@ -47,28 +46,29 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
   const [data, setData] = useState(initialState);
 
   async function handleSubmit() {
-    if (!data.type) {
+    const body = { ...data };
+    if (!body.type) {
       return toast.error('Veuillez choisir un type de consultation');
     }
-    if (!data.dueAt) {
+    if (!body.dueAt) {
       return toast.error('Vous devez préciser une date prévue');
     }
-    if (!data.person) {
+    if (!body.person) {
       return toast.error('Veuillez sélectionner une personne suivie');
     }
-    if ([DONE, CANCEL].includes(data.status)) {
-      data.completedAt = data.completedAt || new Date();
+    if ([DONE, CANCEL].includes(body.status)) {
+      body.completedAt = body.completedAt || new Date();
     } else {
-      data.completedAt = null;
+      body.completedAt = null;
     }
     const consultationResponse = isNewConsultation
       ? await API.post({
           path: '/consultation',
-          body: prepareConsultationForEncryption(organisation.consultations)(data),
+          body: prepareConsultationForEncryption(organisation.consultations)(body),
         })
       : await API.put({
           path: `/consultation/${initialState._id}`,
-          body: prepareConsultationForEncryption(organisation.consultations)(data),
+          body: prepareConsultationForEncryption(organisation.consultations)(body),
         });
     if (!consultationResponse.ok) return onClose();
     const consult = { ...consultationResponse.decryptedData, ...defaultConsultationFields };
@@ -78,7 +78,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
       setAllConsultations((all) =>
         all
           .map((c) => {
-            if (c._id === data._id) return consult;
+            if (c._id === body._id) return consult;
             return c;
           })
           .sort((a, b) => new Date(b.dueAt) - new Date(a.dueAt))
@@ -145,8 +145,8 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
               />
             )}
           </div>
-          <div className="tw-grid tw-grid-cols-2 tw-gap-4">
-            <div className="tw-flex tw-flex-col">
+          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+            <div className="tw-flex tw-basis-1/2 tw-flex-col tw-p-4">
               <label htmlFor="create-consultation-name">Nom (facultatif)</label>
               <input
                 className="form-text tailwindui"
@@ -156,7 +156,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                 onChange={(e) => setData({ ...data, name: e.currentTarget.value })}
               />
             </div>
-            <div>
+            <div className="tw-basis-1/2 tw-p-4">
               <label htmlFor="type" className="form-text tailwindui">
                 Type
               </label>
@@ -169,13 +169,10 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                 onChange={(e) => {
                   setData({ ...data, type: e.currentTarget.value });
                 }}
-                placeholder="-- Choisissez le type de consultation --"
+                placeholder="-- Type de consultation --"
                 options={organisation.consultations.map((e) => e.name)}
               />
             </div>
-          </div>
-          {/* We still need bootstrap here because `CustomFieldInput` */}
-          <Row>
             {organisation.consultations
               .find((e) => e.name === data.type)
               ?.fields.filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
@@ -193,10 +190,28 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                   />
                 );
               })}
-          </Row>
+          </div>
           <hr />
-          <div className="tw-grid tw-grid-cols-2 tw-gap-4">
+          <div>
             <div>
+              <label htmlFor="create-consultation-onlyme">
+                <input
+                  type="checkbox"
+                  id="create-consultation-onlyme"
+                  style={{ marginRight: '0.5rem' }}
+                  name="onlyVisibleByCreator"
+                  checked={data.onlyVisibleBy?.includes(user._id)}
+                  onChange={() => {
+                    setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
+                  }}
+                />
+                Seulement visible par moi
+              </label>
+            </div>
+          </div>
+          <hr />
+          <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+            <div className="tw-basis-1/2 tw-p-4">
               <label htmlFor="new-consultation-select-status">Statut</label>
               <SelectStatus
                 name="status"
@@ -208,7 +223,7 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                 classNamePrefix="new-consultation-select-status"
               />
             </div>
-            <div>
+            <div className="tw-basis-1/2 tw-p-4">
               <label htmlFor="create-consultation-dueat">Date prévue</label>
               <div>
                 <ReactDatePicker
@@ -225,41 +240,28 @@ export default function ConsultationModal({ onClose, personId, consultation }) {
                 />
               </div>
             </div>
-            <div>
-              <div>
-                <label htmlFor="create-consultation-onlyme">
-                  <input
-                    type="checkbox"
-                    id="create-consultation-onlyme"
-                    style={{ marginRight: '0.5rem' }}
-                    name="onlyVisibleByCreator"
-                    checked={data.onlyVisibleBy?.includes(user._id)}
-                    onChange={() => {
-                      setData({ ...data, onlyVisibleBy: data.onlyVisibleBy?.includes(user._id) ? [] : [user._id] });
-                    }}
-                  />
-                  Seulement visible par moi
-                </label>
-              </div>
-            </div>
+
             {[DONE, CANCEL].includes(data.status) && (
-              <div>
-                <label htmlFor="create-consultation-completedAt">Date réalisée</label>
-                <div>
-                  <ReactDatePicker
-                    locale="fr"
-                    className="form-control"
-                    id="create-consultation-completedAt"
-                    selected={dateForDatePicker(data.completedAt || dayjsInstance())}
-                    onChange={(completedAt) => {
-                      setData({ ...data, completedAt });
-                    }}
-                    timeInputLabel="Heure :"
-                    dateFormat={'dd/MM/yyyy HH:mm'}
-                    showTimeInput
-                  />
+              <>
+                <div className="tw-basis-1/2 tw-p-4" />
+                <div className="tw-basis-1/2 tw-p-4">
+                  <label htmlFor="create-consultation-completedAt">Date réalisée</label>
+                  <div>
+                    <ReactDatePicker
+                      locale="fr"
+                      className="form-control"
+                      id="create-consultation-completedAt"
+                      selected={dateForDatePicker(data.completedAt || dayjsInstance())}
+                      onChange={(completedAt) => {
+                        setData({ ...data, completedAt });
+                      }}
+                      timeInputLabel="Heure :"
+                      dateFormat={'dd/MM/yyyy HH:mm'}
+                      showTimeInput
+                    />
+                  </div>
                 </div>
-              </div>
+              </>
             )}
           </div>
           <hr />

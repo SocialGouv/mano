@@ -52,7 +52,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
               // the only con is that there is nomore arrows to increase/decrease the value
               // https://stackoverflow.com/a/54463605/5225096
               type="text"
-              inputmode={field.type === 'number' ? 'numeric' : undefined}
+              inputMode={field.type === 'number' ? 'numeric' : undefined}
             />
           )}
           {!!['textarea'].includes(field.type) && (
