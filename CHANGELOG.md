@@ -1,3 +1,10 @@
+## [1.220.2](https://github.com/SocialGouv/mano/compare/v1.220.1...v1.220.2) (2023-01-17)
+
+
+### Bug Fixes
+
+* average + two decimals numbers ([5132155](https://github.com/SocialGouv/mano/commit/513215569b4b1293e3b610fa70451c2090727090))
+
 ## [1.220.1](https://github.com/SocialGouv/mano/compare/v1.220.0...v1.220.1) (2023-01-17)
 
 
