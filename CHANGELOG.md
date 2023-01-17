@@ -1,3 +1,10 @@
+# [1.221.0](https://github.com/SocialGouv/mano/compare/v1.220.2...v1.221.0) (2023-01-17)
+
+
+### Features
+
+* help on each stat element ([#1194](https://github.com/SocialGouv/mano/issues/1194)) ([b91fc4a](https://github.com/SocialGouv/mano/commit/b91fc4a9c3d5ab153ce72e0bdd0a8eded799cb07))
+
 ## [1.220.2](https://github.com/SocialGouv/mano/compare/v1.220.1...v1.220.2) (2023-01-17)
 
 
