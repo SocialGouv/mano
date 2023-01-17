@@ -5,6 +5,7 @@ import API from '../services/api';
 import { toast } from 'react-toastify';
 import IncrementorSmall from './IncrementorSmall';
 import { organisationState } from '../recoil/auth';
+import { capture } from '../services/sentry';
 
 const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', services, onUpdateServices: setServices }) => {
   const organisation = useRecoilValue(organisationState);
@@ -14,6 +15,7 @@ const ReceptionService = ({ report, team, dateString, dataTestIdPrefix = '', ser
   useEffect(
     // Init services for a team. We need to fetch services from legacy report and database and merge them.
     function initServices() {
+      if (!dateString || !team._id) return capture('Missing params for initServices in reception', { extra: { dateString, team, report } });
       API.get({ path: `/service/team/${team._id}/date/${dateString}` }).then((res) => {
         if (!res.ok) return toast.error(<ErrorOnGetServices />);
         const servicesFromLegacyReport = report?.services?.length ? JSON.parse(report?.services) : {};

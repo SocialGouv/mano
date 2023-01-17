@@ -3,6 +3,7 @@ import { useDebounce } from 'react-use';
 import styled from 'styled-components';
 import { theme } from '../config';
 import API from '../services/api';
+import { capture } from '../services/sentry';
 
 const IncrementorSmall = ({ service, team, date, count: initialValue, onUpdated, dataTestId, disabled = false }) => {
   const [value, setValue] = useState(initialValue);
@@ -12,6 +13,7 @@ const IncrementorSmall = ({ service, team, date, count: initialValue, onUpdated,
   useDebounce(
     function updateServiceInDatabase() {
       if (value === initialValue || disabled) return;
+      if (!date || !team) return capture('Missing params for initServices in IncrementorSmall', { extra: { date, team, service, initialValue } });
       API.post({ path: `/service/team/${team}/date/${date}`, body: { count: value, service } }).then((res) => {
         if (res.ok) onUpdated(res.data.count);
       });
