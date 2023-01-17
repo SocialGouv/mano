@@ -173,6 +173,42 @@ export default function useDataMigrator() {
           migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
         }
       }
+
+      if (!organisation.migrations?.includes('services-in-services-table')) {
+        setLoadingText(LOADING_TEXT);
+        const res = await API.get({
+          path: '/report',
+          query: { organisation: organisationId, after: 0, withDeleted: false },
+        });
+        const reportsToUpdate = (res.decryptedData || []).filter((e) => e.services && Object.values(JSON.parse(e.services || '{}')).length);
+        const reportsWithoutServicesProperty = reportsToUpdate.map((e) => {
+          const { services, ...report } = e;
+          return report;
+        });
+        // Save all services in services table
+        const servicesToSaveInDB = reportsToUpdate.reduce((acc, report) => {
+          const services = Object.entries(JSON.parse(report.services || '{}'))
+            .filter(([, value]) => value)
+            .map(([service, value]) => ({
+              team: report.team,
+              date: report.date,
+              service: String(service),
+              count: Number(value),
+            }));
+          return [...acc, ...services];
+        }, []);
+
+        const encryptedActionsToMigrate = await Promise.all(reportsWithoutServicesProperty.map(prepareActionForEncryption).map(encryptItem));
+        const response = await API.put({
+          path: `/migration/services-in-services-table`,
+          body: { reportsToUpdate: encryptedActionsToMigrate, servicesToSaveInDB },
+          query: { migrationLastUpdateAt },
+        });
+        if (response.ok) {
+          setOrganisation(response.organisation);
+          migrationLastUpdateAt = response.organisation.migrationLastUpdateAt;
+        }
+      }
     },
   };
 }
