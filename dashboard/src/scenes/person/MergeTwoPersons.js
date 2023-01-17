@@ -237,13 +237,11 @@ const MergeTwoPersons = ({ person }) => {
 
                 const mergedActions = actions
                   .filter((a) => a.person === personToMergeAndDelete._id)
-                  .map((comment) => prepareActionForEncryption({ ...comment, person: originPerson._id }))
-                  .map(encryptItem);
+                  .map((comment) => prepareActionForEncryption({ ...comment, person: originPerson._id }));
 
                 const mergedComments = comments
                   .filter((c) => c.person === personToMergeAndDelete._id)
-                  .map((comment) => prepareCommentForEncryption({ ...comment, person: originPerson._id }))
-                  .map(encryptItem);
+                  .map((comment) => prepareCommentForEncryption({ ...comment, person: originPerson._id }));
 
                 const mergedRelsPersonPlace = relsPersonPlace
                   .filter((rel) => rel.person === personToMergeAndDelete._id)
@@ -258,13 +256,11 @@ const MergeTwoPersons = ({ person }) => {
 
                 const mergedPassages = passages
                   .filter((p) => p.person === personToMergeAndDelete._id)
-                  .map((passage) => preparePassageForEncryption({ ...passage, person: originPerson._id }))
-                  .map(encryptItem);
+                  .map((passage) => preparePassageForEncryption({ ...passage, person: originPerson._id }));
 
                 const mergedRencontres = rencontres
                   .filter((r) => r.person === personToMergeAndDelete._id)
-                  .map((rencontre) => prepareRencontreForEncryption({ ...rencontre, person: originPerson._id }))
-                  .map(encryptItem);
+                  .map((rencontre) => prepareRencontreForEncryption({ ...rencontre, person: originPerson._id }));
 
                 const mergedConsultations = consultations
                   .filter((consultation) => consultation.person === personToMergeAndDelete._id)
