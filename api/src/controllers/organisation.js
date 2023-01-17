@@ -60,27 +60,16 @@ router.get(
     }
 
     const places = await Place.count(query);
-    console.log(Date.now() - startLoadingDate, "places", places);
     const relsPersonPlace = await RelPersonPlace.count(query);
-    console.log(Date.now() - startLoadingDate, "relsPersonPlace", relsPersonPlace);
     const actions = await Action.count(query);
-    console.log(Date.now() - startLoadingDate, "actions", actions);
     const persons = await Person.count(query);
-    console.log(Date.now() - startLoadingDate, "persons", persons);
     const groups = await Group.count(query);
-    console.log(Date.now() - startLoadingDate, "groups", groups);
     const comments = await Comment.count(query);
-    console.log(Date.now() - startLoadingDate, "comments", comments);
     const passages = await Passage.count(query);
-    console.log(Date.now() - startLoadingDate, "passages", passages);
     const rencontres = await Rencontre.count(query);
-    console.log(Date.now() - startLoadingDate, "rencontres", rencontres);
     const reports = await Report.count(query);
-    console.log(Date.now() - startLoadingDate, "reports", reports);
     const territoryObservations = await TerritoryObservation.count(query);
-    console.log(Date.now() - startLoadingDate, "territoryObservations", territoryObservations);
     const territories = await Territory.count(query);
-    console.log(Date.now() - startLoadingDate, "territories", territories);
 
     // Medical data is never saved in cache so we always have to download all at every page reload.
     // In other words "after" param is intentionnaly ignored for consultations, treatments and medical files.
@@ -201,29 +190,17 @@ router.get(
       attributes: ["organisation", [fn("COUNT", "TagName"), "countByOrg"]],
     };
 
-    console.log(Date.now() - startLoadingDate, "actions");
     const actions = (await Action.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "persons");
     const persons = (await Person.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "groups");
     const groups = (await Group.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "territories");
     const territories = (await Territory.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "reports");
     const reports = (await Report.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "comments");
     const comments = (await Comment.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "passages");
     const passages = (await Passage.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "rencontres");
     const rencontres = (await Rencontre.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "consultations");
     const consultations = (await Consultation.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "observations");
     const observations = (await TerritoryObservation.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "treatments");
     const treatments = (await Treatment.findAll(countQuery)).map((item) => item.toJSON());
-    console.log(Date.now() - startLoadingDate, "users");
     const users = (await User.findAll(countQuery)).map((item) => item.toJSON());
 
     return res.status(200).send({
