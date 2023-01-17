@@ -1,3 +1,10 @@
+## [1.223.2](https://github.com/SocialGouv/mano/compare/v1.223.1...v1.223.2) (2023-01-17)
+
+
+### Bug Fixes
+
+* **dashboard:** onboarding message for teams was always displayed ([#1207](https://github.com/SocialGouv/mano/issues/1207)) ([bad8798](https://github.com/SocialGouv/mano/commit/bad8798d0024a7c471abee1fac31726cf6479ce7))
+
 ## [1.223.1](https://github.com/SocialGouv/mano/compare/v1.223.0...v1.223.1) (2023-01-17)
 
 
