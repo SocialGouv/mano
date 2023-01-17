@@ -1,3 +1,10 @@
+## [1.223.5](https://github.com/SocialGouv/mano/compare/v1.223.4...v1.223.5) (2023-01-17)
+
+
+### Bug Fixes
+
+* **app:** actions todo sorting ([#1211](https://github.com/SocialGouv/mano/issues/1211)) ([04aac20](https://github.com/SocialGouv/mano/commit/04aac2071b19ca3c031be53974d927009d63e38d))
+
 ## [1.223.4](https://github.com/SocialGouv/mano/compare/v1.223.3...v1.223.4) (2023-01-17)
 
 
