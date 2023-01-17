@@ -1,3 +1,10 @@
+## [1.222.2](https://github.com/SocialGouv/mano/compare/v1.222.1...v1.222.2) (2023-01-17)
+
+
+### Bug Fixes
+
+* **api:** add index to improve performances ([#1201](https://github.com/SocialGouv/mano/issues/1201)) ([b461c62](https://github.com/SocialGouv/mano/commit/b461c6243609b823e40c305b791b68fd41399f0e))
+
 ## [1.222.1](https://github.com/SocialGouv/mano/compare/v1.222.0...v1.222.1) (2023-01-17)
 
 
