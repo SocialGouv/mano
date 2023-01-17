@@ -2,6 +2,8 @@ const excludeFields = new Set([
   '_id',
   'encryptedEntityKey',
   'entityKey',
+  'createdBy',
+  'documents',
   'user', // because it is an id
   'organisation', // because it is an id
   'action', // because it is an id
