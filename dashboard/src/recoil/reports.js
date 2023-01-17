@@ -14,7 +14,8 @@ export const reportsState = atom({
         /* check if duplicate reports */
         const duplicateReports = Object.entries(
           newValue.reduce((reportsByDate, report) => {
-            if (report.date < '2022-11-25') return reportsByDate;
+            // TIL: undefined < '2022-11-25' === false. So we need to check if report.date is defined.
+            if (!report.date || report.date < '2022-11-25') return reportsByDate;
             if (!reportsByDate[`${report.date}-${report.team}`]) reportsByDate[`${report.date}-${report.team}`] = [];
             reportsByDate[`${report.date}-${report.team}`].push(report);
             return reportsByDate;
