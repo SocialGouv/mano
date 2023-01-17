@@ -2,15 +2,39 @@ const { VERSION, MINIMUM_DASHBOARD_VERSION } = require("../config");
 
 const MINIMUM_MOBILE_APP_VERSION = [2, 30, 0];
 
-const featuresDashboard = {
-  "1.218.0": "En cliquant sur une statistique d'action, on peut voir la liste d'actions concernées",
-  "1.217.0":
-    "Vous n'êtes plus déconnectés automatiquement après 3h d'inactivité, mais la clé de chiffrement vous sera demandée pour continuer votre session",
-  "1.216.0": "Une bulle d'aide est disponbile dans 2 statistiques de personnes suivies",
-  "1.215.0": "Dans l'export depuis les statistiques, le nom d'utilisateur n'est plus exporté avec les actions",
-  "1.214.1": "Les commentaires créées en même temps qu'une action sont de nouveau disponibles dans les comptes-rendus",
-  "1.214.0": "Possibilité de filtrer par date non renseignée",
-};
+const featuresDashboard = [
+  {
+    version: "1.221.0",
+    feature: "Une bulle d'aide est disponible dans chaque statistique",
+    date: "2023-01-17",
+  },
+  {
+    version: "1.218.0",
+    feature: "En cliquant sur une statistique d'action, on peut voir la liste d'actions concernées",
+    date: "2023-01-13",
+  },
+  {
+    version: "1.217.0",
+    feature:
+      "Vous n'êtes plus déconnectés automatiquement après 3h d'inactivité, mais la clé de chiffrement vous sera demandée pour continuer votre session",
+    date: "2023-01-13",
+  },
+  {
+    version: "1.215.0",
+    feature: "Dans l'export depuis les statistiques, le nom d'utilisateur n'est plus exporté avec les actions",
+    date: "2023-01-12",
+  },
+  {
+    version: "1.214.1",
+    feature: "Les commentaires créées en même temps qu'une action sont de nouveau disponibles dans les comptes-rendus",
+    date: "2023-01-11",
+  },
+  {
+    version: "1.214.0",
+    feature: "Possibilité de filtrer par date non renseignée",
+    date: "2023-01-11",
+  },
+];
 
 module.exports = ({ headers: { version, platform } }, res, next) => {
   if (platform === "website") return next();
@@ -21,11 +45,7 @@ module.exports = ({ headers: { version, platform } }, res, next) => {
     res.header("X-MINIMUM-DASHBOARD-VERSION", MINIMUM_DASHBOARD_VERSION);
     res.header(
       "X-DASHBOARD-NEWFEATURES",
-      Object.keys(featuresDashboard)
-        .filter((v) => v > version)
-        .reverse()
-        .map((version) => featuresDashboard[version])
-        .join("_")
+      featuresDashboard.filter((item) => item.version > version)
     );
     // See: https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Access-Control-Expose-Headers
     res.header("Access-Control-Expose-Headers", "X-API-VERSION, X-MINIMUM-DASHBOARD-VERSION, X-DASHBOARD-NEWFEATURES");
