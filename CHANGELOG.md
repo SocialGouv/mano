@@ -1,3 +1,11 @@
+## [1.222.1](https://github.com/SocialGouv/mano/compare/v1.222.0...v1.222.1) (2023-01-17)
+
+
+### Bug Fixes
+
+* consultations date + consultation onlyVisibleBy ([#1205](https://github.com/SocialGouv/mano/issues/1205)) ([7d61f35](https://github.com/SocialGouv/mano/commit/7d61f350c58a2d263a617d0b8a5e09222837611e))
+* sort order for persons ([0ad8cf4](https://github.com/SocialGouv/mano/commit/0ad8cf470e816d83cd68ff20e80167939c2160b8))
+
 # [1.222.0](https://github.com/SocialGouv/mano/compare/v1.221.0...v1.222.0) (2023-01-17)
 
 
