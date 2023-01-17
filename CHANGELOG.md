@@ -1,3 +1,10 @@
+## [1.223.3](https://github.com/SocialGouv/mano/compare/v1.223.2...v1.223.3) (2023-01-17)
+
+
+### Bug Fixes
+
+* debug empty date for service ([#1209](https://github.com/SocialGouv/mano/issues/1209)) ([d0154f0](https://github.com/SocialGouv/mano/commit/d0154f0480e15002e053c2a74fc9ba8d10007f78))
+
 ## [1.223.2](https://github.com/SocialGouv/mano/compare/v1.223.1...v1.223.2) (2023-01-17)
 
 
