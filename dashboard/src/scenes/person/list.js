@@ -63,15 +63,16 @@ const personsFilteredSelector = selectorFamily({
 const personsFilteredBySearchSelector = selectorFamily({
   key: 'personsFilteredBySearchSelector',
   get:
-    ({ viewAllOrganisationData, filters, alertness, search }) =>
+    ({ viewAllOrganisationData, filters, alertness, search, sortBy, sortOrder }) =>
     ({ get }) => {
       const personsFiltered = get(personsFilteredSelector({ viewAllOrganisationData, filters, alertness }));
+      const personsSorted = [...personsFiltered].sort(sortPersons(sortBy, sortOrder));
 
       if (!search?.length) {
-        return personsFiltered;
+        return personsSorted;
       }
 
-      const personsfilteredBySearch = filterBySearch(search, personsFiltered);
+      const personsfilteredBySearch = filterBySearch(search, personsSorted);
 
       return personsfilteredBySearch;
     },
@@ -119,18 +120,14 @@ const List = () => {
   const [page, setPage] = useSearchParamState('page', 0);
   const currentTeam = useRecoilValue(currentTeamState);
 
-  const personsFilteredBySearch = useRecoilValue(personsFilteredBySearchSelector({ search, viewAllOrganisationData, filters, alertness }));
-
-  const personsSorted = useMemo(() => {
-    const sorted = [...personsFilteredBySearch];
-    sorted.sort(sortPersons(sortBy, sortOrder));
-    return sorted;
-  }, [personsFilteredBySearch, sortBy, sortOrder]);
+  const personsFilteredBySearch = useRecoilValue(
+    personsFilteredBySearchSelector({ search, viewAllOrganisationData, filters, alertness, sortBy, sortOrder })
+  );
 
   const data = useMemo(() => {
-    return personsSorted.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
-  }, [personsSorted, page]);
-  const total = useMemo(() => personsSorted.length, [personsSorted]);
+    return personsFilteredBySearch.filter((_, index) => index < (page + 1) * limit && index >= page * limit);
+  }, [personsFilteredBySearch, page]);
+  const total = useMemo(() => personsFilteredBySearch.length, [personsFilteredBySearch]);
 
   const organisation = useRecoilValue(organisationState);
   const history = useHistory();

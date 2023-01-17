@@ -43,6 +43,5 @@ export const filterBySearch = (search, items = []) => {
       const stringifiedItem = JSON.stringify(prepareItemForSearch(item));
       return stringifiedItem.toLocaleLowerCase().includes(search);
     });
-
   return [...firstItems, ...secondItems, ...lastItems];
 };
