@@ -439,6 +439,7 @@ router.post(
         healthcareProfessional: userWithoutPassword.healthcareProfessional,
         lastChangePasswordAt: userWithoutPassword.lastChangePasswordAt,
         termsAccepted: userWithoutPassword.termsAccepted,
+        gaveFeedbackEarly2023: userWithoutPassword.gaveFeedbackEarly2023,
       },
     });
   })
@@ -475,6 +476,7 @@ router.get(
         healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
+        gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
         team: team.map((t) => t._id),
       },
     });
@@ -516,6 +518,7 @@ router.get(
         healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
+        gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
         lastLoginAt: user.lastLoginAt,
         teams: teams.map(serializeTeam),
       });
@@ -534,6 +537,7 @@ router.put(
         name: z.optional(z.string().min(1)),
         email: z.preprocess((email) => email.trim().toLowerCase(), z.string().email().optional().or(z.literal(""))),
         password: z.optional(z.string().min(1)),
+        gaveFeedbackEarly2023: z.optional(z.boolean()),
         team: z.optional(z.array(z.string().regex(looseUuidRegex))),
         ...(req.body.termsAccepted ? { termsAccepted: z.preprocess((input) => new Date(input), z.date()) } : {}),
       });
@@ -544,7 +548,7 @@ router.put(
     }
 
     const _id = req.user._id;
-    const { name, email, password, team, termsAccepted } = req.body;
+    const { name, email, password, team, termsAccepted, gaveFeedbackEarly2023 } = req.body;
 
     const user = await User.findOne({ where: { _id } });
     if (!user) return res.status(404).send({ ok: false, error: "Utilisateur non trouvé" });
@@ -556,6 +560,8 @@ router.put(
       if (!validatePassword(password)) return res.status(400).send({ ok: false, error: passwordCheckError, code: PASSWORD_NOT_VALIDATED });
       user.set({ password: password });
     }
+
+    if (gaveFeedbackEarly2023) user.set({ gaveFeedbackEarly2023 });
 
     const tx = await User.sequelize.transaction();
     if (team && Array.isArray(team)) {
@@ -580,6 +586,7 @@ router.put(
         healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
+        gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
       },
     });
   })
@@ -643,6 +650,7 @@ router.put(
         healthcareProfessional: user.healthcareProfessional,
         lastChangePasswordAt: user.lastChangePasswordAt,
         termsAccepted: user.termsAccepted,
+        gaveFeedbackEarly2023: user.gaveFeedbackEarly2023,
       },
     });
   })
