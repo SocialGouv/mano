@@ -1,13 +1,14 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { useRecoilValue } from 'recoil';
+import { useRecoilState, useRecoilValue } from 'recoil';
 import packageInfo from '../../package.json';
 import { organisationState, teamsState, userState } from '../recoil/auth';
 import OpenNewWindowIcon from './OpenNewWindowIcon';
 import SessionCountDownLimiter from './SessionCountDownLimiter';
+import API from '../services/api';
 
 const Drawer = () => {
-  const user = useRecoilValue(userState);
+  const [user, setUser] = useRecoilState(userState);
   const organisation = useRecoilValue(organisationState);
   const teams = useRecoilValue(teamsState);
 
@@ -16,6 +17,15 @@ const Drawer = () => {
   const role = user.role;
 
   const isOnboarding = onboardingForEncryption || onboardingForTeams;
+  const [feedbacks, setFeedbacks] = React.useState(0);
+
+  useEffect(() => {
+    API.get({ path: '/public/feedbacks' }).then((res) => {
+      if (res.ok) {
+        setFeedbacks(res.data);
+      }
+    });
+  }, []);
 
   return (
     <nav
@@ -122,16 +132,33 @@ const Drawer = () => {
             </li>
           </>
         )}
-        <a
-          target="_blank"
-          rel="noreferrer"
-          href="https://docs.google.com/forms/d/e/1FAIpQLScnizjlH0dCJ-wa-xeiZJcmemrKqiDkDo5linLwtCUjwr3uzg/viewform?usp=sf_link"
-          className="tw-relative !tw-mt-4 tw-cursor-pointer tw-rounded-md tw-border-black !tw-bg-main !tw-text-white hover:!tw-opacity-100">
-          <div className="tw-absolute -tw-top-2 -tw-left-2 tw-text-2xl">👋</div>
-          <div className="tw-px-2 tw-py-4 tw-text-center tw-text-xs tw-font-semibold">
-            Hep&nbsp;! Auriez-vous une minute à nous accorder pour améliorer Mano&nbsp;?
-          </div>
-        </a>
+        {!user.gaveFeedbackEarly2023 && (
+          <>
+            <a
+              target="_blank"
+              rel="noreferrer"
+              onClick={() => {
+                API.put({ path: '/user', body: { gaveFeedbackEarly2023: true } }).then((res) => {
+                  if (res.ok) {
+                    setUser(res.user);
+                  }
+                });
+              }}
+              href="https://docs.google.com/forms/d/e/1FAIpQLScnizjlH0dCJ-wa-xeiZJcmemrKqiDkDo5linLwtCUjwr3uzg/viewform?usp=sf_link"
+              className="tw-relative !tw-mt-4 tw-cursor-pointer tw-rounded-md tw-border-black !tw-bg-main !tw-text-white hover:!tw-opacity-100 motion-safe:tw-animate-brrrr">
+              <div className="tw-absolute -tw-top-2 -tw-left-2 tw-text-2xl motion-safe:tw-animate-coucou">👋</div>
+              <div className="tw-px-2 tw-py-4 tw-text-center tw-text-xs tw-font-semibold">
+                Hep&nbsp;! Auriez-vous une minute à nous accorder pour améliorer Mano&nbsp;?
+              </div>
+            </a>
+            <div className="tw-mt-1 tw-h-1 tw-w-full tw-rounded-full tw-bg-gray-200">
+              <div className="tw-h-1 tw-rounded-full tw-bg-main" style={{ width: `${(feedbacks.count / feedbacks.totalUsers) * 100}%` }} />
+            </div>
+            <small className="tw-block tw-text-[0.65rem] tw-text-main">
+              {feedbacks.count} sur {feedbacks.totalUsers} à récolter
+            </small>
+          </>
+        )}
       </div>
       <p className="tw-mt-auto tw-flex tw-flex-col tw-justify-between tw-text-[0.65rem] tw-text-main">
         <span>Version: {packageInfo.version}</span>

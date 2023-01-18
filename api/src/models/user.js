@@ -21,6 +21,7 @@ User.init(
     role: { type: DataTypes.TEXT, defaultValue: "normal" },
     debugApp: DataTypes.JSONB,
     debugDashboard: DataTypes.JSONB,
+    gaveFeedbackEarly2023: DataTypes.BOOLEAN,
   },
   {
     sequelize,
