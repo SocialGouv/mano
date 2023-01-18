@@ -1,3 +1,10 @@
+# [1.224.0](https://github.com/SocialGouv/mano/compare/v1.223.5...v1.224.0) (2023-01-18)
+
+
+### Features
+
+* pimp feedback ([#1212](https://github.com/SocialGouv/mano/issues/1212)) ([20a4dac](https://github.com/SocialGouv/mano/commit/20a4daca163804f6eb79b561dfaead68e2e60474))
+
 ## [1.223.5](https://github.com/SocialGouv/mano/compare/v1.223.4...v1.223.5) (2023-01-17)
 
 
