@@ -1,8 +1,7 @@
 import React, { useMemo } from 'react';
-import { Col, Row } from 'reactstrap';
 import { useHistory } from 'react-router-dom';
 import { selector, selectorFamily, useRecoilValue } from 'recoil';
-import styled from 'styled-components';
+import { useLocalStorage } from 'react-use';
 import { SmallHeader } from '../../components/header';
 import Page from '../../components/pagination';
 import Search from '../../components/search';
@@ -18,9 +17,8 @@ import {
 } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
-import { formatBirthDate, formatDateWithFullMonth } from '../../services/date';
+import { dayjsInstance, formatBirthDate, formatDateWithFullMonth } from '../../services/date';
 import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
-import { theme } from '../../config';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { placesState } from '../../recoil/places';
 import { filterBySearch } from '../search/utils';
@@ -29,7 +27,6 @@ import useSearchParamState from '../../services/useSearchParamState';
 import { useDataLoader } from '../../components/DataLoader';
 import ExclamationMarkButton from '../../components/tailwind/ExclamationMarkButton';
 import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
-import { useLocalStorage } from 'react-use';
 
 const limit = 20;
 
@@ -152,16 +149,16 @@ const List = () => {
           </>
         }
       />
-      <Row>
-        <Col>
-          <PersonsActionsStyled>
+      <div className="tw-flex tw-flex-wrap">
+        <div className="tw-relative tw-w-full tw-max-w-full tw-grow tw-basis-0">
+          <div className="tw-mb-8 tw-flex tw-w-full tw-justify-end">
             <CreatePerson refreshable />
-          </PersonsActionsStyled>
-        </Col>
-      </Row>
-      <Row style={{ marginBottom: 20 }}>
-        <Col md={12} style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
-          <label htmlFor="search" style={{ marginRight: 20, width: 250, flexShrink: 0 }}>
+          </div>
+        </div>
+      </div>
+      <div className="tw-mb-5 tw-flex tw-flex-wrap">
+        <div className="tw-mb-5 tw-flex tw-w-full tw-items-center">
+          <label htmlFor="search" className="tw-mr-5 tw-w-64 tw-shrink-0">
             Recherche :{' '}
           </label>
           <Search
@@ -176,8 +173,8 @@ const List = () => {
               }
             }}
           />
-        </Col>
-        <Col md={12} className="tw-flex tw-items-center">
+        </div>
+        <div className="tw-flex tw-w-full tw-items-center">
           <label htmlFor="viewAllOrganisationData" className="tw-ml-72">
             <input
               type="checkbox"
@@ -189,8 +186,8 @@ const List = () => {
             />
             Afficher les personnes de toute l'organisation
           </label>
-        </Col>
-        <Col md={12} className="tw-flex tw-items-center">
+        </div>
+        <div className="tw-flex tw-w-full tw-items-center">
           <label htmlFor="alertness" className="tw-ml-72">
             <input
               type="checkbox"
@@ -202,8 +199,8 @@ const List = () => {
             />
             N'afficher que les personnes vulnérables où ayant besoin d'une attention particulière
           </label>
-        </Col>
-      </Row>
+        </div>
+      </div>
       <Filters base={filterPersonsWithAllFields} filters={filters} onChange={setFilters} title="Autres filtres : " saveInURLParams />
       <Table
         data={data}
@@ -239,7 +236,7 @@ const List = () => {
             render: (p) => {
               if (p.outOfActiveList)
                 return (
-                  <div style={{ color: theme.black50 }}>
+                  <div className="tw-text-black50">
                     <div>{p.name}</div>
                     <div>Sortie de file active : {p.outOfActiveListReasons?.join(', ')}</div>
                   </div>
@@ -256,7 +253,7 @@ const List = () => {
             sortBy,
             render: (p) => {
               if (!p.birthdate) return '';
-              else if (p.outOfActiveList) return <i style={{ color: theme.black50 }}>{p.formattedBirthDate}</i>;
+              else if (p.outOfActiveList) return <i className="tw-text-black50">{p.formattedBirthDate}</i>;
               return (
                 <span>
                   <i>{p.formattedBirthDate}</i>
@@ -293,9 +290,28 @@ const List = () => {
             sortOrder,
             sortBy,
             render: (p) => {
-              if (p.outOfActiveList)
-                return <div style={{ color: theme.black50 }}>{formatDateWithFullMonth(p.followedSince || p.createdAt || '')}</div>;
+              if (p.outOfActiveList) return <div className="tw-text-black50">{formatDateWithFullMonth(p.followedSince || p.createdAt || '')}</div>;
               return formatDateWithFullMonth(p.followedSince || p.createdAt || '');
+            },
+          },
+          {
+            title: 'Dernière interaction',
+            dataKey: 'lastUpdateCheckForGDPR',
+            onSortOrder: setSortOrder,
+            onSortBy: setSortBy,
+            sortOrder,
+            sortBy,
+            render: (p) => {
+              return (
+                <div
+                  className={
+                    dayjsInstance(p.lastUpdateCheckForGDPR).isAfter(dayjsInstance().add(-2, 'year'))
+                      ? 'tw-font-bold tw-text-red-500'
+                      : 'tw-text-black50'
+                  }>
+                  {formatDateWithFullMonth(p.lastUpdateCheckForGDPR)}
+                </div>
+              );
             },
           },
         ].filter((c) => organisation.groupsEnabled || c.dataKey !== 'group')}
@@ -313,12 +329,4 @@ const Teams = ({ person: { _id, assignedTeams } }) => (
   </div>
 );
 
-const PersonsActionsStyled = styled.div`
-  margin-bottom: 40px;
-  width: 100%;
-  display: flex;
-  justify-content: flex-end;
-`;
-
-// eslint-disable-next-line import/no-anonymous-default-export
 export default List;
