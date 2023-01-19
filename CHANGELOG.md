@@ -1,3 +1,10 @@
+# [1.225.0](https://github.com/SocialGouv/mano/compare/v1.224.1...v1.225.0) (2023-01-19)
+
+
+### Features
+
+* **dashboard:** rgpd visible in persons list ([#1217](https://github.com/SocialGouv/mano/issues/1217)) ([870751c](https://github.com/SocialGouv/mano/commit/870751c69bff7253e76bb9e698aadea3255ce975))
+
 ## [1.224.1](https://github.com/SocialGouv/mano/compare/v1.224.0...v1.224.1) (2023-01-19)
 
 
