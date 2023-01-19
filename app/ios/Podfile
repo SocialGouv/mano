@@ -47,6 +47,10 @@ target 'mano' do
   post_install do |installer|
     react_native_post_install(
       installer,
+      # if the line below is not here, the `pod install with --project-directory` will fail
+      # see https://github.com/facebook/react-native/pull/35754?notification_referrer_id=NT_kwDOAeQU0LM1MjExOTMzMjEyOjMxNzI0NzUy#issuecomment-1386443021
+      # TODO: remove on RN 72
+      'node_modules/react-native',
       # Set `mac_catalyst_enabled` to `true` in order to apply patches
       # necessary for Mac Catalyst builds
       :mac_catalyst_enabled => false
