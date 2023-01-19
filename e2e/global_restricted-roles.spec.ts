@@ -41,7 +41,6 @@ test("test restricted accesses", async ({ page }) => {
     await page.getByLabel("Description").fill("cool man");
     await page.getByLabel("Personne très vulnérable, ou ayant besoin d'une attention particulière").check();
     await page.getByRole("dialog").getByText("Informations sociales").click();
-    // locator('.person-custom-select-situation-personnelle__control')
     await clickOnEmptyReactSelect(page, "person-custom-select-situation-personnelle", "Homme isolé");
     await page.getByRole("dialog").getByText("Informations médicales").click();
     await clickOnEmptyReactSelect(page, "person-select-healthInsurances", "Régime Général");

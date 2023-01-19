@@ -60,7 +60,7 @@ test("test", async ({ page }) => {
   await page.locator("#react-select-employment-option-3").click();
   await page.locator(".person-select-resources__value-container").click();
   await page.locator("#react-select-resources-option-1").click();
-  await page.locator("div:nth-child(2) > .row > div:nth-child(10)").click();
+  await page.locator(".person-select-reasons__value-container").click();
   await page.locator("#react-select-reasons-option-2").click();
   await page.getByRole("dialog").getByText("Informations médicales").click();
   await page.locator(".person-select-healthInsurances__value-container").click();
