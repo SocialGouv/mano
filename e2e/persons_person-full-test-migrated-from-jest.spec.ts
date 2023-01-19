@@ -45,7 +45,7 @@ test("test", async ({ page }) => {
   await page.getByLabel("Description").fill("Description");
   await page.getByText("Personne très vulnérable, ou ayant besoin d'une attention particulière").click();
   await page.getByText("+").first().click();
-  await page.locator(".person-select-personalSituation__value-container").click();
+  await page.locator(".person-custom-select-situation-personnelle__value-container").click();
   await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("social");
   await page.locator(".person-select-animals__value-container").click();

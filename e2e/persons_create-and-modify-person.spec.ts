@@ -50,7 +50,7 @@ test("Create and modify a person", async ({ page }) => {
   await page.getByLabel("Description").fill("Test de description");
 
   await page.getByRole("dialog").getByText("Informations sociales").click();
-  await clickOnEmptyReactSelect(page, "person-select-personalSituation", "Famille");
+  await clickOnEmptyReactSelect(page, "person-custom-select-situation-personnelle", "Famille");
   await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("aucune");
   await page.locator(".person-select-animals__value-container").click();

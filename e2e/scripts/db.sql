@@ -73,7 +73,7 @@ CREATE TABLE IF NOT EXISTS mano."Organisation" (
     collaborations text[],
     "customFieldsObs" jsonb,
     "fieldsPersonsCustomizableOptions" jsonb,
-    "customFieldsPersonsSocial" jsonb,
+    "customFieldsPersonsSocial" jsonb default '[{"name":"personalSituation","type":"enum","label":"Situation personnelle","enabled":true,"options":["Aucune","Homme isolé","Femme isolée","En couple","Famille","Famille monoparentale","Mineur","Autre"],"required":false,"showInStats":true}]',
     "customFieldsPersonsMedical" jsonb,
     "encryptedVerificationKey" text,
     migrations text[],
