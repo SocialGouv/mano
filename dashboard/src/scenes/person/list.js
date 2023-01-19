@@ -306,8 +306,8 @@ const List = () => {
                 <div
                   className={
                     dayjsInstance(p.lastUpdateCheckForGDPR).isAfter(dayjsInstance().add(-2, 'year'))
-                      ? 'tw-font-bold tw-text-red-500'
-                      : 'tw-text-black50'
+                      ? 'tw-text-black50'
+                      : 'tw-font-bold tw-text-red-500'
                   }>
                   {formatDateWithFullMonth(p.lastUpdateCheckForGDPR)}
                 </div>
