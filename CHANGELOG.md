@@ -1,3 +1,10 @@
+## [1.224.1](https://github.com/SocialGouv/mano/compare/v1.224.0...v1.224.1) (2023-01-19)
+
+
+### Bug Fixes
+
+* **dashboard:** outOfActiveList in history ([#1214](https://github.com/SocialGouv/mano/issues/1214)) ([585a52f](https://github.com/SocialGouv/mano/commit/585a52fe7ed42f519240e0ef9541571cb1e76805))
+
 # [1.224.0](https://github.com/SocialGouv/mano/compare/v1.223.5...v1.224.0) (2023-01-18)
 
 
