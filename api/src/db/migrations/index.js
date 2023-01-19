@@ -28,5 +28,6 @@
   await require("./2022-12-30_new-table-service")();
   await require("./2023-01-16_add-index-everywhere")();
   await require("./2023-01-18-gave-feedback-2023")();
+  await require("./2023-01-19_custom-fields-person")();
   await require("./2023-01-24_can-disable-territories")();
 })();

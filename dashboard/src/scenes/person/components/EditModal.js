@@ -235,17 +235,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       {openPanels.includes('social') && (
                         <Row>
                           <Col md={4}>
-                            <Label htmlFor="person-select-personalSituation">Situation personnelle</Label>
-                            <SelectAsInput
-                              options={personFields.find((f) => f.name === 'personalSituation').options}
-                              name="personalSituation"
-                              value={values.personalSituation || ''}
-                              onChange={handleChange}
-                              inputId="person-select-personalSituation"
-                              classNamePrefix="person-select-personalSituation"
-                            />
-                          </Col>
-                          <Col md={4}>
                             <FormGroup>
                               <Label htmlFor="structureSocial">Structure de suivi social</Label>
                               <Input name="structureSocial" id="structureSocial" value={values.structureSocial || ''} onChange={handleChange} />

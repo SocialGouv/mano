@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import { useRecoilValue } from 'recoil';
 import ScrollContainer from '../../components/ScrollContainer';
 import SubHeader from '../../components/SubHeader';
-import PersonalSituationSelect from '../../components/Selects/PersonalSituationSelect';
 import AnimalsSelect from '../../components/Selects/AnimalsSelect';
 import NationalitySituationSelect from '../../components/Selects/NationalitySituationSelect';
 import YesNoSelect from '../../components/Selects/YesNoSelect';
@@ -44,11 +43,6 @@ const InformationsSocial = ({ navigation, editable, updating, onChange, onUpdate
     <>
       <SubHeader center backgroundColor={backgroundColor || colors.app.color} onBack={navigation.goBack} caption="Informations sociales" />
       <ScrollContainer ref={scrollViewRef} backgroundColor={backgroundColor || colors.app.color}>
-        <PersonalSituationSelect
-          value={person.personalSituation}
-          onSelect={(personalSituation) => onChange({ personalSituation })}
-          editable={editable}
-        />
         <InputLabelled
           label="Structure de suivi social"
           onChangeText={(structureSocial) => onChange({ structureSocial })}

@@ -16,15 +16,6 @@ const personFields = [
   { name: "alertness", type: "boolean", label: "Personne très vulnérable", encrypted: true, importable: true, filterable: true },
   { name: "wanderingAt", type: "date", label: "En rue depuis le", encrypted: true, importable: true, filterable: true },
   {
-    name: "personalSituation",
-    type: "enum",
-    label: "Situation personnelle",
-    encrypted: true,
-    importable: true,
-    options: ["Aucune", "Homme isolé", "Femme isolée", "En couple", "Famille", "Famille monoparentale", "Mineur", "Autre"],
-    filterable: true,
-  },
-  {
     name: "nationalitySituation",
     type: "enum",
     label: "Nationalité",
@@ -237,8 +228,21 @@ const defaultMedicalCustomFields = [
   },
 ];
 
+const defaultSocialCustomFields = [
+  {
+    name: "personalSituation",
+    type: "enum",
+    label: "Situation personnelle",
+    enabled: true,
+    options: ["Aucune", "Homme isolé", "Femme isolée", "En couple", "Famille", "Famille monoparentale", "Mineur", "Autre"],
+    required: false,
+    showInStats: true,
+  },
+];
+
 module.exports = {
   personFields,
   fieldsPersonsCustomizableOptions,
+  defaultSocialCustomFields,
   defaultMedicalCustomFields,
 };
