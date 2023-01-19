@@ -3,7 +3,7 @@ import { Col, FormGroup, Row, Modal, ModalBody, ModalHeader, Label } from 'react
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-
+import { userState } from '../../recoil/auth';
 import ButtonCustom from '../../components/ButtonCustom';
 import { fieldsPersonsCustomizableOptionsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import API from '../../services/api';
@@ -13,17 +13,28 @@ import SelectCustom from '../../components/SelectCustom';
 
 const OutOfActiveList = ({ person }) => {
   const [open, setOpen] = useState(false);
-
+  
   const preparePersonForEncryption = usePreparePersonForEncryption();
-
+  const user = useRecoilValue(userState);
+  
   const fieldsPersonsCustomizableOptions = useRecoilValue(fieldsPersonsCustomizableOptionsSelector);
   const setPersons = useSetRecoilState(personsState);
 
-  const handleSetOutOfActiveList = async (outOfActiveListReasons = [], outOfActiveListDate = Date.now()) => {
-    const outOfActiveList = !person.outOfActiveList;
+  const reintegerInActiveList = async () => {
+    const historyEntry = {
+      date: new Date(),
+      user: user._id,
+      data: {
+        outOfActiveList: { oldValue: true, newValue: false },
+        outOfActiveListReasons: { oldValue: person.outOfActiveListReasons, newValue: [] },
+        outOfActiveListDate: { oldValue: person.outOfActiveListDate, newValue: null },
+      },
+    };
+    
+    const history = [...(person.history || []), historyEntry];
     const response = await API.put({
       path: `/person/${person._id}`,
-      body: preparePersonForEncryption({ ...person, outOfActiveList: outOfActiveList, outOfActiveListReasons, outOfActiveListDate }),
+      body: preparePersonForEncryption({ ...person, outOfActiveList: false, outOfActiveListReasons: [], outOfActiveListDate: null, history }),
     });
     if (response.ok) {
       const newPerson = response.decryptedData;
@@ -33,25 +44,55 @@ const OutOfActiveList = ({ person }) => {
           return p;
         })
       );
-      toast.success(person.name + (outOfActiveList ? ' est hors de la file active.' : ' est dans la file active.'));
+      toast.success(person.name + ' est réintégré dans la file active');
     }
   };
 
+  const setOutOfActiveList = async (updatedPerson) => {
+    updatedPerson.outOfActiveList = true;
+
+    const historyEntry = {
+      date: new Date(),
+      user: user._id,
+      data: {
+        outOfActiveList: { newValue: true },
+        outOfActiveListReasons: { newValue: updatedPerson.outOfActiveListReasons },
+        outOfActiveListDate: { newValue: updatedPerson.outOfActiveListDate },
+      },
+    };
+
+    updatedPerson.history = [...(person.history || []), historyEntry];
+    const response = await API.put({
+      path: `/person/${person._id}`,
+      body: preparePersonForEncryption(updatedPerson),
+    });
+    if (response.ok) {
+      const newPerson = response.decryptedData;
+      setPersons((persons) =>
+        persons.map((p) => {
+          if (p._id === person._id) return newPerson;
+          return p;
+        })
+      );
+      toast.success(person.name + ' est hors de la file active');
+    }
+  };
+  
   return (
     <>
       <ButtonCustom
         title={person.outOfActiveList ? 'Réintégrer dans la file active' : 'Sortie de file active'}
         type="button"
-        onClick={() => (person.outOfActiveList ? handleSetOutOfActiveList() : setOpen(true))}
+        onClick={() => (person.outOfActiveList ? reintegerInActiveList() : setOpen(true))}
         color={'warning'}
       />
       <Modal isOpen={open} toggle={() => setOpen(false)} size="lg" backdrop="static">
         <ModalHeader toggle={() => setOpen(false)}>Sortie de file active de {person.name}</ModalHeader>
         <ModalBody>
           <Formik
-            initialValues={person}
+            initialValues={{ ...person, outOfActiveListDate: dateForDatePicker(Date.now()), outOfActiveListReasons: [] }}
             onSubmit={async (body) => {
-              await handleSetOutOfActiveList(body.outOfActiveListReasons, body.outOfActiveListDate);
+              await setOutOfActiveList(body);
               setOpen(false);
             }}>
             {({ values, handleChange, handleSubmit, isSubmitting }) => (
@@ -90,7 +131,7 @@ const OutOfActiveList = ({ person }) => {
                         <DatePicker
                           locale="fr"
                           className="form-control"
-                          selected={dateForDatePicker(values.outOfActiveListDate || Date.now())}
+                          selected={dateForDatePicker(values.outOfActiveListDate)}
                           onChange={(date) => handleChange({ target: { value: date, name: 'outOfActiveListDate' } })}
                           dateFormat="dd/MM/yyyy"
                           id="outOfActiveListDate"

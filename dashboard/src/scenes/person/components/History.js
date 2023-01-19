@@ -5,13 +5,13 @@ import { Title } from '../../../components/header';
 import UserName from '../../../components/UserName';
 import { teamsState } from '../../../recoil/auth';
 import { personFieldsIncludingCustomFieldsSelector } from '../../../recoil/persons';
-import { dayjsInstance } from '../../../services/date';
+import { formatDateWithFullMonth, dayjsInstance } from '../../../services/date';
 
 const History = ({ person }) => {
   const personFieldsIncludingCustomFields = useRecoilValue(personFieldsIncludingCustomFieldsSelector);
   const teams = useRecoilValue(teamsState);
   const history = useMemo(() => [...(person.history || [])].reverse(), [person.history]);
-
+  
   return (
     <div>
       <Row style={{ marginTop: '30px', marginBottom: '5px' }}>
@@ -58,6 +58,30 @@ const History = ({ person }) => {
                             <code>"{(value.oldValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
                             <span>↓</span>
                             <code>"{(value.newValue || []).map((teamId) => teams.find((t) => t._id === teamId)?.name).join(', ')}"</code>
+                          </p>
+                        );
+                      }
+                      if (key === 'outOfActiveListReasons') {
+                        if (!value.newValue.length) return null;
+                        return (
+                          <p className="tw-flex tw-flex-col" key={key}>
+                            <span>{personField?.label}: </span>
+                            <code>{value.newValue.join(', ')}</code>
+                          </p>
+                        );
+                      }
+                      if (key === 'outOfActiveList') {
+                        return (
+                          <p className="tw-flex tw-flex-col" key={key}>
+                            <span>{value.newValue === true ? 'Sortie de file active' : 'Réintégration dans la file active'}</span>
+                          </p>
+                        );
+                      }
+                      if (key === 'outOfActiveListDate') {
+                        if (!value.newValue) return null;
+                        return (
+                          <p className="tw-flex tw-flex-col" key={key}>
+                            <span>{formatDateWithFullMonth(value.newValue)}</span>
                           </p>
                         );
                       }

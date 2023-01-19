@@ -91,7 +91,7 @@ test("test", async ({ page }) => {
     await page.getByRole("button", { name: "Sortie de file active" }).click();
     await clickOnEmptyReactSelect(page, "person-select-outOfActiveListReasons", "Relai vers autre structure");
     await page.getByRole("button", { name: "Sauvegarder" }).click();
-    await page.getByText("personne1 est hors de la file active.").click();
+    await page.getByText("personne1 est hors de la file active").click();
 
     await page.getByRole("button", { name: "Dossier Médical" }).click();
     await clickOnEmptyReactSelect(page, "person-custom-select-douleur", "Colonne vertébrale merde je me suis trompé");
