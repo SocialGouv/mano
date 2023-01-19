@@ -299,6 +299,7 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
   const optionIsDisabled = useCallback(
     (option) => {
       if (typeIsDisabled) return true;
+      if (isNewField) return false;
 
       if (['number'].includes(field.type)) {
         return !['text', 'number', 'textarea', 'enum'].includes(option.value);
@@ -311,7 +312,7 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
       }
       return true;
     },
-    [typeIsDisabled, field.type]
+    [typeIsDisabled, field.type, isNewField]
   );
 
   return (
