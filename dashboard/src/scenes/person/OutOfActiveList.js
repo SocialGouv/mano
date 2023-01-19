@@ -8,7 +8,7 @@ import ButtonCustom from '../../components/ButtonCustom';
 import { fieldsPersonsCustomizableOptionsSelector, personsState, usePreparePersonForEncryption } from '../../recoil/persons';
 import API from '../../services/api';
 import DatePicker from 'react-datepicker';
-import { dateForDatePicker } from '../../services/date';
+import { dateForDatePicker, getDateFromRawInputOdDatePicker } from '../../services/date';
 import SelectCustom from '../../components/SelectCustom';
 
 const OutOfActiveList = ({ person }) => {
@@ -91,7 +91,10 @@ const OutOfActiveList = ({ person }) => {
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.outOfActiveListDate || Date.now())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'outOfActiveListDate' } })}
+                          onChangeRaw={(e) => {
+                            const date = getDateFromRawInputOdDatePicker(e.target.value);
+                            if (date) handleChange({ target: { value: date, name: 'outOfActiveListDate' } });
+                          }}
                           dateFormat="dd/MM/yyyy"
                           id="outOfActiveListDate"
                         />

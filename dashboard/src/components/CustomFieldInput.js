@@ -4,7 +4,7 @@ import styled from 'styled-components';
 import SelectAsInput from './SelectAsInput';
 import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
-import { dateForDatePicker } from '../services/date';
+import { dateForDatePicker, getDateFromRawInputOdDatePicker } from '../services/date';
 import { capture } from '../services/sentry';
 
 const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, disabled, hideLabel = false }) => {
@@ -74,7 +74,10 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
                 className="form-control"
                 id={id}
                 selected={dateForDatePicker(values[field.name] ? values[field.name] : field.required ? new Date() : null)}
-                onChange={(date) => handleChange({ target: { value: date, name: field.name } })}
+                onChangeRaw={(e) => {
+                  const date = getDateFromRawInputOdDatePicker(e.target.value);
+                  if (date) handleChange({ target: { value: date, name: field.name } });
+                }}
                 timeInputLabel="Heure :"
                 dateFormat={`dd/MM/yyyy${field.type === 'date-with-time' ? ' HH:mm' : ''}`}
                 showTimeInput={field.type === 'date-with-time'}

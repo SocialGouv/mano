@@ -8,7 +8,7 @@ import ButtonCustom from './ButtonCustom';
 import SelectUser from './SelectUser';
 import { teamsState, userState } from '../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker } from '../services/date';
+import { dateForDatePicker, getDateFromRawInputOdDatePicker } from '../services/date';
 import API from '../services/api';
 import { rencontresState, prepareRencontreForEncryption } from '../recoil/rencontres';
 import SelectTeam from './SelectTeam';
@@ -128,7 +128,10 @@ const Rencontre = ({ rencontre, onFinished }) => {
                             locale="fr"
                             className="form-control"
                             selected={dateForDatePicker(values.date)}
-                            onChange={(date) => handleChange({ target: { value: date, name: 'date' } })}
+                            onChangeRaw={(e) => {
+                              const date = getDateFromRawInputOdDatePicker(e.target.value);
+                              if (date) handleChange({ target: { value: date, name: 'date' } });
+                            }}
                             timeInputLabel="Heure :"
                             dateFormat="dd/MM/yyyy HH:mm"
                             showTimeInput

@@ -7,7 +7,7 @@ import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import { dateForDatePicker, dayjsInstance } from '../services/date';
+import { dateForDatePicker, dayjsInstance, getDateFromRawInputOdDatePicker } from '../services/date';
 import API from '../services/api';
 
 import SelectPerson from './SelectPerson';
@@ -197,7 +197,10 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.dueAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
+                          onChangeRaw={(e) => {
+                            const date = getDateFromRawInputOdDatePicker(e.target.value);
+                            if (date) handleChange({ target: { value: date, name: 'dueAt' } });
+                          }}
                           dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
                           showTimeInput={values.withTime}
                         />

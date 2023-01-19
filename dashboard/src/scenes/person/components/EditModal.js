@@ -8,7 +8,7 @@ import {
   personsState,
   usePreparePersonForEncryption,
 } from '../../../recoil/persons';
-import { dateForDatePicker } from '../../../services/date';
+import { dateForDatePicker, getDateFromRawInputOdDatePicker } from '../../../services/date';
 import DatePicker from 'react-datepicker';
 import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
@@ -125,7 +125,10 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                                 locale="fr"
                                 className="form-control"
                                 selected={dateForDatePicker(values.birthdate)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
+                                onChangeRaw={(e) => {
+                                  const date = getDateFromRawInputOdDatePicker(e.target.value);
+                                  if (date) handleChange({ target: { value: date, name: 'birthdate' } });
+                                }}
                                 dateFormat="dd/MM/yyyy"
                                 id="person-birthdate"
                               />
@@ -140,7 +143,10 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                                 locale="fr"
                                 className="form-control"
                                 selected={dateForDatePicker(values.wanderingAt)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
+                                onChangeRaw={(e) => {
+                                  const date = getDateFromRawInputOdDatePicker(e.target.value);
+                                  if (date) handleChange({ target: { value: date, name: 'wanderingAt' } });
+                                }}
                                 dateFormat="dd/MM/yyyy"
                                 id="person-wanderingAt"
                               />
@@ -155,7 +161,10 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                                 locale="fr"
                                 className="form-control"
                                 selected={dateForDatePicker(values.followedSince || values.createdAt)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'followedSince' } })}
+                                onChangeRaw={(e) => {
+                                  const date = getDateFromRawInputOdDatePicker(e.target.value);
+                                  if (date) handleChange({ target: { value: date, name: 'followedSince' } });
+                                }}
                                 dateFormat="dd/MM/yyyy"
                                 id="person-followedSince"
                               />

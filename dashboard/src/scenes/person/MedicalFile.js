@@ -8,7 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
 import { personsState, usePreparePersonForEncryption, personFieldsSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
-import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime, getDateFromRawInputOdDatePicker } from '../../services/date';
 import API from '../../services/api';
 import useSearchParamState from '../../services/useSearchParamState';
 import SelectAsInput from '../../components/SelectAsInput';
@@ -187,7 +187,10 @@ export function MedicalFile({ person }) {
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.birthdate)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
+                          onChangeRaw={(e) => {
+                            const date = getDateFromRawInputOdDatePicker(e.target.value);
+                            if (date) handleChange({ target: { value: date, name: 'birthdate' } });
+                          }}
                           dateFormat="dd/MM/yyyy"
                           id="person-birthdate"
                         />
@@ -826,7 +829,10 @@ export function MedicalFile({ person }) {
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.startDate)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'startDate' } })}
+                          onChangeRaw={(e) => {
+                            const date = getDateFromRawInputOdDatePicker(e.target.value);
+                            if (date) handleChange({ target: { value: date, name: 'startDate' } });
+                          }}
                           dateFormat={'dd/MM/yyyy'}
                         />
                       </div>
@@ -842,7 +848,10 @@ export function MedicalFile({ person }) {
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.endDate)}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'endDate' } })}
+                          onChangeRaw={(e) => {
+                            const date = getDateFromRawInputOdDatePicker(e.target.value);
+                            if (date) handleChange({ target: { value: date, name: 'endDate' } });
+                          }}
                           dateFormat={'dd/MM/yyyy'}
                         />
                       </div>

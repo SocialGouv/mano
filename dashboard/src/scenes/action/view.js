@@ -18,7 +18,7 @@ import SelectStatus from '../../components/SelectStatus';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
+import { dateForDatePicker, dayjsInstance, getDateFromRawInputOdDatePicker, now } from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
 import useTitle from '../../services/useTitle';
@@ -241,7 +241,10 @@ const ActionView = () => {
                         locale="fr"
                         className="form-control"
                         selected={dateForDatePicker(values.dueAt ?? new Date())}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
+                        onChangeRaw={(e) => {
+                          const date = getDateFromRawInputOdDatePicker(e.target.value);
+                          if (date) handleChange({ target: { value: date, name: 'dueAt' } });
+                        }}
                         dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
                         showTimeInput={values.withTime}
                       />
@@ -306,7 +309,10 @@ const ActionView = () => {
                           locale="fr"
                           className="form-control"
                           selected={dateForDatePicker(values.completedAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
+                          onChangeRaw={(e) => {
+                            const date = getDateFromRawInputOdDatePicker(e.target.value);
+                            if (date) handleChange({ target: { value: date, name: 'completedAt' } });
+                          }}
                           timeInputLabel="Heure :"
                           dateFormat="dd/MM/yyyy HH:mm"
                           showTimeInput

@@ -13,7 +13,7 @@ import CustomFieldInput from './CustomFieldInput';
 import { currentTeamState, teamsState, userState } from '../recoil/auth';
 import { territoriesState } from '../recoil/territory';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker, dayjsInstance } from '../services/date';
+import { dateForDatePicker, dayjsInstance, getDateFromRawInputOdDatePicker } from '../services/date';
 import API from '../services/api';
 import useCreateReportAtDateIfNotExist from '../services/useCreateReportAtDateIfNotExist';
 export const policeSelect = ['Oui', 'Non'];
@@ -108,7 +108,10 @@ const CreateObservation = ({ observation = {}, forceOpen = 0 }) => {
                           name="observedAt"
                           className="form-control"
                           selected={dateForDatePicker((values.observedAt || values.createdAt) ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'observedAt' } })}
+                          onChangeRaw={(e) => {
+                            const date = getDateFromRawInputOdDatePicker(e.target.value);
+                            if (date) handleChange({ target: { value: date, name: 'observedAt' } });
+                          }}
                           timeInputLabel="Heure :"
                           dateFormat="dd/MM/yyyy HH:mm"
                           showTimeInput

@@ -1,11 +1,13 @@
 import 'dayjs/locale/fr';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import isBetween from 'dayjs/plugin/isBetween';
+import customParseFormat from 'dayjs/plugin/customParseFormat';
 import dayjs from 'dayjs';
 
 dayjs.locale('fr');
 dayjs.extend(relativeTime);
 dayjs.extend(isBetween);
+dayjs.extend(customParseFormat);
 
 /** FORMAT DATES **/
 
@@ -75,6 +77,22 @@ export function isAfterToday(date) {
 
 export function dateForDatePicker(date) {
   return date && dayjs(date).isValid() ? dayjs(date).toDate() : null;
+}
+
+export function getDateFromRawInputOdDatePicker(rawInput) {
+  if (!rawInput) return null;
+  // format DDMMYYYY
+  if (!rawInput.includes('/')) {
+    if (rawInput.length !== 8) return null;
+    const date = dayjs(rawInput, 'DDMMYYYY');
+    if (dayjs(date).isValid()) return date;
+    return null;
+  }
+  // format DD/MM/YYYY
+  if (rawInput.length !== 10) return null;
+  const date = dayjs(rawInput, 'DD/MM/YYYY');
+  if (dayjs(date).isValid()) return date;
+  return null;
 }
 
 export function getMonths() {
