@@ -44,7 +44,7 @@ const OutOfActiveList = ({ person }) => {
           return p;
         })
       );
-      toast.success(person.name + ' est réintégré de la file active');
+      toast.success(person.name + ' est réintégré dans la file active');
     }
   };
 
