@@ -107,10 +107,6 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
 
 export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0 });
 
-const refreshPage = ()=>{
-  window.location.reload();
-}
-
 const reset = () => {
   hashedOrgEncryptionKey = null;
   enableEncrypt = false;
@@ -120,13 +116,10 @@ const reset = () => {
   AppSentry.setTag('organisationId', '');
 };
 
-const logout = async (status) => {
+const logout = async () => {
   await post({ path: '/user/logout' });
-  refreshPage();
   reset();
-  if (window.location.pathname !== '/auth') {
-    if (status === '401') toast.error('Votre session a expiré, veuillez vous reconnecter');
-  }
+  window.location.reload();
 };
 
 // Upload a file to a path.

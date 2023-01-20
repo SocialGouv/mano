@@ -15,7 +15,6 @@ import { currentTeamState, organisationState, teamsState, userState } from '../r
 import API from '../services/api';
 import { useRecoilState, useRecoilValue } from 'recoil';
 import Notification from './Notification';
-import { toast } from 'react-toastify';
 import { useDataLoader } from './DataLoader';
 import OpenNewWindowIcon from './OpenNewWindowIcon';
 
