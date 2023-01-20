@@ -87,7 +87,23 @@ export const filterPersonsBaseSelector = selector({
   key: 'filterPersonsBaseSelector',
   get: ({ get }) => {
     const personFields = get(personFieldsSelector);
-    return personFields.filter((m) => m.filterable).map(({ name, ...rest }) => ({ field: name, ...rest }));
+    const filterPersonsBase = [];
+    for (const field of personFields) {
+      if (!field.filterable) continue;
+      filterPersonsBase.push({
+        field: field.name,
+        ...field,
+      });
+      if (field.name === 'birthdate') {
+        filterPersonsBase.push({
+          field: 'age',
+          label: 'Age',
+          type: 'number',
+          filterable: true,
+        });
+      }
+    }
+    return filterPersonsBase;
   },
 });
 

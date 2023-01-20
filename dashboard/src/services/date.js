@@ -27,7 +27,12 @@ export function formatDateTimeWithNameOfDay(date) {
 
 export function formatBirthDate(date) {
   const birthDate = dayjs(date);
-  return `${birthDate.format('DD/MM/YYYY')} (${dayjsInstance(dayjsInstance()).diff(birthDate, 'year')} ans)`;
+  return `${birthDate.format('DD/MM/YYYY')} (${formatAge(date)} ans)`;
+}
+
+export function formatAge(date) {
+  const birthDate = dayjs(date);
+  return dayjsInstance(dayjsInstance()).diff(birthDate, 'year');
 }
 
 export function formatCalendarDate(date) {

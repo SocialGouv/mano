@@ -1,6 +1,4 @@
 import React from 'react';
-import styled from 'styled-components';
-import { Col, Row, Input } from 'reactstrap';
 import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dayjsInstance, isOnSameDay } from '../services/date';
@@ -13,8 +11,19 @@ export const filterData = (data, filters, returnWholeArray = false) => {
         .map((item, index) => {
           const itemValue = item[filter.field];
           if (['number'].includes(filter.type)) {
-            if (itemValue === filter.value) return item;
-            return null;
+            const { number, number2, comparator } = filter.value;
+            if (comparator === 'unfilled') return !itemValue || [null, undefined].includes(itemValue) ? item : null;
+            if (!itemValue || [null, undefined].includes(itemValue)) return null;
+            if (comparator === 'between') {
+              if (Number(number) < Number(number2)) {
+                return Number(itemValue) >= Number(number) && Number(itemValue) <= Number(number2) ? item : null;
+              } else {
+                return Number(itemValue) >= Number(number2) && Number(itemValue) <= Number(number) ? item : null;
+              }
+            }
+            if (comparator === 'equals') return Number(itemValue) === Number(number) ? item : null;
+            if (comparator === 'lower') return Number(itemValue) < Number(number) ? item : null;
+            if (comparator === 'greater') return Number(itemValue) > Number(number) ? item : null;
           }
           if (['boolean'].includes(filter.type)) {
             if (filter.value === 'Oui' && !!itemValue) return item;
@@ -22,12 +31,12 @@ export const filterData = (data, filters, returnWholeArray = false) => {
             return null;
           }
           if (['date-with-time', 'date'].includes(filter.type)) {
-            const { date, dateComparator } = filter.value;
-            if (dateComparator === 'unfilled') return !itemValue || [null, undefined].includes(itemValue) ? item : null;
+            const { date, comparator } = filter.value;
+            if (comparator === 'unfilled') return !itemValue || [null, undefined].includes(itemValue) ? item : null;
             if (!itemValue || [null, undefined].includes(itemValue)) return null;
-            if (dateComparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
-            if (dateComparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
-            if (dateComparator === 'equals') return isOnSameDay(itemValue, date) ? item : null;
+            if (comparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
+            if (comparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
+            if (comparator === 'equals') return isOnSameDay(itemValue, date) ? item : null;
           }
           if (!itemValue || [null, undefined].includes(itemValue)) return filter.value === 'Non renseigné' ? item : null;
           if (typeof itemValue === 'boolean') {
@@ -89,24 +98,27 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
   }
 
   return (
-    <Container>
-      <Subcontainer>
-        <Row>
-          <Col md={10}>
-            <Title>{title}</Title>
-          </Col>
-          <Col md={2}>
-            <AddButton onClick={onAddFilter} disabled={filters.find((f) => !f.field)}>
+    <div className="border-b tw-z-50 tw-mb-8 tw-flex tw-w-full tw-justify-center tw-self-center tw-border-gray-300 tw-pb-4">
+      <div className="tw-w-full">
+        <div className="tw-flex tw-flex-wrap">
+          <div className="tw-basis-5/6">
+            <p className="tw-m-0">{title}</p>
+          </div>
+          <div className="tw-basis-1/6 tw-pl-8">
+            <button
+              type="button"
+              className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-main disabled:tw-opacity-20"
+              onClick={onAddFilter}
+              disabled={filters.find((f) => !f.field)}>
               + Ajouter
               <br />
               un filtre
-            </AddButton>
-          </Col>
-        </Row>
+            </button>
+          </div>
+        </div>
         {filters.map((filter, index) => {
           // filter: field, value, type
           const filterValues = getFilterValuesByField(filter.field, base, index);
-
           const onChangeField = (newField) => {
             onChange(
               filters.map((_filter, i) => (i === index ? { field: newField?.field, value: null, type: newField?.type } : _filter)),
@@ -127,8 +139,8 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
           };
 
           return (
-            <Row style={{ marginBottom: 10 }} key={`${filter.field || 'empty'}${index}`}>
-              <Col md={4}>
+            <div className="-tw-mx-4 tw-mb-2.5 tw-flex tw-flex-wrap" key={`${filter.field || 'empty'}${index}`}>
+              <div className="tw-basis-1/3 tw-px-4">
                 <SelectCustom
                   options={filterFields}
                   value={filter.field ? filter : null}
@@ -138,18 +150,25 @@ const Filters = ({ onChange, base, filters, title = 'Filtres :', saveInURLParams
                   isClearable={true}
                   isMulti={false}
                 />
-              </Col>
-              <Col md={4}>
+              </div>
+              <div className="tw-basis-1/3 tw-px-4">
                 <ValueSelector field={filter.field} filterValues={filterValues} value={filter.value} base={base} onChangeValue={onChangeValue} />
-              </Col>
-              <Col md={2}>
-                {!!filters.filter((_filter) => Boolean(_filter.field)).length && <DeleteButton onClick={onRemoveFilter}>Retirer</DeleteButton>}
-              </Col>
-            </Row>
+              </div>
+              <div className="tw-basis-1/6 tw-pl-4">
+                {!!filters.filter((_filter) => Boolean(_filter.field)).length && (
+                  <button
+                    type="button"
+                    className="tw-h-full tw-w-full tw-rounded tw-border tw-border-gray-300 tw-bg-white tw-text-red-500"
+                    onClick={onRemoveFilter}>
+                    Retirer
+                  </button>
+                )}
+              </div>
+            </div>
           );
         })}
-      </Subcontainer>
-    </Container>
+      </div>
+    </div>
   );
 };
 
@@ -172,18 +191,42 @@ const dateOptions = [
   },
 ];
 
+const numberOptions = [
+  {
+    label: 'Inférieur à',
+    value: 'lower',
+  },
+  {
+    label: 'Supérieur à',
+    value: 'greater',
+  },
+  {
+    label: 'Égal à',
+    value: 'equals',
+  },
+  {
+    label: 'Entre',
+    value: 'between',
+  },
+  {
+    label: 'Non renseigné',
+    value: 'unfilled',
+  },
+];
+
 const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
-  const [dateComparator, setDateComparator] = React.useState(null);
+  const [comparator, setComparator] = React.useState(null);
   if (!field) return <></>;
   const current = base.find((filter) => filter.field === field);
   if (!current) return <></>;
   const { type, field: name } = current;
 
-  if (['text', 'number', 'textarea'].includes(type)) {
+  if (['text', 'textarea'].includes(type)) {
     return (
-      <Input
+      <input
         name={name}
-        type={type === 'textarea' ? 'text' : type}
+        className="tailwindui !tw-mt-0"
+        type="text"
         value={value || ''}
         onChange={(e) => {
           e.preventDefault();
@@ -195,32 +238,87 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
 
   if (['date-with-time', 'date'].includes(type)) {
     return (
-      <Row>
-        <Col sm={value?.dateComparator !== 'unfilled' ? 6 : 12}>
+      <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+        <div className={['tw-px-4', value?.comparator !== 'unfilled' ? 'tw-basis-1/2' : 'tw-basis-full'].join(' ')}>
           <SelectCustom
             options={dateOptions}
-            value={dateOptions.find((opt) => opt.value === value?.dateComparator)}
+            value={dateOptions.find((opt) => opt.value === value?.comparator)}
             isClearable={!value}
             onChange={(e) => {
-              if (!e) return setDateComparator(null);
-              setDateComparator(e.value);
-              onChangeValue({ date: value?.date, dateComparator: e.value });
+              if (!e) return setComparator(null);
+              setComparator(e.value);
+              onChangeValue({ date: value?.date, comparator: e.value });
             }}
           />
-        </Col>
-        {value?.dateComparator !== 'unfilled' && (
-          <Col sm={6}>
+        </div>
+        {value?.comparator !== 'unfilled' && (
+          <div className="tw-basis-1/2 tw-px-4">
             <DatePicker
               locale="fr"
               dateFormat="dd/MM/yyyy"
               className="form-control"
               name={name}
               selected={value?.date ? new Date(value?.date) : null}
-              onChange={(date) => onChangeValue({ date, dateComparator })}
+              onChange={(date) => onChangeValue({ date, comparator })}
             />
-          </Col>
+          </div>
         )}
-      </Row>
+      </div>
+    );
+  }
+
+  if (['number'].includes(type)) {
+    return (
+      <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+        <div
+          className={[
+            'tw-px-4',
+            value?.comparator === 'unfilled' ? 'tw-basis-full' : '',
+            value?.comparator === 'between' ? 'tw-basis-5/12' : '',
+            !['unfilled', 'between'].includes(value?.comparator) ? 'tw-basis-1/2' : '',
+          ].join(' ')}>
+          <SelectCustom
+            options={numberOptions}
+            value={numberOptions.find((opt) => opt.value === value?.comparator)}
+            isClearable={!value}
+            onChange={(e) => {
+              if (!e) return setComparator(null);
+              setComparator(e.value);
+              onChangeValue({ number: value?.number, comparator: e.value });
+            }}
+          />
+        </div>
+        {value?.comparator !== 'unfilled' && (
+          <div className={['tw-px-4', value?.comparator === 'between' ? 'tw-basis-3/12' : 'tw-basis-1/2'].join(' ')}>
+            <input
+              name={name}
+              className="tailwindui !tw-mt-0"
+              type="number"
+              value={value?.number || ''}
+              onChange={(e) => {
+                onChangeValue({ number: e.target.value, number2: value?.number2, comparator });
+              }}
+            />
+          </div>
+        )}
+        {value?.comparator === 'between' && (
+          <>
+            {/* we have an input here, just for styling purpose, to have 'et' aligned with number and number2 */}
+            <input className="tailwindui !tw-mt-0 tw-basis-1/12 !tw-border-0 !tw-bg-transparent !tw-shadow-none" disabled defaultValue="et" />
+            <div className="tw-basis-3/12 tw-px-4">
+              <input
+                name={name}
+                className="tailwindui !tw-mt-0"
+                type="number"
+                value={value?.number2 || ''}
+                onChange={(e) => {
+                  onChangeValue({ number2: e.target.value, number: value?.number, comparator });
+                }}
+              />
+            </div>
+          </>
+        )}
+      </div>
     );
   }
 
@@ -235,44 +333,5 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
     />
   );
 };
-
-const Title = styled.span`
-  display: block;
-`;
-
-const Container = styled.div`
-  align-self: center;
-  padding-bottom: 15px;
-  margin-bottom: 30px;
-  display: flex;
-  justify-content: center;
-  border-bottom: 1px solid #ddd;
-  width: 100%;
-  z-index: 1000;
-`;
-
-const Subcontainer = styled.div`
-  width: 100%;
-`;
-
-const AddOrDeleteFilterButton = styled.button`
-  width: 100%;
-  height: 100%;
-  background-color: #fff;
-  border-radius: 4px;
-  border: 1px solid rgb(204, 204, 204);
-  color: red;
-`;
-
-const AddButton = styled(AddOrDeleteFilterButton)`
-  color: green;
-  :disabled {
-    opacity: 0.2;
-  }
-`;
-
-const DeleteButton = styled(AddOrDeleteFilterButton)`
-  color: red;
-`;
 
 export default Filters;
