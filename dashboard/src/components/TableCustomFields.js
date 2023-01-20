@@ -312,7 +312,7 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
       }
       return true;
     },
-    [typeIsDisabled, field.type, isNewField]
+    [typeIsDisabled, isNewField, fieldIsUsed, field.type]
   );
 
   return (
