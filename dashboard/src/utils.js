@@ -4,18 +4,6 @@ const isNullOrUndefined = (value) => {
   return false;
 };
 
-const typeOptions = [
-  { value: 'text', label: 'Texte' },
-  { value: 'textarea', label: 'Zone de texte multi-lignes' },
-  { value: 'number', label: 'Nombre' },
-  { value: 'date', label: 'Date sans heure' },
-  { value: 'date-with-time', label: 'Date avec heure' },
-  { value: 'yes-no', label: 'Oui/Non' },
-  { value: 'enum', label: 'Choix dans une liste' },
-  { value: 'multi-choice', label: 'Choix multiple dans une liste' },
-  { value: 'boolean', label: 'Case à cocher' },
-];
-
 // Download a file in browser.
 function download(file, fileName) {
   if (window.navigator.msSaveOrOpenBlob) {
@@ -31,4 +19,4 @@ function download(file, fileName) {
   }
 }
 
-export { download, typeOptions, isNullOrUndefined };
+export { download, isNullOrUndefined };

@@ -1,8 +1,7 @@
-import React, { useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import { toast } from 'react-toastify';
 import { useRecoilState } from 'recoil';
 import { organisationState } from '../recoil/auth';
-import { typeOptions } from '../utils';
 import API from '../services/api';
 import ButtonCustom from './ButtonCustom';
 import SelectCustom from './SelectCustom';
@@ -12,6 +11,17 @@ import TableCustomFieldteamSelector from './TableCustomFieldTeamSelector';
 import SelectDraggableAndEditable from './SelectDraggableAndEditable';
 import { ModalBody, ModalContainer, ModalFooter, ModalHeader } from './tailwind/Modal';
 
+const typeOptions = [
+  { value: 'text', label: 'Texte' },
+  { value: 'textarea', label: 'Zone de texte multi-lignes' },
+  { value: 'number', label: 'Nombre' },
+  { value: 'date', label: 'Date sans heure' },
+  { value: 'date-with-time', label: 'Date avec heure' },
+  { value: 'yes-no', label: 'Oui/Non' },
+  { value: 'enum', label: 'Choix dans une liste' },
+  { value: 'multi-choice', label: 'Choix multiple dans une liste' },
+  { value: 'boolean', label: 'Case à cocher' },
+];
 const getValueFromType = (type) => typeOptions.find((opt) => opt.value === type);
 
 const sanitizeFields = (field) => {
@@ -277,6 +287,34 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
     onSaveField(editedField);
   };
 
+  const typeIsDisabled = useMemo(() => {
+    if (isNewField || !fieldIsUsed) return false;
+    // the idea to disable the type is to avoid bugs with existing data if the type is changed.
+    // for example, if the type is changed from multi-choice (array) to text (string), or from boolean to text
+    // BUT some data is compatible, let's allow it
+    if (['boolean', 'multi-choice'].includes(field.type)) return true;
+    return false;
+  }, [isNewField, fieldIsUsed, field.type]);
+
+  const optionIsDisabled = useCallback(
+    (option) => {
+      if (typeIsDisabled) return true;
+      if (isNewField || !fieldIsUsed) return false;
+
+      if (['number'].includes(field.type)) {
+        return !['text', 'number', 'textarea', 'enum'].includes(option.value);
+      }
+      if (['text', 'textarea', 'enum', 'yes-no'].includes(field.type)) {
+        return !['text', 'textarea', 'enum'].includes(option.value);
+      }
+      if (['date', 'date-with-time'].includes(field.type)) {
+        return !['date', 'date-with-time'].includes(option.value);
+      }
+      return true;
+    },
+    [typeIsDisabled, field.type, isNewField]
+  );
+
   return (
     <ModalContainer open={open} onClose={() => onClose(null)} size="3xl">
       <ModalHeader title={!isNewField ? 'Modifier le champ' : 'Créer un nouveau champ'} />
@@ -308,7 +346,8 @@ const EditCustomField = ({ data, editingField, onClose, onSaveField, isNewField,
               inputId="type"
               classNamePrefix="type"
               name="type"
-              isDisabled={fieldIsUsed || onlyOptionsEditable}
+              isDisabled={typeIsDisabled || onlyOptionsEditable}
+              isOptionDisabled={optionIsDisabled}
               options={typeOptions}
               value={getValueFromType(field.type)}
               onChange={(v) => setField({ ...field, type: v.value })}
