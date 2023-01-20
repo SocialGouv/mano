@@ -47,6 +47,7 @@ const customFieldSchema = z
     showInStats: z.optional(z.boolean()),
     onlyHealthcareProfessional: z.optional(z.boolean()),
     options: z.optional(z.array(z.string())),
+    allowCreateOption: z.optional(z.boolean()),
   })
   .strict();
 

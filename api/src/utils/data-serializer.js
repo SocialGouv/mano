@@ -1,5 +1,5 @@
 const { defaultMedicalFileCustomFields } = require("./custom-fields/medicalFile");
-const { fieldsPersonsCustomizableOptions, defaultMedicalCustomFields, personFields } = require("./custom-fields/person");
+const { fieldsPersonsCustomizableOptions, personFields } = require("./custom-fields/person");
 
 function serializeOrganisation(organisation) {
   return {
@@ -43,7 +43,7 @@ function serializeOrganisation(organisation) {
     fieldsPersonsCustomizableOptions: organisation.fieldsPersonsCustomizableOptions || fieldsPersonsCustomizableOptions,
     /* custom fields persons */
     customFieldsPersonsSocial: organisation.customFieldsPersonsSocial || [],
-    customFieldsPersonsMedical: organisation.customFieldsPersonsMedical || defaultMedicalCustomFields,
+    customFieldsPersonsMedical: organisation.customFieldsPersonsMedical || [],
     customFieldsMedicalFile: organisation.customFieldsMedicalFile || defaultMedicalFileCustomFields,
   };
 }
