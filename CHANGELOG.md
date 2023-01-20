@@ -1,3 +1,11 @@
+## [1.227.2](https://github.com/SocialGouv/mano/compare/v1.227.1...v1.227.2) (2023-01-20)
+
+
+### Bug Fixes
+
+* **dashboard:** cut too long words without spaces in action ([#1225](https://github.com/SocialGouv/mano/issues/1225)) ([e90c02f](https://github.com/SocialGouv/mano/commit/e90c02fe63a534b3e0d7d545ba66ef1fd14ee13a))
+* **dashboard:** cut too long words without spaces in service ([#1228](https://github.com/SocialGouv/mano/issues/1228)) ([249ba25](https://github.com/SocialGouv/mano/commit/249ba2526a6c657007a1253302679d18265852ec))
+
 ## [1.227.1](https://github.com/SocialGouv/mano/compare/v1.227.0...v1.227.1) (2023-01-20)
 
 
