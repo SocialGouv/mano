@@ -345,7 +345,7 @@ const Web = () => (
     
       <ul className="mb-3 list-none list-card">
         <li>
-          Cette fonctionnalité n’est accessible qu’aux comptes “admin”. Si vous ne la trouvez pas, vous pouvez commencer par vérifier que vous êtes bien connecté à l'interface web avec un compte "admin".
+          Cette fonctionnalité n’est accessible qu’aux comptes “admin”. Si vous ne la trouvez pas, vous pouvez commencer par vérifier que vous avez bien effectué une connexion à l'interface web avec un compte "admin".
         </li>
       </ul>
 

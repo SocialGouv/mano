@@ -26,7 +26,7 @@ const PersonPlaces = ({ person }) => {
   const { refresh } = useDataLoader();
 
   const onDeleteRelPersonPlace = async (relPersonPlace) => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce lieu fréquenté ?')) return;
+    if (!window.confirm('Voulez-vous vraiment supprimer ce lieu fréquenté ?')) return;
     setDeleting(true);
     const response = await API.delete({ path: `/relPersonPlace/${relPersonPlace?._id}` });
     setDeleting(false);

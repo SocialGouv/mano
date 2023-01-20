@@ -142,7 +142,7 @@ const Structure = ({ structure: initStructure, onSuccess, existingCategories, op
   };
 
   const onDeleteStructure = async () => {
-    if (window.confirm('Êtes-vous sûr de vouloir supprimer cette structure ? Cette action est irréversible.')) {
+    if (window.confirm('Voulez-vous vraiment supprimer cette structure ? Cette action est irréversible.')) {
       const res = await API.delete({ path: `/structure/${structure._id}` });
       if (!res.ok) return;
       toast.success('Structure supprimée !');

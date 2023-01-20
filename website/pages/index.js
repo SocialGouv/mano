@@ -207,7 +207,7 @@ export default function Index() {
             </h3>
             <p className="text-sm text-gray-600 md:text-base">
               Certaines maraudes sont en charge de territoires éclatés (comme les différentes gares
-              SNCF de Paris), d'autres d'un micro territoire resseré (par exemple une portion des
+              SNCF de Paris), d'autres d'un micro territoire resserré (par exemple une portion des
               maréchaux entre deux portes du périphérique parisien). Certains équipes ne travaillent
               qu'en rue, d'autres gèrent{" "}
               <a
@@ -278,7 +278,7 @@ export default function Index() {
             <AppriciateCheck content="la liste des structures spécialisées avec contacts, horaires et itinéraire pour s’y rendre" />
             <AppriciateCheck content="l’outil de suivi de l’évolution des territoires" />
             <AppriciateCheck content="la formation des utilisateurs et utilisatrices par l’équipe de MANO directement en maraude et sur les lieux d'accueil du public ainsi que le support téléphonique" />
-            <AppriciateCheck content="le développement toujours en cours de l’application et à l’écoute exclusive des besoins des professionnels du terrain" />
+            <AppriciateCheck content="le développement toujours en cours de l’application et à l’écoute exclusive des besoins des professionnel·le·s du terrain" />
             <AppriciateCheck content="les réunions inter-services des utilisateurs de MANO" />
           </div>
         </div>

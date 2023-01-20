@@ -185,7 +185,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
   };
 
   const onDeleteGroup = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce groupe et toutes ses catégories ? Cette opération est irréversible')) return;
+    if (!window.confirm('Voulez-vous vraiment supprimer ce groupe et toutes ses catégories ? Cette opération est irréversible')) return;
     const newActionsGroupedCategories = actionsGroupedCategories.filter((group) => group.groupTitle !== groupTitle);
     const categoriesToDelete = actionsGroupedCategories.find((group) => group.groupTitle === groupTitle).categories;
     const encryptedActions = await Promise.all(
@@ -389,7 +389,7 @@ const Category = ({ category, groupTitle }) => {
   };
 
   const onDeleteCategory = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer cette catégorie ? Cette opération est irréversible')) return;
+    if (!window.confirm('Voulez-vous vraiment supprimer cette catégorie ? Cette opération est irréversible')) return;
     const newActionsGroupedCategories = actionsGroupedCategories.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {

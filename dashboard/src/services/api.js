@@ -189,7 +189,7 @@ const execute = async ({ method, path = '', body = null, query = {}, headers = {
     ) {
       toast.error(
         'Veuillez vous reconnecter',
-        'Il semble que vous soyez connecté à plusieurs organisations dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.',
+        'Il semble que des connexions à plusieurs organisations soient actives dans un même navigateur (par exemple dans un autre onglet). Cela peut poser des problèmes de cache.',
         { timeOut: 8000 }
       );
       logout();

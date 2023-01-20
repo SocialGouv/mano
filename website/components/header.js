@@ -16,7 +16,7 @@ export default function Header() {
       <Head>
         <link rel='shortcut icon' href='/logo-green.png' />
         <title>
-          Mano | Un service gratuit dédié aux professionnels de maraude et de lieux d’accueil.
+          Mano | Un service gratuit dédié aux professionnel·le·s de maraude et de lieux d’accueil.
         </title>
       </Head>
       <header className='z-20 flex items-center justify-between w-full px-4 py-5 bg-white border-b md:px-6 border-shamrock-50'>

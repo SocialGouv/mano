@@ -156,7 +156,7 @@ const MergeTwoPersons = ({ person }) => {
       if (!originValue?.length && !!mergeValue?.length) continue;
       if (!!originValue?.length && !mergeValue?.length) continue;
       if (JSON.stringify(originValue) === JSON.stringify(mergeValue)) continue;
-      alert('Les champs médicaux ne sont pas identiques. Vous devez être un professionnel de santé pour fusionner des dossiers médicaux différents.');
+      alert('Les champs médicaux ne sont pas identiques. Vous devez être un·e professionnel·le de santé pour fusionner des dossiers médicaux différents.');
       setPersonToMergeAndDelete(null);
       return;
     }

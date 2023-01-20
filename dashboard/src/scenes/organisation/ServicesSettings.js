@@ -184,7 +184,7 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
   };
 
   const onDeleteGroup = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce groupe et tous ses services ? Cette opération est irréversible')) return;
+    if (!window.confirm('Voulez-vous vraiment supprimer ce groupe et tous ses services ? Cette opération est irréversible')) return;
     const newGroupedServices = groupedServices.filter((group) => group.groupTitle !== groupTitle);
 
     const oldOrganisation = organisation;
@@ -388,7 +388,7 @@ const Service = ({ service, groupTitle }) => {
   };
 
   const onDeleteService = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce service ? Cette opération est irréversible')) return;
+    if (!window.confirm('Voulez-vous vraiment supprimer ce service ? Cette opération est irréversible')) return;
     const newGroupedServices = groupedServices.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {
