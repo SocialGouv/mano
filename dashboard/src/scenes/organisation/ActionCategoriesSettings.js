@@ -261,7 +261,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
 
   return (
     <>
-      <div className="tw-min-h-full tw-basis-1/2 tw-p-1 xl:tw-basis-1/3">
+      <div className="tw-min-h-full tw-basis-1/2 tw-p-1 xl:tw-basis-1/3 tw-break-all">
         <details
           open
           key={groupTitle}
@@ -270,7 +270,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
           className="service-group tw-flex tw-min-h-full tw-flex-col tw-rounded-2xl tw-bg-main tw-bg-opacity-10 tw-p-4">
           <summary className="tw-basis-full tw-text-sm tw-font-bold tw-tracking-wide tw-text-gray-700">
             <div className="tw-group tw-inline-flex tw-w-11/12 tw-shrink tw-justify-between">
-              <span className="category-group-title tw-pl-2">
+              <span className="category-group-title tw-pl-2"> 
                 {groupTitle} ({categories.length})
               </span>
               <button
@@ -288,7 +288,7 @@ const ActionCategoriesGroup = ({ groupTitle, categories, onDragAndDrop }) => {
             ) : (
               categories.map((category) => <Category category={category} key={category} groupTitle={groupTitle} />)
             )}
-            <form className="tw-mt-4 tw-flex" onSubmit={onAddCategory}>
+            <form className="tw-mt-4 tw-flex tw-break-normal" onSubmit={onAddCategory}>
               <input
                 type="text"
                 id="newCategory"
