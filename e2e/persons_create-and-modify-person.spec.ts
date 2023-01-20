@@ -53,13 +53,13 @@ test("Create and modify a person", async ({ page }) => {
   await clickOnEmptyReactSelect(page, "person-custom-select-situation-personnelle", "Famille");
   await page.getByLabel("Structure de suivi social").click();
   await page.getByLabel("Structure de suivi social").fill("aucune");
-  await page.locator(".person-select-animals__value-container").click();
+  await page.locator(".person-custom-select-avec-animaux__value-container").click();
   await page.getByText("Oui", { exact: true }).click();
   await page.locator(".person-custom-select-hébergement__value-container").click();
   await page.locator(".person-custom-select-hébergement__menu").getByText("Oui", { exact: true }).click();
   await page.locator(".person-custom-select-type-dhébergement__value-container").click();
   await page.getByText("Logement", { exact: true }).click();
-  await page.locator(".person-custom-select-nationalite__value-container").click();
+  await page.locator(".person-custom-select-nationalité__value-container").click();
   await page.getByText("UE", { exact: true }).click();
   await page.locator(".person-custom-select-emploi__value-container").click();
   await page.getByText("CDD", { exact: true }).click();
