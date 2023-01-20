@@ -1,3 +1,10 @@
+## [1.226.1](https://github.com/SocialGouv/mano/compare/v1.226.0...v1.226.1) (2023-01-20)
+
+
+### Bug Fixes
+
+* **dashboard:** allow change certain types of custom fields ([#1215](https://github.com/SocialGouv/mano/issues/1215)) ([04b6e52](https://github.com/SocialGouv/mano/commit/04b6e522f7d64e4f7b9bccb577310701451d5385))
+
 # [1.226.0](https://github.com/SocialGouv/mano/compare/v1.225.0...v1.226.0) (2023-01-20)
 
 
