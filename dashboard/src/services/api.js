@@ -1,4 +1,4 @@
-import { atom } from 'recoil';
+import { atom, RecoilLoadable } from 'recoil';
 import { getRecoil, setRecoil } from 'recoil-nexus';
 import URI from 'urijs';
 import { toast } from 'react-toastify';
@@ -107,6 +107,10 @@ const decryptDBItem = async (item, { path, encryptedVerificationKey = null } = {
 
 export const recoilResetKeyState = atom({ key: 'recoilResetKeyState', default: 0 });
 
+const refreshPage = ()=>{
+  window.location.reload();
+}
+
 const reset = () => {
   hashedOrgEncryptionKey = null;
   enableEncrypt = false;
@@ -118,9 +122,9 @@ const reset = () => {
 
 const logout = async (status) => {
   await post({ path: '/user/logout' });
+  refreshPage();
   reset();
   if (window.location.pathname !== '/auth') {
-    window.history.pushState({}, '', '/auth');
     if (status === '401') toast.error('Votre session a expiré, veuillez vous reconnecter');
   }
 };

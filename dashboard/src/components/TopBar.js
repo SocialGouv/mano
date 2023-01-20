@@ -98,11 +98,6 @@ const TopBar = () => {
                   .then(() => {
                     return API.logout();
                   })
-                  .then(() => {
-                    setTimeout(() => {
-                      toast.info('Vous êtes déconnecté(e)', 'Veuillez vérifier votre historique et le vider si besoin');
-                    });
-                  });
               }}>
               Se déconnecter et supprimer toute trace de mon passage
             </DropdownItem>
