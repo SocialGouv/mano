@@ -1,3 +1,10 @@
+## [1.226.2](https://github.com/SocialGouv/mano/compare/v1.226.1...v1.226.2) (2023-01-20)
+
+
+### Bug Fixes
+
+* **app,dashboard:** small typo in search algo prepareItemForSearch ([#1222](https://github.com/SocialGouv/mano/issues/1222)) ([2313670](https://github.com/SocialGouv/mano/commit/23136707935f42206096f4c042b628d424330963))
+
 ## [1.226.1](https://github.com/SocialGouv/mano/compare/v1.226.0...v1.226.1) (2023-01-20)
 
 
