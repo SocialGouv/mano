@@ -1,3 +1,10 @@
+## [1.227.1](https://github.com/SocialGouv/mano/compare/v1.227.0...v1.227.1) (2023-01-20)
+
+
+### Bug Fixes
+
+* sort by lastUpdateCheckForGDPR ([0192b28](https://github.com/SocialGouv/mano/commit/0192b288309456630fca385b353c72c8636ea5cc))
+
 # [1.227.0](https://github.com/SocialGouv/mano/compare/v1.226.2...v1.227.0) (2023-01-20)
 
 
