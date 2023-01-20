@@ -8,8 +8,7 @@ import {
   personsState,
   usePreparePersonForEncryption,
 } from '../../../recoil/persons';
-import { dateForDatePicker } from '../../../services/date';
-import DatePicker from 'react-datepicker';
+import { dayjsInstance } from '../../../services/date';
 import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
@@ -121,12 +120,16 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-birthdate">Date de naissance</Label>
                             <div>
-                              <DatePicker
-                                locale="fr"
+                              <input
                                 className="form-control"
-                                selected={dateForDatePicker(values.birthdate)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'birthdate' } })}
-                                dateFormat="dd/MM/yyyy"
+                                type="date"
+                                name="birthdate"
+                                defaultValue={values.birthdate ? dayjsInstance(values.birthdate).format('YYYY-MM-DD') : undefined}
+                                onBlur={(e) => {
+                                  if (dayjsInstance(e.target.value).isValid()) {
+                                    handleChange({ target: { value: dayjsInstance(e.target.value).toDate(), name: 'birthdate' } });
+                                  }
+                                }}
                                 id="person-birthdate"
                               />
                             </div>
@@ -136,12 +139,16 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-wanderingAt">En rue depuis le</Label>
                             <div>
-                              <DatePicker
-                                locale="fr"
-                                className="form-control"
-                                selected={dateForDatePicker(values.wanderingAt)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'wanderingAt' } })}
-                                dateFormat="dd/MM/yyyy"
+                              <input
+                                className="form-control placeholder:tw-opacity-0"
+                                type="date"
+                                name="wanderingAt"
+                                defaultValue={values.wanderingAt ? dayjsInstance(values.wanderingAt).format('YYYY-MM-DD') : undefined}
+                                onBlur={(e) => {
+                                  if (dayjsInstance(e.target.value).isValid()) {
+                                    handleChange({ target: { value: dayjsInstance(e.target.value).toDate(), name: 'wanderingAt' } });
+                                  }
+                                }}
                                 id="person-wanderingAt"
                               />
                             </div>
@@ -151,12 +158,16 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                           <FormGroup>
                             <Label htmlFor="person-followedSince">Suivi(e) depuis le / Créé(e) le</Label>
                             <div>
-                              <DatePicker
-                                locale="fr"
-                                className="form-control"
-                                selected={dateForDatePicker(values.followedSince || values.createdAt)}
-                                onChange={(date) => handleChange({ target: { value: date, name: 'followedSince' } })}
-                                dateFormat="dd/MM/yyyy"
+                              <input
+                                className="form-control placeholder:tw-opacity-0"
+                                type="date"
+                                name="followedSince"
+                                defaultValue={values.followedSince ? dayjsInstance(values.followedSince).format('YYYY-MM-DD') : undefined}
+                                onBlur={(e) => {
+                                  if (dayjsInstance(e.target.value).isValid()) {
+                                    handleChange({ target: { value: dayjsInstance(e.target.value).toDate(), name: 'followedSince' } });
+                                  }
+                                }}
                                 id="person-followedSince"
                               />
                             </div>

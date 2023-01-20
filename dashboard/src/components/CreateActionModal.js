@@ -2,12 +2,11 @@ import React from 'react';
 import { FormGroup, Input, Label } from 'reactstrap';
 import { Formik } from 'formik';
 import { toast } from 'react-toastify';
-import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 
 import { actionsState, CANCEL, DONE, prepareActionForEncryption, TODO } from '../recoil/actions';
 import { currentTeamState, organisationState, teamsState, userState } from '../recoil/auth';
-import { dateForDatePicker, dayjsInstance } from '../services/date';
+import { dayjsInstance } from '../services/date';
 import API from '../services/api';
 
 import SelectPerson from './SelectPerson';
@@ -191,15 +190,17 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                     <FormGroup>
                       <Label htmlFor="dueAt">À faire le</Label>
                       <div>
-                        <DatePicker
-                          id="dueAt"
+                        <input
+                          className="form-control placeholder:tw-opacity-0"
+                          type={values.withTime ? 'datetime-local' : 'date'}
                           name="dueAt"
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.dueAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
-                          dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
-                          showTimeInput={values.withTime}
+                          defaultValue={values.dueAt ? dayjsInstance(values.dueAt).format('YYYY-MM-DDTHH:mm') : undefined}
+                          onBlur={(e) => {
+                            if (dayjsInstance(e.target.value).isValid()) {
+                              handleChange({ target: { value: dayjsInstance(e.target.value).toDate(), name: 'dueAt' } });
+                            }
+                          }}
+                          id="dueAt"
                         />
                       </div>
                       <div>
@@ -257,16 +258,17 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                         {values.status === DONE && <Label htmlFor="completedAt">Faite le</Label>}
                         {values.status === CANCEL && <Label htmlFor="completedAt">Annulée le</Label>}
                         <div>
-                          <DatePicker
-                            id="completedAt"
+                          <input
+                            className="form-control placeholder:tw-opacity-0"
+                            type="datetime-local"
                             name="completedAt"
-                            locale="fr"
-                            className="form-control"
-                            selected={dateForDatePicker(values.completedAt ?? new Date())}
-                            onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
-                            timeInputLabel="Heure :"
-                            dateFormat="dd/MM/yyyy HH:mm"
-                            showTimeInput
+                            defaultValue={dayjsInstance(values.completedAt || new Date()).format('YYYY-MM-DDTHH:mm')}
+                            onBlur={(e) => {
+                              if (dayjsInstance(e.target.value).isValid()) {
+                                handleChange({ target: { value: dayjsInstance(e.target.value).toDate(), name: 'completedAt' } });
+                              }
+                            }}
+                            id="completedAt"
                           />
                         </div>
                       </FormGroup>

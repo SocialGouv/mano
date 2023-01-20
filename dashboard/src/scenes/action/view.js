@@ -236,14 +236,20 @@ const ActionView = () => {
                   <div className="tw-mb-4">
                     <label htmlFor="dueAt">À faire le</label>
                     <div>
-                      <DatePicker
+                      <input
+                        className="form-control placeholder:tw-opacity-0"
+                        type={values.withTime ? 'datetime-local' : 'date'}
+                        key={values.withTime}
+                        name="dueAt"
+                        defaultValue={
+                          values.dueAt ? dayjsInstance(values.dueAt).format(values.withTime ? 'YYYY-MM-DDTHH:mm' : 'YYYY-MM-DD') : undefined
+                        }
+                        onBlur={(e) => {
+                          if (dayjsInstance(e.target.value).isValid()) {
+                            handleChange({ target: { value: dayjsInstance(e.target.value).toDate(), name: 'dueAt' } });
+                          }
+                        }}
                         id="dueAt"
-                        locale="fr"
-                        className="form-control"
-                        selected={dateForDatePicker(values.dueAt ?? new Date())}
-                        onChange={(date) => handleChange({ target: { value: date, name: 'dueAt' } })}
-                        dateFormat={values.withTime ? 'dd/MM/yyyy HH:mm' : 'dd/MM/yyyy'}
-                        showTimeInput={values.withTime}
                       />
                     </div>
                     <div>
@@ -301,15 +307,17 @@ const ActionView = () => {
                       {values.status === DONE && <label htmlFor="completedAt">Faite le</label>}
                       {values.status === CANCEL && <label htmlFor="completedAt">Annulée le</label>}
                       <div>
-                        <DatePicker
+                        <input
+                          className="form-control placeholder:tw-opacity-0"
+                          type="datetime-local"
+                          name="completedAt"
+                          defaultValue={dayjsInstance(values.completedAt || new Date()).format('YYYY-MM-DDTHH:mm')}
+                          onBlur={(e) => {
+                            if (dayjsInstance(e.target.value).isValid()) {
+                              handleChange({ target: { value: dayjsInstance(e.target.value).toDate(), name: 'completedAt' } });
+                            }
+                          }}
                           id="completedAt"
-                          locale="fr"
-                          className="form-control"
-                          selected={dateForDatePicker(values.completedAt ?? new Date())}
-                          onChange={(date) => handleChange({ target: { value: date, name: 'completedAt' } })}
-                          timeInputLabel="Heure :"
-                          dateFormat="dd/MM/yyyy HH:mm"
-                          showTimeInput
                         />
                       </div>
                     </div>

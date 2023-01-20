@@ -332,6 +332,13 @@ input:-webkit-autofill:active {
   -webkit-box-shadow: 0 0 0 30px rgba(222, 243, 237, 1) inset !important;
 }
 
+input[type='date']:in-range::-webkit-datetime-edit-year-field,
+input[type='date']:in-range::-webkit-datetime-edit-month-field,
+input[type='date']:in-range::-webkit-datetime-edit-day-field,
+input[type='date']:in-range::-webkit-datetime-edit-text {
+  opacity: 0.5;
+}
+
 $theme-colors: (
   'primary': #49c3a6,
 );
