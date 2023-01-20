@@ -58,17 +58,6 @@ const PersonStats = ({
         <BlockGroup groups={groupsForPersons(personsForStats)} title={`Nombre de familles dans lesquelles se trouvent des ${title}`} />
       </div>
       <CustomResponsivePie
-        title="Nationalité"
-        onItemClick={(newSlice) => {
-          onSliceClick(newSlice, 'nationalitySituation');
-        }}
-        field="nationalitySituation"
-        data={getPieData(personsForStats, 'nationalitySituation', {
-          options: personFields.find((f) => f.name === 'nationalitySituation').options,
-        })}
-        help={`Nationalité des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-      />
-      <CustomResponsivePie
         title="Genre"
         field="gender"
         onItemClick={(newSlice) => {
@@ -76,24 +65,6 @@ const PersonStats = ({
         }}
         data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
         help={`Genre des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-      />
-      <CustomResponsivePie
-        title="Motif de la situation de rue"
-        field="reasons"
-        onItemClick={(newSlice) => {
-          onSliceClick(newSlice, 'reasons');
-        }}
-        data={getPieData(personsForStats, 'reasons', { options: personFields.find((f) => f.name === 'reasons').options })}
-        help={`Motif de la situation de rue des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-      />
-      <CustomResponsivePie
-        title="Ressources"
-        field="resources"
-        onItemClick={(newSlice) => {
-          onSliceClick(newSlice, 'resources');
-        }}
-        data={getPieData(personsForStats, 'resources', { options: personFields.find((f) => f.name === 'resources').options })}
-        help={`Ressources des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
       <AgeRangeBar
         persons={personsForStats}
@@ -121,49 +92,6 @@ const PersonStats = ({
           setSlicedData(data);
           setPersonsModalOpened(true);
         }}
-      />
-      <CustomResponsivePie
-        title="Type d'hébergement"
-        data={getAdressPieData(personsForStats)}
-        onItemClick={(newSlice) => {
-          const newSlicefield = filterBase.find((f) => f.field === 'addressDetail');
-          setSliceField(newSlicefield);
-          setSliceValue(newSlice);
-          // FIXME
-          setSlicedData(
-            personsForStats.filter((person) => {
-              if (newSlice === 'Oui (Autre)') {
-                return person.address === 'Oui' && !person.addressDetail;
-              }
-              if (newSlice === 'Non') {
-                return person.address === 'Non';
-              }
-              if (['Non renseigné'].includes(newSlice)) {
-                return person.address == null || !person.address?.length;
-              }
-              return person.address === 'Oui' && person[newSlicefield.field]?.includes(newSlice);
-            })
-          );
-          setPersonsModalOpened(true);
-        }}
-        help={`Type d'hébergement des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-      />
-      <CustomResponsivePie
-        title="Couverture médicale des personnes"
-        field="healthInsurances"
-        onItemClick={(newSlice) => {
-          onSliceClick(newSlice, 'healthInsurances');
-        }}
-        data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
-        help={`Couverture médicale des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-      />
-      <CustomResponsivePie
-        title="Avec animaux"
-        data={getPieData(personsForStats, 'hasAnimal')}
-        onItemClick={(newSlice) => {
-          onSliceClick(newSlice, 'hasAnimal');
-        }}
-        help={`Répartition des ${title} avec animaux dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
       <CustomResponsivePie
         title="Personnes très vulnérables"

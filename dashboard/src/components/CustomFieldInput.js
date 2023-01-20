@@ -109,6 +109,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
           )}
           {!!['enum'].includes(field.type) && (
             <SelectAsInput
+              creatable={Boolean(field.allowCreateOption)}
               options={field.options}
               name={field.name}
               value={values[field.name] || ''}
@@ -120,6 +121,7 @@ const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, di
           )}
           {!!['multi-choice'].includes(field.type) && (
             <SelectCustom
+              creatable={Boolean(field.allowCreateOption)}
               options={(field.options || []).map((o) => ({ value: o, label: o }))}
               name={field.name}
               onChange={(values) => {

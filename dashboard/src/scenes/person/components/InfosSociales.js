@@ -30,31 +30,6 @@ export default function InfosSociales({ person }) {
       </div>
       <div className="my-4">{person.description}</div>
       <Row>
-        <Col md={4}>
-          <InfoSocialeLine label="Structure de suivi social" value={person.structureSocial} />
-        </Col>
-        <Col md={4}>
-          <InfoSocialeLine label="Avec animaux" value={person.hasAnimal} />
-        </Col>
-        <Col md={4}>
-          <InfoSocialeLine label="Hébergement" value={person.address} />
-        </Col>
-        <Col md={4}>
-          <InfoSocialeLine label="Type d'hébergement" value={person.addressDetail} />
-        </Col>
-
-        <Col md={4}>
-          <InfoSocialeLine label="Nationalité" value={person.nationalitySituation} />
-        </Col>
-        <Col md={4}>
-          <InfoSocialeLine label="Emploi" value={person.employment} />
-        </Col>
-        <Col md={4}>
-          <InfoSocialeLine label="Resources" value={person.resources || []} type="multi-choice" />
-        </Col>
-        <Col md={4}>
-          <InfoSocialeLine label="Motif de la situation en rue" value={person.reasons || []} type="multi-choice" />
-        </Col>
         {customFields.map((field, i) => (
           <Col key={field.label + i} md={4}>
             <InfoSocialeLine type={field.type} label={field.label} value={person[field.name]} />
