@@ -5,7 +5,7 @@ import SelectCustom from './SelectCustom';
 import DatePicker from 'react-datepicker';
 import { dayjsInstance, isOnSameDay } from '../services/date';
 
-export const filterData = (data, filters) => {
+export const filterData = (data, filters, returnWholeArray = false) => {
   if (!!filters?.filter((f) => Boolean(f?.value)).length) {
     for (let filter of filters) {
       if (!filter.field || !filter.value) continue;
@@ -50,6 +50,7 @@ export const filterData = (data, filters) => {
           // type is array
           if (!itemValue.length && filter.value === 'Non renseigné') return item;
           if (itemValue?.includes?.(filter.value)) {
+            if (returnWholeArray) return item;
             let newValues = itemValue.filter((value) => value !== filter.value);
             if (!newValues.length) newValues = ['Uniquement'];
             return {
