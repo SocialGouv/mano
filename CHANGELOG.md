@@ -1,3 +1,10 @@
+# [1.227.0](https://github.com/SocialGouv/mano/compare/v1.226.2...v1.227.0) (2023-01-20)
+
+
+### Features
+
+* **dashboard:** add click on persons slice in stats ([#1213](https://github.com/SocialGouv/mano/issues/1213)) ([ec6d29a](https://github.com/SocialGouv/mano/commit/ec6d29af6f1d028c6ee76ce1375066b107ef63ba))
+
 ## [1.226.2](https://github.com/SocialGouv/mano/compare/v1.226.1...v1.226.2) (2023-01-20)
 
 
