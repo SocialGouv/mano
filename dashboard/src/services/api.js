@@ -1,4 +1,4 @@
-import { atom, RecoilLoadable } from 'recoil';
+import { atom } from 'recoil';
 import { getRecoil, setRecoil } from 'recoil-nexus';
 import URI from 'urijs';
 import { toast } from 'react-toastify';
