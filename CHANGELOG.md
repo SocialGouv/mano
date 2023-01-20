@@ -1,3 +1,10 @@
+# [1.226.0](https://github.com/SocialGouv/mano/compare/v1.225.0...v1.226.0) (2023-01-20)
+
+
+### Features
+
+* **dashboard:** right button position comments in action ([#1220](https://github.com/SocialGouv/mano/issues/1220)) ([f066e1f](https://github.com/SocialGouv/mano/commit/f066e1f5f56dab36e5a0431a006abad17d528d21))
+
 # [1.225.0](https://github.com/SocialGouv/mano/compare/v1.224.1...v1.225.0) (2023-01-19)
 
 
