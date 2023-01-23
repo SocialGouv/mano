@@ -68,7 +68,6 @@ test("test", async ({ page }) => {
   await page.locator("#react-select-healthInsurances-option-1").click();
   await page.locator(".person-custom-select-couvertures-médicales__value-container").click();
   await page.locator("#react-select-healthInsurances-option-3").click();
-  await page.locator("div:nth-child(3) > .row > div:nth-child(2)").dblclick();
   await page.getByLabel("Structure de suivi médical").fill("dedede");
   await clickOnEmptyReactSelect(page, "person-custom-select-consommations", "Amphétamine/MDMA/Ecstasy");
   await clickOnEmptyReactSelect(page, "person-custom-select-vulnérabilités", "Injecteur");
