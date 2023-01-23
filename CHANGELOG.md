@@ -1,3 +1,10 @@
+## [1.227.5](https://github.com/SocialGouv/mano/compare/v1.227.4...v1.227.5) (2023-01-23)
+
+
+### Bug Fixes
+
+* **dashboard:** couper les noms de personnes trop long dans le dossier d'une personne ([#1231](https://github.com/SocialGouv/mano/issues/1231)) ([15e3ee6](https://github.com/SocialGouv/mano/commit/15e3ee650046ed9dc638f27a83097aa5dcf57e91))
+
 ## [1.227.4](https://github.com/SocialGouv/mano/compare/v1.227.3...v1.227.4) (2023-01-23)
 
 
