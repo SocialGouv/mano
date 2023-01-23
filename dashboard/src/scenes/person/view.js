@@ -116,7 +116,7 @@ export default function View() {
           )}
         </div>
       </div>
-      <div className="tw-pt-4">
+      <div className="tw-pt-4 tw-break-all">
         {person.outOfActiveList && (
           <Alert color="warning" className="noprint">
             {person?.name} est en dehors de la file active, pour{' '}
