@@ -23,36 +23,37 @@ const ActionsStats = ({
   const [categorySlice, setCategorySlice] = useState(null);
 
   const actionsDataForGroups = useMemo(() => {
-    return actionsWithDetailedGroupAndCategories.reduce((actions, action) => {
-      if (!actions.find((a) => a._id === action._id)) {
-        return [...actions, action];
-      }
-      return actions;
-    }, []);
+    const uniqueActionPerGroup = {};
+    for (const action of actionsWithDetailedGroupAndCategories) {
+      uniqueActionPerGroup[action._id] = action;
+    }
+    return Object.values(uniqueActionPerGroup);
   }, [actionsWithDetailedGroupAndCategories]);
 
   const filteredActionsBySlice = useMemo(() => {
     if (groupSlice) {
-      return actionsDataForGroups.reduce((actions, action) => {
-        if (groupSlice === 'Non renseigné' && !action.categoryGroup && !actions.find((a) => a._id === action._id)) {
-          return [...actions, action];
+      const withGroupSlice = {};
+      for (const action of actionsDataForGroups) {
+        if (groupSlice === 'Non renseigné' && !action.categoryGroup) {
+          withGroupSlice[action._id] = action;
         }
-        if (action.categoryGroup === groupSlice && !actions.find((a) => a._id === action._id)) {
-          return [...actions, action];
+        if (action.categoryGroup === groupSlice) {
+          withGroupSlice[action._id] = action;
         }
-        return actions;
-      }, []);
+      }
+      return Object.values(withGroupSlice);
     }
     if (categorySlice) {
-      return actionsWithDetailedGroupAndCategories.reduce((actions, action) => {
-        if (categorySlice === 'Non renseigné' && !action.categories?.length && !actions.find((a) => a._id === action._id)) {
-          return [...actions, action];
+      const withCatSlice = {};
+      for (const action of actionsWithDetailedGroupAndCategories) {
+        if (categorySlice === 'Non renseigné' && !action.categories?.length) {
+          withCatSlice[action._id] = action;
         }
-        if (action.categories.includes(categorySlice) && !actions.find((a) => a._id === action._id)) {
-          return [...actions, action];
+        if (action.categories.includes(categorySlice)) {
+          withCatSlice[action._id] = action;
         }
-        return actions;
-      }, []);
+      }
+      return Object.values(withCatSlice);
     }
     return [];
   }, [actionsDataForGroups, actionsWithDetailedGroupAndCategories, groupSlice, categorySlice]);
