@@ -74,7 +74,7 @@ export default function View() {
         </div>
       </div>
       <div className="tw-flex tw-w-full tw-justify-center">
-        <div className="noprint tw-flex tw-flex-1 ">
+        <div className="noprint tw-flex tw-flex-1">
           {!['restricted-access'].includes(user.role) && (
             <ul className="nav nav-tabs tw-m-auto">
               <li role="presentation" className="nav-item">
