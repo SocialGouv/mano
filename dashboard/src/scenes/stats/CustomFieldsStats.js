@@ -58,9 +58,7 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
         <CustomResponsivePie
           title={field.label}
           help={help?.(field.label.capitalize())}
-          onItemClick={(newSlice) => {
-            onSliceClick(newSlice, field.name);
-          }}
+          onItemClick={onSliceClick ? (newSlice) => onSliceClick?.(newSlice, field.name) : undefined}
           key={field.name}
           data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
         />
