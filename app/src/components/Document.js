@@ -3,11 +3,12 @@ import styled from 'styled-components';
 import { Text, Alert } from 'react-native';
 import API from '../services/api';
 import FileViewer from 'react-native-file-viewer';
-import { connectActionSheet } from '@expo/react-native-action-sheet';
+import { useActionSheet } from '@expo/react-native-action-sheet';
 
-const Document = ({ showActionSheetWithOptions, personId, document, onDelete }) => {
+const Document = ({ personId, document, onDelete }) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const { showActionSheetWithOptions } = useActionSheet();
 
   const onMorePress = async () => {
     const options = ['Supprimer', 'Annuler'];
@@ -84,4 +85,4 @@ const DocumentContainer = styled.TouchableOpacity`
 const DocumentTitle = styled.Text`
   text-align: left;
 `;
-export default connectActionSheet(Document);
+export default Document;
