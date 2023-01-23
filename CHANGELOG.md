@@ -1,3 +1,10 @@
+## [1.227.4](https://github.com/SocialGouv/mano/compare/v1.227.3...v1.227.4) (2023-01-23)
+
+
+### Bug Fixes
+
+* MANO-8T disable click on pie slice when aciton is unavailable ([43c1e90](https://github.com/SocialGouv/mano/commit/43c1e90f992fd71f947521b2daf8859a367a79a1))
+
 ## [1.227.3](https://github.com/SocialGouv/mano/compare/v1.227.2...v1.227.3) (2023-01-23)
 
 
