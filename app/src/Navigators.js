@@ -325,7 +325,7 @@ const App = () => {
       resetTeams();
       resetCurrentTeam();
       if (clearAllRef.current) {
-        Alert.alert('Vous êtes déconnecté(e)', 'Vous pouvez aussi supprimer Mano pour plus de sécurité');
+        Alert.alert('Déconnexion réussie', 'Vous pouvez aussi supprimer Mano pour plus de sécurité');
         clearAllRef.current = false;
       }
       setResetLoginStackKey((k) => k + 1);

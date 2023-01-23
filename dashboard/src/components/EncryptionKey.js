@@ -277,7 +277,7 @@ const EncryptionKey = ({ isMain }) => {
   if (organisation.encryptionEnabled && !user.healthcareProfessional)
     return (
       <em>
-        Vous ne pouvez pas changer la clé de chiffrement car vous n'êtes pas déclaré comme adminstrateur de type professionel de santé. Il est
+        Vous ne pouvez pas changer la clé de chiffrement car vous n'êtes pas déclaré·e comme administrateur·trice de type professionel·le de santé. Il est
         nécessaire d'avoir accès à l'ensemble des données de l'organisation pour pouvoir changer son chiffrement.
       </em>
     );

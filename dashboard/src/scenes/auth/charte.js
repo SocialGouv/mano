@@ -28,7 +28,7 @@ const Charte = () => {
         <ol>
           <li>Présentation du dispositif et propriété des données</li>
           <p>
-            MANO est un outil destiné aux maraudes, équipes mobiles et professionnels intervenant sur des lieux d’accueil. Il comprend une application
+            MANO est un outil destiné aux maraudes, équipes mobiles et professionnel·le·s intervenant sur des lieux d’accueil. Il comprend une application
             accessible en rue et une interface web.
             <br />
             <br />
@@ -55,7 +55,7 @@ const Charte = () => {
               Ces points sont l'occasion d’échanger sur les pratiques et expériences avec MANO et de remonter les besoins du terrain.
             </li>
             <li>
-              L’équipe MANO s’engage à prendre en compte les retours du terrain et à inclure les professionnels dans le processus de développement de
+              L’équipe MANO s’engage à prendre en compte les retours du terrain et à inclure les professionnel·le·s dans le processus de développement de
               l'outil.
             </li>
           </ul>
@@ -107,7 +107,7 @@ const Charte = () => {
               donc une prise en charge particulière par les équipes, dont la traçabilité apportera un bénéfice dans l’accompagnement.
             </li>
             <li>
-              Vigilance lors de la saisie d'informations concernant les personnes suivies&nbsp;: les professionnels ne saisissent que le strict
+              Vigilance lors de la saisie d'informations concernant les personnes suivies&nbsp;: les professionnel·le·s ne saisissent que le strict
               nécessaire à l'accompagnement (en anonymisant notamment au maximum les dossiers). Il est cependant possible d’utiliser l’identité de la
               personne, si elle est nécessaire à l’accompagnement.
             </li>
@@ -119,7 +119,7 @@ const Charte = () => {
             </li>
             <li>
               Création de compte et clôture de compte&nbsp;: les personnes qui ont un rôle d'administrateur s'engagent à maintenir à jour les accès à
-              MANO. En cas de départ d'un membre de l'équipe, son compte doit être désactivé le jour même. De même, seuls les professionnels en
+              MANO. En cas de départ d'un membre de l'équipe, son compte doit être désactivé le jour même. De même, seul·e·s les professionnel·le·s en
               contact avec les personnes suivies ont le droit d'avoir accès à leurs données personnelles.
             </li>
             <li>
@@ -136,7 +136,7 @@ const Charte = () => {
           </ul>
         </ol>
         <b>
-          Tout manquement à ces engagements pourra conduire MANO à retirer l'utilisation de l'outil à un professionnel, une équipe ou une
+          Tout manquement à ces engagements pourra conduire MANO à retirer l'utilisation de l'outil à un·e professionnel·le, une équipe ou une
           organisation.
         </b>
       </Content>

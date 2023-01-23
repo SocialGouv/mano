@@ -100,7 +100,7 @@ const TopBar = () => {
                   })
                   .then(() => {
                     setTimeout(() => {
-                      toast.info('Vous êtes déconnecté(e)', 'Veuillez vérifier votre historique et le vider si besoin');
+                      toast.info('Déconnexion réussie', 'Veuillez vérifier votre historique et le vider si besoin');
                     });
                   });
               }}>

@@ -89,7 +89,7 @@ test("Lieux fréquentés", async ({ page }) => {
   await page.getByText("Le lieu a été ajouté").click();
 
   page.once("dialog", (dialog) => {
-    expect(dialog.message()).toBe("Êtes-vous sûr de vouloir supprimer ce lieu fréquenté ?");
+    expect(dialog.message()).toBe("Voulez-vous vraiment supprimer ce lieu fréquenté ?");
     dialog.accept();
   });
   await page.getByRole("button", { name: "Supprimer le lieu fréquenté faux lieu" }).click();
