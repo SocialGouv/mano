@@ -4,10 +4,10 @@ const sequelize = require("../sequelize");
 
 module.exports = async () => {
   try {
-    await sequelize.query(`ALTER TABLE "mano"."Organisation" ADD COLUMN IF NOT EXISTS "customFieldsPersonsSocial" jsonb :defaultValue;`, {
+    await sequelize.query(`ALTER TABLE "mano"."Organisation" ADD COLUMN IF NOT EXISTS "customFieldsPersonsSocial" jsonb default :defaultValue;`, {
       replacements: { defaultValue: JSON.stringify(defaultSocialCustomFields) },
     });
-    await sequelize.query(`ALTER TABLE "mano"."Organisation" ADD COLUMN IF NOT EXISTS "customFieldsPersonsMedical" jsonb :defaultValue;`, {
+    await sequelize.query(`ALTER TABLE "mano"."Organisation" ADD COLUMN IF NOT EXISTS "customFieldsPersonsMedical" jsonb default :defaultValue;`, {
       replacements: { defaultValue: JSON.stringify(defaultMedicalCustomFields) },
     });
   } catch (e) {
