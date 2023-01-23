@@ -14,7 +14,6 @@ import SelectTeamMultiple from '../../../components/SelectTeamMultiple';
 import { currentTeamState, userState } from '../../../recoil/auth';
 import { useRecoilValue, useSetRecoilState } from 'recoil';
 import CustomFieldInput from '../../../components/CustomFieldInput';
-import SelectCustom from '../../../components/SelectCustom';
 import { useState } from 'react';
 import ButtonCustom from '../../../components/ButtonCustom';
 import { Formik } from 'formik';

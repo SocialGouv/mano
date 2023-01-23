@@ -409,30 +409,6 @@ const StatsWanderingAtRangeBar = ({ persons, onItemClick }) => {
   );
 };
 
-const getAdressPieData = (data) => {
-  data = data.reduce(
-    (newData, person) => {
-      if (!person.address) {
-        newData['Non renseigné']++;
-        return newData;
-      }
-      if (person.address === 'Non') {
-        newData.Non++;
-        return newData;
-      }
-      if (!person.addressDetail) {
-        newData['Oui (Autre)']++;
-        return newData;
-      }
-      if (!newData[person.addressDetail]) newData[person.addressDetail] = 0;
-      newData[person.addressDetail]++;
-      return newData;
-    },
-    { 'Oui (Autre)': 0, Non: 0, 'Non renseigné': 0 }
-  );
-  return Object.keys(data).map((key) => ({ id: key, label: key, value: data[key] }));
-};
-
 const Teams = ({ person: { _id, assignedTeams } }) => (
   <React.Fragment key={_id}>
     {assignedTeams?.map((teamId) => (
