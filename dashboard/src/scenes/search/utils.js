@@ -19,7 +19,7 @@ const prepareItemForSearch = (item) => {
   const itemClean = {};
   for (let key of Object.keys(item)) {
     if (excludeFields.has(key)) continue;
-    if (isObject(itemClean[key])) {
+    if (isObject(item[key])) {
       itemClean[key] = prepareItemForSearch(item[key]);
     } else if (Array.isArray(item[key])) {
       itemClean[key] = item[key].map(prepareItemForSearch);

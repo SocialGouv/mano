@@ -1,3 +1,60 @@
+## [1.227.4](https://github.com/SocialGouv/mano/compare/v1.227.3...v1.227.4) (2023-01-23)
+
+
+### Bug Fixes
+
+* MANO-8T disable click on pie slice when aciton is unavailable ([43c1e90](https://github.com/SocialGouv/mano/commit/43c1e90f992fd71f947521b2daf8859a367a79a1))
+
+## [1.227.3](https://github.com/SocialGouv/mano/compare/v1.227.2...v1.227.3) (2023-01-23)
+
+
+### Bug Fixes
+
+* **wording:** converted some wording in epicene writing ([#1229](https://github.com/SocialGouv/mano/issues/1229)) ([010cc9f](https://github.com/SocialGouv/mano/commit/010cc9f502e74d5e209683ffd426995760b5683e))
+
+## [1.227.2](https://github.com/SocialGouv/mano/compare/v1.227.1...v1.227.2) (2023-01-20)
+
+
+### Bug Fixes
+
+* **dashboard:** cut too long words without spaces in action ([#1225](https://github.com/SocialGouv/mano/issues/1225)) ([e90c02f](https://github.com/SocialGouv/mano/commit/e90c02fe63a534b3e0d7d545ba66ef1fd14ee13a))
+* **dashboard:** cut too long words without spaces in service ([#1228](https://github.com/SocialGouv/mano/issues/1228)) ([249ba25](https://github.com/SocialGouv/mano/commit/249ba2526a6c657007a1253302679d18265852ec))
+
+## [1.227.1](https://github.com/SocialGouv/mano/compare/v1.227.0...v1.227.1) (2023-01-20)
+
+
+### Bug Fixes
+
+* sort by lastUpdateCheckForGDPR ([0192b28](https://github.com/SocialGouv/mano/commit/0192b288309456630fca385b353c72c8636ea5cc))
+
+# [1.227.0](https://github.com/SocialGouv/mano/compare/v1.226.2...v1.227.0) (2023-01-20)
+
+
+### Features
+
+* **dashboard:** add click on persons slice in stats ([#1213](https://github.com/SocialGouv/mano/issues/1213)) ([ec6d29a](https://github.com/SocialGouv/mano/commit/ec6d29af6f1d028c6ee76ce1375066b107ef63ba))
+
+## [1.226.2](https://github.com/SocialGouv/mano/compare/v1.226.1...v1.226.2) (2023-01-20)
+
+
+### Bug Fixes
+
+* **app,dashboard:** small typo in search algo prepareItemForSearch ([#1222](https://github.com/SocialGouv/mano/issues/1222)) ([2313670](https://github.com/SocialGouv/mano/commit/23136707935f42206096f4c042b628d424330963))
+
+## [1.226.1](https://github.com/SocialGouv/mano/compare/v1.226.0...v1.226.1) (2023-01-20)
+
+
+### Bug Fixes
+
+* **dashboard:** allow change certain types of custom fields ([#1215](https://github.com/SocialGouv/mano/issues/1215)) ([04b6e52](https://github.com/SocialGouv/mano/commit/04b6e522f7d64e4f7b9bccb577310701451d5385))
+
+# [1.226.0](https://github.com/SocialGouv/mano/compare/v1.225.0...v1.226.0) (2023-01-20)
+
+
+### Features
+
+* **dashboard:** right button position comments in action ([#1220](https://github.com/SocialGouv/mano/issues/1220)) ([f066e1f](https://github.com/SocialGouv/mano/commit/f066e1f5f56dab36e5a0431a006abad17d528d21))
+
 # [1.225.0](https://github.com/SocialGouv/mano/compare/v1.224.1...v1.225.0) (2023-01-19)
 
 

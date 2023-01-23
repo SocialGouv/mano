@@ -242,7 +242,7 @@ const View = () => {
                       {organisation.encryptionEnabled ? (
                         <>
                           <p>
-                            Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
+                            Disponible pour les professionnel·le·s de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
                           </p>
                           <hr />
                           <Row>
@@ -543,7 +543,7 @@ function Consultations({ handleChange, isSubmitting, handleSubmit }) {
     <>
       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Consultations</h3>
       <p>
-        Disponible pour les professionnels de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
+        Disponible pour le personnel de santé 🧑‍⚕️ seulement dans l'onglet <b>Dossier médical</b> d'une personne suivie
       </p>
       <hr />
 

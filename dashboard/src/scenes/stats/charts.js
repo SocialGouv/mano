@@ -42,7 +42,7 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
           </tbody>
         </table>
       </div>
-      <div className={['tw-h-[30vw] tw-max-w-[66%] tw-basis-2/3 tw-font-bold', !!onClick ? '[&_path]:tw-cursor-pointer' : ''].join(' ')}>
+      <div className={['tw-h-[30vw] tw-max-w-[66%] tw-basis-2/3 tw-font-bold', !!onItemClick ? '[&_path]:tw-cursor-pointer' : ''].join(' ')}>
         <ResponsivePie
           data={total ? data : []}
           sortByValue
@@ -66,9 +66,16 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
   );
 };
 
-export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisTitleY, help }) => {
-  const getItemValue = (item) => Object.values(item)[1];
+const getItemValue = (item) => Object.values(item)[1];
+
+export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axisTitleX, axisTitleY, help }) => {
   const total = data.reduce((sum, item) => sum + getItemValue(item), 0);
+
+  const onClick = ({ id }) => {
+    if (!onItemClick) return;
+    onItemClick(id);
+  };
+
   return (
     <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
       <div className="tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center">
@@ -80,7 +87,7 @@ export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisT
         <table className="tw-w-full tw-border tw-border-zinc-400">
           <tbody>
             {[...data].map((item) => (
-              <tr key={item.name}>
+              <tr key={item.name} onClick={() => onClick({ id: item.name })}>
                 <td className="tw-border tw-border-zinc-400 tw-p-1">{item.name}</td>
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{getItemValue(item)}</td>
                 <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${Math.round((getItemValue(item) / total) * 1000) / 10}%`}</td>
@@ -94,10 +101,15 @@ export const CustomResponsiveBar = ({ title, data, categories, axisTitleX, axisT
           </tbody>
         </table>
       </div>
-      <div className="tw-flex tw-h-80 tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold">
+      <div
+        className={[
+          'tw-flex tw-h-80 tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold',
+          !!onItemClick ? '[&_rect]:tw-cursor-pointer' : '',
+        ].join(' ')}>
         <ResponsiveBar
-          data={data}
-          keys={categories}
+          data={data.filter((c) => c.name !== 'Non renseigné')}
+          keys={categories.filter((c) => c !== 'Non renseigné')}
+          onClick={onClick}
           indexBy="name"
           margin={{ top: 40, right: 0, bottom: 50, left: 60 }}
           padding={0.3}

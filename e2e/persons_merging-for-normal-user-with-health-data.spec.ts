@@ -123,7 +123,7 @@ test("merging normal user with health data", async ({ page }) => {
     await page.getByRole("button", { name: "Fusionner avec un autre dossier" }).click();
     const forbiddenMergeListener = async (dialog) => {
       expect(dialog.message()).toBe(
-        "Les champs médicaux ne sont pas identiques. Vous devez être un professionnel de santé pour fusionner des dossiers médicaux différents."
+        "Les champs médicaux ne sont pas identiques. Vous devez être un·e professionnel·le de santé pour fusionner des dossiers médicaux différents."
       );
       await dialog.accept();
     };

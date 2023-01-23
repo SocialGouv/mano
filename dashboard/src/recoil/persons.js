@@ -164,6 +164,14 @@ export const sortPersons = (sortBy, sortOrder) => (a, b) => {
     if (!b.followedSince) return sortOrder === 'DESC' ? 1 : -1;
     return sortOrder === 'ASC' ? new Date(b.followedSince) - new Date(a.followedSince) : new Date(a.followedSince) - new Date(b.followedSince);
   }
+  if (sortBy === 'lastUpdateCheckForGDPR') {
+    if (!a.lastUpdateCheckForGDPR && !b.lastUpdateCheckForGDPR) return defaultSort(a, b, sortOrder);
+    if (!a.lastUpdateCheckForGDPR) return sortOrder === 'ASC' ? 1 : -1;
+    if (!b.lastUpdateCheckForGDPR) return sortOrder === 'DESC' ? 1 : -1;
+    return sortOrder === 'ASC'
+      ? new Date(b.lastUpdateCheckForGDPR) - new Date(a.lastUpdateCheckForGDPR)
+      : new Date(a.lastUpdateCheckForGDPR) - new Date(b.lastUpdateCheckForGDPR);
+  }
   // DEFAULT SORTING
   // (sortBy === 'name')
   return defaultSort(a, b, sortOrder);

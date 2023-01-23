@@ -305,13 +305,14 @@ const EditingComment = ({ value = {}, commentId, onSubmit, onCancel, newComment 
                       </Col>
                     )}
                   </Row>
-                  <br />
+                  <div className="tw-mt-4 tw-flex tw-justify-end">
                   <ButtonCustom
                     type="submit"
                     disabled={isSubmitting}
                     onClick={() => !isSubmitting && handleSubmit()}
                     title={isSubmitting ? 'Sauvegarde...' : 'Sauvegarder'}
                   />
+                  </div>
                 </React.Fragment>
               );
             }}

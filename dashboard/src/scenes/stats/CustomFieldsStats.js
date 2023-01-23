@@ -12,7 +12,7 @@ function getColsSize(totalCols) {
   return '1/4';
 }
 
-const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = '', help }) => {
+const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId = '', help, onSliceClick }) => {
   const team = useRecoilValue(currentTeamState);
 
   const customFieldsInStats = customFields
@@ -58,6 +58,7 @@ const CustomFieldsStats = ({ customFields, data, additionalCols = [], dataTestId
         <CustomResponsivePie
           title={field.label}
           help={help?.(field.label.capitalize())}
+          onItemClick={onSliceClick ? (newSlice) => onSliceClick?.(newSlice, field.name) : undefined}
           key={field.name}
           data={getPieData(data, field.name, { options: field.options, isBoolean: field.type === 'boolean' })}
         />

@@ -107,7 +107,7 @@ const List = () => {
               return (
                 <>
                   <div>{user.role}</div>
-                  {user.healthcareProfessional ? <div>🧑‍⚕️ professionnel de santé</div> : ''}
+                  {user.healthcareProfessional ? <div>🧑‍⚕️ professionnel·le de santé</div> : ''}
                 </>
               );
             },
@@ -236,10 +236,10 @@ const Create = ({ onChange }) => {
                         checked={values.healthcareProfessional}
                         onChange={handleChange}
                       />
-                      Professionnel de santé
+                      Professionnel·le de santé
                     </Label>
                     <div>
-                      <small className="text-muted">Un professionnel de santé à accès au dossier médical complet des personnes.</small>
+                      <small className="text-muted">Un professionnel·le de santé à accès au dossier médical complet des personnes.</small>
                     </div>
                   </Col>
                 </Row>

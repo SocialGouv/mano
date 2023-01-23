@@ -184,7 +184,7 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
   };
 
   const onDeleteGroup = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce groupe et tous ses services ? Cette opération est irréversible')) return;
+    if (!window.confirm('Voulez-vous vraiment supprimer ce groupe et tous ses services ? Cette opération est irréversible')) return;
     const newGroupedServices = groupedServices.filter((group) => group.groupTitle !== groupTitle);
 
     const oldOrganisation = organisation;
@@ -241,7 +241,7 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
 
   return (
     <>
-      <div className="tw-min-h-full tw-basis-1/2 tw-p-1 xl:tw-basis-1/3">
+      <div className="tw-min-h-full tw-basis-1/2 tw-p-1 xl:tw-basis-1/3 tw-break-all">
         <details
           open
           key={groupTitle}
@@ -276,7 +276,7 @@ const ServicesGroup = ({ groupTitle, services, onDragAndDrop }) => {
                 className="form-text tw-my-1  tw-w-full tw-rounded tw-bg-white/50 tw-px-1.5 tw-py-1 placeholder:tw-opacity-80"
                 placeholder="Ajouter un service"
               />
-              <button type="submit" className="tw-ml-4 tw-rounded tw-bg-transparent hover:tw-underline">
+              <button type="submit" className="tw-ml-4 tw-rounded tw-bg-transparent hover:tw-underline tw-break-normal">
                 Ajouter
               </button>
             </form>
@@ -388,7 +388,7 @@ const Service = ({ service, groupTitle }) => {
   };
 
   const onDeleteService = async () => {
-    if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce service ? Cette opération est irréversible')) return;
+    if (!window.confirm('Voulez-vous vraiment supprimer ce service ? Cette opération est irréversible')) return;
     const newGroupedServices = groupedServices.map((group) => {
       if (group.groupTitle !== groupTitle) return group;
       return {

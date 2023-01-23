@@ -170,7 +170,7 @@ const CommentModal = ({ comment = {}, isNewComment, onClose, person }) => {
                       color="danger"
                       disabled={isSubmitting}
                       onClick={async () => {
-                        if (!window.confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?')) return;
+                        if (!window.confirm('Voulez-vous vraiment supprimer ce commentaire ?')) return;
                         window.sessionStorage.removeItem('currentComment');
                         await API.delete({ path: `/comment/${comment._id}` });
                         setComments((comments) => comments.filter((c) => c._id !== comment._id));
