@@ -6,7 +6,7 @@ import DatePicker from 'react-datepicker';
 import { useRecoilValue, useSetRecoilState, useRecoilState } from 'recoil';
 import { v4 as uuidv4 } from 'uuid';
 import ButtonCustom from '../../components/ButtonCustom';
-import { personsState, usePreparePersonForEncryption, personFieldsSelector } from '../../recoil/persons';
+import { personsState, usePreparePersonForEncryption, personFieldsSelector, customFieldsPersonsMedicalSelector } from '../../recoil/persons';
 import { currentTeamState, organisationState, usersState, userState } from '../../recoil/auth';
 import { dateForDatePicker, dayjsInstance, formatDateWithFullMonth, formatTime } from '../../services/date';
 import API from '../../services/api';
@@ -54,6 +54,7 @@ export function MedicalFile({ person }) {
 
   const personFields = useRecoilValue(personFieldsSelector);
   const customFieldsMedicalFile = useRecoilValue(customFieldsMedicalFileSelector);
+  const customFieldsPersonsMedical = useRecoilValue(customFieldsPersonsMedicalSelector);
   const preparePersonForEncryption = usePreparePersonForEncryption();
 
   const user = useRecoilValue(userState);
@@ -112,6 +113,9 @@ export function MedicalFile({ person }) {
     return [...ordonnances, ...consultationsDocs, ...otherDocs].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
   }, [consultations, medicalFile?.documents, treatments]);
 
+  console.log(customFieldsPersonsMedical);
+  console.log(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical'));
+  console.log(Boolean(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical')));
   return (
     <>
       <h1 className="printonly">Dossier médical de {person?.name}</h1>
@@ -144,18 +148,23 @@ export function MedicalFile({ person }) {
             <CustomFieldDisplay type="text" value={person.gender} />
           </b>
         </div>
-        <div>
-          Structure de suivi médical&nbsp;:{' '}
-          <b>
-            <CustomFieldDisplay type="text" value={person.structureMedical} />
-          </b>
-        </div>
-        <div>
-          Couverture(s) médicale(s)&nbsp;:{' '}
-          <b>
-            <CustomFieldDisplay type="multi-choice" value={person.healthInsurances} />
-          </b>
-        </div>
+        {/* These custom fields are displayed by default, because they where displayed before they became custom fields */}
+        {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical')) && (
+          <div>
+            Structure de suivi médical&nbsp;:{' '}
+            <b>
+              <CustomFieldDisplay type="text" value={person.structureMedical} />
+            </b>
+          </div>
+        )}
+        {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'healthInsurances')) && (
+          <div>
+            Couverture(s) médicale(s)&nbsp;:{' '}
+            <b>
+              <CustomFieldDisplay type="multi-choice" value={person.healthInsurances} />
+            </b>
+          </div>
+        )}
       </div>
       <div className="noprint">
         <Formik
@@ -205,28 +214,34 @@ export function MedicalFile({ person }) {
                       classNamePrefix="person-select-gender"
                     />
                   </Col>
-                  <Col md={4}>
-                    <FormGroup>
-                      <Label htmlFor="structureMedical">Structure de suivi médical</Label>
-                      <Input name="structureMedical" id="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
-                    </FormGroup>
-                  </Col>
-                  <Col md={4}>
-                    <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
-                    <SelectCustom
-                      options={personFields.find((f) => f.name === 'healthInsurances').options.map((_option) => ({ value: _option, label: _option }))}
-                      value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
-                      getOptionValue={(i) => i.value}
-                      getOptionLabel={(i) => i.label}
-                      onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
-                      name="healthInsurances"
-                      isClearable={false}
-                      isMulti
-                      inputId="person-select-healthInsurances"
-                      classNamePrefix="person-select-healthInsurances"
-                      placeholder={' -- Choisir -- '}
-                    />
-                  </Col>
+                  {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'structureMedical')) && (
+                    <Col md={4}>
+                      <FormGroup>
+                        <Label htmlFor="structureMedical">Structure de suivi médical</Label>
+                        <Input name="structureMedical" id="structureMedical" value={values.structureMedical || ''} onChange={handleChange} />
+                      </FormGroup>
+                    </Col>
+                  )}
+                  {Boolean(customFieldsPersonsMedical.find((e) => e.name === 'healthInsurances')) && (
+                    <Col md={4}>
+                      <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
+                      <SelectCustom
+                        options={customFieldsPersonsMedical
+                          .find((f) => f.name === 'healthInsurances')
+                          .options.map((_option) => ({ value: _option, label: _option }))}
+                        value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
+                        getOptionValue={(i) => i.value}
+                        getOptionLabel={(i) => i.label}
+                        onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
+                        name="healthInsurances"
+                        isClearable={false}
+                        isMulti
+                        inputId="person-select-healthInsurances"
+                        classNamePrefix="person-select-healthInsurances"
+                        placeholder={' -- Choisir -- '}
+                      />
+                    </Col>
+                  )}
                 </Row>
                 <div className="tw-mb-10 tw-flex tw-justify-end">
                   <ButtonCustom

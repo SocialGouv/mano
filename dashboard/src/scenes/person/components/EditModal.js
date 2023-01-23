@@ -259,30 +259,6 @@ export default function EditModal({ person, selectedPanel, onClose }) {
                       </div>
                       {openPanels.includes('medical') && (
                         <Row>
-                          <Col md={4}>
-                            <Label htmlFor="person-select-healthInsurances">Couverture(s) médicale(s)</Label>
-                            <SelectCustom
-                              options={personFields
-                                .find((f) => f.name === 'healthInsurances')
-                                .options.map((_option) => ({ value: _option, label: _option }))}
-                              value={values.healthInsurances?.map((_option) => ({ value: _option, label: _option })) || []}
-                              getOptionValue={(i) => i.value}
-                              getOptionLabel={(i) => i.label}
-                              onChange={(values) => handleChange({ currentTarget: { value: values.map((v) => v.value), name: 'healthInsurances' } })}
-                              name="healthInsurances"
-                              isClearable={false}
-                              isMulti
-                              inputId="person-select-healthInsurances"
-                              classNamePrefix="person-select-healthInsurances"
-                              placeholder={' -- Choisir -- '}
-                            />
-                          </Col>
-                          <Col md={4}>
-                            <FormGroup>
-                              <Label htmlFor="structureMedical">Structure de suivi médical</Label>
-                              <Input name="structureMedical" id="structureMedical" value={values.structureMedical} onChange={handleChange} />
-                            </FormGroup>
-                          </Col>
                           {customFieldsPersonsMedical
                             .filter((f) => f.enabled || f.enabledTeams?.includes(team._id))
                             .map((field) => (

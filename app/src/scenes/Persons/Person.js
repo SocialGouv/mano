@@ -75,8 +75,6 @@ const Person = ({ route, navigation }) => {
         gender: person.gender || '',
         phone: person.phone?.trim() || '',
         description: person.description?.trim() || '',
-        structureMedical: person.structureMedical?.trim() || '',
-        healthInsurances: person.healthInsurances || [],
         vulnerabilities: person.vulnerabilities || [],
         consumptions: person.consumptions || [],
         assignedTeams: person.assignedTeams || [],

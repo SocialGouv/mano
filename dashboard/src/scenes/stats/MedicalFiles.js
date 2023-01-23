@@ -17,12 +17,6 @@ const MedicalFilesStats = ({ filterBase, filterPersons, setFilterPersons, person
         data={getPieData(personsForStats, 'gender', { options: personFields.find((f) => f.name === 'gender').options })}
         help={`Couverture médicale des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
       />
-      <CustomResponsivePie
-        title="Couverture médicale des personnes"
-        field="healthInsurances"
-        data={getPieData(personsForStats, 'healthInsurances', { options: personFields.find((f) => f.name === 'healthInsurances').options })}
-        help={`Couverture médicale des ${title} dans la période définie.\n\nSi aucune période n'est définie, on considère l'ensemble des personnes.`}
-      />
       <CustomFieldsStats
         data={personsForStats}
         customFields={customFieldsMedicalFile}

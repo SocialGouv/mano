@@ -9,7 +9,12 @@ import { capture } from '../services/sentry';
 
 const CustomFieldInput = ({ field, values, handleChange, model, colWidth = 4, disabled, hideLabel = false }) => {
   const id = useMemo(() => {
-    const slugifiedLabel = field.label.toLowerCase().replace(/ /g, '-').replace("'", '') ?? field.name;
+    const slugifiedLabel =
+      field.label
+        .toLowerCase()
+        .replace(/ /g, '-')
+        .replace(/[\\(\\)]/g, '')
+        .replace("'", '') ?? field.name;
     if (['text', 'number'].includes(field.type)) return `${model}-custom-input-${slugifiedLabel}`;
     if (['textarea'].includes(field.type)) return `${model}-custom-textarea-${slugifiedLabel}`;
     if (['date-with-time', 'date'].includes(field.type)) return `${model}-custom-datepicker-${slugifiedLabel}`;

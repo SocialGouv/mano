@@ -15,39 +15,6 @@ const personFields = [
   { name: "description", type: "textarea", label: "Description", encrypted: true, importable: true, filterable: true },
   { name: "alertness", type: "boolean", label: "Personne très vulnérable", encrypted: true, importable: true, filterable: true },
   { name: "wanderingAt", type: "date", label: "En rue depuis le", encrypted: true, importable: true, filterable: true },
-  { name: "structureMedical", type: "text", label: "Structure de suivi médical", encrypted: true, importable: true, filterable: true },
-  {
-    name: "reasons",
-    type: "multi-choice",
-    label: "Motif de la situation en rue",
-    encrypted: true,
-    importable: true,
-    options: [
-      "Sortie d'hébergement",
-      "Expulsion de logement/hébergement",
-      "Départ du pays d'origine",
-      "Départ de région",
-      "Rupture familiale",
-      "Perte d'emploi",
-      "Sortie d'hospitalisation",
-      "Problème de santé",
-      "Sortie d'ASE",
-      "Sortie de détention",
-      "Rupture de soins",
-      "Autre",
-    ],
-    filterable: true,
-  },
-  {
-    name: "healthInsurances",
-    type: "multi-choice",
-    label: "Couverture(s) médicale(s)",
-    encrypted: true,
-    importable: true,
-    options: ["Aucune", "Régime Général", "PUMa", "AME", "CSS", "Autre"],
-    filterable: true,
-  },
-
   { name: "phone", type: "text", label: "Téléphone", encrypted: true, importable: true, filterable: true },
   { name: "assignedTeams", type: "multi-choice", label: "Équipes en charge", encrypted: true, importable: true, filterable: false },
   { name: "_id", label: "", encrypted: false, importable: false, filterable: false },
@@ -91,6 +58,16 @@ const fieldsPersonsCustomizableOptions = [
 ];
 
 const defaultMedicalCustomFields = [
+  {
+    name: "healthInsurances",
+    type: "multi-choice",
+    label: "Couverture(s) médicale(s)",
+    enabled: true,
+    options: ["Aucune", "Régime Général", "PUMa", "AME", "CSS", "Autre"],
+    required: false,
+    showInStats: true,
+  },
+  { name: "structureMedical", type: "text", label: "Structure de suivi médical", enabled: true, required: false, showInStats: true },
   {
     name: "consumptions",
     label: "Consommations",
