@@ -116,13 +116,10 @@ const reset = () => {
   AppSentry.setTag('organisationId', '');
 };
 
-const logout = async (status) => {
+const logout = async () => {
   await post({ path: '/user/logout' });
   reset();
-  if (window.location.pathname !== '/auth') {
-    window.history.pushState({}, '', '/auth');
-    if (status === '401') toast.error('Votre session a expiré, veuillez vous reconnecter');
-  }
+  window.location.reload();
 };
 
 // Upload a file to a path.
