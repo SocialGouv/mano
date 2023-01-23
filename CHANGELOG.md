@@ -1,3 +1,10 @@
+## [1.227.3](https://github.com/SocialGouv/mano/compare/v1.227.2...v1.227.3) (2023-01-23)
+
+
+### Bug Fixes
+
+* **wording:** converted some wording in epicene writing ([#1229](https://github.com/SocialGouv/mano/issues/1229)) ([010cc9f](https://github.com/SocialGouv/mano/commit/010cc9f502e74d5e209683ffd426995760b5683e))
+
 ## [1.227.2](https://github.com/SocialGouv/mano/compare/v1.227.1...v1.227.2) (2023-01-20)
 
 
