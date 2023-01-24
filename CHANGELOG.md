@@ -1,3 +1,10 @@
+## [1.229.4](https://github.com/SocialGouv/mano/compare/v1.229.3...v1.229.4) (2023-01-24)
+
+
+### Bug Fixes
+
+* **dasboard:** nom de personne trop long dans la liste des personnes suivies ([#1242](https://github.com/SocialGouv/mano/issues/1242)) ([b7b48da](https://github.com/SocialGouv/mano/commit/b7b48da9e7a718ff5c598e5a432795b65ddc8d3c))
+
 ## [1.229.3](https://github.com/SocialGouv/mano/compare/v1.229.2...v1.229.3) (2023-01-24)
 
 
