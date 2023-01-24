@@ -18,7 +18,15 @@ import SelectStatus from '../../components/SelectStatus';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { CANCEL, DONE, actionsState, mappedIdsToLabels, prepareActionForEncryption, TODO } from '../../recoil/actions';
 import { selectorFamily, useRecoilValue, useSetRecoilState } from 'recoil';
-import { dateForDatePicker, dayjsInstance, now } from '../../services/date';
+import {
+  dateForDatePicker,
+  dayjsInstance,
+  now,
+  dateForInputDate,
+  LEFT_BOUNDARY_DATE,
+  RIGHT_BOUNDARY_DATE,
+  outOfBoundariesDate,
+} from '../../services/date';
 import { commentsState, prepareCommentForEncryption } from '../../recoil/comments';
 import API from '../../services/api';
 import useTitle from '../../services/useTitle';
@@ -125,6 +133,8 @@ const ActionView = () => {
         onSubmit={async (body) => {
           body.teams = Array.isArray(body.teams) ? body.teams : [body.team];
           if (!body.teams?.length) return toast.error('Une action doit être associée à au moins une équipe.');
+          if (!body.dueAt) return toast.error("La date d'échéance est obligatoire");
+          if (outOfBoundariesDate(body.dueAt)) return toast.error("La date d'échéance est hors limites (entre 1900 et 2100)");
           const statusChanged = body.status && action.status !== body.status;
           if (statusChanged) {
             if ([DONE, CANCEL].includes(body.status)) {
@@ -173,7 +183,7 @@ const ActionView = () => {
             }
           }
         }}>
-        {({ values, handleChange, handleSubmit, isSubmitting }) => {
+        {({ values, handleChange, handleSubmit, isSubmitting, setFieldValue }) => {
           const canToggleGroupCheck =
             !!organisation.groupsEnabled && !!values.person && groups.find((group) => group.persons.includes(values.person));
           return (
@@ -238,12 +248,13 @@ const ActionView = () => {
                     <div>
                       <input
                         id="dueAt"
+                        key={values.withTime}
                         className="form-control"
                         type={values.withTime ? 'datetime-local' : 'date'}
-                        value={dayjsInstance(values.dueAt).format(values.withTime ? 'YYYY-MM-DDTHH:mm' : 'YYYY-MM-DD')}
+                        defaultValue={dateForInputDate(values.dueAt, values.withTime)}
                         onChange={handleChange}
-                        min="1901-01-01"
-                        max="2200-01-01"
+                        min={dateForInputDate(LEFT_BOUNDARY_DATE, values.withTime)}
+                        max={dateForInputDate(RIGHT_BOUNDARY_DATE, values.withTime)}
                       />
                     </div>
                     <div>
@@ -254,7 +265,8 @@ const ActionView = () => {
                         className="tw-mr-2"
                         checked={values.withTime || false}
                         onChange={() => {
-                          handleChange({ target: { name: 'withTime', checked: Boolean(!values.withTime), value: Boolean(!values.withTime) } });
+                          const withTime = !values.withTime;
+                          handleChange({ target: { name: 'withTime', checked: withTime, value: withTime } });
                         }}
                       />
                       <label htmlFor="withTime">Montrer l'heure</label>
