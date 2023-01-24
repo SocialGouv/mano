@@ -32,7 +32,7 @@ export const filterData = (data, filters, returnWholeArray = false) => {
           }
           if (['date-with-time', 'date'].includes(filter.type)) {
             const { date, comparator } = filter.value;
-            if (comparator === 'unfilled') return !itemValue || [null, undefined].includes(itemValue) ? item : null;
+            if (comparator === 'unfilled') return !itemValue ? item : null;
             if (!itemValue || [null, undefined].includes(itemValue)) return null;
             if (comparator === 'before') return dayjsInstance(itemValue).isBefore(date) ? item : null;
             if (comparator === 'after') return dayjsInstance(itemValue).isAfter(date) ? item : null;
