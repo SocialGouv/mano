@@ -1,3 +1,10 @@
+## [1.229.2](https://github.com/SocialGouv/mano/compare/v1.229.1...v1.229.2) (2023-01-24)
+
+
+### Bug Fixes
+
+* **dashboard:** supprimer la modale qui s'ouvre lors du telechargement de documents dans tous les documents medicaux ([#1243](https://github.com/SocialGouv/mano/issues/1243)) ([7e7c5f2](https://github.com/SocialGouv/mano/commit/7e7c5f2bd9b1988c416963e5f5387d65d837c8df))
+
 ## [1.229.1](https://github.com/SocialGouv/mano/compare/v1.229.0...v1.229.1) (2023-01-24)
 
 
