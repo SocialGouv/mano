@@ -304,8 +304,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
         )}
         {value?.comparator === 'between' && (
           <>
-            {/* we have an input here, just for styling purpose, to have 'et' aligned with number and number2 */}
-            <input className="tailwindui !tw-mt-0 tw-basis-1/12 !tw-border-0 !tw-bg-transparent !tw-shadow-none" disabled defaultValue="et" />
+            <div>et</div>
             <div className="tw-basis-3/12 tw-px-4">
               <input
                 name={name}
