@@ -1,3 +1,10 @@
+# [1.229.0](https://github.com/SocialGouv/mano/compare/v1.228.2...v1.229.0) (2023-01-24)
+
+
+### Features
+
+* **api:** rallongement de la durée du lien d'initialisation du compte et de changement du mot de passe + ajout du lien vers la réinitialisation du mot de passe dans l'email ([#1238](https://github.com/SocialGouv/mano/issues/1238)) ([c8d5d71](https://github.com/SocialGouv/mano/commit/c8d5d71551eb23928ddbb8a0ab53cdbd5519446c))
+
 ## [1.228.2](https://github.com/SocialGouv/mano/compare/v1.228.1...v1.228.2) (2023-01-24)
 
 
