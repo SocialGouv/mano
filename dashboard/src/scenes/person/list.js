@@ -17,7 +17,7 @@ import {
 } from '../../recoil/persons';
 import TagTeam from '../../components/TagTeam';
 import Filters, { filterData } from '../../components/Filters';
-import { dayjsInstance, formatBirthDate, formatDateWithFullMonth } from '../../services/date';
+import { dayjsInstance, formatDateWithFullMonth } from '../../services/date';
 import { personsWithMedicalFileMergedSelector } from '../../recoil/selectors';
 import { currentTeamState, organisationState, userState } from '../../recoil/auth';
 import { placesState } from '../../recoil/places';
@@ -30,24 +30,12 @@ import { customFieldsMedicalFileSelector } from '../../recoil/medicalFiles';
 
 const limit = 20;
 
-const personsPopulatedWithFormattedBirthDateSelector = selector({
-  key: 'personsPopulatedWithFormattedBirthDateSelector',
-  get: ({ get }) => {
-    const persons = get(personsWithMedicalFileMergedSelector);
-    const personsWithBirthdateFormatted = persons.map((person) => ({
-      ...person,
-      formattedBirthDate: formatBirthDate(person.birthdate),
-    }));
-    return personsWithBirthdateFormatted;
-  },
-});
-
 const personsFilteredSelector = selectorFamily({
   key: 'personsFilteredSelector',
   get:
     ({ viewAllOrganisationData, filters, alertness }) =>
     ({ get }) => {
-      const personWithBirthDate = get(personsPopulatedWithFormattedBirthDateSelector);
+      const personWithBirthDate = get(personsWithMedicalFileMergedSelector);
       const currentTeam = get(currentTeamState);
       let pFiltered = personWithBirthDate;
       if (!!filters?.filter((f) => Boolean(f?.value)).length) pFiltered = filterData(pFiltered, filters);

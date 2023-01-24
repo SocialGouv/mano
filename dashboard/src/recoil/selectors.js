@@ -3,7 +3,7 @@ import { personsState } from './persons';
 import { placesState } from './places';
 import { relsPersonPlaceState } from './relPersonPlace';
 import { reportsState } from './reports';
-import { isOnSameDay } from '../services/date';
+import { formatAge, formatBirthDate, isOnSameDay } from '../services/date';
 import { customFieldsObsSelector, territoryObservationsState } from './territoryObservations';
 import { selector, selectorFamily } from 'recoil';
 import { actionsState } from './actions';
@@ -106,7 +106,13 @@ export const itemsGroupedByPersonSelector = selector({
     const user = get(userState);
     const usersObject = get(usersObjectSelector);
     for (const person of persons) {
-      personsObject[person._id] = { ...person, userPopulated: usersObject[person.user], lastUpdateCheckForGDPR: person.updatedAt };
+      personsObject[person._id] = {
+        ...person,
+        userPopulated: usersObject[person.user],
+        lastUpdateCheckForGDPR: person.updatedAt,
+        formattedBirthDate: formatBirthDate(person.birthdate),
+        age: formatAge(person.birthdate),
+      };
     }
     const actions = Object.values(get(actionsWithCommentsSelector));
     const comments = get(commentsState);

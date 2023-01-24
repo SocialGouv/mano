@@ -382,8 +382,8 @@ const Stats = () => {
   const reportsServices = useMemo(() => reports.map((rep) => (rep.services ? JSON.parse(rep.services) : null)).filter(Boolean), [reports]);
   const filterPersonsBase = useRecoilValue(filterPersonsBaseSelector);
   // Add enabled custom fields in filters.
-  const filterPersonsWithAllFields = (withMedicalWiles = false) => [
-    ...(withMedicalWiles ? customFieldsMedicalFile : [])
+  const filterPersonsWithAllFields = (withMedicalFiles = false) => [
+    ...(withMedicalFiles ? customFieldsMedicalFile : [])
       .filter((a) => a.enabled || a.enabledTeams?.includes(currentTeam._id))
       .map((a) => ({ field: a.name, ...a })),
     ...filterPersonsBase.map((f) =>
