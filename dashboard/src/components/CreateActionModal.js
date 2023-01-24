@@ -193,6 +193,8 @@ const CreateActionModal = ({ person = null, persons = null, isMulti = false, com
                         <input
                           className="form-control placeholder:tw-opacity-0"
                           type={values.withTime ? 'datetime-local' : 'date'}
+                          min="1901-01-01"
+                          max="2200-01-01"
                           name="dueAt"
                           defaultValue={values.dueAt ? dayjsInstance(values.dueAt).format('YYYY-MM-DDTHH:mm') : undefined}
                           onBlur={(e) => {
