@@ -1,3 +1,10 @@
+## [1.229.1](https://github.com/SocialGouv/mano/compare/v1.229.0...v1.229.1) (2023-01-24)
+
+
+### Bug Fixes
+
+* **dashboard:** time remaining session ([#1245](https://github.com/SocialGouv/mano/issues/1245)) ([e257e2b](https://github.com/SocialGouv/mano/commit/e257e2b189baadca7992c77083bf91609539d638))
+
 # [1.229.0](https://github.com/SocialGouv/mano/compare/v1.228.2...v1.229.0) (2023-01-24)
 
 
