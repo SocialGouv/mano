@@ -51,9 +51,10 @@ const SessionCountDownLimiter = () => {
 
   return (
     <>
-      <span className={['tw-mt-4', remainingSession < warnBeforeEndOfSession ? 'tw-font-bold tw-text-red-500' : ''].join(' ')}>
-        Temps de session: {timeString}
-      </span>
+      <div className={['tw-mt-4', remainingSession < warnBeforeEndOfSession ? 'tw-font-bold tw-text-red-500' : ''].join(' ')}>
+        <div>Temps de session restant</div>
+        <div>{timeString}</div>
+      </div>
       <button
         onClick={() => setReloadModalOpen(true)}
         className={[
