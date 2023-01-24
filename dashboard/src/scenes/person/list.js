@@ -224,12 +224,12 @@ const List = () => {
             render: (p) => {
               if (p.outOfActiveList)
                 return (
-                  <div className="tw-text-black50">
-                    <div>{p.name}</div>
+                  <div className="tw-text-black50 tw-max-w-md">
+                    <div className="tw-flex tw-break-all">{p.name}</div>
                     <div>Sortie de file active : {p.outOfActiveListReasons?.join(', ')}</div>
                   </div>
                 );
-              return p.name;
+              return <div className="tw-max-w-md tw-flex tw-break-all">{p.name}</div>
             },
           },
           {
