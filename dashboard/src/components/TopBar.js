@@ -98,7 +98,7 @@ const TopBar = () => {
                     return API.logout();
                   })
               }}>
-              Se déconnecter et supprimer toute trace de mon passage
+              Se déconnecter et vider le cache
             </DropdownItem>
           </DropdownMenu>
         </ButtonDropdown>
