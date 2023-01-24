@@ -269,7 +269,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
 
   if (['number'].includes(type)) {
     return (
-      <div className="-tw-mx-4 tw-flex tw-flex-wrap">
+      <div className="-tw-mx-4 tw-flex tw-flex-wrap tw-items-center">
         <div
           className={[
             'tw-px-4',
