@@ -1,3 +1,10 @@
+## [1.228.1](https://github.com/SocialGouv/mano/compare/v1.228.0...v1.228.1) (2023-01-24)
+
+
+### Bug Fixes
+
+* action stats loading ([#1232](https://github.com/SocialGouv/mano/issues/1232)) ([85d2862](https://github.com/SocialGouv/mano/commit/85d286203f96927fab46d5c045c39ee68dae3275))
+
 # [1.228.0](https://github.com/SocialGouv/mano/compare/v1.227.5...v1.228.0) (2023-01-24)
 
 
