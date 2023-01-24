@@ -21,7 +21,7 @@ export async function loginWith(page: Page, email: string, password: string = "s
 
 export async function logOut(page: Page, name: string) {
   await page.getByRole("button", { name }).click();
-  await page.getByRole("menuitem", { name: "Se déconnecter et supprimer toute trace de mon passage" }).click();
+  await page.getByRole("menuitem", { name: "Se déconnecter et vider le cache" }).click();
   await expect(page).toHaveURL("http://localhost:8090/auth");
 }
 
