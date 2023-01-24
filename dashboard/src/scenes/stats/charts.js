@@ -12,37 +12,44 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
   };
 
   return (
-    <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-flex-wrap tw-items-center tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
-      <div className="tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center ">
+    <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-break-inside-avoid tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
+      <div
+        className={[
+          'tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center',
+          data.length > 40 ? 'print:!tw-mb-4 print:!tw-mt-0' : '',
+        ].join(' ')}>
         <p className="tw-m-0 tw-inline-block tw-text-center tw-text-lg tw-font-medium tw-text-black">
           {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
         </p>
       </div>
-      <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center">
-        <table className="tw-w-full tw-border tw-border-zinc-400">
+      <div className="tw-flex tw-basis-1/3 tw-items-center tw-justify-center print:tw-max-h-screen">
+        <table
+          className={['tw-w-full tw-border-zinc-400 [&_td]:tw-p-1', data.length > 40 ? 'print:![font-size:14px] [&_td]:print:!tw-p-0' : ''].join(
+            ' '
+          )}>
           <tbody>
             {[...data]
               .sort((a, b) => (a.value < b.value ? 1 : -1))
               .map(({ key, label, value }) => (
                 <tr key={key + label + value} onClick={() => onClick({ id: label })}>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1">{label}</td>
-                  <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{value}</td>
-                  {total ? (
-                    <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center">{`${Math.round((value / total) * 1000) / 10}%`}</td>
-                  ) : (
-                    <></>
-                  )}
+                  <td className="tw-border tw-border-zinc-400">{label}</td>
+                  <td className="tw-border tw-border-zinc-400 tw-text-center">{value}</td>
+                  {total ? <td className="tw-border tw-border-zinc-400 tw-text-center">{`${Math.round((value / total) * 1000) / 10}%`}</td> : <></>}
                 </tr>
               ))}
             <tr>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-font-bold">Total</td>
-              <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">{total}</td>
-              {total ? <td className="tw-border tw-border-zinc-400 tw-p-1 tw-text-center tw-font-bold">100%</td> : <></>}
+              <td className="tw-border tw-border-zinc-400 tw-font-bold">Total</td>
+              <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">{total}</td>
+              {total ? <td className="tw-border tw-border-zinc-400 tw-text-center tw-font-bold">100%</td> : <></>}
             </tr>
           </tbody>
         </table>
       </div>
-      <div className={['tw-h-[30vw] tw-max-w-[66%] tw-basis-2/3 tw-font-bold', !!onItemClick ? '[&_path]:tw-cursor-pointer' : ''].join(' ')}>
+      <div
+        className={[
+          'tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[55%] print:!tw-grow print:!tw-basis-0',
+          !!onItemClick ? '[&_path]:tw-cursor-pointer' : '',
+        ].join(' ')}>
         <ResponsivePie
           data={total ? data : []}
           sortByValue
@@ -51,11 +58,13 @@ export const CustomResponsivePie = ({ data = [], title, onItemClick, help }) => 
           innerRadius={0.5}
           padAngle={0.7}
           cornerRadius={3}
+          startAngle={360}
+          endAngle={0}
           colors={{ scheme: 'set2' }}
           borderWidth={1}
           borderColor={{ from: 'color', modifiers: [['darker', 0.2]] }}
-          arcLinkLabelsSkipAngle={8}
-          arcLabelsSkipAngle={8}
+          arcLinkLabelsSkipAngle={data.length > 20 ? 12 : 8}
+          arcLabelsSkipAngle={data.length > 20 ? 12 : 8}
           enableArcLinkLabels
           onClick={onClick}
           sliceLabelsTextColor="#333333"
@@ -77,8 +86,8 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
   };
 
   return (
-    <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
-      <div className="tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center">
+    <div className="tw-my-4 tw-mx-0 tw-flex tw-w-full tw-break-inside-avoid tw-flex-wrap tw-items-center tw-justify-between tw-rounded-2xl tw-border tw-border-main25 tw-bg-white tw-p-4">
+      <div className="avoid tw-relative tw-mt-4 tw-mb-12 tw-flex tw-basis-full tw-justify-center">
         <p className="tw-m-0 tw-inline-block tw-text-center tw-text-lg tw-font-medium tw-text-black">
           {title} {!!help && <HelpButtonAndModal title={title} help={help} />}
         </p>
@@ -103,7 +112,7 @@ export const CustomResponsiveBar = ({ title, data, categories, onItemClick, axis
       </div>
       <div
         className={[
-          'tw-flex tw-h-80 tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold',
+          'tw-flex tw-h-80 tw-max-w-[50%] tw-basis-1/2 tw-items-center tw-justify-center tw-font-bold print:tw-w-[600px] print:tw-max-w-[60%] print:!tw-grow print:!tw-basis-0',
           !!onItemClick ? '[&_rect]:tw-cursor-pointer' : '',
         ].join(' ')}>
         <ResponsiveBar

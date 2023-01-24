@@ -21,7 +21,7 @@ import { personsWithMedicalFileMergedSelector, itemsGroupedByPersonSelector } fr
 import { groupsState } from '../../recoil/groups';
 import { dayjsInstance, getIsDayWithinHoursOffsetOfPeriod } from '../../services/date';
 import useTitle from '../../services/useTitle';
-import DateRangePickerWithPresets from '../../components/DateRangePickerWithPresets';
+import DateRangePickerWithPresets, { formatPeriod } from '../../components/DateRangePickerWithPresets';
 import { useDataLoader } from '../../components/DataLoader';
 import { HeaderStyled, RefreshButton, Title as HeaderTitle } from '../../components/header';
 import Loading from '../../components/loading';
@@ -117,6 +117,7 @@ const Stats = () => {
   ]);
   const [viewAllOrganisationData, setViewAllOrganisationData] = useLocalStorage('stats-viewAllOrganisationData', teams.length === 1);
   const [period, setPeriod] = useLocalStorage('period', { startDate: null, endDate: null });
+  const [preset, setPreset] = useLocalStorage('stats-date-preset', null);
   const [actionsStatuses, setActionsStatuses] = useLocalStorage('stats-actionsStatuses', DONE);
   const [selectedTeams, setSelectedTeams] = useLocalStorage('stats-teams', [currentTeam]);
   const [actionsCategoriesGroups, setActionsCategoriesGroups] = useLocalStorage('stats-catGroups', []);
@@ -402,8 +403,19 @@ const Stats = () => {
 
   return (
     <>
-      <HeaderStyled className="!tw-py-4 tw-px-0">
-        <div className="tw-flex tw-grow">
+      <HeaderStyled className=" !tw-py-4 tw-px-0">
+        <div className="printonly tw-py-4 tw-px-8 tw-text-2xl tw-font-bold" aria-hidden>
+          Statistiques{' '}
+          {viewAllOrganisationData ? (
+            <>globales</>
+          ) : (
+            <>
+              {selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"} {selectedTeams.map((t) => t.name).join(', ')}
+            </>
+          )}{' '}
+          - {formatPeriod({ period, preset })}
+        </div>
+        <div className="noprint tw-flex tw-grow">
           <HeaderTitle className="tw-w-64 tw-font-normal">
             <span>Statistiques {viewAllOrganisationData ? <>globales</> : <>{selectedTeams.length > 1 ? 'des équipes' : "de l'équipe"}</>}</span>
           </HeaderTitle>
@@ -432,9 +444,9 @@ const Stats = () => {
           </div>
         </div>
       </HeaderStyled>
-      <div className="date-picker-container tw-mb-5 tw-flex tw-flex-wrap tw-items-center">
+      <div className="noprint date-picker-container tw-mb-5 tw-flex tw-flex-wrap tw-items-center">
         <div className="tw-min-w-[15rem] tw-shrink-0 tw-basis-1/3 tw-p-0">
-          <DateRangePickerWithPresets period={period} setPeriod={setPeriod} />
+          <DateRangePickerWithPresets period={period} setPeriod={setPeriod} preset={preset} setPreset={setPreset} />
         </div>
         <div className="tw-flex tw-basis-2/3 tw-justify-end">
           <RefreshButton />
@@ -445,7 +457,7 @@ const Stats = () => {
           />
         </div>
       </div>
-      <ul className="tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
+      <ul className="noprint tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
         {tabs
           .filter(
             (e) =>
@@ -470,7 +482,7 @@ const Stats = () => {
             );
           })}
       </ul>
-      <div>
+      <div className="print:tw-flex print:tw-flex-col print:tw-px-8 print:tw-py-4">
         {activeTab === 'Général' && (
           <GeneralStats
             personsForStats={personsForStats}
@@ -584,6 +596,8 @@ const Stats = () => {
           </>
         )}
       </div>
+      {/* HACK: this last div is because Chrome crop the end of the page - I didn't find any better solution */}
+      <div className="printonly tw-h-screen" aria-hidden />
     </>
   );
 };

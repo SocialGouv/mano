@@ -140,6 +140,24 @@ table.table-selego {
   }
 }
 
+/* react-datepicker */
+
+.stats-datepicker .react-datepicker {
+  @apply tw-rounded-none tw-border-0 tw-border-l tw-border-gray-300;
+}
+.stats-datepicker .react-datepicker__day--outside-month {
+  @apply tw-opacity-30;
+}
+.stats-datepicker .react-datepicker__day--in-range,
+.stats-datepicker .react-datepicker__day--selected,
+.stats-datepicker .react-datepicker__day--keyboard-selected,
+.stats-datepicker .react-datepicker__day--in-selecting-range {
+  @apply tw-bg-main;
+}
+.stats-datepicker .react-datepicker__navigation-icon {
+  @apply tw-text-[10px];
+}
+
 /* reset */
 
 * {
@@ -317,6 +335,7 @@ hr {
   @page {
     margin: 1cm;
     margin-top: 50px;
+    margin-bottom: 30mm !important;
   }
 }
 @media screen {
