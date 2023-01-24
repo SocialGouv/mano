@@ -14,7 +14,7 @@ import ScrollContainer from '../../components/ScrollContainer';
 import Spacer from '../../components/Spacer';
 import Tags from '../../components/Tags';
 import { CANCEL, DONE } from '../../recoil/actions';
-import { currentTeamState } from '../../recoil/auth';
+import { currentTeamState, organisationState } from '../../recoil/auth';
 import { prepareReportForEncryption, reportsState } from '../../recoil/reports';
 import API from '../../services/api';
 import colors from '../../utils/colors';
@@ -79,6 +79,7 @@ const Report = ({ navigation, route }) => {
   const actionsCanceled = useRecoilValue(actionsCompletedOrCanceledForReport({ date: day, status: CANCEL }));
   const comments = useRecoilValue(commentsForReport({ date: day }));
   const observations = useRecoilValue(observationsForReport({ date: day }));
+  const organisation = useRecoilValue(organisationState);
 
   const isFocused = useIsFocused();
   const createReportAtDateIfNotExist = useCreateReportAtDateIfNotExist();
@@ -260,13 +261,18 @@ const Report = ({ navigation, route }) => {
           onPress={() => navigation.navigate('CommentsForReport', { date: reportDB?.date })}
           disabled={!comments.length}
         />
+        {!!organisation.territoriesEnabled && (
+          <>
+            <Spacer height={30} />
+            <Row
+              withNextButton
+              caption={`Observations (${observations.length})`}
+              onPress={() => navigation.navigate('Observations', { date: reportDB?.date })}
+              disabled={!observations.length}
+            />
+          </>
+        )}
         <Spacer height={30} />
-        <Row
-          withNextButton
-          caption={`Observations (${observations.length})`}
-          onPress={() => navigation.navigate('Observations', { date: reportDB?.date })}
-          disabled={!observations.length}
-        />
       </ScrollContainer>
     </SceneContainer>
   );
