@@ -1,3 +1,10 @@
+## [1.228.2](https://github.com/SocialGouv/mano/compare/v1.228.1...v1.228.2) (2023-01-24)
+
+
+### Bug Fixes
+
+* **dashboard:** couper les mots trop longs depuis la modal de suppression ([#1236](https://github.com/SocialGouv/mano/issues/1236)) ([bba2d72](https://github.com/SocialGouv/mano/commit/bba2d72f52511fd5dc9603622181dce78b7f1e81))
+
 ## [1.228.1](https://github.com/SocialGouv/mano/compare/v1.228.0...v1.228.1) (2023-01-24)
 
 
