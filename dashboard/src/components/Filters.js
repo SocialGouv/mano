@@ -12,7 +12,7 @@ export const filterData = (data, filters, returnWholeArray = false) => {
           const itemValue = item[filter.field];
           if (['number'].includes(filter.type)) {
             const { number, number2, comparator } = filter.value;
-            if (comparator === 'unfilled') return !itemValue || [null, undefined].includes(itemValue) ? item : null;
+            if (comparator === 'unfilled') return !itemValue ? item : null;
             if (!itemValue || [null, undefined].includes(itemValue)) return null;
             if (comparator === 'between') {
               if (Number(number) < Number(number2)) {
