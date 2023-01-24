@@ -1,3 +1,10 @@
+## [1.229.3](https://github.com/SocialGouv/mano/compare/v1.229.2...v1.229.3) (2023-01-24)
+
+
+### Bug Fixes
+
+* **dashboard:** nom trop long qui dépassait dans la modale de sortie de file active ([#1241](https://github.com/SocialGouv/mano/issues/1241)) ([23b83d8](https://github.com/SocialGouv/mano/commit/23b83d8593c033451c56bcd9de1cef3ac794a291))
+
 ## [1.229.2](https://github.com/SocialGouv/mano/compare/v1.229.1...v1.229.2) (2023-01-24)
 
 
