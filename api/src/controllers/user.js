@@ -252,7 +252,7 @@ router.post(
 
     const token = crypto.randomBytes(20).toString("hex");
     user.forgotPasswordResetToken = token;
-    user.forgotPasswordResetExpires = new Date(Date.now() + JWT_MAX_AGE * 1000);
+    user.forgotPasswordResetExpires = new Date(Date.now() + 60 * 60 * 24 * 30 * 1000); // 30 days
 
     const link = `https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}`;
 
@@ -329,7 +329,7 @@ router.post(
       password: crypto.randomBytes(60).toString("hex"), // A useless password.
       organisation: req.user.organisation,
       forgotPasswordResetToken: token,
-      forgotPasswordResetExpires: new Date(Date.now() + JWT_MAX_AGE * 1000),
+      forgotPasswordResetExpires: new Date(Date.now() + 60 * 60 * 24 * 30 * 1000), // 30 days
     };
 
     const prevUser = await User.findOne({ where: { email: newUser.email } });
@@ -353,6 +353,7 @@ router.post(
 Votre identifiant pour vous connecter à Mano est ${data.email}.
 Vous pouvez dès à présent vous connecter pour choisir votre mot de passe ici:
 https://dashboard-mano.fabrique.social.gouv.fr/auth/reset?token=${token}
+NOTE: si le lien ci-dessus est expiré, vous pouvez demander une nouvelle réinitialisation de mot de passe ici: https://dashboard-mano.fabrique.social.gouv.fr
 
 Vous pourrez ensuite commencer à utiliser Mano en suivant ce lien:
 https://dashboard-mano.fabrique.social.gouv.fr/

@@ -131,7 +131,7 @@ router.post(
         role: "admin",
         organisation: organisation._id,
         forgotPasswordResetToken: token,
-        forgotPasswordResetExpires: new Date(Date.now() + JWT_MAX_AGE * 1000),
+        forgotPasswordResetExpires: new Date(Date.now() + 60 * 60 * 24 * 30 * 1000), // 30 days
       },
       { returning: true }
     );
