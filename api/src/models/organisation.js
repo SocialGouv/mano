@@ -20,6 +20,7 @@ Organisation.init(
     encryptedVerificationKey: DataTypes.TEXT,
     encrypting: { type: DataTypes.BOOLEAN, default: false },
     receptionEnabled: { type: DataTypes.BOOLEAN },
+    territoriesEnabled: { type: DataTypes.BOOLEAN },
     groupsEnabled: { type: DataTypes.BOOLEAN },
     groupedServices: {
       type: DataTypes.JSONB,

@@ -301,6 +301,7 @@ const View = () => {
                     <>
                       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Accueil de jour</h3>
                       <div className="tw-flex tw-flex-col">
+                        <h4 className="tw-my-8">Activer l'accueil de jour</h4>
                         <FormGroup>
                           <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
                             <input
@@ -311,7 +312,10 @@ const View = () => {
                               checked={values.receptionEnabled || false}
                               onChange={handleChange}
                             />
-                            <label htmlFor="receptionEnabled">Activer l'accueil de jour</label>
+                            <label htmlFor="receptionEnabled">
+                              Activer l'accueil de jour, pour pouvoir enregistrer les services proposés par votre oranisation. Un menu "Accueil"
+                              apparaîtra sur la barre de navigation latérale.
+                            </label>
                           </div>
                         </FormGroup>
                         <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
@@ -331,6 +335,32 @@ const View = () => {
                   return (
                     <>
                       <h3 className="tw-my-10 tw-flex tw-justify-between tw-text-xl tw-font-extrabold">Territoires</h3>
+                      <h4 className="tw-my-8">Activer les territoires</h4>
+                      <FormGroup>
+                        <div className="tw-ml-5 tw-flex tw-w-4/5 tw-items-baseline">
+                          <input
+                            type="checkbox"
+                            className="tw-mr-2"
+                            name="territoriesEnabled"
+                            id="territoriesEnabled"
+                            checked={values.territoriesEnabled || false}
+                            onChange={handleChange}
+                          />
+                          <label htmlFor="territoriesEnabled">
+                            Activer les territoires, pour pouvoir enregistrer des observations liées à ces territoires. Un menu "Territoires"
+                            apparaîtra sur la barre de navigation latérale, et sur l'application mobile.
+                          </label>
+                        </div>
+                      </FormGroup>
+                      <div className="tw-mb-10 tw-flex tw-justify-end tw-gap-4">
+                        <ButtonCustom
+                          title={'Mettre à jour'}
+                          disabled={values.territoriesEnabled === organisation.territoriesEnabled}
+                          loading={isSubmitting}
+                          onClick={handleSubmit}
+                        />
+                      </div>
+                      <hr />
                       {organisation.encryptionEnabled ? (
                         <>
                           <Label>Champs personnalisés</Label>
@@ -409,6 +439,7 @@ const View = () => {
                               onClick={handleSubmit}
                             />
                           </div>
+                          <hr />
                           <h4 className="tw-my-8">Champs permanents - options modulables</h4>
                           <TableCustomFields
                             customFields="fieldsPersonsCustomizableOptions"
@@ -418,6 +449,7 @@ const View = () => {
                             onlyOptionsEditable
                             onEditChoice={onEditPersonsCustomInputChoice('fieldsPersonsCustomizableOptions')}
                           />
+                          <hr />
                           <h4 className="tw-my-8">Champs personnalisés - informations sociales</h4>
                           <TableCustomFields
                             customFields="customFieldsPersonsSocial"
@@ -426,6 +458,7 @@ const View = () => {
                             fields={customFieldsPersonsSocial}
                             onEditChoice={onEditPersonsCustomInputChoice('customFieldsPersonsSocial')}
                           />
+                          <hr />
                           <h4 className="tw-my-8">Champs personnalisés - informations médicales</h4>
                           <TableCustomFields
                             customFields="customFieldsPersonsMedical"

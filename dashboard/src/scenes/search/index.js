@@ -166,6 +166,7 @@ const View = () => {
   }, [search, allActions]);
 
   const persons = useRecoilValue(personsFilteredBySearchForSearchSelector({ search }));
+  const organisation = useRecoilValue(organisationState);
   const comments = useRecoilValue(commentsFilteredBySearchSelector({ search }));
 
   const places = useMemo(() => {
@@ -186,27 +187,34 @@ const View = () => {
     return (
       <>
         <ul className="tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-justify-evenly tw-border-b tw-border-zinc-200 tw-pl-0">
-          {tabsContents.map((tabCaption, index) => {
-            return (
-              <li key={index} className="tw-grow tw-cursor-pointer">
-                <button
-                  key={tabCaption}
-                  className={[
-                    '-tw-mb-px tw-block tw-w-full tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
-                    activeTab !== tabCaption && 'tw-text-main75',
-                    activeTab === tabCaption && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
-                  ].join(' ')}
-                  onClick={() => setActiveTab(tabCaption)}>
-                  {tabCaption === 'Actions' && `Actions (${actions.length})`}
-                  {tabCaption === 'Personnes' && `Personnes (${persons.length})`}
-                  {tabCaption === 'Commentaires' && `Commentaires (${comments.length})`}
-                  {tabCaption === 'Lieux' && `Lieux (${places.length})`}
-                  {tabCaption === 'Territoires' && `Territoires (${territories.length})`}
-                  {tabCaption === 'Observations' && `Observations (${observations.length})`}
-                </button>
-              </li>
-            );
-          })}
+          {tabsContents
+            .filter((tabCaption) => {
+              if (['Observations', 'Territoires'].includes(tabCaption)) {
+                return !!organisation.territoriesEnabled;
+              }
+              return true;
+            })
+            .map((tabCaption, index) => {
+              return (
+                <li key={index} className="tw-grow tw-cursor-pointer">
+                  <button
+                    key={tabCaption}
+                    className={[
+                      '-tw-mb-px tw-block tw-w-full tw-rounded-t-md tw-border tw-border-transparent tw-py-2 tw-px-4',
+                      activeTab !== tabCaption && 'tw-text-main75',
+                      activeTab === tabCaption && 'tw-border-x-zinc-200 tw-border-t-zinc-200 tw-bg-white',
+                    ].join(' ')}
+                    onClick={() => setActiveTab(tabCaption)}>
+                    {tabCaption === 'Actions' && `Actions (${actions.length})`}
+                    {tabCaption === 'Personnes' && `Personnes (${persons.length})`}
+                    {tabCaption === 'Commentaires' && `Commentaires (${comments.length})`}
+                    {tabCaption === 'Lieux' && `Lieux (${places.length})`}
+                    {tabCaption === 'Territoires' && `Territoires (${territories.length})`}
+                    {tabCaption === 'Observations' && `Observations (${observations.length})`}
+                  </button>
+                </li>
+              );
+            })}
         </ul>
         <div className="[&_table]:!tw-p0 tw-w-full tw-rounded-lg tw-bg-white tw-py-4 tw-px-8 print:tw-mb-4 [&_.title]:!tw-pb-5">
           {activeTab === 'Actions' && <Actions actions={actions} />}

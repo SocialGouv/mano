@@ -447,13 +447,19 @@ const Stats = () => {
       </div>
       <ul className="tw-mb-5 tw-flex tw-list-none tw-flex-wrap tw-border-b tw-border-zinc-200 tw-pl-0">
         {tabs
-          .filter(
-            (e) =>
-              user.healthcareProfessional ||
-              !['Consultations', 'Dossiers médicaux des personnes créées', 'Dossiers médicaux des personnes suivies'].includes(e)
-          )
+          .filter((tabCaption) => {
+            if (['Consultations', 'Dossiers médicaux des personnes créées', 'Dossiers médicaux des personnes suivies'].includes(tabCaption)) {
+              return !!user.healthcareProfessional;
+            }
+            if (['Observations'].includes(tabCaption)) {
+              return !!organisation.territoriesEnabled;
+            }
+            if (['Accueil'].includes(tabCaption)) {
+              return !!organisation.receptionEnabled;
+            }
+            return true;
+          })
           .map((tabCaption, index) => {
-            if (!organisation.receptionEnabled && tabCaption === 'Accueil') return null;
             return (
               <li key={index} className="tw-cursor-pointer">
                 <button
