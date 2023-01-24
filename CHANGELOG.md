@@ -1,3 +1,10 @@
+# [1.228.0](https://github.com/SocialGouv/mano/compare/v1.227.5...v1.228.0) (2023-01-24)
+
+
+### Features
+
+* **dashboard:** filtre sur les âges + filtres de nombres "entre x et y" ([#1227](https://github.com/SocialGouv/mano/issues/1227)) ([e8254e5](https://github.com/SocialGouv/mano/commit/e8254e5250b959be0ca28b18aeac069b9a3d997e))
+
 ## [1.227.5](https://github.com/SocialGouv/mano/compare/v1.227.4...v1.227.5) (2023-01-23)
 
 
