@@ -1,3 +1,10 @@
+# [1.230.0](https://github.com/SocialGouv/mano/compare/v1.229.5...v1.230.0) (2023-01-24)
+
+
+### Features
+
+* **dashboard:** possibilité d'imprimer les statistiques ([#1244](https://github.com/SocialGouv/mano/issues/1244)) ([5527a18](https://github.com/SocialGouv/mano/commit/5527a18889a104cc82753a1e636d0ad683f5d853))
+
 ## [1.229.5](https://github.com/SocialGouv/mano/compare/v1.229.4...v1.229.5) (2023-01-24)
 
 
