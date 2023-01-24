@@ -54,7 +54,7 @@ const Menu = ({ navigation }) => {
         <Spacer height={30} />
         <Row caption="Se déconnecter" color="#F00" loading={isLoggingOut} Component={TouchableWithoutFeedback} onPress={() => onLogoutRequest()} />
         <Row
-          caption="Se déconnecter et supprimer toute trace de mon passage"
+          caption="Se déconnecter et vider le cache"
           color="#F00"
           loading={isLoggingOut}
           Component={TouchableWithoutFeedback}
