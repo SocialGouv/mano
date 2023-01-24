@@ -43,8 +43,8 @@ const DeleteButtonAndConfirmModal = ({
             en respectant les majuscules, minuscules ou accents
             <br />
           </p>
-          <p style={{ marginBottom: 30, display: 'block', width: '100%', textAlign: 'center' }}>
-            <b style={{ color: theme.redDark }}>{textToConfirm}</b>
+          <p className="tw-flex tw-break-all tw-justify-center tw-text-center">
+            <b style={{color: theme.redDark}}>{textToConfirm}</b>
           </p>
           <Formik
             initialValues={{ textToConfirm: '' }}
@@ -90,6 +90,7 @@ const StyledModal = styled(Modal)`
     width: 100%;
     flex-grow: 1;
     padding: auto;
+    overflow-wrap: break-word;
   }
 `;
 
