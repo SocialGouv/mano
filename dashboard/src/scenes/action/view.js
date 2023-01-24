@@ -265,8 +265,7 @@ const ActionView = () => {
                         className="tw-mr-2"
                         checked={values.withTime || false}
                         onChange={() => {
-                          const withTime = !values.withTime;
-                          handleChange({ target: { name: 'withTime', checked: withTime, value: withTime } });
+                          handleChange({ target: { name: 'withTime', checked: Boolean(!values.withTime), value: Boolean(!values.withTime) } });
                         }}
                       />
                       <label htmlFor="withTime">Montrer l'heure</label>
