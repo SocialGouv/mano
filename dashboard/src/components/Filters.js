@@ -294,6 +294,7 @@ const ValueSelector = ({ field, filterValues, value, onChangeValue, base }) => {
               name={name}
               className="tailwindui !tw-mt-0"
               type="number"
+              min="0"
               value={value?.number || ''}
               onChange={(e) => {
                 onChangeValue({ number: e.target.value, number2: value?.number2, comparator });
